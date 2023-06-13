@@ -38,7 +38,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.RoleConstants;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -52,26 +52,25 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
+
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -207,19 +206,10 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 
 		DataRecordCollection getDataRecordCollection =
 			dataRecordCollectionResource.getDataDefinitionDataRecordCollection(
-				testGetDataDefinitionDataRecordCollection_getDataDefinitionId(
-					postDataRecordCollection));
+				postDataRecordCollection.getDataDefinitionId());
 
 		assertEquals(postDataRecordCollection, getDataRecordCollection);
 		assertValid(getDataRecordCollection);
-	}
-
-	protected Long
-			testGetDataDefinitionDataRecordCollection_getDataDefinitionId(
-				DataRecordCollection dataRecordCollection)
-		throws Exception {
-
-		return dataRecordCollection.getDataDefinitionId();
 	}
 
 	protected DataRecordCollection
@@ -235,7 +225,7 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 		throws Exception {
 
 		DataRecordCollection dataRecordCollection =
-			testGraphQLGetDataDefinitionDataRecordCollection_addDataRecordCollection();
+			testGraphQLDataRecordCollection_addDataRecordCollection();
 
 		Assert.assertTrue(
 			equals(
@@ -249,21 +239,13 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 									{
 										put(
 											"dataDefinitionId",
-											testGraphQLGetDataDefinitionDataRecordCollection_getDataDefinitionId(
-												dataRecordCollection));
+											dataRecordCollection.
+												getDataDefinitionId());
 									}
 								},
 								getGraphQLFields())),
 						"JSONObject/data",
 						"Object/dataDefinitionDataRecordCollection"))));
-	}
-
-	protected Long
-			testGraphQLGetDataDefinitionDataRecordCollection_getDataDefinitionId(
-				DataRecordCollection dataRecordCollection)
-		throws Exception {
-
-		return dataRecordCollection.getDataDefinitionId();
 	}
 
 	@Test
@@ -288,13 +270,6 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 						getGraphQLFields())),
 				"JSONArray/errors", "Object/0", "JSONObject/extensions",
 				"Object/code"));
-	}
-
-	protected DataRecordCollection
-			testGraphQLGetDataDefinitionDataRecordCollection_addDataRecordCollection()
-		throws Exception {
-
-		return testGraphQLDataRecordCollection_addDataRecordCollection();
 	}
 
 	@Test
@@ -330,10 +305,7 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantDataRecordCollection),
 				(List<DataRecordCollection>)page.getItems());
-			assertValid(
-				page,
-				testGetDataDefinitionDataRecordCollectionsPage_getExpectedActions(
-					irrelevantDataDefinitionId));
+			assertValid(page);
 		}
 
 		DataRecordCollection dataRecordCollection1 =
@@ -354,36 +326,13 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(dataRecordCollection1, dataRecordCollection2),
 			(List<DataRecordCollection>)page.getItems());
-		assertValid(
-			page,
-			testGetDataDefinitionDataRecordCollectionsPage_getExpectedActions(
-				dataDefinitionId));
+		assertValid(page);
 
 		dataRecordCollectionResource.deleteDataRecordCollection(
 			dataRecordCollection1.getId());
 
 		dataRecordCollectionResource.deleteDataRecordCollection(
 			dataRecordCollection2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetDataDefinitionDataRecordCollectionsPage_getExpectedActions(
-				Long dataDefinitionId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		Map createBatchAction = new HashMap<>();
-		createBatchAction.put("method", "POST");
-		createBatchAction.put(
-			"href",
-			"http://localhost:8080/o/data-engine/v2.0/data-definitions/{dataDefinitionId}/data-record-collections/batch".
-				replace(
-					"{dataDefinitionId}", String.valueOf(dataDefinitionId)));
-
-		expectedActions.put("createBatch", createBatchAction);
-
-		return expectedActions;
 	}
 
 	@Test
@@ -526,7 +475,7 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 	@Test
 	public void testGraphQLDeleteDataRecordCollection() throws Exception {
 		DataRecordCollection dataRecordCollection =
-			testGraphQLDeleteDataRecordCollection_addDataRecordCollection();
+			testGraphQLDataRecordCollection_addDataRecordCollection();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -541,6 +490,7 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteDataRecordCollection"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -556,13 +506,6 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected DataRecordCollection
-			testGraphQLDeleteDataRecordCollection_addDataRecordCollection()
-		throws Exception {
-
-		return testGraphQLDataRecordCollection_addDataRecordCollection();
 	}
 
 	@Test
@@ -589,7 +532,7 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 	@Test
 	public void testGraphQLGetDataRecordCollection() throws Exception {
 		DataRecordCollection dataRecordCollection =
-			testGraphQLGetDataRecordCollection_addDataRecordCollection();
+			testGraphQLDataRecordCollection_addDataRecordCollection();
 
 		Assert.assertTrue(
 			equals(
@@ -630,13 +573,6 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 						getGraphQLFields())),
 				"JSONArray/errors", "Object/0", "JSONObject/extensions",
 				"Object/code"));
-	}
-
-	protected DataRecordCollection
-			testGraphQLGetDataRecordCollection_addDataRecordCollection()
-		throws Exception {
-
-		return testGraphQLDataRecordCollection_addDataRecordCollection();
 	}
 
 	@Test
@@ -754,20 +690,11 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 		DataRecordCollection getDataRecordCollection =
 			dataRecordCollectionResource.
 				getSiteDataRecordCollectionByDataRecordCollectionKey(
-					testGetSiteDataRecordCollectionByDataRecordCollectionKey_getSiteId(
-						postDataRecordCollection),
+					postDataRecordCollection.getSiteId(),
 					postDataRecordCollection.getDataRecordCollectionKey());
 
 		assertEquals(postDataRecordCollection, getDataRecordCollection);
 		assertValid(getDataRecordCollection);
-	}
-
-	protected Long
-			testGetSiteDataRecordCollectionByDataRecordCollectionKey_getSiteId(
-				DataRecordCollection dataRecordCollection)
-		throws Exception {
-
-		return dataRecordCollection.getSiteId();
 	}
 
 	protected DataRecordCollection
@@ -783,7 +710,7 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 		throws Exception {
 
 		DataRecordCollection dataRecordCollection =
-			testGraphQLGetSiteDataRecordCollectionByDataRecordCollectionKey_addDataRecordCollection();
+			testGraphQLDataRecordCollection_addDataRecordCollection();
 
 		Assert.assertTrue(
 			equals(
@@ -798,10 +725,8 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 										put(
 											"siteKey",
 											"\"" +
-												testGraphQLGetSiteDataRecordCollectionByDataRecordCollectionKey_getSiteId(
-													dataRecordCollection) +
-														"\"");
-
+												dataRecordCollection.
+													getSiteId() + "\"");
 										put(
 											"dataRecordCollectionKey",
 											"\"" +
@@ -813,14 +738,6 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 								getGraphQLFields())),
 						"JSONObject/data",
 						"Object/dataRecordCollectionByDataRecordCollectionKey"))));
-	}
-
-	protected Long
-			testGraphQLGetSiteDataRecordCollectionByDataRecordCollectionKey_getSiteId(
-				DataRecordCollection dataRecordCollection)
-		throws Exception {
-
-		return dataRecordCollection.getSiteId();
 	}
 
 	@Test
@@ -849,13 +766,6 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 						getGraphQLFields())),
 				"JSONArray/errors", "Object/0", "JSONObject/extensions",
 				"Object/code"));
-	}
-
-	protected DataRecordCollection
-			testGraphQLGetSiteDataRecordCollectionByDataRecordCollectionKey_addDataRecordCollection()
-		throws Exception {
-
-		return testGraphQLDataRecordCollection_addDataRecordCollection();
 	}
 
 	protected DataRecordCollection
@@ -1009,13 +919,6 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 	}
 
 	protected void assertValid(Page<DataRecordCollection> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<DataRecordCollection> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<DataRecordCollection> dataRecordCollections =
@@ -1031,20 +934,6 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1219,16 +1108,14 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1245,10 +1132,6 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1258,18 +1141,18 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1399,115 +1282,6 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -1582,6 +1356,18 @@ public abstract class BaseDataRecordCollectionResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseDataRecordCollectionResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

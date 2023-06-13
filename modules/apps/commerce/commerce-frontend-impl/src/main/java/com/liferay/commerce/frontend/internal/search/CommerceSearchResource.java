@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.liferay.commerce.account.constants.CommerceAccountConstants;
 import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.util.CommerceAccountHelper;
+import com.liferay.commerce.constants.CommerceWebKeys;
 import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.context.CommerceContextFactory;
 import com.liferay.commerce.frontend.internal.account.CommerceAccountResource;
@@ -39,6 +40,7 @@ import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
 import com.liferay.commerce.service.CommerceOrderService;
+import com.liferay.commerce.util.CommerceUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -100,16 +102,9 @@ public class CommerceSearchResource {
 		try {
 			Layout layout = _layoutLocalService.getLayout(plid);
 
+			themeDisplay.setScopeGroupId(layout.getGroupId());
 			themeDisplay.setLayout(layout);
 			themeDisplay.setLayoutSet(layout.getLayoutSet());
-			themeDisplay.setScopeGroupId(layout.getGroupId());
-
-			CommerceAccount commerceAccount =
-				_commerceAccountHelper.getCurrentCommerceAccount(
-					_commerceChannelLocalService.
-						getCommerceChannelGroupIdBySiteGroupId(
-							themeDisplay.getScopeGroupId()),
-					httpServletRequest);
 
 			List<SearchItemModel> searchItemModels = new ArrayList<>();
 
@@ -121,6 +116,14 @@ public class CommerceSearchResource {
 			if (themeDisplay.isSignedIn()) {
 				searchItemModels.addAll(
 					searchAccounts(queryString, themeDisplay));
+
+				CommerceAccount commerceAccount =
+					_commerceAccountHelper.getCurrentCommerceAccount(
+						_commerceChannelLocalService.
+							getCommerceChannelGroupIdBySiteGroupId(
+								themeDisplay.getScopeGroupId()),
+						httpServletRequest);
+
 				searchItemModels.addAll(
 					searchOrders(queryString, themeDisplay, commerceAccount));
 			}
@@ -184,7 +187,6 @@ public class CommerceSearchResource {
 				"item", account.getName());
 
 			searchItemModel.setImage(account.getThumbnail());
-
 			searchItemModel.setUrl(
 				_getAccountManagementPortletEditURL(
 					GetterUtil.getLong(account.getAccountId()), themeDisplay));
@@ -374,6 +376,15 @@ public class CommerceSearchResource {
 		SearchItemModel searchItemModel = new SearchItemModel(
 			"item", HtmlUtil.escape(cpCatalogEntry.getName()));
 
+		HttpServletRequest httpServletRequest = themeDisplay.getRequest();
+
+		searchItemModel.setImage(
+			_cpDefinitionHelper.getDefaultImageFileURL(
+				CommerceUtil.getCommerceAccountId(
+					(CommerceContext)httpServletRequest.getAttribute(
+						CommerceWebKeys.COMMERCE_CONTEXT)),
+				cpCatalogEntry.getCPDefinitionId()));
+
 		String subtitle = cpCatalogEntry.getShortDescription();
 
 		if (Validator.isNull(subtitle)) {
@@ -381,8 +392,6 @@ public class CommerceSearchResource {
 		}
 
 		searchItemModel.setSubtitle(subtitle);
-
-		searchItemModel.setImage(cpCatalogEntry.getDefaultImageFileUrl());
 
 		String url = _cpDefinitionHelper.getFriendlyURL(
 			cpCatalogEntry.getCPDefinitionId(), themeDisplay);

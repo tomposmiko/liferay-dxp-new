@@ -23,11 +23,13 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Alec Sloan
@@ -49,31 +51,29 @@ public class CPDAvailabilityEstimateUpgradeProcess
 
 		_addIndexes(CPDAvailabilityEstimateModelImpl.TABLE_NAME);
 
-		try (PreparedStatement ps = connection.prepareStatement(
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"update CPDAvailabilityEstimate set CProductId = ? where " +
 					"CPDefinitionId = ?");
 			Statement s = connection.createStatement();
-			ResultSet rs = s.executeQuery(
+			ResultSet resultSet = s.executeQuery(
 				"select distinct CPDefinitionId from " +
 					"CPDAvailabilityEstimate")) {
 
-			while (rs.next()) {
-				long cpDefinitionId = rs.getLong("CPDefinitionId");
+			while (resultSet.next()) {
+				long cpDefinitionId = resultSet.getLong("CPDefinitionId");
 
 				CPDefinition cpDefinition =
 					_cpDefinitionLocalService.getCPDefinition(cpDefinitionId);
 
-				ps.setLong(1, cpDefinition.getCProductId());
+				preparedStatement.setLong(1, cpDefinition.getCProductId());
 
-				ps.setLong(2, cpDefinitionId);
+				preparedStatement.setLong(2, cpDefinitionId);
 
-				ps.execute();
+				preparedStatement.execute();
 			}
 		}
 
-		if (hasIndex("CPDAvailabilityEstimate", "IX_86A2368F")) {
-			runSQL("drop index IX_86A2368F on CPDAvailabilityEstimate");
-		}
+		runSQL("drop index IX_86A2368F on CPDAvailabilityEstimate");
 
 		runSQL(
 			"alter table CPDAvailabilityEstimate drop column CPDefinitionId");
@@ -95,7 +95,7 @@ public class CPDAvailabilityEstimateUpgradeProcess
 						indexMetadata.getIndexName(), tableName));
 			}
 
-			if (!hasIndex(tableName, indexMetadata.getIndexName())) {
+			if (!_tableHasIndex(tableName, indexMetadata.getIndexName())) {
 				runSQL(indexMetadata.getCreateSQL(null));
 			}
 			else if (_log.isInfoEnabled()) {
@@ -105,6 +105,26 @@ public class CPDAvailabilityEstimateUpgradeProcess
 						indexMetadata.getIndexName(), tableName));
 			}
 		}
+	}
+
+	private boolean _tableHasIndex(String tableName, String indexName)
+		throws Exception {
+
+		DatabaseMetaData metadata = connection.getMetaData();
+
+		try (ResultSet resultSet = metadata.getIndexInfo(
+				null, null, tableName, false, false)) {
+
+			while (resultSet.next()) {
+				String curIndexName = resultSet.getString("index_name");
+
+				if (Objects.equals(indexName, curIndexName)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

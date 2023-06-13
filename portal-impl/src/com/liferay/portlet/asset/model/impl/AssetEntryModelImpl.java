@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -92,7 +93,7 @@ public class AssetEntryModelImpl
 		{"visible", Types.BOOLEAN}, {"startDate", Types.TIMESTAMP},
 		{"endDate", Types.TIMESTAMP}, {"publishDate", Types.TIMESTAMP},
 		{"expirationDate", Types.TIMESTAMP}, {"mimeType", Types.VARCHAR},
-		{"title", Types.VARCHAR}, {"description", Types.CLOB},
+		{"title", Types.CLOB}, {"description", Types.CLOB},
 		{"summary", Types.CLOB}, {"url", Types.VARCHAR},
 		{"layoutUuid", Types.VARCHAR}, {"height", Types.INTEGER},
 		{"width", Types.INTEGER}, {"priority", Types.DOUBLE}
@@ -122,7 +123,7 @@ public class AssetEntryModelImpl
 		TABLE_COLUMNS_MAP.put("publishDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("expirationDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("mimeType", Types.VARCHAR);
-		TABLE_COLUMNS_MAP.put("title", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("title", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("description", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("summary", Types.CLOB);
 		TABLE_COLUMNS_MAP.put("url", Types.VARCHAR);
@@ -133,7 +134,7 @@ public class AssetEntryModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table AssetEntry (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,entryId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,classUuid VARCHAR(75) null,classTypeId LONG,listable BOOLEAN,visible BOOLEAN,startDate DATE null,endDate DATE null,publishDate DATE null,expirationDate DATE null,mimeType VARCHAR(75) null,title STRING null,description TEXT null,summary TEXT null,url STRING null,layoutUuid VARCHAR(75) null,height INTEGER,width INTEGER,priority DOUBLE,primary key (entryId, ctCollectionId))";
+		"create table AssetEntry (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,entryId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,classUuid VARCHAR(75) null,classTypeId LONG,listable BOOLEAN,visible BOOLEAN,startDate DATE null,endDate DATE null,publishDate DATE null,expirationDate DATE null,mimeType VARCHAR(75) null,title TEXT null,description TEXT null,summary TEXT null,url STRING null,layoutUuid VARCHAR(75) null,height INTEGER,width INTEGER,priority DOUBLE,primary key (entryId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP = "drop table AssetEntry";
 
@@ -297,26 +298,6 @@ public class AssetEntryModelImpl
 		return models;
 	}
 
-	public static final String MAPPING_TABLE_ASSETENTRIES_ASSETCATEGORIES_NAME =
-		"AssetEntries_AssetCategories";
-
-	public static final Object[][]
-		MAPPING_TABLE_ASSETENTRIES_ASSETCATEGORIES_COLUMNS = {
-			{"companyId", Types.BIGINT}, {"categoryId", Types.BIGINT},
-			{"entryId", Types.BIGINT}
-		};
-
-	public static final String
-		MAPPING_TABLE_ASSETENTRIES_ASSETCATEGORIES_SQL_CREATE =
-			"create table AssetEntries_AssetCategories (companyId LONG not null,categoryId LONG not null,entryId LONG not null,ctCollectionId LONG default 0 not null,ctChangeType BOOLEAN,primary key (categoryId, entryId, ctCollectionId))";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final boolean
-		FINDER_CACHE_ENABLED_ASSETENTRIES_ASSETCATEGORIES = true;
-
 	public static final String MAPPING_TABLE_ASSETENTRIES_ASSETTAGS_NAME =
 		"AssetEntries_AssetTags";
 
@@ -424,130 +405,152 @@ public class AssetEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<AssetEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, AssetEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<AssetEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<AssetEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AssetEntry.class.getClassLoader(), AssetEntry.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", AssetEntry::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", AssetEntry::getCtCollectionId);
-		attributeGetterFunctions.put("entryId", AssetEntry::getEntryId);
-		attributeGetterFunctions.put("groupId", AssetEntry::getGroupId);
-		attributeGetterFunctions.put("companyId", AssetEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", AssetEntry::getUserId);
-		attributeGetterFunctions.put("userName", AssetEntry::getUserName);
-		attributeGetterFunctions.put("createDate", AssetEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", AssetEntry::getModifiedDate);
-		attributeGetterFunctions.put("classNameId", AssetEntry::getClassNameId);
-		attributeGetterFunctions.put("classPK", AssetEntry::getClassPK);
-		attributeGetterFunctions.put("classUuid", AssetEntry::getClassUuid);
-		attributeGetterFunctions.put("classTypeId", AssetEntry::getClassTypeId);
-		attributeGetterFunctions.put("listable", AssetEntry::getListable);
-		attributeGetterFunctions.put("visible", AssetEntry::getVisible);
-		attributeGetterFunctions.put("startDate", AssetEntry::getStartDate);
-		attributeGetterFunctions.put("endDate", AssetEntry::getEndDate);
-		attributeGetterFunctions.put("publishDate", AssetEntry::getPublishDate);
-		attributeGetterFunctions.put(
-			"expirationDate", AssetEntry::getExpirationDate);
-		attributeGetterFunctions.put("mimeType", AssetEntry::getMimeType);
-		attributeGetterFunctions.put("title", AssetEntry::getTitle);
-		attributeGetterFunctions.put("description", AssetEntry::getDescription);
-		attributeGetterFunctions.put("summary", AssetEntry::getSummary);
-		attributeGetterFunctions.put("url", AssetEntry::getUrl);
-		attributeGetterFunctions.put("layoutUuid", AssetEntry::getLayoutUuid);
-		attributeGetterFunctions.put("height", AssetEntry::getHeight);
-		attributeGetterFunctions.put("width", AssetEntry::getWidth);
-		attributeGetterFunctions.put("priority", AssetEntry::getPriority);
+		try {
+			Constructor<AssetEntry> constructor =
+				(Constructor<AssetEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<AssetEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<AssetEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<AssetEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AssetEntry, Object>>();
 		Map<String, BiConsumer<AssetEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<AssetEntry, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", AssetEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AssetEntry, Long>)AssetEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", AssetEntry::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<AssetEntry, Long>)AssetEntry::setCtCollectionId);
+		attributeGetterFunctions.put("entryId", AssetEntry::getEntryId);
 		attributeSetterBiConsumers.put(
 			"entryId", (BiConsumer<AssetEntry, Long>)AssetEntry::setEntryId);
+		attributeGetterFunctions.put("groupId", AssetEntry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<AssetEntry, Long>)AssetEntry::setGroupId);
+		attributeGetterFunctions.put("companyId", AssetEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AssetEntry, Long>)AssetEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", AssetEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<AssetEntry, Long>)AssetEntry::setUserId);
+		attributeGetterFunctions.put("userName", AssetEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<AssetEntry, String>)AssetEntry::setUserName);
+		attributeGetterFunctions.put("createDate", AssetEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<AssetEntry, Date>)AssetEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", AssetEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<AssetEntry, Date>)AssetEntry::setModifiedDate);
+		attributeGetterFunctions.put("classNameId", AssetEntry::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<AssetEntry, Long>)AssetEntry::setClassNameId);
+		attributeGetterFunctions.put("classPK", AssetEntry::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK", (BiConsumer<AssetEntry, Long>)AssetEntry::setClassPK);
+		attributeGetterFunctions.put("classUuid", AssetEntry::getClassUuid);
 		attributeSetterBiConsumers.put(
 			"classUuid",
 			(BiConsumer<AssetEntry, String>)AssetEntry::setClassUuid);
+		attributeGetterFunctions.put("classTypeId", AssetEntry::getClassTypeId);
 		attributeSetterBiConsumers.put(
 			"classTypeId",
 			(BiConsumer<AssetEntry, Long>)AssetEntry::setClassTypeId);
+		attributeGetterFunctions.put("listable", AssetEntry::getListable);
 		attributeSetterBiConsumers.put(
 			"listable",
 			(BiConsumer<AssetEntry, Boolean>)AssetEntry::setListable);
+		attributeGetterFunctions.put("visible", AssetEntry::getVisible);
 		attributeSetterBiConsumers.put(
 			"visible", (BiConsumer<AssetEntry, Boolean>)AssetEntry::setVisible);
+		attributeGetterFunctions.put("startDate", AssetEntry::getStartDate);
 		attributeSetterBiConsumers.put(
 			"startDate",
 			(BiConsumer<AssetEntry, Date>)AssetEntry::setStartDate);
+		attributeGetterFunctions.put("endDate", AssetEntry::getEndDate);
 		attributeSetterBiConsumers.put(
 			"endDate", (BiConsumer<AssetEntry, Date>)AssetEntry::setEndDate);
+		attributeGetterFunctions.put("publishDate", AssetEntry::getPublishDate);
 		attributeSetterBiConsumers.put(
 			"publishDate",
 			(BiConsumer<AssetEntry, Date>)AssetEntry::setPublishDate);
+		attributeGetterFunctions.put(
+			"expirationDate", AssetEntry::getExpirationDate);
 		attributeSetterBiConsumers.put(
 			"expirationDate",
 			(BiConsumer<AssetEntry, Date>)AssetEntry::setExpirationDate);
+		attributeGetterFunctions.put("mimeType", AssetEntry::getMimeType);
 		attributeSetterBiConsumers.put(
 			"mimeType",
 			(BiConsumer<AssetEntry, String>)AssetEntry::setMimeType);
+		attributeGetterFunctions.put("title", AssetEntry::getTitle);
 		attributeSetterBiConsumers.put(
 			"title", (BiConsumer<AssetEntry, String>)AssetEntry::setTitle);
+		attributeGetterFunctions.put("description", AssetEntry::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<AssetEntry, String>)AssetEntry::setDescription);
+		attributeGetterFunctions.put("summary", AssetEntry::getSummary);
 		attributeSetterBiConsumers.put(
 			"summary", (BiConsumer<AssetEntry, String>)AssetEntry::setSummary);
+		attributeGetterFunctions.put("url", AssetEntry::getUrl);
 		attributeSetterBiConsumers.put(
 			"url", (BiConsumer<AssetEntry, String>)AssetEntry::setUrl);
+		attributeGetterFunctions.put("layoutUuid", AssetEntry::getLayoutUuid);
 		attributeSetterBiConsumers.put(
 			"layoutUuid",
 			(BiConsumer<AssetEntry, String>)AssetEntry::setLayoutUuid);
+		attributeGetterFunctions.put("height", AssetEntry::getHeight);
 		attributeSetterBiConsumers.put(
 			"height", (BiConsumer<AssetEntry, Integer>)AssetEntry::setHeight);
+		attributeGetterFunctions.put("width", AssetEntry::getWidth);
 		attributeSetterBiConsumers.put(
 			"width", (BiConsumer<AssetEntry, Integer>)AssetEntry::setWidth);
+		attributeGetterFunctions.put("priority", AssetEntry::getPriority);
 		attributeSetterBiConsumers.put(
 			"priority",
 			(BiConsumer<AssetEntry, Double>)AssetEntry::setPriority);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -1622,6 +1625,62 @@ public class AssetEntryModelImpl
 	}
 
 	@Override
+	public AssetEntry cloneWithOriginalValues() {
+		AssetEntryImpl assetEntryImpl = new AssetEntryImpl();
+
+		assetEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		assetEntryImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		assetEntryImpl.setEntryId(this.<Long>getColumnOriginalValue("entryId"));
+		assetEntryImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		assetEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		assetEntryImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		assetEntryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		assetEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		assetEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		assetEntryImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		assetEntryImpl.setClassPK(this.<Long>getColumnOriginalValue("classPK"));
+		assetEntryImpl.setClassUuid(
+			this.<String>getColumnOriginalValue("classUuid"));
+		assetEntryImpl.setClassTypeId(
+			this.<Long>getColumnOriginalValue("classTypeId"));
+		assetEntryImpl.setListable(
+			this.<Boolean>getColumnOriginalValue("listable"));
+		assetEntryImpl.setVisible(
+			this.<Boolean>getColumnOriginalValue("visible"));
+		assetEntryImpl.setStartDate(
+			this.<Date>getColumnOriginalValue("startDate"));
+		assetEntryImpl.setEndDate(this.<Date>getColumnOriginalValue("endDate"));
+		assetEntryImpl.setPublishDate(
+			this.<Date>getColumnOriginalValue("publishDate"));
+		assetEntryImpl.setExpirationDate(
+			this.<Date>getColumnOriginalValue("expirationDate"));
+		assetEntryImpl.setMimeType(
+			this.<String>getColumnOriginalValue("mimeType"));
+		assetEntryImpl.setTitle(this.<String>getColumnOriginalValue("title"));
+		assetEntryImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		assetEntryImpl.setSummary(
+			this.<String>getColumnOriginalValue("summary"));
+		assetEntryImpl.setUrl(this.<String>getColumnOriginalValue("url"));
+		assetEntryImpl.setLayoutUuid(
+			this.<String>getColumnOriginalValue("layoutUuid"));
+		assetEntryImpl.setHeight(
+			this.<Integer>getColumnOriginalValue("height"));
+		assetEntryImpl.setWidth(this.<Integer>getColumnOriginalValue("width"));
+		assetEntryImpl.setPriority(
+			this.<Double>getColumnOriginalValue("priority"));
+
+		return assetEntryImpl;
+	}
+
+	@Override
 	public int compareTo(AssetEntry assetEntry) {
 		long primaryKey = assetEntry.getPrimaryKey();
 
@@ -1926,9 +1985,7 @@ public class AssetEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AssetEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AssetEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

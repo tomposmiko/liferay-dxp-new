@@ -30,6 +30,10 @@ public class DDMFormInstanceRecordVersionLocalServiceWrapper
 	implements DDMFormInstanceRecordVersionLocalService,
 			   ServiceWrapper<DDMFormInstanceRecordVersionLocalService> {
 
+	public DDMFormInstanceRecordVersionLocalServiceWrapper() {
+		this(null);
+	}
+
 	public DDMFormInstanceRecordVersionLocalServiceWrapper(
 		DDMFormInstanceRecordVersionLocalService
 			ddmFormInstanceRecordVersionLocalService) {
@@ -338,6 +342,14 @@ public class DDMFormInstanceRecordVersionLocalServiceWrapper
 		return _ddmFormInstanceRecordVersionLocalService.
 			getFormInstanceRecordVersions(
 				ddmFormInstanceRecordId, start, end, orderByComparator);
+	}
+
+	@Override
+	public java.util.List<DDMFormInstanceRecordVersion>
+		getFormInstanceRecordVersions(long userId, long formInstanceId) {
+
+		return _ddmFormInstanceRecordVersionLocalService.
+			getFormInstanceRecordVersions(userId, formInstanceId);
 	}
 
 	@Override

@@ -30,6 +30,10 @@ public class LayoutSEOSiteLocalServiceWrapper
 	implements LayoutSEOSiteLocalService,
 			   ServiceWrapper<LayoutSEOSiteLocalService> {
 
+	public LayoutSEOSiteLocalServiceWrapper() {
+		this(null);
+	}
+
 	public LayoutSEOSiteLocalServiceWrapper(
 		LayoutSEOSiteLocalService layoutSEOSiteLocalService) {
 
@@ -104,6 +108,13 @@ public class LayoutSEOSiteLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSEOSiteLocalService.deleteLayoutSEOSite(layoutSEOSiteId);
+	}
+
+	@Override
+	public void deleteLayoutSEOSite(String uuid, long groupId)
+		throws com.liferay.layout.seo.exception.NoSuchSiteException {
+
+		_layoutSEOSiteLocalService.deleteLayoutSEOSite(uuid, groupId);
 	}
 
 	/**

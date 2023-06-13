@@ -45,21 +45,80 @@ public class SearchHitDocumentTranslatorImpl
 
 		if (MapUtil.isNotEmpty(documentSourceMap)) {
 			for (String fieldName : documentSourceMap.keySet()) {
-				_addFieldFromSource(document, fieldName, documentSourceMap);
+				addFieldFromSource(document, fieldName, documentSourceMap);
 			}
 		}
+		else {
+			Map<String, DocumentField> documentFields = searchHit.getFields();
 
-		Map<String, DocumentField> documentFields = searchHit.getFields();
-
-		if (MapUtil.isNotEmpty(documentFields)) {
-			for (String fieldName : documentFields.keySet()) {
-				if (document.getField(fieldName) == null) {
-					_addField(document, fieldName, documentFields);
-				}
+			for (String documentFieldName : documentFields.keySet()) {
+				addField(document, documentFieldName, documentFields);
 			}
 		}
 
 		return document;
+	}
+
+	protected void addField(
+		Document document, String fieldName,
+		Map<String, DocumentField> documentFields) {
+
+		Field field = getField(fieldName, documentFields);
+
+		if (field != null) {
+			document.add(field);
+		}
+	}
+
+	protected void addFieldFromSource(
+		Document document, String fieldName,
+		Map<String, Object> documentSourceMap) {
+
+		Field field = getFieldFromSource(fieldName, documentSourceMap);
+
+		if (field != null) {
+			document.add(field);
+		}
+	}
+
+	protected Field getField(
+		String fieldName, Map<String, DocumentField> documentFields) {
+
+		String geopointIndicatorSuffix = ".geopoint";
+
+		if (fieldName.endsWith(geopointIndicatorSuffix)) {
+			return null;
+		}
+
+		DocumentField documentField = documentFields.get(fieldName);
+
+		if (documentFields.containsKey(
+				fieldName.concat(geopointIndicatorSuffix))) {
+
+			return translateGeoPoint(documentField);
+		}
+
+		return translate(documentField);
+	}
+
+	protected Field getFieldFromSource(
+		String fieldName, Map<String, Object> documentSourceMap) {
+
+		String geopointIndicatorSuffix = ".geopoint";
+
+		if (fieldName.endsWith(geopointIndicatorSuffix)) {
+			return null;
+		}
+
+		Object value = documentSourceMap.get(fieldName);
+
+		if (documentSourceMap.containsKey(
+				fieldName.concat(geopointIndicatorSuffix))) {
+
+			return translateGeoPoint(fieldName, value);
+		}
+
+		return translate(fieldName, value);
 	}
 
 	protected Field translate(DocumentField documentField) {
@@ -78,74 +137,12 @@ public class SearchHitDocumentTranslatorImpl
 		return new Field(fieldName, String.valueOf(value));
 	}
 
-	private void _addField(
-		Document document, String fieldName,
-		Map<String, DocumentField> documentFields) {
-
-		Field field = _getField(fieldName, documentFields);
-
-		if (field != null) {
-			document.add(field);
-		}
-	}
-
-	private void _addFieldFromSource(
-		Document document, String fieldName,
-		Map<String, Object> documentSourceMap) {
-
-		Field field = _getFieldFromSource(fieldName, documentSourceMap);
-
-		if (field != null) {
-			document.add(field);
-		}
-	}
-
-	private Field _getField(
-		String fieldName, Map<String, DocumentField> documentFields) {
-
-		if (_isInvalidFieldName(fieldName)) {
-			return null;
-		}
-
-		DocumentField documentField = documentFields.get(fieldName);
-
-		if (documentFields.containsKey(fieldName.concat(".geopoint"))) {
-			return _translateGeoPoint(documentField);
-		}
-
-		return translate(documentField);
-	}
-
-	private Field _getFieldFromSource(
-		String fieldName, Map<String, Object> documentSourceMap) {
-
-		if (_isInvalidFieldName(fieldName)) {
-			return null;
-		}
-
-		Object value = documentSourceMap.get(fieldName);
-
-		if (documentSourceMap.containsKey(fieldName.concat(".geopoint"))) {
-			return _translateGeoPoint(fieldName, value);
-		}
-
-		return translate(fieldName, value);
-	}
-
-	private boolean _isInvalidFieldName(String fieldName) {
-		if (fieldName.endsWith(".geopoint") || fieldName.equals("_ignored")) {
-			return true;
-		}
-
-		return false;
-	}
-
-	private Field _translateGeoPoint(DocumentField documentField) {
-		return _translateGeoPoint(
+	protected Field translateGeoPoint(DocumentField documentField) {
+		return translateGeoPoint(
 			documentField.getName(), documentField.getValue());
 	}
 
-	private Field _translateGeoPoint(String fieldName, Object value) {
+	protected Field translateGeoPoint(String fieldName, Object value) {
 		Field field = new Field(fieldName);
 
 		String[] values = StringUtil.split(String.valueOf(value));

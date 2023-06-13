@@ -33,6 +33,7 @@ import com.liferay.portal.workflow.kaleo.model.KaleoInstanceTokenModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -261,138 +262,160 @@ public class KaleoInstanceTokenModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, KaleoInstanceToken>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			KaleoInstanceToken.class.getClassLoader(), KaleoInstanceToken.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<KaleoInstanceToken> constructor =
+				(Constructor<KaleoInstanceToken>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<KaleoInstanceToken, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<KaleoInstanceToken, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<KaleoInstanceToken, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<KaleoInstanceToken, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", KaleoInstanceToken::getMvccVersion);
-		attributeGetterFunctions.put(
-			"kaleoInstanceTokenId",
-			KaleoInstanceToken::getKaleoInstanceTokenId);
-		attributeGetterFunctions.put("groupId", KaleoInstanceToken::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", KaleoInstanceToken::getCompanyId);
-		attributeGetterFunctions.put("userId", KaleoInstanceToken::getUserId);
-		attributeGetterFunctions.put(
-			"userName", KaleoInstanceToken::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", KaleoInstanceToken::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", KaleoInstanceToken::getModifiedDate);
-		attributeGetterFunctions.put(
-			"kaleoDefinitionId", KaleoInstanceToken::getKaleoDefinitionId);
-		attributeGetterFunctions.put(
-			"kaleoDefinitionVersionId",
-			KaleoInstanceToken::getKaleoDefinitionVersionId);
-		attributeGetterFunctions.put(
-			"kaleoInstanceId", KaleoInstanceToken::getKaleoInstanceId);
-		attributeGetterFunctions.put(
-			"parentKaleoInstanceTokenId",
-			KaleoInstanceToken::getParentKaleoInstanceTokenId);
-		attributeGetterFunctions.put(
-			"currentKaleoNodeId", KaleoInstanceToken::getCurrentKaleoNodeId);
-		attributeGetterFunctions.put(
-			"currentKaleoNodeName",
-			KaleoInstanceToken::getCurrentKaleoNodeName);
-		attributeGetterFunctions.put(
-			"className", KaleoInstanceToken::getClassName);
-		attributeGetterFunctions.put("classPK", KaleoInstanceToken::getClassPK);
-		attributeGetterFunctions.put(
-			"completed", KaleoInstanceToken::getCompleted);
-		attributeGetterFunctions.put(
-			"completionDate", KaleoInstanceToken::getCompletionDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<KaleoInstanceToken, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<KaleoInstanceToken, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<KaleoInstanceToken, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", KaleoInstanceToken::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<KaleoInstanceToken, Long>)
 				KaleoInstanceToken::setMvccVersion);
+		attributeGetterFunctions.put(
+			"kaleoInstanceTokenId",
+			KaleoInstanceToken::getKaleoInstanceTokenId);
 		attributeSetterBiConsumers.put(
 			"kaleoInstanceTokenId",
 			(BiConsumer<KaleoInstanceToken, Long>)
 				KaleoInstanceToken::setKaleoInstanceTokenId);
+		attributeGetterFunctions.put("groupId", KaleoInstanceToken::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<KaleoInstanceToken, Long>)
 				KaleoInstanceToken::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", KaleoInstanceToken::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<KaleoInstanceToken, Long>)
 				KaleoInstanceToken::setCompanyId);
+		attributeGetterFunctions.put("userId", KaleoInstanceToken::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<KaleoInstanceToken, Long>)
 				KaleoInstanceToken::setUserId);
+		attributeGetterFunctions.put(
+			"userName", KaleoInstanceToken::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<KaleoInstanceToken, String>)
 				KaleoInstanceToken::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", KaleoInstanceToken::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<KaleoInstanceToken, Date>)
 				KaleoInstanceToken::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", KaleoInstanceToken::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<KaleoInstanceToken, Date>)
 				KaleoInstanceToken::setModifiedDate);
+		attributeGetterFunctions.put(
+			"kaleoDefinitionId", KaleoInstanceToken::getKaleoDefinitionId);
 		attributeSetterBiConsumers.put(
 			"kaleoDefinitionId",
 			(BiConsumer<KaleoInstanceToken, Long>)
 				KaleoInstanceToken::setKaleoDefinitionId);
+		attributeGetterFunctions.put(
+			"kaleoDefinitionVersionId",
+			KaleoInstanceToken::getKaleoDefinitionVersionId);
 		attributeSetterBiConsumers.put(
 			"kaleoDefinitionVersionId",
 			(BiConsumer<KaleoInstanceToken, Long>)
 				KaleoInstanceToken::setKaleoDefinitionVersionId);
+		attributeGetterFunctions.put(
+			"kaleoInstanceId", KaleoInstanceToken::getKaleoInstanceId);
 		attributeSetterBiConsumers.put(
 			"kaleoInstanceId",
 			(BiConsumer<KaleoInstanceToken, Long>)
 				KaleoInstanceToken::setKaleoInstanceId);
+		attributeGetterFunctions.put(
+			"parentKaleoInstanceTokenId",
+			KaleoInstanceToken::getParentKaleoInstanceTokenId);
 		attributeSetterBiConsumers.put(
 			"parentKaleoInstanceTokenId",
 			(BiConsumer<KaleoInstanceToken, Long>)
 				KaleoInstanceToken::setParentKaleoInstanceTokenId);
+		attributeGetterFunctions.put(
+			"currentKaleoNodeId", KaleoInstanceToken::getCurrentKaleoNodeId);
 		attributeSetterBiConsumers.put(
 			"currentKaleoNodeId",
 			(BiConsumer<KaleoInstanceToken, Long>)
 				KaleoInstanceToken::setCurrentKaleoNodeId);
+		attributeGetterFunctions.put(
+			"currentKaleoNodeName",
+			KaleoInstanceToken::getCurrentKaleoNodeName);
 		attributeSetterBiConsumers.put(
 			"currentKaleoNodeName",
 			(BiConsumer<KaleoInstanceToken, String>)
 				KaleoInstanceToken::setCurrentKaleoNodeName);
+		attributeGetterFunctions.put(
+			"className", KaleoInstanceToken::getClassName);
 		attributeSetterBiConsumers.put(
 			"className",
 			(BiConsumer<KaleoInstanceToken, String>)
 				KaleoInstanceToken::setClassName);
+		attributeGetterFunctions.put("classPK", KaleoInstanceToken::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<KaleoInstanceToken, Long>)
 				KaleoInstanceToken::setClassPK);
+		attributeGetterFunctions.put(
+			"completed", KaleoInstanceToken::getCompleted);
 		attributeSetterBiConsumers.put(
 			"completed",
 			(BiConsumer<KaleoInstanceToken, Boolean>)
 				KaleoInstanceToken::setCompleted);
+		attributeGetterFunctions.put(
+			"completionDate", KaleoInstanceToken::getCompletionDate);
 		attributeSetterBiConsumers.put(
 			"completionDate",
 			(BiConsumer<KaleoInstanceToken, Date>)
 				KaleoInstanceToken::setCompletionDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -827,6 +850,51 @@ public class KaleoInstanceTokenModelImpl
 	}
 
 	@Override
+	public KaleoInstanceToken cloneWithOriginalValues() {
+		KaleoInstanceTokenImpl kaleoInstanceTokenImpl =
+			new KaleoInstanceTokenImpl();
+
+		kaleoInstanceTokenImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		kaleoInstanceTokenImpl.setKaleoInstanceTokenId(
+			this.<Long>getColumnOriginalValue("kaleoInstanceTokenId"));
+		kaleoInstanceTokenImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		kaleoInstanceTokenImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		kaleoInstanceTokenImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		kaleoInstanceTokenImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		kaleoInstanceTokenImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		kaleoInstanceTokenImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		kaleoInstanceTokenImpl.setKaleoDefinitionId(
+			this.<Long>getColumnOriginalValue("kaleoDefinitionId"));
+		kaleoInstanceTokenImpl.setKaleoDefinitionVersionId(
+			this.<Long>getColumnOriginalValue("kaleoDefinitionVersionId"));
+		kaleoInstanceTokenImpl.setKaleoInstanceId(
+			this.<Long>getColumnOriginalValue("kaleoInstanceId"));
+		kaleoInstanceTokenImpl.setParentKaleoInstanceTokenId(
+			this.<Long>getColumnOriginalValue("parentKaleoInstanceTokenId"));
+		kaleoInstanceTokenImpl.setCurrentKaleoNodeId(
+			this.<Long>getColumnOriginalValue("currentKaleoNodeId"));
+		kaleoInstanceTokenImpl.setCurrentKaleoNodeName(
+			this.<String>getColumnOriginalValue("currentKaleoNodeName"));
+		kaleoInstanceTokenImpl.setClassName(
+			this.<String>getColumnOriginalValue("className"));
+		kaleoInstanceTokenImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		kaleoInstanceTokenImpl.setCompleted(
+			this.<Boolean>getColumnOriginalValue("completed"));
+		kaleoInstanceTokenImpl.setCompletionDate(
+			this.<Date>getColumnOriginalValue("completionDate"));
+
+		return kaleoInstanceTokenImpl;
+	}
+
+	@Override
 	public int compareTo(KaleoInstanceToken kaleoInstanceToken) {
 		int value = 0;
 
@@ -1081,9 +1149,7 @@ public class KaleoInstanceTokenModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, KaleoInstanceToken>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					KaleoInstanceToken.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

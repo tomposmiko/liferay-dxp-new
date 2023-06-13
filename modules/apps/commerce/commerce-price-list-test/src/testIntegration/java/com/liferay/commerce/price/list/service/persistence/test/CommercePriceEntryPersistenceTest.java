@@ -15,7 +15,6 @@
 package com.liferay.commerce.price.list.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.price.list.exception.DuplicateCommercePriceEntryExternalReferenceCodeException;
 import com.liferay.commerce.price.list.exception.NoSuchPriceEntryException;
 import com.liferay.commerce.price.list.model.CommercePriceEntry;
 import com.liferay.commerce.price.list.service.CommercePriceEntryLocalServiceUtil;
@@ -130,6 +129,8 @@ public class CommercePriceEntryPersistenceTest {
 
 		CommercePriceEntry newCommercePriceEntry = _persistence.create(pk);
 
+		newCommercePriceEntry.setMvccVersion(RandomTestUtil.nextLong());
+
 		newCommercePriceEntry.setUuid(RandomTestUtil.randomString());
 
 		newCommercePriceEntry.setExternalReferenceCode(
@@ -197,6 +198,9 @@ public class CommercePriceEntryPersistenceTest {
 			_persistence.findByPrimaryKey(
 				newCommercePriceEntry.getPrimaryKey());
 
+		Assert.assertEquals(
+			existingCommercePriceEntry.getMvccVersion(),
+			newCommercePriceEntry.getMvccVersion());
 		Assert.assertEquals(
 			existingCommercePriceEntry.getUuid(),
 			newCommercePriceEntry.getUuid());
@@ -281,28 +285,6 @@ public class CommercePriceEntryPersistenceTest {
 		Assert.assertEquals(
 			Time.getShortTimestamp(existingCommercePriceEntry.getStatusDate()),
 			Time.getShortTimestamp(newCommercePriceEntry.getStatusDate()));
-	}
-
-	@Test(
-		expected = DuplicateCommercePriceEntryExternalReferenceCodeException.class
-	)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CommercePriceEntry commercePriceEntry = addCommercePriceEntry();
-
-		CommercePriceEntry newCommercePriceEntry = addCommercePriceEntry();
-
-		newCommercePriceEntry.setCompanyId(commercePriceEntry.getCompanyId());
-
-		newCommercePriceEntry = _persistence.update(newCommercePriceEntry);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCommercePriceEntry);
-
-		newCommercePriceEntry.setExternalReferenceCode(
-			commercePriceEntry.getExternalReferenceCode());
-
-		_persistence.update(newCommercePriceEntry);
 	}
 
 	@Test
@@ -416,16 +398,17 @@ public class CommercePriceEntryPersistenceTest {
 
 	protected OrderByComparator<CommercePriceEntry> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CommercePriceEntry", "uuid", true, "externalReferenceCode", true,
-			"commercePriceEntryId", true, "companyId", true, "userId", true,
-			"userName", true, "createDate", true, "modifiedDate", true,
-			"commercePriceListId", true, "CPInstanceUuid", true, "CProductId",
-			true, "price", true, "promoPrice", true, "discountDiscovery", true,
-			"discountLevel1", true, "discountLevel2", true, "discountLevel3",
-			true, "discountLevel4", true, "hasTierPrice", true, "bulkPricing",
-			true, "displayDate", true, "expirationDate", true,
-			"lastPublishDate", true, "status", true, "statusByUserId", true,
-			"statusByUserName", true, "statusDate", true);
+			"CommercePriceEntry", "mvccVersion", true, "uuid", true,
+			"externalReferenceCode", true, "commercePriceEntryId", true,
+			"companyId", true, "userId", true, "userName", true, "createDate",
+			true, "modifiedDate", true, "commercePriceListId", true,
+			"CPInstanceUuid", true, "CProductId", true, "price", true,
+			"promoPrice", true, "discountDiscovery", true, "discountLevel1",
+			true, "discountLevel2", true, "discountLevel3", true,
+			"discountLevel4", true, "hasTierPrice", true, "bulkPricing", true,
+			"displayDate", true, "expirationDate", true, "lastPublishDate",
+			true, "status", true, "statusByUserId", true, "statusByUserName",
+			true, "statusDate", true);
 	}
 
 	@Test
@@ -747,6 +730,8 @@ public class CommercePriceEntryPersistenceTest {
 		long pk = RandomTestUtil.nextLong();
 
 		CommercePriceEntry commercePriceEntry = _persistence.create(pk);
+
+		commercePriceEntry.setMvccVersion(RandomTestUtil.nextLong());
 
 		commercePriceEntry.setUuid(RandomTestUtil.randomString());
 

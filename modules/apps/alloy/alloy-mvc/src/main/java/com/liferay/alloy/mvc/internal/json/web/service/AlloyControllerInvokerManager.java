@@ -25,6 +25,8 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONSerializable;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceActionsManagerUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.LiferayPortletConfig;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -127,6 +129,11 @@ public class AlloyControllerInvokerManager {
 			_alloyControllerInvokers.put(controller, alloyControllerInvoker);
 		}
 		catch (NoClassNecessaryException noClassNecessaryException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					noClassNecessaryException, noClassNecessaryException);
+			}
+
 			return;
 		}
 		catch (Exception exception) {
@@ -339,17 +346,15 @@ public class AlloyControllerInvokerManager {
 				methodVisitor.visitInsn(Opcodes.AASTORE);
 			}
 
-			sb = new StringBundler(5);
-
-			sb.append(StringPool.OPEN_PARENTHESIS);
-			sb.append(Type.getDescriptor(String.class));
-			sb.append(Type.getDescriptor(Object[].class));
-			sb.append(StringPool.CLOSE_PARENTHESIS);
-			sb.append(Type.getDescriptor(JSONSerializable.class));
-
 			methodVisitor.visitMethodInsn(
 				Opcodes.INVOKEVIRTUAL, alloyControllerInvokerClassBinaryName,
-				"invokeAlloyController", sb.toString());
+				"invokeAlloyController",
+				StringBundler.concat(
+					StringPool.OPEN_PARENTHESIS,
+					Type.getDescriptor(String.class),
+					Type.getDescriptor(Object[].class),
+					StringPool.CLOSE_PARENTHESIS,
+					Type.getDescriptor(JSONSerializable.class)));
 
 			methodVisitor.visitInsn(Opcodes.ARETURN);
 
@@ -413,14 +418,8 @@ public class AlloyControllerInvokerManager {
 	}
 
 	protected String getAPIPath(String controller, Method method) {
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(StringPool.SLASH);
-		sb.append(controller);
-		sb.append(StringPool.SLASH);
-		sb.append(method.getName());
-
-		return sb.toString();
+		return StringBundler.concat(
+			StringPool.SLASH, controller, StringPool.SLASH, method.getName());
 	}
 
 	protected String getClassBinaryName(String className) {
@@ -439,6 +438,9 @@ public class AlloyControllerInvokerManager {
 	}
 
 	private static final String _BASE_CLASS_NAME = "AlloyControllerInvokerImpl";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		AlloyControllerInvokerManager.class);
 
 	private final Map<String, AlloyControllerInvoker> _alloyControllerInvokers =
 		new ConcurrentHashMap<>();

@@ -14,10 +14,10 @@
 
 import {getLocalizedValue} from './lang.es';
 
-export const forEachDataDefinitionField = (
+export function forEachDataDefinitionField(
 	dataDefinition = {dataDefinitionFields: []},
 	fn
-) => {
+) {
 	const {dataDefinitionFields = []} = dataDefinition;
 
 	for (let i = 0; i < dataDefinitionFields.length; i++) {
@@ -41,32 +41,12 @@ export const forEachDataDefinitionField = (
 	}
 
 	return false;
-};
+}
 
-export const containsFieldSet = (dataDefinition, dataDefinitionId) => {
-	let hasFieldSet = false;
-
-	forEachDataDefinitionField(dataDefinition, (dataDefinitionField) => {
-		const {customProperties, fieldType} = dataDefinitionField;
-
-		if (
-			fieldType === 'fieldset' &&
-			customProperties &&
-			customProperties.ddmStructureId == dataDefinitionId
-		) {
-			hasFieldSet = true;
-		}
-
-		return hasFieldSet;
-	});
-
-	return hasFieldSet;
-};
-
-export const getDataDefinitionField = (
+export function getDataDefinitionField(
 	dataDefinition = {dataDefinitionFields: []},
 	fieldName
-) => {
+) {
 	let field = null;
 
 	forEachDataDefinitionField(dataDefinition, (currentField) => {
@@ -80,14 +60,9 @@ export const getDataDefinitionField = (
 	});
 
 	return field;
-};
+}
 
-export const getDataDefinitionFieldSet = (dataDefinitionFields, fieldSetId) =>
-	dataDefinitionFields.find(
-		({customProperties: {ddmStructureId}}) => ddmStructureId == fieldSetId
-	);
-
-export const getFieldLabel = (dataDefinition, fieldName) => {
+export function getFieldLabel(dataDefinition, fieldName) {
 	const field = getDataDefinitionField(dataDefinition, fieldName);
 
 	if (field) {
@@ -95,14 +70,14 @@ export const getFieldLabel = (dataDefinition, fieldName) => {
 	}
 
 	return fieldName;
-};
+}
 
-export const getOptionLabel = (
+export function getOptionLabel(
 	options = {},
 	value,
 	defaultLanguageId = themeDisplay.getDefaultLanguageId(),
 	languageId = themeDisplay.getLanguageId()
-) => {
+) {
 	const getLabel = (languageId) => {
 		if (options[languageId]) {
 			return options[languageId].find((option) => option.value === value)
@@ -111,4 +86,4 @@ export const getOptionLabel = (
 	};
 
 	return getLabel(languageId) || getLabel(defaultLanguageId) || value;
-};
+}

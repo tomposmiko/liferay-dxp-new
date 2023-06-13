@@ -26,15 +26,16 @@ import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.exception.AccountNameException;
 import com.liferay.portal.kernel.exception.CompanyMxException;
+import com.liferay.portal.kernel.exception.CompanyNameException;
 import com.liferay.portal.kernel.exception.CompanyVirtualHostException;
 import com.liferay.portal.kernel.exception.ModelListenerException;
-import com.liferay.portal.kernel.exception.NoSuchAccountException;
 import com.liferay.portal.kernel.exception.NoSuchPasswordPolicyException;
 import com.liferay.portal.kernel.exception.NoSuchVirtualHostException;
 import com.liferay.portal.kernel.exception.RequiredCompanyException;
-import com.liferay.portal.kernel.model.Account;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.Company;
@@ -53,7 +54,6 @@ import com.liferay.portal.kernel.model.adapter.StagedTheme;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.service.AccountLocalServiceUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
@@ -88,8 +88,7 @@ import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.repository.liferayrepository.LiferayRepository;
-import com.liferay.portal.repository.temporaryrepository.TemporaryFileEntryRepository;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -109,7 +108,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.Callable;
+import java.util.TimeZone;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.junit.After;
@@ -198,8 +197,6 @@ public class CompanyLocalServiceTest {
 		for (String webId : PortalInstances.getWebIds()) {
 			Assert.assertNotEquals(companyWebId, webId);
 		}
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -244,8 +241,6 @@ public class CompanyLocalServiceTest {
 			"The company organization child group should delete with the " +
 				"company",
 			group);
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -302,12 +297,10 @@ public class CompanyLocalServiceTest {
 		serviceContext.setUserId(userId);
 
 		DLAppLocalServiceUtil.addFileEntry(
-			userId, guestGroup.getGroupId(), 0, "test.xml", "text/xml",
-			"test.xml", "", "", "test".getBytes(), serviceContext);
+			null, userId, guestGroup.getGroupId(), 0, "test.xml", "text/xml",
+			"test.xml", "", "", "test".getBytes(), null, null, serviceContext);
 
 		CompanyLocalServiceUtil.deleteCompany(companyId);
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -320,27 +313,22 @@ public class CompanyLocalServiceTest {
 
 		long userId = UserLocalServiceUtil.getDefaultUserId(companyId);
 
-		final Group group = GroupTestUtil.addGroup(
+		Group group = GroupTestUtil.addGroup(
 			companyId, userId, GroupConstants.DEFAULT_PARENT_GROUP_ID);
 
 		LayoutSetPrototype layoutSetPrototype = addLayoutSetPrototype(
 			companyId, userId, RandomTestUtil.randomString());
 
-		final long layoutSetPrototypeId =
+		long layoutSetPrototypeId =
 			layoutSetPrototype.getLayoutSetPrototypeId();
 
 		TransactionInvokerUtil.invoke(
 			_transactionConfig,
-			new Callable<Void>() {
+			() -> {
+				SitesUtil.updateLayoutSetPrototypesLinks(
+					group, layoutSetPrototypeId, 0, true, false);
 
-				@Override
-				public Void call() throws Exception {
-					SitesUtil.updateLayoutSetPrototypesLinks(
-						group, layoutSetPrototypeId, 0, true, false);
-
-					return null;
-				}
-
+				return null;
 			});
 
 		addUser(
@@ -371,26 +359,21 @@ public class CompanyLocalServiceTest {
 		Group group = GroupTestUtil.addGroup(
 			companyId, userId, GroupConstants.DEFAULT_PARENT_GROUP_ID);
 
-		final UserGroup userGroup = UserGroupTestUtil.addUserGroup(
+		UserGroup userGroup = UserGroupTestUtil.addUserGroup(
 			group.getGroupId());
 
-		final LayoutSetPrototype layoutSetPrototype = addLayoutSetPrototype(
+		LayoutSetPrototype layoutSetPrototype = addLayoutSetPrototype(
 			companyId, userId, RandomTestUtil.randomString());
 
 		TransactionInvokerUtil.invoke(
 			_transactionConfig,
-			new Callable<Void>() {
+			() -> {
+				SitesUtil.updateLayoutSetPrototypesLinks(
+					userGroup.getGroup(),
+					layoutSetPrototype.getLayoutSetPrototypeId(), 0, true,
+					false);
 
-				@Override
-				public Void call() throws Exception {
-					SitesUtil.updateLayoutSetPrototypesLinks(
-						userGroup.getGroup(),
-						layoutSetPrototype.getLayoutSetPrototypeId(), 0, true,
-						false);
-
-					return null;
-				}
-
+				return null;
 			});
 
 		CompanyLocalServiceUtil.deleteCompany(companyId);
@@ -426,8 +409,6 @@ public class CompanyLocalServiceTest {
 		group = GroupLocalServiceUtil.fetchGroup(group.getGroupId());
 
 		Assert.assertNull(group);
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -494,8 +475,6 @@ public class CompanyLocalServiceTest {
 		user = UserLocalServiceUtil.fetchUser(user.getUserId());
 
 		Assert.assertNull(user);
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -544,19 +523,6 @@ public class CompanyLocalServiceTest {
 				user.getUserId(), group.getGroupId(), role.getRoleId()));
 
 		Assert.assertNull(UserLocalServiceUtil.fetchUser(user.getUserId()));
-
-		deleteStagingClassNameEntries();
-	}
-
-	@Test(expected = NoSuchAccountException.class)
-	public void testDeleteCompanyDeletesAccount() throws Exception {
-		Company company = addCompany();
-
-		CompanyLocalServiceUtil.deleteCompany(company);
-
-		deleteStagingClassNameEntries();
-
-		AccountLocalServiceUtil.getAccount(company.getAccountId());
 	}
 
 	@Test(expected = NoSuchPasswordPolicyException.class)
@@ -566,8 +532,6 @@ public class CompanyLocalServiceTest {
 		Company company = addCompany();
 
 		CompanyLocalServiceUtil.deleteCompany(company);
-
-		deleteStagingClassNameEntries();
 
 		PasswordPolicyLocalServiceUtil.getDefaultPasswordPolicy(
 			company.getCompanyId());
@@ -588,8 +552,6 @@ public class CompanyLocalServiceTest {
 			company.getCompanyId(), GroupConstants.ANY_PARENT_GROUP_ID, false);
 
 		Assert.assertEquals(0, count);
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -607,8 +569,6 @@ public class CompanyLocalServiceTest {
 			company.getCompanyId(), false);
 
 		Assert.assertEquals(0, count);
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -623,32 +583,23 @@ public class CompanyLocalServiceTest {
 
 		Assert.assertEquals(
 			layoutSetPrototypes.toString(), 0, layoutSetPrototypes.size());
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test(expected = NoSuchPasswordPolicyException.class)
 	public void testDeleteCompanyDeletesNondefaultPasswordPolicies()
 		throws Throwable {
 
-		final Company company = addCompany();
+		Company company = addCompany();
 
 		CompanyLocalServiceUtil.deleteCompany(company);
 
-		deleteStagingClassNameEntries();
-
 		TransactionInvokerUtil.invoke(
 			_transactionConfig,
-			new Callable<Void>() {
+			() -> {
+				PasswordPolicyLocalServiceUtil.getPasswordPolicy(
+					company.getCompanyId(), false);
 
-				@Override
-				public Void call() throws Exception {
-					PasswordPolicyLocalServiceUtil.getPasswordPolicy(
-						company.getCompanyId(), false);
-
-					return null;
-				}
-
+				return null;
 			});
 	}
 
@@ -663,8 +614,6 @@ public class CompanyLocalServiceTest {
 			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID);
 
 		Assert.assertEquals(0, count);
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -673,66 +622,48 @@ public class CompanyLocalServiceTest {
 
 		CompanyLocalServiceUtil.deleteCompany(company);
 
-		for (long companyId : PortalInstances.getCompanyIds()) {
-			Assert.assertNotEquals(
+		CompanyLocalServiceUtil.forEachCompanyId(
+			companyId -> Assert.assertNotEquals(
 				"Company instance was not deleted", company.getCompanyId(),
-				companyId);
-		}
-
-		deleteStagingClassNameEntries();
+				(long)companyId));
 	}
 
 	@Test
 	public void testDeleteCompanyDeletesPortalPreferences() throws Throwable {
-		final Company company = addCompany();
+		Company company = addCompany();
 
 		CompanyLocalServiceUtil.deleteCompany(company);
 
 		TransactionInvokerUtil.invoke(
 			_transactionConfig,
-			new Callable<Void>() {
+			() -> {
+				PortalPreferences portalPreferences =
+					PortalPreferencesLocalServiceUtil.fetchPortalPreferences(
+						company.getCompanyId(),
+						PortletKeys.PREFS_OWNER_TYPE_COMPANY);
 
-				@Override
-				public Void call() throws Exception {
-					PortalPreferences portalPreferences =
-						PortalPreferencesLocalServiceUtil.
-							fetchPortalPreferences(
-								company.getCompanyId(),
-								PortletKeys.PREFS_OWNER_TYPE_COMPANY);
+				Assert.assertNull(portalPreferences);
 
-					Assert.assertNull(portalPreferences);
-
-					return null;
-				}
-
+				return null;
 			});
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
 	public void testDeleteCompanyDeletesPortlets() throws Throwable {
-		final Company company = addCompany();
+		Company company = addCompany();
 
 		CompanyLocalServiceUtil.deleteCompany(company);
 
 		TransactionInvokerUtil.invoke(
 			_transactionConfig,
-			new Callable<Void>() {
+			() -> {
+				int count = PortletLocalServiceUtil.getPortletsCount(
+					company.getCompanyId());
 
-				@Override
-				public Void call() {
-					int count = PortletLocalServiceUtil.getPortletsCount(
-						company.getCompanyId());
+				Assert.assertEquals(0, count);
 
-					Assert.assertEquals(0, count);
-
-					return null;
-				}
-
+				return null;
 			});
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -745,8 +676,6 @@ public class CompanyLocalServiceTest {
 			company.getCompanyId());
 
 		Assert.assertEquals(roles.toString(), 0, roles.size());
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -788,8 +717,6 @@ public class CompanyLocalServiceTest {
 
 		Assert.assertEquals(UserGroupRole.class.getName(), list.get(0));
 		Assert.assertEquals(Role.class.getName(), list.get(1));
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -802,8 +729,6 @@ public class CompanyLocalServiceTest {
 			company.getCompanyId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		Assert.assertEquals(users.toString(), 0, users.size());
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test(expected = NoSuchVirtualHostException.class)
@@ -811,8 +736,6 @@ public class CompanyLocalServiceTest {
 		Company company = addCompany();
 
 		CompanyLocalServiceUtil.deleteCompany(company);
-
-		deleteStagingClassNameEntries();
 
 		VirtualHostLocalServiceUtil.getVirtualHost(company.getWebId());
 	}
@@ -824,8 +747,6 @@ public class CompanyLocalServiceTest {
 		Company company = addCompany();
 
 		CompanyLocalServiceUtil.deleteCompany(company);
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test(expected = RequiredCompanyException.class)
@@ -833,8 +754,6 @@ public class CompanyLocalServiceTest {
 		long companyId = PortalInstances.getDefaultCompanyId();
 
 		CompanyLocalServiceUtil.deleteCompany(companyId);
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -851,8 +770,29 @@ public class CompanyLocalServiceTest {
 			CompanyLocalServiceUtil.getCompanyByVirtualHost("0:0:0:0:0:0:0:1"));
 
 		CompanyLocalServiceUtil.deleteCompany(company);
+	}
 
-		deleteStagingClassNameEntries();
+	@Test
+	public void testUpdateCompanyLocales() throws Exception {
+		Company company = addCompany();
+
+		String languageId = "ca_ES";
+		TimeZone timeZone = company.getTimeZone();
+
+		CompanyLocalServiceUtil.updateDisplay(
+			company.getCompanyId(), languageId, timeZone.getID());
+
+		CompanyLocalServiceUtil.updatePreferences(
+			company.getCompanyId(),
+			UnicodePropertiesBuilder.put(
+				PropsKeys.LOCALES, languageId
+			).build());
+
+		Assert.assertEquals(
+			Collections.singleton(LocaleUtil.fromLanguageId(languageId)),
+			LanguageUtil.getAvailableLocales());
+
+		CompanyLocalServiceUtil.deleteCompany(company);
 	}
 
 	@Test
@@ -881,14 +821,13 @@ public class CompanyLocalServiceTest {
 			StringUtil.merge(companyLanguageIds),
 			groupTypeSettingsUnicodeProperties.getProperty(PropsKeys.LOCALES));
 
-		UnicodeProperties unicodeProperties = new UnicodeProperties();
-
 		String languageIds = "ca_ES,en_US";
 
-		unicodeProperties.put(PropsKeys.LOCALES, languageIds);
-
 		CompanyLocalServiceUtil.updatePreferences(
-			company.getCompanyId(), unicodeProperties);
+			company.getCompanyId(),
+			UnicodePropertiesBuilder.put(
+				PropsKeys.LOCALES, languageIds
+			).build());
 
 		Assert.assertEquals(
 			languageIds,
@@ -904,8 +843,6 @@ public class CompanyLocalServiceTest {
 			groupTypeSettingsUnicodeProperties.getProperty(PropsKeys.LOCALES));
 
 		CompanyLocalServiceUtil.deleteCompany(company);
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -927,12 +864,10 @@ public class CompanyLocalServiceTest {
 
 		Assert.assertEquals(languageId, user.getLanguageId());
 		Assert.assertEquals("CET", user.getTimeZoneId());
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
-	public void testUpdateInvalidAccountNames() throws Exception {
+	public void testUpdateInvalidCompanyNames() throws Exception {
 		Company company = addCompany();
 
 		long companyId = company.getCompanyId();
@@ -942,29 +877,23 @@ public class CompanyLocalServiceTest {
 		Group group = GroupTestUtil.addGroup(
 			companyId, userId, GroupConstants.DEFAULT_PARENT_GROUP_ID);
 
-		testUpdateAccountNames(
+		testUpdateCompanyNames(
 			company,
 			new String[] {StringPool.BLANK, group.getDescriptiveName()}, true);
 
 		CompanyLocalServiceUtil.deleteCompany(company.getCompanyId());
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
 	public void testUpdateInvalidMx() throws Exception {
 		testUpdateMx("abc", false, true);
 		testUpdateMx(StringPool.BLANK, false, true);
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
 	public void testUpdateInvalidVirtualHostnames() throws Exception {
 		testUpdateVirtualHostnames(
 			new String[] {StringPool.BLANK, "localhost", ".abc"}, true);
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -973,20 +902,16 @@ public class CompanyLocalServiceTest {
 		testUpdateMx("abc.com", true, false);
 		testUpdateMx(StringPool.BLANK, false, true);
 		testUpdateMx(StringPool.BLANK, false, false);
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
-	public void testUpdateValidAccountNames() throws Exception {
+	public void testUpdateValidCompanyNames() throws Exception {
 		Company company = addCompany();
 
-		testUpdateAccountNames(
+		testUpdateCompanyNames(
 			company, new String[] {RandomTestUtil.randomString()}, false);
 
 		CompanyLocalServiceUtil.deleteCompany(company.getCompanyId());
-
-		deleteStagingClassNameEntries();
 	}
 
 	@Test
@@ -997,8 +922,6 @@ public class CompanyLocalServiceTest {
 				"0000:0000:0000:0000:0000:0000:0000:0001"
 			},
 			false);
-
-		deleteStagingClassNameEntries();
 	}
 
 	protected Company addCompany() throws Exception {
@@ -1053,8 +976,6 @@ public class CompanyLocalServiceTest {
 	}
 
 	protected void deleteStagingClassNameEntries() {
-		deleteClassName(TemporaryFileEntryRepository.class.getName());
-		deleteClassName(LiferayRepository.class.getName());
 		deleteClassName(Folder.class.getName());
 		deleteClassName(StagedAssetLink.class.getName());
 		deleteClassName(StagedLayoutSet.class.getName());
@@ -1072,26 +993,27 @@ public class CompanyLocalServiceTest {
 		return serviceContext;
 	}
 
-	protected void testUpdateAccountNames(
-			Company company, String[] accountNames, boolean expectFailure)
+	protected void testUpdateCompanyNames(
+			Company company, String[] companyNames, boolean expectFailure)
 		throws Exception {
 
-		Account account = AccountLocalServiceUtil.getAccount(
-			company.getAccountId());
-
-		for (String accountName : accountNames) {
+		for (String companyName : companyNames) {
 			try {
 				company = CompanyLocalServiceUtil.updateCompany(
 					company.getCompanyId(), company.getVirtualHostname(),
 					company.getMx(), company.getHomeURL(), true, null,
-					accountName, account.getLegalName(), account.getLegalId(),
-					account.getLegalType(), account.getSicCode(),
-					account.getTickerSymbol(), account.getIndustry(),
-					account.getType(), account.getSize());
+					companyName, company.getLegalName(), company.getLegalId(),
+					company.getLegalType(), company.getSicCode(),
+					company.getTickerSymbol(), company.getIndustry(),
+					company.getType(), company.getSize());
 
 				Assert.assertFalse(expectFailure);
 			}
-			catch (AccountNameException accountNameException) {
+			catch (CompanyNameException companyNameException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(companyNameException, companyNameException);
+				}
+
 				Assert.assertTrue(expectFailure);
 			}
 		}
@@ -1134,6 +1056,10 @@ public class CompanyLocalServiceTest {
 			}
 		}
 		catch (CompanyMxException companyMxException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(companyMxException, companyMxException);
+			}
+
 			Assert.assertFalse(valid);
 			Assert.assertTrue(mailMxUpdate);
 		}
@@ -1159,6 +1085,12 @@ public class CompanyLocalServiceTest {
 				Assert.assertFalse(expectFailure);
 			}
 			catch (CompanyVirtualHostException companyVirtualHostException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						companyVirtualHostException,
+						companyVirtualHostException);
+				}
+
 				Assert.assertTrue(expectFailure);
 			}
 		}
@@ -1204,6 +1136,9 @@ public class CompanyLocalServiceTest {
 
 		return list;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		CompanyLocalServiceTest.class);
 
 	private static final TransactionConfig _transactionConfig;
 

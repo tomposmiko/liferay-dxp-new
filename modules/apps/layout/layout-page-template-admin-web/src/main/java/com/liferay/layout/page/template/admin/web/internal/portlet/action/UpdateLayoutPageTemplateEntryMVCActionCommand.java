@@ -18,7 +18,6 @@ import com.liferay.layout.page.template.admin.constants.LayoutPageTemplateAdminP
 import com.liferay.layout.page.template.admin.web.internal.handler.LayoutPageTemplateEntryExceptionRequestHandler;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -40,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + LayoutPageTemplateAdminPortletKeys.LAYOUT_PAGE_TEMPLATES,
-		"mvc.command.name=/layout_page_template/update_layout_page_template_entry"
+		"mvc.command.name=/layout_page_template_admin/update_layout_page_template_entry"
 	},
 	service = MVCActionCommand.class
 )
@@ -67,12 +66,11 @@ public class UpdateLayoutPageTemplateEntryMVCActionCommand
 				addSuccessMessage(actionRequest, actionResponse);
 			}
 
-			String redirect = ParamUtil.getString(actionRequest, "redirect");
-
-			JSONObject jsonObject = JSONUtil.put("redirectURL", redirect);
-
 			JSONPortletResponseUtil.writeJSON(
-				actionRequest, actionResponse, jsonObject);
+				actionRequest, actionResponse,
+				JSONUtil.put(
+					"redirectURL",
+					ParamUtil.getString(actionRequest, "redirect")));
 		}
 		catch (PortalException portalException) {
 			SessionErrors.add(

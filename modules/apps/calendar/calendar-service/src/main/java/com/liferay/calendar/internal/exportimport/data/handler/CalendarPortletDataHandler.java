@@ -37,7 +37,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class CalendarPortletDataHandler extends BasePortletDataHandler {
 
-	public static final String SCHEMA_VERSION = "1.0.0";
+	public static final String SCHEMA_VERSION = "4.0.0";
 
 	@Override
 	public String getSchemaVersion() {
@@ -47,7 +47,14 @@ public class CalendarPortletDataHandler extends BasePortletDataHandler {
 	@Activate
 	protected void activate() {
 		setDataLevel(DataLevel.PORTLET_INSTANCE);
-		setDataPortletPreferences(StringPool.BLANK);
+		setDataPortletPreferences(
+			"defaultDuration", "defaultView", "displaySchedulerHeader",
+			"displaySchedulerOnly", "enableRss", "eventsPerPage",
+			"maxDaysDisplayed", "portletSetupCss", "portletSetupUseCustomTitle",
+			"rssDelta", "rssDisplayStyle", "rssFeedType", "rssTimeInterval",
+			"showAgendaView", "showDayView", "showMonthView", "showUserEvents",
+			"showWeekView", "timeFormat", "timeZoneId", "usePortalTimeZone",
+			"weekStartsOn");
 	}
 
 	@Override

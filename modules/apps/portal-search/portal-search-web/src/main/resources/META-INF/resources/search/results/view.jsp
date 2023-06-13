@@ -80,7 +80,7 @@ SearchContainer<Document> searchContainer = searchResultsPortletDisplayContext.g
 			entries="<%= searchResultSummaryDisplayContexts %>"
 		/>
 
-		<aui:form action="#" useNamespace="<%= false %>">
+		<aui:form useNamespace="<%= false %>">
 			<liferay-ui:search-paginator
 				id='<%= liferayPortletResponse.getNamespace() + "searchContainerTag" %>'
 				markupView="lexicon"

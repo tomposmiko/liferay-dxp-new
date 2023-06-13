@@ -17,7 +17,6 @@ package com.liferay.segments.service.persistence.impl;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -29,16 +28,15 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -72,12 +70,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -93,7 +88,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo Garcia
  * @generated
  */
-@Component(service = SegmentsEntryPersistence.class)
+@Component(service = {SegmentsEntryPersistence.class, BasePersistence.class})
 public class SegmentsEntryPersistenceImpl
 	extends BasePersistenceImpl<SegmentsEntry>
 	implements SegmentsEntryPersistence {
@@ -213,7 +208,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsEntry segmentsEntry : list) {
@@ -604,7 +599,7 @@ public class SegmentsEntryPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -740,7 +735,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof SegmentsEntry) {
@@ -860,7 +855,7 @@ public class SegmentsEntryPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1032,7 +1027,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsEntry segmentsEntry : list) {
@@ -1457,7 +1452,7 @@ public class SegmentsEntryPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1619,7 +1614,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsEntry segmentsEntry : list) {
@@ -2485,7 +2480,7 @@ public class SegmentsEntryPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SegmentsEntryModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param start the lower bound of the range of segments entries
 	 * @param end the upper bound of the range of segments entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -2531,7 +2526,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsEntry>)finderCache.getResult(
-				_finderPathWithPaginationFindByGroupId, finderArgs, this);
+				_finderPathWithPaginationFindByGroupId, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsEntry segmentsEntry : list) {
@@ -2641,7 +2636,7 @@ public class SegmentsEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2707,7 +2702,7 @@ public class SegmentsEntryPersistenceImpl
 			finderArgs = new Object[] {StringUtil.merge(groupIds)};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByGroupId, finderArgs, this);
+				_finderPathWithPaginationCountByGroupId, finderArgs);
 		}
 
 		if (count == null) {
@@ -2974,7 +2969,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsEntry segmentsEntry : list) {
@@ -3368,7 +3363,7 @@ public class SegmentsEntryPersistenceImpl
 
 			finderArgs = new Object[] {source};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3523,7 +3518,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsEntry segmentsEntry : list) {
@@ -3914,7 +3909,7 @@ public class SegmentsEntryPersistenceImpl
 
 			finderArgs = new Object[] {type};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4049,8 +4044,7 @@ public class SegmentsEntryPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByG_S, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByG_S, finderArgs);
 		}
 
 		if (result instanceof SegmentsEntry) {
@@ -4171,7 +4165,7 @@ public class SegmentsEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, segmentsEntryKey};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4341,7 +4335,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsEntry segmentsEntry : list) {
@@ -5266,7 +5260,7 @@ public class SegmentsEntryPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SegmentsEntryModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param active the active
 	 * @param start the lower bound of the range of segments entries
 	 * @param end the upper bound of the range of segments entries (not inclusive)
@@ -5315,7 +5309,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsEntry>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_A, finderArgs, this);
+				_finderPathWithPaginationFindByG_A, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsEntry segmentsEntry : list) {
@@ -5436,7 +5430,7 @@ public class SegmentsEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, active};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5507,7 +5501,7 @@ public class SegmentsEntryPersistenceImpl
 			finderArgs = new Object[] {StringUtil.merge(groupIds), active};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByG_A, finderArgs, this);
+				_finderPathWithPaginationCountByG_A, finderArgs);
 		}
 
 		if (count == null) {
@@ -5810,7 +5804,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsEntry segmentsEntry : list) {
@@ -6232,7 +6226,7 @@ public class SegmentsEntryPersistenceImpl
 
 			finderArgs = new Object[] {active, type};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -6411,7 +6405,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsEntry segmentsEntry : list) {
@@ -7448,7 +7442,7 @@ public class SegmentsEntryPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SegmentsEntryModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param active the active
 	 * @param type the type
 	 * @param start the lower bound of the range of segments entries
@@ -7502,7 +7496,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsEntry>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_A_T, finderArgs, this);
+				_finderPathWithPaginationFindByG_A_T, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsEntry segmentsEntry : list) {
@@ -7643,7 +7637,7 @@ public class SegmentsEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, active, type};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -7734,7 +7728,7 @@ public class SegmentsEntryPersistenceImpl
 			};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByG_A_T, finderArgs, this);
+				_finderPathWithPaginationCountByG_A_T, finderArgs);
 		}
 
 		if (count == null) {
@@ -8118,7 +8112,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsEntry segmentsEntry : list) {
@@ -9266,7 +9260,7 @@ public class SegmentsEntryPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SegmentsEntryModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param active the active
 	 * @param source the source
 	 * @param type the type
@@ -9323,7 +9317,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsEntry>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_A_S_T, finderArgs, this);
+				_finderPathWithPaginationFindByG_A_S_T, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsEntry segmentsEntry : list) {
@@ -9488,7 +9482,7 @@ public class SegmentsEntryPersistenceImpl
 
 			finderArgs = new Object[] {groupId, active, source, type};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -9598,7 +9592,7 @@ public class SegmentsEntryPersistenceImpl
 			};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByG_A_S_T, finderArgs, this);
+				_finderPathWithPaginationCountByG_A_S_T, finderArgs);
 		}
 
 		if (count == null) {
@@ -10003,9 +9997,7 @@ public class SegmentsEntryPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(SegmentsEntryImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(SegmentsEntryImpl.class);
 	}
 
 	/**
@@ -10029,9 +10021,7 @@ public class SegmentsEntryPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(SegmentsEntryImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(SegmentsEntryImpl.class, primaryKey);
@@ -10046,20 +10036,18 @@ public class SegmentsEntryPersistenceImpl
 			segmentsEntryModelImpl.getGroupId()
 		};
 
+		finderCache.putResult(_finderPathCountByUUID_G, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathCountByUUID_G, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByUUID_G, args, segmentsEntryModelImpl, false);
+			_finderPathFetchByUUID_G, args, segmentsEntryModelImpl);
 
 		args = new Object[] {
 			segmentsEntryModelImpl.getGroupId(),
 			segmentsEntryModelImpl.getSegmentsEntryKey()
 		};
 
+		finderCache.putResult(_finderPathCountByG_S, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathCountByG_S, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByG_S, args, segmentsEntryModelImpl, false);
+			_finderPathFetchByG_S, args, segmentsEntryModelImpl);
 	}
 
 	/**
@@ -10321,9 +10309,7 @@ public class SegmentsEntryPersistenceImpl
 	 */
 	@Override
 	public SegmentsEntry fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				SegmentsEntry.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(SegmentsEntry.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -10542,7 +10528,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -10618,7 +10604,7 @@ public class SegmentsEntryPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -10746,30 +10732,23 @@ public class SegmentsEntryPersistenceImpl
 	 * Initializes the segments entry persistence.
 	 */
 	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class, new SegmentsEntryModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", SegmentsEntry.class.getName()));
-
+	public void activate() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByUuid = _createFinderPath(
+		_finderPathWithPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
@@ -10777,27 +10756,27 @@ public class SegmentsEntryPersistenceImpl
 			},
 			new String[] {"uuid_"}, true);
 
-		_finderPathWithoutPaginationFindByUuid = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			true);
 
-		_finderPathCountByUuid = _createFinderPath(
+		_finderPathCountByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			false);
 
-		_finderPathFetchByUUID_G = _createFinderPath(
+		_finderPathFetchByUUID_G = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "groupId"}, true);
 
-		_finderPathCountByUUID_G = _createFinderPath(
+		_finderPathCountByUUID_G = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "groupId"}, false);
 
-		_finderPathWithPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -10806,17 +10785,17 @@ public class SegmentsEntryPersistenceImpl
 			},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathWithoutPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathCountByUuid_C = _createFinderPath(
+		_finderPathCountByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
 
-		_finderPathWithPaginationFindByGroupId = _createFinderPath(
+		_finderPathWithPaginationFindByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -10824,22 +10803,22 @@ public class SegmentsEntryPersistenceImpl
 			},
 			new String[] {"groupId"}, true);
 
-		_finderPathWithoutPaginationFindByGroupId = _createFinderPath(
+		_finderPathWithoutPaginationFindByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			true);
 
-		_finderPathCountByGroupId = _createFinderPath(
+		_finderPathCountByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			false);
 
-		_finderPathWithPaginationCountByGroupId = _createFinderPath(
+		_finderPathWithPaginationCountByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			false);
 
-		_finderPathWithPaginationFindBySource = _createFinderPath(
+		_finderPathWithPaginationFindBySource = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findBySource",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
@@ -10847,17 +10826,17 @@ public class SegmentsEntryPersistenceImpl
 			},
 			new String[] {"source"}, true);
 
-		_finderPathWithoutPaginationFindBySource = _createFinderPath(
+		_finderPathWithoutPaginationFindBySource = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findBySource",
 			new String[] {String.class.getName()}, new String[] {"source"},
 			true);
 
-		_finderPathCountBySource = _createFinderPath(
+		_finderPathCountBySource = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countBySource",
 			new String[] {String.class.getName()}, new String[] {"source"},
 			false);
 
-		_finderPathWithPaginationFindByType = _createFinderPath(
+		_finderPathWithPaginationFindByType = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByType",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
@@ -10865,27 +10844,27 @@ public class SegmentsEntryPersistenceImpl
 			},
 			new String[] {"type_"}, true);
 
-		_finderPathWithoutPaginationFindByType = _createFinderPath(
+		_finderPathWithoutPaginationFindByType = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByType",
 			new String[] {String.class.getName()}, new String[] {"type_"},
 			true);
 
-		_finderPathCountByType = _createFinderPath(
+		_finderPathCountByType = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByType",
 			new String[] {String.class.getName()}, new String[] {"type_"},
 			false);
 
-		_finderPathFetchByG_S = _createFinderPath(
+		_finderPathFetchByG_S = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByG_S",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "segmentsEntryKey"}, true);
 
-		_finderPathCountByG_S = _createFinderPath(
+		_finderPathCountByG_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_S",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "segmentsEntryKey"}, false);
 
-		_finderPathWithPaginationFindByG_A = _createFinderPath(
+		_finderPathWithPaginationFindByG_A = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_A",
 			new String[] {
 				Long.class.getName(), Boolean.class.getName(),
@@ -10894,22 +10873,22 @@ public class SegmentsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "active_"}, true);
 
-		_finderPathWithoutPaginationFindByG_A = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_A = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_A",
 			new String[] {Long.class.getName(), Boolean.class.getName()},
 			new String[] {"groupId", "active_"}, true);
 
-		_finderPathCountByG_A = _createFinderPath(
+		_finderPathCountByG_A = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_A",
 			new String[] {Long.class.getName(), Boolean.class.getName()},
 			new String[] {"groupId", "active_"}, false);
 
-		_finderPathWithPaginationCountByG_A = _createFinderPath(
+		_finderPathWithPaginationCountByG_A = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_A",
 			new String[] {Long.class.getName(), Boolean.class.getName()},
 			new String[] {"groupId", "active_"}, false);
 
-		_finderPathWithPaginationFindByA_T = _createFinderPath(
+		_finderPathWithPaginationFindByA_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByA_T",
 			new String[] {
 				Boolean.class.getName(), String.class.getName(),
@@ -10918,17 +10897,17 @@ public class SegmentsEntryPersistenceImpl
 			},
 			new String[] {"active_", "type_"}, true);
 
-		_finderPathWithoutPaginationFindByA_T = _createFinderPath(
+		_finderPathWithoutPaginationFindByA_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByA_T",
 			new String[] {Boolean.class.getName(), String.class.getName()},
 			new String[] {"active_", "type_"}, true);
 
-		_finderPathCountByA_T = _createFinderPath(
+		_finderPathCountByA_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByA_T",
 			new String[] {Boolean.class.getName(), String.class.getName()},
 			new String[] {"active_", "type_"}, false);
 
-		_finderPathWithPaginationFindByG_A_T = _createFinderPath(
+		_finderPathWithPaginationFindByG_A_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_A_T",
 			new String[] {
 				Long.class.getName(), Boolean.class.getName(),
@@ -10937,7 +10916,7 @@ public class SegmentsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "active_", "type_"}, true);
 
-		_finderPathWithoutPaginationFindByG_A_T = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_A_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_A_T",
 			new String[] {
 				Long.class.getName(), Boolean.class.getName(),
@@ -10945,7 +10924,7 @@ public class SegmentsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "active_", "type_"}, true);
 
-		_finderPathCountByG_A_T = _createFinderPath(
+		_finderPathCountByG_A_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_A_T",
 			new String[] {
 				Long.class.getName(), Boolean.class.getName(),
@@ -10953,7 +10932,7 @@ public class SegmentsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "active_", "type_"}, false);
 
-		_finderPathWithPaginationCountByG_A_T = _createFinderPath(
+		_finderPathWithPaginationCountByG_A_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_A_T",
 			new String[] {
 				Long.class.getName(), Boolean.class.getName(),
@@ -10961,7 +10940,7 @@ public class SegmentsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "active_", "type_"}, false);
 
-		_finderPathWithPaginationFindByG_A_S_T = _createFinderPath(
+		_finderPathWithPaginationFindByG_A_S_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_A_S_T",
 			new String[] {
 				Long.class.getName(), Boolean.class.getName(),
@@ -10971,7 +10950,7 @@ public class SegmentsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "active_", "source", "type_"}, true);
 
-		_finderPathWithoutPaginationFindByG_A_S_T = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_A_S_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_A_S_T",
 			new String[] {
 				Long.class.getName(), Boolean.class.getName(),
@@ -10979,7 +10958,7 @@ public class SegmentsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "active_", "source", "type_"}, true);
 
-		_finderPathCountByG_A_S_T = _createFinderPath(
+		_finderPathCountByG_A_S_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_A_S_T",
 			new String[] {
 				Long.class.getName(), Boolean.class.getName(),
@@ -10987,7 +10966,7 @@ public class SegmentsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "active_", "source", "type_"}, false);
 
-		_finderPathWithPaginationCountByG_A_S_T = _createFinderPath(
+		_finderPathWithPaginationCountByG_A_S_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_A_S_T",
 			new String[] {
 				Long.class.getName(), Boolean.class.getName(),
@@ -11003,14 +10982,6 @@ public class SegmentsEntryPersistenceImpl
 		_setSegmentsEntryUtilPersistence(null);
 
 		entityCache.removeCache(SegmentsEntryImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setSegmentsEntryUtilPersistence(
@@ -11054,8 +11025,6 @@ public class SegmentsEntryPersistenceImpl
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		super.setSessionFactory(sessionFactory);
 	}
-
-	private BundleContext _bundleContext;
 
 	@Reference
 	protected CTPersistenceHelper ctPersistenceHelper;
@@ -11115,122 +11084,13 @@ public class SegmentsEntryPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"uuid", "active", "type"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class SegmentsEntryModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			SegmentsEntryModelImpl segmentsEntryModelImpl =
-				(SegmentsEntryModelImpl)baseModel;
-
-			long columnBitmask = segmentsEntryModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(segmentsEntryModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						segmentsEntryModelImpl.getColumnBitmask(columnName);
-				}
-
-				if (finderPath.isBaseModelResult() &&
-					(SegmentsEntryPersistenceImpl.
-						FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION ==
-							finderPath.getCacheName())) {
-
-					finderPathColumnBitmask |= _ORDER_BY_COLUMNS_BITMASK;
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(segmentsEntryModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			SegmentsEntryModelImpl segmentsEntryModelImpl, String[] columnNames,
-			boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						segmentsEntryModelImpl.getColumnOriginalValue(
-							columnName);
-				}
-				else {
-					arguments[i] = segmentsEntryModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-		private static final long _ORDER_BY_COLUMNS_BITMASK;
-
-		static {
-			long orderByColumnsBitmask = 0;
-
-			orderByColumnsBitmask |= SegmentsEntryModelImpl.getColumnBitmask(
-				"modifiedDate");
-
-			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
-		}
-
-	}
+	@Reference
+	private SegmentsEntryModelArgumentsResolver
+		_segmentsEntryModelArgumentsResolver;
 
 }

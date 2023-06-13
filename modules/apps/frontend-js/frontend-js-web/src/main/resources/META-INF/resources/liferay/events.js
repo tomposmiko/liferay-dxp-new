@@ -12,7 +12,7 @@
  * details.
  */
 
-(function (A, Liferay) {
+(function (A) {
 	var CLICK_EVENTS = {};
 	var Util = Liferay.Util;
 
@@ -24,17 +24,19 @@
 		Liferay,
 		'delegateClick',
 		(id, fn) => {
-			var el = A.config.doc.getElementById(id);
+			var element = A.config.doc.getElementById(id);
 
-			if (!el || el.id != id) {
+			if (!element || element.id !== id) {
 				return;
 			}
 
-			var guid = A.one(el).addClass('lfr-delegate-click').guid();
+			// eslint-disable-next-line @liferay/aui/no-one
+			var guid = A.one(element).addClass('lfr-delegate-click').guid();
 
 			CLICK_EVENTS[guid] = fn;
 
 			if (!Liferay._baseDelegateHandle) {
+				// eslint-disable-next-line @liferay/aui/no-get-body
 				Liferay._baseDelegateHandle = A.getBody().delegate(
 					'click',
 					Liferay._baseDelegate,
@@ -68,6 +70,7 @@
 
 				Liferay.fire('submitForm', {
 					action,
+					// eslint-disable-next-line @liferay/aui/no-one
 					form: A.one(form),
 					singleSubmit,
 					validate: validate !== false,
@@ -204,4 +207,4 @@
 			dialog.hide();
 		}
 	});
-})(AUI(), Liferay);
+})(AUI());

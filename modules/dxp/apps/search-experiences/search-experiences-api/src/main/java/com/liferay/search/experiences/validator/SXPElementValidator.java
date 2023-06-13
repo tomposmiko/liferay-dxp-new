@@ -14,6 +14,7 @@
 
 package com.liferay.search.experiences.validator;
 
+import com.liferay.search.experiences.exception.SXPElementElementDefinitionJSONException;
 import com.liferay.search.experiences.exception.SXPElementTitleException;
 
 import java.util.Locale;
@@ -24,7 +25,13 @@ import java.util.Map;
  */
 public interface SXPElementValidator {
 
-	public void validate(Map<Locale, String> titleMap, int type)
-		throws SXPElementTitleException;
+	public void validate(String elementDefinitionJSON, int type)
+		throws SXPElementElementDefinitionJSONException;
+
+	public void validate(
+			String elementDefinitionJSON, Map<Locale, String> titleMap,
+			int type)
+		throws SXPElementElementDefinitionJSONException,
+			   SXPElementTitleException;
 
 }

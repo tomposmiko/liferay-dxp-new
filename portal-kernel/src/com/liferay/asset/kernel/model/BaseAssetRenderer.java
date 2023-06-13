@@ -270,14 +270,6 @@ public abstract class BaseAssetRenderer<T> implements AssetRenderer<T> {
 	}
 
 	@Override
-	public String getURLViewInContext(
-			ThemeDisplay themeDisplay, String noSuchEntryRedirect)
-		throws Exception {
-
-		throw null;
-	}
-
-	@Override
 	public String getViewInContextMessage() {
 		return "view-in-context";
 	}
@@ -376,30 +368,14 @@ public abstract class BaseAssetRenderer<T> implements AssetRenderer<T> {
 			(ThemeDisplay)liferayPortletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		return getURLViewInContext(
-			themeDisplay, noSuchEntryRedirect, path, primaryKeyParameterName,
-			primaryKeyParameterValue);
-	}
-
-	protected String getURLViewInContext(
-		ThemeDisplay themeDisplay, String noSuchEntryRedirect, String path,
-		String primaryKeyParameterName, long primaryKeyParameterValue) {
-
-		StringBundler sb = new StringBundler(11);
-
-		sb.append(themeDisplay.getPortalURL());
-		sb.append(themeDisplay.getPathMain());
-		sb.append(path);
-		sb.append("?p_l_id=");
-		sb.append(themeDisplay.getPlid());
-		sb.append("&noSuchEntryRedirect=");
-		sb.append(URLCodec.encodeURL(noSuchEntryRedirect));
-		sb.append(StringPool.AMPERSAND);
-		sb.append(primaryKeyParameterName);
-		sb.append(StringPool.EQUAL);
-		sb.append(primaryKeyParameterValue);
-
-		return PortalUtil.addPreservedParameters(themeDisplay, sb.toString());
+		return PortalUtil.addPreservedParameters(
+			themeDisplay,
+			StringBundler.concat(
+				themeDisplay.getPortalURL(), themeDisplay.getPathMain(), path,
+				"?p_l_id=", themeDisplay.getPlid(), "&noSuchEntryRedirect=",
+				URLCodec.encodeURL(noSuchEntryRedirect), StringPool.AMPERSAND,
+				primaryKeyParameterName, StringPool.EQUAL,
+				primaryKeyParameterValue));
 	}
 
 	private PortletURL _getURLEdit(

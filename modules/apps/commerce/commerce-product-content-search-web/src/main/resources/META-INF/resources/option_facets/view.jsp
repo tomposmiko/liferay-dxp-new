@@ -23,11 +23,11 @@
 </style>
 
 <%
-CPOptionsSearchFacetDisplayContext cpOptionsSearchFacetDisplayContext = (CPOptionsSearchFacetDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
+CPOptionFacetsDisplayContext cpOptionFacetsDisplayContext = (CPOptionFacetsDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 %>
 
 <c:choose>
-	<c:when test="<%= !cpOptionsSearchFacetDisplayContext.hasCommerceChannel() %>">
+	<c:when test="<%= !cpOptionFacetsDisplayContext.hasCommerceChannel() %>">
 		<div class="alert alert-info mx-auto">
 			<liferay-ui:message key="this-site-does-not-have-a-channel" />
 		</div>
@@ -35,7 +35,7 @@ CPOptionsSearchFacetDisplayContext cpOptionsSearchFacetDisplayContext = (CPOptio
 	<c:otherwise>
 
 		<%
-		List<Facet> facets = cpOptionsSearchFacetDisplayContext.getFacets();
+		List<Facet> facets = cpOptionFacetsDisplayContext.getFacets();
 
 		long companyId = company.getCompanyId();
 		%>
@@ -51,51 +51,25 @@ CPOptionsSearchFacetDisplayContext cpOptionsSearchFacetDisplayContext = (CPOptio
 				%>
 
 					<c:if test="<%= !termCollectors.isEmpty() %>">
+
+				<liferay-ui:panel-container
+					extended="<%= true %>"
+					markupView="lexicon"
+					persistState="<%= true %>"
+				>
+					<liferay-ui:panel
+						collapsible="<%= true %>"
+						cssClass="search-facet"
+						markupView="lexicon"
+						persistState="<%= true %>"
+						title="<%= HtmlUtil.escape(cpOptionFacetsDisplayContext.getCPOptionName(companyId, facet.getFieldId())) %>"
+					>
 						<aui:form method="post" name='<%= "assetEntriesFacetForm_" + facet.getFieldName() %>'>
-							<aui:input cssClass="facet-parameter-name" name="facet-parameter-name" type="hidden" value="<%= cpOptionsSearchFacetDisplayContext.getCPOptionKey(companyId, facet.getFieldName()) %>" />
-							<aui:input cssClass="start-parameter-name" name="start-parameter-name" type="hidden" value="<%= cpOptionsSearchFacetDisplayContext.getPaginationStartParameterName() %>" />
-
-							<liferay-ddm:template-renderer
-								className="<%= CPOptionsSearchFacetDisplayContext.class.getName() %>"
-								contextObjects='<%=
-									HashMapBuilder.<String, Object>put(
-										"companyId", companyId
-									).put(
-										"cpOptionsSearchFacetDisplayContext", cpOptionsSearchFacetDisplayContext
-									).put(
-										"fieldName", facet.getFieldName()
-									).put(
-										"name", liferayPortletResponse.getNamespace() + "term_" + facet.getFieldName()
-									).put(
-										"namespace", liferayPortletResponse.getNamespace()
-									).put(
-										"showFrequencies", GetterUtil.getBoolean(portletPreferences.getValue("frequenciesVisible", null), true)
-									).put(
-										"title", HtmlUtil.escape(cpOptionsSearchFacetDisplayContext.getCPOptionName(companyId, facet.getFieldId()))
-									).build()
-								%>'
-								displayStyle='<%= portletPreferences.getValue("displayStyle", "") %>'
-								displayStyleGroupId="<%= cpOptionsSearchFacetDisplayContext.getDisplayStyleGroupId() %>"
-								entries="<%= cpOptionsSearchFacetDisplayContext.getTermDisplayContexts() %>"
-							>
-
-							<liferay-ui:panel-container
-								extended="<%= true %>"
-								id='<%= liferayPortletResponse.getNamespace() + "facetCPOptionsPanelContainer" %>'
-								markupView="lexicon"
-								persistState="<%= true %>"
-							>
-							<liferay-ui:panel
-								collapsible="<%= true %>"
-								cssClass="search-facet"
-								id='<%= liferayPortletResponse.getNamespace() + "facetCPOptionsPanel" %>'
-								markupView="lexicon"
-								persistState="<%= true %>"
-								title="<%= HtmlUtil.escape(cpOptionsSearchFacetDisplayContext.getCPOptionName(companyId, facet.getFieldId())) %>"
-							>
+							<aui:input cssClass="facet-parameter-name" name="facet-parameter-name" type="hidden" value="<%= cpOptionFacetsDisplayContext.getCPOptionKey(companyId, facet.getFieldName()) %>" />
+							<aui:input cssClass="start-parameter-name" name="start-parameter-name" type="hidden" value="<%= cpOptionFacetsDisplayContext.getPaginationStartParameterName() %>" />
 
 							<aui:fieldset>
-								<ul class="asset-type list-unstyled">
+								<ul class="list-unstyled">
 
 								<%
 								int i = 0;
@@ -114,18 +88,16 @@ CPOptionsSearchFacetDisplayContext cpOptionsSearchFacetDisplayContext = (CPOptio
 												name="<portlet:namespace />term_<%= facet.getFieldName() + i %>"
 												onChange="Liferay.Search.FacetUtil.changeSelection(event);"
 												type="checkbox"
-												<%= cpOptionsSearchFacetDisplayContext.isCPOptionValueSelected(companyId, facet.getFieldName(), termCollector.getTerm()) ? "checked" : "" %>
+												<%= cpOptionFacetsDisplayContext.isCPOptionValueSelected(companyId, facet.getFieldName(), termCollector.getTerm()) ? "checked" : "" %>
 											/>
 
-											<span class="custom-control-label term-name <%= cpOptionsSearchFacetDisplayContext.isCPOptionValueSelected(companyId, facet.getFieldName(), termCollector.getTerm()) ? "facet-term-selected" : "facet-term-unselected" %>">
+											<span class="custom-control-label term-name <%= cpOptionFacetsDisplayContext.isCPOptionValueSelected(companyId, facet.getFieldName(), termCollector.getTerm()) ? "facet-term-selected" : "facet-term-unselected" %>">
 												<span class="custom-control-label-text"><%= HtmlUtil.escape(termCollector.getTerm()) %></span>
 											</span>
 
-											<c:if test='<%= GetterUtil.getBoolean(portletPreferences.getValue("frequenciesVisible", null), true) %>'>
-												<small class="term-count">
-													(<%= termCollector.getFrequency() %>)
-												</small>
-											</c:if>
+											<small class="term-count">
+												(<%= termCollector.getFrequency() %>)
+											</small>
 										</label>
 									</div>
 								</li>
@@ -135,10 +107,10 @@ CPOptionsSearchFacetDisplayContext cpOptionsSearchFacetDisplayContext = (CPOptio
 								%>
 
 							</aui:fieldset>
-							</liferay-ui:panel>
-							</liferay-ui:panel-container>
-							</liferay-ddm:template-renderer>
 						</aui:form>
+					</liferay-ui:panel>
+				</liferay-ui:panel-container>
+
 					</c:if>
 
 				<%

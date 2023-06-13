@@ -143,27 +143,6 @@ public class PageFragmentInstanceDefinition implements Cloneable, Serializable {
 
 	protected FragmentViewport[] fragmentViewports;
 
-	public Boolean getIndexed() {
-		return indexed;
-	}
-
-	public void setIndexed(Boolean indexed) {
-		this.indexed = indexed;
-	}
-
-	public void setIndexed(
-		UnsafeSupplier<Boolean, Exception> indexedUnsafeSupplier) {
-
-		try {
-			indexed = indexedUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Boolean indexed;
-
 	public WidgetInstance[] getWidgetInstances() {
 		return widgetInstances;
 	}

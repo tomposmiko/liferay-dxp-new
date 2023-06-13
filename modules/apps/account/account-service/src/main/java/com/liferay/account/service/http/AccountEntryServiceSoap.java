@@ -63,25 +63,11 @@ import java.rmi.RemoteException;
 @Deprecated
 public class AccountEntryServiceSoap {
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 #addAccountEntry(long, long, String, String, String[],
-	 byte[], String, int, ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.account.model.AccountEntrySoap addAccountEntry(
-			long userId, long parentAccountEntryId, String name,
-			String description, String[] domains, byte[] logoBytes, int status)
+	public static void activateAccountEntries(long[] accountEntryIds)
 		throws RemoteException {
 
 		try {
-			com.liferay.account.model.AccountEntry returnValue =
-				AccountEntryServiceUtil.addAccountEntry(
-					userId, parentAccountEntryId, name, description, domains,
-					logoBytes, status);
-
-			return com.liferay.account.model.AccountEntrySoap.toSoapModel(
-				returnValue);
+			AccountEntryServiceUtil.activateAccountEntries(accountEntryIds);
 		}
 		catch (Exception exception) {
 			_log.error(exception, exception);
@@ -90,23 +76,13 @@ public class AccountEntryServiceSoap {
 		}
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 #addAccountEntry(long, long, String, String, String[],
-	 byte[], String, int, ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.account.model.AccountEntrySoap addAccountEntry(
-			long userId, long parentAccountEntryId, String name,
-			String description, String[] domains, byte[] logoBytes, int status,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static com.liferay.account.model.AccountEntrySoap
+			activateAccountEntry(long accountEntryId)
 		throws RemoteException {
 
 		try {
 			com.liferay.account.model.AccountEntry returnValue =
-				AccountEntryServiceUtil.addAccountEntry(
-					userId, parentAccountEntryId, name, description, domains,
-					logoBytes, status, serviceContext);
+				AccountEntryServiceUtil.activateAccountEntry(accountEntryId);
 
 			return com.liferay.account.model.AccountEntrySoap.toSoapModel(
 				returnValue);
@@ -120,8 +96,8 @@ public class AccountEntryServiceSoap {
 
 	public static com.liferay.account.model.AccountEntrySoap addAccountEntry(
 			long userId, long parentAccountEntryId, String name,
-			String description, String[] domains, byte[] logoBytes,
-			String taxIdNumber, String type, int status,
+			String description, String[] domains, String email,
+			byte[] logoBytes, String taxIdNumber, String type, int status,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 
@@ -129,7 +105,109 @@ public class AccountEntryServiceSoap {
 			com.liferay.account.model.AccountEntry returnValue =
 				AccountEntryServiceUtil.addAccountEntry(
 					userId, parentAccountEntryId, name, description, domains,
-					logoBytes, taxIdNumber, type, status, serviceContext);
+					email, logoBytes, taxIdNumber, type, status,
+					serviceContext);
+
+			return com.liferay.account.model.AccountEntrySoap.toSoapModel(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.account.model.AccountEntrySoap
+			addOrUpdateAccountEntry(
+				String externalReferenceCode, long userId,
+				long parentAccountEntryId, String name, String description,
+				String[] domains, String emailAddress, byte[] logoBytes,
+				String taxIdNumber, String type, int status,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			com.liferay.account.model.AccountEntry returnValue =
+				AccountEntryServiceUtil.addOrUpdateAccountEntry(
+					externalReferenceCode, userId, parentAccountEntryId, name,
+					description, domains, emailAddress, logoBytes, taxIdNumber,
+					type, status, serviceContext);
+
+			return com.liferay.account.model.AccountEntrySoap.toSoapModel(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static void deactivateAccountEntries(long[] accountEntryIds)
+		throws RemoteException {
+
+		try {
+			AccountEntryServiceUtil.deactivateAccountEntries(accountEntryIds);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.account.model.AccountEntrySoap
+			deactivateAccountEntry(long accountEntryId)
+		throws RemoteException {
+
+		try {
+			com.liferay.account.model.AccountEntry returnValue =
+				AccountEntryServiceUtil.deactivateAccountEntry(accountEntryId);
+
+			return com.liferay.account.model.AccountEntrySoap.toSoapModel(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static void deleteAccountEntries(long[] accountEntryIds)
+		throws RemoteException {
+
+		try {
+			AccountEntryServiceUtil.deleteAccountEntries(accountEntryIds);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static void deleteAccountEntry(long accountEntryId)
+		throws RemoteException {
+
+		try {
+			AccountEntryServiceUtil.deleteAccountEntry(accountEntryId);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.account.model.AccountEntrySoap fetchAccountEntry(
+			long accountEntryId)
+		throws RemoteException {
+
+		try {
+			com.liferay.account.model.AccountEntry returnValue =
+				AccountEntryServiceUtil.fetchAccountEntry(accountEntryId);
 
 			return com.liferay.account.model.AccountEntrySoap.toSoapModel(
 				returnValue);
@@ -154,6 +232,89 @@ public class AccountEntryServiceSoap {
 					companyId, status, start, end, orderByComparator);
 
 			return com.liferay.account.model.AccountEntrySoap.toSoapModels(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.account.model.AccountEntrySoap getAccountEntry(
+			long accountEntryId)
+		throws RemoteException {
+
+		try {
+			com.liferay.account.model.AccountEntry returnValue =
+				AccountEntryServiceUtil.getAccountEntry(accountEntryId);
+
+			return com.liferay.account.model.AccountEntrySoap.toSoapModel(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.account.model.AccountEntrySoap updateAccountEntry(
+			com.liferay.account.model.AccountEntrySoap accountEntry)
+		throws RemoteException {
+
+		try {
+			com.liferay.account.model.AccountEntry returnValue =
+				AccountEntryServiceUtil.updateAccountEntry(
+					com.liferay.account.model.impl.AccountEntryModelImpl.
+						toModel(accountEntry));
+
+			return com.liferay.account.model.AccountEntrySoap.toSoapModel(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.account.model.AccountEntrySoap updateAccountEntry(
+			long accountEntryId, long parentAccountEntryId, String name,
+			String description, boolean deleteLogo, String[] domains,
+			String emailAddress, byte[] logoBytes, String taxIdNumber,
+			int status,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			com.liferay.account.model.AccountEntry returnValue =
+				AccountEntryServiceUtil.updateAccountEntry(
+					accountEntryId, parentAccountEntryId, name, description,
+					deleteLogo, domains, emailAddress, logoBytes, taxIdNumber,
+					status, serviceContext);
+
+			return com.liferay.account.model.AccountEntrySoap.toSoapModel(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.account.model.AccountEntrySoap
+			updateExternalReferenceCode(
+				long accountEntryId, String externalReferenceCode)
+		throws RemoteException {
+
+		try {
+			com.liferay.account.model.AccountEntry returnValue =
+				AccountEntryServiceUtil.updateExternalReferenceCode(
+					accountEntryId, externalReferenceCode);
+
+			return com.liferay.account.model.AccountEntrySoap.toSoapModel(
 				returnValue);
 		}
 		catch (Exception exception) {

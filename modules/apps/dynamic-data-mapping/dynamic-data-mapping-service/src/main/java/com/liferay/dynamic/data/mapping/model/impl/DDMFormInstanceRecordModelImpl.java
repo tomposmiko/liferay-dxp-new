@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -338,139 +339,161 @@ public class DDMFormInstanceRecordModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, DDMFormInstanceRecord>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DDMFormInstanceRecord.class.getClassLoader(),
+			DDMFormInstanceRecord.class, ModelWrapper.class);
+
+		try {
+			Constructor<DDMFormInstanceRecord> constructor =
+				(Constructor<DDMFormInstanceRecord>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<DDMFormInstanceRecord, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DDMFormInstanceRecord, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<DDMFormInstanceRecord, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<DDMFormInstanceRecord, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", DDMFormInstanceRecord::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", DDMFormInstanceRecord::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", DDMFormInstanceRecord::getUuid);
-		attributeGetterFunctions.put(
-			"formInstanceRecordId",
-			DDMFormInstanceRecord::getFormInstanceRecordId);
-		attributeGetterFunctions.put(
-			"groupId", DDMFormInstanceRecord::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", DDMFormInstanceRecord::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", DDMFormInstanceRecord::getUserId);
-		attributeGetterFunctions.put(
-			"userName", DDMFormInstanceRecord::getUserName);
-		attributeGetterFunctions.put(
-			"versionUserId", DDMFormInstanceRecord::getVersionUserId);
-		attributeGetterFunctions.put(
-			"versionUserName", DDMFormInstanceRecord::getVersionUserName);
-		attributeGetterFunctions.put(
-			"createDate", DDMFormInstanceRecord::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", DDMFormInstanceRecord::getModifiedDate);
-		attributeGetterFunctions.put(
-			"formInstanceId", DDMFormInstanceRecord::getFormInstanceId);
-		attributeGetterFunctions.put(
-			"formInstanceVersion",
-			DDMFormInstanceRecord::getFormInstanceVersion);
-		attributeGetterFunctions.put(
-			"storageId", DDMFormInstanceRecord::getStorageId);
-		attributeGetterFunctions.put(
-			"version", DDMFormInstanceRecord::getVersion);
-		attributeGetterFunctions.put(
-			"ipAddress", DDMFormInstanceRecord::getIpAddress);
-		attributeGetterFunctions.put(
-			"lastPublishDate", DDMFormInstanceRecord::getLastPublishDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<DDMFormInstanceRecord, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<DDMFormInstanceRecord, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<DDMFormInstanceRecord, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", DDMFormInstanceRecord::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DDMFormInstanceRecord, Long>)
 				DDMFormInstanceRecord::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", DDMFormInstanceRecord::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<DDMFormInstanceRecord, Long>)
 				DDMFormInstanceRecord::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", DDMFormInstanceRecord::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<DDMFormInstanceRecord, String>)
 				DDMFormInstanceRecord::setUuid);
+		attributeGetterFunctions.put(
+			"formInstanceRecordId",
+			DDMFormInstanceRecord::getFormInstanceRecordId);
 		attributeSetterBiConsumers.put(
 			"formInstanceRecordId",
 			(BiConsumer<DDMFormInstanceRecord, Long>)
 				DDMFormInstanceRecord::setFormInstanceRecordId);
+		attributeGetterFunctions.put(
+			"groupId", DDMFormInstanceRecord::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<DDMFormInstanceRecord, Long>)
 				DDMFormInstanceRecord::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", DDMFormInstanceRecord::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DDMFormInstanceRecord, Long>)
 				DDMFormInstanceRecord::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", DDMFormInstanceRecord::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<DDMFormInstanceRecord, Long>)
 				DDMFormInstanceRecord::setUserId);
+		attributeGetterFunctions.put(
+			"userName", DDMFormInstanceRecord::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<DDMFormInstanceRecord, String>)
 				DDMFormInstanceRecord::setUserName);
+		attributeGetterFunctions.put(
+			"versionUserId", DDMFormInstanceRecord::getVersionUserId);
 		attributeSetterBiConsumers.put(
 			"versionUserId",
 			(BiConsumer<DDMFormInstanceRecord, Long>)
 				DDMFormInstanceRecord::setVersionUserId);
+		attributeGetterFunctions.put(
+			"versionUserName", DDMFormInstanceRecord::getVersionUserName);
 		attributeSetterBiConsumers.put(
 			"versionUserName",
 			(BiConsumer<DDMFormInstanceRecord, String>)
 				DDMFormInstanceRecord::setVersionUserName);
+		attributeGetterFunctions.put(
+			"createDate", DDMFormInstanceRecord::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<DDMFormInstanceRecord, Date>)
 				DDMFormInstanceRecord::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", DDMFormInstanceRecord::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<DDMFormInstanceRecord, Date>)
 				DDMFormInstanceRecord::setModifiedDate);
+		attributeGetterFunctions.put(
+			"formInstanceId", DDMFormInstanceRecord::getFormInstanceId);
 		attributeSetterBiConsumers.put(
 			"formInstanceId",
 			(BiConsumer<DDMFormInstanceRecord, Long>)
 				DDMFormInstanceRecord::setFormInstanceId);
+		attributeGetterFunctions.put(
+			"formInstanceVersion",
+			DDMFormInstanceRecord::getFormInstanceVersion);
 		attributeSetterBiConsumers.put(
 			"formInstanceVersion",
 			(BiConsumer<DDMFormInstanceRecord, String>)
 				DDMFormInstanceRecord::setFormInstanceVersion);
+		attributeGetterFunctions.put(
+			"storageId", DDMFormInstanceRecord::getStorageId);
 		attributeSetterBiConsumers.put(
 			"storageId",
 			(BiConsumer<DDMFormInstanceRecord, Long>)
 				DDMFormInstanceRecord::setStorageId);
+		attributeGetterFunctions.put(
+			"version", DDMFormInstanceRecord::getVersion);
 		attributeSetterBiConsumers.put(
 			"version",
 			(BiConsumer<DDMFormInstanceRecord, String>)
 				DDMFormInstanceRecord::setVersion);
+		attributeGetterFunctions.put(
+			"ipAddress", DDMFormInstanceRecord::getIpAddress);
 		attributeSetterBiConsumers.put(
 			"ipAddress",
 			(BiConsumer<DDMFormInstanceRecord, String>)
 				DDMFormInstanceRecord::setIpAddress);
+		attributeGetterFunctions.put(
+			"lastPublishDate", DDMFormInstanceRecord::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<DDMFormInstanceRecord, Date>)
 				DDMFormInstanceRecord::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -960,6 +983,51 @@ public class DDMFormInstanceRecordModelImpl
 	}
 
 	@Override
+	public DDMFormInstanceRecord cloneWithOriginalValues() {
+		DDMFormInstanceRecordImpl ddmFormInstanceRecordImpl =
+			new DDMFormInstanceRecordImpl();
+
+		ddmFormInstanceRecordImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		ddmFormInstanceRecordImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		ddmFormInstanceRecordImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		ddmFormInstanceRecordImpl.setFormInstanceRecordId(
+			this.<Long>getColumnOriginalValue("formInstanceRecordId"));
+		ddmFormInstanceRecordImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		ddmFormInstanceRecordImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		ddmFormInstanceRecordImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		ddmFormInstanceRecordImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		ddmFormInstanceRecordImpl.setVersionUserId(
+			this.<Long>getColumnOriginalValue("versionUserId"));
+		ddmFormInstanceRecordImpl.setVersionUserName(
+			this.<String>getColumnOriginalValue("versionUserName"));
+		ddmFormInstanceRecordImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		ddmFormInstanceRecordImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		ddmFormInstanceRecordImpl.setFormInstanceId(
+			this.<Long>getColumnOriginalValue("formInstanceId"));
+		ddmFormInstanceRecordImpl.setFormInstanceVersion(
+			this.<String>getColumnOriginalValue("formInstanceVersion"));
+		ddmFormInstanceRecordImpl.setStorageId(
+			this.<Long>getColumnOriginalValue("storageId"));
+		ddmFormInstanceRecordImpl.setVersion(
+			this.<String>getColumnOriginalValue("version"));
+		ddmFormInstanceRecordImpl.setIpAddress(
+			this.<String>getColumnOriginalValue("ipAddress"));
+		ddmFormInstanceRecordImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+
+		return ddmFormInstanceRecordImpl;
+	}
+
+	@Override
 	public int compareTo(DDMFormInstanceRecord ddmFormInstanceRecord) {
 		long primaryKey = ddmFormInstanceRecord.getPrimaryKey();
 
@@ -1223,9 +1291,7 @@ public class DDMFormInstanceRecordModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DDMFormInstanceRecord>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DDMFormInstanceRecord.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

@@ -16,6 +16,13 @@ import {config} from '../config/index';
 import serviceFetch from './serviceFetch';
 
 export default {
+	getCollectionConfiguration(collection) {
+		return serviceFetch(config.getCollectionConfigurationURL, {
+			body: {
+				collectionKey: collection.key,
+			},
+		});
+	},
 
 	/**
 	 * Get an asset's value
@@ -25,24 +32,50 @@ export default {
 	 * @param {function} options.onNetworkStatus
 	 */
 	getCollectionField({
+		activePage,
+		classNameId,
+		classPK,
 		collection,
 		languageId,
 		listItemStyle,
 		listStyle,
+		numberOfItems,
+		numberOfItemsPerPage,
 		onNetworkStatus,
-		size,
+		paginationType,
 		templateKey,
 	}) {
 		return serviceFetch(
 			config.getCollectionFieldURL,
 			{
 				body: {
+					activePage,
+					classNameId,
+					classPK,
 					languageId,
 					layoutObjectReference: JSON.stringify(collection),
 					listItemStyle,
 					listStyle,
-					size,
+					numberOfItems,
+					numberOfItemsPerPage,
+					paginationType,
 					templateKey,
+				},
+			},
+			onNetworkStatus
+		);
+	},
+
+	getCollectionFilters() {
+		return serviceFetch(config.getCollectionFiltersURL, {}, () => {});
+	},
+
+	getCollectionItemCount({collection, onNetworkStatus}) {
+		return serviceFetch(
+			config.getCollectionItemCountURL,
+			{
+				body: {
+					layoutObjectReference: JSON.stringify(collection),
 				},
 			},
 			onNetworkStatus
@@ -57,22 +90,28 @@ export default {
 	 * @param {string} options.itemType Collection itemType
 	 * @param {function} options.onNetworkStatus
 	 */
-	getCollectionMappingFields({
-		fieldType,
-		itemSubtype,
-		itemType,
-		onNetworkStatus,
-	}) {
+	getCollectionMappingFields({itemSubtype, itemType, onNetworkStatus}) {
 		return serviceFetch(
 			config.getCollectionMappingFieldsURL,
 			{
 				body: {
-					fieldType,
 					itemSubtype,
 					itemType,
 				},
 			},
 			onNetworkStatus
+		);
+	},
+
+	/**
+	 * @param {Array<{collectionId: string}>} collections
+	 * @returns {Promise<string[]>}
+	 */
+	getCollectionSupportedFilters(collections) {
+		return serviceFetch(
+			config.getCollectionSupportedFiltersURL,
+			{body: {collections: JSON.stringify(collections)}},
+			() => {}
 		);
 	},
 };

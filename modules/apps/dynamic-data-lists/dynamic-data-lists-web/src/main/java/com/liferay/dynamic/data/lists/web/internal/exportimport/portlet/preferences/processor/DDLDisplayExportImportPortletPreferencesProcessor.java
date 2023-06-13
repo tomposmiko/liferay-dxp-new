@@ -23,7 +23,9 @@ import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.exportimport.portlet.preferences.processor.Capability;
 import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessor;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
@@ -68,15 +70,18 @@ public class DDLDisplayExportImportPortletPreferencesProcessor
 	}
 
 	@Override
-	public boolean isPublishDisplayedContent() {
-		return false;
-	}
-
-	@Override
 	public PortletPreferences processExportPortletPreferences(
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
+
+		if (!MapUtil.getBoolean(
+				portletDataContext.getParameterMap(),
+				PortletDataHandlerKeys.PORTLET_DATA) &&
+			MergeLayoutPrototypesThreadLocal.isInProgress()) {
+
+			return portletPreferences;
+		}
 
 		try {
 			portletDataContext.addPortletPermissions(
@@ -197,14 +202,14 @@ public class DDLDisplayExportImportPortletPreferencesProcessor
 	}
 
 	protected ActionableDynamicQuery getRecordActionableDynamicQuery(
-		final PortletDataContext portletDataContext,
-		final DDLRecordSet recordSet, final String portletId) {
+		PortletDataContext portletDataContext, DDLRecordSet recordSet,
+		String portletId) {
 
 		ActionableDynamicQuery recordActionableDynamicQuery =
 			_ddlRecordStagedModelRepository.getExportActionableDynamicQuery(
 				portletDataContext);
 
-		final ActionableDynamicQuery.AddCriteriaMethod addCriteriaMethod =
+		ActionableDynamicQuery.AddCriteriaMethod addCriteriaMethod =
 			recordActionableDynamicQuery.getAddCriteriaMethod();
 
 		recordActionableDynamicQuery.setAddCriteriaMethod(

@@ -14,6 +14,8 @@
 
 package com.liferay.asset.categories.admin.web.internal.exportimport.data.handler;
 
+import com.liferay.asset.categories.admin.web.internal.exportimport.data.handler.helper.AssetVocabularySettingsExportHelper;
+import com.liferay.asset.categories.admin.web.internal.exportimport.data.handler.helper.AssetVocabularySettingsImportHelper;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
@@ -30,7 +32,6 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -215,17 +216,16 @@ public class AssetVocabularyStagedModelDataHandler
 				null, portletDataContext.getScopeGroupId(),
 				vocabulary.getName(), 2);
 
-			Map<Locale, String> vocabularyTitleMap = getVocabularyTitleMap(
-				portletDataContext.getScopeGroupId(), vocabulary, name);
-
 			serviceContext.setUuid(vocabulary.getUuid());
 
 			importedVocabulary = _assetVocabularyLocalService.addVocabulary(
-				userId, portletDataContext.getScopeGroupId(), StringPool.BLANK,
-				vocabularyTitleMap.get(LocaleUtil.getSiteDefault()),
-				vocabularyTitleMap, vocabulary.getDescriptionMap(),
-				vocabulary.getSettings(), vocabulary.getVisibilityType(),
-				serviceContext);
+				vocabulary.getExternalReferenceCode(), userId,
+				portletDataContext.getScopeGroupId(), StringPool.BLANK,
+				vocabulary.getTitle(),
+				getVocabularyTitleMap(
+					portletDataContext.getScopeGroupId(), vocabulary, name),
+				vocabulary.getDescriptionMap(), vocabulary.getSettings(),
+				vocabulary.getVisibilityType(), serviceContext);
 		}
 		else {
 			String name = getVocabularyName(
@@ -323,11 +323,9 @@ public class AssetVocabularyStagedModelDataHandler
 		AssetVocabulary vocabulary =
 			_assetVocabularyLocalService.fetchGroupVocabulary(groupId, name);
 
-		if (vocabulary == null) {
-			return name;
-		}
+		if ((vocabulary == null) ||
+			(Validator.isNotNull(uuid) && uuid.equals(vocabulary.getUuid()))) {
 
-		if (Validator.isNotNull(uuid) && uuid.equals(vocabulary.getUuid())) {
 			return name;
 		}
 

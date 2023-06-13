@@ -9,7 +9,7 @@ definition {
 	macro closePortalLocalizationWarning {
 		Alert.closeMessage(messageType = "PORTAL_LOCALIZATION");
 
-		Pause(locator1 = 2000);
+		Pause(locator1 = "2000");
 	}
 
 	macro confirmSecurity {
@@ -26,27 +26,41 @@ definition {
 		}
 	}
 
+	macro viewConversionMessage {
+		AssertVisible(
+			key_alertMessage = "${alertMessage}",
+			key_type = "${alertType}",
+			locator1 = "Message#CONVERSION_ALERT_MESSAGE");
+	}
+
+	macro viewDuplicateErrorMessage {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Message#ERROR_1",
+			value1 = "Please enter a unique name.");
+	}
+
 	macro viewErrorMessage {
 		AssertTextEquals.assertPartialText(
 			locator1 = "Message#ERROR",
-			value1 = ${errorMessage});
+			value1 = "${errorMessage}");
 	}
 
 	macro viewExpireContentFailedMessage {
 		AssertTextEquals.assertPartialText(
-			locator1 = "Message#ERROR_1",
+			key_alertMessage = "Please enter a valid expiration date.",
+			locator1 = "Message#ERROR_ENTER_A_VALID_VALUE",
 			value1 = "Please enter a valid expiration date.");
 	}
 
 	macro viewInfoMessage {
 		AssertTextEquals(
 			locator1 = "Message#INFO_2",
-			value1 = ${infoMessage});
+			value1 = "${infoMessage}");
 	}
 
 	macro viewInfoMessageSpecific {
 		AssertElementPresent(
-			key_infoMessage = ${infoMessage},
+			key_infoMessage = "${infoMessage}",
 			locator1 = "Message#INFO_SPECIFIC");
 	}
 
@@ -59,24 +73,24 @@ definition {
 	macro viewLocalizationMessage {
 		AssertTextEquals.assertPartialText(
 			locator1 = "Home#PORTAL_LOCALIZATION_TRANSLATION_LANGUAGE_MESSAGE",
-			value1 = ${translationLanguageLocalizationMessage});
+			value1 = "${translationLanguageLocalizationMessage}");
 
 		if (isSet(defaultLanguageLocalizationMessage)) {
 			AssertTextEquals(
-				key_pageLocale = ${defaultLanguageLocalizationMessage},
+				key_pageLocale = "${defaultLanguageLocalizationMessage}",
 				locator1 = "Home#PORTAL_LOCALIZATION_DEFAULT_LANGUAGE_MESSAGE",
-				value1 = ${defaultLanguageLocalizationMessage});
+				value1 = "${defaultLanguageLocalizationMessage}");
 		}
 
 		AssertTextEquals(
 			locator1 = "Home#PORTAL_LOCALIZATION_PREFERRED_LANGUAGE_MESSAGE",
-			value1 = ${preferredLanguageLocalizationMessage});
+			value1 = "${preferredLanguageLocalizationMessage}");
 	}
 
 	macro viewMutedMessage {
 		AssertTextEquals.assertPartialText(
 			locator1 = "Message#EMPTY_INFO_DEPOT",
-			value1 = ${muteMessage});
+			value1 = "${muteMessage}");
 	}
 
 	macro viewRequestFailedToComplete {
@@ -93,12 +107,15 @@ definition {
 			value1 = "This field is required.");
 	}
 
+	macro viewSpecificRequiredField {
+		AssertTextEquals.assertPartialText(
+			key_fieldFieldLabel = "${fieldFieldLabel}",
+			locator1 = "Message#ERROR_FIELD_REQUIRED",
+			value1 = "This field is required.");
+	}
+
 	macro viewSuccessMessage {
 		VerifyElementPresent(locator1 = "Message#SUCCESS_DISMISSIBLE");
-
-		if (IsElementPresent(locator1 = "Button#CLOSE_MESSAGE")) {
-			Click(locator1 = "Button#CLOSE_MESSAGE");
-		}
 	}
 
 	macro viewSuccessMessageText {
@@ -106,12 +123,12 @@ definition {
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "Message#SUCCESS",
-			value1 = ${successMessage});
+			value1 = "${successMessage}");
 	}
 
 	macro viewWarningSpecific {
 		AssertElementPresent(
-			key_warningMessage = ${warningMessage},
+			key_warningMessage = "${warningMessage}",
 			locator1 = "Message#WARNING_SPECIFIC");
 	}
 

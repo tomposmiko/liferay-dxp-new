@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.3.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_3_0.dtd">
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.4.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_4_0.dtd">
 
 <service-builder auto-namespace-tables="false" change-tracking-enabled="true" dependency-injector="ds" mvcc-enabled="true" package-path="com.liferay.segments">
 	<author>Eduardo Garcia</author>
@@ -149,10 +149,6 @@
 			<finder-column name="segmentsEntryId" />
 			<finder-column name="roleId" />
 		</finder>
-
-		<!-- References -->
-
-		<reference entity="Role" package-path="com.liferay.portal" />
 	</entity>
 	<entity local-service="true" name="SegmentsExperience" remote-service="true" uuid="true">
 
@@ -181,6 +177,7 @@
 		<column localized="true" name="name" type="String" />
 		<column name="priority" type="int" />
 		<column name="active" type="boolean" />
+		<column name="typeSettings" type="String" />
 		<column name="lastPublishDate" type="Date" />
 
 		<!-- Order -->
@@ -243,10 +240,6 @@
 			<finder-column name="classPK" />
 			<finder-column name="active" />
 		</finder>
-
-		<!-- References -->
-
-		<reference entity="Layout" package-path="com.liferay.portal" />
 	</entity>
 	<entity local-service="true" name="SegmentsExperiment" remote-service="true" uuid="true">
 
@@ -312,10 +305,6 @@
 			<finder-column name="classPK" />
 			<finder-column arrayable-operator="OR" name="status" />
 		</finder>
-
-		<!-- References -->
-
-		<reference entity="UserNotificationEvent" package-path="com.liferay.portal.kernel" />
 	</entity>
 	<entity local-service="true" name="SegmentsExperimentRel" remote-service="true">
 

@@ -43,8 +43,6 @@ import com.liferay.commerce.product.service.persistence.CommerceCatalogPersisten
 import com.liferay.commerce.product.service.persistence.CommerceChannelPersistence;
 import com.liferay.commerce.product.service.persistence.CommerceChannelRelFinder;
 import com.liferay.commerce.product.service.persistence.CommerceChannelRelPersistence;
-import com.liferay.document.library.kernel.service.persistence.DLFileEntryPersistence;
-import com.liferay.expando.kernel.service.persistence.ExpandoRowPersistence;
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
@@ -73,8 +71,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -316,7 +312,13 @@ public abstract class CPAttachmentFileEntryLocalServiceBaseImpl
 		return cpAttachmentFileEntryPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp attachment file entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp attachment file entry's external reference code
+	 * @return the matching cp attachment file entry, or <code>null</code> if a matching cp attachment file entry could not be found
+	 */
 	@Override
 	public CPAttachmentFileEntry
 		fetchCPAttachmentFileEntryByExternalReferenceCode(
@@ -326,6 +328,9 @@ public abstract class CPAttachmentFileEntryLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPAttachmentFileEntryByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public CPAttachmentFileEntry fetchCPAttachmentFileEntryByReferenceCode(
@@ -335,7 +340,14 @@ public abstract class CPAttachmentFileEntryLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp attachment file entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp attachment file entry's external reference code
+	 * @return the matching cp attachment file entry
+	 * @throws PortalException if a matching cp attachment file entry could not be found
+	 */
 	@Override
 	public CPAttachmentFileEntry
 			getCPAttachmentFileEntryByExternalReferenceCode(
@@ -567,6 +579,7 @@ public abstract class CPAttachmentFileEntryLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -585,6 +598,7 @@ public abstract class CPAttachmentFileEntryLocalServiceBaseImpl
 			(CPAttachmentFileEntry)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<CPAttachmentFileEntry> getBasePersistence() {
 		return cpAttachmentFileEntryPersistence;
 	}
@@ -1818,115 +1832,6 @@ public abstract class CPAttachmentFileEntryLocalServiceBaseImpl
 		this.userPersistence = userPersistence;
 	}
 
-	/**
-	 * Returns the dl app local service.
-	 *
-	 * @return the dl app local service
-	 */
-	public com.liferay.document.library.kernel.service.DLAppLocalService
-		getDLAppLocalService() {
-
-		return dlAppLocalService;
-	}
-
-	/**
-	 * Sets the dl app local service.
-	 *
-	 * @param dlAppLocalService the dl app local service
-	 */
-	public void setDLAppLocalService(
-		com.liferay.document.library.kernel.service.DLAppLocalService
-			dlAppLocalService) {
-
-		this.dlAppLocalService = dlAppLocalService;
-	}
-
-	/**
-	 * Returns the document library file entry local service.
-	 *
-	 * @return the document library file entry local service
-	 */
-	public com.liferay.document.library.kernel.service.DLFileEntryLocalService
-		getDLFileEntryLocalService() {
-
-		return dlFileEntryLocalService;
-	}
-
-	/**
-	 * Sets the document library file entry local service.
-	 *
-	 * @param dlFileEntryLocalService the document library file entry local service
-	 */
-	public void setDLFileEntryLocalService(
-		com.liferay.document.library.kernel.service.DLFileEntryLocalService
-			dlFileEntryLocalService) {
-
-		this.dlFileEntryLocalService = dlFileEntryLocalService;
-	}
-
-	/**
-	 * Returns the document library file entry persistence.
-	 *
-	 * @return the document library file entry persistence
-	 */
-	public DLFileEntryPersistence getDLFileEntryPersistence() {
-		return dlFileEntryPersistence;
-	}
-
-	/**
-	 * Sets the document library file entry persistence.
-	 *
-	 * @param dlFileEntryPersistence the document library file entry persistence
-	 */
-	public void setDLFileEntryPersistence(
-		DLFileEntryPersistence dlFileEntryPersistence) {
-
-		this.dlFileEntryPersistence = dlFileEntryPersistence;
-	}
-
-	/**
-	 * Returns the expando row local service.
-	 *
-	 * @return the expando row local service
-	 */
-	public com.liferay.expando.kernel.service.ExpandoRowLocalService
-		getExpandoRowLocalService() {
-
-		return expandoRowLocalService;
-	}
-
-	/**
-	 * Sets the expando row local service.
-	 *
-	 * @param expandoRowLocalService the expando row local service
-	 */
-	public void setExpandoRowLocalService(
-		com.liferay.expando.kernel.service.ExpandoRowLocalService
-			expandoRowLocalService) {
-
-		this.expandoRowLocalService = expandoRowLocalService;
-	}
-
-	/**
-	 * Returns the expando row persistence.
-	 *
-	 * @return the expando row persistence
-	 */
-	public ExpandoRowPersistence getExpandoRowPersistence() {
-		return expandoRowPersistence;
-	}
-
-	/**
-	 * Sets the expando row persistence.
-	 *
-	 * @param expandoRowPersistence the expando row persistence
-	 */
-	public void setExpandoRowPersistence(
-		ExpandoRowPersistence expandoRowPersistence) {
-
-		this.expandoRowPersistence = expandoRowPersistence;
-	}
-
 	public void afterPropertiesSet() {
 		persistedModelLocalServiceRegistry.register(
 			"com.liferay.commerce.product.model.CPAttachmentFileEntry",
@@ -2233,34 +2138,6 @@ public abstract class CPAttachmentFileEntryLocalServiceBaseImpl
 
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	@ServiceReference(
-		type = com.liferay.document.library.kernel.service.DLAppLocalService.class
-	)
-	protected com.liferay.document.library.kernel.service.DLAppLocalService
-		dlAppLocalService;
-
-	@ServiceReference(
-		type = com.liferay.document.library.kernel.service.DLFileEntryLocalService.class
-	)
-	protected
-		com.liferay.document.library.kernel.service.DLFileEntryLocalService
-			dlFileEntryLocalService;
-
-	@ServiceReference(type = DLFileEntryPersistence.class)
-	protected DLFileEntryPersistence dlFileEntryPersistence;
-
-	@ServiceReference(
-		type = com.liferay.expando.kernel.service.ExpandoRowLocalService.class
-	)
-	protected com.liferay.expando.kernel.service.ExpandoRowLocalService
-		expandoRowLocalService;
-
-	@ServiceReference(type = ExpandoRowPersistence.class)
-	protected ExpandoRowPersistence expandoRowPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CPAttachmentFileEntryLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

@@ -14,7 +14,6 @@
 
 package com.liferay.headless.admin.workflow.internal.resource.v1_0.factory;
 
-import com.liferay.headless.admin.workflow.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowTaskTransitionsResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,18 +33,14 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -53,7 +48,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -62,8 +59,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @generated
  */
 @Component(
-	property = "resource.locator.key=/headless-admin-workflow/v1.0/WorkflowTaskTransitions",
-	service = WorkflowTaskTransitionsResource.Factory.class
+	immediate = true, service = WorkflowTaskTransitionsResource.Factory.class
 )
 @Generated("")
 public class WorkflowTaskTransitionsResourceFactoryImpl
@@ -79,8 +75,10 @@ public class WorkflowTaskTransitionsResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return _workflowTaskTransitionsResourceProxyProviderFunction.
-					apply(
+				return (WorkflowTaskTransitionsResource)
+					ProxyUtil.newProxyInstance(
+						WorkflowTaskTransitionsResource.class.getClassLoader(),
+						new Class<?>[] {WorkflowTaskTransitionsResource.class},
 						(proxy, method, arguments) -> _invoke(
 							method, arguments, _checkPermissions,
 							_httpServletRequest, _httpServletResponse,
@@ -139,32 +137,14 @@ public class WorkflowTaskTransitionsResourceFactoryImpl
 		};
 	}
 
-	private static Function<InvocationHandler, WorkflowTaskTransitionsResource>
-		_getProxyProviderFunction() {
+	@Activate
+	protected void activate() {
+		WorkflowTaskTransitionsResource.FactoryHolder.factory = this;
+	}
 
-		Class<?> proxyClass = ProxyUtil.getProxyClass(
-			WorkflowTaskTransitionsResource.class.getClassLoader(),
-			WorkflowTaskTransitionsResource.class);
-
-		try {
-			Constructor<WorkflowTaskTransitionsResource> constructor =
-				(Constructor<WorkflowTaskTransitionsResource>)
-					proxyClass.getConstructor(InvocationHandler.class);
-
-			return invocationHandler -> {
-				try {
-					return constructor.newInstance(invocationHandler);
-				}
-				catch (ReflectiveOperationException
-							reflectiveOperationException) {
-
-					throw new InternalError(reflectiveOperationException);
-				}
-			};
-		}
-		catch (NoSuchMethodException noSuchMethodException) {
-			throw new InternalError(noSuchMethodException);
-		}
+	@Deactivate
+	protected void deactivate() {
+		WorkflowTaskTransitionsResource.FactoryHolder.factory = null;
 	}
 
 	private Object _invoke(
@@ -187,7 +167,7 @@ public class WorkflowTaskTransitionsResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		WorkflowTaskTransitionsResource workflowTaskTransitionsResource =
@@ -216,8 +196,6 @@ public class WorkflowTaskTransitionsResourceFactoryImpl
 		workflowTaskTransitionsResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		workflowTaskTransitionsResource.setRoleLocalService(_roleLocalService);
-		workflowTaskTransitionsResource.setSortParserProvider(
-			_sortParserProvider);
 
 		try {
 			return method.invoke(workflowTaskTransitionsResource, arguments);
@@ -234,11 +212,6 @@ public class WorkflowTaskTransitionsResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
-
-	private static final Function
-		<InvocationHandler, WorkflowTaskTransitionsResource>
-			_workflowTaskTransitionsResourceProxyProviderFunction =
-				_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
@@ -261,6 +234,9 @@ public class WorkflowTaskTransitionsResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -269,9 +245,6 @@ public class WorkflowTaskTransitionsResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

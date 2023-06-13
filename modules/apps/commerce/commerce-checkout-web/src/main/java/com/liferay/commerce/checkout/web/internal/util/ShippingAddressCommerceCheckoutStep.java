@@ -14,8 +14,8 @@
 
 package com.liferay.commerce.checkout.web.internal.util;
 
-import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.service.CommerceAccountLocalService;
+import com.liferay.commerce.checkout.helper.CommerceCheckoutStepHttpHelper;
 import com.liferay.commerce.checkout.web.internal.display.context.ShippingAddressCheckoutStepDisplayContext;
 import com.liferay.commerce.constants.CommerceAddressConstants;
 import com.liferay.commerce.constants.CommerceCheckoutWebKeys;
@@ -128,7 +128,6 @@ public class ShippingAddressCommerceCheckoutStep
 		ShippingAddressCheckoutStepDisplayContext
 			shippingAddressCheckoutStepDisplayContext =
 				new ShippingAddressCheckoutStepDisplayContext(
-					_commerceAccountModelResourcePermission,
 					_commerceAddressService, httpServletRequest);
 
 		CommerceOrder commerceOrder =
@@ -137,7 +136,7 @@ public class ShippingAddressCommerceCheckoutStep
 		if (!commerceOrder.isOpen()) {
 			httpServletRequest.setAttribute(
 				CommerceCheckoutWebKeys.COMMERCE_CHECKOUT_STEP_ORDER_DETAIL_URL,
-				_commerceCheckoutStepHelper.getOrderDetailURL(
+				_commerceCheckoutStepHttpHelper.getOrderDetailURL(
 					httpServletRequest, commerceOrder));
 
 			_jspRenderer.renderJSP(
@@ -173,17 +172,11 @@ public class ShippingAddressCommerceCheckoutStep
 	@Reference
 	private CommerceAccountLocalService _commerceAccountLocalService;
 
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.account.model.CommerceAccount)"
-	)
-	private ModelResourcePermission<CommerceAccount>
-		_commerceAccountModelResourcePermission;
-
 	@Reference
 	private CommerceAddressService _commerceAddressService;
 
 	@Reference
-	private CommerceCheckoutStepHelper _commerceCheckoutStepHelper;
+	private CommerceCheckoutStepHttpHelper _commerceCheckoutStepHttpHelper;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.commerce.model.CommerceOrder)"

@@ -16,9 +16,11 @@ package com.liferay.dynamic.data.mapping.form.field.type.internal.checkbox;
 
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
+import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.form.field.type.internal.util.DDMFormFieldTypeUtil;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
@@ -26,8 +28,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 
 import java.util.Map;
-
-import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -37,7 +37,8 @@ import org.osgi.service.component.annotations.Component;
  * @author Marcellus Tavares
  */
 @Component(
-	immediate = true, property = "ddm.form.field.type.name=checkbox",
+	immediate = true,
+	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.CHECKBOX,
 	service = {
 		CheckboxDDMFormFieldTemplateContextContributor.class,
 		DDMFormFieldTemplateContextContributor.class
@@ -79,6 +80,11 @@ public class CheckboxDDMFormFieldTemplateContextContributor
 					ddmFormFieldRenderingContext.getHttpServletRequest());
 			}
 		).put(
+			"tooltip",
+			DDMFormFieldTypeUtil.getPropertyValue(
+				ddmFormField, ddmFormFieldRenderingContext.getLocale(),
+				"tooltip")
+		).put(
 			"value",
 			GetterUtil.getBoolean(
 				DDMFormFieldTypeUtil.getValue(
@@ -92,17 +98,16 @@ public class CheckboxDDMFormFieldTemplateContextContributor
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
 			RequestBackedPortletURLFactoryUtil.create(httpServletRequest);
 
-		PortletURL portletURL = requestBackedPortletURLFactory.createActionURL(
-			ConfigurationAdminPortletKeys.SYSTEM_SETTINGS);
-
-		portletURL.setParameter(
-			"mvcRenderCommandName", "/configuration_admin/edit_configuration");
-		portletURL.setParameter(
+		return PortletURLBuilder.create(
+			requestBackedPortletURLFactory.createActionURL(
+				ConfigurationAdminPortletKeys.SYSTEM_SETTINGS)
+		).setMVCRenderCommandName(
+			"/configuration_admin/edit_configuration"
+		).setParameter(
 			"factoryPid",
 			"com.liferay.dynamic.data.mapping.form.web.internal." +
-				"configuration.DDMFormWebConfiguration");
-
-		return portletURL.toString();
+				"configuration.DDMFormWebConfiguration"
+		).buildString();
 	}
 
 }

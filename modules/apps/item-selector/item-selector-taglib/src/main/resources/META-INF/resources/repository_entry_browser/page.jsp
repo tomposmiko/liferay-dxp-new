@@ -20,6 +20,7 @@
 String randomNamespace = PortalUtil.generateRandomKey(request, "taglib_ui_repository_entry_browse_page") + StringPool.UNDERLINE;
 
 String displayStyle = GetterUtil.getString(request.getAttribute("liferay-item-selector:repository-entry-browser:displayStyle"));
+PortletURL editImageURL = (PortletURL)request.getAttribute("liferay-item-selector:repository-entry-browser:editImageURL");
 String emptyResultsMessage = GetterUtil.getString(request.getAttribute("liferay-item-selector:repository-entry-browser:emptyResultsMessage"));
 ItemSelectorReturnType existingFileEntryReturnType = (ItemSelectorReturnType)request.getAttribute("liferay-item-selector:repository-entry-browser:existingFileEntryReturnType");
 List<String> extensions = (List)request.getAttribute("liferay-item-selector:repository-entry-browser:extensions");
@@ -45,7 +46,7 @@ if (Validator.isNotNull(keywords)) {
 %>
 
 <liferay-util:html-top>
-	<link href="<%= ServletContextUtil.getContextPath() %>/repository_entry_browser/css/main.css" rel="stylesheet" type="text/css" />
+	<link href="<%= ServletContextUtil.getContextPath() + "/repository_entry_browser/css/main.css" %>" rel="stylesheet" type="text/css" />
 </liferay-util:html-top>
 
 <%
@@ -67,7 +68,7 @@ SearchContainer<?> searchContainer = new SearchContainer(renderRequest, itemSele
 	searchFormMethod="POST"
 	searchFormName="searchFm"
 	selectable="<%= false %>"
-	showCreationMenu="<%= true %>"
+	showCreationMenu="<%= itemSelectorRepositoryEntryManagementToolbarDisplayContext.isShowCreationMenu() %>"
 	showInfoButton="<%= false %>"
 	showSearch="<%= showSearch %>"
 	sortingOrder="<%= itemSelectorRepositoryEntryManagementToolbarDisplayContext.getOrderByType() %>"
@@ -103,7 +104,7 @@ SearchContainer<?> searchContainer = new SearchContainer(renderRequest, itemSele
 		/>
 	</c:if>
 
-	<c:if test="<%= showDragAndDropZone && !showSearchInfo %>">
+	<c:if test="<%= showDragAndDropZone && !showSearchInfo && DLFolderPermission.contains(permissionChecker, scopeGroupId, folderId, ActionKeys.ADD_DOCUMENT) %>">
 		<liferay-util:buffer
 			var="selectFileHTML"
 		>
@@ -313,7 +314,7 @@ SearchContainer<?> searchContainer = new SearchContainer(renderRequest, itemSele
 							<c:when test='<%= displayStyle.equals("icon") %>'>
 
 								<%
-								row.setCssClass("entry-card lfr-asset-folder");
+								row.setCssClass("card-page-item card-page-item-directory");
 								%>
 
 								<c:if test="<%= folder != null %>">
@@ -395,10 +396,10 @@ SearchContainer<?> searchContainer = new SearchContainer(renderRequest, itemSele
 										<c:choose>
 											<c:when test="<%= Validator.isNull(thumbnailSrc) %>">
 												<liferay-frontend:icon-vertical-card
-													actionJsp="/repository_entry_browser/action_button_preview.jsp"
+													actionJsp='<%= repositoryEntryBrowserDisplayContext.isPreviewable(latestFileVersion) ? "/repository_entry_browser/action_button_preview.jsp" : StringPool.BLANK %>'
 													actionJspServletContext="<%= application %>"
 													cardCssClass="card-interactive"
-													cssClass="file-card form-check form-check-card item-preview"
+													cssClass='<%= (repositoryEntryBrowserDisplayContext.isPreviewable(latestFileVersion) ? "item-preview-editable" : StringPool.BLANK) + " item-preview file-card form-check form-check-card" %>'
 													data="<%= data %>"
 													icon="documents-and-media"
 													title="<%= title %>"
@@ -425,10 +426,10 @@ SearchContainer<?> searchContainer = new SearchContainer(renderRequest, itemSele
 											</c:when>
 											<c:otherwise>
 												<liferay-frontend:vertical-card
-													actionJsp="/repository_entry_browser/action_button_preview.jsp"
+													actionJsp='<%= repositoryEntryBrowserDisplayContext.isPreviewable(latestFileVersion) ? "/repository_entry_browser/action_button_preview.jsp" : StringPool.BLANK %>'
 													actionJspServletContext="<%= application %>"
 													cardCssClass="card-interactive"
-													cssClass="form-check form-check-card image-card item-preview"
+													cssClass='<%= (repositoryEntryBrowserDisplayContext.isPreviewable(latestFileVersion) ? "item-preview-editable" : StringPool.BLANK) + " item-preview form-check form-check-card image-card" %>'
 													data="<%= data %>"
 													imageUrl="<%= thumbnailSrc %>"
 													title="<%= title %>"
@@ -598,19 +599,8 @@ SearchContainer<?> searchContainer = new SearchContainer(renderRequest, itemSele
 	var itemSelector = new ItemSelectorRepositoryEntryBrowser.default({
 		closeCaption: '<%= UnicodeLanguageUtil.get(request, tabName) %>',
 
-		<c:if test="<%= uploadURL != null %>">
-
-			<%
-			String imageEditorPortletId = PortletProviderUtil.getPortletId(Image.class.getName(), PortletProvider.Action.EDIT);
-			%>
-
-			<c:if test="<%= Validator.isNotNull(imageEditorPortletId) %>">
-				<liferay-portlet:renderURL portletName="<%= imageEditorPortletId %>" var="viewImageEditorURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-					<liferay-portlet:param name="mvcRenderCommandName" value="/frontend_image_editor/view" />
-				</liferay-portlet:renderURL>
-
-				editItemURL: '<%= viewImageEditorURL.toString() %>',
-			</c:if>
+		<c:if test="<%= editImageURL != null %>">
+			editImageURL: '<%= editImageURL.toString() %>',
 		</c:if>
 
 		maxFileSize: '<%= maxFileSize %>',
@@ -633,9 +623,9 @@ SearchContainer<?> searchContainer = new SearchContainer(renderRequest, itemSele
 		</c:if>
 	});
 
-	itemSelector.on('selectedItem', function (event) {
+	itemSelector.on('selectedItem', (event) => {
 		Liferay.Util.getOpener().Liferay.fire(
-			decodeURIComponent('<%= itemSelectedEventName %>'),
+			'<%= itemSelectedEventName %>',
 			event
 		);
 	});

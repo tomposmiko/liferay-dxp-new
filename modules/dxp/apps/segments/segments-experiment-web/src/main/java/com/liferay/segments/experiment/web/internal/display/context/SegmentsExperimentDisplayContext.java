@@ -15,6 +15,7 @@
 package com.liferay.segments.experiment.web.internal.display.context;
 
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -23,7 +24,6 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -62,8 +62,6 @@ import java.util.ResourceBundle;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-import javax.portlet.ActionRequest;
-import javax.portlet.PortletURL;
 import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
@@ -116,12 +114,12 @@ public class SegmentsExperimentDisplayContext {
 
 	protected Map<String, Object> getContext() throws PortalException {
 		return HashMapBuilder.<String, Object>put(
-			"assetsPath", _getAssetsPath()
-		).put(
 			"contentPageEditorNamespace",
 			_getContentPageEditorPortletNamespace()
 		).put(
 			"endpoints", _getEndpoints()
+		).put(
+			"imagesPath", _getImagesPath()
 		).put(
 			"namespace", _getSegmentsExperimentPortletNamespace()
 		).put(
@@ -165,26 +163,20 @@ public class SegmentsExperimentDisplayContext {
 				SegmentsExperimentConstants.Status.getExclusiveStatusValues()));
 	}
 
-	private String _getAssetsPath() {
-		return PortalUtil.getPathContext(_httpServletRequest) + "/assets";
-	}
-
 	private String _getCalculateSegmentsExperimentEstimatedDurationURL() {
 		return _getSegmentsExperimentActionURL(
 			"/calculate_segments_experiment_estimated_duration");
 	}
 
 	private String _getContentPageEditorActionURL(String action) {
-		LiferayPortletResponse liferayPortletResponse =
-			_portal.getLiferayPortletResponse(_renderResponse);
-
-		PortletURL actionURL = liferayPortletResponse.createActionURL(
-			ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET);
-
-		actionURL.setParameter(ActionRequest.ACTION_NAME, action);
-
 		return HttpUtil.addParameter(
-			actionURL.toString(), "p_l_mode", Constants.EDIT);
+			PortletURLBuilder.createActionURL(
+				_portal.getLiferayPortletResponse(_renderResponse),
+				ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET
+			).setActionName(
+				action
+			).buildString(),
+			"p_l_mode", Constants.EDIT);
 	}
 
 	private String _getContentPageEditorPortletNamespace() {
@@ -199,7 +191,7 @@ public class SegmentsExperimentDisplayContext {
 
 	private String _getCreateSegmentsVariantURL() {
 		return _getContentPageEditorActionURL(
-			"/content_layout/add_segments_experience");
+			"/layout_content_page_editor/add_segments_experience");
 	}
 
 	private String _getDeleteSegmentsExperimentURL() {
@@ -233,14 +225,24 @@ public class SegmentsExperimentDisplayContext {
 		String layoutFullURL = PortalUtil.getLayoutFullURL(
 			draftLayout, _themeDisplay);
 
+		String layoutURL = _portal.getLayoutURL(_themeDisplay);
+
+		long segmentsExperienceId = _getSegmentsExperienceId();
+
+		if (segmentsExperienceId != -1) {
+			layoutURL = HttpUtil.setParameter(
+				layoutURL, "segmentsExperienceId", segmentsExperienceId);
+		}
+
 		layoutFullURL = HttpUtil.setParameter(
-			layoutFullURL, "redirect", layoutFullURL);
+			layoutFullURL, "p_l_back_url", layoutURL);
 
 		layoutFullURL = HttpUtil.setParameter(
 			layoutFullURL, "p_l_mode", Constants.EDIT);
+		layoutFullURL = HttpUtil.setParameter(
+			layoutFullURL, "redirect", layoutFullURL);
 
-		return HttpUtil.setParameter(
-			layoutFullURL, "p_l_back_url", _themeDisplay.getURLCurrent());
+		return layoutFullURL;
 	}
 
 	private String _getEditSegmentsVariantURL() {
@@ -301,6 +303,10 @@ public class SegmentsExperimentDisplayContext {
 		}
 
 		return segmentsExperimentsJSONArray;
+	}
+
+	private String _getImagesPath() {
+		return PortalUtil.getPathContext(_httpServletRequest) + "/images";
 	}
 
 	private Map<String, Object> _getPage() {
@@ -401,12 +407,13 @@ public class SegmentsExperimentDisplayContext {
 	}
 
 	private String _getSegmentsExperimentActionURL(String action) {
-		PortletURL actionURL = _renderResponse.createActionURL();
-
-		actionURL.setParameter(ActionRequest.ACTION_NAME, action);
-
 		return HttpUtil.addParameter(
-			actionURL.toString(), "p_l_mode", Constants.VIEW);
+			PortletURLBuilder.createActionURL(
+				_renderResponse
+			).setActionName(
+				action
+			).buildString(),
+			"p_l_mode", Constants.VIEW);
 	}
 
 	private JSONArray _getSegmentsExperimentGoalsJSONArray(Locale locale) {

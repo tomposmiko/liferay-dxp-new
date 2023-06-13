@@ -13,7 +13,8 @@
  */
 
 import {openImageSelector} from '../../core/openImageSelector';
-import {config} from '../config/index';
+import {getEditableLinkValue} from '../utils/getEditableLinkValue';
+import {getEditableLocalizedValue} from '../utils/getEditableLocalizedValue';
 
 /**
  * @param {HTMLElement} element HTMLElement where the editor
@@ -30,12 +31,10 @@ function createEditor(element, changeCallback, destroyCallback) {
 		const url = image && image.url ? image.url : '';
 
 		changeCallback(
-			config.adaptiveMediaEnabled
-				? {
-						fileEntryId: image ? image.fileEntryId : undefined,
-						url,
-				  }
-				: url,
+			{
+				fileEntryId: image ? image.fileEntryId : undefined,
+				url,
+			},
 			{imageTitle: image && image.title ? image.title : ''}
 		);
 	}, destroyCallback);
@@ -52,8 +51,9 @@ function destroyEditor() {}
  * @param {object} config Editable value's config object
  * @param {string} [config.href] Image anchor url
  * @param {string} [config.target] Image anchor target
+ * @param {string} languageId Language id
  */
-function render(element, value, config = {}) {
+function render(element, value, editableConfig = {}, languageId) {
 	let image = null;
 
 	if (element instanceof HTMLImageElement) {
@@ -64,21 +64,23 @@ function render(element, value, config = {}) {
 	}
 
 	if (image) {
-		image.alt = value.alt || config.alt || image.alt;
+		image.alt = getEditableLocalizedValue(editableConfig.alt, languageId);
 
-		if (config.href) {
+		const link = getEditableLinkValue(editableConfig, languageId);
+
+		if (link.href) {
 			if (image.parentElement instanceof HTMLAnchorElement) {
-				image.parentElement.href = config.href;
-				image.parentElement.target = config.target || '';
+				image.parentElement.href = link.href;
+				image.parentElement.target = link.target;
 			}
 			else {
-				const link = document.createElement('a');
+				const anchorElement = document.createElement('a');
 
-				link.href = config.href;
-				link.target = config.target || '';
+				anchorElement.href = link.href;
+				anchorElement.target = link.target;
 
-				image.parentElement.replaceChild(link, image);
-				link.appendChild(image);
+				image.parentElement.replaceChild(anchorElement, image);
+				anchorElement.appendChild(image);
 			}
 		}
 

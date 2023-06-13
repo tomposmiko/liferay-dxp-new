@@ -114,7 +114,7 @@ public class DDMFormFieldTypesServlet extends HttpServlet {
 		httpServletResponse.setStatus(HttpServletResponse.SC_OK);
 
 		ServletResponseUtil.write(
-			httpServletResponse, fieldTypesJSONArray.toString());
+			httpServletResponse, fieldTypesJSONArray.toJSONString());
 	}
 
 	protected JSONObject getFieldTypeMetadataJSONObject(
@@ -122,11 +122,16 @@ public class DDMFormFieldTypesServlet extends HttpServlet {
 
 		JSONObject jsonObject = new JSONObjectImpl();
 
-		if (!configuration.isEmpty()) {
-			jsonObject.put("configuration", configuration);
-		}
-
 		return jsonObject.put(
+			"configuration",
+			() -> {
+				if (!configuration.isEmpty()) {
+					return configuration;
+				}
+
+				return null;
+			}
+		).put(
 			"javaScriptModule",
 			resolveModuleName(
 				_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(

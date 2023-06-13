@@ -25,12 +25,13 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 import com.liferay.portal.upload.LiferayInputStream;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -85,11 +86,12 @@ public class UploadServletRequestFilter extends BasePortalFilter {
 				_portal.getCompanyId(httpServletRequest), portletId);
 
 			if (portlet != null) {
-				FilterConfig filterConfig = getFilterConfig();
+				ServletContext servletContext =
+					(ServletContext)httpServletRequest.getAttribute(
+						WebKeys.CTX);
 
 				InvokerPortlet invokerPortlet =
-					PortletInstanceFactoryUtil.create(
-						portlet, filterConfig.getServletContext());
+					PortletInstanceFactoryUtil.create(portlet, servletContext);
 
 				LiferayPortletConfig liferayPortletConfig =
 					(LiferayPortletConfig)invokerPortlet.getPortletConfig();

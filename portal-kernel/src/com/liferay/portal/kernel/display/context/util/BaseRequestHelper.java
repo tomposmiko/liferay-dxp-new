@@ -37,8 +37,11 @@ import javax.portlet.PortletURL;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @author Iván Zaera
+ * @author     Iván Zaera
+ * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+ *             com.liferay.portal.kernel.display.context.helper.BaseRequestHelper}
  */
+@Deprecated
 public abstract class BaseRequestHelper {
 
 	public BaseRequestHelper(HttpServletRequest httpServletRequest) {

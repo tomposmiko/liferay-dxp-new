@@ -18,6 +18,7 @@ import com.liferay.search.experiences.rest.dto.v1_0.Condition;
 import com.liferay.search.experiences.rest.dto.v1_0.Contains;
 import com.liferay.search.experiences.rest.dto.v1_0.Equals;
 import com.liferay.search.experiences.rest.dto.v1_0.In;
+import com.liferay.search.experiences.rest.dto.v1_0.Range;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -56,6 +57,7 @@ public class ConditionUtil {
 		_unpack(condition.getContains());
 		_unpack(condition.getEquals());
 		_unpack(condition.getIn());
+		_unpack(condition.getRange());
 		_unpack(condition.getNot());
 	}
 
@@ -65,6 +67,7 @@ public class ConditionUtil {
 		}
 
 		_unpackValue(contains::setValue, contains::getValue);
+		_unpackValues(contains::setValues, contains::getValues);
 	}
 
 	private static void _unpack(Equals equals) {
@@ -80,7 +83,16 @@ public class ConditionUtil {
 			return;
 		}
 
-		_unpackValue(in::setValue, in::getValue);
+		_unpackValues(in::setValues, in::getValues);
+	}
+
+	private static void _unpack(Range range) {
+		if (range == null) {
+			return;
+		}
+
+		_unpackValue(range::setValue, range::getValue);
+		_unpackValues(range::setValues, range::getValues);
 	}
 
 	private static void _unpackValue(
@@ -90,6 +102,18 @@ public class ConditionUtil {
 
 		if (value != null) {
 			consumer.accept(UnpackUtil.unpack(value));
+		}
+	}
+
+	private static void _unpackValues(
+		Consumer<Object[]> consumer, Supplier<Object[]> supplier) {
+
+		Object[] values = supplier.get();
+
+		if (values != null) {
+			Arrays.setAll(values, i -> UnpackUtil.unpack(values[i]));
+
+			consumer.accept(values);
 		}
 	}
 

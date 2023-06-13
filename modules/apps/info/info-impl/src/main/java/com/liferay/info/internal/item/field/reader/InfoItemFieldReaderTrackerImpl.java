@@ -165,8 +165,22 @@ public class InfoItemFieldReaderTrackerImpl
 			_infoDisplayContributorField = infoDisplayContributorField;
 		}
 
+		/**
+		 *   @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+		 *          #getInfoField()}
+		 */
+		@Deprecated
 		@Override
-		public InfoField<?> getField() {
+		public InfoField getField() {
+			return getInfoField();
+		}
+
+		public InfoDisplayContributorField<?> getInfoDisplayContributorField() {
+			return _infoDisplayContributorField;
+		}
+
+		@Override
+		public InfoField<?> getInfoField() {
 			InfoFieldType infoFieldType = TextInfoFieldType.INSTANCE;
 
 			InfoDisplayContributorFieldType infoDisplayContributorFieldType =
@@ -186,18 +200,12 @@ public class InfoItemFieldReaderTrackerImpl
 			return InfoField.builder(
 			).infoFieldType(
 				infoFieldType
-			).namespace(
-				InfoDisplayContributorField.class.getSimpleName()
 			).name(
 				getKey()
 			).labelInfoLocalizedValue(
 				(InfoLocalizedValue<String>)InfoLocalizedValue.function(
 					locale -> _infoDisplayContributorField.getLabel(locale))
 			).build();
-		}
-
-		public InfoDisplayContributorField<?> getInfoDisplayContributorField() {
-			return _infoDisplayContributorField;
 		}
 
 		@Override

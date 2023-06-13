@@ -9,37 +9,70 @@ definition {
 	}
 
 	macro expandSection {
-		if (IsElementPresent(key_sectionName = ${sectionName}, locator1 = "StyleBookEditor#STYLE_BOOK_EDITOR_SIDEBAR_COLLAPSED")) {
+		if (IsElementPresent(key_sectionName = "${sectionName}", locator1 = "StyleBookEditor#STYLE_BOOK_EDITOR_SIDEBAR_COLLAPSED")) {
 			AssertClick(
-				key_sectionName = ${sectionName},
+				key_sectionName = "${sectionName}",
 				locator1 = "StyleBookEditor#STYLE_BOOK_EDITOR_SIDEBAR_COLLAPSED",
-				value1 = ${sectionName});
+				value1 = "${sectionName}");
 		}
 
 		AssertElementPresent(
-			key_sectionName = ${sectionName},
+			key_sectionName = "${sectionName}",
 			locator1 = "StyleBookEditor#STYLE_BOOK_EDITOR_SIDEBAR_EXPANDED");
 	}
 
 	macro goToPageViaPagePreviewInfoBar {
 		Click(locator1 = "StyleBookEditor#PAGE_PREVIEW_INFO_BAR_TOGGLE");
 
-		MenuItem.click(menuItem = ${pageName});
+		MenuItem.click(menuItem = "${pageName}");
 	}
 
 	macro selectForm {
 		Click(locator1 = "StyleBookEditor#FORM_CONTROL_SELECT_BUTTON");
 
-		MenuItem.click(menuItem = ${formName});
+		MenuItem.click(menuItem = "${formName}");
+	}
+
+	macro selectPreviewItem {
+		Click(
+			index = "2",
+			locator1 = "StyleBookEditor#PREVIEW_SELECTOR");
+
+		if ((IsElementNotPresent(key_menuItem = "${previewItem}", locator1 = "MenuItem#ANY_MENU_ITEM")) && (IsElementPresent(key_text = "More", locator1 = "Button#ANY"))) {
+			AssertElementPresent(
+				key_caption = "${caption}",
+				locator1 = "Dropdown#CAPTION");
+
+			WaitForLiferayEvent.initializeLiferayEventLog();
+
+			Button.clickMore();
+
+			SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+			LexiconCard.clickCard(card = "${previewItem}");
+
+			SelectFrameTop();
+		}
+		else {
+			MenuItem.click(menuItem = "${previewItem}");
+		}
+	}
+
+	macro selectPreviewType {
+		Click(
+			index = "1",
+			locator1 = "StyleBookEditor#PREVIEW_SELECTOR");
+
+		MenuItem.click(menuItem = "${previewType}");
 	}
 
 	macro selectStyleBook {
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		LexiconCard.clickCardTitle(card = ${styleBookName});
+		LexiconCard.clickCardTitle(card = "${styleBookName}");
 
 		AssertElementPresent(
-			key_card = ${styleBookName},
+			key_card = "${styleBookName}",
 			locator1 = "Card#CARD_SELECTED");
 
 		SelectFrameTop();
@@ -50,19 +83,31 @@ definition {
 	macro selectStyleBookViaPageDesignOptions {
 		Navigator.gotoNavTab(navTab = "Style Book");
 
-		WaitForPageLoad();
-
-		Click(
-			key_card = ${styleBookName},
+		Click.waitForMenuToggleJSClick(
+			key_card = "${styleBookName}",
 			locator1 = "Card#CARD_TYPE_ASSET");
 
 		AssertElementPresent(
-			key_card = ${styleBookName},
+			key_card = "${styleBookName}",
 			locator1 = "Card#CARD_SELECTED");
 	}
 
+	macro viewCurrentPreviewItem {
+		AssertTextEquals(
+			index = "2",
+			locator1 = "StyleBookEditor#PREVIEW_SELECTOR",
+			value1 = "${previewItem}");
+	}
+
+	macro viewCurrentPreviewType {
+		AssertTextEquals(
+			index = "1",
+			locator1 = "StyleBookEditor#PREVIEW_SELECTOR",
+			value1 = "${previewType}");
+	}
+
 	macro waitForAutoSave {
-		Pause(locator1 = 1000);
+		Pause(locator1 = "1000");
 
 		AssertVisible(locator1 = "StyleBookEditor#DRAFT_SAVED_MESSAGE");
 	}

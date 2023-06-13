@@ -27,7 +27,7 @@ import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.model.ReleaseConstants;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.service.ReleaseLocalService;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.NotificationThreadLocal;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.portal.output.stream.container.OutputStreamContainer;
@@ -44,7 +44,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,6 +55,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
@@ -66,7 +66,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.verify.extender.internal.configuration.VerifyProcessTrackerConfiguration",
-	immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {
 		"osgi.command.function=check", "osgi.command.function=checkAll",
 		"osgi.command.function=execute", "osgi.command.function=executeAll",
@@ -79,11 +79,15 @@ import org.osgi.service.component.annotations.Reference;
 public class VerifyProcessTrackerOSGiCommands {
 
 	@Descriptor("List latest execution result for a specific verify process")
-	public void check(final String verifyProcessName) {
+	public void check(String verifyProcessName) {
 		try {
 			getVerifyProcesses(_verifyProcesses, verifyProcessName);
 		}
 		catch (IllegalArgumentException illegalArgumentException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(illegalArgumentException, illegalArgumentException);
+			}
+
 			System.out.println(
 				"No verify process with name " + verifyProcessName);
 
@@ -121,7 +125,7 @@ public class VerifyProcessTrackerOSGiCommands {
 	}
 
 	@Descriptor("Execute a specific verify process")
-	public void execute(final String verifyProcessName) {
+	public void execute(String verifyProcessName) {
 		_execute(_verifyProcesses, verifyProcessName, null, true);
 	}
 
@@ -163,6 +167,10 @@ public class VerifyProcessTrackerOSGiCommands {
 			getVerifyProcesses(_verifyProcesses, verifyProcessName);
 		}
 		catch (IllegalArgumentException illegalArgumentException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(illegalArgumentException, illegalArgumentException);
+			}
+
 			System.out.println(
 				"No verify process with name " + verifyProcessName);
 
@@ -380,8 +388,8 @@ public class VerifyProcessTrackerOSGiCommands {
 
 	private void _execute(
 		ServiceTrackerMap<String, List<VerifyProcess>> verifyProcessTrackerMap,
-		final String verifyProcessName, String outputStreamContainerFactoryName,
-		final boolean force) {
+		String verifyProcessName, String outputStreamContainerFactoryName,
+		boolean force) {
 
 		executeVerifyProcesses(
 			verifyProcessTrackerMap, verifyProcessName,
@@ -390,13 +398,12 @@ public class VerifyProcessTrackerOSGiCommands {
 	}
 
 	private void _registerMarkerObject(String verifyProcessName) {
-		Dictionary<String, String> dictionary = new HashMapDictionary<>();
-
-		dictionary.put("verify.process.name", verifyProcessName);
-
 		ServiceRegistration<Object> serviceRegistration =
 			_bundleContext.registerService(
-				Object.class, new Object(), dictionary);
+				Object.class, new Object(),
+				HashMapDictionaryBuilder.put(
+					"verify.process.name", verifyProcessName
+				).build());
 
 		_serviceRegistrations.put(verifyProcessName, serviceRegistration);
 	}
@@ -408,8 +415,7 @@ public class VerifyProcessTrackerOSGiCommands {
 		OutputStreamContainer outputStreamContainer =
 			outputStreamContainerFactory.create("all-verifiers");
 
-		final OutputStream outputStream =
-			outputStreamContainer.getOutputStream();
+		OutputStream outputStream = outputStreamContainer.getOutputStream();
 
 		outputStreamContainerFactoryTracker.runWithSwappedLog(
 			new AllVerifiersRunnable(outputStream, force),

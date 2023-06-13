@@ -58,7 +58,7 @@ public class OrderNote implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(OrderNote.class, json);
 	}
 
-	@Schema(example = "Alessio Antonio Rendina")
+	@Schema
 	public String getAuthor() {
 		return author;
 	}
@@ -86,7 +86,7 @@ public class OrderNote implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String author;
 
-	@Schema(example = "This order will be shipped separately")
+	@Schema
 	public String getContent() {
 		return content;
 	}
@@ -114,7 +114,7 @@ public class OrderNote implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String content;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -143,7 +143,7 @@ public class OrderNote implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -169,7 +169,7 @@ public class OrderNote implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@Schema(example = "CAB-34098-789-N")
+	@Schema
 	public String getOrderExternalReferenceCode() {
 		return orderExternalReferenceCode;
 	}
@@ -202,7 +202,7 @@ public class OrderNote implements Serializable {
 	protected String orderExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30128")
+	@Schema
 	public Long getOrderId() {
 		return orderId;
 	}
@@ -230,7 +230,7 @@ public class OrderNote implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long orderId;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getRestricted() {
 		return restricted;
 	}

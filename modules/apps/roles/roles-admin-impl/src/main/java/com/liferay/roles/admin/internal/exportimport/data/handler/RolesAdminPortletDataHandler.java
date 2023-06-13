@@ -60,7 +60,7 @@ public class RolesAdminPortletDataHandler extends BasePortletDataHandler {
 
 	public static final String NAMESPACE = "roles_admin";
 
-	public static final String SCHEMA_VERSION = "1.0.0";
+	public static final String SCHEMA_VERSION = "4.0.0";
 
 	@Override
 	public String getSchemaVersion() {
@@ -112,7 +112,7 @@ public class RolesAdminPortletDataHandler extends BasePortletDataHandler {
 
 	@Override
 	protected String doExportData(
-			final PortletDataContext portletDataContext, String portletId,
+			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
 		throws Exception {
 
@@ -165,7 +165,7 @@ public class RolesAdminPortletDataHandler extends BasePortletDataHandler {
 	}
 
 	protected ActionableDynamicQuery getRoleActionableDynamicQuery(
-		final PortletDataContext portletDataContext, final boolean export) {
+		PortletDataContext portletDataContext, boolean export) {
 
 		ActionableDynamicQuery actionableDynamicQuery =
 			_roleLocalService.getExportActionableDynamicQuery(
@@ -252,13 +252,10 @@ public class RolesAdminPortletDataHandler extends BasePortletDataHandler {
 
 		@Override
 		public void performAction(Role role) throws PortalException {
-			if (!_export) {
-				return;
-			}
-
-			if (!_portletDataContext.getBooleanParameter(
+			if (!_export ||
+				(!_portletDataContext.getBooleanParameter(
 					NAMESPACE, "system-roles") &&
-				_allSystemRoleNames.contains(role.getName())) {
+				 _allSystemRoleNames.contains(role.getName()))) {
 
 				return;
 			}

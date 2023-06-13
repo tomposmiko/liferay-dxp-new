@@ -107,15 +107,29 @@ public interface CommercePriceModifierLocalService
 		throws PortalException;
 
 	public CommercePriceModifier addCommercePriceModifier(
-			long groupId, String title, String target, long commercePriceListId,
-			String modifierType, BigDecimal modifierAmount, double priority,
-			boolean active, int displayDateMonth, int displayDateDay,
-			int displayDateYear, int displayDateHour, int displayDateMinute,
-			int expirationDateMonth, int expirationDateDay,
-			int expirationDateYear, int expirationDateHour,
-			int expirationDateMinute, String externalReferenceCode,
+			String externalReferenceCode, long groupId, String title,
+			String target, long commercePriceListId, String modifierType,
+			BigDecimal modifierAmount, double priority, boolean active,
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute,
 			boolean neverExpire, ServiceContext serviceContext)
 		throws PortalException;
+
+	public CommercePriceModifier addOrUpdateCommercePriceModifier(
+			String externalReferenceCode, long userId,
+			long commercePriceModifierId, long groupId, String title,
+			String target, long commercePriceListId, String modifierType,
+			BigDecimal modifierAmount, double priority, boolean active,
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute,
+			boolean neverExpire, ServiceContext serviceContext)
+		throws PortalException;
+
+	public void checkCommercePriceModifiers() throws PortalException;
 
 	/**
 	 * Creates a new commerce price modifier with the primary key. Does not add the commerce price modifier to the database.
@@ -254,18 +268,27 @@ public interface CommercePriceModifierLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommercePriceModifier fetchByExternalReferenceCode(
-		long companyId, String externalReferenceCode);
+		String externalReferenceCode, long companyId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommercePriceModifier fetchCommercePriceModifier(
 		long commercePriceModifierId);
 
-	@Deprecated
+	/**
+	 * Returns the commerce price modifier with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce price modifier's external reference code
+	 * @return the matching commerce price modifier, or <code>null</code> if a matching commerce price modifier could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommercePriceModifier
 		fetchCommercePriceModifierByExternalReferenceCode(
 			long companyId, String externalReferenceCode);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommercePriceModifierByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommercePriceModifier fetchCommercePriceModifierByReferenceCode(
@@ -297,7 +320,14 @@ public interface CommercePriceModifierLocalService
 			long commercePriceModifierId)
 		throws PortalException;
 
-	@Deprecated
+	/**
+	 * Returns the commerce price modifier with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce price modifier's external reference code
+	 * @return the matching commerce price modifier
+	 * @throws PortalException if a matching commerce price modifier could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommercePriceModifier
 			getCommercePriceModifierByExternalReferenceCode(
@@ -439,18 +469,6 @@ public interface CommercePriceModifierLocalService
 			long userId, long commercePriceModifierId, int status,
 			ServiceContext serviceContext,
 			Map<String, Serializable> workflowContext)
-		throws PortalException;
-
-	public CommercePriceModifier upsertCommercePriceModifier(
-			long userId, long commercePriceModifierId, long groupId,
-			String title, String target, long commercePriceListId,
-			String modifierType, BigDecimal modifierAmount, double priority,
-			boolean active, int displayDateMonth, int displayDateDay,
-			int displayDateYear, int displayDateHour, int displayDateMinute,
-			int expirationDateMonth, int expirationDateDay,
-			int expirationDateYear, int expirationDateHour,
-			int expirationDateMinute, String externalReferenceCode,
-			boolean neverExpire, ServiceContext serviceContext)
 		throws PortalException;
 
 }

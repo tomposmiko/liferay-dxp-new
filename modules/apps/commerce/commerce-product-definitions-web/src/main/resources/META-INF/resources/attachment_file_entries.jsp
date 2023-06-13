@@ -40,12 +40,13 @@ Map<String, String> contextParams = HashMapBuilder.<String, String>put(
 				contextParams="<%= contextParams %>"
 				creationMenu="<%= cpAttachmentFileEntriesDisplayContext.getCreationMenu(CPAttachmentFileEntryConstants.TYPE_IMAGE) %>"
 				dataProviderKey="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_IMAGES %>"
-				formId="fm"
+				formName="fm"
 				id="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_IMAGES %>"
 				itemsPerPage="<%= 10 %>"
 				namespace="<%= liferayPortletResponse.getNamespace() %>"
 				pageNumber="<%= 1 %>"
 				portletURL="<%= portletURL %>"
+				selectedItemsKey="cpattachmentFileEntryId"
 			/>
 		</commerce-ui:panel>
 
@@ -57,12 +58,13 @@ Map<String, String> contextParams = HashMapBuilder.<String, String>put(
 				contextParams="<%= contextParams %>"
 				creationMenu="<%= cpAttachmentFileEntriesDisplayContext.getCreationMenu(CPAttachmentFileEntryConstants.TYPE_OTHER) %>"
 				dataProviderKey="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_ATTACHMENTS %>"
-				formId="fm"
+				formName="fm"
 				id="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_ATTACHMENTS %>"
 				itemsPerPage="<%= 10 %>"
 				namespace="<%= liferayPortletResponse.getNamespace() %>"
 				pageNumber="<%= 1 %>"
 				portletURL="<%= portletURL %>"
+				selectedItemsKey="cpattachmentFileEntryId"
 			/>
 		</commerce-ui:panel>
 	</aui:form>

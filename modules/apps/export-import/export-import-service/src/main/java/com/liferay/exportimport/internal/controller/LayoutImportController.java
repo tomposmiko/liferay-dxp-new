@@ -99,6 +99,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -337,21 +338,19 @@ public class LayoutImportController implements ImportController {
 			long layoutId = GetterUtil.getLong(
 				portletElement.attributeValue("layout-id"));
 
-			if (layoutId == 0) {
-				long plid = LayoutConstants.DEFAULT_PLID;
+			long plid = LayoutConstants.DEFAULT_PLID;
 
-				Layout layout = layouts.get(layoutId);
+			Layout layout = layouts.get(layoutId);
 
-				if (layout != null) {
-					plid = layout.getPlid();
-				}
-
-				portletDataContext.setPlid(plid);
-				portletDataContext.setPortletId(
-					portletElement.attributeValue("portlet-id"));
-
-				_portletImportController.deletePortletData(portletDataContext);
+			if (layout != null) {
+				plid = layout.getPlid();
 			}
+
+			portletDataContext.setPlid(plid);
+			portletDataContext.setPortletId(
+				portletElement.attributeValue("portlet-id"));
+
+			_portletImportController.deletePortletData(portletDataContext);
 		}
 	}
 
@@ -1221,18 +1220,20 @@ public class LayoutImportController implements ImportController {
 
 		// Available locales
 
-		String[] sourceAvailableLanguageIds = StringUtil.split(
-			headerElement.attributeValue("available-locales"));
+		List<Locale> sourceAvailableLocales = Arrays.asList(
+			LocaleUtil.fromLanguageIds(
+				StringUtil.split(
+					headerElement.attributeValue("available-locales"))));
 
-		for (String sourceAvailableLanguageId : sourceAvailableLanguageIds) {
+		for (Locale sourceAvailableLocale : sourceAvailableLocales) {
 			if (!LanguageUtil.isAvailableLocale(
-					groupId, sourceAvailableLanguageId)) {
+					groupId, sourceAvailableLocale)) {
 
 				LocaleException localeException = new LocaleException(
 					LocaleException.TYPE_EXPORT_IMPORT);
 
-				localeException.setSourceAvailableLanguageIds(
-					Arrays.asList(sourceAvailableLanguageIds));
+				localeException.setSourceAvailableLocales(
+					sourceAvailableLocales);
 				localeException.setTargetAvailableLocales(
 					LanguageUtil.getAvailableLocales(groupId));
 

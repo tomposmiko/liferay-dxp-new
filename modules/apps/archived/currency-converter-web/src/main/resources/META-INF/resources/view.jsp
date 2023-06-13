@@ -182,11 +182,15 @@ NumberFormat decimalFormat = NumberFormat.getNumberInstance(locale);
 							<span class="currency-header"><liferay-ui:message key="historical-charts" /></span>
 
 							<%
-							PortletURL portletURL = renderResponse.createRenderURL();
-
-							portletURL.setParameter("number", String.valueOf(number));
-							portletURL.setParameter("from", currencyConverter.getFromSymbol());
-							portletURL.setParameter("to", currencyConverter.getToSymbol());
+							PortletURL portletURL = PortletURLBuilder.createRenderURL(
+								renderResponse
+							).setParameter(
+								"from", currencyConverter.getFromSymbol()
+							).setParameter(
+								"number", number
+							).setParameter(
+								"to", currencyConverter.getToSymbol()
+							).buildPortletURL();
 							%>
 
 							<c:choose>

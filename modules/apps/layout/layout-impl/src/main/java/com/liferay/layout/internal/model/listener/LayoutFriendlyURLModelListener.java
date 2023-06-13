@@ -14,7 +14,6 @@
 
 package com.liferay.layout.internal.model.listener;
 
-import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.layout.friendly.url.LayoutFriendlyURLEntryHelper;
 import com.liferay.portal.kernel.exception.ModelListenerException;
@@ -41,18 +40,16 @@ public class LayoutFriendlyURLModelListener
 	public void onAfterCreate(LayoutFriendlyURL layoutFriendlyURL)
 		throws ModelListenerException {
 
-		if (!ExportImportThreadLocal.isImportInProcess()) {
-			_addFriendlyURLEntry(layoutFriendlyURL);
-		}
+		_addFriendlyURLEntry(layoutFriendlyURL);
 	}
 
 	@Override
-	public void onAfterUpdate(LayoutFriendlyURL layoutFriendlyURL)
+	public void onAfterUpdate(
+			LayoutFriendlyURL originalLayoutFriendlyURL,
+			LayoutFriendlyURL layoutFriendlyURL)
 		throws ModelListenerException {
 
-		if (!ExportImportThreadLocal.isImportInProcess()) {
-			_addFriendlyURLEntry(layoutFriendlyURL);
-		}
+		_addFriendlyURLEntry(layoutFriendlyURL);
 	}
 
 	private void _addFriendlyURLEntry(LayoutFriendlyURL layoutFriendlyURL) {
@@ -60,14 +57,21 @@ public class LayoutFriendlyURLModelListener
 			if (!_stagingGroupHelper.isLiveGroup(
 					layoutFriendlyURL.getGroupId())) {
 
+				long classNameId = _layoutFriendlyURLEntryHelper.getClassNameId(
+					layoutFriendlyURL.isPrivateLayout());
+
+				String urlTitle =
+					_friendlyURLEntryLocalService.getUniqueUrlTitle(
+						layoutFriendlyURL.getGroupId(), classNameId,
+						layoutFriendlyURL.getPlid(),
+						layoutFriendlyURL.getFriendlyURL(),
+						layoutFriendlyURL.getLanguageId());
+
 				_friendlyURLEntryLocalService.addFriendlyURLEntry(
-					layoutFriendlyURL.getGroupId(),
-					_layoutFriendlyURLEntryHelper.getClassNameId(
-						layoutFriendlyURL.isPrivateLayout()),
+					layoutFriendlyURL.getGroupId(), classNameId,
 					layoutFriendlyURL.getPlid(),
 					Collections.singletonMap(
-						layoutFriendlyURL.getLanguageId(),
-						layoutFriendlyURL.getFriendlyURL()),
+						layoutFriendlyURL.getLanguageId(), urlTitle),
 					ServiceContextThreadLocal.getServiceContext());
 			}
 		}

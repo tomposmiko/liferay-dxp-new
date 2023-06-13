@@ -329,24 +329,6 @@ public class FragmentEntryLinkPersistenceTest {
 	}
 
 	@Test
-	public void testCountByC_R() throws Exception {
-		_persistence.countByC_R(RandomTestUtil.nextLong(), "");
-
-		_persistence.countByC_R(0L, "null");
-
-		_persistence.countByC_R(0L, (String)null);
-	}
-
-	@Test
-	public void testCountByC_RArrayable() throws Exception {
-		_persistence.countByC_R(
-			RandomTestUtil.nextLong(),
-			new String[] {
-				RandomTestUtil.randomString(), "", "null", null, null
-			});
-	}
-
-	@Test
 	public void testCountByG_OFELI_P() throws Exception {
 		_persistence.countByG_OFELI_P(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
@@ -383,6 +365,14 @@ public class FragmentEntryLinkPersistenceTest {
 	}
 
 	@Test
+	public void testCountByG_S_PArrayable() throws Exception {
+		_persistence.countByG_S_P(
+			RandomTestUtil.nextLong(),
+			new long[] {RandomTestUtil.nextLong(), 0L},
+			RandomTestUtil.nextLong());
+	}
+
+	@Test
 	public void testCountByG_C_C() throws Exception {
 		_persistence.countByG_C_C(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
@@ -407,6 +397,17 @@ public class FragmentEntryLinkPersistenceTest {
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
 
 		_persistence.countByG_S_C_C(0L, 0L, 0L, 0L);
+	}
+
+	@Test
+	public void testCountByG_S_P_R() throws Exception {
+		_persistence.countByG_S_P_R(
+			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
+			RandomTestUtil.nextLong(), "");
+
+		_persistence.countByG_S_P_R(0L, 0L, 0L, "null");
+
+		_persistence.countByG_S_P_R(0L, 0L, 0L, (String)null);
 	}
 
 	@Test

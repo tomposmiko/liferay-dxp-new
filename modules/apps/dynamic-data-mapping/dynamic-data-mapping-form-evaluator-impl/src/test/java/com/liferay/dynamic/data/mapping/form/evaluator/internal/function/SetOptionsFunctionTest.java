@@ -85,14 +85,13 @@ public class SetOptionsFunctionTest extends PowerMockito {
 
 		jsonObject.put("pt_BR", jsonArray);
 
-		String json = jsonObject.toString();
+		String json = jsonObject.toJSONString();
 
-		DefaultDDMExpressionObserver defaultDDMExpressionObserver =
-			new DefaultDDMExpressionObserver();
+		DefaultDDMExpressionObserver spyDefaultDDMExpressionObserver = spy(
+			new DefaultDDMExpressionObserver());
 
-		DefaultDDMExpressionObserver spy = spy(defaultDDMExpressionObserver);
-
-		_setOptionsFunction.setDDMExpressionObserver(spy);
+		_setOptionsFunction.setDDMExpressionObserver(
+			spyDefaultDDMExpressionObserver);
 
 		_setOptionsFunction.setDDMExpressionParameterAccessor(
 			new DefaultDDMExpressionParameterAccessor());
@@ -103,7 +102,7 @@ public class SetOptionsFunctionTest extends PowerMockito {
 			ArgumentCaptor.forClass(UpdateFieldPropertyRequest.class);
 
 		Mockito.verify(
-			spy, Mockito.times(1)
+			spyDefaultDDMExpressionObserver, Mockito.times(1)
 		).updateFieldProperty(
 			argumentCaptor.capture()
 		);
@@ -140,12 +139,11 @@ public class SetOptionsFunctionTest extends PowerMockito {
 			"pt_BR"
 		);
 
-		DefaultDDMExpressionObserver defaultDDMExpressionObserver =
-			new DefaultDDMExpressionObserver();
+		DefaultDDMExpressionObserver spyDefaultDDMExpressionObserver = spy(
+			new DefaultDDMExpressionObserver());
 
-		DefaultDDMExpressionObserver spy = spy(defaultDDMExpressionObserver);
-
-		_setOptionsFunction.setDDMExpressionObserver(spy);
+		_setOptionsFunction.setDDMExpressionObserver(
+			spyDefaultDDMExpressionObserver);
 
 		_setOptionsFunction.setDDMExpressionParameterAccessor(
 			new DefaultDDMExpressionParameterAccessor());
@@ -156,7 +154,7 @@ public class SetOptionsFunctionTest extends PowerMockito {
 			ArgumentCaptor.forClass(UpdateFieldPropertyRequest.class);
 
 		Mockito.verify(
-			spy, Mockito.times(1)
+			spyDefaultDDMExpressionObserver, Mockito.times(1)
 		).updateFieldProperty(
 			argumentCaptor.capture()
 		);

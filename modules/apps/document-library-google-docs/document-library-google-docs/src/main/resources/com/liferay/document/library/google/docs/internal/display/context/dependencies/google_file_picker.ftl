@@ -46,15 +46,9 @@ GoogleFilePicker.prototype = {
 			groupDocuments.addView(viewId.SPREADSHEETS);
 			groupDocuments.addView(viewId.PRESENTATIONS);
 
-			var groupPhotos = new google.picker.ViewGroup(viewId.PHOTOS);
-
-			groupPhotos.addView(viewId.PHOTO_UPLOAD);
-			groupPhotos.addView(viewId.WEBCAM);
-
 			var picker = new google.picker.PickerBuilder();
 
 			picker.addViewGroup(groupDocuments);
-			picker.addViewGroup(groupPhotos);
 
 			picker.addView(viewId.RECENTLY_PICKED);
 
@@ -108,6 +102,7 @@ GoogleFilePicker.prototype = {
 					"ICON_URL": doc[googlePickerDoc.ICON_URL] || '',
 					"ID": doc[googlePickerDoc.ID],
 					"NAME": doc[googlePickerDoc.NAME],
+					"TITLE": doc[googlePickerDoc.NAME].replace(/\.[^.]*$/, ''),
 					"URL": doc[googlePickerDoc.URL] || ''
 				});
 		}
@@ -119,8 +114,7 @@ GoogleFilePicker.API_KEY = '${htmlUtil.escapeJS(googleAppsAPIKey)}';
 GoogleFilePicker.CLIENT_ID = '${htmlUtil.escapeJS(googleClientId)}';
 
 GoogleFilePicker.SCOPE = [
-	'https://www.googleapis.com/auth/drive.readonly',
-	'https://www.googleapis.com/auth/photos.upload'
+	'https://www.googleapis.com/auth/drive.readonly'
 ];
 
 window.onGoogleAPILoad = function() {

@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.checkout.web.internal.util;
 
+import com.liferay.commerce.checkout.helper.CommerceCheckoutStepHttpHelper;
 import com.liferay.commerce.checkout.web.internal.display.context.ShippingMethodCheckoutStepDisplayContext;
 import com.liferay.commerce.constants.CommerceCheckoutWebKeys;
 import com.liferay.commerce.constants.CommerceWebKeys;
@@ -41,9 +42,6 @@ import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUti
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.transaction.Propagation;
-import com.liferay.portal.kernel.transaction.TransactionConfig;
-import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -99,7 +97,7 @@ public class ShippingMethodCommerceCheckoutStep
 			(CommerceOrder)httpServletRequest.getAttribute(
 				CommerceCheckoutWebKeys.COMMERCE_ORDER);
 
-		if (_commerceCheckoutStepHelper.
+		if (_commerceCheckoutStepHttpHelper.
 				isActiveShippingMethodCommerceCheckoutStep(
 					httpServletRequest) &&
 			_commerceShippingHelper.isShippable(commerceOrder)) {
@@ -147,7 +145,7 @@ public class ShippingMethodCommerceCheckoutStep
 		if (!commerceOrder.isOpen()) {
 			httpServletRequest.setAttribute(
 				CommerceCheckoutWebKeys.COMMERCE_CHECKOUT_STEP_ORDER_DETAIL_URL,
-				_commerceCheckoutStepHelper.getOrderDetailURL(
+				_commerceCheckoutStepHttpHelper.getOrderDetailURL(
 					httpServletRequest, commerceOrder));
 
 			_jspRenderer.renderJSP(
@@ -268,39 +266,20 @@ public class ShippingMethodCommerceCheckoutStep
 
 		long commerceShippingMethodId = GetterUtil.getLong(
 			commerceShippingOptionKey.substring(0, pos));
-		String shippingOptionName = commerceShippingOptionKey.substring(
+		String commerceShippingOptionName = commerceShippingOptionKey.substring(
 			pos + 1);
 
 		BigDecimal shippingAmount = getShippingAmount(
 			commerceContext, commerceOrder, commerceShippingMethodId,
-			shippingOptionName, themeDisplay.getLocale());
+			commerceShippingOptionName, themeDisplay.getLocale());
 
-		try {
-			TransactionInvokerUtil.invoke(
-				_transactionConfig,
-				() -> {
-					_commerceOrderLocalService.updateShippingMethod(
-						commerceOrder.getCommerceOrderId(),
-						commerceShippingMethodId, shippingOptionName,
-						shippingAmount, commerceContext);
-
-					_commerceOrderLocalService.recalculatePrice(
-						commerceOrder.getCommerceOrderId(), commerceContext);
-
-					return null;
-				});
-		}
-		catch (Throwable throwable) {
-			throw new PortalException(throwable);
-		}
+		_commerceOrderLocalService.updateCommerceShippingMethod(
+			commerceOrder.getCommerceOrderId(), commerceShippingMethodId,
+			commerceShippingOptionName, shippingAmount, commerceContext);
 	}
 
-	private static final TransactionConfig _transactionConfig =
-		TransactionConfig.Factory.create(
-			Propagation.REQUIRED, new Class<?>[] {Exception.class});
-
 	@Reference
-	private CommerceCheckoutStepHelper _commerceCheckoutStepHelper;
+	private CommerceCheckoutStepHttpHelper _commerceCheckoutStepHttpHelper;
 
 	@Reference
 	private CommerceOrderLocalService _commerceOrderLocalService;

@@ -27,6 +27,10 @@ public class SXPBlueprintLocalServiceWrapper
 	implements ServiceWrapper<SXPBlueprintLocalService>,
 			   SXPBlueprintLocalService {
 
+	public SXPBlueprintLocalServiceWrapper() {
+		this(null);
+	}
+
 	public SXPBlueprintLocalServiceWrapper(
 		SXPBlueprintLocalService sxpBlueprintLocalService) {
 
@@ -35,16 +39,16 @@ public class SXPBlueprintLocalServiceWrapper
 
 	@Override
 	public com.liferay.search.experiences.model.SXPBlueprint addSXPBlueprint(
-			String externalReferenceCode, long userId, String configurationJSON,
+			long userId, String configurationJSON,
 			java.util.Map<java.util.Locale, String> descriptionMap,
-			String elementInstancesJSON, String schemaVersion,
+			String elementInstancesJSON,
 			java.util.Map<java.util.Locale, String> titleMap,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _sxpBlueprintLocalService.addSXPBlueprint(
-			externalReferenceCode, userId, configurationJSON, descriptionMap,
-			elementInstancesJSON, schemaVersion, titleMap, serviceContext);
+			userId, configurationJSON, descriptionMap, elementInstancesJSON,
+			titleMap, serviceContext);
 	}
 
 	/**
@@ -253,27 +257,6 @@ public class SXPBlueprintLocalServiceWrapper
 		return _sxpBlueprintLocalService.fetchSXPBlueprint(sxpBlueprintId);
 	}
 
-	@Deprecated
-	@Override
-	public com.liferay.search.experiences.model.SXPBlueprint
-		fetchSXPBlueprintByExternalReferenceCode(
-			long companyId, String externalReferenceCode) {
-
-		return _sxpBlueprintLocalService.
-			fetchSXPBlueprintByExternalReferenceCode(
-				companyId, externalReferenceCode);
-	}
-
-	@Deprecated
-	@Override
-	public com.liferay.search.experiences.model.SXPBlueprint
-		fetchSXPBlueprintByReferenceCode(
-			long companyId, String externalReferenceCode) {
-
-		return _sxpBlueprintLocalService.fetchSXPBlueprintByReferenceCode(
-			companyId, externalReferenceCode);
-	}
-
 	/**
 	 * Returns the sxp blueprint with the matching UUID and company.
 	 *
@@ -349,17 +332,6 @@ public class SXPBlueprintLocalServiceWrapper
 		return _sxpBlueprintLocalService.getSXPBlueprint(sxpBlueprintId);
 	}
 
-	@Deprecated
-	@Override
-	public com.liferay.search.experiences.model.SXPBlueprint
-			getSXPBlueprintByExternalReferenceCode(
-				long companyId, String externalReferenceCode)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _sxpBlueprintLocalService.getSXPBlueprintByExternalReferenceCode(
-			companyId, externalReferenceCode);
-	}
-
 	/**
 	 * Returns the sxp blueprint with the matching UUID and company.
 	 *
@@ -424,14 +396,14 @@ public class SXPBlueprintLocalServiceWrapper
 	public com.liferay.search.experiences.model.SXPBlueprint updateSXPBlueprint(
 			long userId, long sxpBlueprintId, String configurationJSON,
 			java.util.Map<java.util.Locale, String> descriptionMap,
-			String elementInstancesJSON, String schemaVersion,
+			String elementInstancesJSON,
 			java.util.Map<java.util.Locale, String> titleMap,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _sxpBlueprintLocalService.updateSXPBlueprint(
 			userId, sxpBlueprintId, configurationJSON, descriptionMap,
-			elementInstancesJSON, schemaVersion, titleMap, serviceContext);
+			elementInstancesJSON, titleMap, serviceContext);
 	}
 
 	/**

@@ -42,7 +42,6 @@ import javax.servlet.http.HttpSession;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Matchers;
@@ -57,8 +56,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 public class OAuth2ControllerTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@BeforeClass

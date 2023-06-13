@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.kernel.notifications.UserNotificationManagerUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.BigDecimalUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -417,12 +418,8 @@ public class SegmentsExperimentLocalServiceImpl
 			ServiceContextThreadLocal.getServiceContext();
 
 		if ((serviceContext == null) ||
-			(serviceContext.getUserId() == segmentsExperiment.getUserId())) {
-
-			return;
-		}
-
-		if (!UserNotificationManagerUtil.isDeliver(
+			(serviceContext.getUserId() == segmentsExperiment.getUserId()) ||
+			!UserNotificationManagerUtil.isDeliver(
 				segmentsExperiment.getUserId(),
 				SegmentsPortletKeys.SEGMENTS_EXPERIMENT, 0,
 				SegmentsExperimentConstants.NOTIFICATION_TYPE_UPDATE_STATUS,
@@ -431,7 +428,7 @@ public class SegmentsExperimentLocalServiceImpl
 			return;
 		}
 
-		userNotificationEventLocalService.sendUserNotificationEvents(
+		_userNotificationEventLocalService.sendUserNotificationEvents(
 			segmentsExperiment.getUserId(),
 			SegmentsPortletKeys.SEGMENTS_EXPERIMENT,
 			UserNotificationDeliveryConstants.TYPE_WEBSITE,
@@ -734,5 +731,9 @@ public class SegmentsExperimentLocalServiceImpl
 	@Reference
 	private SegmentsExperimentRelLocalService
 		_segmentsExperimentRelLocalService;
+
+	@Reference
+	private UserNotificationEventLocalService
+		_userNotificationEventLocalService;
 
 }

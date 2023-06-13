@@ -18,6 +18,7 @@ import com.liferay.dynamic.data.mapping.constants.DDMStructureConstants;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.util.DDMUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanParamUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -28,13 +29,13 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
 import java.util.Map;
-
-import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -62,27 +63,29 @@ public class DLEditDDMStructureDisplayContext {
 			).put(
 				"pluginEntryPoint",
 				npmResolvedPackageName +
-					"/document_library/js/ddm/panels/index.es"
+					"/document_library/js/data-engine/panels/index.es"
 			).put(
 				"sidebarPanelId", "properties"
 			).put(
 				"url",
-				() -> {
-					PortletURL editBasicInfoURL =
-						_liferayPortletResponse.createRenderURL();
-
-					editBasicInfoURL.setParameter(
-						"mvcPath",
-						"/document_library/ddm" +
-							"/basic_info_data_engine_editor.jsp");
-					editBasicInfoURL.setParameter(
-						"ddmStructureId", String.valueOf(getDDMStructureId()));
-					editBasicInfoURL.setWindowState(
-						LiferayWindowState.EXCLUSIVE);
-
-					return editBasicInfoURL.toString();
-				}
+				() -> PortletURLBuilder.createRenderURL(
+					_liferayPortletResponse
+				).setMVCPath(
+					"/document_library/ddm/basic_info_data_engine_editor.jsp"
+				).setParameter(
+					"ddmStructureId", getDDMStructureId()
+				).setWindowState(
+					LiferayWindowState.EXCLUSIVE
+				).buildString()
 			).build());
+	}
+
+	public Map<String, Object> getComponentContext() {
+		return HashMapBuilder.<String, Object>put(
+			"contentTitle", "name"
+		).put(
+			"defaultLanguageId", getDefaultLanguageId()
+		).build();
 	}
 
 	public DDMStructure getDDMStructure() {
@@ -105,6 +108,16 @@ public class DLEditDDMStructureDisplayContext {
 			_httpServletRequest, "ddmStructureId");
 
 		return _ddmStructureId;
+	}
+
+	public String getDefaultLanguageId() {
+		DDMStructure ddmStructure = getDDMStructure();
+
+		if (ddmStructure == null) {
+			return LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault());
+		}
+
+		return ddmStructure.getDefaultLanguageId();
 	}
 
 	public String getFields() throws PortalException {
@@ -185,8 +198,26 @@ public class DLEditDDMStructureDisplayContext {
 		return _script;
 	}
 
+	public String getSelectedLanguageId() {
+		if (Validator.isNotNull(_defaultLanguageId)) {
+			return _defaultLanguageId;
+		}
+
+		_defaultLanguageId = ParamUtil.getString(
+			_httpServletRequest, "languageId");
+
+		if (Validator.isNotNull(_defaultLanguageId)) {
+			return _defaultLanguageId;
+		}
+
+		_defaultLanguageId = getDefaultLanguageId();
+
+		return _defaultLanguageId;
+	}
+
 	private DDMStructure _ddmStructure;
 	private Long _ddmStructureId;
+	private String _defaultLanguageId;
 	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private Long _parentDDMStructureId;

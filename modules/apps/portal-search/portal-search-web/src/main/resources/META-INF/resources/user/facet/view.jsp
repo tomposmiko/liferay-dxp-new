@@ -47,7 +47,7 @@ UserFacetPortletInstanceConfiguration userFacetPortletInstanceConfiguration = us
 		<aui:input autocomplete="off" name="<%= HtmlUtil.escapeAttribute(userSearchFacetDisplayContext.getParamName()) %>" type="hidden" value="<%= userSearchFacetDisplayContext.getParamValue() %>" />
 	</c:when>
 	<c:otherwise>
-		<aui:form action="#" method="post" name="fm">
+		<aui:form method="post" name="fm">
 			<aui:input autocomplete="off" name="<%= HtmlUtil.escapeAttribute(userSearchFacetDisplayContext.getParamName()) %>" type="hidden" value="<%= userSearchFacetDisplayContext.getParamValue() %>" />
 			<aui:input cssClass="facet-parameter-name" name="facet-parameter-name" type="hidden" value="<%= userSearchFacetDisplayContext.getParamName() %>" />
 			<aui:input cssClass="start-parameter-name" name="start-parameter-name" type="hidden" value="<%= userSearchFacetDisplayContext.getPaginationStartParameterName() %>" />
@@ -93,7 +93,6 @@ UserFacetPortletInstanceConfiguration userFacetPortletInstanceConfiguration = us
 										<div class="custom-checkbox custom-control">
 											<label class="facet-checkbox-label" for="<portlet:namespace />term_<%= i %>">
 												<input
-													autocomplete="off"
 													<%= userSearchFacetTermDisplayContext.isSelected() ? "checked" : StringPool.BLANK %>
 													class="custom-control-input facet-term"
 													data-term-id="<%= HtmlUtil.escapeAttribute(userSearchFacetTermDisplayContext.getUserName()) %>"

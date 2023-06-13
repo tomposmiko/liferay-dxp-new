@@ -10,9 +10,7 @@
 </thead>
 
 <tbody>
-
 <!-- GENERAL CARDS -->
-
 <tr>
 	<td>INTERVAL_OPTION</td>
 	<td>//button[contains(@class,'interval-option')][normalize-space(text())='${interval}']</td>
@@ -96,11 +94,6 @@
 <tr>
 	<td>TRASH_ICON</td>
 	<td>//div[contains(@class,'card-root')][.//h5[contains(@class,'card-title')][normalize-space(text())='${key_cardTitle}']]//button[*[name()='svg'][contains(@class,'icon-trash')]]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>GRAPH_WITHOUT_DATA</td>
-	<td>//*[@class='recharts-cartesian-grid']</td>
 	<td></td>
 </tr>
 </tbody>

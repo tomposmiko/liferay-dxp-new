@@ -26,9 +26,17 @@ else if (collapsible) {
 
 	collapsed = GetterUtil.getBoolean(SessionClicks.get(request, id, null), defaultState);
 }
+
+if (Validator.isNull(cssClass)) {
+	cssClass = collapsible ? "panel panel-unstyled" : StringPool.BLANK;
+}
+
+if (Validator.isNull(panelHeaderLinkCssClass)) {
+	panelHeaderLinkCssClass = collapsible ? "sheet-subtitle" : StringPool.BLANK;
+}
 %>
 
-<fieldset class="<%= collapsible ? "panel panel-default" : StringPool.BLANK %> <%= cssClass %>" <%= Validator.isNotNull(id) ? "id=\"" + id + "\"" : StringPool.BLANK %> <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %>>
+<fieldset class="<%= cssClass %>" <%= Validator.isNotNull(id) ? "id=\"" + id + "\"" : StringPool.BLANK %> <%= InlineUtil.buildDynamicAttributes(dynamicAttributes) %>>
 	<c:choose>
 		<c:when test="<%= Validator.isNotNull(label) %>">
 			<liferay-util:buffer
@@ -47,29 +55,23 @@ else if (collapsible) {
 						<%= header %>
 					</legend>
 
-					<div class="panel-heading" id="<%= id %>Header" role="presentation">
-						<div class="panel-title" id="<%= id %>Title">
-							<a aria-controls="<%= id %>Content" aria-expanded="<%= !collapsed %>" class="collapse-icon collapse-icon-middle <%= collapsed ? "collapsed" : StringPool.BLANK %>" data-toggle="liferay-collapse" href="#<%= id %>Content" role="button">
-								<span aria-hidden="true">
-									<%= header %>
-								</span>
+					<a aria-controls="<%= id %>Content" aria-expanded="<%= !collapsed %>" class="collapse-icon collapse-icon-middle <%= panelHeaderLinkCssClass %> <%= collapsed ? "collapsed" : StringPool.BLANK %>" data-toggle="liferay-collapse" href="#<%= id %>Content" role="button">
+						<span class="c-inner" tabindex="-1">
+							<span aria-hidden="true">
+								<%= header %>
+							</span>
 
-								<aui:icon cssClass="collapse-icon-closed" image="angle-right" markupView="lexicon" />
+							<aui:icon cssClass="collapse-icon-closed" image="angle-right" markupView="lexicon" />
 
-								<aui:icon cssClass="collapse-icon-open" image="angle-down" markupView="lexicon" />
-							</a>
-						</div>
-					</div>
+							<aui:icon cssClass="collapse-icon-open" image="angle-down" markupView="lexicon" />
+						</span>
+					</a>
 				</c:when>
 				<c:otherwise>
 					<legend class="fieldset-legend">
-						<div class="panel-heading" id="<%= id %>Header" role="presentation">
-							<div class="panel-title" id="<%= id %>Title">
-								<span class="legend">
-									<%= header %>
-								</span>
-							</div>
-						</div>
+						<span class="legend">
+							<%= header %>
+						</span>
 					</legend>
 				</c:otherwise>
 			</c:choose>
@@ -81,5 +83,5 @@ else if (collapsible) {
 		</c:otherwise>
 	</c:choose>
 
-	<div aria-labelledby="<%= id %>Header" class="<%= !collapsed ? "show" : StringPool.BLANK %> <%= collapsible ? "panel-collapse collapse" : StringPool.BLANK %> <%= column ? "row" : StringPool.BLANK %>" id="<%= id %>Content" role="presentation">
+	<div class="<%= !collapsed ? "show" : StringPool.BLANK %> <%= collapsible ? "panel-collapse collapse" : StringPool.BLANK %> <%= column ? "row" : StringPool.BLANK %>" id="<%= id %>Content" role="presentation">
 		<div class="panel-body">

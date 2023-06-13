@@ -57,7 +57,7 @@ public class ProcessSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (process.getActive() != null) {
 			if (sb.length() > 1) {
@@ -193,7 +193,7 @@ public class ProcessSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (process.getActive() == null) {
 			map.put("active", null);

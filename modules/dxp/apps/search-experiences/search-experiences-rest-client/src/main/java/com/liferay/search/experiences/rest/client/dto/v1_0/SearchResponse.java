@@ -19,7 +19,6 @@ import com.liferay.search.experiences.rest.client.serdes.v1_0.SearchResponseSerD
 
 import java.io.Serializable;
 
-import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -34,27 +33,6 @@ public class SearchResponse implements Cloneable, Serializable {
 	public static SearchResponse toDTO(String json) {
 		return SearchResponseSerDes.toDTO(json);
 	}
-
-	public Map[] getErrors() {
-		return errors;
-	}
-
-	public void setErrors(Map[] errors) {
-		this.errors = errors;
-	}
-
-	public void setErrors(
-		UnsafeSupplier<Map[], Exception> errorsUnsafeSupplier) {
-
-		try {
-			errors = errorsUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Map[] errors;
 
 	public Integer getPage() {
 		return page;
@@ -96,27 +74,6 @@ public class SearchResponse implements Cloneable, Serializable {
 
 	protected Integer pageSize;
 
-	public Object getRequest() {
-		return request;
-	}
-
-	public void setRequest(Object request) {
-		this.request = request;
-	}
-
-	public void setRequest(
-		UnsafeSupplier<Object, Exception> requestUnsafeSupplier) {
-
-		try {
-			request = requestUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Object request;
-
 	public String getRequestString() {
 		return requestString;
 	}
@@ -137,27 +94,6 @@ public class SearchResponse implements Cloneable, Serializable {
 	}
 
 	protected String requestString;
-
-	public Object getResponse() {
-		return response;
-	}
-
-	public void setResponse(Object response) {
-		this.response = response;
-	}
-
-	public void setResponse(
-		UnsafeSupplier<Object, Exception> responseUnsafeSupplier) {
-
-		try {
-			response = responseUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Object response;
 
 	public String getResponseString() {
 		return responseString;
@@ -180,47 +116,26 @@ public class SearchResponse implements Cloneable, Serializable {
 
 	protected String responseString;
 
-	public SearchHits getSearchHits() {
-		return searchHits;
+	public Integer getTotalHits() {
+		return totalHits;
 	}
 
-	public void setSearchHits(SearchHits searchHits) {
-		this.searchHits = searchHits;
+	public void setTotalHits(Integer totalHits) {
+		this.totalHits = totalHits;
 	}
 
-	public void setSearchHits(
-		UnsafeSupplier<SearchHits, Exception> searchHitsUnsafeSupplier) {
+	public void setTotalHits(
+		UnsafeSupplier<Integer, Exception> totalHitsUnsafeSupplier) {
 
 		try {
-			searchHits = searchHitsUnsafeSupplier.get();
+			totalHits = totalHitsUnsafeSupplier.get();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected SearchHits searchHits;
-
-	public SearchRequest getSearchRequest() {
-		return searchRequest;
-	}
-
-	public void setSearchRequest(SearchRequest searchRequest) {
-		this.searchRequest = searchRequest;
-	}
-
-	public void setSearchRequest(
-		UnsafeSupplier<SearchRequest, Exception> searchRequestUnsafeSupplier) {
-
-		try {
-			searchRequest = searchRequestUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected SearchRequest searchRequest;
+	protected Integer totalHits;
 
 	@Override
 	public SearchResponse clone() throws CloneNotSupportedException {

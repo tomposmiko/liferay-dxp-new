@@ -47,6 +47,7 @@ public class DLFileEntryTypeSoap implements Serializable {
 		soapModel.setFileEntryTypeKey(model.getFileEntryTypeKey());
 		soapModel.setName(model.getName());
 		soapModel.setDescription(model.getDescription());
+		soapModel.setScope(model.getScope());
 		soapModel.setLastPublishDate(model.getLastPublishDate());
 
 		return soapModel;
@@ -219,6 +220,14 @@ public class DLFileEntryTypeSoap implements Serializable {
 		_description = description;
 	}
 
+	public int getScope() {
+		return _scope;
+	}
+
+	public void setScope(int scope) {
+		_scope = scope;
+	}
+
 	public Date getLastPublishDate() {
 		return _lastPublishDate;
 	}
@@ -241,6 +250,7 @@ public class DLFileEntryTypeSoap implements Serializable {
 	private String _fileEntryTypeKey;
 	private String _name;
 	private String _description;
+	private int _scope;
 	private Date _lastPublishDate;
 
 }

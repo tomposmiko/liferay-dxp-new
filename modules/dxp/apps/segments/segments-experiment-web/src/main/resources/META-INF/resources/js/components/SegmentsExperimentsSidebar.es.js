@@ -85,7 +85,7 @@ function SegmentsExperimentsSidebar({
 	return page.type === 'content' ? (
 		<DispatchContext.Provider value={dispatch}>
 			<StateContext.Provider value={state}>
-				<div className="p-3">
+				<div className="pb-3 px-3">
 					<SegmentsExperiments
 						onCreateSegmentsExperiment={
 							_handleCreateSegmentsExperiment
@@ -99,6 +99,7 @@ function SegmentsExperimentsSidebar({
 						}
 						onTargetChange={_handleTargetChange}
 					/>
+
 					{createExperimentModal.active && (
 						<ClayModal observer={creationModalObserver} size="lg">
 							<SegmentsExperimentsModal
@@ -115,6 +116,7 @@ function SegmentsExperimentsSidebar({
 							/>
 						</ClayModal>
 					)}
+
 					{editExperimentModal.active && (
 						<ClayModal observer={editionModalObserver} size="lg">
 							<SegmentsExperimentsModal
@@ -354,7 +356,7 @@ function SegmentsExperimentsSidebar({
 		const body = {
 			description: experiment.description,
 			goal: experiment.goal.value,
-			goalTarget: selector,
+			goalTarget: selector && `#${selector}`,
 			name: experiment.name,
 			segmentsExperimentId: experiment.segmentsExperimentId,
 		};

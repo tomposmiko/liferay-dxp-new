@@ -241,6 +241,26 @@
 
 						<aui:button-row>
 							<aui:button name="finishButton" type="submit" value="finish-configuration" />
+
+							<div class="btn float-right" id="basicConfiguration">
+
+								<%
+								request.setAttribute("liferay-learn:message:key", "setup-wizard-basic-configuration");
+								request.setAttribute("liferay-learn:message:resource", "portal-web");
+								%>
+
+								<liferay-util:dynamic-include key="/html/portal/setup_wizard.jsp#help_link" />
+							</div>
+
+							<div class="btn float-right hide" id="databaseConfiguration">
+
+								<%
+								request.setAttribute("liferay-learn:message:key", "setup-wizard-database-configuration");
+								request.setAttribute("liferay-learn:message:resource", "portal-web");
+								%>
+
+								<liferay-util:dynamic-include key="/html/portal/setup_wizard.jsp#help_link" />
+							</div>
 						</aui:button-row>
 					</aui:form>
 
@@ -263,6 +283,9 @@
 						var sampleData = A.one('#sampleData');
 						var addSampleData = A.one('#addSampleData');
 
+						var basicConfiguration = A.one('#basicConfiguration');
+						var databaseConfiguration = A.one('#databaseConfiguration');
+
 						var command = A.one('#<%= Constants.CMD %>');
 						var setupForm = A.one('#fm');
 
@@ -280,6 +303,10 @@
 							sampleData.toggle(!showDefault);
 
 							defaultDatabase.val(showDefault);
+
+							databaseConfiguration.toggle(!showDefault);
+
+							basicConfiguration.toggle(showDefault);
 						};
 
 						databaseSelector.on(
@@ -415,7 +442,7 @@
 									</svg>
 								</span>
 
-								<strong class="lead"><liferay-ui:message key="success-colon" /></strong><liferay-ui:message key="your-configuration-was-saved-sucessfully" />
+								<strong class="lead"><liferay-ui:message key="success-colon" /></strong><liferay-ui:message key="your-configuration-was-saved-successfully" />
 							</div>
 
 							<p class="lfr-setup-notice">
@@ -476,7 +503,13 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-md-12 text-center text-md-left">
-					<liferay-ui:message key="powered-by" /> <a class="text-white" href="http://www.liferay.com" rel="external">Liferay</a>
+					<liferay-util:buffer
+						var="poweredByLiferay"
+					>
+						<a class="text-white" href="http://www.liferay.com" rel="external">Liferay</a>
+					</liferay-util:buffer>
+
+					<liferay-ui:message arguments="<%= poweredByLiferay %>" key="powered-by-x" />
 				</div>
 			</div>
 		</div>

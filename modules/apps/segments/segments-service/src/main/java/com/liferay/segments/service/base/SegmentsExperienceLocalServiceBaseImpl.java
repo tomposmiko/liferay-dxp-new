@@ -37,8 +37,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -450,6 +448,7 @@ public abstract class SegmentsExperienceLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -468,6 +467,7 @@ public abstract class SegmentsExperienceLocalServiceBaseImpl
 			(SegmentsExperience)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<SegmentsExperience> getBasePersistence() {
 		return segmentsExperiencePersistence;
 	}
@@ -703,18 +703,11 @@ public abstract class SegmentsExperienceLocalServiceBaseImpl
 		classNameLocalService;
 
 	@Reference
-	protected com.liferay.portal.kernel.service.LayoutLocalService
-		layoutLocalService;
-
-	@Reference
 	protected com.liferay.portal.kernel.service.ResourceLocalService
 		resourceLocalService;
 
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SegmentsExperienceLocalServiceBaseImpl.class);
 
 }

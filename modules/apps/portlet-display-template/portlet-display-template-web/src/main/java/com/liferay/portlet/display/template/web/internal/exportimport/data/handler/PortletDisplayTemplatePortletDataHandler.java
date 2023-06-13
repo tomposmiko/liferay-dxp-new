@@ -54,6 +54,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Juan Fernández
  */
 @Component(
+	enabled = false,
 	property = "javax.portlet.name=" + PortletKeys.PORTLET_DISPLAY_TEMPLATE,
 	service = PortletDataHandler.class
 )
@@ -62,7 +63,7 @@ public class PortletDisplayTemplatePortletDataHandler
 
 	public static final String NAMESPACE = "portlet_display_template";
 
-	public static final String SCHEMA_VERSION = "1.0.0";
+	public static final String SCHEMA_VERSION = "4.0.0";
 
 	@Override
 	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
@@ -180,14 +181,14 @@ public class PortletDisplayTemplatePortletDataHandler
 	}
 
 	protected ActionableDynamicQuery getDDMTemplateActionableDynamicQuery(
-		final PortletDataContext portletDataContext, final Long[] classNameIds,
-		final StagedModelType stagedModelType) {
+		PortletDataContext portletDataContext, Long[] classNameIds,
+		StagedModelType stagedModelType) {
 
 		ExportActionableDynamicQuery exportActionableDynamicQuery =
 			_ddmTemplateLocalService.getExportActionableDynamicQuery(
 				portletDataContext);
 
-		final ActionableDynamicQuery.AddCriteriaMethod addCriteriaMethod =
+		ActionableDynamicQuery.AddCriteriaMethod addCriteriaMethod =
 			exportActionableDynamicQuery.getAddCriteriaMethod();
 
 		exportActionableDynamicQuery.setAddCriteriaMethod(

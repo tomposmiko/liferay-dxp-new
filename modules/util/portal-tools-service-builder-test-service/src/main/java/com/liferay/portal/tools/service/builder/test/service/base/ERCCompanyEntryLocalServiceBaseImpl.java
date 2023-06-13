@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -247,21 +245,12 @@ public abstract class ERCCompanyEntryLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the erc company entry with the matching UUID and company.
+	 * Returns the erc company entry with the matching external reference code and company.
 	 *
-	 * @param uuid the erc company entry's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the erc company entry's external reference code
 	 * @return the matching erc company entry, or <code>null</code> if a matching erc company entry could not be found
 	 */
-	@Override
-	public ERCCompanyEntry fetchERCCompanyEntryByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		return ercCompanyEntryPersistence.fetchByUuid_C_First(
-			uuid, companyId, null);
-	}
-
-	@Deprecated
 	@Override
 	public ERCCompanyEntry fetchERCCompanyEntryByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -270,6 +259,9 @@ public abstract class ERCCompanyEntryLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchERCCompanyEntryByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public ERCCompanyEntry fetchERCCompanyEntryByReferenceCode(
@@ -279,7 +271,14 @@ public abstract class ERCCompanyEntryLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the erc company entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the erc company entry's external reference code
+	 * @return the matching erc company entry
+	 * @throws PortalException if a matching erc company entry could not be found
+	 */
 	@Override
 	public ERCCompanyEntry getERCCompanyEntryByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -348,6 +347,7 @@ public abstract class ERCCompanyEntryLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -366,6 +366,7 @@ public abstract class ERCCompanyEntryLocalServiceBaseImpl
 			(ERCCompanyEntry)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<ERCCompanyEntry> getBasePersistence() {
 		return ercCompanyEntryPersistence;
 	}
@@ -378,23 +379,6 @@ public abstract class ERCCompanyEntryLocalServiceBaseImpl
 		throws PortalException {
 
 		return ercCompanyEntryPersistence.findByPrimaryKey(primaryKeyObj);
-	}
-
-	/**
-	 * Returns the erc company entry with the matching UUID and company.
-	 *
-	 * @param uuid the erc company entry's UUID
-	 * @param companyId the primary key of the company
-	 * @return the matching erc company entry
-	 * @throws PortalException if a matching erc company entry could not be found
-	 */
-	@Override
-	public ERCCompanyEntry getERCCompanyEntryByUuidAndCompanyId(
-			String uuid, long companyId)
-		throws PortalException {
-
-		return ercCompanyEntryPersistence.findByUuid_C_First(
-			uuid, companyId, null);
 	}
 
 	/**
@@ -589,9 +573,6 @@ public abstract class ERCCompanyEntryLocalServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ERCCompanyEntryLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

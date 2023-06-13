@@ -30,11 +30,17 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 @DDMForm(
 	rules = {
 		@DDMFormRule(
+			actions = "setValue('required', isRequiredObjectField(getValue('objectFieldName')))",
+			condition = "hasObjectField(getValue('objectFieldName'))"
+		),
+		@DDMFormRule(
 			actions = {
+				"setEnabled('required', not(hasObjectField(getValue('objectFieldName'))))",
 				"setVisible('dataType', FALSE)",
-				"setVisible('requiredDescription', getValue('required') and " +
-					"isRequiredDescriptionEnabled())"
-			}
+				"setVisible('requiredDescription', getValue('required'))",
+				"setVisible('requiredErrorMessage', getValue('required'))"
+			},
+			condition = "TRUE"
 		)
 	}
 )
@@ -50,7 +56,7 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 							size = 12,
 							value = {
 								"label", "tip", "required",
-								"requiredDescription"
+								"requiredDescription", "requiredErrorMessage"
 							}
 						)
 					}
@@ -66,9 +72,10 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 							size = 12,
 							value = {
 								"name", "fieldReference", "predefinedValue",
-								"visibilityExpression", "fieldNamespace",
-								"indexType", "localizable", "readOnly",
-								"dataType", "type", "showLabel", "repeatable"
+								"objectFieldName", "visibilityExpression",
+								"fieldNamespace", "indexType", "localizable",
+								"readOnly", "dataType", "type", "showLabel",
+								"repeatable"
 							}
 						)
 					}
@@ -85,6 +92,14 @@ public interface ImageDDMFormFieldTypeSettings
 	public String dataType();
 
 	@DDMFormField(
+		label = "%searchable", optionLabels = {"%disable", "%keyword", "%text"},
+		optionValues = {"none", "keyword", "text"}, predefinedValue = "text",
+		type = "radio"
+	)
+	@Override
+	public String indexType();
+
+	@DDMFormField(
 		dataType = "string", label = "%predefined-value", type = "image"
 	)
 	@Override
@@ -92,7 +107,11 @@ public interface ImageDDMFormFieldTypeSettings
 
 	@DDMFormField(
 		label = "%required-description", predefinedValue = "true",
-		properties = "showAsSwitcher=true"
+		properties = {
+			"showAsSwitcher=true",
+			"tooltip=%an-image-description-will-be-required",
+			"visualProperty=true"
+		}
 	)
 	public boolean requiredDescription();
 

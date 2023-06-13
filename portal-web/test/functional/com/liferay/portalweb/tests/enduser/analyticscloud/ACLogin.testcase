@@ -21,7 +21,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 
@@ -29,7 +29,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8534 | Test Summary: Sign out of AC"
-	@priority = 5
+	@priority = "5"
 	test CanSignOutAC {
 		task ("Navigate to AC workspace") {
 			ACUtils.launchAC();

@@ -37,6 +37,7 @@ import com.liferay.site.navigation.model.SiteNavigationMenuItemSoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -338,131 +339,153 @@ public class SiteNavigationMenuItemModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, SiteNavigationMenuItem>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			SiteNavigationMenuItem.class.getClassLoader(),
+			SiteNavigationMenuItem.class, ModelWrapper.class);
+
+		try {
+			Constructor<SiteNavigationMenuItem> constructor =
+				(Constructor<SiteNavigationMenuItem>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<SiteNavigationMenuItem, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<SiteNavigationMenuItem, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<SiteNavigationMenuItem, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<SiteNavigationMenuItem, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", SiteNavigationMenuItem::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", SiteNavigationMenuItem::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", SiteNavigationMenuItem::getUuid);
-		attributeGetterFunctions.put(
-			"siteNavigationMenuItemId",
-			SiteNavigationMenuItem::getSiteNavigationMenuItemId);
-		attributeGetterFunctions.put(
-			"groupId", SiteNavigationMenuItem::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", SiteNavigationMenuItem::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", SiteNavigationMenuItem::getUserId);
-		attributeGetterFunctions.put(
-			"userName", SiteNavigationMenuItem::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", SiteNavigationMenuItem::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", SiteNavigationMenuItem::getModifiedDate);
-		attributeGetterFunctions.put(
-			"siteNavigationMenuId",
-			SiteNavigationMenuItem::getSiteNavigationMenuId);
-		attributeGetterFunctions.put(
-			"parentSiteNavigationMenuItemId",
-			SiteNavigationMenuItem::getParentSiteNavigationMenuItemId);
-		attributeGetterFunctions.put("name", SiteNavigationMenuItem::getName);
-		attributeGetterFunctions.put("type", SiteNavigationMenuItem::getType);
-		attributeGetterFunctions.put(
-			"typeSettings", SiteNavigationMenuItem::getTypeSettings);
-		attributeGetterFunctions.put("order", SiteNavigationMenuItem::getOrder);
-		attributeGetterFunctions.put(
-			"lastPublishDate", SiteNavigationMenuItem::getLastPublishDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<SiteNavigationMenuItem, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<SiteNavigationMenuItem, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<SiteNavigationMenuItem, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", SiteNavigationMenuItem::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<SiteNavigationMenuItem, Long>)
 				SiteNavigationMenuItem::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", SiteNavigationMenuItem::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<SiteNavigationMenuItem, Long>)
 				SiteNavigationMenuItem::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", SiteNavigationMenuItem::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<SiteNavigationMenuItem, String>)
 				SiteNavigationMenuItem::setUuid);
+		attributeGetterFunctions.put(
+			"siteNavigationMenuItemId",
+			SiteNavigationMenuItem::getSiteNavigationMenuItemId);
 		attributeSetterBiConsumers.put(
 			"siteNavigationMenuItemId",
 			(BiConsumer<SiteNavigationMenuItem, Long>)
 				SiteNavigationMenuItem::setSiteNavigationMenuItemId);
+		attributeGetterFunctions.put(
+			"groupId", SiteNavigationMenuItem::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<SiteNavigationMenuItem, Long>)
 				SiteNavigationMenuItem::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", SiteNavigationMenuItem::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<SiteNavigationMenuItem, Long>)
 				SiteNavigationMenuItem::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", SiteNavigationMenuItem::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<SiteNavigationMenuItem, Long>)
 				SiteNavigationMenuItem::setUserId);
+		attributeGetterFunctions.put(
+			"userName", SiteNavigationMenuItem::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<SiteNavigationMenuItem, String>)
 				SiteNavigationMenuItem::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", SiteNavigationMenuItem::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<SiteNavigationMenuItem, Date>)
 				SiteNavigationMenuItem::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", SiteNavigationMenuItem::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<SiteNavigationMenuItem, Date>)
 				SiteNavigationMenuItem::setModifiedDate);
+		attributeGetterFunctions.put(
+			"siteNavigationMenuId",
+			SiteNavigationMenuItem::getSiteNavigationMenuId);
 		attributeSetterBiConsumers.put(
 			"siteNavigationMenuId",
 			(BiConsumer<SiteNavigationMenuItem, Long>)
 				SiteNavigationMenuItem::setSiteNavigationMenuId);
+		attributeGetterFunctions.put(
+			"parentSiteNavigationMenuItemId",
+			SiteNavigationMenuItem::getParentSiteNavigationMenuItemId);
 		attributeSetterBiConsumers.put(
 			"parentSiteNavigationMenuItemId",
 			(BiConsumer<SiteNavigationMenuItem, Long>)
 				SiteNavigationMenuItem::setParentSiteNavigationMenuItemId);
+		attributeGetterFunctions.put("name", SiteNavigationMenuItem::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<SiteNavigationMenuItem, String>)
 				SiteNavigationMenuItem::setName);
+		attributeGetterFunctions.put("type", SiteNavigationMenuItem::getType);
 		attributeSetterBiConsumers.put(
 			"type",
 			(BiConsumer<SiteNavigationMenuItem, String>)
 				SiteNavigationMenuItem::setType);
+		attributeGetterFunctions.put(
+			"typeSettings", SiteNavigationMenuItem::getTypeSettings);
 		attributeSetterBiConsumers.put(
 			"typeSettings",
 			(BiConsumer<SiteNavigationMenuItem, String>)
 				SiteNavigationMenuItem::setTypeSettings);
+		attributeGetterFunctions.put("order", SiteNavigationMenuItem::getOrder);
 		attributeSetterBiConsumers.put(
 			"order",
 			(BiConsumer<SiteNavigationMenuItem, Integer>)
 				SiteNavigationMenuItem::setOrder);
+		attributeGetterFunctions.put(
+			"lastPublishDate", SiteNavigationMenuItem::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<SiteNavigationMenuItem, Date>)
 				SiteNavigationMenuItem::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -920,6 +943,50 @@ public class SiteNavigationMenuItemModelImpl
 	}
 
 	@Override
+	public SiteNavigationMenuItem cloneWithOriginalValues() {
+		SiteNavigationMenuItemImpl siteNavigationMenuItemImpl =
+			new SiteNavigationMenuItemImpl();
+
+		siteNavigationMenuItemImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		siteNavigationMenuItemImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		siteNavigationMenuItemImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		siteNavigationMenuItemImpl.setSiteNavigationMenuItemId(
+			this.<Long>getColumnOriginalValue("siteNavigationMenuItemId"));
+		siteNavigationMenuItemImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		siteNavigationMenuItemImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		siteNavigationMenuItemImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		siteNavigationMenuItemImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		siteNavigationMenuItemImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		siteNavigationMenuItemImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		siteNavigationMenuItemImpl.setSiteNavigationMenuId(
+			this.<Long>getColumnOriginalValue("siteNavigationMenuId"));
+		siteNavigationMenuItemImpl.setParentSiteNavigationMenuItemId(
+			this.<Long>getColumnOriginalValue(
+				"parentSiteNavigationMenuItemId"));
+		siteNavigationMenuItemImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		siteNavigationMenuItemImpl.setType(
+			this.<String>getColumnOriginalValue("type_"));
+		siteNavigationMenuItemImpl.setTypeSettings(
+			this.<String>getColumnOriginalValue("typeSettings"));
+		siteNavigationMenuItemImpl.setOrder(
+			this.<Integer>getColumnOriginalValue("order_"));
+		siteNavigationMenuItemImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+
+		return siteNavigationMenuItemImpl;
+	}
+
+	@Override
 	public int compareTo(SiteNavigationMenuItem siteNavigationMenuItem) {
 		long primaryKey = siteNavigationMenuItem.getPrimaryKey();
 
@@ -1172,9 +1239,7 @@ public class SiteNavigationMenuItemModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, SiteNavigationMenuItem>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					SiteNavigationMenuItem.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

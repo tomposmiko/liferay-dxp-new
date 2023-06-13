@@ -130,6 +130,11 @@ public class CPDefinitionLocalizationWrapper
 		}
 	}
 
+	@Override
+	public CPDefinitionLocalization cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
 	/**
 	 * Returns the company ID of this cp definition localization.
 	 *

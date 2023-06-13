@@ -25,7 +25,7 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portal.kernel.upgrade.BaseUpgradePortletPreferences;
+import com.liferay.portal.kernel.upgrade.BasePortletPreferencesUpgradeProcess;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -54,7 +54,8 @@ import javax.portlet.PortletPreferences;
 /**
  * @author Sam Ziemer
  */
-public class UpgradePortletPreferences extends BaseUpgradePortletPreferences {
+public class UpgradePortletPreferences
+	extends BasePortletPreferencesUpgradeProcess {
 
 	public UpgradePortletPreferences(
 		DDMStructureLocalService ddmStructureLocalService,
@@ -98,22 +99,19 @@ public class UpgradePortletPreferences extends BaseUpgradePortletPreferences {
 	protected String getJournalArticleResourceUuid(String journalArticleUuid)
 		throws Exception {
 
-		StringBundler sb = new StringBundler(5);
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				StringBundler.concat(
+					"select JournalArticleResource.uuid_ from ",
+					"JournalArticleResource inner join JournalArticle on ",
+					"JournalArticle.resourcePrimKey = ",
+					"JournalArticleResource.resourcePrimKey where ",
+					"JournalArticle.uuid_ = ?"))) {
 
-		sb.append("select JournalArticleResource.uuid_ from ");
-		sb.append("JournalArticleResource inner join JournalArticle on ");
-		sb.append("JournalArticle.resourcePrimKey = ");
-		sb.append("JournalArticleResource.resourcePrimKey where ");
-		sb.append("JournalArticle.uuid_ = ?");
+			preparedStatement.setString(1, journalArticleUuid);
 
-		try (PreparedStatement ps = connection.prepareStatement(
-				sb.toString())) {
-
-			ps.setString(1, journalArticleUuid);
-
-			try (ResultSet rs = ps.executeQuery()) {
-				if (rs.next()) {
-					return rs.getString("uuid_");
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				if (resultSet.next()) {
+					return resultSet.getString("uuid_");
 				}
 
 				return null;
@@ -135,7 +133,9 @@ public class UpgradePortletPreferences extends BaseUpgradePortletPreferences {
 			return false;
 		}
 
-		if (Objects.equals(ddmFormField.getType(), "ddm-date")) {
+		if (Objects.equals("date", ddmFormField.getType()) ||
+			Objects.equals("ddm-date", ddmFormField.getType())) {
+
 			return true;
 		}
 
@@ -265,17 +265,10 @@ public class UpgradePortletPreferences extends BaseUpgradePortletPreferences {
 				if ((ddmFormField != null) &&
 					Validator.isNotNull(ddmFormField.getIndexType())) {
 
-					StringBundler sb = new StringBundler(7);
-
-					sb.append(values[0]);
-					sb.append(_DDM_FIELD_SEPARATOR);
-					sb.append(ddmFormField.getIndexType());
-					sb.append(_DDM_FIELD_SEPARATOR);
-					sb.append(values[1]);
-					sb.append(_DDM_FIELD_SEPARATOR);
-					sb.append(fieldName);
-
-					value = sb.toString();
+					value = StringBundler.concat(
+						values[0], _DDM_FIELD_SEPARATOR,
+						ddmFormField.getIndexType(), _DDM_FIELD_SEPARATOR,
+						values[1], _DDM_FIELD_SEPARATOR, fieldName);
 				}
 			}
 			else if ((values.length == 4) && oldDDMPreferenceValueFormat) {
@@ -303,6 +296,15 @@ public class UpgradePortletPreferences extends BaseUpgradePortletPreferences {
 		PortletPreferences portletPreferences =
 			PortletPreferencesFactoryUtil.fromXML(
 				companyId, ownerId, ownerType, plid, portletId, xml);
+
+		portletPreferences = upgradePreferences(portletPreferences);
+
+		return PortletPreferencesFactoryUtil.toXML(portletPreferences);
+	}
+
+	protected PortletPreferences upgradePreferences(
+			PortletPreferences portletPreferences)
+		throws Exception {
 
 		String[] assetEntryXmls = portletPreferences.getValues(
 			"asset-entry-xml", new String[0]);
@@ -333,7 +335,7 @@ public class UpgradePortletPreferences extends BaseUpgradePortletPreferences {
 
 		upgradeOrderByColumns(portletPreferences);
 
-		return PortletPreferencesFactoryUtil.toXML(portletPreferences);
+		return portletPreferences;
 	}
 
 	protected void upgradeUuids(String[] assetEntryXmls) throws Exception {

@@ -62,7 +62,7 @@ public class Specification implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(Specification.class, json);
 	}
 
-	@Schema(example = "{hu_HU=Horvatorszag, hr_HR=Hrvatska, en_US=Croatia}")
+	@Schema
 	@Valid
 	public Map<String, String> getDescription() {
 		return description;
@@ -92,7 +92,7 @@ public class Specification implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> description;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getFacetable() {
 		return facetable;
 	}
@@ -121,7 +121,7 @@ public class Specification implements Serializable {
 	protected Boolean facetable;
 
 	@DecimalMin("0")
-	@Schema(example = "31130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -147,7 +147,7 @@ public class Specification implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(example = "specification-key")
+	@Schema
 	public String getKey() {
 		return key;
 	}
@@ -204,7 +204,7 @@ public class Specification implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected OptionCategory optionCategory;
 
-	@Schema(example = "{en_US=Croatia, hr_HR=Hrvatska, hu_HU=Horvatorszag}")
+	@Schema
 	@Valid
 	public Map<String, String> getTitle() {
 		return title;

@@ -18,20 +18,21 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			Site.tearDownCP();
+			JSONDepot.deleteDepot(depotName = "Test Depot Name");
 
-			Depot.tearDownCP();
+			Site.tearDownCP();
 
 			User.logoutPG();
 		}
 	}
 
 	@description = "This test covers LPS-113731. It ensures that roles and permissions from a library are removed after membership is revoked."
-	@priority = 5
+	@priority = "5"
+	@refactorneeded
 	test AccessALAfterRevokingMembership {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -54,7 +55,7 @@ definition {
 
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "VIEW_CONTROL_PANEL",
-			resourceName = 90,
+			resourceName = "90",
 			roleTitle = "Depot Regrole Name");
 
 		Permissions.definePermissionViaJSONAPI(
@@ -125,7 +126,8 @@ definition {
 	}
 
 	@description = "This ensures that the Asset Library Connected Site Members role does not appear in user roles even after it is automatically assigned to a connected site member. This test also covers permissions and makes sure the library asset can be updated by the role."
-	@priority = 5
+	@priority = "5"
+	@refactorneeded
 	test AddSiteMemberWithPermissionsAfterConnectingSite {
 		JSONGroup.addGroup(groupName = "Site Name");
 
@@ -133,13 +135,9 @@ definition {
 			groupName = "Site Name",
 			layoutName = "Test Page Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
-
-		DepotNavigator.gotoSites(depotName = "Test Depot Name");
-
-		Depot.connectSite(siteList = "Site Name");
+		JSONDepot.connectSite(
+			depotName = "Test Depot Name",
+			groupName = "Site Name");
 
 		JSONUser.addUser(
 			userEmailAddress = "user1@liferay.com",
@@ -198,17 +196,20 @@ definition {
 			site = "false",
 			title = "WC WebContent Title");
 
-		Navigator.gotoSitePage(
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page Name",
+			widgetName = "Web Content Display");
+
+		Navigator.openSitePage(
 			pageName = "Test Page Name",
 			siteName = "Site Name");
-
-		Portlet.addPG(portletName = "Web Content Display");
 
 		WebContentDisplayPortlet.selectWebContent(
 			depotName = "Test Depot Name",
 			webContentTitle = "WC WebContent Title");
 
-		Navigator.gotoSitePage(
+		Navigator.openSitePage(
 			pageName = "Test Page Name",
 			siteName = "Site Name");
 
@@ -218,7 +219,7 @@ definition {
 			permissionDefinitionKey = "CONTENT_PERMISSIONS_VIEW_CHECKBOX",
 			roleTitle = "Guest");
 
-		Navigator.gotoSitePage(
+		Navigator.openSitePage(
 			pageName = "Test Page Name",
 			siteName = "Site Name");
 
@@ -232,7 +233,7 @@ definition {
 			userLoginEmailAddress = "user1@liferay.com",
 			userLoginFullName = "userfn userln");
 
-		Navigator.gotoSitePage(
+		Navigator.openSitePage(
 			pageName = "Test Page Name",
 			siteName = "Site Name");
 
@@ -252,7 +253,7 @@ definition {
 
 		for (var permissionDefinitionKey : list "INLINE_PERMISSIONS_UPDATE_CHECKBOX,INLINE_PERMISSIONS_VIEW_CHECKBOX") {
 			Role.definePermissionPG(
-				permissionDefinitionKey = ${permissionDefinitionKey},
+				permissionDefinitionKey = "${permissionDefinitionKey}",
 				roleTitle = "asset-library-connected-site-member");
 		}
 
@@ -260,7 +261,7 @@ definition {
 			userLoginEmailAddress = "user1@liferay.com",
 			userLoginFullName = "userfn userln");
 
-		Navigator.gotoSitePage(
+		Navigator.openSitePage(
 			pageName = "Test Page Name",
 			siteName = "Site Name");
 
@@ -272,7 +273,8 @@ definition {
 	}
 
 	@description = "This ensures that the user can perform CRUD operations with an AL role that has all WC permissions."
-	@priority = 5
+	@priority = "5"
+	@refactorneeded
 	test AssignALRoleWithAllWCPermissions {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -284,7 +286,7 @@ definition {
 
 		for (var resourceActionIndex : list "ACCESS_IN_CONTROL_PANEL,ADD_TO_PAGE,CONFIGURATION,PERMISSIONS,PREFERENCES,VIEW") {
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = ${resourceActionIndex},
+				resourceAction = "${resourceActionIndex}",
 				resourceName = "com_liferay_journal_web_portlet_JournalPortlet",
 				roleTitle = "AL Role Name",
 				roleType = "asset library");
@@ -292,7 +294,7 @@ definition {
 
 		for (var resourceActionIndex : list "ADD_ARTICLE,ADD_FEED,ADD_FOLDER,ADD_STRUCTURE,ADD_TEMPLATE,PERMISSIONS,SUBSCRIBE,UPDATE,VIEW") {
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = ${resourceActionIndex},
+				resourceAction = "${resourceActionIndex}",
 				resourceName = "com.liferay.journal",
 				roleTitle = "AL Role Name",
 				roleType = "asset library");
@@ -300,7 +302,7 @@ definition {
 
 		for (var resourceActionIndex : list "ADD_DISCUSSION,DELETE,DELETE_DISCUSSION,EXPIRE,PERMISSIONS,SUBSCRIBE,UPDATE,UPDATE_DISCUSSION,VIEW") {
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = ${resourceActionIndex},
+				resourceAction = "${resourceActionIndex}",
 				resourceName = "com.liferay.journal.model.JournalArticle",
 				roleTitle = "AL Role Name",
 				roleType = "asset library");
@@ -361,14 +363,19 @@ definition {
 
 		PortletEntry.publish();
 
-		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
+		DepotNavigator.openToEditWCEntry(
+			depotName = "Test Depot Name",
+			webContentTitle = "WC WebContent Title");
 
 		WebContent.editCP(
 			webContentContentEdit = "WC WebContent Content Edit",
 			webContentTitle = "WC WebContent Title",
 			webContentTitleEdit = "WC WebContent Title Edit");
 
-		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title Edit");
+		DepotNavigator.openToEditWCEntry(
+			depotName = "Test Depot Name",
+			version = "1.1",
+			webContentTitle = "WC WebContent Title");
 
 		WebContent.viewCP(
 			webContentContent = "WC WebContent Content Edit",
@@ -382,7 +389,8 @@ definition {
 	}
 
 	@description = "This ensures that the user can edit documents with an AL role that has edit documents permissions."
-	@priority = 5
+	@priority = "5"
+	@refactorneeded
 	test AssignALRoleWithDMEditPermissions {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -423,7 +431,7 @@ definition {
 
 		for (var resourceActionIndex : list "UPDATE,VIEW") {
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = ${resourceActionIndex},
+				resourceAction = "${resourceActionIndex}",
 				resourceName = "com.liferay.document.library.kernel.model.DLFileEntry",
 				roleTitle = "AL Role Name",
 				roleType = "asset library");
@@ -484,7 +492,8 @@ definition {
 	}
 
 	@description = "This ensures that an asset library role can be deleted."
-	@priority = 5
+	@priority = "5"
+	@refactorneeded
 	test DeleteALRole {
 		Role.openRolesAdmin();
 
@@ -514,7 +523,8 @@ definition {
 	}
 
 	@description = "This ensures that an asset library role can be edited."
-	@priority = 5
+	@priority = "5"
+	@refactorneeded
 	test EditALRole {
 		Role.openRolesAdmin();
 
@@ -547,7 +557,8 @@ definition {
 	}
 
 	@description = "This ensures that an asset library role can be edited."
-	@priority = 5
+	@priority = "5"
+	@refactorneeded
 	test ViewALAdminRole {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -622,7 +633,8 @@ definition {
 	}
 
 	@description = "This ensures that the Asset Library Connected Site Members role does not appear in user roles even it is automatically assigned to an existing site member after connecting site."
-	@priority = 5
+	@priority = "5"
+	@refactorneeded
 	test ViewExistingSiteMemberAfterConnectingSite {
 		JSONUser.addUser(
 			userEmailAddress = "user1@liferay.com",
@@ -655,13 +667,9 @@ definition {
 			siteName = "Site Name",
 			userScreenName = "usersn");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
-
-		DepotNavigator.gotoSites(depotName = "Test Depot Name");
-
-		Depot.connectSite(siteList = "Site Name");
+		JSONDepot.connectSite(
+			depotName = "Test Depot Name",
+			groupName = "Site Name");
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",

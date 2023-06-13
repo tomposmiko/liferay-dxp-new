@@ -177,6 +177,20 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 
 		Contact contact = _contactPersistence.create(0);
 
+		if (contactExpandoMappings.containsKey(ContactConverterKeys.PREFIX)) {
+			String prefix = contactExpandoMappings.getProperty(
+				ContactConverterKeys.PREFIX);
+
+			contactMappings.put(ContactConverterKeys.PREFIX, prefix);
+		}
+
+		if (contactExpandoMappings.containsKey(ContactConverterKeys.SUFFIX)) {
+			String suffix = contactExpandoMappings.getProperty(
+				ContactConverterKeys.SUFFIX);
+
+			contactMappings.put(ContactConverterKeys.SUFFIX, suffix);
+		}
+
 		long prefixId = getListTypeId(
 			attributes, contactMappings, ContactConverterKeys.PREFIX,
 			ListTypeConstants.CONTACT_PREFIX);
@@ -212,6 +226,10 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 			contact.setBirthday(birthday);
 		}
 		catch (ParseException parseException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(parseException, parseException);
+			}
+
 			Calendar birthdayCalendar = CalendarFactoryUtil.getCalendar(
 				1970, Calendar.JANUARY, 1);
 

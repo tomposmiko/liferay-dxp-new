@@ -14,13 +14,17 @@
 
 package com.liferay.journal.web.internal.info.display.contributor;
 
+import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
-import com.liferay.asset.util.AssetHelper;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
+import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.web.internal.asset.model.JournalArticleAssetRendererFactory;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Locale;
 
@@ -30,16 +34,10 @@ import java.util.Locale;
 public class JournalArticleInfoDisplayObjectProvider
 	implements InfoDisplayObjectProvider<JournalArticle> {
 
-	public JournalArticleInfoDisplayObjectProvider(
-			JournalArticle article, AssetHelper assetHelper,
-			JournalArticleAssetRendererFactory
-				journalArticleAssetRendererFactory)
+	public JournalArticleInfoDisplayObjectProvider(JournalArticle article)
 		throws PortalException {
 
 		_article = article;
-		_assetHelper = assetHelper;
-		_journalArticleAssetRendererFactory =
-			journalArticleAssetRendererFactory;
 
 		_assetEntry = _getAssetEntry(article);
 	}
@@ -76,8 +74,18 @@ public class JournalArticleInfoDisplayObjectProvider
 
 	@Override
 	public String getKeywords(Locale locale) {
-		return _assetHelper.getAssetKeywords(
-			_assetEntry.getClassName(), _assetEntry.getClassPK(), locale);
+		String[] assetTagNames = AssetTagLocalServiceUtil.getTagNames(
+			_assetEntry.getClassName(), _assetEntry.getClassPK());
+		String[] assetCategoryNames =
+			AssetCategoryLocalServiceUtil.getCategoryNames(
+				_assetEntry.getClassName(), _assetEntry.getClassPK());
+
+		String[] keywords =
+			new String[assetTagNames.length + assetCategoryNames.length];
+
+		ArrayUtil.combine(assetTagNames, assetCategoryNames, keywords);
+
+		return StringUtil.merge(keywords);
 	}
 
 	@Override
@@ -95,15 +103,16 @@ public class JournalArticleInfoDisplayObjectProvider
 	private AssetEntry _getAssetEntry(JournalArticle journalArticle)
 		throws PortalException {
 
-		return _journalArticleAssetRendererFactory.getAssetEntry(
+		AssetRendererFactory<?> assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
+				JournalArticle.class.getName());
+
+		return assetRendererFactory.getAssetEntry(
 			JournalArticle.class.getName(),
 			journalArticle.getResourcePrimKey());
 	}
 
 	private final JournalArticle _article;
 	private final AssetEntry _assetEntry;
-	private final AssetHelper _assetHelper;
-	private final JournalArticleAssetRendererFactory
-		_journalArticleAssetRendererFactory;
 
 }

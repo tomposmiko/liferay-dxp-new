@@ -13,21 +13,31 @@
  */
 
 import classNames from 'classnames';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 
 import useSetRef from '../../../core/hooks/useSetRef';
 import {getLayoutDataItemPropTypes} from '../../../prop-types/index';
+import {CONTAINER_WIDTH_TYPES} from '../../config/constants/containerWidthTypes';
+import {
+	useHoveredItemId,
+	useHoveredItemType,
+} from '../../contexts/ControlsContext';
+import {useSelector} from '../../contexts/StoreContext';
 import selectCanUpdateItemConfiguration from '../../selectors/selectCanUpdateItemConfiguration';
-import {useSelector} from '../../store/index';
 import {getFrontendTokenValue} from '../../utils/getFrontendTokenValue';
 import {getResponsiveConfig} from '../../utils/getResponsiveConfig';
+import {isValidSpacingOption} from '../../utils/isValidSpacingOption';
 import Topper from '../Topper';
 import Container from './Container';
+import isHovered from './isHovered';
 
 const ContainerWithControls = React.forwardRef(({children, item}, ref) => {
 	const canUpdateItemConfiguration = useSelector(
 		selectCanUpdateItemConfiguration
 	);
+	const hoveredItemType = useHoveredItemType();
+	const hoveredItemId = useHoveredItemId();
+	const [hovered, setHovered] = useState(false);
 	const selectedViewportSize = useSelector(
 		(state) => state.selectedViewportSize
 	);
@@ -39,6 +49,7 @@ const ContainerWithControls = React.forwardRef(({children, item}, ref) => {
 	const {widthType} = itemConfig;
 
 	const {
+		display,
 		height,
 		marginLeft,
 		marginRight,
@@ -51,17 +62,39 @@ const ContainerWithControls = React.forwardRef(({children, item}, ref) => {
 	const style = {};
 
 	style.boxShadow = getFrontendTokenValue(shadow);
+	style.display = display;
 	style.maxWidth = maxWidth;
 	style.minWidth = minWidth;
 	style.width = width;
 
+	useEffect(() => {
+		const backgroundImage = item.config?.styles?.backgroundImage;
+
+		if (backgroundImage?.classNameId && backgroundImage?.classPK) {
+			setHovered(
+				isHovered({
+					editableValue: backgroundImage,
+					hoveredItemId,
+					hoveredItemType,
+				})
+			);
+		}
+	}, [hoveredItemId, hoveredItemType, item]);
+
 	return (
 		<Topper
 			className={classNames({
-				container: widthType === 'fixed',
-				[`ml-${marginLeft}`]: widthType !== 'fixed',
-				[`mr-${marginRight}`]: widthType !== 'fixed',
-				'p-0': widthType === 'fixed',
+				[`container-fluid`]: widthType === CONTAINER_WIDTH_TYPES.fixed,
+				[`container-fluid-max-xl`]:
+					widthType === CONTAINER_WIDTH_TYPES.fixed,
+				[`ml-${marginLeft}`]:
+					isValidSpacingOption(marginLeft) &&
+					widthType !== CONTAINER_WIDTH_TYPES.fixed,
+				[`mr-${marginRight}`]:
+					isValidSpacingOption(marginRight) &&
+					widthType !== CONTAINER_WIDTH_TYPES.fixed,
+				'p-0': widthType === CONTAINER_WIDTH_TYPES.fixed,
+				'page-editor__topper--hovered': hovered,
 			})}
 			item={item}
 			itemElement={itemElement}
@@ -69,7 +102,7 @@ const ContainerWithControls = React.forwardRef(({children, item}, ref) => {
 		>
 			<Container
 				className={classNames({
-					empty: !item.children.length && !height,
+					'empty': !item.children.length && !height,
 					'page-editor__container': canUpdateItemConfiguration,
 				})}
 				item={item}

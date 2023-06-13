@@ -18,6 +18,7 @@ import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.MVCCModel;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -33,7 +34,7 @@ import java.util.Date;
  * @generated
  */
 public class CPAttachmentFileEntryCacheModel
-	implements CacheModel<CPAttachmentFileEntry>, Externalizable {
+	implements CacheModel<CPAttachmentFileEntry>, Externalizable, MVCCModel {
 
 	@Override
 	public boolean equals(Object object) {
@@ -48,8 +49,9 @@ public class CPAttachmentFileEntryCacheModel
 		CPAttachmentFileEntryCacheModel cpAttachmentFileEntryCacheModel =
 			(CPAttachmentFileEntryCacheModel)object;
 
-		if (CPAttachmentFileEntryId ==
-				cpAttachmentFileEntryCacheModel.CPAttachmentFileEntryId) {
+		if ((CPAttachmentFileEntryId ==
+				cpAttachmentFileEntryCacheModel.CPAttachmentFileEntryId) &&
+			(mvccVersion == cpAttachmentFileEntryCacheModel.mvccVersion)) {
 
 			return true;
 		}
@@ -59,14 +61,28 @@ public class CPAttachmentFileEntryCacheModel
 
 	@Override
 	public int hashCode() {
-		return HashUtil.hash(0, CPAttachmentFileEntryId);
+		int hashCode = HashUtil.hash(0, CPAttachmentFileEntryId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
+	public long getMvccVersion() {
+		return mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		this.mvccVersion = mvccVersion;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(47);
+		StringBundler sb = new StringBundler(53);
 
-		sb.append("{uuid=");
+		sb.append("{mvccVersion=");
+		sb.append(mvccVersion);
+		sb.append(", uuid=");
 		sb.append(uuid);
 		sb.append(", externalReferenceCode=");
 		sb.append(externalReferenceCode);
@@ -90,6 +106,10 @@ public class CPAttachmentFileEntryCacheModel
 		sb.append(classPK);
 		sb.append(", fileEntryId=");
 		sb.append(fileEntryId);
+		sb.append(", cdnEnabled=");
+		sb.append(cdnEnabled);
+		sb.append(", cdnURL=");
+		sb.append(cdnURL);
 		sb.append(", displayDate=");
 		sb.append(displayDate);
 		sb.append(", expirationDate=");
@@ -121,6 +141,8 @@ public class CPAttachmentFileEntryCacheModel
 	public CPAttachmentFileEntry toEntityModel() {
 		CPAttachmentFileEntryImpl cpAttachmentFileEntryImpl =
 			new CPAttachmentFileEntryImpl();
+
+		cpAttachmentFileEntryImpl.setMvccVersion(mvccVersion);
 
 		if (uuid == null) {
 			cpAttachmentFileEntryImpl.setUuid("");
@@ -167,6 +189,14 @@ public class CPAttachmentFileEntryCacheModel
 		cpAttachmentFileEntryImpl.setClassNameId(classNameId);
 		cpAttachmentFileEntryImpl.setClassPK(classPK);
 		cpAttachmentFileEntryImpl.setFileEntryId(fileEntryId);
+		cpAttachmentFileEntryImpl.setCDNEnabled(cdnEnabled);
+
+		if (cdnURL == null) {
+			cpAttachmentFileEntryImpl.setCDNURL("");
+		}
+		else {
+			cpAttachmentFileEntryImpl.setCDNURL(cdnURL);
+		}
 
 		if (displayDate == Long.MIN_VALUE) {
 			cpAttachmentFileEntryImpl.setDisplayDate(null);
@@ -234,6 +264,7 @@ public class CPAttachmentFileEntryCacheModel
 	public void readExternal(ObjectInput objectInput)
 		throws ClassNotFoundException, IOException {
 
+		mvccVersion = objectInput.readLong();
 		uuid = objectInput.readUTF();
 		externalReferenceCode = objectInput.readUTF();
 
@@ -253,6 +284,9 @@ public class CPAttachmentFileEntryCacheModel
 		classPK = objectInput.readLong();
 
 		fileEntryId = objectInput.readLong();
+
+		cdnEnabled = objectInput.readBoolean();
+		cdnURL = objectInput.readUTF();
 		displayDate = objectInput.readLong();
 		expirationDate = objectInput.readLong();
 		title = objectInput.readUTF();
@@ -272,6 +306,8 @@ public class CPAttachmentFileEntryCacheModel
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+		objectOutput.writeLong(mvccVersion);
+
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -309,6 +345,16 @@ public class CPAttachmentFileEntryCacheModel
 		objectOutput.writeLong(classPK);
 
 		objectOutput.writeLong(fileEntryId);
+
+		objectOutput.writeBoolean(cdnEnabled);
+
+		if (cdnURL == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(cdnURL);
+		}
+
 		objectOutput.writeLong(displayDate);
 		objectOutput.writeLong(expirationDate);
 
@@ -345,6 +391,7 @@ public class CPAttachmentFileEntryCacheModel
 		objectOutput.writeLong(statusDate);
 	}
 
+	public long mvccVersion;
 	public String uuid;
 	public String externalReferenceCode;
 	public long CPAttachmentFileEntryId;
@@ -357,6 +404,8 @@ public class CPAttachmentFileEntryCacheModel
 	public long classNameId;
 	public long classPK;
 	public long fileEntryId;
+	public boolean cdnEnabled;
+	public String cdnURL;
 	public long displayDate;
 	public long expirationDate;
 	public String title;

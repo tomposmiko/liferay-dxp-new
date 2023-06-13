@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
@@ -107,7 +106,7 @@ public class UserIndexerIndexedFieldsByAssociationTest {
 		_userGroups = userGroupSearchFixture.getUserGroups();
 
 		indexedFieldsFixture = new IndexedFieldsFixture(
-			_resourcePermissionLocalService, _searchEngineHelper, _uidFactory,
+			_resourcePermissionLocalService, _uidFactory,
 			_documentBuilderFactory);
 	}
 
@@ -123,7 +122,7 @@ public class UserIndexerIndexedFieldsByAssociationTest {
 
 		User user = addUser();
 
-		final Map<String, String> map = new HashMap<>();
+		Map<String, String> map = new HashMap<>();
 
 		indexedFieldsFixture.populateUID(user, map);
 
@@ -153,7 +152,7 @@ public class UserIndexerIndexedFieldsByAssociationTest {
 
 		User user = addUser();
 
-		final Map<String, String> map1 = HashMapBuilder.put(
+		Map<String, String> map1 = HashMapBuilder.put(
 			Field.COMPANY_ID, String.valueOf(user.getCompanyId())
 		).put(
 			Field.ENTRY_CLASS_NAME, user.getModelClassName()
@@ -179,7 +178,7 @@ public class UserIndexerIndexedFieldsByAssociationTest {
 
 		_userLocalService.addOrganizationUser(organizationId, user);
 
-		final Map<String, String> map2 = HashMapBuilder.putAll(
+		Map<String, String> map2 = HashMapBuilder.putAll(
 			map1
 		).put(
 			"organizationCount", "1"
@@ -193,7 +192,7 @@ public class UserIndexerIndexedFieldsByAssociationTest {
 
 		_userLocalService.addUserGroupUser(userGroupId, user);
 
-		final Map<String, String> map3 = HashMapBuilder.putAll(
+		Map<String, String> map3 = HashMapBuilder.putAll(
 			map2
 		).put(
 			"userGroupIds", String.valueOf(userGroupId)
@@ -354,9 +353,6 @@ public class UserIndexerIndexedFieldsByAssociationTest {
 	@Inject
 	private static ResourcePermissionLocalService
 		_resourcePermissionLocalService;
-
-	@Inject
-	private static SearchEngineHelper _searchEngineHelper;
 
 	@Inject
 	private static Searcher _searcher;

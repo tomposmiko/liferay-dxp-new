@@ -18,11 +18,12 @@ import com.liferay.commerce.availability.estimate.web.internal.util.CommerceAvai
 import com.liferay.commerce.constants.CommerceActionKeys;
 import com.liferay.commerce.model.CommerceAvailabilityEstimate;
 import com.liferay.commerce.service.CommerceAvailabilityEstimateService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -41,10 +42,12 @@ public class CommerceAvailabilityEstimateDisplayContext {
 
 	public CommerceAvailabilityEstimateDisplayContext(
 		CommerceAvailabilityEstimateService commerceAvailabilityEstimateService,
+		PortletResourcePermission portletResourcePermission,
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
 		_commerceAvailabilityEstimateService =
 			commerceAvailabilityEstimateService;
+		_portletResourcePermission = portletResourcePermission;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 	}
@@ -81,12 +84,13 @@ public class CommerceAvailabilityEstimateDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
-
-		portletURL.setParameter("orderByCol", getOrderByCol());
-		portletURL.setParameter("orderByType", getOrderByType());
-
-		return portletURL;
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setParameter(
+			"orderByCol", getOrderByCol()
+		).setParameter(
+			"orderByType", getOrderByType()
+		).buildPortletURL();
 	}
 
 	public SearchContainer<CommerceAvailabilityEstimate> getSearchContainer()
@@ -138,8 +142,8 @@ public class CommerceAvailabilityEstimateDisplayContext {
 		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		return PortalPermissionUtil.contains(
-			themeDisplay.getPermissionChecker(),
+		return _portletResourcePermission.contains(
+			themeDisplay.getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_AVAILABILITY_ESTIMATES);
 	}
 
@@ -154,6 +158,7 @@ public class CommerceAvailabilityEstimateDisplayContext {
 	private CommerceAvailabilityEstimate _commerceAvailabilityEstimate;
 	private final CommerceAvailabilityEstimateService
 		_commerceAvailabilityEstimateService;
+	private final PortletResourcePermission _portletResourcePermission;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 	private RowChecker _rowChecker;

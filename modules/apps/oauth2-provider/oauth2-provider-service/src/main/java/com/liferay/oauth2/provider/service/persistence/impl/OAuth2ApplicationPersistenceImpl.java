@@ -24,7 +24,6 @@ import com.liferay.oauth2.provider.service.persistence.OAuth2ApplicationUtil;
 import com.liferay.oauth2.provider.service.persistence.impl.constants.OAuthTwoPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -36,14 +35,13 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -59,17 +57,13 @@ import java.lang.reflect.InvocationHandler;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -85,7 +79,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = OAuth2ApplicationPersistence.class)
+@Component(
+	service = {OAuth2ApplicationPersistence.class, BasePersistence.class}
+)
 public class OAuth2ApplicationPersistenceImpl
 	extends BasePersistenceImpl<OAuth2Application>
 	implements OAuth2ApplicationPersistence {
@@ -107,9 +103,9 @@ public class OAuth2ApplicationPersistenceImpl
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
-	private FinderPath _finderPathWithPaginationFindByC;
-	private FinderPath _finderPathWithoutPaginationFindByC;
-	private FinderPath _finderPathCountByC;
+	private FinderPath _finderPathWithPaginationFindByCompanyId;
+	private FinderPath _finderPathWithoutPaginationFindByCompanyId;
+	private FinderPath _finderPathCountByCompanyId;
 
 	/**
 	 * Returns all the o auth2 applications where companyId = &#63;.
@@ -118,8 +114,9 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @return the matching o auth2 applications
 	 */
 	@Override
-	public List<OAuth2Application> findByC(long companyId) {
-		return findByC(companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<OAuth2Application> findByCompanyId(long companyId) {
+		return findByCompanyId(
+			companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
@@ -135,8 +132,10 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @return the range of matching o auth2 applications
 	 */
 	@Override
-	public List<OAuth2Application> findByC(long companyId, int start, int end) {
-		return findByC(companyId, start, end, null);
+	public List<OAuth2Application> findByCompanyId(
+		long companyId, int start, int end) {
+
+		return findByCompanyId(companyId, start, end, null);
 	}
 
 	/**
@@ -153,11 +152,11 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @return the ordered range of matching o auth2 applications
 	 */
 	@Override
-	public List<OAuth2Application> findByC(
+	public List<OAuth2Application> findByCompanyId(
 		long companyId, int start, int end,
 		OrderByComparator<OAuth2Application> orderByComparator) {
 
-		return findByC(companyId, start, end, orderByComparator, true);
+		return findByCompanyId(companyId, start, end, orderByComparator, true);
 	}
 
 	/**
@@ -175,7 +174,7 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @return the ordered range of matching o auth2 applications
 	 */
 	@Override
-	public List<OAuth2Application> findByC(
+	public List<OAuth2Application> findByCompanyId(
 		long companyId, int start, int end,
 		OrderByComparator<OAuth2Application> orderByComparator,
 		boolean useFinderCache) {
@@ -187,12 +186,12 @@ public class OAuth2ApplicationPersistenceImpl
 			(orderByComparator == null)) {
 
 			if (useFinderCache) {
-				finderPath = _finderPathWithoutPaginationFindByC;
+				finderPath = _finderPathWithoutPaginationFindByCompanyId;
 				finderArgs = new Object[] {companyId};
 			}
 		}
 		else if (useFinderCache) {
-			finderPath = _finderPathWithPaginationFindByC;
+			finderPath = _finderPathWithPaginationFindByCompanyId;
 			finderArgs = new Object[] {
 				companyId, start, end, orderByComparator
 			};
@@ -202,7 +201,7 @@ public class OAuth2ApplicationPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<OAuth2Application>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (OAuth2Application oAuth2Application : list) {
@@ -228,7 +227,7 @@ public class OAuth2ApplicationPersistenceImpl
 
 			sb.append(_SQL_SELECT_OAUTH2APPLICATION_WHERE);
 
-			sb.append(_FINDER_COLUMN_C_COMPANYID_2);
+			sb.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 			if (orderByComparator != null) {
 				appendOrderByComparator(
@@ -280,12 +279,12 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @throws NoSuchOAuth2ApplicationException if a matching o auth2 application could not be found
 	 */
 	@Override
-	public OAuth2Application findByC_First(
+	public OAuth2Application findByCompanyId_First(
 			long companyId,
 			OrderByComparator<OAuth2Application> orderByComparator)
 		throws NoSuchOAuth2ApplicationException {
 
-		OAuth2Application oAuth2Application = fetchByC_First(
+		OAuth2Application oAuth2Application = fetchByCompanyId_First(
 			companyId, orderByComparator);
 
 		if (oAuth2Application != null) {
@@ -312,11 +311,11 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @return the first matching o auth2 application, or <code>null</code> if a matching o auth2 application could not be found
 	 */
 	@Override
-	public OAuth2Application fetchByC_First(
+	public OAuth2Application fetchByCompanyId_First(
 		long companyId,
 		OrderByComparator<OAuth2Application> orderByComparator) {
 
-		List<OAuth2Application> list = findByC(
+		List<OAuth2Application> list = findByCompanyId(
 			companyId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -335,12 +334,12 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @throws NoSuchOAuth2ApplicationException if a matching o auth2 application could not be found
 	 */
 	@Override
-	public OAuth2Application findByC_Last(
+	public OAuth2Application findByCompanyId_Last(
 			long companyId,
 			OrderByComparator<OAuth2Application> orderByComparator)
 		throws NoSuchOAuth2ApplicationException {
 
-		OAuth2Application oAuth2Application = fetchByC_Last(
+		OAuth2Application oAuth2Application = fetchByCompanyId_Last(
 			companyId, orderByComparator);
 
 		if (oAuth2Application != null) {
@@ -367,17 +366,17 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @return the last matching o auth2 application, or <code>null</code> if a matching o auth2 application could not be found
 	 */
 	@Override
-	public OAuth2Application fetchByC_Last(
+	public OAuth2Application fetchByCompanyId_Last(
 		long companyId,
 		OrderByComparator<OAuth2Application> orderByComparator) {
 
-		int count = countByC(companyId);
+		int count = countByCompanyId(companyId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<OAuth2Application> list = findByC(
+		List<OAuth2Application> list = findByCompanyId(
 			companyId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -397,7 +396,7 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @throws NoSuchOAuth2ApplicationException if a o auth2 application with the primary key could not be found
 	 */
 	@Override
-	public OAuth2Application[] findByC_PrevAndNext(
+	public OAuth2Application[] findByCompanyId_PrevAndNext(
 			long oAuth2ApplicationId, long companyId,
 			OrderByComparator<OAuth2Application> orderByComparator)
 		throws NoSuchOAuth2ApplicationException {
@@ -412,12 +411,12 @@ public class OAuth2ApplicationPersistenceImpl
 
 			OAuth2Application[] array = new OAuth2ApplicationImpl[3];
 
-			array[0] = getByC_PrevAndNext(
+			array[0] = getByCompanyId_PrevAndNext(
 				session, oAuth2Application, companyId, orderByComparator, true);
 
 			array[1] = oAuth2Application;
 
-			array[2] = getByC_PrevAndNext(
+			array[2] = getByCompanyId_PrevAndNext(
 				session, oAuth2Application, companyId, orderByComparator,
 				false);
 
@@ -431,7 +430,7 @@ public class OAuth2ApplicationPersistenceImpl
 		}
 	}
 
-	protected OAuth2Application getByC_PrevAndNext(
+	protected OAuth2Application getByCompanyId_PrevAndNext(
 		Session session, OAuth2Application oAuth2Application, long companyId,
 		OrderByComparator<OAuth2Application> orderByComparator,
 		boolean previous) {
@@ -449,7 +448,7 @@ public class OAuth2ApplicationPersistenceImpl
 
 		sb.append(_SQL_SELECT_OAUTH2APPLICATION_WHERE);
 
-		sb.append(_FINDER_COLUMN_C_COMPANYID_2);
+		sb.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 		if (orderByComparator != null) {
 			String[] orderByConditionFields =
@@ -548,8 +547,8 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @return the matching o auth2 applications that the user has permission to view
 	 */
 	@Override
-	public List<OAuth2Application> filterFindByC(long companyId) {
-		return filterFindByC(
+	public List<OAuth2Application> filterFindByCompanyId(long companyId) {
+		return filterFindByCompanyId(
 			companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
@@ -566,10 +565,10 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @return the range of matching o auth2 applications that the user has permission to view
 	 */
 	@Override
-	public List<OAuth2Application> filterFindByC(
+	public List<OAuth2Application> filterFindByCompanyId(
 		long companyId, int start, int end) {
 
-		return filterFindByC(companyId, start, end, null);
+		return filterFindByCompanyId(companyId, start, end, null);
 	}
 
 	/**
@@ -586,12 +585,12 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @return the ordered range of matching o auth2 applications that the user has permission to view
 	 */
 	@Override
-	public List<OAuth2Application> filterFindByC(
+	public List<OAuth2Application> filterFindByCompanyId(
 		long companyId, int start, int end,
 		OrderByComparator<OAuth2Application> orderByComparator) {
 
 		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
-			return findByC(companyId, start, end, orderByComparator);
+			return findByCompanyId(companyId, start, end, orderByComparator);
 		}
 
 		StringBundler sb = null;
@@ -612,7 +611,7 @@ public class OAuth2ApplicationPersistenceImpl
 				_FILTER_SQL_SELECT_OAUTH2APPLICATION_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
-		sb.append(_FINDER_COLUMN_C_COMPANYID_2);
+		sb.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
 			sb.append(
@@ -683,13 +682,13 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @throws NoSuchOAuth2ApplicationException if a o auth2 application with the primary key could not be found
 	 */
 	@Override
-	public OAuth2Application[] filterFindByC_PrevAndNext(
+	public OAuth2Application[] filterFindByCompanyId_PrevAndNext(
 			long oAuth2ApplicationId, long companyId,
 			OrderByComparator<OAuth2Application> orderByComparator)
 		throws NoSuchOAuth2ApplicationException {
 
 		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
-			return findByC_PrevAndNext(
+			return findByCompanyId_PrevAndNext(
 				oAuth2ApplicationId, companyId, orderByComparator);
 		}
 
@@ -703,12 +702,12 @@ public class OAuth2ApplicationPersistenceImpl
 
 			OAuth2Application[] array = new OAuth2ApplicationImpl[3];
 
-			array[0] = filterGetByC_PrevAndNext(
+			array[0] = filterGetByCompanyId_PrevAndNext(
 				session, oAuth2Application, companyId, orderByComparator, true);
 
 			array[1] = oAuth2Application;
 
-			array[2] = filterGetByC_PrevAndNext(
+			array[2] = filterGetByCompanyId_PrevAndNext(
 				session, oAuth2Application, companyId, orderByComparator,
 				false);
 
@@ -722,7 +721,7 @@ public class OAuth2ApplicationPersistenceImpl
 		}
 	}
 
-	protected OAuth2Application filterGetByC_PrevAndNext(
+	protected OAuth2Application filterGetByCompanyId_PrevAndNext(
 		Session session, OAuth2Application oAuth2Application, long companyId,
 		OrderByComparator<OAuth2Application> orderByComparator,
 		boolean previous) {
@@ -746,7 +745,7 @@ public class OAuth2ApplicationPersistenceImpl
 				_FILTER_SQL_SELECT_OAUTH2APPLICATION_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
-		sb.append(_FINDER_COLUMN_C_COMPANYID_2);
+		sb.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 		if (!getDB().isSupportsInlineDistinct()) {
 			sb.append(
@@ -883,9 +882,9 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @param companyId the company ID
 	 */
 	@Override
-	public void removeByC(long companyId) {
+	public void removeByCompanyId(long companyId) {
 		for (OAuth2Application oAuth2Application :
-				findByC(
+				findByCompanyId(
 					companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 
 			remove(oAuth2Application);
@@ -899,19 +898,19 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @return the number of matching o auth2 applications
 	 */
 	@Override
-	public int countByC(long companyId) {
-		FinderPath finderPath = _finderPathCountByC;
+	public int countByCompanyId(long companyId) {
+		FinderPath finderPath = _finderPathCountByCompanyId;
 
 		Object[] finderArgs = new Object[] {companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
 
 			sb.append(_SQL_COUNT_OAUTH2APPLICATION_WHERE);
 
-			sb.append(_FINDER_COLUMN_C_COMPANYID_2);
+			sb.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 			String sql = sb.toString();
 
@@ -948,16 +947,16 @@ public class OAuth2ApplicationPersistenceImpl
 	 * @return the number of matching o auth2 applications that the user has permission to view
 	 */
 	@Override
-	public int filterCountByC(long companyId) {
+	public int filterCountByCompanyId(long companyId) {
 		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
-			return countByC(companyId);
+			return countByCompanyId(companyId);
 		}
 
 		StringBundler sb = new StringBundler(2);
 
 		sb.append(_FILTER_SQL_COUNT_OAUTH2APPLICATION_WHERE);
 
-		sb.append(_FINDER_COLUMN_C_COMPANYID_2);
+		sb.append(_FINDER_COLUMN_COMPANYID_COMPANYID_2);
 
 		String sql = InlineSQLHelperUtil.replacePermissionCheck(
 			sb.toString(), OAuth2Application.class.getName(),
@@ -989,7 +988,7 @@ public class OAuth2ApplicationPersistenceImpl
 		}
 	}
 
-	private static final String _FINDER_COLUMN_C_COMPANYID_2 =
+	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 =
 		"oAuth2Application.companyId = ?";
 
 	private FinderPath _finderPathFetchByC_C;
@@ -1067,8 +1066,7 @@ public class OAuth2ApplicationPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_C, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_C, finderArgs);
 		}
 
 		if (result instanceof OAuth2Application) {
@@ -1194,7 +1192,7 @@ public class OAuth2ApplicationPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, clientId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1329,9 +1327,7 @@ public class OAuth2ApplicationPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(OAuth2ApplicationImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(OAuth2ApplicationImpl.class);
 	}
 
 	/**
@@ -1357,9 +1353,7 @@ public class OAuth2ApplicationPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(OAuth2ApplicationImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(OAuth2ApplicationImpl.class, primaryKey);
@@ -1374,10 +1368,9 @@ public class OAuth2ApplicationPersistenceImpl
 			oAuth2ApplicationModelImpl.getClientId()
 		};
 
+		finderCache.putResult(_finderPathCountByC_C, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathCountByC_C, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByC_C, args, oAuth2ApplicationModelImpl, false);
+			_finderPathFetchByC_C, args, oAuth2ApplicationModelImpl);
 	}
 
 	/**
@@ -1706,7 +1699,7 @@ public class OAuth2ApplicationPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<OAuth2Application>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1776,7 +1769,7 @@ public class OAuth2ApplicationPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1831,54 +1824,46 @@ public class OAuth2ApplicationPersistenceImpl
 	 * Initializes the o auth2 application persistence.
 	 */
 	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class,
-			new OAuth2ApplicationModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", OAuth2Application.class.getName()));
-
+	public void activate() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByC = _createFinderPath(
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC",
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), OrderByComparator.class.getName()
 			},
 			new String[] {"companyId"}, true);
 
-		_finderPathWithoutPaginationFindByC = _createFinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC",
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			true);
 
-		_finderPathCountByC = _createFinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC",
+		_finderPathCountByCompanyId = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
 
-		_finderPathFetchByC_C = _createFinderPath(
+		_finderPathFetchByC_C = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_C",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "clientId"}, true);
 
-		_finderPathCountByC_C = _createFinderPath(
+		_finderPathCountByC_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "clientId"}, false);
@@ -1891,14 +1876,6 @@ public class OAuth2ApplicationPersistenceImpl
 		_setOAuth2ApplicationUtilPersistence(null);
 
 		entityCache.removeCache(OAuth2ApplicationImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setOAuth2ApplicationUtilPersistence(
@@ -1942,8 +1919,6 @@ public class OAuth2ApplicationPersistenceImpl
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		super.setSessionFactory(sessionFactory);
 	}
-
-	private BundleContext _bundleContext;
 
 	@Reference
 	protected EntityCache entityCache;
@@ -2000,105 +1975,13 @@ public class OAuth2ApplicationPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"oAuth2ApplicationScopeAliasesId"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class OAuth2ApplicationModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			OAuth2ApplicationModelImpl oAuth2ApplicationModelImpl =
-				(OAuth2ApplicationModelImpl)baseModel;
-
-			long columnBitmask = oAuth2ApplicationModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					oAuth2ApplicationModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						oAuth2ApplicationModelImpl.getColumnBitmask(columnName);
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					oAuth2ApplicationModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			OAuth2ApplicationModelImpl oAuth2ApplicationModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						oAuth2ApplicationModelImpl.getColumnOriginalValue(
-							columnName);
-				}
-				else {
-					arguments[i] = oAuth2ApplicationModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-	}
+	@Reference
+	private OAuth2ApplicationModelArgumentsResolver
+		_oAuth2ApplicationModelArgumentsResolver;
 
 }

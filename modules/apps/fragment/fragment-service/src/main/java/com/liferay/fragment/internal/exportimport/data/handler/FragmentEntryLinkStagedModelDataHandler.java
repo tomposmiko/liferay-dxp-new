@@ -27,11 +27,6 @@ import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
-import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.LayoutLocalService;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
@@ -80,14 +75,6 @@ public class FragmentEntryLinkStagedModelDataHandler
 		Element fragmentEntryLinkElement =
 			portletDataContext.getExportDataElement(fragmentEntryLink);
 
-		Layout layout = _layoutLocalService.fetchLayout(
-			fragmentEntryLink.getPlid());
-
-		if (layout != null) {
-			fragmentEntryLinkElement.addAttribute(
-				"fragment-entry-link-layout-uuid", layout.getUuid());
-		}
-
 		if (!MapUtil.getBoolean(
 				portletDataContext.getParameterMap(),
 				PortletDataHandlerKeys.PORTLET_DATA) &&
@@ -124,25 +111,6 @@ public class FragmentEntryLinkStagedModelDataHandler
 		}
 
 		fragmentEntryLink.setEditableValues(editableValues);
-
-		FragmentEntry fragmentEntry =
-			_fragmentEntryLocalService.fetchFragmentEntry(
-				fragmentEntryLink.getFragmentEntryId());
-
-		if ((fragmentEntry != null) &&
-			(fragmentEntry.getGroupId() != fragmentEntryLink.getGroupId())) {
-
-			Group group = _groupLocalService.fetchGroup(
-				fragmentEntry.getGroupId());
-
-			if (group != null) {
-				fragmentEntryLinkElement.addAttribute(
-					"fragment-entry-group-key", group.getGroupKey());
-			}
-
-			fragmentEntryLinkElement.addAttribute(
-				"fragment-entry-key", fragmentEntry.getFragmentEntryKey());
-		}
 
 		portletDataContext.addClassedModel(
 			fragmentEntryLinkElement,
@@ -214,32 +182,6 @@ public class FragmentEntryLinkStagedModelDataHandler
 					fragmentEntryId = fragmentEntryLink.getFragmentEntryId();
 				}
 			}
-			else {
-				Element fragmentEntryLinkElement =
-					portletDataContext.getImportDataStagedModelElement(
-						fragmentEntryLink);
-
-				String fragmentEntryGroupKey = GetterUtil.getString(
-					fragmentEntryLinkElement.attributeValue(
-						"fragment-entry-group-key"));
-
-				Group group = _groupLocalService.fetchGroup(
-					fragmentEntryLink.getCompanyId(), fragmentEntryGroupKey);
-
-				if (group != null) {
-					String fragmentEntryKey = GetterUtil.getString(
-						fragmentEntryLinkElement.attributeValue(
-							"fragment-entry-key"));
-
-					fragmentEntry =
-						_fragmentEntryLocalService.fetchFragmentEntry(
-							group.getGroupId(), fragmentEntryKey);
-				}
-
-				if (fragmentEntry != null) {
-					fragmentEntryId = fragmentEntry.getFragmentEntryId();
-				}
-			}
 		}
 
 		Map<Long, Long> referenceClassPKs =
@@ -247,29 +189,8 @@ public class FragmentEntryLinkStagedModelDataHandler
 				fragmentEntryLink.getClassName());
 
 		long referenceClassPK = MapUtil.getLong(
-			referenceClassPKs, fragmentEntryLink.getClassPK());
-
-		if (referenceClassPK == 0) {
-			referenceClassPK = fragmentEntryLink.getClassPK();
-
-			Element fragmentEntryLinkElement =
-				portletDataContext.getImportDataStagedModelElement(
-					fragmentEntryLink);
-
-			String fragmentEntryLinkLayoutUuid = GetterUtil.getString(
-				fragmentEntryLinkElement.attributeValue(
-					"fragment-entry-link-layout-uuid"));
-
-			if (Validator.isNotNull(fragmentEntryLinkLayoutUuid)) {
-				Layout layout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
-					fragmentEntryLinkLayoutUuid,
-					portletDataContext.getScopeGroupId(), true);
-
-				if (layout != null) {
-					referenceClassPK = layout.getPlid();
-				}
-			}
-		}
+			referenceClassPKs, fragmentEntryLink.getClassPK(),
+			fragmentEntryLink.getClassPK());
 
 		FragmentEntryLink importedFragmentEntryLink =
 			(FragmentEntryLink)fragmentEntryLink.clone();
@@ -348,12 +269,6 @@ public class FragmentEntryLinkStagedModelDataHandler
 
 	@Reference
 	private FragmentEntryLocalService _fragmentEntryLocalService;
-
-	@Reference
-	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private LayoutLocalService _layoutLocalService;
 
 	@Reference
 	private Portal _portal;

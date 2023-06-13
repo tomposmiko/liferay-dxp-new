@@ -22,7 +22,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.search.web.internal.util.PortletPreferencesHelper;
+import com.liferay.portal.search.web.internal.helper.PortletPreferencesHelper;
 
 import java.util.Optional;
 
@@ -35,10 +35,10 @@ public class ModifiedFacetPortletPreferencesImpl
 	implements ModifiedFacetPortletPreferences {
 
 	public ModifiedFacetPortletPreferencesImpl(
-		Optional<PortletPreferences> portletPreferences) {
+		Optional<PortletPreferences> portletPreferencesOptional) {
 
 		_portletPreferencesHelper = new PortletPreferencesHelper(
-			portletPreferences);
+			portletPreferencesOptional);
 	}
 
 	@Override

@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -75,10 +76,11 @@ public class CommerceShipmentModelImpl
 	public static final String TABLE_NAME = "CommerceShipment";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"commerceShipmentId", Types.BIGINT}, {"groupId", Types.BIGINT},
-		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
-		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
-		{"modifiedDate", Types.TIMESTAMP}, {"commerceAccountId", Types.BIGINT},
+		{"mvccVersion", Types.BIGINT}, {"commerceShipmentId", Types.BIGINT},
+		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
+		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
+		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
+		{"commerceAccountId", Types.BIGINT},
 		{"commerceAddressId", Types.BIGINT},
 		{"commerceShippingMethodId", Types.BIGINT},
 		{"shippingOptionName", Types.CLOB}, {"carrier", Types.VARCHAR},
@@ -90,6 +92,7 @@ public class CommerceShipmentModelImpl
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("commerceShipmentId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -109,7 +112,7 @@ public class CommerceShipmentModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CommerceShipment (commerceShipmentId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commerceAccountId LONG,commerceAddressId LONG,commerceShippingMethodId LONG,shippingOptionName TEXT null,carrier VARCHAR(75) null,trackingNumber VARCHAR(75) null,shippingDate DATE null,expectedDate DATE null,status INTEGER)";
+		"create table CommerceShipment (mvccVersion LONG default 0 not null,commerceShipmentId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commerceAccountId LONG,commerceAddressId LONG,commerceShippingMethodId LONG,shippingOptionName TEXT null,carrier VARCHAR(75) null,trackingNumber VARCHAR(75) null,shippingDate DATE null,expectedDate DATE null,status INTEGER)";
 
 	public static final String TABLE_SQL_DROP = "drop table CommerceShipment";
 
@@ -183,6 +186,7 @@ public class CommerceShipmentModelImpl
 
 		CommerceShipment model = new CommerceShipmentImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setCommerceShipmentId(soapModel.getCommerceShipmentId());
 		model.setGroupId(soapModel.getGroupId());
 		model.setCompanyId(soapModel.getCompanyId());
@@ -318,117 +322,160 @@ public class CommerceShipmentModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CommerceShipment>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceShipment.class.getClassLoader(), CommerceShipment.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<CommerceShipment> constructor =
+				(Constructor<CommerceShipment>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<CommerceShipment, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CommerceShipment, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceShipment, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<CommerceShipment, Object>>();
-
-		attributeGetterFunctions.put(
-			"commerceShipmentId", CommerceShipment::getCommerceShipmentId);
-		attributeGetterFunctions.put("groupId", CommerceShipment::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceShipment::getCompanyId);
-		attributeGetterFunctions.put("userId", CommerceShipment::getUserId);
-		attributeGetterFunctions.put("userName", CommerceShipment::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceShipment::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceShipment::getModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceAccountId", CommerceShipment::getCommerceAccountId);
-		attributeGetterFunctions.put(
-			"commerceAddressId", CommerceShipment::getCommerceAddressId);
-		attributeGetterFunctions.put(
-			"commerceShippingMethodId",
-			CommerceShipment::getCommerceShippingMethodId);
-		attributeGetterFunctions.put(
-			"shippingOptionName", CommerceShipment::getShippingOptionName);
-		attributeGetterFunctions.put("carrier", CommerceShipment::getCarrier);
-		attributeGetterFunctions.put(
-			"trackingNumber", CommerceShipment::getTrackingNumber);
-		attributeGetterFunctions.put(
-			"shippingDate", CommerceShipment::getShippingDate);
-		attributeGetterFunctions.put(
-			"expectedDate", CommerceShipment::getExpectedDate);
-		attributeGetterFunctions.put("status", CommerceShipment::getStatus);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CommerceShipment, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceShipment, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<CommerceShipment, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CommerceShipment::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CommerceShipment, Long>)
+				CommerceShipment::setMvccVersion);
+		attributeGetterFunctions.put(
+			"commerceShipmentId", CommerceShipment::getCommerceShipmentId);
 		attributeSetterBiConsumers.put(
 			"commerceShipmentId",
 			(BiConsumer<CommerceShipment, Long>)
 				CommerceShipment::setCommerceShipmentId);
+		attributeGetterFunctions.put("groupId", CommerceShipment::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceShipment, Long>)CommerceShipment::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceShipment::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceShipment, Long>)CommerceShipment::setCompanyId);
+		attributeGetterFunctions.put("userId", CommerceShipment::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceShipment, Long>)CommerceShipment::setUserId);
+		attributeGetterFunctions.put("userName", CommerceShipment::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceShipment, String>)
 				CommerceShipment::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceShipment::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceShipment, Date>)
 				CommerceShipment::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceShipment::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceShipment, Date>)
 				CommerceShipment::setModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceAccountId", CommerceShipment::getCommerceAccountId);
 		attributeSetterBiConsumers.put(
 			"commerceAccountId",
 			(BiConsumer<CommerceShipment, Long>)
 				CommerceShipment::setCommerceAccountId);
+		attributeGetterFunctions.put(
+			"commerceAddressId", CommerceShipment::getCommerceAddressId);
 		attributeSetterBiConsumers.put(
 			"commerceAddressId",
 			(BiConsumer<CommerceShipment, Long>)
 				CommerceShipment::setCommerceAddressId);
+		attributeGetterFunctions.put(
+			"commerceShippingMethodId",
+			CommerceShipment::getCommerceShippingMethodId);
 		attributeSetterBiConsumers.put(
 			"commerceShippingMethodId",
 			(BiConsumer<CommerceShipment, Long>)
 				CommerceShipment::setCommerceShippingMethodId);
+		attributeGetterFunctions.put(
+			"shippingOptionName", CommerceShipment::getShippingOptionName);
 		attributeSetterBiConsumers.put(
 			"shippingOptionName",
 			(BiConsumer<CommerceShipment, String>)
 				CommerceShipment::setShippingOptionName);
+		attributeGetterFunctions.put("carrier", CommerceShipment::getCarrier);
 		attributeSetterBiConsumers.put(
 			"carrier",
 			(BiConsumer<CommerceShipment, String>)CommerceShipment::setCarrier);
+		attributeGetterFunctions.put(
+			"trackingNumber", CommerceShipment::getTrackingNumber);
 		attributeSetterBiConsumers.put(
 			"trackingNumber",
 			(BiConsumer<CommerceShipment, String>)
 				CommerceShipment::setTrackingNumber);
+		attributeGetterFunctions.put(
+			"shippingDate", CommerceShipment::getShippingDate);
 		attributeSetterBiConsumers.put(
 			"shippingDate",
 			(BiConsumer<CommerceShipment, Date>)
 				CommerceShipment::setShippingDate);
+		attributeGetterFunctions.put(
+			"expectedDate", CommerceShipment::getExpectedDate);
 		attributeSetterBiConsumers.put(
 			"expectedDate",
 			(BiConsumer<CommerceShipment, Date>)
 				CommerceShipment::setExpectedDate);
+		attributeGetterFunctions.put("status", CommerceShipment::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<CommerceShipment, Integer>)CommerceShipment::setStatus);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@JSON
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@JSON
@@ -798,6 +845,7 @@ public class CommerceShipmentModelImpl
 	public Object clone() {
 		CommerceShipmentImpl commerceShipmentImpl = new CommerceShipmentImpl();
 
+		commerceShipmentImpl.setMvccVersion(getMvccVersion());
 		commerceShipmentImpl.setCommerceShipmentId(getCommerceShipmentId());
 		commerceShipmentImpl.setGroupId(getGroupId());
 		commerceShipmentImpl.setCompanyId(getCompanyId());
@@ -817,6 +865,48 @@ public class CommerceShipmentModelImpl
 		commerceShipmentImpl.setStatus(getStatus());
 
 		commerceShipmentImpl.resetOriginalValues();
+
+		return commerceShipmentImpl;
+	}
+
+	@Override
+	public CommerceShipment cloneWithOriginalValues() {
+		CommerceShipmentImpl commerceShipmentImpl = new CommerceShipmentImpl();
+
+		commerceShipmentImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		commerceShipmentImpl.setCommerceShipmentId(
+			this.<Long>getColumnOriginalValue("commerceShipmentId"));
+		commerceShipmentImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		commerceShipmentImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commerceShipmentImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commerceShipmentImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commerceShipmentImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commerceShipmentImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commerceShipmentImpl.setCommerceAccountId(
+			this.<Long>getColumnOriginalValue("commerceAccountId"));
+		commerceShipmentImpl.setCommerceAddressId(
+			this.<Long>getColumnOriginalValue("commerceAddressId"));
+		commerceShipmentImpl.setCommerceShippingMethodId(
+			this.<Long>getColumnOriginalValue("commerceShippingMethodId"));
+		commerceShipmentImpl.setShippingOptionName(
+			this.<String>getColumnOriginalValue("shippingOptionName"));
+		commerceShipmentImpl.setCarrier(
+			this.<String>getColumnOriginalValue("carrier"));
+		commerceShipmentImpl.setTrackingNumber(
+			this.<String>getColumnOriginalValue("trackingNumber"));
+		commerceShipmentImpl.setShippingDate(
+			this.<Date>getColumnOriginalValue("shippingDate"));
+		commerceShipmentImpl.setExpectedDate(
+			this.<Date>getColumnOriginalValue("expectedDate"));
+		commerceShipmentImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
 
 		return commerceShipmentImpl;
 	}
@@ -895,6 +985,8 @@ public class CommerceShipmentModelImpl
 	public CacheModel<CommerceShipment> toCacheModel() {
 		CommerceShipmentCacheModel commerceShipmentCacheModel =
 			new CommerceShipmentCacheModel();
+
+		commerceShipmentCacheModel.mvccVersion = getMvccVersion();
 
 		commerceShipmentCacheModel.commerceShipmentId = getCommerceShipmentId();
 
@@ -1071,12 +1163,11 @@ public class CommerceShipmentModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CommerceShipment>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CommerceShipment.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private long _commerceShipmentId;
 	private long _groupId;
 	private long _companyId;
@@ -1122,6 +1213,7 @@ public class CommerceShipmentModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("commerceShipmentId", _commerceShipmentId);
 		_columnOriginalValues.put("groupId", _groupId);
 		_columnOriginalValues.put("companyId", _companyId);
@@ -1152,37 +1244,39 @@ public class CommerceShipmentModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("commerceShipmentId", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("groupId", 2L);
+		columnBitmasks.put("commerceShipmentId", 2L);
 
-		columnBitmasks.put("companyId", 4L);
+		columnBitmasks.put("groupId", 4L);
 
-		columnBitmasks.put("userId", 8L);
+		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("userName", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("createDate", 32L);
+		columnBitmasks.put("userName", 32L);
 
-		columnBitmasks.put("modifiedDate", 64L);
+		columnBitmasks.put("createDate", 64L);
 
-		columnBitmasks.put("commerceAccountId", 128L);
+		columnBitmasks.put("modifiedDate", 128L);
 
-		columnBitmasks.put("commerceAddressId", 256L);
+		columnBitmasks.put("commerceAccountId", 256L);
 
-		columnBitmasks.put("commerceShippingMethodId", 512L);
+		columnBitmasks.put("commerceAddressId", 512L);
 
-		columnBitmasks.put("shippingOptionName", 1024L);
+		columnBitmasks.put("commerceShippingMethodId", 1024L);
 
-		columnBitmasks.put("carrier", 2048L);
+		columnBitmasks.put("shippingOptionName", 2048L);
 
-		columnBitmasks.put("trackingNumber", 4096L);
+		columnBitmasks.put("carrier", 4096L);
 
-		columnBitmasks.put("shippingDate", 8192L);
+		columnBitmasks.put("trackingNumber", 8192L);
 
-		columnBitmasks.put("expectedDate", 16384L);
+		columnBitmasks.put("shippingDate", 16384L);
 
-		columnBitmasks.put("status", 32768L);
+		columnBitmasks.put("expectedDate", 32768L);
+
+		columnBitmasks.put("status", 65536L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

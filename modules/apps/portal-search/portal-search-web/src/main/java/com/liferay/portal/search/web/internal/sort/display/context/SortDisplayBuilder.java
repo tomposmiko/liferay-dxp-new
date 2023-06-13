@@ -149,7 +149,7 @@ public class SortDisplayBuilder {
 	}
 
 	protected String getParameterValue() {
-		if (!_selectedFields.isEmpty()) {
+		if (_selectedFields.size() > 0) {
 			return _selectedFields.get(_selectedFields.size() - 1);
 		}
 
@@ -182,15 +182,9 @@ public class SortDisplayBuilder {
 	protected boolean isRenderNothing() {
 		JSONArray jsonArray = _sortPortletPreferences.getFieldsJSONArray();
 
-		if (jsonArray == null) {
-			return true;
-		}
+		if ((jsonArray == null) || (jsonArray.length() == 0) ||
+			_renderNothing) {
 
-		if (jsonArray.length() == 0) {
-			return true;
-		}
-
-		if (_renderNothing) {
 			return true;
 		}
 

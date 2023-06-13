@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * This class is used by SOAP remote services.
+ * This class is used by SOAP remote services, specifically {@link com.liferay.remote.app.service.http.RemoteAppEntryServiceSoap}.
  *
  * @author Brian Wing Shun Chan
  * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -41,8 +41,23 @@ public class RemoteAppEntrySoap implements Serializable {
 		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
+		soapModel.setCustomElementCSSURLs(model.getCustomElementCSSURLs());
+		soapModel.setCustomElementHTMLElementName(
+			model.getCustomElementHTMLElementName());
+		soapModel.setCustomElementURLs(model.getCustomElementURLs());
+		soapModel.setDescription(model.getDescription());
+		soapModel.setFriendlyURLMapping(model.getFriendlyURLMapping());
+		soapModel.setIFrameURL(model.getIFrameURL());
+		soapModel.setInstanceable(model.isInstanceable());
 		soapModel.setName(model.getName());
-		soapModel.setUrl(model.getUrl());
+		soapModel.setPortletCategoryName(model.getPortletCategoryName());
+		soapModel.setProperties(model.getProperties());
+		soapModel.setSourceCodeURL(model.getSourceCodeURL());
+		soapModel.setType(model.getType());
+		soapModel.setStatus(model.getStatus());
+		soapModel.setStatusByUserId(model.getStatusByUserId());
+		soapModel.setStatusByUserName(model.getStatusByUserName());
+		soapModel.setStatusDate(model.getStatusDate());
 
 		return soapModel;
 	}
@@ -165,6 +180,68 @@ public class RemoteAppEntrySoap implements Serializable {
 		_modifiedDate = modifiedDate;
 	}
 
+	public String getCustomElementCSSURLs() {
+		return _customElementCSSURLs;
+	}
+
+	public void setCustomElementCSSURLs(String customElementCSSURLs) {
+		_customElementCSSURLs = customElementCSSURLs;
+	}
+
+	public String getCustomElementHTMLElementName() {
+		return _customElementHTMLElementName;
+	}
+
+	public void setCustomElementHTMLElementName(
+		String customElementHTMLElementName) {
+
+		_customElementHTMLElementName = customElementHTMLElementName;
+	}
+
+	public String getCustomElementURLs() {
+		return _customElementURLs;
+	}
+
+	public void setCustomElementURLs(String customElementURLs) {
+		_customElementURLs = customElementURLs;
+	}
+
+	public String getDescription() {
+		return _description;
+	}
+
+	public void setDescription(String description) {
+		_description = description;
+	}
+
+	public String getFriendlyURLMapping() {
+		return _friendlyURLMapping;
+	}
+
+	public void setFriendlyURLMapping(String friendlyURLMapping) {
+		_friendlyURLMapping = friendlyURLMapping;
+	}
+
+	public String getIFrameURL() {
+		return _iFrameURL;
+	}
+
+	public void setIFrameURL(String iFrameURL) {
+		_iFrameURL = iFrameURL;
+	}
+
+	public boolean getInstanceable() {
+		return _instanceable;
+	}
+
+	public boolean isInstanceable() {
+		return _instanceable;
+	}
+
+	public void setInstanceable(boolean instanceable) {
+		_instanceable = instanceable;
+	}
+
 	public String getName() {
 		return _name;
 	}
@@ -173,12 +250,68 @@ public class RemoteAppEntrySoap implements Serializable {
 		_name = name;
 	}
 
-	public String getUrl() {
-		return _url;
+	public String getPortletCategoryName() {
+		return _portletCategoryName;
 	}
 
-	public void setUrl(String url) {
-		_url = url;
+	public void setPortletCategoryName(String portletCategoryName) {
+		_portletCategoryName = portletCategoryName;
+	}
+
+	public String getProperties() {
+		return _properties;
+	}
+
+	public void setProperties(String properties) {
+		_properties = properties;
+	}
+
+	public String getSourceCodeURL() {
+		return _sourceCodeURL;
+	}
+
+	public void setSourceCodeURL(String sourceCodeURL) {
+		_sourceCodeURL = sourceCodeURL;
+	}
+
+	public String getType() {
+		return _type;
+	}
+
+	public void setType(String type) {
+		_type = type;
+	}
+
+	public int getStatus() {
+		return _status;
+	}
+
+	public void setStatus(int status) {
+		_status = status;
+	}
+
+	public long getStatusByUserId() {
+		return _statusByUserId;
+	}
+
+	public void setStatusByUserId(long statusByUserId) {
+		_statusByUserId = statusByUserId;
+	}
+
+	public String getStatusByUserName() {
+		return _statusByUserName;
+	}
+
+	public void setStatusByUserName(String statusByUserName) {
+		_statusByUserName = statusByUserName;
+	}
+
+	public Date getStatusDate() {
+		return _statusDate;
+	}
+
+	public void setStatusDate(Date statusDate) {
+		_statusDate = statusDate;
 	}
 
 	private long _mvccVersion;
@@ -189,7 +322,21 @@ public class RemoteAppEntrySoap implements Serializable {
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
+	private String _customElementCSSURLs;
+	private String _customElementHTMLElementName;
+	private String _customElementURLs;
+	private String _description;
+	private String _friendlyURLMapping;
+	private String _iFrameURL;
+	private boolean _instanceable;
 	private String _name;
-	private String _url;
+	private String _portletCategoryName;
+	private String _properties;
+	private String _sourceCodeURL;
+	private String _type;
+	private int _status;
+	private long _statusByUserId;
+	private String _statusByUserName;
+	private Date _statusDate;
 
 }

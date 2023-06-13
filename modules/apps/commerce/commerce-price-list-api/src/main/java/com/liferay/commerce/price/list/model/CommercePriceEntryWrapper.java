@@ -45,6 +45,7 @@ public class CommercePriceEntryWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("commercePriceEntryId", getCommercePriceEntryId());
@@ -78,6 +79,12 @@ public class CommercePriceEntryWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -246,6 +253,11 @@ public class CommercePriceEntryWrapper
 		if (statusDate != null) {
 			setStatusDate(statusDate);
 		}
+	}
+
+	@Override
+	public CommercePriceEntry cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
 	}
 
 	/**
@@ -443,6 +455,16 @@ public class CommercePriceEntryWrapper
 	}
 
 	/**
+	 * Returns the mvcc version of this commerce price entry.
+	 *
+	 * @return the mvcc version of this commerce price entry
+	 */
+	@Override
+	public long getMvccVersion() {
+		return model.getMvccVersion();
+	}
+
+	/**
 	 * Returns the price of this commerce price entry.
 	 *
 	 * @return the price of this commerce price entry
@@ -453,11 +475,11 @@ public class CommercePriceEntryWrapper
 	}
 
 	@Override
-	public com.liferay.commerce.currency.model.CommerceMoney getPriceMoney(
-			long commerceCurrencyId)
+	public com.liferay.commerce.currency.model.CommerceMoney
+			getPriceCommerceMoney(long commerceCurrencyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return model.getPriceMoney(commerceCurrencyId);
+		return model.getPriceCommerceMoney(commerceCurrencyId);
 	}
 
 	/**
@@ -481,11 +503,11 @@ public class CommercePriceEntryWrapper
 	}
 
 	@Override
-	public com.liferay.commerce.currency.model.CommerceMoney getPromoPriceMoney(
-			long commerceCurrencyId)
+	public com.liferay.commerce.currency.model.CommerceMoney
+			getPromoPriceCommerceMoney(long commerceCurrencyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return model.getPromoPriceMoney(commerceCurrencyId);
+		return model.getPromoPriceCommerceMoney(commerceCurrencyId);
 	}
 
 	/**
@@ -871,6 +893,16 @@ public class CommercePriceEntryWrapper
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		model.setModifiedDate(modifiedDate);
+	}
+
+	/**
+	 * Sets the mvcc version of this commerce price entry.
+	 *
+	 * @param mvccVersion the mvcc version of this commerce price entry
+	 */
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		model.setMvccVersion(mvccVersion);
 	}
 
 	/**

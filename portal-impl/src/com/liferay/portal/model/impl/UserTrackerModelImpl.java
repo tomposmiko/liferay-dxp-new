@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -240,64 +241,86 @@ public class UserTrackerModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<UserTracker, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, UserTracker>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<UserTracker, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<UserTracker, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			UserTracker.class.getClassLoader(), UserTracker.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", UserTracker::getMvccVersion);
-		attributeGetterFunctions.put(
-			"userTrackerId", UserTracker::getUserTrackerId);
-		attributeGetterFunctions.put("companyId", UserTracker::getCompanyId);
-		attributeGetterFunctions.put("userId", UserTracker::getUserId);
-		attributeGetterFunctions.put(
-			"modifiedDate", UserTracker::getModifiedDate);
-		attributeGetterFunctions.put("sessionId", UserTracker::getSessionId);
-		attributeGetterFunctions.put("remoteAddr", UserTracker::getRemoteAddr);
-		attributeGetterFunctions.put("remoteHost", UserTracker::getRemoteHost);
-		attributeGetterFunctions.put("userAgent", UserTracker::getUserAgent);
+		try {
+			Constructor<UserTracker> constructor =
+				(Constructor<UserTracker>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<UserTracker, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<UserTracker, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<UserTracker, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<UserTracker, Object>>();
 		Map<String, BiConsumer<UserTracker, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<UserTracker, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", UserTracker::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<UserTracker, Long>)UserTracker::setMvccVersion);
+		attributeGetterFunctions.put(
+			"userTrackerId", UserTracker::getUserTrackerId);
 		attributeSetterBiConsumers.put(
 			"userTrackerId",
 			(BiConsumer<UserTracker, Long>)UserTracker::setUserTrackerId);
+		attributeGetterFunctions.put("companyId", UserTracker::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<UserTracker, Long>)UserTracker::setCompanyId);
+		attributeGetterFunctions.put("userId", UserTracker::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<UserTracker, Long>)UserTracker::setUserId);
+		attributeGetterFunctions.put(
+			"modifiedDate", UserTracker::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<UserTracker, Date>)UserTracker::setModifiedDate);
+		attributeGetterFunctions.put("sessionId", UserTracker::getSessionId);
 		attributeSetterBiConsumers.put(
 			"sessionId",
 			(BiConsumer<UserTracker, String>)UserTracker::setSessionId);
+		attributeGetterFunctions.put("remoteAddr", UserTracker::getRemoteAddr);
 		attributeSetterBiConsumers.put(
 			"remoteAddr",
 			(BiConsumer<UserTracker, String>)UserTracker::setRemoteAddr);
+		attributeGetterFunctions.put("remoteHost", UserTracker::getRemoteHost);
 		attributeSetterBiConsumers.put(
 			"remoteHost",
 			(BiConsumer<UserTracker, String>)UserTracker::setRemoteHost);
+		attributeGetterFunctions.put("userAgent", UserTracker::getUserAgent);
 		attributeSetterBiConsumers.put(
 			"userAgent",
 			(BiConsumer<UserTracker, String>)UserTracker::setUserAgent);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -570,6 +593,31 @@ public class UserTrackerModelImpl
 	}
 
 	@Override
+	public UserTracker cloneWithOriginalValues() {
+		UserTrackerImpl userTrackerImpl = new UserTrackerImpl();
+
+		userTrackerImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		userTrackerImpl.setUserTrackerId(
+			this.<Long>getColumnOriginalValue("userTrackerId"));
+		userTrackerImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		userTrackerImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		userTrackerImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		userTrackerImpl.setSessionId(
+			this.<String>getColumnOriginalValue("sessionId"));
+		userTrackerImpl.setRemoteAddr(
+			this.<String>getColumnOriginalValue("remoteAddr"));
+		userTrackerImpl.setRemoteHost(
+			this.<String>getColumnOriginalValue("remoteHost"));
+		userTrackerImpl.setUserAgent(
+			this.<String>getColumnOriginalValue("userAgent"));
+
+		return userTrackerImpl;
+	}
+
+	@Override
 	public int compareTo(UserTracker userTracker) {
 		long primaryKey = userTracker.getPrimaryKey();
 
@@ -778,9 +826,7 @@ public class UserTrackerModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, UserTracker>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					UserTracker.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

@@ -18,7 +18,7 @@ import com.liferay.portal.file.install.FileInstaller;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.osgi.web.wab.generator.internal.artifact.ArtifactURLUtil;
 import com.liferay.portal.osgi.web.wab.generator.internal.artifact.WarArtifactUrlTransformer;
@@ -38,7 +38,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
@@ -226,14 +225,12 @@ public class WabGenerator
 
 		ClassLoader classLoader = clazz.getClassLoader();
 
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-		properties.put(
-			URLConstants.URL_HANDLER_PROTOCOL, new String[] {"webbundle"});
-
 		bundleContext.registerService(
 			URLStreamHandlerService.class.getName(),
-			new WabURLStreamHandlerService(classLoader, this), properties);
+			new WabURLStreamHandlerService(classLoader, this),
+			HashMapDictionaryBuilder.<String, Object>put(
+				URLConstants.URL_HANDLER_PROTOCOL, new String[] {"webbundle"}
+			).build());
 	}
 
 	/**

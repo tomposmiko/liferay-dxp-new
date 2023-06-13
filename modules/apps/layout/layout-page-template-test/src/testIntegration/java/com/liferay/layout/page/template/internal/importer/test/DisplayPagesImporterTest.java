@@ -24,6 +24,7 @@ import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServ
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
@@ -176,14 +177,11 @@ public class DisplayPagesImporterTest {
 	private File _generateZipFile(String testCaseName) throws Exception {
 		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
 
-		StringBuilder sb = new StringBuilder(3);
-
-		sb.append(_BASE_PATH + testCaseName);
-		sb.append(StringPool.FORWARD_SLASH + _ROOT_FOLDER);
-		sb.append(StringPool.FORWARD_SLASH);
-
 		Enumeration<URL> enumeration = _bundle.findEntries(
-			sb.toString(),
+			StringBundler.concat(
+				_BASE_PATH + testCaseName,
+				StringPool.FORWARD_SLASH + _ROOT_FOLDER,
+				StringPool.FORWARD_SLASH),
 			LayoutPageTemplateExportImportConstants.
 				FILE_NAME_DISPLAY_PAGE_TEMPLATE,
 			true);

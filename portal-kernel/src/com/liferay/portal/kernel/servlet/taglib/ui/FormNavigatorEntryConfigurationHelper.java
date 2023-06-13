@@ -18,8 +18,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * @author Alejandro Tardín
+ * @author     Alejandro Tardín
+ * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
  */
+@Deprecated
 public interface FormNavigatorEntryConfigurationHelper {
 
 	public <T> Optional<List<FormNavigatorEntry<T>>> getFormNavigatorEntries(

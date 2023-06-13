@@ -49,27 +49,25 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -184,10 +182,12 @@ public abstract class BaseOrderItemResourceTestCase {
 
 		orderItem.setDeliveryGroup(regex);
 		orderItem.setExternalReferenceCode(regex);
+		orderItem.setFormattedQuantity(regex);
 		orderItem.setOrderExternalReferenceCode(regex);
 		orderItem.setPrintedNote(regex);
 		orderItem.setSku(regex);
 		orderItem.setSkuExternalReferenceCode(regex);
+		orderItem.setUnitOfMeasure(regex);
 
 		String json = OrderItemSerDes.toJSON(orderItem);
 
@@ -197,10 +197,12 @@ public abstract class BaseOrderItemResourceTestCase {
 
 		Assert.assertEquals(regex, orderItem.getDeliveryGroup());
 		Assert.assertEquals(regex, orderItem.getExternalReferenceCode());
+		Assert.assertEquals(regex, orderItem.getFormattedQuantity());
 		Assert.assertEquals(regex, orderItem.getOrderExternalReferenceCode());
 		Assert.assertEquals(regex, orderItem.getPrintedNote());
 		Assert.assertEquals(regex, orderItem.getSku());
 		Assert.assertEquals(regex, orderItem.getSkuExternalReferenceCode());
+		Assert.assertEquals(regex, orderItem.getUnitOfMeasure());
 	}
 
 	@Test
@@ -258,8 +260,7 @@ public abstract class BaseOrderItemResourceTestCase {
 	public void testGraphQLGetOrderItemByExternalReferenceCode()
 		throws Exception {
 
-		OrderItem orderItem =
-			testGraphQLGetOrderItemByExternalReferenceCode_addOrderItem();
+		OrderItem orderItem = testGraphQLOrderItem_addOrderItem();
 
 		Assert.assertTrue(
 			equals(
@@ -309,13 +310,6 @@ public abstract class BaseOrderItemResourceTestCase {
 				"Object/code"));
 	}
 
-	protected OrderItem
-			testGraphQLGetOrderItemByExternalReferenceCode_addOrderItem()
-		throws Exception {
-
-		return testGraphQLOrderItem_addOrderItem();
-	}
-
 	@Test
 	public void testPatchOrderItemByExternalReferenceCode() throws Exception {
 		Assert.assertTrue(false);
@@ -344,7 +338,7 @@ public abstract class BaseOrderItemResourceTestCase {
 
 	@Test
 	public void testGraphQLDeleteOrderItem() throws Exception {
-		OrderItem orderItem = testGraphQLDeleteOrderItem_addOrderItem();
+		OrderItem orderItem = testGraphQLOrderItem_addOrderItem();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -357,6 +351,7 @@ public abstract class BaseOrderItemResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteOrderItem"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -370,12 +365,6 @@ public abstract class BaseOrderItemResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected OrderItem testGraphQLDeleteOrderItem_addOrderItem()
-		throws Exception {
-
-		return testGraphQLOrderItem_addOrderItem();
 	}
 
 	@Test
@@ -396,7 +385,7 @@ public abstract class BaseOrderItemResourceTestCase {
 
 	@Test
 	public void testGraphQLGetOrderItem() throws Exception {
-		OrderItem orderItem = testGraphQLGetOrderItem_addOrderItem();
+		OrderItem orderItem = testGraphQLOrderItem_addOrderItem();
 
 		Assert.assertTrue(
 			equals(
@@ -435,12 +424,6 @@ public abstract class BaseOrderItemResourceTestCase {
 				"Object/code"));
 	}
 
-	protected OrderItem testGraphQLGetOrderItem_addOrderItem()
-		throws Exception {
-
-		return testGraphQLOrderItem_addOrderItem();
-	}
-
 	@Test
 	public void testPatchOrderItem() throws Exception {
 		Assert.assertTrue(false);
@@ -476,10 +459,7 @@ public abstract class BaseOrderItemResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantOrderItem),
 				(List<OrderItem>)page.getItems());
-			assertValid(
-				page,
-				testGetOrderByExternalReferenceCodeOrderItemsPage_getExpectedActions(
-					irrelevantExternalReferenceCode));
+			assertValid(page);
 		}
 
 		OrderItem orderItem1 =
@@ -498,24 +478,11 @@ public abstract class BaseOrderItemResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(orderItem1, orderItem2),
 			(List<OrderItem>)page.getItems());
-		assertValid(
-			page,
-			testGetOrderByExternalReferenceCodeOrderItemsPage_getExpectedActions(
-				externalReferenceCode));
+		assertValid(page);
 
 		orderItemResource.deleteOrderItem(orderItem1.getId());
 
 		orderItemResource.deleteOrderItem(orderItem2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetOrderByExternalReferenceCodeOrderItemsPage_getExpectedActions(
-				String externalReferenceCode)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -634,9 +601,7 @@ public abstract class BaseOrderItemResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantOrderItem),
 				(List<OrderItem>)page.getItems());
-			assertValid(
-				page,
-				testGetOrderIdOrderItemsPage_getExpectedActions(irrelevantId));
+			assertValid(page);
 		}
 
 		OrderItem orderItem1 = testGetOrderIdOrderItemsPage_addOrderItem(
@@ -653,20 +618,11 @@ public abstract class BaseOrderItemResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(orderItem1, orderItem2),
 			(List<OrderItem>)page.getItems());
-		assertValid(page, testGetOrderIdOrderItemsPage_getExpectedActions(id));
+		assertValid(page);
 
 		orderItemResource.deleteOrderItem(orderItem1.getId());
 
 		orderItemResource.deleteOrderItem(orderItem2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetOrderIdOrderItemsPage_getExpectedActions(Long id)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -840,6 +796,14 @@ public abstract class BaseOrderItemResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("decimalQuantity", additionalAssertFieldName)) {
+				if (orderItem.getDecimalQuantity() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("deliveryGroup", additionalAssertFieldName)) {
 				if (orderItem.getDeliveryGroup() == null) {
 					valid = false;
@@ -986,6 +950,16 @@ public abstract class BaseOrderItemResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"formattedQuantity", additionalAssertFieldName)) {
+
+				if (orderItem.getFormattedQuantity() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("name", additionalAssertFieldName)) {
 				if (orderItem.getName() == null) {
 					valid = false;
@@ -1116,6 +1090,14 @@ public abstract class BaseOrderItemResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("unitOfMeasure", additionalAssertFieldName)) {
+				if (orderItem.getUnitOfMeasure() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("unitPrice", additionalAssertFieldName)) {
 				if (orderItem.getUnitPrice() == null) {
 					valid = false;
@@ -1143,13 +1125,6 @@ public abstract class BaseOrderItemResourceTestCase {
 	}
 
 	protected void assertValid(Page<OrderItem> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<OrderItem> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<OrderItem> orderItems = page.getItems();
@@ -1164,20 +1139,6 @@ public abstract class BaseOrderItemResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1261,6 +1222,17 @@ public abstract class BaseOrderItemResourceTestCase {
 				if (!equals(
 						(Map)orderItem1.getCustomFields(),
 						(Map)orderItem2.getCustomFields())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("decimalQuantity", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						orderItem1.getDecimalQuantity(),
+						orderItem2.getDecimalQuantity())) {
 
 					return false;
 				}
@@ -1452,6 +1424,19 @@ public abstract class BaseOrderItemResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"formattedQuantity", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						orderItem1.getFormattedQuantity(),
+						orderItem2.getFormattedQuantity())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("id", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						orderItem1.getId(), orderItem2.getId())) {
@@ -1632,6 +1617,17 @@ public abstract class BaseOrderItemResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("unitOfMeasure", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						orderItem1.getUnitOfMeasure(),
+						orderItem2.getUnitOfMeasure())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("unitPrice", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						orderItem1.getUnitPrice(), orderItem2.getUnitPrice())) {
@@ -1692,16 +1688,14 @@ public abstract class BaseOrderItemResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1718,10 +1712,6 @@ public abstract class BaseOrderItemResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1731,18 +1721,18 @@ public abstract class BaseOrderItemResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1764,6 +1754,11 @@ public abstract class BaseOrderItemResourceTestCase {
 		}
 
 		if (entityFieldName.equals("customFields")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("decimalQuantity")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
 		}
@@ -1844,6 +1839,14 @@ public abstract class BaseOrderItemResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("formattedQuantity")) {
+			sb.append("'");
+			sb.append(String.valueOf(orderItem.getFormattedQuantity()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("id")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -1887,9 +1890,8 @@ public abstract class BaseOrderItemResourceTestCase {
 		}
 
 		if (entityFieldName.equals("quantity")) {
-			sb.append(String.valueOf(orderItem.getQuantity()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("requestedDeliveryDate")) {
@@ -1927,9 +1929,8 @@ public abstract class BaseOrderItemResourceTestCase {
 		}
 
 		if (entityFieldName.equals("shippedQuantity")) {
-			sb.append(String.valueOf(orderItem.getShippedQuantity()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("shippingAddress")) {
@@ -1966,6 +1967,14 @@ public abstract class BaseOrderItemResourceTestCase {
 		if (entityFieldName.equals("subscription")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("unitOfMeasure")) {
+			sb.append("'");
+			sb.append(String.valueOf(orderItem.getUnitOfMeasure()));
+			sb.append("'");
+
+			return sb.toString();
 		}
 
 		if (entityFieldName.equals("unitPrice")) {
@@ -2027,6 +2036,8 @@ public abstract class BaseOrderItemResourceTestCase {
 					RandomTestUtil.randomString());
 				externalReferenceCode = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
+				formattedQuantity = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
 				orderExternalReferenceCode = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
@@ -2042,6 +2053,8 @@ public abstract class BaseOrderItemResourceTestCase {
 					RandomTestUtil.randomString());
 				skuId = RandomTestUtil.randomLong();
 				subscription = RandomTestUtil.randomBoolean();
+				unitOfMeasure = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 			}
 		};
 	}
@@ -2060,115 +2073,6 @@ public abstract class BaseOrderItemResourceTestCase {
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
-
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
 
 	protected class GraphQLField {
 
@@ -2244,6 +2148,18 @@ public abstract class BaseOrderItemResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseOrderItemResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

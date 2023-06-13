@@ -18,8 +18,6 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -53,7 +51,7 @@ public class TCKtoJUnitConverter {
 			_convert(new File(inputFile), new File(outputDir));
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			exception.printStackTrace();
 		}
 	}
 
@@ -180,8 +178,5 @@ public class TCKtoJUnitConverter {
 			StringBundler.concat(outputDir, "/TEST-", className, ".xml"),
 			sb.toString());
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		TCKtoJUnitConverter.class);
 
 }

@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -277,64 +278,86 @@ public class ExpandoColumnModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<ExpandoColumn, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, ExpandoColumn>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<ExpandoColumn, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<ExpandoColumn, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ExpandoColumn.class.getClassLoader(), ExpandoColumn.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", ExpandoColumn::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", ExpandoColumn::getCtCollectionId);
-		attributeGetterFunctions.put("columnId", ExpandoColumn::getColumnId);
-		attributeGetterFunctions.put("companyId", ExpandoColumn::getCompanyId);
-		attributeGetterFunctions.put("tableId", ExpandoColumn::getTableId);
-		attributeGetterFunctions.put("name", ExpandoColumn::getName);
-		attributeGetterFunctions.put("type", ExpandoColumn::getType);
-		attributeGetterFunctions.put(
-			"defaultData", ExpandoColumn::getDefaultData);
-		attributeGetterFunctions.put(
-			"typeSettings", ExpandoColumn::getTypeSettings);
+		try {
+			Constructor<ExpandoColumn> constructor =
+				(Constructor<ExpandoColumn>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<ExpandoColumn, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<ExpandoColumn, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<ExpandoColumn, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<ExpandoColumn, Object>>();
 		Map<String, BiConsumer<ExpandoColumn, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<ExpandoColumn, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", ExpandoColumn::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<ExpandoColumn, Long>)ExpandoColumn::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", ExpandoColumn::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<ExpandoColumn, Long>)ExpandoColumn::setCtCollectionId);
+		attributeGetterFunctions.put("columnId", ExpandoColumn::getColumnId);
 		attributeSetterBiConsumers.put(
 			"columnId",
 			(BiConsumer<ExpandoColumn, Long>)ExpandoColumn::setColumnId);
+		attributeGetterFunctions.put("companyId", ExpandoColumn::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<ExpandoColumn, Long>)ExpandoColumn::setCompanyId);
+		attributeGetterFunctions.put("tableId", ExpandoColumn::getTableId);
 		attributeSetterBiConsumers.put(
 			"tableId",
 			(BiConsumer<ExpandoColumn, Long>)ExpandoColumn::setTableId);
+		attributeGetterFunctions.put("name", ExpandoColumn::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<ExpandoColumn, String>)ExpandoColumn::setName);
+		attributeGetterFunctions.put("type", ExpandoColumn::getType);
 		attributeSetterBiConsumers.put(
 			"type", (BiConsumer<ExpandoColumn, Integer>)ExpandoColumn::setType);
+		attributeGetterFunctions.put(
+			"defaultData", ExpandoColumn::getDefaultData);
 		attributeSetterBiConsumers.put(
 			"defaultData",
 			(BiConsumer<ExpandoColumn, String>)ExpandoColumn::setDefaultData);
+		attributeGetterFunctions.put(
+			"typeSettings", ExpandoColumn::getTypeSettings);
 		attributeSetterBiConsumers.put(
 			"typeSettings",
 			(BiConsumer<ExpandoColumn, String>)ExpandoColumn::setTypeSettings);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -566,6 +589,31 @@ public class ExpandoColumnModelImpl
 	}
 
 	@Override
+	public ExpandoColumn cloneWithOriginalValues() {
+		ExpandoColumnImpl expandoColumnImpl = new ExpandoColumnImpl();
+
+		expandoColumnImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		expandoColumnImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		expandoColumnImpl.setColumnId(
+			this.<Long>getColumnOriginalValue("columnId"));
+		expandoColumnImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		expandoColumnImpl.setTableId(
+			this.<Long>getColumnOriginalValue("tableId"));
+		expandoColumnImpl.setName(this.<String>getColumnOriginalValue("name"));
+		expandoColumnImpl.setType(
+			this.<Integer>getColumnOriginalValue("type_"));
+		expandoColumnImpl.setDefaultData(
+			this.<String>getColumnOriginalValue("defaultData"));
+		expandoColumnImpl.setTypeSettings(
+			this.<String>getColumnOriginalValue("typeSettings"));
+
+		return expandoColumnImpl;
+	}
+
+	@Override
 	public int compareTo(ExpandoColumn expandoColumn) {
 		int value = 0;
 
@@ -757,9 +805,7 @@ public class ExpandoColumnModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, ExpandoColumn>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					ExpandoColumn.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

@@ -481,7 +481,8 @@ if (urlConfiguration != null) {
 	StringBundler urlConfigurationJSSB = new StringBundler(PropsValues.PORTLET_CONFIG_SHOW_PORTLET_ID ? 14 : 12);
 
 	urlConfigurationJSSB.append("Liferay.Portlet.openModal({");
-	urlConfigurationJSSB.append("namespace: '");
+	urlConfigurationJSSB.append("iframeBodyCssClass: '");
+	urlConfigurationJSSB.append("', namespace: '");
 	urlConfigurationJSSB.append(portletDisplay.getNamespace());
 	urlConfigurationJSSB.append("', portletSelector: '#p_p_id_");
 	urlConfigurationJSSB.append(portletDisplay.getId());
@@ -577,7 +578,7 @@ LiferayPortletURL urlExportImport = PortletURLFactoryUtil.create(request, Portle
 
 urlExportImport.setWindowState(LiferayWindowState.POP_UP);
 
-urlExportImport.setParameter("mvcRenderCommandName", "exportImport");
+urlExportImport.setParameter("mvcRenderCommandName", "/export_import/export_import");
 urlExportImport.setParameter("redirect", currentURL);
 urlExportImport.setParameter("returnToFullPageURL", currentURL);
 urlExportImport.setParameter("portletResource", portletDisplay.getId());
@@ -751,7 +752,7 @@ LiferayPortletURL urlStaging = PortletURLFactoryUtil.create(request, PortletKeys
 
 urlStaging.setWindowState(LiferayWindowState.POP_UP);
 
-urlStaging.setParameter("mvcRenderCommandName", "publishPortlet");
+urlStaging.setParameter("mvcRenderCommandName", "/export_import/publish_portlet");
 urlStaging.setParameter("cmd", Constants.PUBLISH_TO_LIVE);
 urlStaging.setParameter("redirect", currentURL);
 urlStaging.setParameter("returnToFullPageURL", currentURL);
@@ -1135,5 +1136,5 @@ liferayRenderRequest.cleanUp();
 %>
 
 <%!
-private static Log _log = LogFactoryUtil.getLog("portal_web.docroot.html.portal.render_portlet_jsp");
+private static final Log _log = LogFactoryUtil.getLog("portal_web.docroot.html.portal.render_portlet_jsp");
 %>

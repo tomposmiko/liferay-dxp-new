@@ -16,16 +16,18 @@ package com.liferay.commerce.product.options.web.internal.display.context;
 
 import com.liferay.commerce.product.model.CPOptionCategory;
 import com.liferay.commerce.product.model.CPSpecificationOption;
-import com.liferay.commerce.product.options.web.internal.portlet.action.ActionHelper;
+import com.liferay.commerce.product.options.web.internal.portlet.action.helper.ActionHelper;
 import com.liferay.commerce.product.options.web.internal.util.CPOptionsPortletUtil;
 import com.liferay.commerce.product.service.CPOptionCategoryService;
 import com.liferay.commerce.product.service.CPSpecificationOptionService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -46,12 +48,14 @@ public class CPSpecificationOptionDisplayContext
 	public CPSpecificationOptionDisplayContext(
 			ActionHelper actionHelper, HttpServletRequest httpServletRequest,
 			CPOptionCategoryService cpOptionCategoryService,
-			CPSpecificationOptionService cpSpecificationOptionService)
+			CPSpecificationOptionService cpSpecificationOptionService,
+			PortletResourcePermission portletResourcePermission)
 		throws PortalException {
 
 		super(
 			actionHelper, httpServletRequest,
-			CPSpecificationOption.class.getSimpleName());
+			CPSpecificationOption.class.getSimpleName(),
+			portletResourcePermission);
 
 		setDefaultOrderByCol("label");
 
@@ -92,11 +96,11 @@ public class CPSpecificationOptionDisplayContext
 
 	@Override
 	public PortletURL getPortletURL() throws PortalException {
-		PortletURL portletURL = super.getPortletURL();
-
-		portletURL.setParameter("navigation", getNavigation());
-
-		return portletURL;
+		return PortletURLBuilder.create(
+			super.getPortletURL()
+		).setNavigation(
+			getNavigation()
+		).buildPortletURL();
 	}
 
 	@Override

@@ -20,45 +20,37 @@
 ViewSXPBlueprintsDisplayContext viewSXPBlueprintsDisplayContext = (ViewSXPBlueprintsDisplayContext)request.getAttribute(SXPWebKeys.VIEW_SXP_BLUEPRINTS_DISPLAY_CONTEXT);
 %>
 
-<aui:form action="<%= viewSXPBlueprintsDisplayContext.getPortletURL() %>" method="post" name="fm">
-	<aui:input name="redirect" type="hidden" value="<%= String.valueOf(viewSXPBlueprintsDisplayContext.getPortletURL()) %>" />
-
-	<div id="<portlet:namespace />viewSXPBlueprints">
-		<react:component
-			module="sxp_blueprint_admin/js/view_sxp_blueprints/index"
-			props='<%=
-				HashMapBuilder.<String, Object>put(
-					"apiURL", viewSXPBlueprintsDisplayContext.getAPIURL()
-				).put(
-					"defaultLocale", LocaleUtil.toLanguageId(LocaleUtil.getDefault())
-				).put(
-					"deleteSXPBlueprintURL",
-					PortletURLBuilder.createActionURL(
-						liferayPortletResponse
-					).setActionName(
-						"/sxp_blueprint_admin/edit_sxp_blueprint"
-					).setCMD(
-						Constants.DELETE
-					).buildString()
-				).put(
-					"editSXPBlueprintURL",
-					PortletURLBuilder.createRenderURL(
-						liferayPortletResponse
-					).setMVCRenderCommandName(
-						"/sxp_blueprint_admin/edit_sxp_blueprint"
-					).buildString()
-				).put(
-					"formName", "fm"
-				).put(
-					"hasAddSXPBlueprintPermission", viewSXPBlueprintsDisplayContext.hasAddSXPBlueprintPermission()
-				).put(
-					"namespace", liferayPortletResponse.getNamespace()
-				).build()
-			%>'
-		/>
-	</div>
-</aui:form>
-
-<liferay-frontend:component
-	module="sxp_blueprint_admin/js/utils/openInitialSuccessToastHandler"
+<frontend-data-set:headless-display
+	apiURL="<%= viewSXPBlueprintsDisplayContext.getAPIURL() %>"
+	creationMenu="<%= viewSXPBlueprintsDisplayContext.getCreationMenu() %>"
+	fdsActionDropdownItems="<%= viewSXPBlueprintsDisplayContext.getFDSActionDropdownItems() %>"
+	formName="fm"
+	id="<%= SXPBlueprintAdminFDSNames.SXP_BLUEPRINTS %>"
+	itemsPerPage="<%= 20 %>"
+	namespace="<%= liferayPortletResponse.getNamespace() %>"
+	pageNumber="<%= 1 %>"
+	portletURL="<%= liferayPortletResponse.createRenderURL() %>"
+	style="fluid"
 />
+
+<div id="<portlet:namespace />addSXPBlueprint">
+	<react:component
+		module="sxp_blueprint_admin/js/view_sxp_blueprints/AddSXPBlueprintModal"
+		props='<%=
+			HashMapBuilder.<String, Object>put(
+				"contextPath", application.getContextPath()
+			).put(
+				"defaultLocale", LocaleUtil.toLanguageId(LocaleUtil.getDefault())
+			).put(
+				"editSXPBlueprintURL",
+				PortletURLBuilder.createRenderURL(
+					renderResponse
+				).setMVCRenderCommandName(
+					"/sxp_blueprint_admin/edit_sxp_blueprint"
+				).buildString()
+			).put(
+				"portletNamespace", liferayPortletResponse.getNamespace()
+			).build()
+		%>'
+	/>
+</div>

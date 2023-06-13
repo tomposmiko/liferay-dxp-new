@@ -42,7 +42,6 @@ const headerTitle = 'Images';
 const items = [
 	{
 		metadata: JSON.stringify(basicMetadata),
-		mimeType: 'image/jpeg',
 		returntype: 'returntype',
 		title: item1Title,
 		url: itemUrl,
@@ -50,7 +49,6 @@ const items = [
 	},
 	{
 		metadata: JSON.stringify(basicMetadata),
-		mimeType: 'image/jpeg',
 		returntype: 'returntype',
 		title: item2Title,
 		url: itemUrl,
@@ -71,21 +69,16 @@ const renderPreviewComponent = (props) =>
 describe('ItemSelectorPreview', () => {
 	beforeAll(() => {
 		Liferay.component = jest.fn();
-		Liferay.SideNavigation = {
-			destroy: jest.fn(),
-			initialize: jest.fn(),
-		};
+		Liferay.SideNavigation = jest.fn();
+		Liferay.SideNavigation.initialize = jest.fn();
 	});
 
 	afterEach(cleanup);
 
-	it('initialize/destroy the sidebar properly', () => {
+	it('initialize the sidebar only once', () => {
 		renderPreviewComponent(previewProps);
 
-		expect(
-			Liferay.SideNavigation.initialize.mock.calls.length -
-				Liferay.SideNavigation.destroy.mock.calls.length
-		).toBe(1);
+		expect(Liferay.SideNavigation.initialize).toHaveBeenCalledTimes(1);
 	});
 
 	it('renders the ItemSelectorPreview component with the fullscreen class', () => {
@@ -97,7 +90,7 @@ describe('ItemSelectorPreview', () => {
 	it('renders the header component', () => {
 		const {getByText} = renderPreviewComponent(previewProps);
 
-		expect(getByText(headerTitle));
+		expect(getByText(headerTitle)).toBeTruthy();
 	});
 
 	it('renders the carousel component', () => {
@@ -112,7 +105,7 @@ describe('ItemSelectorPreview', () => {
 			currentIndex: 1,
 		});
 
-		expect(getByText(item2Title));
+		expect(getByText(item2Title)).toBeTruthy();
 	});
 
 	it('shows the next item when requested', () => {
@@ -120,13 +113,13 @@ describe('ItemSelectorPreview', () => {
 			...previewProps,
 		});
 
-		expect(getByText(item1Title));
+		expect(getByText(item1Title)).toBeTruthy();
 
 		const rigthArrowButton = container.querySelectorAll('.icon-arrow')[1];
 
 		fireEvent.click(rigthArrowButton);
 
-		expect(getByText(item2Title));
+		expect(getByText(item2Title)).toBeTruthy();
 	});
 
 	it('returns to the first item when requested the next item for the last one', () => {
@@ -138,7 +131,7 @@ describe('ItemSelectorPreview', () => {
 		const rigthArrowButton = container.querySelectorAll('.icon-arrow')[1];
 
 		fireEvent.click(rigthArrowButton);
-		expect(getByText(item1Title));
+		expect(getByText(item1Title)).toBeTruthy();
 	});
 
 	it('shows the previous item when pressed the left key event', () => {
@@ -152,7 +145,7 @@ describe('ItemSelectorPreview', () => {
 			which: 37,
 		});
 
-		expect(getByText(item2Title));
+		expect(getByText(item2Title)).toBeTruthy();
 	});
 
 	it('handleSelectedItem is called when Add button is clicked', () => {

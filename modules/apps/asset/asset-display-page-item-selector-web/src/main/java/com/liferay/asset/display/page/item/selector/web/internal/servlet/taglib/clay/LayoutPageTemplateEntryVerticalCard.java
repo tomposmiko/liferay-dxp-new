@@ -42,43 +42,27 @@ public class LayoutPageTemplateEntryVerticalCard implements VerticalCard {
 	}
 
 	@Override
-	public Map<String, String> getData() {
-		return HashMapBuilder.put(
-			"id",
-			String.valueOf(
-				_layoutPageTemplateEntry.getLayoutPageTemplateEntryId())
-		).put(
-			"name", _layoutPageTemplateEntry.getName()
-		).put(
-			"plid", String.valueOf(_layoutPageTemplateEntry.getPlid())
-		).put(
-			"type", "asset-display-page"
-		).build();
-	}
-
-	@Override
-	public String getElementClasses() {
+	public String getCssClass() {
 		return "card-interactive card-interactive-secondary " +
 			"layout-page-template-entry";
 	}
 
 	@Override
+	public Map<String, String> getDynamicAttributes() {
+		return HashMapBuilder.put(
+			"data-id",
+			String.valueOf(
+				_layoutPageTemplateEntry.getLayoutPageTemplateEntryId())
+		).put(
+			"data-name", _layoutPageTemplateEntry.getName()
+		).put(
+			"data-type", "asset-display-page"
+		).build();
+	}
+
+	@Override
 	public String getIcon() {
 		return "page";
-	}
-
-	@Override
-	public String getStickerIcon() {
-		if (_layoutPageTemplateEntry.isDefaultTemplate()) {
-			return "check-circle";
-		}
-
-		return null;
-	}
-
-	@Override
-	public String getStickerStyle() {
-		return "primary";
 	}
 
 	@Override

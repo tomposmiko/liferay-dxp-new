@@ -23,7 +23,8 @@ ViewAccountGroupsManagementToolbarDisplayContext viewAccountGroupsManagementTool
 %>
 
 <clay:management-toolbar
-	displayContext="<%= viewAccountGroupsManagementToolbarDisplayContext %>"
+	managementToolbarDisplayContext="<%= viewAccountGroupsManagementToolbarDisplayContext %>"
+	propsTransformer="account_groups_admin/js/AccountGroupsManagementToolbarPropsTransformer"
 />
 
 <clay:container-fluid>
@@ -38,12 +39,26 @@ ViewAccountGroupsManagementToolbarDisplayContext viewAccountGroupsManagementTool
 				keyProperty="accountGroupId"
 				modelVar="accountGroupDisplay"
 			>
+
+				<%
+				row.setData(
+					HashMapBuilder.<String, Object>put(
+						"actions", StringUtil.merge(viewAccountGroupsManagementToolbarDisplayContext.getAvailableActions(accountGroupDisplay))
+					).build());
+				%>
+
 				<portlet:renderURL var="rowURL">
 					<portlet:param name="mvcRenderCommandName" value="/account_admin/edit_account_group" />
 					<portlet:param name="backURL" value="<%= currentURL %>" />
 					<portlet:param name="accountGroupId" value="<%= String.valueOf(accountGroupDisplay.getAccountGroupId()) %>" />
 					<portlet:param name="screenNavigationCategoryKey" value="<%= AccountScreenNavigationEntryConstants.CATEGORY_KEY_ACCOUNTS %>" />
 				</portlet:renderURL>
+
+				<%
+				if (!AccountGroupPermission.contains(permissionChecker, accountGroupDisplay.getAccountGroupId(), ActionKeys.UPDATE)) {
+					rowURL = null;
+				}
+				%>
 
 				<liferay-ui:search-container-column-text
 					cssClass="table-cell-expand table-title"
@@ -77,8 +92,3 @@ ViewAccountGroupsManagementToolbarDisplayContext viewAccountGroupsManagementTool
 		</liferay-ui:search-container>
 	</aui:form>
 </clay:container-fluid>
-
-<liferay-frontend:component
-	componentId="<%= viewAccountGroupsManagementToolbarDisplayContext.getDefaultEventHandler() %>"
-	module="account_groups_admin/js/AccountGroupsManagementToolbarDefaultEventHandler.es"
-/>

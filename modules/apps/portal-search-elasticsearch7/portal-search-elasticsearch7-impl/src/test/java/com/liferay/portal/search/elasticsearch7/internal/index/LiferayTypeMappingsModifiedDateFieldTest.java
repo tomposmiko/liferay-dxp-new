@@ -15,10 +15,8 @@
 package com.liferay.portal.search.elasticsearch7.internal.index;
 
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexName;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.PropsImpl;
 
 import java.util.Collections;
 import java.util.Date;
@@ -40,14 +38,11 @@ import org.junit.rules.TestName;
 public class LiferayTypeMappingsModifiedDateFieldTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws Exception {
-		PropsUtil.setProps(new PropsImpl());
-
 		Class<?> clazz = getClass();
 
 		_liferayIndexFixture = new LiferayIndexFixture(

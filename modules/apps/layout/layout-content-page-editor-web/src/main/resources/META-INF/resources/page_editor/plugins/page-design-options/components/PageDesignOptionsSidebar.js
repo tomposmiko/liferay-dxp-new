@@ -22,8 +22,8 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {LAYOUT_TYPES} from '../../../app/config/constants/layoutTypes';
 import {config} from '../../../app/config/index';
+import {useDispatch, useSelector} from '../../../app/contexts/StoreContext';
 import LayoutService from '../../../app/services/LayoutService';
-import {useDispatch, useSelector} from '../../../app/store/index';
 import changeMasterLayout from '../../../app/thunks/changeMasterLayout';
 import {useId} from '../../../app/utils/useId';
 import SidebarPanelContent from '../../../common/components/SidebarPanelContent';
@@ -150,7 +150,7 @@ export default function PageDesignOptionsSidebar() {
 							active={activeTabId === index}
 							innerProps={{
 								'aria-controls': getTabPanelId(index),
-								id: getTabId(index),
+								'id': getTabId(index),
 							}}
 							key={index}
 							onClick={() => setActiveTabId(index)}
@@ -184,9 +184,13 @@ const OptionList = ({options = [], icon, type}) => {
 	if (type === OPTIONS_TYPES.styleBook && !config.styleBookEnabled) {
 		return (
 			<ClayAlert className="mt-3" displayType="info">
-				{Liferay.Language.get(
-					'this-page-is-using-a-different-theme-than-the-one-set-for-public-pages'
-				)}
+				{config.isPrivateLayoutsEnabled
+					? Liferay.Language.get(
+							'this-page-is-using-a-different-theme-than-the-one-set-for-public-pages'
+					  )
+					: Liferay.Language.get(
+							'this-page-is-using-a-different-theme-than-the-one-set-for-pages'
+					  )}
 			</ClayAlert>
 		);
 	}
@@ -228,6 +232,7 @@ const OptionList = ({options = [], icon, type}) => {
 									</div>
 								)}
 							</ClayCard.AspectRatio>
+
 							<ClayCard.Body>
 								<ClayCard.Row>
 									<div className="autofit-col autofit-col-expand">
@@ -235,6 +240,7 @@ const OptionList = ({options = [], icon, type}) => {
 											<ClayCard.Description displayType="title">
 												{name}
 											</ClayCard.Description>
+
 											{subtitle && (
 												<ClayCard.Description displayType="subtitle">
 													{subtitle}

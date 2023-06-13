@@ -102,6 +102,30 @@ public class KaleoLogLocalServiceUtil {
 				<com.liferay.portal.workflow.kaleo.model.
 					KaleoTaskAssignmentInstance>
 						previousKaleoTaskAssignmentInstances,
+			com.liferay.portal.workflow.kaleo.model.KaleoTaskAssignmentInstance
+				kaleoTaskAssignmentInstance,
+			com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken
+				kaleoTaskInstanceToken,
+			String comment, Map<String, Serializable> workflowContext,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addTaskAssignmentKaleoLog(
+			previousKaleoTaskAssignmentInstances, kaleoTaskAssignmentInstance,
+			kaleoTaskInstanceToken, comment, workflowContext, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addTaskAssignmentKaleoLog(List, KaleoTaskAssignmentInstance,
+	 KaleoTaskInstanceToken, String, Map, ServiceContext)}}
+	 */
+	@Deprecated
+	public static KaleoLog addTaskAssignmentKaleoLog(
+			List
+				<com.liferay.portal.workflow.kaleo.model.
+					KaleoTaskAssignmentInstance>
+						previousKaleoTaskAssignmentInstances,
 			com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken
 				kaleoTaskInstanceToken,
 			String comment, Map<String, Serializable> workflowContext,
@@ -111,6 +135,22 @@ public class KaleoLogLocalServiceUtil {
 		return getService().addTaskAssignmentKaleoLog(
 			previousKaleoTaskAssignmentInstances, kaleoTaskInstanceToken,
 			comment, workflowContext, serviceContext);
+	}
+
+	public static List<KaleoLog> addTaskAssignmentKaleoLogs(
+			List
+				<com.liferay.portal.workflow.kaleo.model.
+					KaleoTaskAssignmentInstance>
+						previousTaskAssignmentInstances,
+			com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken
+				kaleoTaskInstanceToken,
+			String comment, Map<String, Serializable> workflowContext,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addTaskAssignmentKaleoLogs(
+			previousTaskAssignmentInstances, kaleoTaskInstanceToken, comment,
+			workflowContext, serviceContext);
 	}
 
 	public static KaleoLog addTaskCompletionKaleoLog(
@@ -333,20 +373,6 @@ public class KaleoLogLocalServiceUtil {
 		return getService().getIndexableActionableDynamicQuery();
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 #getKaleoInstanceKaleoLogs(long, long, List, int, int,
-	 OrderByComparator)}
-	 */
-	@Deprecated
-	public static List<KaleoLog> getKaleoInstanceKaleoLogs(
-		long kaleoInstanceId, List<Integer> logTypes, int start, int end,
-		OrderByComparator<KaleoLog> orderByComparator) {
-
-		return getService().getKaleoInstanceKaleoLogs(
-			kaleoInstanceId, logTypes, start, end, orderByComparator);
-	}
-
 	public static List<KaleoLog> getKaleoInstanceKaleoLogs(
 		long companyId, long kaleoInstanceId, List<Integer> logTypes, int start,
 		int end, OrderByComparator<KaleoLog> orderByComparator) {
@@ -354,18 +380,6 @@ public class KaleoLogLocalServiceUtil {
 		return getService().getKaleoInstanceKaleoLogs(
 			companyId, kaleoInstanceId, logTypes, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 #getKaleoInstanceKaleoLogsCount(long, long, List)}
-	 */
-	@Deprecated
-	public static int getKaleoInstanceKaleoLogsCount(
-		long kaleoInstanceId, List<Integer> logTypes) {
-
-		return getService().getKaleoInstanceKaleoLogsCount(
-			kaleoInstanceId, logTypes);
 	}
 
 	public static int getKaleoInstanceKaleoLogsCount(
@@ -410,20 +424,6 @@ public class KaleoLogLocalServiceUtil {
 		return getService().getKaleoLogsCount();
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 #getKaleoTaskInstanceTokenKaleoLogs(long, long, List, int,
-	 int, OrderByComparator)}
-	 */
-	@Deprecated
-	public static List<KaleoLog> getKaleoTaskInstanceTokenKaleoLogs(
-		long kaleoTaskInstanceTokenId, List<Integer> logTypes, int start,
-		int end, OrderByComparator<KaleoLog> orderByComparator) {
-
-		return getService().getKaleoTaskInstanceTokenKaleoLogs(
-			kaleoTaskInstanceTokenId, logTypes, start, end, orderByComparator);
-	}
-
 	public static List<KaleoLog> getKaleoTaskInstanceTokenKaleoLogs(
 		long companyId, long kaleoTaskInstanceTokenId, List<Integer> logTypes,
 		int start, int end, OrderByComparator<KaleoLog> orderByComparator) {
@@ -431,18 +431,6 @@ public class KaleoLogLocalServiceUtil {
 		return getService().getKaleoTaskInstanceTokenKaleoLogs(
 			companyId, kaleoTaskInstanceTokenId, logTypes, start, end,
 			orderByComparator);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 #getKaleoTaskInstanceTokenKaleoLogsCount(long, long, List)}
-	 */
-	@Deprecated
-	public static int getKaleoTaskInstanceTokenKaleoLogsCount(
-		long kaleoTaskInstanceTokenId, List<Integer> logTypes) {
-
-		return getService().getKaleoTaskInstanceTokenKaleoLogsCount(
-			kaleoTaskInstanceTokenId, logTypes);
 	}
 
 	public static int getKaleoTaskInstanceTokenKaleoLogsCount(

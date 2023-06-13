@@ -28,23 +28,26 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 
 <%@ include file="/navbar_definitions.jspf" %>
 
-<div class="pt-4" id="<portlet:namespace />productDefinitionsContainer">
-	<aui:form action="<%= portletURL %>" cssClass="container-fluid-1280" method="post" name="fm">
+<div id="<portlet:namespace />productDefinitionsContainer">
+	<aui:form action="<%= portletURL %>" method="post" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" />
 		<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 		<aui:input name="deleteCPDefinitionIds" type="hidden" />
 
 		<clay:headless-data-set-display
 			apiURL="/o/headless-commerce-admin-catalog/v1.0/products?nestedFields=skus,catalog"
+			bulkActionDropdownItems="<%= cpDefinitionsDisplayContext.getBulkActionDropdownItems() %>"
 			clayDataSetActionDropdownItems="<%= cpDefinitionsDisplayContext.getClayDataSetActionDropdownItems() %>"
 			creationMenu="<%= cpDefinitionsDisplayContext.getCreationMenu() %>"
-			formId="fm"
+			formName="fm"
 			id="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_DEFINITIONS %>"
 			itemsPerPage="<%= 10 %>"
 			namespace="<%= liferayPortletResponse.getNamespace() %>"
 			pageNumber="<%= 1 %>"
 			portletURL="<%= portletURL %>"
-			style="stacked"
+			selectedItemsKey="id"
+			selectionType="multiple"
+			style="fluid"
 		/>
 	</aui:form>
 </div>

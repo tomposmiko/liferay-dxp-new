@@ -27,11 +27,15 @@ CProduct cProduct = cpDefinitionGroupedEntry.getEntryCProduct();
 
 CPDefinition cProductCPDefinition = CPDefinitionLocalServiceUtil.getCPDefinition(cProduct.getPublishedCPDefinitionId());
 
-PortletURL groupedProductsURL = renderResponse.createRenderURL();
-
-groupedProductsURL.setParameter("mvcRenderCommandName", "/cp_definitions/edit_cp_definition");
-groupedProductsURL.setParameter("cpDefinitionId", String.valueOf(cpDefinition.getCPDefinitionId()));
-groupedProductsURL.setParameter("screenNavigationCategoryKey", cpDefinitionGroupedEntriesDisplayContext.getScreenNavigationCategoryKey());
+PortletURL groupedProductsURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCRenderCommandName(
+	"/cp_definitions/edit_cp_definition"
+).setParameter(
+	"cpDefinitionId", cpDefinition.getCPDefinitionId()
+).setParameter(
+	"screenNavigationCategoryKey", cpDefinitionGroupedEntriesDisplayContext.getScreenNavigationCategoryKey()
+).buildPortletURL();
 
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(groupedProductsURL.toString());
@@ -43,7 +47,7 @@ renderResponse.setTitle(cpDefinition.getName(themeDisplay.getLanguageId()) + " -
 	<portlet:param name="mvcRenderCommandName" value="/cp_definitions/edit_cp_definition_grouped_entry" />
 </portlet:actionURL>
 
-<aui:form action="<%= editCPDefinitionGroupedEntryActionURL %>" cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveCPDefinitionGroupedEntry();" %>'>
+<aui:form action="<%= editCPDefinitionGroupedEntryActionURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveCPDefinitionGroupedEntry();" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= groupedProductsURL %>" />
 	<aui:input name="cpDefinitionGroupedEntryId" type="hidden" value="<%= cpDefinitionGroupedEntry.getCPDefinitionGroupedEntryId() %>" />

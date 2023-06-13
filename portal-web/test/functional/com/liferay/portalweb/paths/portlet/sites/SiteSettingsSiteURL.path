@@ -10,22 +10,10 @@
 </thead>
 
 <tbody>
-
 <!--SITE_URL-->
-
 <tr>
 	<td>SITE_URL_FRIENDLY_URL_LABEL</td>
-	<td>//div[contains(@id,'siteUrlContent')]//label[contains(.,'Friendly URL')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>SITE_URL_VIRTUAL_HOSTS_PUBLIC_PAGES_LABEL</td>
-	<td>//div[(contains(@class,'control-group') or contains(@class,'form-group'))]/label[contains(@for,'publicVirtualHost')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>SITE_URL_VIRTUAL_HOSTS_PRIVATE_PAGES_LABEL</td>
-	<td>//div[(contains(@class,'control-group') or contains(@class,'form-group'))]/label[contains(@for,'privateVirtualHost')]</td>
+	<td>//div[contains(@class,'form-group')]//label[contains(@for,'groupFriendlyURL')]</td>
 	<td></td>
 </tr>
 </tbody>

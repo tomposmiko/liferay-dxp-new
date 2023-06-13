@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Region;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CountryService;
 import com.liferay.portal.kernel.service.OrganizationService;
@@ -106,8 +105,7 @@ public class OrganizationIndexerIndexedFieldsTest {
 		_groups = groupSearchFixture.getGroups();
 
 		_indexedFieldsFixture = new IndexedFieldsFixture(
-			resourcePermissionLocalService, searchEngineHelper, uidFactory,
-			documentBuilderFactory);
+			resourcePermissionLocalService, uidFactory, documentBuilderFactory);
 
 		_organizationFixture = organizationFixture;
 		_organizations = organizationFixture.getOrganizations();
@@ -198,9 +196,6 @@ public class OrganizationIndexerIndexedFieldsTest {
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
 
 	@Inject
-	protected SearchEngineHelper searchEngineHelper;
-
-	@Inject
 	protected Searcher searcher;
 
 	@Inject
@@ -246,8 +241,6 @@ public class OrganizationIndexerIndexedFieldsTest {
 		).put(
 			Field.USER_ID, String.valueOf(organization.getUserId())
 		).put(
-			Field.USER_NAME, StringUtil.toLowerCase(organization.getUserName())
-		).put(
 			"country", _organizationFixture.getCountryNames(organization)
 		).put(
 			"nameTreePath", organization.getName()
@@ -259,6 +252,14 @@ public class OrganizationIndexerIndexedFieldsTest {
 			String.valueOf(organization.getParentOrganizationId())
 		).put(
 			"region",
+			() -> {
+				Region region = regionService.getRegion(
+					organization.getRegionId());
+
+				return StringUtil.toLowerCase(region.getName());
+			}
+		).put(
+			Field.getSortableFieldName("region"),
 			() -> {
 				Region region = regionService.getRegion(
 					organization.getRegionId());

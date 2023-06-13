@@ -52,16 +52,16 @@ CPDefinition cpDefinition = cpDefinitionOptionRelDisplayContext.getCPDefinition(
 						method: 'POST',
 					}
 				)
-					.then(function (response) {
+					.then((response) => {
 						if (response.ok) {
 							return response.json();
 						}
 
-						return response.json().then(function (data) {
+						return response.json().then((data) => {
 							return Promise.reject(data.errorDescription);
 						});
 					})
-					.then(function (e) {
+					.then((e) => {
 						Liferay.fire(events.UPDATE_DATASET_DISPLAY, {
 							id:
 								'<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_OPTIONS %>',
@@ -91,12 +91,12 @@ CPDefinition cpDefinition = cpDefinitionOptionRelDisplayContext.getCPDefinition(
 						method: 'POST',
 					}
 				)
-					.then(function (response) {
+					.then((response) => {
 						if (response.ok) {
 							return response.json();
 						}
 
-						return response.json().then(function (data) {
+						return response.json().then((data) => {
 							return Promise.reject(data.errorDescription);
 						});
 					})
@@ -113,7 +113,6 @@ CPDefinition cpDefinition = cpDefinitionOptionRelDisplayContext.getCPDefinition(
 				getSelectedItems: getSelectedItems,
 				inputPlaceholder:
 					'<%= LanguageUtil.get(request, "find-or-create-an-option") %>',
-				itemCreatedMessage: '<%= LanguageUtil.get(request, "option-created") %>',
 				itemSelectedMessage: '<%= LanguageUtil.get(request, "option-selected") %>',
 				itemsKey: 'id',
 				linkedDatasetsId: [
@@ -130,7 +129,7 @@ CPDefinition cpDefinition = cpDefinitionOptionRelDisplayContext.getCPDefinition(
 						fieldName: ['name', 'LANG'],
 					},
 				],
-				spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
+				spritemap: '<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg',
 				titleLabel: '<%= LanguageUtil.get(request, "add-existing-option") %>',
 			});
 		</aui:script>
@@ -153,6 +152,7 @@ CPDefinition cpDefinition = cpDefinitionOptionRelDisplayContext.getCPDefinition(
 					namespace="<%= liferayPortletResponse.getNamespace() %>"
 					pageNumber="<%= 1 %>"
 					portletURL="<%= currentURLObj %>"
+					selectedItemsKey="cpdefinitionOptionRelId"
 				/>
 			</aui:form>
 		</commerce-ui:panel>

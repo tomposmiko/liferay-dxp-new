@@ -141,6 +141,11 @@ public class RepositoryEntryWrapper
 		}
 	}
 
+	@Override
+	public RepositoryEntry cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
 	/**
 	 * Returns the company ID of this repository entry.
 	 *

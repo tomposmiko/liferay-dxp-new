@@ -50,11 +50,11 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 						<%
 						List<SegmentsEntry> availableSegmentsEntries = editAssetListDisplayContext.getAvailableSegmentsEntries();
 
-						List<AssetListEntrySegmentsEntryRel> assetListEntrySegmentsEntryRels = editAssetListDisplayContext.getAssetListEntrySegmentsEntryRels();
+						List<AssetListEntrySegmentsEntryRel> assetEntryListSegmentsEntryRels = editAssetListDisplayContext.getAssetListEntrySegmentsEntryRels();
 						%>
 
 						<c:choose>
-							<c:when test="<%= assetListEntrySegmentsEntryRels.size() > 1 %>">
+							<c:when test="<%= assetEntryListSegmentsEntryRels.size() > 1 %>">
 								<clay:content-row
 									verticalAlign="center"
 								>
@@ -64,10 +64,6 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 										<strong class="text-uppercase">
 											<liferay-ui:message key="personalized-variations" />
 										</strong>
-
-										<p>
-											<liferay-ui:message key="personalized-variations-help" />
-										</p
 									</clay:content-col>
 
 									<c:if test="<%= Validator.isNotNull(assetListEntry.getAssetEntryType()) %>">
@@ -92,20 +88,24 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 								<ul class="nav nav-stacked">
 
 									<%
-									for (AssetListEntrySegmentsEntryRel assetListEntrySegmentsEntryRel : assetListEntrySegmentsEntryRels) {
+									for (AssetListEntrySegmentsEntryRel assetListEntrySegmentsEntryRel : assetEntryListSegmentsEntryRels) {
 									%>
 
 										<li class="nav-item">
-
-											<%
-											PortletURL editAssetListEntryURL = renderResponse.createRenderURL();
-
-											editAssetListEntryURL.setParameter("mvcPath", "/edit_asset_list_entry.jsp");
-											editAssetListEntryURL.setParameter("assetListEntryId", String.valueOf(assetListEntrySegmentsEntryRel.getAssetListEntryId()));
-											editAssetListEntryURL.setParameter("segmentsEntryId", String.valueOf(assetListEntrySegmentsEntryRel.getSegmentsEntryId()));
-											%>
-
-											<a class="nav-link text-truncate <%= (editAssetListDisplayContext.getSegmentsEntryId() == assetListEntrySegmentsEntryRel.getSegmentsEntryId()) ? "active" : StringPool.BLANK %>" href="<%= editAssetListEntryURL.toString() %>">
+											<a
+												class="nav-link text-truncate <%= (editAssetListDisplayContext.getSegmentsEntryId() == assetListEntrySegmentsEntryRel.getSegmentsEntryId()) ? "active" : StringPool.BLANK %>"
+												href="<%=
+													PortletURLBuilder.createRenderURL(
+														renderResponse
+													).setMVCPath(
+														"/edit_asset_list_entry.jsp"
+													).setParameter(
+														"assetListEntryId", assetListEntrySegmentsEntryRel.getAssetListEntryId()
+													).setParameter(
+														"segmentsEntryId", assetListEntrySegmentsEntryRel.getSegmentsEntryId()
+													).buildString()
+												%>"
+											>
 												<%= HtmlUtil.escape(editAssetListDisplayContext.getSegmentsEntryName(assetListEntrySegmentsEntryRel.getSegmentsEntryId(), locale)) %>
 											</a>
 										</li>

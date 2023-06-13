@@ -21,13 +21,13 @@ ViewTranslationDisplayContext viewTranslationDisplayContext = (ViewTranslationDi
 %>
 
 <liferay-util:html-top>
-	<link href="<%= PortalUtil.getStaticResourceURL(request, PortalUtil.getPathProxy() + application.getContextPath() + "/css/main.css") %>" rel="stylesheet" />
+	<link href="<%= PortalUtil.getStaticResourceURL(request, application.getContextPath() + "/css/main.css") %>" rel="stylesheet" />
 </liferay-util:html-top>
 
 <clay:container-fluid
-	cssClass="container-view"
+	cssClass="container-view translation"
 >
-	<div class="sheet translate-body-form">
+	<div class="sheet translation-edit-body-form">
 		<clay:row>
 			<clay:col
 				md="6"
@@ -118,7 +118,7 @@ ViewTranslationDisplayContext viewTranslationDisplayContext = (ViewTranslationDi
 									<%= label %>
 								</label>
 
-								<div class="translate-editor-preview" dir="<%= sourceContentDir %>">
+								<div class="translation-editor-preview" dir="<%= sourceContentDir %>">
 									<%= sourceContent %>
 								</div>
 							</c:when>
@@ -142,7 +142,7 @@ ViewTranslationDisplayContext viewTranslationDisplayContext = (ViewTranslationDi
 									<%= label %>
 								</label>
 
-								<div class="translate-editor-preview" dir="<%= LanguageUtil.get(viewTranslationDisplayContext.getTargetLocale(), "lang.dir") %>">
+								<div class="translation-editor-preview" dir="<%= LanguageUtil.get(viewTranslationDisplayContext.getTargetLocale(), "lang.dir") %>">
 									<%= targetContent %>
 								</div>
 							</c:when>

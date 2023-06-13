@@ -15,6 +15,7 @@
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
+import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.content.page.editor.listener.ContentPageEditorListenerTracker;
 import com.liferay.layout.content.page.editor.web.internal.util.layout.structure.LayoutStructureUtil;
@@ -22,7 +23,6 @@ import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutRevision;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutRevisionLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
@@ -61,7 +60,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
-		"mvc.command.name=/content_layout/publish_layout"
+		"mvc.command.name=/layout_content_page_editor/publish_layout"
 	},
 	service = {AopService.class, MVCActionCommand.class}
 )
@@ -88,10 +87,7 @@ public class PublishLayoutMVCActionCommand
 		Layout draftLayout = _layoutLocalService.getLayout(
 			themeDisplay.getPlid());
 
-		if ((draftLayout.getClassPK() == 0) ||
-			(_portal.getClassNameId(Layout.class) !=
-				draftLayout.getClassNameId())) {
-
+		if (!draftLayout.isDraftLayout()) {
 			sendRedirect(actionRequest, actionResponse);
 
 			return;
@@ -143,8 +139,8 @@ public class PublishLayoutMVCActionCommand
 		throws Exception {
 
 		LayoutStructureUtil.deleteMarkedForDeletionItems(
-			_contentPageEditorListenerTracker, draftLayout.getGroupId(),
-			draftLayout.getPlid());
+			draftLayout.getCompanyId(), _contentPageEditorListenerTracker,
+			draftLayout.getGroupId(), draftLayout.getPlid(), _portletRegistry);
 
 		if (_workflowDefinitionLinkLocalService.hasWorkflowDefinitionLink(
 				layout.getCompanyId(), layout.getGroupId(),
@@ -156,36 +152,34 @@ public class PublishLayoutMVCActionCommand
 				serviceContext, Collections.emptyMap());
 		}
 		else {
-			User user = _userLocalService.fetchUser(layout.getUserId());
+			_layoutCopyHelper.copyLayout(draftLayout, layout);
 
-			if (user == null) {
-				layout.setUserId(userId);
-			}
-
-			layout = _layoutCopyHelper.copyLayout(draftLayout, layout);
-
-			layout.setType(draftLayout.getType());
-			layout.setStatus(WorkflowConstants.STATUS_APPROVED);
-
-			String layoutPrototypeUuid = layout.getLayoutPrototypeUuid();
-
-			layout.setLayoutPrototypeUuid(null);
-
-			_layoutLocalService.updateLayout(layout);
+			layout = _layoutLocalService.getLayout(layout.getPlid());
 
 			draftLayout = _layoutLocalService.getLayout(draftLayout.getPlid());
 
 			UnicodeProperties typeSettingsUnicodeProperties =
 				draftLayout.getTypeSettingsProperties();
 
+			String layoutPrototypeUuid = layout.getLayoutPrototypeUuid();
+
 			if (Validator.isNotNull(layoutPrototypeUuid)) {
 				typeSettingsUnicodeProperties.setProperty(
 					"layoutPrototypeUuid", layoutPrototypeUuid);
 			}
 
+			typeSettingsUnicodeProperties.put(
+				"published", Boolean.TRUE.toString());
+
 			draftLayout.setStatus(WorkflowConstants.STATUS_APPROVED);
 
 			_layoutLocalService.updateLayout(draftLayout);
+
+			layout.setType(draftLayout.getType());
+			layout.setLayoutPrototypeUuid(null);
+			layout.setStatus(WorkflowConstants.STATUS_APPROVED);
+
+			_layoutLocalService.updateLayout(layout);
 
 			_updateLayoutRevision(layout, serviceContext);
 		}
@@ -195,10 +189,8 @@ public class PublishLayoutMVCActionCommand
 			Layout layout, ServiceContext serviceContext)
 		throws Exception {
 
-		Layout proxyLayout = _layoutLocalService.fetchLayout(layout.getPlid());
-
 		LayoutRevision layoutRevision = LayoutStagingUtil.getLayoutRevision(
-			proxyLayout);
+			layout);
 
 		if (layoutRevision == null) {
 			return;
@@ -231,7 +223,7 @@ public class PublishLayoutMVCActionCommand
 	private Portal _portal;
 
 	@Reference
-	private UserLocalService _userLocalService;
+	private PortletRegistry _portletRegistry;
 
 	@Reference
 	private WorkflowDefinitionLinkLocalService

@@ -20,6 +20,7 @@ import com.liferay.data.engine.rest.dto.v2_0.DataLayoutColumn;
 import com.liferay.data.engine.rest.dto.v2_0.DataLayoutPage;
 import com.liferay.data.engine.rest.dto.v2_0.DataLayoutRow;
 import com.liferay.dynamic.data.mapping.form.builder.rule.DDMFormRuleDeserializer;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
@@ -30,8 +31,6 @@ import com.liferay.dynamic.data.mapping.model.DDMFormRule;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -44,7 +43,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import org.powermock.api.mockito.PowerMockito;
@@ -61,7 +59,7 @@ public class DataLayoutUtilTest extends PowerMockito {
 	@Before
 	public void setUp() {
 		_setUpJSONFactoryUtil();
-		_setUpLanguageUtil();
+		_setUpLocaleUtil();
 	}
 
 	@Test
@@ -69,7 +67,7 @@ public class DataLayoutUtilTest extends PowerMockito {
 		Locale locale = LocaleUtil.US;
 
 		DDMForm ddmForm = DDMFormTestUtil.createDDMForm(
-			SetUtil.fromArray(new Locale[] {locale}), locale);
+			SetUtil.fromArray(locale), locale);
 
 		ddmForm.addDDMFormField(
 			new DDMFormField() {
@@ -198,7 +196,9 @@ public class DataLayoutUtilTest extends PowerMockito {
 		Assert.assertEquals(
 			ddmFormLayout,
 			DataLayoutUtil.toDDMFormLayout(
-				dataLayout, ddmForm, ddmFormRuleDeserializer));
+				dataLayout, ddmForm,
+				PowerMockito.mock(DDMFormFieldTypeServicesTracker.class),
+				ddmFormRuleDeserializer));
 	}
 
 	private void _setUpJSONFactoryUtil() {
@@ -207,31 +207,20 @@ public class DataLayoutUtilTest extends PowerMockito {
 		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
 	}
 
-	private void _setUpLanguageUtil() {
+	private void _setUpLocaleUtil() {
+		mockStatic(LocaleUtil.class);
+
 		when(
-			_language.getAvailableLocales()
+			LocaleUtil.fromLanguageId("en_US")
 		).thenReturn(
-			SetUtil.fromArray(LocaleUtil.US)
+			LocaleUtil.US
 		);
 
 		when(
-			_language.isAvailableLocale(Matchers.eq(LocaleUtil.US))
+			LocaleUtil.toLanguageId(LocaleUtil.US)
 		).thenReturn(
-			true
+			"en_US"
 		);
-
-		when(
-			_language.isAvailableLocale(
-				Matchers.eq(LocaleUtil.toLanguageId(LocaleUtil.US)))
-		).thenReturn(
-			true
-		);
-
-		LanguageUtil languageUtil = new LanguageUtil();
-
-		languageUtil.setLanguage(_language);
 	}
-
-	private final Language _language = Mockito.mock(Language.class);
 
 }

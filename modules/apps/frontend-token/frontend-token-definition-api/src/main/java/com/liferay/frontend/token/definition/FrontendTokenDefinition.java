@@ -14,7 +14,6 @@
 
 package com.liferay.frontend.token.definition;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
 
@@ -26,23 +25,13 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface FrontendTokenDefinition {
 
-	public default Collection<FrontendTokenCategory>
-		getFrontendTokenCategories() {
+	public Collection<FrontendTokenCategory> getFrontendTokenCategories();
 
-		return new ArrayList<>();
-	}
+	public Collection<FrontendTokenMapping> getFrontendTokenMappings();
 
-	public default Collection<FrontendTokenMapping> getFrontendTokenMappings() {
-		return new ArrayList<>();
-	}
+	public Collection<FrontendToken> getFrontendTokens();
 
-	public default Collection<FrontendToken> getFrontendTokens() {
-		return new ArrayList<>();
-	}
-
-	public default Collection<FrontendTokenSet> getFrontendTokenSets() {
-		return new ArrayList<>();
-	}
+	public Collection<FrontendTokenSet> getFrontendTokenSets();
 
 	public String getJSON(Locale locale);
 

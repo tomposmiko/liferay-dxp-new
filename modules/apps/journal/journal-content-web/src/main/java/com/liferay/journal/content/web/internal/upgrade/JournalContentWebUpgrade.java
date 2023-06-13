@@ -16,16 +16,10 @@ package com.liferay.journal.content.web.internal.upgrade;
 
 import com.liferay.journal.content.web.internal.upgrade.v1_0_0.UpgradePortletId;
 import com.liferay.journal.content.web.internal.upgrade.v1_0_0.UpgradePortletPreferences;
-import com.liferay.journal.service.JournalArticleLocalService;
-import com.liferay.portal.kernel.language.Language;
-import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
@@ -35,33 +29,11 @@ public class JournalContentWebUpgrade implements UpgradeStepRegistrator {
 
 	@Override
 	public void register(Registry registry) {
-		registry.register("0.0.0", "1.1.0", new DummyUpgradeStep());
+		registry.register("0.0.0", "1.0.0", new DummyUpgradeStep());
 
 		registry.register(
 			"0.0.1", "1.0.0", new UpgradePortletId(),
 			new UpgradePortletPreferences());
-
-		registry.register(
-			"1.0.0", "1.1.0",
-			new com.liferay.journal.content.web.internal.upgrade.v1_1_0.
-				UpgradePortletPreferences(
-					_groupLocalService, _journalArticleLocalService, _language,
-					_layoutLocalService, _portal));
 	}
-
-	@Reference
-	private GroupLocalService _groupLocalService;
-
-	@Reference
-	private JournalArticleLocalService _journalArticleLocalService;
-
-	@Reference
-	private Language _language;
-
-	@Reference
-	private LayoutLocalService _layoutLocalService;
-
-	@Reference
-	private Portal _portal;
 
 }

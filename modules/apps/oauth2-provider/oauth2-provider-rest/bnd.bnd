@@ -1,6 +1,6 @@
 Bundle-Name: Liferay OAuth2 Provider REST
 Bundle-SymbolicName: com.liferay.oauth2.provider.rest
-Bundle-Version: 3.0.43
+Bundle-Version: 4.0.14
 Import-Package:\
 	!javax.cache.*,\
 	\
@@ -31,8 +31,8 @@ Import-Package:\
 -dsannotations-options: inherit
 -includeresource:\
 	@cxf-rt-rs-extension-providers*.jar,\
+	@cxf-rt-rs-json-basic*.jar,\
 	@cxf-rt-rs-security-jose*.jar,\
 	@cxf-rt-rs-security-jose-jaxrs*.jar,\
 	@cxf-rt-rs-security-oauth2*.jar,\
-	@cxf-rt-security*.jar,\
-	@org.apache.cxf.jaxrs.json.basic*.jar
+	@cxf-rt-security*.jar

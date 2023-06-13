@@ -278,6 +278,12 @@
 		</attribute>
 		<attribute>
 			<description></description>
+			<name>itemSelectorReturnType</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description></description>
 			<name>itemSelectorSaveEvent</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
@@ -296,9 +302,8 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
-			<description></description>
+			<description>Deprecated as of 7.4.0, with no direct replacement.</description>
 			<name>pathThemeImages</name>
-			<required>true</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
@@ -310,13 +315,20 @@
 		</attribute>
 		<attribute>
 			<description></description>
-			<name>showHiddenLayouts</name>
+			<name>showDraftLayouts</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 			<type>boolean</type>
 		</attribute>
 		<attribute>
 			<description></description>
+			<name>showHiddenLayouts</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>Deprecated as of 7.4.0, with no direct replacement.</description>
 			<name>viewType</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>

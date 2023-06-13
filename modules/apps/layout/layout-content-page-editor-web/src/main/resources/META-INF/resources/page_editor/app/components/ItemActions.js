@@ -19,32 +19,66 @@ import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
 
 import {getLayoutDataItemPropTypes} from '../../prop-types/index';
-import {useDispatch, useSelector} from '../store/index';
+import {useSelectItem} from '../contexts/ControlsContext';
+import {useDispatch, useSelector} from '../contexts/StoreContext';
+import {useWidgets} from '../contexts/WidgetsContext';
 import deleteItem from '../thunks/deleteItem';
 import duplicateItem from '../thunks/duplicateItem';
 import canBeDuplicated from '../utils/canBeDuplicated';
 import canBeRemoved from '../utils/canBeRemoved';
 import canBeSaved from '../utils/canBeSaved';
-import {useSelectItem} from './Controls';
+import updateItemStyle from '../utils/updateItemStyle';
 import SaveFragmentCompositionModal from './SaveFragmentCompositionModal';
-import {useWidgets} from './WidgetsContext';
 
 export default function ItemActions({item}) {
 	const [active, setActive] = useState(false);
 	const dispatch = useDispatch();
 	const selectItem = useSelectItem();
-	const state = useSelector((state) => state);
 	const widgets = useWidgets();
 
-	const {fragmentEntryLinks, layoutData, segmentsExperienceId} = state;
+	const {
+		fragmentEntryLinks,
+		layoutData,
+		segmentsExperienceId,
+		selectedViewportSize,
+	} = useSelector((state) => state);
 
 	const [openSaveModal, setOpenSaveModal] = useState(false);
 
-	const itemActions = useMemo(() => {
-		const actions = [];
+	const dropdownItems = useMemo(() => {
+		const items = [];
+
+		items.push({
+			action: () => {
+				updateItemStyle({
+					dispatch,
+					itemId: item.itemId,
+					segmentsExperienceId,
+					selectedViewportSize,
+					styleName: 'display',
+					styleValue: 'none',
+				});
+			},
+			icon: 'hidden',
+			label: Liferay.Language.get('hide-fragment'),
+		});
+
+		if (canBeSaved(item, layoutData)) {
+			items.push({
+				action: () => setOpenSaveModal(true),
+				icon: 'disk',
+				label: Liferay.Language.get('save-composition'),
+			});
+		}
+
+		if (items.length) {
+			items.push({
+				type: 'separator',
+			});
+		}
 
 		if (canBeDuplicated(fragmentEntryLinks, item, layoutData, widgets)) {
-			actions.push({
+			items.push({
 				action: () =>
 					dispatch(
 						duplicateItem({
@@ -56,24 +90,19 @@ export default function ItemActions({item}) {
 				icon: 'paste',
 				label: Liferay.Language.get('duplicate'),
 			});
-		}
 
-		if (canBeSaved(item, layoutData)) {
-			actions.push({
-				action: () => setOpenSaveModal(true),
-				icon: 'disk',
-				label: Liferay.Language.get('save-composition'),
+			items.push({
+				type: 'separator',
 			});
 		}
 
 		if (canBeRemoved(item, layoutData)) {
-			actions.push({
+			items.push({
 				action: () =>
 					dispatch(
 						deleteItem({
 							itemId: item.itemId,
 							selectItem,
-							store: state,
 						})
 					),
 				icon: 'times-circle',
@@ -81,23 +110,32 @@ export default function ItemActions({item}) {
 			});
 		}
 
-		return actions;
+		return items;
 	}, [
 		dispatch,
 		fragmentEntryLinks,
 		item,
 		layoutData,
 		segmentsExperienceId,
+		selectedViewportSize,
 		selectItem,
-		state,
 		widgets,
 	]);
 
-	return itemActions?.length ? (
+	if (!dropdownItems.length) {
+		return null;
+	}
+
+	return (
 		<>
 			<ClayDropDown
 				active={active}
 				alignmentPosition={Align.BottomRight}
+				menuElementAttrs={{
+					containerProps: {
+						className: 'cadmin',
+					},
+				}}
 				onActiveChange={setActive}
 				trigger={
 					<ClayButton
@@ -113,21 +151,28 @@ export default function ItemActions({item}) {
 				}
 			>
 				<ClayDropDown.ItemList>
-					{itemActions.map((itemAction) => (
-						<ClayDropDown.Item
-							key={itemAction.label}
-							onClick={() => {
-								setActive(false);
+					{dropdownItems.map((dropdownItem, index, array) =>
+						dropdownItem.type === 'separator' ? (
+							index !== array.length - 1 && (
+								<ClayDropDown.Divider key={index} />
+							)
+						) : (
+							<React.Fragment key={index}>
+								<ClayDropDown.Item
+									onClick={() => {
+										setActive(false);
 
-								itemAction.action();
-							}}
-							symbolLeft={itemAction.icon}
-						>
-							<p className="d-inline-block m-0 ml-4">
-								{itemAction.label}
-							</p>
-						</ClayDropDown.Item>
-					))}
+										dropdownItem.action();
+									}}
+									symbolLeft={dropdownItem.icon}
+								>
+									<p className="d-inline-block m-0 ml-4">
+										{dropdownItem.label}
+									</p>
+								</ClayDropDown.Item>
+							</React.Fragment>
+						)
+					)}
 				</ClayDropDown.ItemList>
 			</ClayDropDown>
 
@@ -137,7 +182,7 @@ export default function ItemActions({item}) {
 				/>
 			)}
 		</>
-	) : null;
+	);
 }
 
 ItemActions.propTypes = {

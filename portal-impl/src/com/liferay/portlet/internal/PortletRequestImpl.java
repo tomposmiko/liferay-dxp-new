@@ -532,13 +532,13 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 			return _portletSessionImpl.getId();
 		}
 
-		HttpSession session = _httpServletRequest.getSession(false);
+		HttpSession httpSession = _httpServletRequest.getSession(false);
 
-		if (session == null) {
+		if (httpSession == null) {
 			return StringPool.BLANK;
 		}
 
-		return session.getId();
+		return httpSession.getId();
 	}
 
 	@Override
@@ -628,6 +628,9 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 						themeDisplay.getCompanyId(), portletResource);
 				}
 				catch (Exception exception) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(exception, exception);
+					}
 				}
 
 				if (resourcePortlet != null) {

@@ -49,6 +49,17 @@ public class CPOptionValueServiceUtil {
 			cpOptionId, titleMap, priority, key, serviceContext);
 	}
 
+	public static CPOptionValue addOrUpdateCPOptionValue(
+			String externalReferenceCode, long cpOptionId,
+			Map<java.util.Locale, String> nameMap, double priority, String key,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addOrUpdateCPOptionValue(
+			externalReferenceCode, cpOptionId, nameMap, priority, key,
+			serviceContext);
+	}
+
 	public static void deleteCPOptionValue(long cpOptionValueId)
 		throws PortalException {
 
@@ -56,11 +67,11 @@ public class CPOptionValueServiceUtil {
 	}
 
 	public static CPOptionValue fetchByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
+			String externalReferenceCode, long companyId)
 		throws PortalException {
 
 		return getService().fetchByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	public static CPOptionValue fetchCPOptionValue(long cpOptionValueId)
@@ -97,6 +108,24 @@ public class CPOptionValueServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
+	public static com.liferay.portal.kernel.search.BaseModelSearchResult
+		<CPOptionValue> searchCPOptionValues(
+				long companyId, long cpOptionId, String keywords, int start,
+				int end, com.liferay.portal.kernel.search.Sort[] sorts)
+			throws PortalException {
+
+		return getService().searchCPOptionValues(
+			companyId, cpOptionId, keywords, start, end, sorts);
+	}
+
+	public static int searchCPOptionValuesCount(
+			long companyId, long cpOptionId, String keywords)
+		throws PortalException {
+
+		return getService().searchCPOptionValuesCount(
+			companyId, cpOptionId, keywords);
+	}
+
 	public static CPOptionValue updateCPOptionValue(
 			long cpOptionValueId, Map<java.util.Locale, String> titleMap,
 			double priority, String key,
@@ -105,17 +134,6 @@ public class CPOptionValueServiceUtil {
 
 		return getService().updateCPOptionValue(
 			cpOptionValueId, titleMap, priority, key, serviceContext);
-	}
-
-	public static CPOptionValue upsertCPOptionValue(
-			long cpOptionId, Map<java.util.Locale, String> nameMap,
-			double priority, String key, String externalReferenceCode,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		return getService().upsertCPOptionValue(
-			cpOptionId, nameMap, priority, key, externalReferenceCode,
-			serviceContext);
 	}
 
 	public static CPOptionValueService getService() {

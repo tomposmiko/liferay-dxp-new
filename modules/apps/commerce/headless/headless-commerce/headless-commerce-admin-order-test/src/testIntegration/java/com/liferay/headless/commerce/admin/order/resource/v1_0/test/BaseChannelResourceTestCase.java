@@ -47,26 +47,25 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
+
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -196,25 +195,140 @@ public abstract class BaseChannelResourceTestCase {
 	}
 
 	@Test
+	public void testGetOrderRuleChannelChannel() throws Exception {
+		Channel postChannel = testGetOrderRuleChannelChannel_addChannel();
+
+		Channel getChannel = channelResource.getOrderRuleChannelChannel(null);
+
+		assertEquals(postChannel, getChannel);
+		assertValid(getChannel);
+	}
+
+	protected Channel testGetOrderRuleChannelChannel_addChannel()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetOrderRuleChannelChannel() throws Exception {
+		Channel channel = testGraphQLChannel_addChannel();
+
+		Assert.assertTrue(
+			equals(
+				channel,
+				ChannelSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"orderRuleChannelChannel",
+								new HashMap<String, Object>() {
+									{
+										put("orderRuleChannelId", null);
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data", "Object/orderRuleChannelChannel"))));
+	}
+
+	@Test
+	public void testGraphQLGetOrderRuleChannelChannelNotFound()
+		throws Exception {
+
+		Long irrelevantOrderRuleChannelId = RandomTestUtil.randomLong();
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"orderRuleChannelChannel",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"orderRuleChannelId",
+									irrelevantOrderRuleChannelId);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	@Test
+	public void testGetOrderTypeChannelChannel() throws Exception {
+		Channel postChannel = testGetOrderTypeChannelChannel_addChannel();
+
+		Channel getChannel = channelResource.getOrderTypeChannelChannel(null);
+
+		assertEquals(postChannel, getChannel);
+		assertValid(getChannel);
+	}
+
+	protected Channel testGetOrderTypeChannelChannel_addChannel()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testGraphQLGetOrderTypeChannelChannel() throws Exception {
+		Channel channel = testGraphQLChannel_addChannel();
+
+		Assert.assertTrue(
+			equals(
+				channel,
+				ChannelSerDes.toDTO(
+					JSONUtil.getValueAsString(
+						invokeGraphQLQuery(
+							new GraphQLField(
+								"orderTypeChannelChannel",
+								new HashMap<String, Object>() {
+									{
+										put("orderTypeChannelId", null);
+									}
+								},
+								getGraphQLFields())),
+						"JSONObject/data", "Object/orderTypeChannelChannel"))));
+	}
+
+	@Test
+	public void testGraphQLGetOrderTypeChannelChannelNotFound()
+		throws Exception {
+
+		Long irrelevantOrderTypeChannelId = RandomTestUtil.randomLong();
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"orderTypeChannelChannel",
+						new HashMap<String, Object>() {
+							{
+								put(
+									"orderTypeChannelId",
+									irrelevantOrderTypeChannelId);
+							}
+						},
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
+	}
+
+	@Test
 	public void testGetOrderByExternalReferenceCodeChannel() throws Exception {
 		Channel postChannel =
 			testGetOrderByExternalReferenceCodeChannel_addChannel();
 
 		Channel getChannel =
 			channelResource.getOrderByExternalReferenceCodeChannel(
-				testGetOrderByExternalReferenceCodeChannel_getExternalReferenceCode(
-					postChannel));
+				postChannel.getExternalReferenceCode());
 
 		assertEquals(postChannel, getChannel);
 		assertValid(getChannel);
-	}
-
-	protected String
-			testGetOrderByExternalReferenceCodeChannel_getExternalReferenceCode(
-				Channel channel)
-		throws Exception {
-
-		return channel.getExternalReferenceCode();
 	}
 
 	protected Channel testGetOrderByExternalReferenceCodeChannel_addChannel()
@@ -228,8 +342,7 @@ public abstract class BaseChannelResourceTestCase {
 	public void testGraphQLGetOrderByExternalReferenceCodeChannel()
 		throws Exception {
 
-		Channel channel =
-			testGraphQLGetOrderByExternalReferenceCodeChannel_addChannel();
+		Channel channel = testGraphQLChannel_addChannel();
 
 		Assert.assertTrue(
 			equals(
@@ -244,21 +357,14 @@ public abstract class BaseChannelResourceTestCase {
 										put(
 											"externalReferenceCode",
 											"\"" +
-												testGraphQLGetOrderByExternalReferenceCodeChannel_getExternalReferenceCode(
-													channel) + "\"");
+												channel.
+													getExternalReferenceCode() +
+														"\"");
 									}
 								},
 								getGraphQLFields())),
 						"JSONObject/data",
 						"Object/orderByExternalReferenceCodeChannel"))));
-	}
-
-	protected String
-			testGraphQLGetOrderByExternalReferenceCodeChannel_getExternalReferenceCode(
-				Channel channel)
-		throws Exception {
-
-		return channel.getExternalReferenceCode();
 	}
 
 	@Test
@@ -286,28 +392,15 @@ public abstract class BaseChannelResourceTestCase {
 				"Object/code"));
 	}
 
-	protected Channel
-			testGraphQLGetOrderByExternalReferenceCodeChannel_addChannel()
-		throws Exception {
-
-		return testGraphQLChannel_addChannel();
-	}
-
 	@Test
 	public void testGetOrderIdChannel() throws Exception {
 		Channel postChannel = testGetOrderIdChannel_addChannel();
 
 		Channel getChannel = channelResource.getOrderIdChannel(
-			testGetOrderIdChannel_getId(postChannel));
+			postChannel.getId());
 
 		assertEquals(postChannel, getChannel);
 		assertValid(getChannel);
-	}
-
-	protected Long testGetOrderIdChannel_getId(Channel channel)
-		throws Exception {
-
-		return channel.getId();
 	}
 
 	protected Channel testGetOrderIdChannel_addChannel() throws Exception {
@@ -317,7 +410,7 @@ public abstract class BaseChannelResourceTestCase {
 
 	@Test
 	public void testGraphQLGetOrderIdChannel() throws Exception {
-		Channel channel = testGraphQLGetOrderIdChannel_addChannel();
+		Channel channel = testGraphQLChannel_addChannel();
 
 		Assert.assertTrue(
 			equals(
@@ -329,20 +422,11 @@ public abstract class BaseChannelResourceTestCase {
 								"orderIdChannel",
 								new HashMap<String, Object>() {
 									{
-										put(
-											"id",
-											testGraphQLGetOrderIdChannel_getId(
-												channel));
+										put("id", channel.getId());
 									}
 								},
 								getGraphQLFields())),
 						"JSONObject/data", "Object/orderIdChannel"))));
-	}
-
-	protected Long testGraphQLGetOrderIdChannel_getId(Channel channel)
-		throws Exception {
-
-		return channel.getId();
 	}
 
 	@Test
@@ -363,12 +447,6 @@ public abstract class BaseChannelResourceTestCase {
 						getGraphQLFields())),
 				"JSONArray/errors", "Object/0", "JSONObject/extensions",
 				"Object/code"));
-	}
-
-	protected Channel testGraphQLGetOrderIdChannel_addChannel()
-		throws Exception {
-
-		return testGraphQLChannel_addChannel();
 	}
 
 	protected Channel testGraphQLChannel_addChannel() throws Exception {
@@ -491,12 +569,6 @@ public abstract class BaseChannelResourceTestCase {
 	}
 
 	protected void assertValid(Page<Channel> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<Channel> page, Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<Channel> channels = page.getItems();
@@ -511,20 +583,6 @@ public abstract class BaseChannelResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -682,16 +740,14 @@ public abstract class BaseChannelResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -708,10 +764,6 @@ public abstract class BaseChannelResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -721,18 +773,18 @@ public abstract class BaseChannelResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -855,115 +907,6 @@ public abstract class BaseChannelResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -1038,6 +981,18 @@ public abstract class BaseChannelResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseChannelResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

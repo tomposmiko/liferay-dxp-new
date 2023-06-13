@@ -22,11 +22,11 @@
 	<clay:sheet-section>
 		<h3 class="sheet-subtitle"><liferay-ui:message key="pages" /></h3>
 
-		<ul class="flex-container layout-selector" id="<portlet:namespace />pages">
-			<c:if test="<%= !disableInputs || LayoutStagingUtil.isBranchingLayoutSet(selectPagesGroup, selectPagesPrivateLayout) %>">
+		<ul class="d-flex flex-wrap layout-selector" id="<portlet:namespace />pages">
+			<c:if test="<%= (!disableInputs && selectPagesGroup.isPrivateLayoutsEnabled()) || LayoutStagingUtil.isBranchingLayoutSet(selectPagesGroup, selectPagesPrivateLayout) %>">
 				<li class="layout-selector-options">
 					<aui:fieldset label="pages-options">
-						<c:if test="<%= !disableInputs %>">
+						<c:if test="<%= !disableInputs && selectPagesGroup.isPrivateLayoutsEnabled() %>">
 							<c:choose>
 								<c:when test="<%= selectPagesPrivateLayout %>">
 									<aui:button id="changeToPublicLayoutsButton" value="change-to-public-pages" />
@@ -80,7 +80,22 @@
 			</c:if>
 
 			<li class="layout-selector-options">
-				<aui:fieldset helpMessage="child-page-publication-warning" label='<%= "pages-to-" + action %>'>
+
+				<%
+				String childPageHelpMessage = "child-page-export-process-warning";
+
+				if (action.equals(Constants.PUBLISH)) {
+					childPageHelpMessage = "child-page-publish-process-warning";
+
+					StagingConfiguration stagingConfiguration = ConfigurationProviderUtil.getCompanyConfiguration(StagingConfiguration.class, company.getCompanyId());
+
+					if (!stagingConfiguration.publishParentLayoutsByDefault()) {
+						childPageHelpMessage = null;
+					}
+				}
+				%>
+
+				<aui:fieldset helpMessage="<%= childPageHelpMessage %>" label='<%= "pages-to-" + action %>'>
 					<c:choose>
 						<c:when test="<%= disableInputs %>">
 							<liferay-util:buffer
@@ -178,7 +193,7 @@
 		</ul>
 
 		<c:if test="<%= action.equals(Constants.PUBLISH) %>">
-			<ul class="deletions flex-container layout-selector" id="<portlet:namespace />pagedeletions">
+			<ul class="d-flex deletions flex-wrap layout-selector" id="<portlet:namespace />pagedeletions">
 				<li class="layout-selector-options">
 					<aui:fieldset label="page-deletions">
 

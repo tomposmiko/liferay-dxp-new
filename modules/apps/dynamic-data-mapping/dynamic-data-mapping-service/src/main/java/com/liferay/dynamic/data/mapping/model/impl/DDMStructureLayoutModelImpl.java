@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -335,121 +336,143 @@ public class DDMStructureLayoutModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, DDMStructureLayout>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DDMStructureLayout.class.getClassLoader(), DDMStructureLayout.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<DDMStructureLayout> constructor =
+				(Constructor<DDMStructureLayout>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<DDMStructureLayout, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DDMStructureLayout, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<DDMStructureLayout, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<DDMStructureLayout, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", DDMStructureLayout::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", DDMStructureLayout::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", DDMStructureLayout::getUuid);
-		attributeGetterFunctions.put(
-			"structureLayoutId", DDMStructureLayout::getStructureLayoutId);
-		attributeGetterFunctions.put("groupId", DDMStructureLayout::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", DDMStructureLayout::getCompanyId);
-		attributeGetterFunctions.put("userId", DDMStructureLayout::getUserId);
-		attributeGetterFunctions.put(
-			"userName", DDMStructureLayout::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", DDMStructureLayout::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", DDMStructureLayout::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", DDMStructureLayout::getClassNameId);
-		attributeGetterFunctions.put(
-			"structureLayoutKey", DDMStructureLayout::getStructureLayoutKey);
-		attributeGetterFunctions.put(
-			"structureVersionId", DDMStructureLayout::getStructureVersionId);
-		attributeGetterFunctions.put("name", DDMStructureLayout::getName);
-		attributeGetterFunctions.put(
-			"description", DDMStructureLayout::getDescription);
-		attributeGetterFunctions.put(
-			"definition", DDMStructureLayout::getDefinition);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<DDMStructureLayout, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<DDMStructureLayout, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<DDMStructureLayout, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", DDMStructureLayout::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DDMStructureLayout, Long>)
 				DDMStructureLayout::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", DDMStructureLayout::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<DDMStructureLayout, Long>)
 				DDMStructureLayout::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", DDMStructureLayout::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<DDMStructureLayout, String>)
 				DDMStructureLayout::setUuid);
+		attributeGetterFunctions.put(
+			"structureLayoutId", DDMStructureLayout::getStructureLayoutId);
 		attributeSetterBiConsumers.put(
 			"structureLayoutId",
 			(BiConsumer<DDMStructureLayout, Long>)
 				DDMStructureLayout::setStructureLayoutId);
+		attributeGetterFunctions.put("groupId", DDMStructureLayout::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<DDMStructureLayout, Long>)
 				DDMStructureLayout::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", DDMStructureLayout::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DDMStructureLayout, Long>)
 				DDMStructureLayout::setCompanyId);
+		attributeGetterFunctions.put("userId", DDMStructureLayout::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<DDMStructureLayout, Long>)
 				DDMStructureLayout::setUserId);
+		attributeGetterFunctions.put(
+			"userName", DDMStructureLayout::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<DDMStructureLayout, String>)
 				DDMStructureLayout::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", DDMStructureLayout::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<DDMStructureLayout, Date>)
 				DDMStructureLayout::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", DDMStructureLayout::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<DDMStructureLayout, Date>)
 				DDMStructureLayout::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", DDMStructureLayout::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<DDMStructureLayout, Long>)
 				DDMStructureLayout::setClassNameId);
+		attributeGetterFunctions.put(
+			"structureLayoutKey", DDMStructureLayout::getStructureLayoutKey);
 		attributeSetterBiConsumers.put(
 			"structureLayoutKey",
 			(BiConsumer<DDMStructureLayout, String>)
 				DDMStructureLayout::setStructureLayoutKey);
+		attributeGetterFunctions.put(
+			"structureVersionId", DDMStructureLayout::getStructureVersionId);
 		attributeSetterBiConsumers.put(
 			"structureVersionId",
 			(BiConsumer<DDMStructureLayout, Long>)
 				DDMStructureLayout::setStructureVersionId);
+		attributeGetterFunctions.put("name", DDMStructureLayout::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<DDMStructureLayout, String>)
 				DDMStructureLayout::setName);
+		attributeGetterFunctions.put(
+			"description", DDMStructureLayout::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<DDMStructureLayout, String>)
 				DDMStructureLayout::setDescription);
+		attributeGetterFunctions.put(
+			"definition", DDMStructureLayout::getDefinition);
 		attributeSetterBiConsumers.put(
 			"definition",
 			(BiConsumer<DDMStructureLayout, String>)
 				DDMStructureLayout::setDefinition);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -1188,6 +1211,47 @@ public class DDMStructureLayoutModelImpl
 	}
 
 	@Override
+	public DDMStructureLayout cloneWithOriginalValues() {
+		DDMStructureLayoutImpl ddmStructureLayoutImpl =
+			new DDMStructureLayoutImpl();
+
+		ddmStructureLayoutImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		ddmStructureLayoutImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		ddmStructureLayoutImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		ddmStructureLayoutImpl.setStructureLayoutId(
+			this.<Long>getColumnOriginalValue("structureLayoutId"));
+		ddmStructureLayoutImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		ddmStructureLayoutImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		ddmStructureLayoutImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		ddmStructureLayoutImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		ddmStructureLayoutImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		ddmStructureLayoutImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		ddmStructureLayoutImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		ddmStructureLayoutImpl.setStructureLayoutKey(
+			this.<String>getColumnOriginalValue("structureLayoutKey"));
+		ddmStructureLayoutImpl.setStructureVersionId(
+			this.<Long>getColumnOriginalValue("structureVersionId"));
+		ddmStructureLayoutImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		ddmStructureLayoutImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		ddmStructureLayoutImpl.setDefinition(
+			this.<String>getColumnOriginalValue("definition"));
+
+		return ddmStructureLayoutImpl;
+	}
+
+	@Override
 	public int compareTo(DDMStructureLayout ddmStructureLayout) {
 		long primaryKey = ddmStructureLayout.getPrimaryKey();
 
@@ -1441,9 +1505,7 @@ public class DDMStructureLayoutModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DDMStructureLayout>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DDMStructureLayout.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

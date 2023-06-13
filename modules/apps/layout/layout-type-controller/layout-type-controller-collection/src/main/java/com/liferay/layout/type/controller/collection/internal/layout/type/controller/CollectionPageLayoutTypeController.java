@@ -14,8 +14,6 @@
 
 package com.liferay.layout.type.controller.collection.internal.layout.type.controller;
 
-import com.liferay.fragment.constants.FragmentActionKeys;
-import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorWebKeys;
 import com.liferay.layout.type.controller.BaseLayoutTypeControllerImpl;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
@@ -31,6 +29,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
+import com.liferay.portal.kernel.servlet.PipingServletResponse;
 import com.liferay.portal.kernel.servlet.TransferHeadersHelperUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
@@ -39,7 +38,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.taglib.servlet.PipingServletResponse;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -89,7 +87,7 @@ public class CollectionPageLayoutTypeController
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		if (layout.getClassNameId() == _portal.getClassNameId(Layout.class)) {
+		if (layout.isDraftLayout()) {
 			Layout curLayout = _layoutLocalService.fetchLayout(
 				layout.getClassPK());
 
@@ -115,10 +113,6 @@ public class CollectionPageLayoutTypeController
 
 			layoutMode = Constants.VIEW;
 		}
-
-		httpServletRequest.setAttribute(
-			FragmentActionKeys.FRAGMENT_RENDERER_CONTROLLER,
-			_fragmentRendererController);
 
 		String page = getViewPage();
 
@@ -301,9 +295,6 @@ public class CollectionPageLayoutTypeController
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CollectionPageLayoutTypeController.class);
-
-	@Reference
-	private FragmentRendererController _fragmentRendererController;
 
 	@Reference
 	private Http _http;

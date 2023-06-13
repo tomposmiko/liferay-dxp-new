@@ -36,7 +36,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.odata.entity.BooleanEntityField;
 import com.liferay.portal.odata.entity.DateTimeEntityField;
@@ -112,7 +112,8 @@ public class UserExpandoColumnModelListener
 	}
 
 	@Override
-	public void onAfterUpdate(ExpandoColumn expandoColumn)
+	public void onAfterUpdate(
+			ExpandoColumn originalExpandoColumn, ExpandoColumn expandoColumn)
 		throws ModelListenerException {
 
 		if (expandoColumn == null) {
@@ -278,11 +279,8 @@ public class UserExpandoColumnModelListener
 		ExpandoTable expandoTable = _expandoTableLocalService.getTable(
 			expandoColumn.getTableId());
 
-		if (expandoTable.getClassNameId() != userClassNameId) {
-			return false;
-		}
-
-		if (!ExpandoTableConstants.DEFAULT_TABLE_NAME.equals(
+		if ((expandoTable.getClassNameId() != userClassNameId) ||
+			!ExpandoTableConstants.DEFAULT_TABLE_NAME.equals(
 				expandoTable.getName())) {
 
 			return false;
@@ -298,11 +296,9 @@ public class UserExpandoColumnModelListener
 		return bundleContext.registerService(
 			EntityModel.class,
 			new UserEntityModel(new ArrayList<>(userEntityFieldsMap.values())),
-			new HashMapDictionary<String, Object>() {
-				{
-					put("entity.model.name", UserEntityModel.NAME);
-				}
-			});
+			HashMapDictionaryBuilder.<String, Object>put(
+				"entity.model.name", UserEntityModel.NAME
+			).build());
 	}
 
 	private void _unregister(

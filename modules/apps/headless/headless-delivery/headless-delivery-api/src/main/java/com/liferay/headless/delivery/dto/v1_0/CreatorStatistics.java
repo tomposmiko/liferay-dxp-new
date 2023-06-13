@@ -62,7 +62,7 @@ public class CreatorStatistics implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(CreatorStatistics.class, json);
 	}
 
-	@Schema(description = "Join date of the author")
+	@Schema(description = "Join date of the author.")
 	public Date getJoinDate() {
 		return joinDate;
 	}
@@ -86,11 +86,11 @@ public class CreatorStatistics implements Serializable {
 		}
 	}
 
-	@GraphQLField(description = "Join date of the author")
+	@GraphQLField(description = "Join date of the author.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date joinDate;
 
-	@Schema(description = "Last post created by the author")
+	@Schema(description = "Last post created by the author.")
 	public Date getLastPostDate() {
 		return lastPostDate;
 	}
@@ -114,7 +114,7 @@ public class CreatorStatistics implements Serializable {
 		}
 	}
 
-	@GraphQLField(description = "Last post created by the author")
+	@GraphQLField(description = "Last post created by the author.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date lastPostDate;
 

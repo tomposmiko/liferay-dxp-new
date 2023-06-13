@@ -14,11 +14,9 @@ import ClayButton from '@clayui/button';
 import {ClayInput} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import ClayModal from '@clayui/modal';
-import {useIsMounted} from 'frontend-js-react-web';
+import {useIsMounted} from '@liferay/frontend-js-react-web';
 import {fetch} from 'frontend-js-web';
 import React, {useState} from 'react';
-
-import {DEFAULT_HEADERS} from '../utils/fetch/fetch_data';
 
 const VALID_EXTENSIONS = '.json';
 
@@ -47,55 +45,57 @@ const ImportSXPBlueprintModal = ({redirectURL}) => {
 		setImportFile(event.target.files[0]);
 	};
 
-	const _handleSubmit = () => {
+	const _handleSubmit = async () => {
 		setLoadingResponse(true);
 
+		const importText = await new Response(importFile).text();
+
 		try {
-			new Response(importFile).text().then((importText) => {
-				const isElement = !!JSON.parse(importText).elementDefinition;
+			const isElement = !!JSON.parse(importText).elementDefinition;
 
-				const fetchURL = isElement
-					? '/o/search-experiences-rest/v1.0/sxp-elements'
-					: '/o/search-experiences-rest/v1.0/sxp-blueprints';
+			const fetchURL = isElement
+				? '/o/search-experiences-rest/v1.0/sxp-elements'
+				: '/o/search-experiences-rest/v1.0/sxp-blueprints';
 
-				fetch(fetchURL, {
-					body: importText,
-					headers: DEFAULT_HEADERS,
-					method: 'POST',
+			fetch(fetchURL, {
+				body: importText,
+				headers: new Headers({
+					'Content-Type': 'application/json',
+				}),
+				method: 'POST',
+			})
+				.then((response) => {
+					return response.json().then((data) => ({
+						ok: response.ok,
+						responseContent: data,
+					}));
 				})
-					.then((response) => {
-						return response.json().then((data) => ({
-							ok: response.ok,
-							responseContent: data,
-						}));
-					})
-					.then(({ok, responseContent}) => {
-						if (!ok) {
-							_handleFormError(
-								isElement
-									? Liferay.Language.get(
-											'unable-to-import-because-the-element-configuration-is-invalid'
-									  )
-									: Liferay.Language.get(
-											'unable-to-import-because-the-blueprint-configuration-is-invalid'
-									  )
-							);
+				.then(({ok, responseContent}) => {
+					if (!ok) {
+						_handleFormError(
+							isElement
+								? Liferay.Language.get(
+										'unable-to-import-because-the-element-configuration-is-invalid'
+								  )
+								: Liferay.Language.get(
+										'unable-to-import-because-the-blueprint-configuration-is-invalid'
+								  )
+						);
 
-							if (process.env.NODE_ENV === 'development') {
-								console.error(responseContent.title);
-							}
+						if (process.env.NODE_ENV === 'development') {
+							console.error(responseContent.title);
 						}
+					}
 
-						setLoadingResponse(false);
+					setLoadingResponse(false);
 
-						if (ok && isMounted()) {
-							_handleClose({redirect: redirectURL});
-						}
-					})
-					.catch(() => {
-						_handleFormError();
-					});
-			});
+					if (ok && isMounted()) {
+						_handleClose({redirect: redirectURL});
+					}
+				})
+				.catch(() => {
+					_handleFormError();
+				});
 		}
 		catch {
 			_handleFormError();
@@ -103,7 +103,7 @@ const ImportSXPBlueprintModal = ({redirectURL}) => {
 	};
 
 	return (
-		<div className="sxp-import-modal-root">
+		<div className="import-sxp-blueprint-form">
 			<ClayModal.Body>
 				{errorMessage && (
 					<ClayAlert

@@ -24,7 +24,6 @@ import com.liferay.bookmarks.service.persistence.BookmarksEntryUtil;
 import com.liferay.bookmarks.service.persistence.impl.constants.BookmarksPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -36,15 +35,14 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -61,17 +59,13 @@ import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -87,7 +81,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = BookmarksEntryPersistence.class)
+@Component(service = {BookmarksEntryPersistence.class, BasePersistence.class})
 public class BookmarksEntryPersistenceImpl
 	extends BasePersistenceImpl<BookmarksEntry>
 	implements BookmarksEntryPersistence {
@@ -204,7 +198,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -587,7 +581,7 @@ public class BookmarksEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -717,7 +711,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof BookmarksEntry) {
@@ -828,7 +822,7 @@ public class BookmarksEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, groupId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -994,7 +988,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -1410,7 +1404,7 @@ public class BookmarksEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1569,7 +1563,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -1928,7 +1922,7 @@ public class BookmarksEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -2072,7 +2066,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -2997,7 +2991,7 @@ public class BookmarksEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param start the lower bound of the range of bookmarks entries
 	 * @param end the upper bound of the range of bookmarks entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -3044,7 +3038,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_F, finderArgs, this);
+				_finderPathWithPaginationFindByG_F, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -3154,7 +3148,7 @@ public class BookmarksEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, folderId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3216,7 +3210,7 @@ public class BookmarksEntryPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByG_F, finderArgs, this);
+			_finderPathWithPaginationCountByG_F, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -3504,7 +3498,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -4240,7 +4234,7 @@ public class BookmarksEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, status};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -4432,7 +4426,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -5168,7 +5162,7 @@ public class BookmarksEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, status};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -5360,7 +5354,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -5750,7 +5744,7 @@ public class BookmarksEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, status};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -5907,7 +5901,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -6681,7 +6675,7 @@ public class BookmarksEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, userId, status};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -6892,7 +6886,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -7666,7 +7660,7 @@ public class BookmarksEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, userId, status};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -7889,7 +7883,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -8867,7 +8861,7 @@ public class BookmarksEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param status the status
 	 * @param start the lower bound of the range of bookmarks entries
 	 * @param end the upper bound of the range of bookmarks entries (not inclusive)
@@ -8915,7 +8909,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_F_S, finderArgs, this);
+				_finderPathWithPaginationFindByG_F_S, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -9034,7 +9028,7 @@ public class BookmarksEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, folderId, status};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -9101,7 +9095,7 @@ public class BookmarksEntryPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByG_F_S, finderArgs, this);
+			_finderPathWithPaginationCountByG_F_S, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -9407,7 +9401,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -10387,7 +10381,7 @@ public class BookmarksEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param status the status
 	 * @param start the lower bound of the range of bookmarks entries
 	 * @param end the upper bound of the range of bookmarks entries (not inclusive)
@@ -10435,7 +10429,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_F_NotS, finderArgs, this);
+				_finderPathWithPaginationFindByG_F_NotS, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -10555,7 +10549,7 @@ public class BookmarksEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, folderId, status};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -10622,7 +10616,7 @@ public class BookmarksEntryPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByG_F_NotS, finderArgs, this);
+			_finderPathWithPaginationCountByG_F_NotS, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -10950,7 +10944,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -11981,7 +11975,7 @@ public class BookmarksEntryPersistenceImpl
 	 *
 	 * @param groupId the group ID
 	 * @param userId the user ID
-	 * @param folderIds the folder IDs
+	 * @param folderId the folder ID
 	 * @param status the status
 	 * @param start the lower bound of the range of bookmarks entries
 	 * @param end the upper bound of the range of bookmarks entries (not inclusive)
@@ -12030,7 +12024,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_U_F_S, finderArgs, this);
+				_finderPathWithPaginationFindByG_U_F_S, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BookmarksEntry bookmarksEntry : list) {
@@ -12161,7 +12155,7 @@ public class BookmarksEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, userId, folderId, status};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(5);
@@ -12235,7 +12229,7 @@ public class BookmarksEntryPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByG_U_F_S, finderArgs, this);
+			_finderPathWithPaginationCountByG_U_F_S, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -12535,9 +12529,7 @@ public class BookmarksEntryPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(BookmarksEntryImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(BookmarksEntryImpl.class);
 	}
 
 	/**
@@ -12561,9 +12553,7 @@ public class BookmarksEntryPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(BookmarksEntryImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(BookmarksEntryImpl.class, primaryKey);
@@ -12578,10 +12568,9 @@ public class BookmarksEntryPersistenceImpl
 			bookmarksEntryModelImpl.getGroupId()
 		};
 
+		finderCache.putResult(_finderPathCountByUUID_G, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathCountByUUID_G, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByUUID_G, args, bookmarksEntryModelImpl, false);
+			_finderPathFetchByUUID_G, args, bookmarksEntryModelImpl);
 	}
 
 	/**
@@ -12912,7 +12901,7 @@ public class BookmarksEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BookmarksEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -12982,7 +12971,7 @@ public class BookmarksEntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -13037,30 +13026,23 @@ public class BookmarksEntryPersistenceImpl
 	 * Initializes the bookmarks entry persistence.
 	 */
 	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class, new BookmarksEntryModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", BookmarksEntry.class.getName()));
-
+	public void activate() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByUuid = _createFinderPath(
+		_finderPathWithPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
@@ -13068,27 +13050,27 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"uuid_"}, true);
 
-		_finderPathWithoutPaginationFindByUuid = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			true);
 
-		_finderPathCountByUuid = _createFinderPath(
+		_finderPathCountByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			false);
 
-		_finderPathFetchByUUID_G = _createFinderPath(
+		_finderPathFetchByUUID_G = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "groupId"}, true);
 
-		_finderPathCountByUUID_G = _createFinderPath(
+		_finderPathCountByUUID_G = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "groupId"}, false);
 
-		_finderPathWithPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -13097,17 +13079,17 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathWithoutPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathCountByUuid_C = _createFinderPath(
+		_finderPathCountByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
 
-		_finderPathWithPaginationFindByCompanyId = _createFinderPath(
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -13115,17 +13097,17 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"companyId"}, true);
 
-		_finderPathWithoutPaginationFindByCompanyId = _createFinderPath(
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			true);
 
-		_finderPathCountByCompanyId = _createFinderPath(
+		_finderPathCountByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
 
-		_finderPathWithPaginationFindByG_F = _createFinderPath(
+		_finderPathWithPaginationFindByG_F = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_F",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13134,22 +13116,22 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "folderId"}, true);
 
-		_finderPathWithoutPaginationFindByG_F = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_F = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_F",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"groupId", "folderId"}, true);
 
-		_finderPathCountByG_F = _createFinderPath(
+		_finderPathCountByG_F = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_F",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"groupId", "folderId"}, false);
 
-		_finderPathWithPaginationCountByG_F = _createFinderPath(
+		_finderPathWithPaginationCountByG_F = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_F",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"groupId", "folderId"}, false);
 
-		_finderPathWithPaginationFindByG_S = _createFinderPath(
+		_finderPathWithPaginationFindByG_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_S",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -13158,17 +13140,17 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "status"}, true);
 
-		_finderPathWithoutPaginationFindByG_S = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"groupId", "status"}, true);
 
-		_finderPathCountByG_S = _createFinderPath(
+		_finderPathCountByG_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"groupId", "status"}, false);
 
-		_finderPathWithPaginationFindByG_NotS = _createFinderPath(
+		_finderPathWithPaginationFindByG_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_NotS",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -13177,12 +13159,12 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "status"}, true);
 
-		_finderPathWithPaginationCountByG_NotS = _createFinderPath(
+		_finderPathWithPaginationCountByG_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_NotS",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"groupId", "status"}, false);
 
-		_finderPathWithPaginationFindByC_NotS = _createFinderPath(
+		_finderPathWithPaginationFindByC_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_NotS",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -13191,12 +13173,12 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"companyId", "status"}, true);
 
-		_finderPathWithPaginationCountByC_NotS = _createFinderPath(
+		_finderPathWithPaginationCountByC_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_NotS",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"companyId", "status"}, false);
 
-		_finderPathWithPaginationFindByG_U_S = _createFinderPath(
+		_finderPathWithPaginationFindByG_U_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13205,7 +13187,7 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "status"}, true);
 
-		_finderPathWithoutPaginationFindByG_U_S = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_U_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13213,7 +13195,7 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "status"}, true);
 
-		_finderPathCountByG_U_S = _createFinderPath(
+		_finderPathCountByG_U_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13221,7 +13203,7 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "status"}, false);
 
-		_finderPathWithPaginationFindByG_U_NotS = _createFinderPath(
+		_finderPathWithPaginationFindByG_U_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_NotS",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13230,7 +13212,7 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "status"}, true);
 
-		_finderPathWithPaginationCountByG_U_NotS = _createFinderPath(
+		_finderPathWithPaginationCountByG_U_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_NotS",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13238,7 +13220,7 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "status"}, false);
 
-		_finderPathWithPaginationFindByG_F_S = _createFinderPath(
+		_finderPathWithPaginationFindByG_F_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_F_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13247,7 +13229,7 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "folderId", "status"}, true);
 
-		_finderPathWithoutPaginationFindByG_F_S = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_F_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_F_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13255,7 +13237,7 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "folderId", "status"}, true);
 
-		_finderPathCountByG_F_S = _createFinderPath(
+		_finderPathCountByG_F_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_F_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13263,7 +13245,7 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "folderId", "status"}, false);
 
-		_finderPathWithPaginationCountByG_F_S = _createFinderPath(
+		_finderPathWithPaginationCountByG_F_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_F_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13271,7 +13253,7 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "folderId", "status"}, false);
 
-		_finderPathWithPaginationFindByG_F_NotS = _createFinderPath(
+		_finderPathWithPaginationFindByG_F_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_F_NotS",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13280,7 +13262,7 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "folderId", "status"}, true);
 
-		_finderPathWithPaginationCountByG_F_NotS = _createFinderPath(
+		_finderPathWithPaginationCountByG_F_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_F_NotS",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13288,7 +13270,7 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "folderId", "status"}, false);
 
-		_finderPathWithPaginationFindByG_U_F_S = _createFinderPath(
+		_finderPathWithPaginationFindByG_U_F_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_F_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13298,7 +13280,7 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "folderId", "status"}, true);
 
-		_finderPathWithoutPaginationFindByG_U_F_S = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_U_F_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_F_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13306,7 +13288,7 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "folderId", "status"}, true);
 
-		_finderPathCountByG_U_F_S = _createFinderPath(
+		_finderPathCountByG_U_F_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_F_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13314,7 +13296,7 @@ public class BookmarksEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "folderId", "status"}, false);
 
-		_finderPathWithPaginationCountByG_U_F_S = _createFinderPath(
+		_finderPathWithPaginationCountByG_U_F_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_F_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -13330,14 +13312,6 @@ public class BookmarksEntryPersistenceImpl
 		_setBookmarksEntryUtilPersistence(null);
 
 		entityCache.removeCache(BookmarksEntryImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setBookmarksEntryUtilPersistence(
@@ -13381,8 +13355,6 @@ public class BookmarksEntryPersistenceImpl
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		super.setSessionFactory(sessionFactory);
 	}
-
-	private BundleContext _bundleContext;
 
 	@Reference
 	protected EntityCache entityCache;
@@ -13439,126 +13411,13 @@ public class BookmarksEntryPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"uuid"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class BookmarksEntryModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			BookmarksEntryModelImpl bookmarksEntryModelImpl =
-				(BookmarksEntryModelImpl)baseModel;
-
-			long columnBitmask = bookmarksEntryModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					bookmarksEntryModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						bookmarksEntryModelImpl.getColumnBitmask(columnName);
-				}
-
-				if (finderPath.isBaseModelResult() &&
-					(BookmarksEntryPersistenceImpl.
-						FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION ==
-							finderPath.getCacheName())) {
-
-					finderPathColumnBitmask |= _ORDER_BY_COLUMNS_BITMASK;
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					bookmarksEntryModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			BookmarksEntryModelImpl bookmarksEntryModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						bookmarksEntryModelImpl.getColumnOriginalValue(
-							columnName);
-				}
-				else {
-					arguments[i] = bookmarksEntryModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-		private static final long _ORDER_BY_COLUMNS_BITMASK;
-
-		static {
-			long orderByColumnsBitmask = 0;
-
-			orderByColumnsBitmask |= BookmarksEntryModelImpl.getColumnBitmask(
-				"folderId");
-			orderByColumnsBitmask |= BookmarksEntryModelImpl.getColumnBitmask(
-				"name");
-
-			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
-		}
-
-	}
+	@Reference
+	private BookmarksEntryModelArgumentsResolver
+		_bookmarksEntryModelArgumentsResolver;
 
 }

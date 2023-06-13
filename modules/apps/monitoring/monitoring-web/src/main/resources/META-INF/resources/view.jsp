@@ -29,13 +29,11 @@ if (PropsValues.LIVE_USERS_ENABLED && PropsValues.SESSION_TRACKER_MEMORY_ENABLED
 	userTrackers = ListUtil.sort(userTrackers, new UserTrackerModifiedDateComparator(orderByType.equals("asc")));
 }
 
-PortletURL portletURL = renderResponse.createRenderURL();
-
-portletURL.setParameter("mvcRenderCommandName", "/monitoring/view");
-
-PortletURL sortingURL = PortletURLUtil.clone(portletURL, renderResponse);
-
-sortingURL.setParameter("orderByType", orderByType.equals("asc") ? "desc" : "asc");
+PortletURL portletURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCRenderCommandName(
+	"/monitoring/view"
+).buildPortletURL();
 %>
 
 <clay:management-toolbar
@@ -43,7 +41,13 @@ sortingURL.setParameter("orderByType", orderByType.equals("asc") ? "desc" : "asc
 	selectable="<%= false %>"
 	showSearch="<%= false %>"
 	sortingOrder="<%= orderByType %>"
-	sortingURL="<%= sortingURL.toString() %>"
+	sortingURL='<%=
+		PortletURLBuilder.create(
+			PortletURLUtil.clone(portletURL, renderResponse)
+		).setParameter(
+			"orderByType", orderByType.equals("asc") ? "desc" : "asc"
+		).buildString()
+	%>'
 />
 
 <clay:container-fluid>

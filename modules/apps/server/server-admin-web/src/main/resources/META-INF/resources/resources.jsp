@@ -40,7 +40,7 @@ long usedMemory = totalMemory - runtime.freeMemory();
 	id="adminServerAdministrationActionsPanelContainer"
 	persistState="<%= true %>"
 >
-	<div class="panel panel-default server-admin-tabs" id="adminServerInformationPanel">
+	<div class="panel panel-secondary server-admin-tabs" id="adminServerInformationPanel">
 		<div class="panel-body">
 			<div class="alert alert-info">
 				<strong><liferay-ui:message key="info" /></strong>: <%= ReleaseInfo.getReleaseInfo() %>
@@ -121,7 +121,7 @@ long usedMemory = totalMemory - runtime.freeMemory();
 
 	<liferay-ui:panel
 		collapsible="<%= true %>"
-		cssClass="server-admin-actions-panel"
+		cssClass="panel-secondary server-admin-actions-panel"
 		extended="<%= true %>"
 		id="adminServerAdministrationSystemActionsPanel"
 		markupView="lexicon"
@@ -152,7 +152,7 @@ long usedMemory = totalMemory - runtime.freeMemory();
 
 	<liferay-ui:panel
 		collapsible="<%= true %>"
-		cssClass="server-admin-actions-panel"
+		cssClass="panel-secondary server-admin-actions-panel"
 		extended="<%= true %>"
 		id="adminServerAdministrationCacheActionsPanel"
 		markupView="lexicon"
@@ -201,7 +201,7 @@ long usedMemory = totalMemory - runtime.freeMemory();
 
 	<liferay-ui:panel
 		collapsible="<%= true %>"
-		cssClass="server-admin-actions-panel"
+		cssClass="panel-secondary server-admin-actions-panel"
 		extended="<%= true %>"
 		id="adminServerAdministrationVerificationActionsPanel"
 		markupView="lexicon"
@@ -232,7 +232,7 @@ long usedMemory = totalMemory - runtime.freeMemory();
 
 	<liferay-ui:panel
 		collapsible="<%= true %>"
-		cssClass="server-admin-actions-panel"
+		cssClass="panel-secondary server-admin-actions-panel"
 		extended="<%= true %>"
 		id="adminServerAdministrationCleanUpActionsPanel"
 		markupView="lexicon"

@@ -125,8 +125,8 @@ public class CTEntryUtil {
 	 * @param ctCollectionId the ct collection ID
 	 * @return the matching ct entries
 	 */
-	public static List<CTEntry> findByCTCollectionId(long ctCollectionId) {
-		return getPersistence().findByCTCollectionId(ctCollectionId);
+	public static List<CTEntry> findByCtCollectionId(long ctCollectionId) {
+		return getPersistence().findByCtCollectionId(ctCollectionId);
 	}
 
 	/**
@@ -141,10 +141,10 @@ public class CTEntryUtil {
 	 * @param end the upper bound of the range of ct entries (not inclusive)
 	 * @return the range of matching ct entries
 	 */
-	public static List<CTEntry> findByCTCollectionId(
+	public static List<CTEntry> findByCtCollectionId(
 		long ctCollectionId, int start, int end) {
 
-		return getPersistence().findByCTCollectionId(
+		return getPersistence().findByCtCollectionId(
 			ctCollectionId, start, end);
 	}
 
@@ -161,11 +161,11 @@ public class CTEntryUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching ct entries
 	 */
-	public static List<CTEntry> findByCTCollectionId(
+	public static List<CTEntry> findByCtCollectionId(
 		long ctCollectionId, int start, int end,
 		OrderByComparator<CTEntry> orderByComparator) {
 
-		return getPersistence().findByCTCollectionId(
+		return getPersistence().findByCtCollectionId(
 			ctCollectionId, start, end, orderByComparator);
 	}
 
@@ -183,11 +183,11 @@ public class CTEntryUtil {
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching ct entries
 	 */
-	public static List<CTEntry> findByCTCollectionId(
+	public static List<CTEntry> findByCtCollectionId(
 		long ctCollectionId, int start, int end,
 		OrderByComparator<CTEntry> orderByComparator, boolean useFinderCache) {
 
-		return getPersistence().findByCTCollectionId(
+		return getPersistence().findByCtCollectionId(
 			ctCollectionId, start, end, orderByComparator, useFinderCache);
 	}
 
@@ -199,11 +199,11 @@ public class CTEntryUtil {
 	 * @return the first matching ct entry
 	 * @throws NoSuchEntryException if a matching ct entry could not be found
 	 */
-	public static CTEntry findByCTCollectionId_First(
+	public static CTEntry findByCtCollectionId_First(
 			long ctCollectionId, OrderByComparator<CTEntry> orderByComparator)
 		throws com.liferay.change.tracking.exception.NoSuchEntryException {
 
-		return getPersistence().findByCTCollectionId_First(
+		return getPersistence().findByCtCollectionId_First(
 			ctCollectionId, orderByComparator);
 	}
 
@@ -214,10 +214,10 @@ public class CTEntryUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching ct entry, or <code>null</code> if a matching ct entry could not be found
 	 */
-	public static CTEntry fetchByCTCollectionId_First(
+	public static CTEntry fetchByCtCollectionId_First(
 		long ctCollectionId, OrderByComparator<CTEntry> orderByComparator) {
 
-		return getPersistence().fetchByCTCollectionId_First(
+		return getPersistence().fetchByCtCollectionId_First(
 			ctCollectionId, orderByComparator);
 	}
 
@@ -229,11 +229,11 @@ public class CTEntryUtil {
 	 * @return the last matching ct entry
 	 * @throws NoSuchEntryException if a matching ct entry could not be found
 	 */
-	public static CTEntry findByCTCollectionId_Last(
+	public static CTEntry findByCtCollectionId_Last(
 			long ctCollectionId, OrderByComparator<CTEntry> orderByComparator)
 		throws com.liferay.change.tracking.exception.NoSuchEntryException {
 
-		return getPersistence().findByCTCollectionId_Last(
+		return getPersistence().findByCtCollectionId_Last(
 			ctCollectionId, orderByComparator);
 	}
 
@@ -244,10 +244,10 @@ public class CTEntryUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching ct entry, or <code>null</code> if a matching ct entry could not be found
 	 */
-	public static CTEntry fetchByCTCollectionId_Last(
+	public static CTEntry fetchByCtCollectionId_Last(
 		long ctCollectionId, OrderByComparator<CTEntry> orderByComparator) {
 
-		return getPersistence().fetchByCTCollectionId_Last(
+		return getPersistence().fetchByCtCollectionId_Last(
 			ctCollectionId, orderByComparator);
 	}
 
@@ -260,12 +260,12 @@ public class CTEntryUtil {
 	 * @return the previous, current, and next ct entry
 	 * @throws NoSuchEntryException if a ct entry with the primary key could not be found
 	 */
-	public static CTEntry[] findByCTCollectionId_PrevAndNext(
+	public static CTEntry[] findByCtCollectionId_PrevAndNext(
 			long ctEntryId, long ctCollectionId,
 			OrderByComparator<CTEntry> orderByComparator)
 		throws com.liferay.change.tracking.exception.NoSuchEntryException {
 
-		return getPersistence().findByCTCollectionId_PrevAndNext(
+		return getPersistence().findByCtCollectionId_PrevAndNext(
 			ctEntryId, ctCollectionId, orderByComparator);
 	}
 
@@ -274,8 +274,8 @@ public class CTEntryUtil {
 	 *
 	 * @param ctCollectionId the ct collection ID
 	 */
-	public static void removeByCTCollectionId(long ctCollectionId) {
-		getPersistence().removeByCTCollectionId(ctCollectionId);
+	public static void removeByCtCollectionId(long ctCollectionId) {
+		getPersistence().removeByCtCollectionId(ctCollectionId);
 	}
 
 	/**
@@ -284,8 +284,8 @@ public class CTEntryUtil {
 	 * @param ctCollectionId the ct collection ID
 	 * @return the number of matching ct entries
 	 */
-	public static int countByCTCollectionId(long ctCollectionId) {
-		return getPersistence().countByCTCollectionId(ctCollectionId);
+	public static int countByCtCollectionId(long ctCollectionId) {
+		return getPersistence().countByCtCollectionId(ctCollectionId);
 	}
 
 	/**
@@ -813,7 +813,7 @@ public class CTEntryUtil {
 	 *
 	 * @param ctCollectionId the ct collection ID
 	 * @param modelClassNameId the model class name ID
-	 * @param modelClassPKs the model class pks
+	 * @param modelClassPK the model class pk
 	 * @param start the lower bound of the range of ct entries
 	 * @param end the upper bound of the range of ct entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)

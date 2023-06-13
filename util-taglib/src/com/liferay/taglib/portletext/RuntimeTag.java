@@ -15,9 +15,7 @@
 package com.liferay.taglib.portletext;
 
 import com.liferay.petra.lang.CentralizedThreadLocal;
-import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -42,13 +40,14 @@ import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.servlet.DynamicServletRequest;
+import com.liferay.portal.kernel.servlet.PipingServletResponse;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.DirectTag;
-import com.liferay.taglib.servlet.PipingServletResponse;
+import com.liferay.taglib.servlet.PipingServletResponseFactory;
 import com.liferay.taglib.util.PortalIncludeUtil;
 import com.liferay.taglib.util.ThreadLocalUtil;
 
@@ -176,7 +175,7 @@ public class RuntimeTag extends TagSupport implements DirectTag {
 		if (pageContext != null) {
 			if (httpServletResponse == pageContext.getResponse()) {
 				httpServletResponse =
-					PipingServletResponse.createPipingServletResponse(
+					PipingServletResponseFactory.createPipingServletResponse(
 						pageContext);
 			}
 			else {
@@ -231,18 +230,11 @@ public class RuntimeTag extends TagSupport implements DirectTag {
 			}
 		}
 
-		if (Validator.isNotNull(queryString)) {
-			queryString = PortletParameterUtil.addNamespace(
-				portletInstanceKey, queryString);
+		queryString = PortletParameterUtil.addNamespace(
+			portletInstanceKey, queryString);
 
-			httpServletRequest = DynamicServletRequest.addQueryString(
-				restrictPortletServletRequest, parameterMap, queryString,
-				false);
-		}
-		else {
-			httpServletRequest = new DynamicServletRequest(
-				restrictPortletServletRequest, parameterMap, false);
-		}
+		httpServletRequest = DynamicServletRequest.addQueryString(
+			restrictPortletServletRequest, parameterMap, queryString, false);
 
 		try {
 			httpServletRequest.setAttribute(
@@ -263,12 +255,20 @@ public class RuntimeTag extends TagSupport implements DirectTag {
 				_embeddedPortletIds.set(embeddedPortletIds);
 			}
 
-			if (embeddedPortletIds.search(portlet.getPortletId()) > -1) {
+			String rootPortletId = portlet.getRootPortletId();
+
+			if (embeddedPortletIds.search(rootPortletId) > -1) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"The application cannot include itself: " +
+							rootPortletId);
+				}
+
 				String errorMessage = LanguageUtil.get(
-					httpServletRequest,
+					originalHttpServletRequest,
 					"the-application-cannot-include-itself");
 
-				httpServletRequest.setAttribute(
+				originalHttpServletRequest.setAttribute(
 					"liferay-portlet:runtime:errorMessage", errorMessage);
 
 				PortalIncludeUtil.include(pageContext, _ERROR_PAGE);
@@ -318,14 +318,8 @@ public class RuntimeTag extends TagSupport implements DirectTag {
 					portletInstanceKey);
 
 			if (count < 1) {
-				try (SafeCloseable safeCloseable =
-						CTCollectionThreadLocal.
-							setProductionModeWithSafeCloseable()) {
-
-					PortletPreferencesFactoryUtil.getLayoutPortletSetup(
-						layout, portletInstanceKey, defaultPreferences);
-				}
-
+				PortletPreferencesFactoryUtil.getLayoutPortletSetup(
+					layout, portletInstanceKey, defaultPreferences);
 				PortletPreferencesFactoryUtil.getPortletSetup(
 					httpServletRequest, portletInstanceKey, defaultPreferences);
 
@@ -352,7 +346,7 @@ public class RuntimeTag extends TagSupport implements DirectTag {
 					httpServletResponse, jsonObject);
 			}
 
-			embeddedPortletIds.push(portletInstanceKey);
+			embeddedPortletIds.push(rootPortletId);
 
 			boolean lifecycleRender = themeDisplay.isLifecycleRender();
 

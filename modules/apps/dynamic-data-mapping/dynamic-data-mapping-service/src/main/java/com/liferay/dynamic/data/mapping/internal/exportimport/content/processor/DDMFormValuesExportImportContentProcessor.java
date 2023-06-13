@@ -16,7 +16,7 @@ package com.liferay.dynamic.data.mapping.internal.exportimport.content.processor
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
-import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
+import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
@@ -27,9 +27,11 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.journal.article.dynamic.data.mapping.form.field.type.constants.JournalArticleDDMFormFieldTypeConstants;
 import com.liferay.journal.exception.NoSuchArticleException;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
+import com.liferay.layout.dynamic.data.mapping.form.field.type.constants.LayoutDDMFormFieldTypeConstants;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -52,7 +54,6 @@ import com.liferay.portal.kernel.xml.Element;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -170,7 +171,7 @@ public class DDMFormValuesExportImportContentProcessor
 
 		@Override
 		public String getFieldType() {
-			return DDMFormFieldType.DOCUMENT_LIBRARY;
+			return DDMFormFieldTypeConstants.DOCUMENT_LIBRARY;
 		}
 
 		@Override
@@ -264,7 +265,7 @@ public class DDMFormValuesExportImportContentProcessor
 
 		@Override
 		public String getFieldType() {
-			return DDMFormFieldType.DOCUMENT_LIBRARY;
+			return DDMFormFieldTypeConstants.DOCUMENT_LIBRARY;
 		}
 
 		@Override
@@ -355,7 +356,7 @@ public class DDMFormValuesExportImportContentProcessor
 		}
 
 		protected String toJSON(FileEntry fileEntry, String type) {
-			JSONObject jsonObject = JSONUtil.put(
+			return JSONUtil.put(
 				"classPK", fileEntry.getFileEntryId()
 			).put(
 				"groupId", fileEntry.getGroupId()
@@ -365,9 +366,7 @@ public class DDMFormValuesExportImportContentProcessor
 				"type", type
 			).put(
 				"uuid", fileEntry.getUuid()
-			);
-
-			return jsonObject.toString();
+			).toString();
 		}
 
 		private final PortletDataContext _portletDataContext;
@@ -389,7 +388,7 @@ public class DDMFormValuesExportImportContentProcessor
 
 		@Override
 		public String getFieldType() {
-			return DDMFormFieldType.JOURNAL_ARTICLE;
+			return JournalArticleDDMFormFieldTypeConstants.JOURNAL_ARTICLE;
 		}
 
 		@Override
@@ -485,7 +484,7 @@ public class DDMFormValuesExportImportContentProcessor
 
 		@Override
 		public String getFieldType() {
-			return DDMFormFieldType.JOURNAL_ARTICLE;
+			return JournalArticleDDMFormFieldTypeConstants.JOURNAL_ARTICLE;
 		}
 
 		@Override
@@ -580,7 +579,7 @@ public class DDMFormValuesExportImportContentProcessor
 
 		@Override
 		public String getFieldType() {
-			return DDMFormFieldType.LINK_TO_PAGE;
+			return LayoutDDMFormFieldTypeConstants.LINK_TO_LAYOUT;
 		}
 
 		@Override
@@ -646,7 +645,7 @@ public class DDMFormValuesExportImportContentProcessor
 
 		@Override
 		public String getFieldType() {
-			return DDMFormFieldType.LINK_TO_PAGE;
+			return LayoutDDMFormFieldTypeConstants.LINK_TO_LAYOUT;
 		}
 
 		@Override
@@ -675,7 +674,7 @@ public class DDMFormValuesExportImportContentProcessor
 					_portletDataContext, jsonObject);
 
 				if (importedLayout != null) {
-					value.addString(locale, toJSON(importedLayout));
+					value.addString(locale, toJSON(importedLayout, locale));
 
 					continue;
 				}
@@ -690,23 +689,6 @@ public class DDMFormValuesExportImportContentProcessor
 
 					if (className.equals(Layout.class.getName())) {
 						String uuid = element.attributeValue("uuid");
-
-						if ((jsonObject.has("groupId") &&
-							 !Objects.equals(
-								 jsonObject.getString("groupId"),
-								 element.attributeValue("group-id"))) ||
-							(jsonObject.has("layoutId") &&
-							 !Objects.equals(
-								 jsonObject.getString("layoutId"),
-								 element.attributeValue("layout-id"))) ||
-							(jsonObject.has("privateLayout") &&
-							 !Objects.equals(
-								 jsonObject.getString("privateLayout"),
-								 element.attributeValue("private-layout")))) {
-
-							continue;
-						}
-
 						String privateLayout = element.attributeValue(
 							"private-layout");
 
@@ -718,7 +700,7 @@ public class DDMFormValuesExportImportContentProcessor
 				}
 
 				if (importedLayout != null) {
-					value.addString(locale, toJSON(importedLayout));
+					value.addString(locale, toJSON(importedLayout, locale));
 				}
 			}
 		}
@@ -743,16 +725,22 @@ public class DDMFormValuesExportImportContentProcessor
 			return layout;
 		}
 
-		protected String toJSON(Layout layout) {
-			JSONObject jsonObject = JSONUtil.put(
+		protected String toJSON(Layout layout, Locale locale)
+			throws PortalException {
+
+			return JSONUtil.put(
 				"groupId", layout.getGroupId()
+			).put(
+				"id", layout.getUuid()
 			).put(
 				"layoutId", layout.getLayoutId()
 			).put(
+				"name", layout.getBreadcrumb(locale)
+			).put(
 				"privateLayout", layout.isPrivateLayout()
-			);
-
-			return jsonObject.toString();
+			).put(
+				"value", layout.getFriendlyURL(locale)
+			).toString();
 		}
 
 		private final PortletDataContext _portletDataContext;

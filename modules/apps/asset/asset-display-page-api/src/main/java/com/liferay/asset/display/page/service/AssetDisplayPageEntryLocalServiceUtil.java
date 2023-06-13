@@ -293,6 +293,16 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 		return getService().getAssetDisplayPageEntries(start, end);
 	}
 
+	public static List<AssetDisplayPageEntry> getAssetDisplayPageEntries(
+		long classNameId, long classTypeId, long layoutPageTemplateEntryId,
+		boolean defaultTemplate, int start, int end,
+		OrderByComparator<AssetDisplayPageEntry> orderByComparator) {
+
+		return getService().getAssetDisplayPageEntries(
+			classNameId, classTypeId, layoutPageTemplateEntryId,
+			defaultTemplate, start, end, orderByComparator);
+	}
+
 	public static List<AssetDisplayPageEntry>
 		getAssetDisplayPageEntriesByLayoutPageTemplateEntryId(
 			long layoutPageTemplateEntryId) {
@@ -353,6 +363,15 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 	 */
 	public static int getAssetDisplayPageEntriesCount() {
 		return getService().getAssetDisplayPageEntriesCount();
+	}
+
+	public static int getAssetDisplayPageEntriesCount(
+		long classNameId, long classTypeId, long layoutPageTemplateEntryId,
+		boolean defaultTemplate) {
+
+		return getService().getAssetDisplayPageEntriesCount(
+			classNameId, classTypeId, layoutPageTemplateEntryId,
+			defaultTemplate);
 	}
 
 	public static int

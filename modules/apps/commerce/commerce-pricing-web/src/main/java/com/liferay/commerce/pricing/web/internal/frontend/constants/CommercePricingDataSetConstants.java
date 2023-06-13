@@ -43,14 +43,28 @@ public class CommercePricingDataSetConstants {
 			"commerceDiscountQualifierChannels";
 
 	public static final String
+		COMMERCE_DATA_SET_KEY_DISCOUNT_QUALIFIER_ORDER_TYPES =
+			"commerceDiscountQualifierOrderTypes";
+
+	public static final String
 		COMMERCE_DATA_SET_KEY_DISCOUNT_RULE_PRODUCT_DEFINITIONS =
 			"commerceDiscountRuleProductDefinitions";
 
 	public static final String COMMERCE_DATA_SET_KEY_DISCOUNT_RULES =
 		"commerceDiscountRules";
 
+	public static final String COMMERCE_DATA_SET_KEY_DISCOUNT_SKUS =
+		"commerceDiscountSkus";
+
 	public static final String COMMERCE_DATA_SET_KEY_DISCOUNTS =
 		"commerceDiscounts";
+
+	public static final String COMMERCE_DATA_SET_KEY_INSTANCE_PRICE_ENTRIES =
+		"cpInstancePriceEntries";
+
+	public static final String
+		COMMERCE_DATA_SET_KEY_INSTANCE_TIER_PRICE_ENTRIES =
+			"cpInstanceTierPriceEntries";
 
 	public static final String COMMERCE_DATA_SET_KEY_PRICE_LIST_ENTRIES =
 		"commercePriceListEntries";
@@ -66,6 +80,10 @@ public class CommercePricingDataSetConstants {
 	public static final String
 		COMMERCE_DATA_SET_KEY_PRICE_LIST_QUALIFIER_CHANNELS =
 			"commercePriceListQualifierChannels";
+
+	public static final String
+		COMMERCE_DATA_SET_KEY_PRICE_LIST_QUALIFIER_ORDER_TYPES =
+			"commercePriceListQualifierOrderTypes";
 
 	public static final String COMMERCE_DATA_SET_KEY_PRICE_LISTS =
 		"commercePriceLists";

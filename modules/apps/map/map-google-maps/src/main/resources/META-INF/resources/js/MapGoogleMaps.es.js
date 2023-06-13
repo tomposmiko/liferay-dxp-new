@@ -12,8 +12,7 @@
  * details.
  */
 
-import MapBase from 'map-common/js/MapBase.es';
-import {toElement} from 'metal-dom';
+import MapBase from '@liferay/map-common/js/MapBase.es';
 
 import GoogleMapsDialog from './GoogleMapsDialog.es';
 import GoogleMapsGeoJSON from './GoogleMapsGeoJSON.es';
@@ -50,7 +49,7 @@ class MapGoogleMaps extends MapBase {
 		};
 
 		const map = new google.maps.Map(
-			toElement(this.boundingBox),
+			document.querySelector(this.boundingBox),
 			Object.assign(mapConfig, controlsConfig)
 		);
 
@@ -78,7 +77,11 @@ class MapGoogleMaps extends MapBase {
 	 */
 	addControl(control, position) {
 		if (this._map.controls[position]) {
-			this._map.controls[position].push(toElement(control));
+			if (typeof control === 'string') {
+				control = document.querySelector(control);
+			}
+
+			this._map.controls[position].push(control);
 		}
 	}
 

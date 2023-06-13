@@ -18,8 +18,8 @@ import React from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 
-import {useWidgets} from '../../../../../../src/main/resources/META-INF/resources/page_editor/app/components/WidgetsContext';
-import {StoreAPIContextProvider} from '../../../../../../src/main/resources/META-INF/resources/page_editor/app/store/index';
+import {StoreAPIContextProvider} from '../../../../../../src/main/resources/META-INF/resources/page_editor/app/contexts/StoreContext';
+import {useWidgets} from '../../../../../../src/main/resources/META-INF/resources/page_editor/app/contexts/WidgetsContext';
 import {setIn} from '../../../../../../src/main/resources/META-INF/resources/page_editor/app/utils/setIn';
 import FragmentsSidebar from '../../../../../../src/main/resources/META-INF/resources/page_editor/plugins/fragments-widgets/components/FragmentsSidebar';
 import TabsPanel from '../../../../../../src/main/resources/META-INF/resources/page_editor/plugins/fragments-widgets/components/TabsPanel';
@@ -41,7 +41,7 @@ jest.mock(
 );
 
 jest.mock(
-	'../../../../../../src/main/resources/META-INF/resources/page_editor/app/components/WidgetsContext',
+	'../../../../../../src/main/resources/META-INF/resources/page_editor/app/contexts/WidgetsContext',
 	() => ({
 		WidgetsContext: ({children}) => <>{children}</>,
 		useWidgets: jest.fn(),
@@ -95,7 +95,7 @@ const NORMALIZED_PORTLET_ITEMS = [
 			used: false,
 		},
 		disabled: false,
-		icon: 'cards2',
+		icon: 'square-hole-multi',
 		itemId: 'template-portlet-1',
 		label: 'Template Portlet 1',
 		portletItems: null,
@@ -150,6 +150,7 @@ const NORMALIZED_TABS = [
 				label: 'Collection 1',
 			},
 		],
+		id: 'fragments',
 		label: 'fragments',
 	},
 	{
@@ -164,7 +165,7 @@ const NORMALIZED_TABS = [
 							used: false,
 						},
 						disabled: false,
-						icon: 'cards2',
+						icon: 'square-hole-multi',
 						itemId: 'portlet-1',
 						label: 'Portlet 1',
 						portletItems: NORMALIZED_PORTLET_ITEMS,
@@ -176,6 +177,7 @@ const NORMALIZED_TABS = [
 				label: 'Widget Collection 1',
 			},
 		],
+		id: 'widgets',
 		label: 'widgets',
 	},
 ];
@@ -239,6 +241,7 @@ describe('FragmentsSidebar', () => {
 
 		expect(TabsPanel).toHaveBeenCalledWith(
 			expect.objectContaining({
+				displayStyle: 'list',
 				tabs: NORMALIZED_TABS,
 			}),
 			{}
@@ -282,6 +285,26 @@ describe('FragmentsSidebar', () => {
 		expect(queryByText('Fragment 3')).not.toBeInTheDocument();
 	});
 
+	it('filters widget template according to a input value', () => {
+		const {getByLabelText, queryByText} = renderComponent(STATE);
+		const input = getByLabelText('search-form');
+
+		act(() => {
+			fireEvent.change(input, {
+				target: {value: 'Template Portlet 1'},
+			});
+
+			jest.runAllTimers();
+		});
+
+		expect(queryByText('Widget Collection 1')).toBeInTheDocument();
+		expect(queryByText('Portlet 1')).toBeInTheDocument();
+		expect(queryByText('Template Portlet 1')).toBeInTheDocument();
+		expect(queryByText('Fragment 1')).not.toBeInTheDocument();
+		expect(queryByText('Fragment 2')).not.toBeInTheDocument();
+		expect(queryByText('Fragment 3')).not.toBeInTheDocument();
+	});
+
 	it('sets square-hole icon when the widget is not instanceable', () => {
 		useWidgets.mockImplementation(() => [
 			{
@@ -313,6 +336,7 @@ describe('FragmentsSidebar', () => {
 
 		expect(TabsPanel).toHaveBeenCalledWith(
 			expect.objectContaining({
+				displayStyle: 'list',
 				tabs: setIn(
 					NORMALIZED_TABS,
 					[1, 'collections', 0, 'children', 0],
@@ -384,6 +408,7 @@ describe('FragmentsSidebar', () => {
 
 		expect(TabsPanel).toHaveBeenCalledWith(
 			expect.objectContaining({
+				displayStyle: 'list',
 				tabs: setIn(
 					NORMALIZED_TABS,
 					[1, 'collections', 0, 'children', 0],
@@ -453,6 +478,7 @@ describe('FragmentsSidebar', () => {
 
 		expect(TabsPanel).toHaveBeenCalledWith(
 			expect.objectContaining({
+				displayStyle: 'list',
 				tabs: setIn(
 					NORMALIZED_TABS,
 					[1, 'collections', 0, 'children', 0, 'portletItems'],
@@ -465,7 +491,7 @@ describe('FragmentsSidebar', () => {
 								used: false,
 							},
 							disabled: false,
-							icon: 'cards2',
+							icon: 'square-hole-multi',
 							itemId: 'portlet-item-1',
 							label: 'Portlet Item 1',
 							portletItems: null,
@@ -532,6 +558,7 @@ describe('FragmentsSidebar', () => {
 
 		expect(TabsPanel).toHaveBeenCalledWith(
 			expect.objectContaining({
+				displayStyle: 'list',
 				tabs: setIn(
 					NORMALIZED_TABS,
 					[1, 'collections', 0, 'collections'],
@@ -551,7 +578,7 @@ describe('FragmentsSidebar', () => {
 												used: false,
 											},
 											disabled: false,
-											icon: 'cards2',
+											icon: 'square-hole-multi',
 											itemId: 'collection-4-portlet',
 											label: 'Collection 4 Portlet',
 											portletItems: null,
@@ -572,55 +599,23 @@ describe('FragmentsSidebar', () => {
 		);
 	});
 
-	it('hides the fragment preview when it is basic component', () => {
-		const tabs = NORMALIZED_TABS;
-		tabs[0] = {
-			collections: [
-				{
-					children: [
-						{
-							data: {
-								fragmentEntryKey: 'fragment-1',
-								groupId: '0',
-								type: 1,
-							},
-							icon: 'fragment-1-icon',
-							itemId: 'fragment-1',
-							label: 'Fragment 1',
-							preview: null,
-							type: 'fragment',
-						},
-					],
-					collectionId: 'BASIC_COMPONENT',
-					label: 'Collection 1',
-				},
-			],
-			label: 'fragments',
-		};
+	describe('Button to switch the display style', () => {
+		Liferay.Util.sub.mockImplementation((langKey, args) =>
+			langKey.replace('x', args)
+		);
 
-		const state = {
-			...STATE,
-			fragments: [
-				{
-					fragmentCollectionId: 'BASIC_COMPONENT',
-					fragmentEntries: [
-						{
-							fragmentEntryKey: 'fragment-1',
-							groupId: '0',
-							icon: 'fragment-1-icon',
-							imagePreviewURL: '/fragment-1-image.png',
-							label: 'Fragment 1',
-							name: 'Fragment 1',
-							type: 1,
-						},
-					],
-					name: 'Collection 1',
-				},
-			],
-		};
+		it('shows the card view when the display style is list', () => {
+			const {getByTitle} = renderComponent(STATE);
 
-		renderComponent(state);
+			expect(getByTitle('switch-to-card-view')).toBeInTheDocument();
+		});
 
-		expect(TabsPanel).toHaveBeenCalledWith({tabs}, {});
+		it('shows the list view when the display style is card', () => {
+			const {getByTitle} = renderComponent(STATE);
+
+			fireEvent.click(getByTitle('switch-to-card-view'));
+
+			expect(getByTitle('switch-to-list-view')).toBeInTheDocument();
+		});
 	});
 });

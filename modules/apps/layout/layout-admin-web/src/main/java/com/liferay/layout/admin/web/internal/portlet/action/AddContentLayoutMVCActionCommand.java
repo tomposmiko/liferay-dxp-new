@@ -20,7 +20,6 @@ import com.liferay.layout.admin.web.internal.security.permission.resource.Layout
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.portal.kernel.change.tracking.CTTransactionException;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
@@ -151,7 +150,7 @@ public class AddContentLayoutMVCActionCommand
 					new HashMap<>(), new HashMap<>(), new HashMap<>(),
 					LayoutConstants.TYPE_CONTENT,
 					typeSettingsUnicodeProperties.toString(), false, false,
-					masterLayoutPlid, new HashMap<>(), serviceContext);
+					new HashMap<>(), masterLayoutPlid, serviceContext);
 			}
 
 			String redirectURL = getRedirectURL(
@@ -180,13 +179,13 @@ public class AddContentLayoutMVCActionCommand
 
 			throw ctTransactionException;
 		}
-		catch (PortalException portalException) {
+		catch (Exception exception) {
 			SessionErrors.add(actionRequest, "layoutNameInvalid");
 
 			hideDefaultErrorMessage(actionRequest);
 
-			_layoutExceptionRequestHandler.handlePortalException(
-				actionRequest, actionResponse, portalException);
+			_layoutExceptionRequestHandler.handleException(
+				actionRequest, actionResponse, exception);
 		}
 	}
 

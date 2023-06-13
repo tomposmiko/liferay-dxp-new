@@ -28,7 +28,7 @@ definition {
 			panel = "Site Administration",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Web Content Display Page");
+		PagesAdmin.addPublicPage(pageName = "Web Content Display Page");
 
 		Navigator.gotoPage(pageName = "Web Content Display Page");
 
@@ -38,13 +38,13 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
 			WebContent.tearDownCP();
 
-			Page.tearDownPG();
+			PagesAdmin.tearDownCP();
 
 			Workflow.tearDownPortalWorkflow();
 
@@ -52,7 +52,7 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ApproveWebContentViaWebContentDisplayPG {
 		Navigator.gotoPage(pageName = "Web Content Display Page");
 
@@ -95,7 +95,7 @@ definition {
 			webContentTitle = "WC WebContent Title");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test RejectWebContentViaWebContentDisplayPG {
 		Navigator.gotoPage(pageName = "Web Content Display Page");
 

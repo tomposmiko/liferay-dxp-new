@@ -142,6 +142,11 @@ public class LayoutPageTemplateStructureWrapper
 		}
 	}
 
+	@Override
+	public LayoutPageTemplateStructure cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
 	/**
 	 * Returns the fully qualified class name of this layout page template structure.
 	 *
@@ -205,13 +210,6 @@ public class LayoutPageTemplateStructureWrapper
 	@Override
 	public String getData(long segmentsExperienceId) {
 		return model.getData(segmentsExperienceId);
-	}
-
-	@Override
-	public String getData(long[] segmentsExperienceIds)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return model.getData(segmentsExperienceIds);
 	}
 
 	/**

@@ -64,22 +64,21 @@ for (AssetRendererFactory<?> assetRendererFactory : assetEntriesSearchFacet.getA
 />
 
 <script>
-	function <portlet:namespace />saveConfiguration() {
-		var form = document.<portlet:namespace />fm;
+	var form = document.<portlet:namespace />fm;
 
-		var currentAssetTypes = Liferay.Util.getFormElement(
-			form,
-			'currentAssetTypes'
-		);
+	var currentAssetTypes = Liferay.Util.getFormElement(form, 'currentAssetTypes');
 
-		var data = {};
+	if (currentAssetTypes) {
+		form.addEventListener('submit', (event) => {
+			event.preventDefault();
 
-		if (currentAssetTypes) {
+			var data = {};
+
 			data[
 				'<%= assetEntriesSearchFacet.getClassName() + "assetTypes" %>'
 			] = Liferay.Util.listSelect(currentAssetTypes);
-		}
 
-		Liferay.Util.postForm(form, {data: data});
+			Liferay.Util.postForm(form, {data: data});
+		});
 	}
 </script>

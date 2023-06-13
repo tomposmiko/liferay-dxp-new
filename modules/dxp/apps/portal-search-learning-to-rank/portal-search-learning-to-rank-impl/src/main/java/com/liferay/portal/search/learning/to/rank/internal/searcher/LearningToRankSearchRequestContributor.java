@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.search.learning.to.rank.configuration.LearningToRankConfiguration",
-	immediate = true,
+	enabled = false, immediate = true,
 	property = "search.request.contributor.id=com.liferay.portal.search.learning.to.rank",
 	service = SearchRequestContributor.class
 )
@@ -102,7 +102,7 @@ public class LearningToRankSearchRequestContributor
 	@Reference
 	protected SearchRequestBuilderFactory searchRequestBuilderFactory;
 
-	private boolean _enabled;
-	private String _model;
+	private volatile boolean _enabled;
+	private volatile String _model;
 
 }

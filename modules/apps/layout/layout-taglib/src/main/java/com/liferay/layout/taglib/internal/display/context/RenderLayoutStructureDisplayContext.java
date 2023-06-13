@@ -15,8 +15,7 @@
 package com.liferay.layout.taglib.internal.display.context;
 
 import com.liferay.asset.info.display.contributor.util.ContentAccessor;
-import com.liferay.document.library.kernel.model.DLFileEntry;
-import com.liferay.fragment.constants.FragmentWebKeys;
+import com.liferay.fragment.entry.processor.helper.FragmentEntryProcessorHelper;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.DefaultFragmentRendererContext;
 import com.liferay.frontend.token.definition.FrontendTokenDefinition;
@@ -27,27 +26,14 @@ import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.item.ClassPKInfoItemIdentifier;
 import com.liferay.info.item.InfoItemDetails;
 import com.liferay.info.item.InfoItemIdentifier;
+import com.liferay.info.item.InfoItemReference;
 import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
-import com.liferay.info.list.renderer.DefaultInfoListRendererContext;
-import com.liferay.info.list.renderer.InfoListRenderer;
-import com.liferay.info.list.renderer.InfoListRendererContext;
-import com.liferay.info.list.renderer.InfoListRendererTracker;
-import com.liferay.info.pagination.Pagination;
 import com.liferay.info.type.WebImage;
-import com.liferay.layout.display.page.LayoutDisplayPageProvider;
-import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
-import com.liferay.layout.list.retriever.DefaultLayoutListRetrieverContext;
-import com.liferay.layout.list.retriever.LayoutListRetriever;
-import com.liferay.layout.list.retriever.LayoutListRetrieverTracker;
-import com.liferay.layout.list.retriever.ListObjectReference;
-import com.liferay.layout.list.retriever.ListObjectReferenceFactory;
-import com.liferay.layout.list.retriever.ListObjectReferenceFactoryTracker;
 import com.liferay.layout.responsive.ResponsiveLayoutStructureUtil;
 import com.liferay.layout.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.layout.util.constants.LayoutDataItemTypeConstants;
-import com.liferay.layout.util.structure.CollectionStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.ContainerStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
@@ -63,13 +49,12 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ClassedModel;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
-import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -83,13 +68,13 @@ import com.liferay.segments.context.RequestContextMapper;
 import com.liferay.style.book.model.StyleBookEntry;
 import com.liferay.style.book.util.DefaultStyleBookEntryUtil;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Rubén Pulido
@@ -97,116 +82,29 @@ import javax.servlet.http.HttpServletResponse;
 public class RenderLayoutStructureDisplayContext {
 
 	public RenderLayoutStructureDisplayContext(
-		Map<String, Object> fieldValues,
-		FrontendTokenDefinitionRegistry frontendTokenDefinitionRegistry,
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse,
-		InfoItemServiceTracker infoItemServiceTracker,
-		InfoListRendererTracker infoListRendererTracker,
-		LayoutDisplayPageProviderTracker layoutDisplayPageProviderTracker,
-		LayoutListRetrieverTracker layoutListRetrieverTracker,
-		LayoutStructure layoutStructure,
-		ListObjectReferenceFactoryTracker listObjectReferenceFactoryTracker,
-		String mainItemId, String mode,
-		RequestContextMapper requestContextMapper,
-		SegmentsEntryRetriever segmentsEntryRetriever, boolean showPreview) {
+		Map<String, Object> fieldValues, HttpServletRequest httpServletRequest,
+		LayoutStructure layoutStructure, String mainItemId, String mode,
+		boolean showPreview) {
 
 		_fieldValues = fieldValues;
-		_frontendTokenDefinitionRegistry = frontendTokenDefinitionRegistry;
 		_httpServletRequest = httpServletRequest;
-		_httpServletResponse = httpServletResponse;
-		_infoItemServiceTracker = infoItemServiceTracker;
-		_infoListRendererTracker = infoListRendererTracker;
-		_layoutDisplayPageProviderTracker = layoutDisplayPageProviderTracker;
-		_layoutListRetrieverTracker = layoutListRetrieverTracker;
 		_layoutStructure = layoutStructure;
-		_listObjectReferenceFactoryTracker = listObjectReferenceFactoryTracker;
 		_mainItemId = mainItemId;
 		_mode = mode;
-		_requestContextMapper = requestContextMapper;
-		_segmentsEntryRetriever = segmentsEntryRetriever;
 		_showPreview = showPreview;
 
 		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
-	public List<Object> getCollection(
-		CollectionStyledLayoutStructureItem
-			collectionStyledLayoutStructureItem) {
-
-		JSONObject collectionJSONObject =
-			collectionStyledLayoutStructureItem.getCollectionJSONObject();
-
-		if ((collectionJSONObject == null) ||
-			(collectionJSONObject.length() <= 0)) {
-
-			return Collections.emptyList();
-		}
-
-		ListObjectReference listObjectReference = _getListObjectReference(
-			collectionJSONObject);
-
-		if (listObjectReference == null) {
-			return Collections.emptyList();
-		}
-
-		LayoutListRetriever<?, ListObjectReference> layoutListRetriever =
-			(LayoutListRetriever<?, ListObjectReference>)
-				_layoutListRetrieverTracker.getLayoutListRetriever(
-					collectionJSONObject.getString("type"));
-
-		if (layoutListRetriever == null) {
-			return Collections.emptyList();
-		}
-
-		DefaultLayoutListRetrieverContext defaultLayoutListRetrieverContext =
-			new DefaultLayoutListRetrieverContext();
-
-		defaultLayoutListRetrieverContext.setSegmentsEntryIds(
-			_getSegmentsEntryIds());
-		defaultLayoutListRetrieverContext.setPagination(
-			Pagination.of(
-				collectionStyledLayoutStructureItem.getNumberOfItems(), 0));
-
-		return layoutListRetriever.getList(
-			listObjectReference, defaultLayoutListRetrieverContext);
-	}
-
-	public LayoutDisplayPageProvider<?> getCollectionLayoutDisplayPageProvider(
-		CollectionStyledLayoutStructureItem
-			collectionStyledLayoutStructureItem) {
-
-		JSONObject collectionJSONObject =
-			collectionStyledLayoutStructureItem.getCollectionJSONObject();
-
-		if ((collectionJSONObject == null) ||
-			(collectionJSONObject.length() <= 0)) {
-
-			return null;
-		}
-
-		ListObjectReference listObjectReference = _getListObjectReference(
-			collectionJSONObject);
-
-		if (listObjectReference == null) {
-			return null;
-		}
-
-		String className = listObjectReference.getItemType();
-
-		if (Objects.equals(className, DLFileEntry.class.getName())) {
-			className = FileEntry.class.getName();
-		}
-
-		return _layoutDisplayPageProviderTracker.
-			getLayoutDisplayPageProviderByClassName(className);
+	public List<String> getCollectionStyledLayoutStructureItemIds() {
+		return _collectionStyledLayoutStructureItemIds;
 	}
 
 	public String getContainerLinkHref(
 			ContainerStyledLayoutStructureItem
 				containerStyledLayoutStructureItem,
-			Object displayObject)
+			Object displayObject, Locale locale)
 		throws PortalException {
 
 		JSONObject linkJSONObject =
@@ -214,6 +112,15 @@ public class RenderLayoutStructureDisplayContext {
 
 		if (linkJSONObject == null) {
 			return StringPool.BLANK;
+		}
+
+		JSONObject localizedJSONObject = linkJSONObject.getJSONObject(
+			LocaleUtil.toLanguageId(locale));
+
+		if ((localizedJSONObject != null) &&
+			(localizedJSONObject.length() > 0)) {
+
+			linkJSONObject = localizedJSONObject;
 		}
 
 		String mappedField = linkJSONObject.getString("mappedField");
@@ -227,19 +134,22 @@ public class RenderLayoutStructureDisplayContext {
 					InfoDisplayWebKeys.INFO_ITEM_DETAILS);
 
 			if ((infoItem != null) && (infoItemDetails != null)) {
+				InfoItemServiceTracker infoItemServiceTracker =
+					ServletContextUtil.getInfoItemServiceTracker();
+
 				InfoItemFieldValuesProvider<Object>
 					infoItemFieldValuesProvider =
-						_infoItemServiceTracker.getFirstInfoItemService(
+						infoItemServiceTracker.getFirstInfoItemService(
 							InfoItemFieldValuesProvider.class,
 							infoItemDetails.getClassName());
 
 				if (infoItemFieldValuesProvider != null) {
-					InfoFieldValue<Object> infoItemFieldValue =
-						infoItemFieldValuesProvider.getInfoItemFieldValue(
+					InfoFieldValue<Object> infoFieldValue =
+						infoItemFieldValuesProvider.getInfoFieldValue(
 							infoItem, mappedField);
 
-					if (infoItemFieldValue != null) {
-						Object object = infoItemFieldValue.getValue(
+					if (infoFieldValue != null) {
+						Object object = infoFieldValue.getValue(
 							LocaleUtil.getDefault());
 
 						if (object instanceof String) {
@@ -263,15 +173,18 @@ public class RenderLayoutStructureDisplayContext {
 			long classPK = linkJSONObject.getLong("classPK");
 
 			if ((classNameId != 0L) && (classPK != 0L)) {
+				InfoItemServiceTracker infoItemServiceTracker =
+					ServletContextUtil.getInfoItemServiceTracker();
+
 				String className = PortalUtil.getClassName(classNameId);
 
 				InfoItemFieldValuesProvider<Object>
 					infoItemFieldValuesProvider =
-						_infoItemServiceTracker.getFirstInfoItemService(
+						infoItemServiceTracker.getFirstInfoItemService(
 							InfoItemFieldValuesProvider.class, className);
 
 				InfoItemObjectProvider<Object> infoItemObjectProvider =
-					_infoItemServiceTracker.getFirstInfoItemService(
+					infoItemServiceTracker.getFirstInfoItemService(
 						InfoItemObjectProvider.class, className);
 
 				if ((infoItemObjectProvider != null) &&
@@ -284,12 +197,12 @@ public class RenderLayoutStructureDisplayContext {
 						infoItemIdentifier);
 
 					if (infoItem != null) {
-						InfoFieldValue<Object> infoItemFieldValue =
-							infoItemFieldValuesProvider.getInfoItemFieldValue(
+						InfoFieldValue<Object> infoFieldValue =
+							infoItemFieldValuesProvider.getInfoFieldValue(
 								infoItem, fieldId);
 
-						if (infoItemFieldValue != null) {
-							Object object = infoItemFieldValue.getValue(
+						if (infoFieldValue != null) {
+							Object object = infoFieldValue.getValue(
 								LocaleUtil.getDefault());
 
 							if (object instanceof String) {
@@ -319,17 +232,36 @@ public class RenderLayoutStructureDisplayContext {
 			}
 		}
 
-		String href = linkJSONObject.getString("href");
+		JSONObject layoutJSONObject = linkJSONObject.getJSONObject("layout");
 
-		if (Validator.isNotNull(href)) {
-			return href;
+		if (layoutJSONObject != null) {
+			long groupId = layoutJSONObject.getLong("groupId");
+			boolean privateLayout = layoutJSONObject.getBoolean(
+				"privateLayout");
+			long layoutId = layoutJSONObject.getLong("layoutId");
+
+			Layout layout = LayoutLocalServiceUtil.fetchLayout(
+				groupId, privateLayout, layoutId);
+
+			if (layout == null) {
+				return StringPool.POUND;
+			}
+
+			return PortalUtil.getLayoutFullURL(layout, _themeDisplay);
+		}
+
+		JSONObject hrefJSONObject = linkJSONObject.getJSONObject("href");
+
+		if (hrefJSONObject != null) {
+			return hrefJSONObject.getString(LocaleUtil.toLanguageId(locale));
 		}
 
 		return StringPool.BLANK;
 	}
 
 	public String getContainerLinkTarget(
-		ContainerStyledLayoutStructureItem containerStyledLayoutStructureItem) {
+		ContainerStyledLayoutStructureItem containerStyledLayoutStructureItem,
+		Locale locale) {
 
 		JSONObject linkJSONObject =
 			containerStyledLayoutStructureItem.getLinkJSONObject();
@@ -338,21 +270,16 @@ public class RenderLayoutStructureDisplayContext {
 			return StringPool.BLANK;
 		}
 
-		return linkJSONObject.getString("target");
-	}
+		JSONObject localizedJSONObject = linkJSONObject.getJSONObject(
+			LocaleUtil.toLanguageId(locale));
 
-	public String getCssClass(
-			FragmentEntryLink fragmentEntryLink,
-			StyledLayoutStructureItem styledLayoutStructureItem)
-		throws Exception {
+		if ((localizedJSONObject != null) &&
+			(localizedJSONObject.length() > 0)) {
 
-		if (!_checkAccessAllowedToFragmentEntryLink(
-				fragmentEntryLink.getFragmentEntryLinkId())) {
-
-			return StringPool.BLANK;
+			linkJSONObject = localizedJSONObject;
 		}
 
-		return getCssClass(styledLayoutStructureItem);
+		return linkJSONObject.getString("target");
 	}
 
 	public String getCssClass(
@@ -382,16 +309,25 @@ public class RenderLayoutStructureDisplayContext {
 				styledLayoutStructureItem.getBorderColorCssClass());
 		}
 
-		if (Objects.equals(
-				styledLayoutStructureItem.getContentDisplay(), "block")) {
-
-			cssClassSB.append(" d-block");
+		if (Objects.equals(styledLayoutStructureItem.getDisplay(), "none")) {
+			cssClassSB.append(" d-lg-");
+			cssClassSB.append(styledLayoutStructureItem.getDisplay());
 		}
+		else if (Objects.equals(
+					styledLayoutStructureItem.getContentDisplay(),
+					"flex-column")) {
 
-		if (Objects.equals(
-				styledLayoutStructureItem.getContentDisplay(), "flex")) {
+			cssClassSB.append(" d-flex flex-column");
+		}
+		else if (Objects.equals(
+					styledLayoutStructureItem.getContentDisplay(),
+					"flex-row")) {
 
-			cssClassSB.append(" d-flex");
+			cssClassSB.append(" d-flex flex-row");
+		}
+		else if (Validator.isNotNull(styledLayoutStructureItem.getDisplay())) {
+			cssClassSB.append(" d-lg-");
+			cssClassSB.append(styledLayoutStructureItem.getDisplay());
 		}
 
 		if (Validator.isNotNull(styledLayoutStructureItem.getJustify())) {
@@ -413,50 +349,54 @@ public class RenderLayoutStructureDisplayContext {
 					containerStyledLayoutStructureItem.getWidthType(),
 					"fixed")) {
 
-				cssClassSB.append(" container");
+				cssClassSB.append(" container-fluid container-fluid-max-xl");
 
 				addHorizontalMargin = false;
 			}
 		}
 
-		if (styledLayoutStructureItem.getMarginBottom() != -1L) {
+		if (Validator.isNotNull(styledLayoutStructureItem.getMarginBottom())) {
 			cssClassSB.append(" mb-lg-");
 			cssClassSB.append(styledLayoutStructureItem.getMarginBottom());
 		}
 
 		if (addHorizontalMargin) {
-			if (styledLayoutStructureItem.getMarginLeft() != -1L) {
+			if (Validator.isNotNull(
+					styledLayoutStructureItem.getMarginLeft())) {
+
 				cssClassSB.append(" ml-lg-");
 				cssClassSB.append(styledLayoutStructureItem.getMarginLeft());
 			}
 
-			if (styledLayoutStructureItem.getMarginRight() != -1L) {
+			if (Validator.isNotNull(
+					styledLayoutStructureItem.getMarginRight())) {
+
 				cssClassSB.append(" mr-lg-");
 				cssClassSB.append(styledLayoutStructureItem.getMarginRight());
 			}
 		}
 
-		if (styledLayoutStructureItem.getMarginTop() != -1L) {
+		if (Validator.isNotNull(styledLayoutStructureItem.getMarginTop())) {
 			cssClassSB.append(" mt-lg-");
 			cssClassSB.append(styledLayoutStructureItem.getMarginTop());
 		}
 
-		if (styledLayoutStructureItem.getPaddingBottom() != -1L) {
+		if (Validator.isNotNull(styledLayoutStructureItem.getPaddingBottom())) {
 			cssClassSB.append(" pb-lg-");
 			cssClassSB.append(styledLayoutStructureItem.getPaddingBottom());
 		}
 
-		if (styledLayoutStructureItem.getPaddingLeft() != -1L) {
+		if (Validator.isNotNull(styledLayoutStructureItem.getPaddingLeft())) {
 			cssClassSB.append(" pl-lg-");
 			cssClassSB.append(styledLayoutStructureItem.getPaddingLeft());
 		}
 
-		if (styledLayoutStructureItem.getPaddingRight() != -1L) {
+		if (Validator.isNotNull(styledLayoutStructureItem.getPaddingRight())) {
 			cssClassSB.append(" pr-lg-");
 			cssClassSB.append(styledLayoutStructureItem.getPaddingRight());
 		}
 
-		if (styledLayoutStructureItem.getPaddingTop() != -1L) {
+		if (Validator.isNotNull(styledLayoutStructureItem.getPaddingTop())) {
 			cssClassSB.append(" pt-lg-");
 			cssClassSB.append(styledLayoutStructureItem.getPaddingTop());
 		}
@@ -468,7 +408,7 @@ public class RenderLayoutStructureDisplayContext {
 			!Objects.equals(textAlignCssClass, "none")) {
 
 			if (!StringUtil.startsWith(textAlignCssClass, "text-")) {
-				cssClassSB.append(" text-");
+				cssClassSB.append(" text-lg-");
 			}
 			else {
 				cssClassSB.append(StringPool.SPACE);
@@ -497,7 +437,9 @@ public class RenderLayoutStructureDisplayContext {
 	}
 
 	public DefaultFragmentRendererContext getDefaultFragmentRendererContext(
-		FragmentEntryLink fragmentEntryLink, String itemId) {
+		FragmentEntryLink fragmentEntryLink, String itemId,
+		List<String> collectionStyledLayoutStructureItemIds,
+		int collectionElementIndex) {
 
 		DefaultFragmentRendererContext defaultFragmentRendererContext =
 			new DefaultFragmentRendererContext(fragmentEntryLink);
@@ -530,34 +472,13 @@ public class RenderLayoutStructureDisplayContext {
 			defaultFragmentRendererContext.setUseCachedContent(false);
 		}
 
+		defaultFragmentRendererContext.
+			setCollectionStyledLayoutStructureItemIds(
+				collectionStyledLayoutStructureItemIds);
+		defaultFragmentRendererContext.setCollectionElementIndex(
+			collectionElementIndex);
+
 		return defaultFragmentRendererContext;
-	}
-
-	public InfoListRenderer<?> getInfoListRenderer(
-		CollectionStyledLayoutStructureItem
-			collectionStyledLayoutStructureItem) {
-
-		if (Validator.isNull(
-				collectionStyledLayoutStructureItem.getListStyle())) {
-
-			return null;
-		}
-
-		return _infoListRendererTracker.getInfoListRenderer(
-			collectionStyledLayoutStructureItem.getListStyle());
-	}
-
-	public InfoListRendererContext getInfoListRendererContext(
-		String listItemStyle, String templateKey) {
-
-		DefaultInfoListRendererContext defaultInfoListRendererContext =
-			new DefaultInfoListRendererContext(
-				_httpServletRequest, _httpServletResponse);
-
-		defaultInfoListRendererContext.setListItemRendererKey(listItemStyle);
-		defaultInfoListRendererContext.setTemplateKey(templateKey);
-
-		return defaultInfoListRendererContext;
 	}
 
 	public LayoutStructure getLayoutStructure() {
@@ -573,29 +494,10 @@ public class RenderLayoutStructureDisplayContext {
 		return layoutStructureItem.getChildrenItemIds();
 	}
 
-	public String getStyle(
-			FragmentEntryLink fragmentEntryLink,
-			StyledLayoutStructureItem styledLayoutStructureItem)
-		throws Exception {
-
-		if (!_checkAccessAllowedToFragmentEntryLink(
-				fragmentEntryLink.getFragmentEntryLinkId())) {
-
-			return StringPool.BLANK;
-		}
-
-		return getStyle(styledLayoutStructureItem);
-	}
-
 	public String getStyle(StyledLayoutStructureItem styledLayoutStructureItem)
 		throws Exception {
 
-		StringBundler styleSB = new StringBundler(57);
-
-		styleSB.append("box-sizing: border-box;");
-
-		String backgroundImage = _getBackgroundImage(
-			styledLayoutStructureItem.getBackgroundImageJSONObject());
+		StringBundler styleSB = new StringBundler(59);
 
 		if (Validator.isNotNull(
 				styledLayoutStructureItem.getBackgroundColor())) {
@@ -607,12 +509,57 @@ public class RenderLayoutStructureDisplayContext {
 			styleSB.append(StringPool.SEMICOLON);
 		}
 
+		JSONObject backgroundImageJSONObject =
+			styledLayoutStructureItem.getBackgroundImageJSONObject();
+
+		String backgroundImage = _getBackgroundImage(backgroundImageJSONObject);
+
 		if (Validator.isNotNull(backgroundImage)) {
 			styleSB.append("background-position: 50% 50%; background-repeat: ");
 			styleSB.append("no-repeat; background-size: cover; ");
 			styleSB.append("background-image: url(");
 			styleSB.append(backgroundImage);
 			styleSB.append(");");
+		}
+
+		long fileEntryId = 0;
+
+		if (backgroundImageJSONObject.has("fileEntryId")) {
+			fileEntryId = backgroundImageJSONObject.getLong("fileEntryId");
+		}
+		else if (backgroundImageJSONObject.has("classNameId") &&
+				 backgroundImageJSONObject.has("classPK") &&
+				 backgroundImageJSONObject.has("fieldId")) {
+
+			FragmentEntryProcessorHelper fragmentEntryProcessorHelper =
+				ServletContextUtil.getFragmentEntryProcessorHelper();
+
+			fileEntryId = fragmentEntryProcessorHelper.getFileEntryId(
+				backgroundImageJSONObject.getLong("classNameId"),
+				backgroundImageJSONObject.getLong("classPK"),
+				backgroundImageJSONObject.getString("fieldId"),
+				LocaleUtil.fromLanguageId(_themeDisplay.getLanguageId()));
+		}
+		else if (backgroundImageJSONObject.has("collectionFieldId")) {
+			FragmentEntryProcessorHelper fragmentEntryProcessorHelper =
+				ServletContextUtil.getFragmentEntryProcessorHelper();
+
+			fileEntryId = fragmentEntryProcessorHelper.getFileEntryId(
+				_httpServletRequest.getAttribute(
+					InfoDisplayWebKeys.INFO_LIST_DISPLAY_OBJECT),
+				backgroundImageJSONObject.getString("collectionFieldId"),
+				LocaleUtil.fromLanguageId(_themeDisplay.getLanguageId()));
+		}
+		else if (backgroundImageJSONObject.has("mappedField")) {
+			fileEntryId = _getFileEntryId(
+				backgroundImageJSONObject.getString("mappedField"),
+				LocaleUtil.fromLanguageId(_themeDisplay.getLanguageId()));
+		}
+
+		if (fileEntryId != 0) {
+			styleSB.append("--background-image-file-entry-id:");
+			styleSB.append(fileEntryId);
+			styleSB.append(StringPool.SEMICOLON);
 		}
 
 		if (Validator.isNotNull(styledLayoutStructureItem.getBorderColor())) {
@@ -631,7 +578,7 @@ public class RenderLayoutStructureDisplayContext {
 			styleSB.append(StringPool.SEMICOLON);
 		}
 
-		if (styledLayoutStructureItem.getBorderWidth() != -1L) {
+		if (Validator.isNotNull(styledLayoutStructureItem.getBorderWidth())) {
 			styleSB.append("border-style: solid; border-width: ");
 			styleSB.append(styledLayoutStructureItem.getBorderWidth());
 			styleSB.append("px;");
@@ -707,9 +654,12 @@ public class RenderLayoutStructureDisplayContext {
 			styleSB.append(StringPool.SEMICOLON);
 		}
 
-		if (styledLayoutStructureItem.getOpacity() != -1L) {
+		if (Validator.isNotNull(styledLayoutStructureItem.getOpacity())) {
+			int opacity = GetterUtil.getInteger(
+				styledLayoutStructureItem.getOpacity(), 100);
+
 			styleSB.append("opacity: ");
-			styleSB.append(styledLayoutStructureItem.getOpacity() / 100.0);
+			styleSB.append(opacity / 100.0);
 			styleSB.append(StringPool.SEMICOLON);
 		}
 
@@ -751,39 +701,34 @@ public class RenderLayoutStructureDisplayContext {
 			return styleValue;
 		}
 
-		if (BrowserSnifferUtil.isIe(_httpServletRequest)) {
-			return styleValue;
-		}
-
 		String cssVariable = styleValueJSONObject.getString(
 			FrontendTokenMapping.TYPE_CSS_VARIABLE);
 
 		return "var(--" + cssVariable + ")";
 	}
 
-	private boolean _checkAccessAllowedToFragmentEntryLink(
-		long fragmentEntryLinkId) {
-
-		try {
-			return GetterUtil.getBoolean(
-				_httpServletRequest.getAttribute(
-					FragmentWebKeys.ACCESS_ALLOWED_TO_FRAGMENT_ENTRY_LINK_ID +
-						fragmentEntryLinkId),
-				true);
-		}
-		catch (Exception exception) {
-			return false;
-		}
-	}
-
-	private String _getBackgroundImage(JSONObject rowConfigJSONObject)
-		throws Exception {
-
-		if (rowConfigJSONObject == null) {
+	private String _getBackgroundImage(JSONObject jsonObject) throws Exception {
+		if (jsonObject == null) {
 			return StringPool.BLANK;
 		}
 
-		String mappedField = rowConfigJSONObject.getString("mappedField");
+		String mappedCollectionValue = StringPool.BLANK;
+
+		String collectionFieldId = jsonObject.getString("collectionFieldId");
+
+		if (Validator.isNotNull(collectionFieldId)) {
+			Object displayObject = _httpServletRequest.getAttribute(
+				InfoDisplayWebKeys.INFO_LIST_DISPLAY_OBJECT);
+
+			mappedCollectionValue = _getMappedCollectionValue(
+				collectionFieldId, displayObject);
+		}
+
+		if (Validator.isNotNull(mappedCollectionValue)) {
+			return mappedCollectionValue;
+		}
+
+		String mappedField = jsonObject.getString("mappedField");
 
 		if (Validator.isNotNull(mappedField)) {
 			Object infoItem = _httpServletRequest.getAttribute(
@@ -794,19 +739,22 @@ public class RenderLayoutStructureDisplayContext {
 					InfoDisplayWebKeys.INFO_ITEM_DETAILS);
 
 			if ((infoItem != null) && (infoItemDetails != null)) {
+				InfoItemServiceTracker infoItemServiceTracker =
+					ServletContextUtil.getInfoItemServiceTracker();
+
 				InfoItemFieldValuesProvider<Object>
 					infoItemFieldValuesProvider =
-						_infoItemServiceTracker.getFirstInfoItemService(
+						infoItemServiceTracker.getFirstInfoItemService(
 							InfoItemFieldValuesProvider.class,
 							infoItemDetails.getClassName());
 
 				if (infoItemFieldValuesProvider != null) {
-					InfoFieldValue<Object> infoItemFieldValue =
-						infoItemFieldValuesProvider.getInfoItemFieldValue(
+					InfoFieldValue<Object> infoFieldValue =
+						infoItemFieldValuesProvider.getInfoFieldValue(
 							infoItem, mappedField);
 
-					if (infoItemFieldValue != null) {
-						Object object = infoItemFieldValue.getValue(
+					if (infoFieldValue != null) {
+						Object object = infoFieldValue.getValue(
 							LocaleUtil.getDefault());
 
 						if (object instanceof JSONObject) {
@@ -829,22 +777,25 @@ public class RenderLayoutStructureDisplayContext {
 			}
 		}
 
-		String fieldId = rowConfigJSONObject.getString("fieldId");
+		String fieldId = jsonObject.getString("fieldId");
 
 		if (Validator.isNotNull(fieldId)) {
-			long classNameId = rowConfigJSONObject.getLong("classNameId");
-			long classPK = rowConfigJSONObject.getLong("classPK");
+			long classNameId = jsonObject.getLong("classNameId");
+			long classPK = jsonObject.getLong("classPK");
 
 			if ((classNameId != 0L) && (classPK != 0L)) {
+				InfoItemServiceTracker infoItemServiceTracker =
+					ServletContextUtil.getInfoItemServiceTracker();
+
 				String className = PortalUtil.getClassName(classNameId);
 
 				InfoItemFieldValuesProvider<Object>
 					infoItemFieldValuesProvider =
-						_infoItemServiceTracker.getFirstInfoItemService(
+						infoItemServiceTracker.getFirstInfoItemService(
 							InfoItemFieldValuesProvider.class, className);
 
 				InfoItemObjectProvider<Object> infoItemObjectProvider =
-					_infoItemServiceTracker.getFirstInfoItemService(
+					infoItemServiceTracker.getFirstInfoItemService(
 						InfoItemObjectProvider.class, className);
 
 				if ((infoItemObjectProvider != null) &&
@@ -857,12 +808,12 @@ public class RenderLayoutStructureDisplayContext {
 						infoItemIdentifier);
 
 					if (infoItem != null) {
-						InfoFieldValue<Object> infoItemFieldValue =
-							infoItemFieldValuesProvider.getInfoItemFieldValue(
+						InfoFieldValue<Object> infoFieldValue =
+							infoItemFieldValuesProvider.getInfoFieldValue(
 								infoItem, fieldId);
 
-						if (infoItemFieldValue != null) {
-							Object object = infoItemFieldValue.getValue(
+						if (infoFieldValue != null) {
+							Object object = infoFieldValue.getValue(
 								LocaleUtil.getDefault());
 
 							if (object instanceof JSONObject) {
@@ -886,13 +837,49 @@ public class RenderLayoutStructureDisplayContext {
 			}
 		}
 
-		String backgroundImageURL = rowConfigJSONObject.getString("url");
+		String backgroundImageURL = jsonObject.getString("url");
 
 		if (Validator.isNotNull(backgroundImageURL)) {
-			return backgroundImageURL;
+			return PortalUtil.getPathContext() + backgroundImageURL;
 		}
 
 		return StringPool.BLANK;
+	}
+
+	private long _getFileEntryId(String fieldId, Locale locale)
+		throws Exception {
+
+		InfoItemDetails infoItemDetails =
+			(InfoItemDetails)_httpServletRequest.getAttribute(
+				InfoDisplayWebKeys.INFO_ITEM_DETAILS);
+
+		if (infoItemDetails == null) {
+			return 0;
+		}
+
+		InfoItemReference infoItemReference =
+			infoItemDetails.getInfoItemReference();
+
+		if (infoItemReference == null) {
+			return 0;
+		}
+
+		InfoItemIdentifier infoItemIdentifier =
+			infoItemReference.getInfoItemIdentifier();
+
+		if (!(infoItemIdentifier instanceof ClassPKInfoItemIdentifier)) {
+			return 0;
+		}
+
+		FragmentEntryProcessorHelper fragmentEntryProcessorHelper =
+			ServletContextUtil.getFragmentEntryProcessorHelper();
+
+		ClassPKInfoItemIdentifier classPKInfoItemIdentifier =
+			(ClassPKInfoItemIdentifier)infoItemIdentifier;
+
+		return fragmentEntryProcessorHelper.getFileEntryId(
+			PortalUtil.getClassNameId(infoItemReference.getClassName()),
+			classPKInfoItemIdentifier.getClassPK(), fieldId, locale);
 	}
 
 	private JSONObject _getFrontendTokensJSONObject() throws Exception {
@@ -920,13 +907,14 @@ public class RenderLayoutStructureDisplayContext {
 				styleBookEntry.getFrontendTokensValues());
 		}
 
-		Group group = _themeDisplay.getScopeGroup();
+		FrontendTokenDefinitionRegistry frontendTokenDefinitionRegistry =
+			ServletContextUtil.getFrontendTokenDefinitionRegistry();
 
 		LayoutSet layoutSet = LayoutSetLocalServiceUtil.fetchLayoutSet(
-			_themeDisplay.getSiteGroupId(), group.isLayoutSetPrototype());
+			_themeDisplay.getSiteGroupId(), false);
 
 		FrontendTokenDefinition frontendTokenDefinition =
-			_frontendTokenDefinitionRegistry.getFrontendTokenDefinition(
+			frontendTokenDefinitionRegistry.getFrontendTokenDefinition(
 				layoutSet.getThemeId());
 
 		if (frontendTokenDefinition == null) {
@@ -1006,29 +994,6 @@ public class RenderLayoutStructureDisplayContext {
 		return _frontendTokensJSONObject;
 	}
 
-	private ListObjectReference _getListObjectReference(
-		JSONObject collectionJSONObject) {
-
-		String type = collectionJSONObject.getString("type");
-
-		LayoutListRetriever<?, ?> layoutListRetriever =
-			_layoutListRetrieverTracker.getLayoutListRetriever(type);
-
-		if (layoutListRetriever == null) {
-			return null;
-		}
-
-		ListObjectReferenceFactory<?> listObjectReferenceFactory =
-			_listObjectReferenceFactoryTracker.getListObjectReference(type);
-
-		if (listObjectReferenceFactory == null) {
-			return null;
-		}
-
-		return listObjectReferenceFactory.getListObjectReference(
-			collectionJSONObject);
-	}
-
 	private String _getMainItemId() {
 		if (Validator.isNotNull(_mainItemId)) {
 			return _mainItemId;
@@ -1054,8 +1019,11 @@ public class RenderLayoutStructureDisplayContext {
 			className = FileEntry.class.getName();
 		}
 
+		InfoItemServiceTracker infoItemServiceTracker =
+			ServletContextUtil.getInfoItemServiceTracker();
+
 		InfoItemFieldValuesProvider<Object> infoItemFieldValuesProvider =
-			_infoItemServiceTracker.getFirstInfoItemService(
+			infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemFieldValuesProvider.class, className);
 
 		if (infoItemFieldValuesProvider == null) {
@@ -1069,14 +1037,15 @@ public class RenderLayoutStructureDisplayContext {
 		}
 
 		InfoFieldValue<Object> infoFieldValue =
-			infoItemFieldValuesProvider.getInfoItemFieldValue(
+			infoItemFieldValuesProvider.getInfoFieldValue(
 				displayObject, collectionFieldId);
 
 		if (infoFieldValue == null) {
 			return StringPool.BLANK;
 		}
 
-		Object value = infoFieldValue.getValue();
+		Object value = infoFieldValue.getValue(
+			LocaleUtil.fromLanguageId(_themeDisplay.getLanguageId()));
 
 		if (value instanceof ContentAccessor) {
 			ContentAccessor contentAccessor = (ContentAccessor)infoFieldValue;
@@ -1086,6 +1055,18 @@ public class RenderLayoutStructureDisplayContext {
 
 		if (value instanceof String) {
 			return (String)value;
+		}
+
+		if (!(value instanceof WebImage)) {
+			return StringPool.BLANK;
+		}
+
+		WebImage webImage = (WebImage)value;
+
+		String url = webImage.getUrl();
+
+		if (Validator.isNotNull(url)) {
+			return url;
 		}
 
 		return StringPool.BLANK;
@@ -1171,29 +1152,19 @@ public class RenderLayoutStructureDisplayContext {
 	private static final Log _log = LogFactoryUtil.getLog(
 		RenderLayoutStructureDisplayContext.class);
 
+	private final List<String> _collectionStyledLayoutStructureItemIds =
+		new ArrayList<>();
 	private final Map<String, Object> _fieldValues;
-	private final FrontendTokenDefinitionRegistry
-		_frontendTokenDefinitionRegistry;
 	private JSONObject _frontendTokensJSONObject;
 	private final HttpServletRequest _httpServletRequest;
-	private final HttpServletResponse _httpServletResponse;
-	private final InfoItemServiceTracker _infoItemServiceTracker;
-	private final InfoListRendererTracker _infoListRendererTracker;
-	private final LayoutDisplayPageProviderTracker
-		_layoutDisplayPageProviderTracker;
-	private final LayoutListRetrieverTracker _layoutListRetrieverTracker;
 	private final LayoutStructure _layoutStructure;
-	private final ListObjectReferenceFactoryTracker
-		_listObjectReferenceFactoryTracker;
 	private final String _mainItemId;
 	private final String _mode;
 	private Long _previewClassNameId;
 	private Long _previewClassPK;
 	private Integer _previewType;
 	private String _previewVersion;
-	private final RequestContextMapper _requestContextMapper;
 	private long[] _segmentsEntryIds;
-	private final SegmentsEntryRetriever _segmentsEntryRetriever;
 	private final boolean _showPreview;
 	private final ThemeDisplay _themeDisplay;
 

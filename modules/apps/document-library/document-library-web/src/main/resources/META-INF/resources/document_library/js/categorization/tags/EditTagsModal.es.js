@@ -17,17 +17,17 @@ import ClayButton from '@clayui/button';
 import {ClayRadio, ClayRadioGroup} from '@clayui/form';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import ClayModal from '@clayui/modal';
+import {useIsMounted} from '@liferay/frontend-js-react-web';
 import {AssetTagsSelector} from 'asset-taglib';
-import {useIsMounted} from 'frontend-js-react-web';
 import {fetch} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 
 import EditTagsContext from './EditTagsContext.es';
 
-const URL_SELECTION = '/bulk/v1.0/bulk-selection',
-	URL_TAGS = '/bulk/v1.0/keywords/common',
-	URL_UPDATE_TAGS = '/bulk/v1.0/keywords/batch';
+const URL_SELECTION = '/bulk/v1.0/bulk-selection';
+const URL_TAGS = '/bulk/v1.0/keywords/common';
+const URL_UPDATE_TAGS = '/bulk/v1.0/keywords/batch';
 
 const noop = () => {};
 
@@ -57,7 +57,7 @@ const EditTagsModal = ({
 	// ones.
 
 	const [initialSelectedItems, setInitialSelectedItems] = useState([]);
-	const [inputValue, setInputValue] = useState('');
+	const [inputValue, setInputValue] = useState();
 
 	// Current selected items.
 
@@ -77,7 +77,9 @@ const EditTagsModal = ({
 			};
 
 			return fetch(`${pathModule}${url}`, init)
-				.then((response) => response.json())
+				.then((response) =>
+					response.status === 204 ? '' : response.json()
+				)
 				.catch(() => {
 					onModalClose();
 				});
@@ -218,8 +220,10 @@ const EditTagsModal = ({
 					{multiple && (
 						<ClayRadioGroup
 							name="add-replace"
-							onChange={handleMultipleSelectedOptionChange}
-							value={selectedRadioGroupValue}
+							onSelectedValueChange={
+								handleMultipleSelectedOptionChange
+							}
+							selectedValue={selectedRadioGroupValue}
 						>
 							<ClayRadio
 								label={Liferay.Language.get('edit')}

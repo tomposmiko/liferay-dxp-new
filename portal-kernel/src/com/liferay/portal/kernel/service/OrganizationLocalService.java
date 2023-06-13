@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.model.SystemEventConstants;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexable;
@@ -159,6 +160,11 @@ public interface OrganizationLocalService
 	public void addOrganizationResources(long userId, Organization organization)
 		throws PortalException;
 
+	public User addOrganizationUserByEmailAddress(
+			String emailAddress, long organizationId,
+			ServiceContext serviceContext)
+		throws PortalException;
+
 	/**
 	 * Assigns the password policy to the organizations, removing any other
 	 * currently assigned password policies.
@@ -172,6 +178,10 @@ public interface OrganizationLocalService
 	public void addUserOrganization(long userId, long organizationId);
 
 	public void addUserOrganization(long userId, Organization organization);
+
+	public void addUserOrganizationByEmailAddress(
+			String emailAddress, long organizationId)
+		throws PortalException;
 
 	public void addUserOrganizations(
 		long userId, List<Organization> organizations);
@@ -255,6 +265,10 @@ public interface OrganizationLocalService
 	public void deleteUserOrganization(long userId, long organizationId);
 
 	public void deleteUserOrganization(long userId, Organization organization);
+
+	public void deleteUserOrganizationByEmailAddress(
+			String emailAddress, long organizationId)
+		throws PortalException;
 
 	public void deleteUserOrganizations(
 		long userId, List<Organization> organizations);
@@ -347,11 +361,20 @@ public interface OrganizationLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Organization fetchOrganization(long companyId, String name);
 
-	@Deprecated
+	/**
+	 * Returns the organization with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the organization's external reference code
+	 * @return the matching organization, or <code>null</code> if a matching organization could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Organization fetchOrganizationByExternalReferenceCode(
 		long companyId, String externalReferenceCode);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchOrganizationByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Organization fetchOrganizationByReferenceCode(
@@ -435,7 +458,14 @@ public interface OrganizationLocalService
 	public Organization getOrganization(long companyId, String name)
 		throws PortalException;
 
-	@Deprecated
+	/**
+	 * Returns the organization with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the organization's external reference code
+	 * @return the matching organization
+	 * @throws PortalException if a matching organization could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Organization getOrganizationByExternalReferenceCode(
 			long companyId, String externalReferenceCode)

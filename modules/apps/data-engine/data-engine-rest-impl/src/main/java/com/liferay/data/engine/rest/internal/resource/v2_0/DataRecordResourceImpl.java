@@ -41,6 +41,7 @@ import com.liferay.dynamic.data.mapping.spi.converter.SPIDDMFormRuleConverter;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -96,6 +97,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 	properties = "OSGI-INF/liferay/rest/v2_0/data-record.properties",
 	scope = ServiceScope.PROTOTYPE, service = DataRecordResource.class
 )
+@CTAware
 public class DataRecordResourceImpl
 	extends BaseDataRecordResourceImpl implements EntityModelResource {
 
@@ -216,8 +218,8 @@ public class DataRecordResourceImpl
 					new QueryFilter(ddmContentBooleanQuery),
 					BooleanClauseOccur.MUST);
 			},
-			_getBooleanFilter(dataListViewId, ddlRecordSet), DDLRecord.class,
-			null, pagination,
+			_getBooleanFilter(dataListViewId, ddlRecordSet),
+			DDLRecord.class.getName(), null, pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
 			searchContext -> {
@@ -367,7 +369,11 @@ public class DataRecordResourceImpl
 
 		_ddlRecordLocalService.updateRecord(
 			PrincipalThreadLocal.getUserId(), dataRecordId, ddmStorageId,
-			new ServiceContext());
+			new ServiceContext() {
+				{
+					setAttribute("status", ddlRecord.getStatus());
+				}
+			});
 
 		return dataRecord;
 	}
@@ -433,7 +439,9 @@ public class DataRecordResourceImpl
 
 				fieldBooleanFilter.add(
 					_ddmIndexer.createFieldValueQueryFilter(
-						ddmStructure, fieldName,
+						ddmStructure,
+						ddmStructure.getFieldProperty(
+							fieldName, "fieldReference"),
 						contextAcceptLanguage.getPreferredLocale(), value),
 					BooleanClauseOccur.SHOULD);
 			}
@@ -515,6 +523,7 @@ public class DataRecordResourceImpl
 				dataRecordValues = dataStorage.get(
 					ddmStructure.getStructureId(), ddlRecord.getDDMStorageId());
 				id = ddlRecord.getRecordId();
+				status = ddlRecord.getStatus();
 			}
 		};
 	}

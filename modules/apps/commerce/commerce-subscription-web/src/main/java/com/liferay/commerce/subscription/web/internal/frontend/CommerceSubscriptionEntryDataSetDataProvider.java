@@ -14,12 +14,13 @@
 
 package com.liferay.commerce.subscription.web.internal.frontend;
 
+import com.liferay.account.constants.AccountPortletKeys;
 import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.constants.CommerceSubscriptionEntryConstants;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.model.CommerceSubscriptionEntry;
-import com.liferay.commerce.product.display.context.util.CPRequestHelper;
+import com.liferay.commerce.product.display.context.helper.CPRequestHelper;
 import com.liferay.commerce.service.CommerceOrderItemService;
 import com.liferay.commerce.service.CommerceSubscriptionEntryService;
 import com.liferay.commerce.subscription.web.internal.frontend.constants.CommerceSubscriptionDataSetConstants;
@@ -29,6 +30,7 @@ import com.liferay.commerce.subscription.web.internal.model.SubscriptionEntry;
 import com.liferay.frontend.taglib.clay.data.Filter;
 import com.liferay.frontend.taglib.clay.data.Pagination;
 import com.liferay.frontend.taglib.clay.data.set.provider.ClayDataSetDataProvider;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.PortletProvider;
@@ -43,7 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.portlet.PortletURL;
+import javax.portlet.PortletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -148,27 +150,19 @@ public class CommerceSubscriptionEntryDataSetDataProvider
 			long commerceAccountId, HttpServletRequest httpServletRequest)
 		throws PortalException {
 
-		CPRequestHelper cpRequestHelper = new CPRequestHelper(
-			httpServletRequest);
-
-		ThemeDisplay themeDisplay = cpRequestHelper.getThemeDisplay();
-
-		PortletURL portletURL = PortletProviderUtil.getPortletURL(
-			httpServletRequest, themeDisplay.getScopeGroup(),
-			CommerceAccount.class.getName(), PortletProvider.Action.EDIT);
-
-		String redirect = ParamUtil.getString(
-			httpServletRequest, "currentUrl",
-			_portal.getCurrentURL(httpServletRequest));
-
-		portletURL.setParameter(
-			"mvcRenderCommandName",
-			"/commerce_account_admin/edit_commerce_account");
-		portletURL.setParameter("redirect", redirect);
-		portletURL.setParameter(
-			"commerceAccountId", String.valueOf(commerceAccountId));
-
-		return portletURL.toString();
+		return PortletURLBuilder.create(
+			_portal.getControlPanelPortletURL(
+				httpServletRequest, AccountPortletKeys.ACCOUNT_ENTRIES_ADMIN,
+				PortletRequest.RENDER_PHASE)
+		).setMVCRenderCommandName(
+			"/account_admin/edit_account_entry"
+		).setRedirect(
+			ParamUtil.getString(
+				httpServletRequest, "currentUrl",
+				_portal.getCurrentURL(httpServletRequest))
+		).setParameter(
+			"accountEntryId", commerceAccountId
+		).buildString();
 	}
 
 	private String _getEditCommerceOrderURL(
@@ -180,22 +174,19 @@ public class CommerceSubscriptionEntryDataSetDataProvider
 
 		ThemeDisplay themeDisplay = cpRequestHelper.getThemeDisplay();
 
-		PortletURL portletURL = PortletProviderUtil.getPortletURL(
-			httpServletRequest, themeDisplay.getScopeGroup(),
-			CommerceOrder.class.getName(), PortletProvider.Action.MANAGE);
-
-		String redirect = ParamUtil.getString(
-			httpServletRequest, "currentUrl",
-			_portal.getCurrentURL(httpServletRequest));
-
-		portletURL.setParameter(
-			"mvcRenderCommandName",
-			"/commerce_open_order_content/edit_commerce_order");
-		portletURL.setParameter("redirect", redirect);
-		portletURL.setParameter(
-			"commerceOrderId", String.valueOf(commerceOrderId));
-
-		return portletURL.toString();
+		return PortletURLBuilder.create(
+			PortletProviderUtil.getPortletURL(
+				httpServletRequest, themeDisplay.getScopeGroup(),
+				CommerceOrder.class.getName(), PortletProvider.Action.MANAGE)
+		).setMVCRenderCommandName(
+			"/commerce_open_order_content/edit_commerce_order"
+		).setRedirect(
+			ParamUtil.getString(
+				httpServletRequest, "currentUrl",
+				_portal.getCurrentURL(httpServletRequest))
+		).setParameter(
+			"commerceOrderId", commerceOrderId
+		).buildString();
 	}
 
 	private Label _getSubscriptionStatus(

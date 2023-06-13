@@ -50,7 +50,7 @@ public class LayoutSetPrototypePortletDataHandler
 
 	public static final String NAMESPACE = "layout_set_prototypes";
 
-	public static final String SCHEMA_VERSION = "1.0.0";
+	public static final String SCHEMA_VERSION = "4.0.0";
 
 	@Override
 	public String getSchemaVersion() {
@@ -92,7 +92,7 @@ public class LayoutSetPrototypePortletDataHandler
 
 	@Override
 	protected String doExportData(
-			final PortletDataContext portletDataContext, String portletId,
+			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
 		throws Exception {
 

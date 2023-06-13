@@ -30,6 +30,7 @@ import com.liferay.portal.tools.service.builder.test.model.LocalizedEntryLocaliz
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -232,70 +233,92 @@ public class LocalizedEntryLocalizationModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, LocalizedEntryLocalization>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			LocalizedEntryLocalization.class.getClassLoader(),
+			LocalizedEntryLocalization.class, ModelWrapper.class);
+
+		try {
+			Constructor<LocalizedEntryLocalization> constructor =
+				(Constructor<LocalizedEntryLocalization>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map
 		<String, Function<LocalizedEntryLocalization, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<LocalizedEntryLocalization, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<LocalizedEntryLocalization, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<LocalizedEntryLocalization, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", LocalizedEntryLocalization::getMvccVersion);
-		attributeGetterFunctions.put(
-			"localizedEntryLocalizationId",
-			LocalizedEntryLocalization::getLocalizedEntryLocalizationId);
-		attributeGetterFunctions.put(
-			"localizedEntryId",
-			LocalizedEntryLocalization::getLocalizedEntryId);
-		attributeGetterFunctions.put(
-			"languageId", LocalizedEntryLocalization::getLanguageId);
-		attributeGetterFunctions.put(
-			"title", LocalizedEntryLocalization::getTitle);
-		attributeGetterFunctions.put(
-			"content", LocalizedEntryLocalization::getContent);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<LocalizedEntryLocalization, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<LocalizedEntryLocalization, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<LocalizedEntryLocalization, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", LocalizedEntryLocalization::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<LocalizedEntryLocalization, Long>)
 				LocalizedEntryLocalization::setMvccVersion);
+		attributeGetterFunctions.put(
+			"localizedEntryLocalizationId",
+			LocalizedEntryLocalization::getLocalizedEntryLocalizationId);
 		attributeSetterBiConsumers.put(
 			"localizedEntryLocalizationId",
 			(BiConsumer<LocalizedEntryLocalization, Long>)
 				LocalizedEntryLocalization::setLocalizedEntryLocalizationId);
+		attributeGetterFunctions.put(
+			"localizedEntryId",
+			LocalizedEntryLocalization::getLocalizedEntryId);
 		attributeSetterBiConsumers.put(
 			"localizedEntryId",
 			(BiConsumer<LocalizedEntryLocalization, Long>)
 				LocalizedEntryLocalization::setLocalizedEntryId);
+		attributeGetterFunctions.put(
+			"languageId", LocalizedEntryLocalization::getLanguageId);
 		attributeSetterBiConsumers.put(
 			"languageId",
 			(BiConsumer<LocalizedEntryLocalization, String>)
 				LocalizedEntryLocalization::setLanguageId);
+		attributeGetterFunctions.put(
+			"title", LocalizedEntryLocalization::getTitle);
 		attributeSetterBiConsumers.put(
 			"title",
 			(BiConsumer<LocalizedEntryLocalization, String>)
 				LocalizedEntryLocalization::setTitle);
+		attributeGetterFunctions.put(
+			"content", LocalizedEntryLocalization::getContent);
 		attributeSetterBiConsumers.put(
 			"content",
 			(BiConsumer<LocalizedEntryLocalization, String>)
 				LocalizedEntryLocalization::setContent);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -487,6 +510,27 @@ public class LocalizedEntryLocalizationModelImpl
 		localizedEntryLocalizationImpl.setContent(getContent());
 
 		localizedEntryLocalizationImpl.resetOriginalValues();
+
+		return localizedEntryLocalizationImpl;
+	}
+
+	@Override
+	public LocalizedEntryLocalization cloneWithOriginalValues() {
+		LocalizedEntryLocalizationImpl localizedEntryLocalizationImpl =
+			new LocalizedEntryLocalizationImpl();
+
+		localizedEntryLocalizationImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		localizedEntryLocalizationImpl.setLocalizedEntryLocalizationId(
+			this.<Long>getColumnOriginalValue("localizedEntryLocalizationId"));
+		localizedEntryLocalizationImpl.setLocalizedEntryId(
+			this.<Long>getColumnOriginalValue("localizedEntryId"));
+		localizedEntryLocalizationImpl.setLanguageId(
+			this.<String>getColumnOriginalValue("languageId"));
+		localizedEntryLocalizationImpl.setTitle(
+			this.<String>getColumnOriginalValue("title"));
+		localizedEntryLocalizationImpl.setContent(
+			this.<String>getColumnOriginalValue("content"));
 
 		return localizedEntryLocalizationImpl;
 	}
@@ -690,8 +734,7 @@ public class LocalizedEntryLocalizationModelImpl
 		private static final Function
 			<InvocationHandler, LocalizedEntryLocalization>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						LocalizedEntryLocalization.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 

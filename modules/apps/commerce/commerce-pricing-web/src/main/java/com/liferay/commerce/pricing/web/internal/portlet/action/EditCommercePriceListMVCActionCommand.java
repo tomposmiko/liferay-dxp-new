@@ -196,9 +196,9 @@ public class EditCommercePriceListMVCActionCommand
 		String name = ParamUtil.getString(actionRequest, "name");
 		double priority = ParamUtil.getDouble(actionRequest, "priority");
 
-		Date now = new Date();
+		Date date = new Date();
 
-		Calendar calendar = CalendarFactoryUtil.getCalendar(now.getTime());
+		Calendar calendar = CalendarFactoryUtil.getCalendar(date.getTime());
 
 		int displayDateMonth = ParamUtil.getInteger(
 			actionRequest, "displayDateMonth", calendar.get(Calendar.MONTH));
@@ -249,13 +249,12 @@ public class EditCommercePriceListMVCActionCommand
 			String type = ParamUtil.getString(actionRequest, "type");
 
 			commercePriceList = _commercePriceListService.addCommercePriceList(
-				commerceCatalogGroupId, serviceContext.getUserId(),
-				commerceCurrencyId, netPrice, type, parentCommercePriceListId,
-				false, name, priority, displayDateMonth, displayDateDay,
-				displayDateYear, displayDateHour, displayDateMinute,
-				expirationDateMonth, expirationDateDay, expirationDateYear,
-				expirationDateHour, expirationDateMinute, null, neverExpire,
-				serviceContext);
+				null, commerceCatalogGroupId, commerceCurrencyId, netPrice,
+				type, parentCommercePriceListId, false, name, priority,
+				displayDateMonth, displayDateDay, displayDateYear,
+				displayDateHour, displayDateMinute, expirationDateMonth,
+				expirationDateDay, expirationDateYear, expirationDateHour,
+				expirationDateMinute, neverExpire, serviceContext);
 		}
 		else {
 			commercePriceList =

@@ -51,7 +51,7 @@ long mfaEmailOTPFailedAttemptsRetryTimeout = GetterUtil.getLong(request.getAttri
 
 	var configuredResendDuration = <%= mfaEmailOTPConfiguration.resendEmailTimeout() %>;
 
-	var failedAttemptsRetryTimeout = <%= mfaEmailOTPFailedAttemptsRetryTimeout %>;
+	var failedAttemptsRetryTimeout = <%=mfaEmailOTPFailedAttemptsRetryTimeout %>;
 
 	var countdown;
 
@@ -66,7 +66,7 @@ long mfaEmailOTPFailedAttemptsRetryTimeout = GetterUtil.getLong(request.getAttri
 	var elapsedTime = Math.floor((Date.now() - previousSetTime) / 1000);
 
 	function <portlet:namespace />createCountdown(f, countdown, interval) {
-		return setInterval(function () {
+		return setInterval(() => {
 			--countdown;
 			f(countdown);
 		}, interval);
@@ -107,7 +107,7 @@ long mfaEmailOTPFailedAttemptsRetryTimeout = GetterUtil.getLong(request.getAttri
 
 		var originalSubmitButtonText = submitEmailButton.text();
 
-		setInterval(function () {
+		setInterval(() => {
 			--failedAttemptsRetryTimeout;
 			{
 				if (failedAttemptsRetryTimeout < 1) {
@@ -126,7 +126,7 @@ long mfaEmailOTPFailedAttemptsRetryTimeout = GetterUtil.getLong(request.getAttri
 		}, 1000);
 	}
 
-	A.one('#<portlet:namespace />sendEmailButton').on('click', function (event) {
+	A.one('#<portlet:namespace />sendEmailButton').on('click', (event) => {
 		sendEmailButton.setAttribute('disabled', 'disabled');
 
 		var resendDuration = <%= mfaEmailOTPConfiguration.resendEmailTimeout() %>;

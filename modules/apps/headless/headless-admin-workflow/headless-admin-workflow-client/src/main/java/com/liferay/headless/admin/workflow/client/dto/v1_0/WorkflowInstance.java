@@ -56,6 +56,27 @@ public class WorkflowInstance implements Cloneable, Serializable {
 
 	protected Boolean completed;
 
+	public String[] getCurrentNodeNames() {
+		return currentNodeNames;
+	}
+
+	public void setCurrentNodeNames(String[] currentNodeNames) {
+		this.currentNodeNames = currentNodeNames;
+	}
+
+	public void setCurrentNodeNames(
+		UnsafeSupplier<String[], Exception> currentNodeNamesUnsafeSupplier) {
+
+		try {
+			currentNodeNames = currentNodeNamesUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String[] currentNodeNames;
+
 	public Date getDateCompletion() {
 		return dateCompletion;
 	}

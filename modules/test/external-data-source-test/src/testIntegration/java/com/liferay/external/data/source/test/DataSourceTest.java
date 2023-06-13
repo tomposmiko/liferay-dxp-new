@@ -50,25 +50,26 @@ public class DataSourceTest {
 
 	@Test
 	public void testUpdate() throws Exception {
-		try (Connection con = _dataSource.getConnection();
-			PreparedStatement ps = con.prepareStatement(
+		try (Connection connection = _dataSource.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(
 				"select * from TestEntity");
-			ResultSet rs = ps.executeQuery()) {
+			ResultSet resultSet = preparedStatement.executeQuery()) {
 
 			Assert.assertTrue(
-				"Missing upgrade process created record", rs.next());
+				"Missing upgrade process created record", resultSet.next());
 
-			Assert.assertEquals(-1, rs.getLong("id_"));
-			Assert.assertEquals("Test Upgrade Value", rs.getString("data_"));
+			Assert.assertEquals(-1, resultSet.getLong("id_"));
+			Assert.assertEquals(
+				"Test Upgrade Value", resultSet.getString("data_"));
 
-			Assert.assertFalse("Found more than 1 record", rs.next());
+			Assert.assertFalse("Found more than 1 record", resultSet.next());
 		}
 
-		try (Connection con = _dataSource.getConnection();
-			PreparedStatement ps = con.prepareStatement(
+		try (Connection connection = _dataSource.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(
 				"delete from TestEntity")) {
 
-			ps.executeUpdate();
+			preparedStatement.executeUpdate();
 		}
 
 		long pk = RandomTestUtil.nextLong();
@@ -79,15 +80,15 @@ public class DataSourceTest {
 
 		TestEntityLocalServiceUtil.addTestEntity(testEntity);
 
-		try (Connection con = _dataSource.getConnection();
-			PreparedStatement ps = con.prepareStatement(
+		try (Connection connection = _dataSource.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(
 				"select * from TestEntity");
-			ResultSet rs = ps.executeQuery()) {
+			ResultSet resultSet = preparedStatement.executeQuery()) {
 
-			Assert.assertTrue(rs.next());
-			Assert.assertEquals(pk, rs.getLong("id_"));
+			Assert.assertTrue(resultSet.next());
+			Assert.assertEquals(pk, resultSet.getLong("id_"));
 			Assert.assertEquals(
-				DataSourceTest.class.getName(), rs.getString("data_"));
+				DataSourceTest.class.getName(), resultSet.getString("data_"));
 		}
 	}
 

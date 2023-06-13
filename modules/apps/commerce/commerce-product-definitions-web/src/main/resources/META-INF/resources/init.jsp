@@ -31,7 +31,10 @@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page import="com.liferay.asset.kernel.model.AssetRenderer" %><%@
+page import="com.liferay.asset.kernel.model.AssetVocabularyConstants" %><%@
 page import="com.liferay.commerce.constants.CPDefinitionInventoryConstants" %><%@
+page import="com.liferay.commerce.constants.CommerceWebKeys" %><%@
+page import="com.liferay.commerce.context.CommerceContext" %><%@
 page import="com.liferay.commerce.currency.model.CommerceCurrency" %><%@
 page import="com.liferay.commerce.inventory.CPDefinitionInventoryEngine" %><%@
 page import="com.liferay.commerce.model.CPDAvailabilityEstimate" %><%@
@@ -100,7 +103,9 @@ page import="com.liferay.commerce.product.model.CommerceCatalog" %><%@
 page import="com.liferay.commerce.product.model.CommerceChannel" %><%@
 page import="com.liferay.commerce.product.servlet.taglib.ui.constants.CPDefinitionScreenNavigationConstants" %><%@
 page import="com.liferay.commerce.product.servlet.taglib.ui.constants.CPInstanceScreenNavigationConstants" %><%@
+page import="com.liferay.commerce.product.type.virtual.constants.VirtualCPTypeConstants" %><%@
 page import="com.liferay.commerce.stock.activity.CommerceLowStockActivity" %><%@
+page import="com.liferay.commerce.util.CommerceUtil" %><%@
 page import="com.liferay.document.library.kernel.exception.NoSuchFileEntryException" %><%@
 page import="com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType" %><%@
 page import="com.liferay.friendly.url.exception.FriendlyURLLengthException" %><%@
@@ -122,7 +127,6 @@ page import="com.liferay.portal.kernel.util.HttpUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
 page import="com.liferay.portal.kernel.util.PortalUtil" %><%@
 page import="com.liferay.portal.kernel.util.StringUtil" %><%@
-page import="com.liferay.portal.kernel.util.UnicodeFormatter" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.kernel.workflow.WorkflowConstants" %>
@@ -133,6 +137,7 @@ page import="com.liferay.portal.kernel.workflow.WorkflowConstants" %>
 
 <%@ page import="java.util.ArrayList" %><%@
 page import="java.util.Arrays" %><%@
+page import="java.util.Calendar" %><%@
 page import="java.util.List" %><%@
 page import="java.util.Map" %><%@
 page import="java.util.StringJoiner" %>

@@ -51,7 +51,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
-		"mvc.command.name=/content_layout/get_available_templates"
+		"mvc.command.name=/layout_content_page_editor/get_available_templates"
 	},
 	service = MVCResourceCommand.class
 )
@@ -71,12 +71,15 @@ public class GetAvailableTemplatesMVCResourceCommand
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
-		List<InfoItemRenderer<?>> infoItemRenderers =
-			_infoItemRendererTracker.getInfoItemRenderers(className);
-
 		Object infoItemObject = _getInfoItemObject(className, classPK);
 
-		for (InfoItemRenderer<?> infoItemRenderer : infoItemRenderers) {
+		for (InfoItemRenderer<?> infoItemRenderer :
+				_infoItemRendererTracker.getInfoItemRenderers(className)) {
+
+			if (!infoItemRenderer.isAvailable()) {
+				continue;
+			}
+
 			if (infoItemRenderer instanceof InfoItemTemplatedRenderer) {
 				JSONArray templatesJSONArray =
 					JSONFactoryUtil.createJSONArray();
@@ -87,6 +90,10 @@ public class GetAvailableTemplatesMVCResourceCommand
 				List<InfoItemRendererTemplate> infoItemRendererTemplates =
 					infoItemTemplatedRenderer.getInfoItemRendererTemplates(
 						infoItemObject, themeDisplay.getLocale());
+
+				if (infoItemRendererTemplates.isEmpty()) {
+					continue;
+				}
 
 				Collections.sort(
 					infoItemRendererTemplates,
@@ -132,15 +139,16 @@ public class GetAvailableTemplatesMVCResourceCommand
 	}
 
 	private Object _getInfoItemObject(String className, long classPK) {
+		InfoItemIdentifier infoItemIdentifier = new ClassPKInfoItemIdentifier(
+			classPK);
+
 		InfoItemObjectProvider<Object> infoItemObjectProvider =
 			_infoItemServiceTracker.getFirstInfoItemService(
-				InfoItemObjectProvider.class, className);
+				InfoItemObjectProvider.class, className,
+				infoItemIdentifier.getInfoItemServiceFilter());
 
 		try {
 			if (infoItemObjectProvider != null) {
-				InfoItemIdentifier infoItemIdentifier =
-					new ClassPKInfoItemIdentifier(classPK);
-
 				return infoItemObjectProvider.getInfoItem(infoItemIdentifier);
 			}
 		}

@@ -60,10 +60,16 @@ public class AccountGroupLocalServiceUtil {
 	}
 
 	public static AccountGroup addAccountGroup(
-			long userId, String name, String description)
+			long userId, String description, String name)
 		throws PortalException {
 
-		return getService().addAccountGroup(userId, name, description);
+		return getService().addAccountGroup(userId, description, name);
+	}
+
+	public static AccountGroup checkGuestAccountGroup(long companyId)
+		throws PortalException {
+
+		return getService().checkGuestAccountGroup(companyId);
 	}
 
 	/**
@@ -95,8 +101,11 @@ public class AccountGroupLocalServiceUtil {
 	 *
 	 * @param accountGroup the account group
 	 * @return the account group that was removed
+	 * @throws PortalException
 	 */
-	public static AccountGroup deleteAccountGroup(AccountGroup accountGroup) {
+	public static AccountGroup deleteAccountGroup(AccountGroup accountGroup)
+		throws PortalException {
+
 		return getService().deleteAccountGroup(accountGroup);
 	}
 
@@ -216,7 +225,13 @@ public class AccountGroupLocalServiceUtil {
 		return getService().fetchAccountGroup(accountGroupId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the account group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account group's external reference code
+	 * @return the matching account group, or <code>null</code> if a matching account group could not be found
+	 */
 	public static AccountGroup fetchAccountGroupByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
 
@@ -224,6 +239,9 @@ public class AccountGroupLocalServiceUtil {
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAccountGroupByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static AccountGroup fetchAccountGroupByReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -245,7 +263,14 @@ public class AccountGroupLocalServiceUtil {
 		return getService().getAccountGroup(accountGroupId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the account group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account group's external reference code
+	 * @return the matching account group
+	 * @throws PortalException if a matching account group could not be found
+	 */
 	public static AccountGroup getAccountGroupByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
 		throws PortalException {
@@ -277,6 +302,12 @@ public class AccountGroupLocalServiceUtil {
 			companyId, start, end, orderByComparator);
 	}
 
+	public static List<AccountGroup> getAccountGroupsByAccountGroupId(
+		long[] accountGroupIds) {
+
+		return getService().getAccountGroupsByAccountGroupId(accountGroupIds);
+	}
+
 	/**
 	 * Returns the number of account groups.
 	 *
@@ -286,10 +317,18 @@ public class AccountGroupLocalServiceUtil {
 		return getService().getAccountGroupsCount();
 	}
 
+	public static int getAccountGroupsCount(long companyId) {
+		return getService().getAccountGroupsCount(companyId);
+	}
+
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 
 		return getService().getActionableDynamicQuery();
+	}
+
+	public static AccountGroup getDefaultAccountGroup(long companyId) {
+		return getService().getDefaultAccountGroup(companyId);
 	}
 
 	public static
@@ -317,6 +356,10 @@ public class AccountGroupLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	public static boolean hasDefaultAccountGroup(long companyId) {
+		return getService().hasDefaultAccountGroup(companyId);
+	}
+
 	public static com.liferay.portal.kernel.search.BaseModelSearchResult
 		<AccountGroup> searchAccountGroups(
 			long companyId, String keywords, int start, int end,
@@ -341,11 +384,11 @@ public class AccountGroupLocalServiceUtil {
 	}
 
 	public static AccountGroup updateAccountGroup(
-			long accountGroupId, String name, String description)
+			long accountGroupId, String description, String name)
 		throws PortalException {
 
 		return getService().updateAccountGroup(
-			accountGroupId, name, description);
+			accountGroupId, description, name);
 	}
 
 	public static AccountGroupLocalService getService() {

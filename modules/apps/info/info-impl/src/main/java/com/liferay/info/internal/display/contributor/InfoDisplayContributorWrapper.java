@@ -19,6 +19,7 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.ClassType;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.info.display.contributor.InfoDisplayContributor;
 import com.liferay.info.display.contributor.InfoDisplayField;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
@@ -270,14 +271,12 @@ public class InfoDisplayContributorWrapper
 
 		InfoForm.Builder infoFormBuilder = InfoForm.builder(
 		).infoFieldSetEntry(
-			consumer -> {
+			unsafeConsumer -> {
 				for (InfoDisplayField infoDisplayField : infoDisplayFields) {
-					consumer.accept(
+					unsafeConsumer.accept(
 						InfoField.builder(
 						).infoFieldType(
 							_getInfoFieldTypeType(infoDisplayField.getType())
-						).namespace(
-							InfoDisplayField.class.getSimpleName()
 						).name(
 							infoDisplayField.getKey()
 						).labelInfoLocalizedValue(
@@ -318,7 +317,7 @@ public class InfoDisplayContributorWrapper
 		InfoItemFieldValues.Builder infoItemFieldValuesBuilder =
 			InfoItemFieldValues.builder(
 			).infoFieldValue(
-				consumer -> {
+				unsafeConsumer -> {
 					for (Map.Entry<String, Object> entry :
 							infoDisplayFieldsValues.entrySet()) {
 
@@ -333,15 +332,13 @@ public class InfoDisplayContributorWrapper
 						InfoField infoField = InfoField.builder(
 						).infoFieldType(
 							TextInfoFieldType.INSTANCE
-						).namespace(
-							InfoDisplayField.class.getName()
 						).name(
 							fieldName
 						).labelInfoLocalizedValue(
 							fieldLabelLocalizedValue
 						).build();
 
-						consumer.accept(
+						unsafeConsumer.accept(
 							new InfoFieldValue<>(infoField, entry.getValue()));
 					}
 				}
@@ -371,7 +368,8 @@ public class InfoDisplayContributorWrapper
 		if (Objects.equals(
 				infoDisplayFieldType,
 				InfoDisplayContributorFieldType.IMAGE.getValue()) ||
-			Objects.equals(infoDisplayFieldType, "ddm-image")) {
+			Objects.equals(
+				infoDisplayFieldType, DDMFormFieldTypeConstants.IMAGE)) {
 
 			return ImageInfoFieldType.INSTANCE;
 		}

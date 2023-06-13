@@ -17,15 +17,14 @@ import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import {useModal} from '@clayui/modal';
-import {useIsMounted} from 'frontend-js-react-web';
+import {ReactPortal, useIsMounted} from '@liferay/frontend-js-react-web';
 import {openToast} from 'frontend-js-web';
 import React, {useEffect, useRef, useState} from 'react';
-import {createPortal} from 'react-dom';
 
 import {config} from '../../../app/config/index';
+import {useDispatch, useSelector} from '../../../app/contexts/StoreContext';
 import selectCanUpdateExperiences from '../../../app/selectors/selectCanUpdateExperiences';
 import selectCanUpdateSegments from '../../../app/selectors/selectCanUpdateSegments';
-import {useDispatch, useSelector} from '../../../app/store/index';
 import createExperience from '../thunks/createExperience';
 import duplicateExperience from '../thunks/duplicateExperience';
 import removeExperience from '../thunks/removeExperience';
@@ -175,7 +174,7 @@ const ExperienceSelector = ({
 		});
 	}, [
 
-		//LPS-127205
+		// LPS-127205
 
 		experiences.length,
 	]);
@@ -333,6 +332,7 @@ const ExperienceSelector = ({
 		<>
 			<ClayButton
 				className="form-control-select pr-4 text-left text-truncate"
+				disabled={!canUpdateExperiences}
 				displayType="secondary"
 				id={selectId}
 				onBlur={handleDropdownButtonBlur}
@@ -347,6 +347,7 @@ const ExperienceSelector = ({
 							{selectedExperience.name}
 						</span>
 					</ClayLayout.ContentCol>
+
 					<ClayLayout.ContentCol>
 						{selectedExperience.hasLockedSegmentsExperiment && (
 							<ClayIcon symbol="lock" />
@@ -355,8 +356,8 @@ const ExperienceSelector = ({
 				</ClayLayout.ContentRow>
 			</ClayButton>
 
-			{open &&
-				createPortal(
+			{open && (
+				<ReactPortal className="cadmin">
 					<div
 						className="dropdown-menu p-4 page-editor__toolbar-experience__dropdown-menu toggled"
 						onBlur={handleDropdownBlur}
@@ -392,9 +393,9 @@ const ExperienceSelector = ({
 								onPriorityIncrease={increasePriority}
 							/>
 						)}
-					</div>,
-					document.body
-				)}
+					</div>
+				</ReactPortal>
+			)}
 
 			{openModal && (
 				<ExperienceModal
@@ -428,6 +429,7 @@ const ExperiencesSelectorHeader = ({
 						{Liferay.Language.get('select-experience')}
 					</h3>
 				</ClayLayout.ContentCol>
+
 				<ClayLayout.ContentCol>
 					{canCreateExperiences === true && (
 						<ClayButton

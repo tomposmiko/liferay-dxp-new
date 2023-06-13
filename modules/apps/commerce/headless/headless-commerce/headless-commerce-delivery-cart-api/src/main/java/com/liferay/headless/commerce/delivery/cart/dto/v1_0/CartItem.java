@@ -59,6 +59,36 @@ public class CartItem implements Serializable {
 	}
 
 	@Schema
+	public String getAdaptiveMediaImageHTMLTag() {
+		return adaptiveMediaImageHTMLTag;
+	}
+
+	public void setAdaptiveMediaImageHTMLTag(String adaptiveMediaImageHTMLTag) {
+		this.adaptiveMediaImageHTMLTag = adaptiveMediaImageHTMLTag;
+	}
+
+	@JsonIgnore
+	public void setAdaptiveMediaImageHTMLTag(
+		UnsafeSupplier<String, Exception>
+			adaptiveMediaImageHTMLTagUnsafeSupplier) {
+
+		try {
+			adaptiveMediaImageHTMLTag =
+				adaptiveMediaImageHTMLTagUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected String adaptiveMediaImageHTMLTag;
+
+	@Schema
 	@Valid
 	public CartItem[] getCartItems() {
 		return cartItems;
@@ -308,6 +338,36 @@ public class CartItem implements Serializable {
 	protected Long productId;
 
 	@Schema
+	@Valid
+	public Map<String, String> getProductURLs() {
+		return productURLs;
+	}
+
+	public void setProductURLs(Map<String, String> productURLs) {
+		this.productURLs = productURLs;
+	}
+
+	@JsonIgnore
+	public void setProductURLs(
+		UnsafeSupplier<Map<String, String>, Exception>
+			productURLsUnsafeSupplier) {
+
+		try {
+			productURLs = productURLsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Map<String, String> productURLs;
+
+	@Schema
 	public Integer getQuantity() {
 		return quantity;
 	}
@@ -416,7 +476,7 @@ public class CartItem implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long skuId;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getSubscription() {
 		return subscription;
 	}
@@ -526,6 +586,20 @@ public class CartItem implements Serializable {
 		StringBundler sb = new StringBundler();
 
 		sb.append("{");
+
+		if (adaptiveMediaImageHTMLTag != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"adaptiveMediaImageHTMLTag\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(adaptiveMediaImageHTMLTag));
+
+			sb.append("\"");
+		}
 
 		if (cartItems != null) {
 			if (sb.length() > 1) {
@@ -647,6 +721,16 @@ public class CartItem implements Serializable {
 			sb.append("\"productId\": ");
 
 			sb.append(productId);
+		}
+
+		if (productURLs != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"productURLs\": ");
+
+			sb.append(_toJSON(productURLs));
 		}
 
 		if (quantity != null) {

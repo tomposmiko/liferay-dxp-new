@@ -11,16 +11,16 @@ definition {
 	}
 
 	tearDown {
-		Page.tearDownCP();
+		PagesAdmin.tearDownCP();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewDependencyAbleFox {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Test Dependency Page");
+		PagesAdmin.addPublicPage(pageName = "Test Dependency Page");
 
 		Navigator.gotoPage(pageName = "Test Dependency Page");
 

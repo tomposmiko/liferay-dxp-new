@@ -28,6 +28,7 @@ public class CPDefinitionFiltersUpgradeProcess
 		addColumn(
 			CPDefinitionModelImpl.class, CPDefinitionModelImpl.TABLE_NAME,
 			"accountGroupFilterEnabled", "BOOLEAN");
+
 		addColumn(
 			CPDefinitionModelImpl.class, CPDefinitionModelImpl.TABLE_NAME,
 			"channelFilterEnabled", "BOOLEAN");

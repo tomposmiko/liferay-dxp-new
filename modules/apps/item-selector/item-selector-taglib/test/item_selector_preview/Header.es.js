@@ -24,6 +24,7 @@ const headerProps = {
 	handleClickBack: jest.fn(),
 	headerTitle,
 	showInfoIcon: true,
+	showNavbar: true,
 };
 
 describe('Header', () => {
@@ -62,7 +63,7 @@ describe('Header', () => {
 	it('renders the header title', () => {
 		const {getByText} = render(<Header {...headerProps} />);
 
-		expect(getByText(headerTitle));
+		expect(getByText(headerTitle)).toBeTruthy();
 	});
 
 	it('calls to handleClickBack when click on back button', () => {
@@ -113,39 +114,5 @@ describe('Header', () => {
 		);
 
 		expect(infoIcon).toBeNull();
-	});
-
-	it('does not render the "icon-pencil" icon when "showEditIcon" prop is set to false', () => {
-		const {container} = render(<Header {...headerProps} />);
-
-		const editIcon = container.querySelector('.lexicon-icon-pencil');
-
-		expect(editIcon).toBeNull();
-	});
-
-	it('renders the "icon-pencil" icon when "showEditIcon" prop is set to true', () => {
-		const props = {...headerProps, showEditIcon: true};
-
-		const {container} = render(<Header {...props} />);
-
-		const editIcon = container.querySelector('.lexicon-icon-pencil');
-
-		expect(editIcon).not.toBeNull();
-	});
-
-	it('calls to handleClickEdit when click on edit icon', () => {
-		const onClickEditMock = jest.fn(() => {});
-
-		const props = {
-			...headerProps,
-			handleClickEdit: onClickEditMock,
-			showEditIcon: true,
-		};
-
-		const {container} = render(<Header {...props} />);
-
-		container.querySelector('.lexicon-icon-pencil').parentElement.click();
-
-		expect(onClickEditMock).toHaveBeenCalledTimes(1);
 	});
 });

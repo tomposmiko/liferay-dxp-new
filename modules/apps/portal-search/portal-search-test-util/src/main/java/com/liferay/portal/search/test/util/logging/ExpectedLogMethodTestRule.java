@@ -14,9 +14,10 @@
 
 package com.liferay.portal.search.test.util.logging;
 
-import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.rule.MethodTestRule;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LogEntry;
+import com.liferay.portal.test.log.LoggerTestUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +48,7 @@ public class ExpectedLogMethodTestRule extends MethodTestRule<Void> {
 			return;
 		}
 
-		Assert.assertThat(getLogRecords(), _matcherBuilder.build());
+		Assert.assertThat(getlogEntries(), _matcherBuilder.build());
 	}
 
 	@Override
@@ -92,32 +93,40 @@ public class ExpectedLogMethodTestRule extends MethodTestRule<Void> {
 	}
 
 	protected void closeCaptureHandler() {
-		if (_captureHandler == null) {
+		if (_logCapture == null) {
 			return;
 		}
 
-		_captureHandler.close();
+		_logCapture.close();
 
-		_captureHandler = null;
+		_logCapture = null;
 	}
 
-	protected List<LogRecord> getLogRecords() {
-		if (_captureHandler != null) {
-			return _captureHandler.getLogRecords();
+	protected List<LogEntry> getlogEntries() {
+		if (_logCapture != null) {
+			return _logCapture.getLogEntries();
 		}
 
 		return Collections.emptyList();
 	}
 
-	protected void openCaptureHandler(String name, Level level) {
-		_captureHandler = JDKLoggerTestUtil.configureJDKLogger(name, level);
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	protected List<LogRecord> getLogRecords() {
+		return Collections.emptyList();
 	}
 
-	protected static class LogOutputMatcher<T extends List<LogRecord>>
+	protected void openCaptureHandler(String name, Level level) {
+		_logCapture = LoggerTestUtil.configureJDKLogger(name, level);
+	}
+
+	protected static class LogOutputMatcher<T extends List<LogEntry>>
 		extends TypeSafeMatcher<T> {
 
 		@Factory
-		public static <T extends List<LogRecord>> Matcher<T> hasMessage(
+		public static <T extends List<LogEntry>> Matcher<T> hasMessage(
 			Matcher<String> matcher) {
 
 			return new LogOutputMatcher<>(matcher);
@@ -144,19 +153,19 @@ public class ExpectedLogMethodTestRule extends MethodTestRule<Void> {
 		}
 
 		@Override
-		protected boolean matchesSafely(T logRecords) {
-			if (matcher.matches(toString(logRecords))) {
+		protected boolean matchesSafely(T logEntries) {
+			if (matcher.matches(toString(logEntries))) {
 				return true;
 			}
 
 			return false;
 		}
 
-		protected String toString(T logRecords) {
-			Stream<LogRecord> stream = logRecords.stream();
+		protected String toString(T logEntries) {
+			Stream<LogEntry> stream = logEntries.stream();
 
 			return stream.map(
-				LogRecord::getMessage
+				LogEntry::getMessage
 			).collect(
 				Collectors.joining()
 			);
@@ -206,7 +215,7 @@ public class ExpectedLogMethodTestRule extends MethodTestRule<Void> {
 		openCaptureHandler(name, level);
 	}
 
-	private CaptureHandler _captureHandler;
+	private LogCapture _logCapture;
 	private final MatcherBuilder _matcherBuilder = new MatcherBuilder();
 
 }

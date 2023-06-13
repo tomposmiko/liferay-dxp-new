@@ -20,57 +20,48 @@ definition {
 			groupName = "Site Name",
 			layoutName = "Test Page");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepotPortlet(
+		JSONDepot.connectSite(
 			depotName = "Test Depot Name",
-			portlet = "Settings");
+			groupName = "Site Name");
 
-		DepotNavigator.gotoSites(depotName = "Test Depot Name");
+		JSONStaging.enableLocalStaging(
+			groupName = "Test Depot Name",
+			site = "false");
 
-		Depot.connectSite(siteList = "Site Name");
-
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(depotName = "Test Depot Name");
-
-		DepotNavigator.gotoPortlet(portlet = "Staging");
-
-		Depot.activateStaging(depotName = "Test Depot Name");
-
-		Navigator.openSiteURL(siteName = "Site Name");
-
-		ProductMenu.gotoPortlet(
-			category = "Publishing",
-			portlet = "Staging");
-
-		Staging.activateStagingCP(siteName = "Site Name");
+		JSONStaging.enableLocalStaging(groupName = "Site Name");
 	}
 
 	tearDown {
+		Staging.disableStagingSite(siteName = "Site Name");
+
+		Depot.disableStagingDepot(depotName = "Test Depot Name");
+
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			Site.tearDownCP();
+			JSONDepot.deleteDepot(depotName = "Test Depot Name");
 
-			Depot.tearDownCP();
+			Site.tearDownCP();
 
 			User.logoutPG();
 		}
 	}
 
 	@description = "This ensures that image in basic article in depot can be deleted and republished in staging site when enabling local staging."
-	@priority = 5
-	test DeleteImageInDepot {
-		DepotNavigator.openDepotDocumentsAndMediaAdminStaging(depotName = "Test Depot Name");
-
-		DMDocument.addCP(
+	@priority = "5"
+	@refactordone
+	test CanDeleteWCInlineImage {
+		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_2.jpg",
-			dmDocumentTitle = "Document_2.jpg");
+			dmDocumentTitle = "Document_2.jpg",
+			groupName = "Test Depot Name-staging",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_2.jpg");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdminStaging(depotName = "Test Depot Name");
 
 		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
 
@@ -92,9 +83,7 @@ definition {
 
 		PortletEntry.publish();
 
-		Navigator.gotoStagedSitePage(
-			pageName = "Test Page",
-			siteName = "Site Name");
+		Navigator.openSiteURL(siteName = "Site Name");
 
 		Navigator.gotoStagedView();
 
@@ -128,9 +117,12 @@ definition {
 
 		Staging.publishToLive();
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
-
-		WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
+		WebContentNavigator.openToEditWCInSite(
+			groupName = "Site Name (Staging)",
+			site = "false",
+			siteURLKey = "site-name",
+			staging = "true",
+			webContentTitle = "WC WebContent Title");
 
 		CKEditor.addSourceContent(content = " ");
 
@@ -158,8 +150,9 @@ definition {
 	}
 
 	@description = "This ensures that friendly URL in basic article in depot can be edited and republished in staging site when enabling local staging."
-	@priority = 5
-	test EditFriendlyURLInDepot {
+	@priority = "5"
+	@refactordone
+	test CanEditFriendlyURL {
 		DepotNavigator.openDepotWebContentAdminStaging(depotName = "Test Depot Name");
 
 		WebContentNavigator.gotoAddCP();
@@ -173,11 +166,15 @@ definition {
 
 		Staging.publishToLive();
 
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name (Staging)",
+			layoutName = "Test Page",
+			site = "false",
+			widgetName = "Web Content Display");
+
 		Navigator.gotoStagedSitePage(
 			pageName = "Test Page",
 			siteName = "Site Name");
-
-		Portlet.addPG(portletName = "Web Content Display");
 
 		WebContentDisplayPortlet.selectWebContent(
 			depotName = "Test Depot Name",
@@ -197,9 +194,7 @@ definition {
 			locator1 = "TextInput#FRIENDLY_URL",
 			value1 = "friendlyurl");
 
-		Navigator.gotoStagedSitePage(
-			pageName = "Test Page",
-			siteName = "Site Name");
+		Navigator.openSiteURL(siteName = "Site Name");
 
 		Navigator.gotoStagedView();
 
@@ -207,7 +202,7 @@ definition {
 
 		Staging.publishToLive();
 
-		Navigator.gotoSitePage(
+		Navigator.openSitePage(
 			pageName = "Test Page",
 			siteName = "Site Name");
 
@@ -239,9 +234,7 @@ definition {
 			locator1 = "TextInput#FRIENDLY_URL",
 			value1 = "friendlyurledit");
 
-		Navigator.gotoStagedSitePage(
-			pageName = "Test Page",
-			siteName = "Site Name");
+		Navigator.openSiteURL(siteName = "Site Name");
 
 		Navigator.gotoStagedView();
 
@@ -249,7 +242,7 @@ definition {
 
 		Staging.publishToLive();
 
-		Navigator.gotoSitePage(
+		Navigator.openSitePage(
 			pageName = "Test Page",
 			siteName = "Site Name");
 
@@ -257,18 +250,29 @@ definition {
 	}
 
 	@description = "This ensures that image in basic article in depot can be edited and republished in staging site when enabling local staging."
-	@priority = 5
-	test EditImageInDepot {
+	@priority = "5"
+	@refactordone
+	test CanEditWCInlineImageInDepot {
 		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		AssertTextEquals(
+			locator1 = "Staging#STAGING_INDICATOR_TITLE_DEPOT",
+			value1 = "Live");
 
 		DepotNavigator.switchStagingStatus(stagingItem = "Staging");
 
-		DepotNavigator.gotoPortlet(portlet = "Documents and Media");
+		AssertTextEquals(
+			locator1 = "Staging#STAGING_INDICATOR_TITLE_DEPOT",
+			value1 = "Staging");
 
-		DMDocument.addCP(
+		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_2.jpg",
-			dmDocumentTitle = "Document_2.jpg");
+			dmDocumentTitle = "Document_2.jpg",
+			groupName = "Test Depot Name-staging",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_2.jpg");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdminStaging(depotName = "Test Depot Name");
 
 		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
 
@@ -290,9 +294,7 @@ definition {
 
 		PortletEntry.publish();
 
-		Navigator.gotoStagedSitePage(
-			pageName = "Test Page",
-			siteName = "Site Name");
+		Navigator.openSiteURL(siteName = "Site Name");
 
 		Navigator.gotoStagedView();
 
@@ -344,8 +346,9 @@ definition {
 	}
 
 	@description = "This ensures that an article using a structure stored in depot can be deleted and republished in staging site when enabling local staging."
-	@priority = 5
-	test PublishDeletedWCCustomization {
+	@priority = "5"
+	@refactordone
+	test CanPublishDeletedWCCustomization {
 		DepotNavigator.openDepotAdmin();
 
 		Depot.configureDDMStructures(
@@ -361,8 +364,7 @@ definition {
 			structureDescription = "WC Structure Description",
 			structureName = "WC Structure Name");
 
-		DynamicDataMapping.addField(
-			field = "Text",
+		DataEngine.addField(
 			fieldFieldLabel = "Text",
 			fieldName = "Text");
 
@@ -396,9 +398,7 @@ definition {
 
 		PortletEntry.publish();
 
-		Navigator.gotoStagedSitePage(
-			pageName = "Test Page",
-			siteName = "Site Name");
+		Navigator.openSiteURL(siteName = "Site Name");
 
 		Navigator.gotoStagedView();
 
@@ -413,9 +413,7 @@ definition {
 			siteName = "Site Name",
 			webContentTitle = "Web Content Title");
 
-		Navigator.gotoStagedSitePage(
-			pageName = "Test Page",
-			siteName = "Site Name");
+		Navigator.openSiteURL(siteName = "Site Name");
 
 		Navigator.gotoStagedView();
 
@@ -429,8 +427,9 @@ definition {
 	}
 
 	@description = "This ensures that an article using a structure stored in depot can be edited and republished in staging site when enabling local staging."
-	@priority = 5
-	test PublishEditedWCCustomization {
+	@priority = "5"
+	@refactordone
+	test CanPublishEditedWCCustomization {
 		DepotNavigator.openDepotAdmin();
 
 		Depot.configureDDMStructures(
@@ -447,8 +446,7 @@ definition {
 			structureDescription = "WC Structure Description",
 			structureName = "WC Structure Name");
 
-		DynamicDataMapping.addField(
-			field = "Text",
+		DataEngine.addField(
 			fieldFieldLabel = "Text",
 			fieldName = "Text");
 
@@ -482,9 +480,7 @@ definition {
 
 		PortletEntry.publish();
 
-		Navigator.gotoStagedSitePage(
-			pageName = "Test Page",
-			siteName = "Site Name");
+		Navigator.openSiteURL(siteName = "Site Name");
 
 		Navigator.gotoStagedView();
 
@@ -498,9 +494,12 @@ definition {
 			onLive = "true",
 			webContentTitle = "Web Content Title");
 
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
-
-		WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
+		WebContentNavigator.openToEditWCInSite(
+			groupName = "Site Name (Staging)",
+			site = "false",
+			siteURLKey = "site-name",
+			staging = "true",
+			webContentTitle = "Web Content Title");
 
 		WebContent.editCP(
 			webContentTitle = "Web Content Title",
@@ -519,9 +518,102 @@ definition {
 			webContentTitle = "Web Content Title Edit");
 	}
 
+	@description = "This ensures that a web content folder with an article in depot can be published in AP through widget config manual selection when enabling local staging."
+	@priority = "5"
+	@refactordone
+	test CanPublishWCFolder {
+		DepotNavigator.openDepotWebContentAdminStaging(depotName = "Test Depot Name");
+
+		WebContentFolder.addCP(
+			folderDescription = "WC Folder Description",
+			folderName = "WC Folder Name");
+
+		WebContentFolder.gotoCP(
+			folderName = "WC Folder Name",
+			webContentTitle = "WC Folder Name");
+
+		WebContentNavigator.gotoAddCP();
+
+		WebContent.addCP(
+			webContentContent = "WC WebContent Content",
+			webContentTitle = "WC WebContent Title");
+
+		PortletEntry.publish();
+
+		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
+
+		Staging.publishToLive();
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name (Staging)",
+			layoutName = "Test Page",
+			site = "false",
+			widgetName = "Asset Publisher");
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		AssetPublisherPortlet.configureManualAssetSelectionPG(
+			assetTitle = "WC Folder Name",
+			assetType = "Web Content Folder",
+			depotName = "Test Depot Name");
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		AssetPublisherPortlet.viewAssetDetailsPG(
+			assetArticleDetails = "1 Article",
+			assetSubfolderDetails = "0 Subfolders",
+			assetTitle = "WC Folder Name",
+			assetType = "Web Content Folder");
+
+		Navigator.openSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		AssetPublisherPortlet.viewAssetNotPresentPG(assetTitle = "WC Folder Name");
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		Navigator.openSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
+
+		AssetPublisherPortlet.viewAssetDetailsPG(
+			assetArticleDetails = "1 Article",
+			assetSubfolderDetails = "0 Subfolders",
+			assetTitle = "WC Folder Name",
+			assetType = "Web Content Folder");
+
+		DepotNavigator.openDepotAdmin();
+
+		DepotNavigator.gotoDepot(depotName = "Test Depot Name");
+
+		DepotNavigator.gotoPortlet(portlet = "Staging");
+
+		Depot.deactivateStaging(depotName = "Test Depot Name");
+	}
+
 	@description = "This ensures that web content with a category in depot can be published in local staging site."
-	@priority = 4
-	test PublishWCWithCategory {
+	@priority = "4"
+	@refactordone
+	test CanPublishWCWithCategory {
 		DepotNavigator.openDepotCategoriesAdminStaging(depotName = "Test Depot Name");
 
 		Vocabulary.addCP(vocabularyName = "Vocabulary Name");
@@ -546,11 +638,15 @@ definition {
 
 		Staging.publishToLive();
 
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name (Staging)",
+			layoutName = "Test Page",
+			site = "false",
+			widgetName = "Asset Publisher");
+
 		Navigator.gotoStagedSitePage(
 			pageName = "Test Page",
 			siteName = "Site Name");
-
-		Portlet.addPG(portletName = "Asset Publisher");
 
 		AssetPublisherPortlet.configureManualAssetSelectionPG(
 			assetTitle = "WC WebContent Title",
@@ -565,7 +661,7 @@ definition {
 
 		Staging.publishToLive();
 
-		Navigator.gotoSitePage(
+		Navigator.openSitePage(
 			pageName = "Test Page",
 			siteName = "Site Name");
 
@@ -574,83 +670,81 @@ definition {
 			value1 = "Depot web content with a category");
 	}
 
-	@description = "This ensures that a web content folder with an article in depot can be published in AP through widget config manual selection when enabling local staging."
-	@priority = 5
-	test PublishWebContentFolder {
-		DepotNavigator.openDepotWebContentAdminStaging(depotName = "Test Depot Name");
+	@description = "This test ensures that a depot WC with an embedded video added from the item selector can be published on a connected local staging site."
+	@priority = "4"
+	@refactordone
+	test CanPublishWCWithEmbeddedVideo {
+		JSONDepot.addDepot(
+			depotDescription = "This is the description of a depot",
+			depotName = "Test Embedded Video Depot Name");
 
-		WebContentFolder.addCP(
-			folderDescription = "WC Folder Description",
-			folderName = "WC Folder Name");
+		JSONGroup.addGroup(groupName = "Test Embedded Video Site Name");
 
-		WebContentFolder.gotoCP(
-			folderName = "WC Folder Name",
-			webContentTitle = "WC Folder Name");
+		JSONLayout.addPublicLayout(
+			groupName = "Test Embedded Video Site Name",
+			layoutName = "Test Page");
+
+		JSONDepot.connectSite(
+			depotName = "Test Embedded Video Depot Name",
+			groupName = "Test Embedded Video Site Name");
+
+		JSONStaging.enableLocalStaging(
+			groupName = "Test Embedded Video Depot Name",
+			site = "false");
+
+		JSONStaging.enableLocalStaging(groupName = "Test Embedded Video Site Name");
+
+		DepotNavigator.openDepotWebContentAdminStaging(depotName = "Test Embedded Video Depot Name");
 
 		WebContentNavigator.gotoAddCP();
 
 		WebContent.addCP(
+			embedVideo = "true",
+			extractedVideoShortcutTitle = "Liferay Digital Experience Platform",
+			videoShortcutDescription = "Video Shortcut Description",
+			videoShortcutPreview = "https://www.youtube.com",
+			videoShortcutTitle = "Test YouTube Video",
+			videoURL = "https://youtu.be/HOdbzGCI5ME",
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "WC WebContent Title");
 
 		PortletEntry.publish();
 
+		DepotNavigator.openDepotWebContentAdminStaging(depotName = "Test Embedded Video Depot Name");
+
 		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
 
 		Staging.publishToLive();
 
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Test Embedded Video Site Name (Staging)",
+			layoutName = "Test Page",
+			site = "false",
+			widgetName = "Web Content Display");
+
 		Navigator.gotoStagedSitePage(
 			pageName = "Test Page",
-			siteName = "Site Name");
+			siteName = "Test Embedded Video Site Name");
 
-		Portlet.addPG(portletName = "Asset Publisher");
+		WebContentDisplayPortlet.selectWebContent(
+			depotName = "Test Embedded Video Depot Name",
+			webContentTitle = "WC WebContent Title");
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Test Page",
+			siteName = "Test Embedded Video Site Name");
+
+		WebContent.viewVideoPreview(service = "youtube");
 
 		Staging.gotoPublishToLive();
 
 		Staging.publishToLive();
 
-		Navigator.gotoStagedSitePage(
+		Navigator.openSitePage(
 			pageName = "Test Page",
-			siteName = "Site Name");
+			siteName = "Test Embedded Video Site Name");
 
-		AssetPublisherPortlet.configureManualAssetSelectionPG(
-			assetTitle = "WC Folder Name",
-			assetType = "Web Content Folder",
-			depotName = "Test Depot Name");
-
-		Navigator.gotoStagedSitePage(
-			pageName = "Test Page",
-			siteName = "Site Name");
-
-		AssertTextEquals(
-			key_assetTitle = "WC Folder Name",
-			locator1 = "AP#ASSET_ABSTRACT_TITLE",
-			value1 = "WC Folder Name");
-
-		Navigator.gotoSitePage(
-			pageName = "Test Page",
-			siteName = "Site Name");
-
-		AssertElementNotPresent(
-			key_assetTitle = "WC Folder Name",
-			locator1 = "AP#ASSET_ABSTRACT_TITLE");
-
-		Navigator.gotoStagedSitePage(
-			pageName = "Test Page",
-			siteName = "Site Name");
-
-		Staging.gotoPublishToLive();
-
-		Staging.publishToLive();
-
-		Navigator.gotoSitePage(
-			pageName = "Test Page",
-			siteName = "Site Name");
-
-		AssertTextEquals(
-			key_assetTitle = "WC Folder Name",
-			locator1 = "AP#ASSET_ABSTRACT_TITLE",
-			value1 = "WC Folder Name");
+		WebContent.viewVideoPreview(service = "youtube");
 	}
 
 }

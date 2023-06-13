@@ -207,62 +207,6 @@ public class GeneralConfiguration implements Serializable {
 	protected Boolean includeResponseString;
 
 	@Schema
-	public String getLanguageId() {
-		return languageId;
-	}
-
-	public void setLanguageId(String languageId) {
-		this.languageId = languageId;
-	}
-
-	@JsonIgnore
-	public void setLanguageId(
-		UnsafeSupplier<String, Exception> languageIdUnsafeSupplier) {
-
-		try {
-			languageId = languageIdUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String languageId;
-
-	@Schema
-	public String getQueryString() {
-		return queryString;
-	}
-
-	public void setQueryString(String queryString) {
-		this.queryString = queryString;
-	}
-
-	@JsonIgnore
-	public void setQueryString(
-		UnsafeSupplier<String, Exception> queryStringUnsafeSupplier) {
-
-		try {
-			queryString = queryStringUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String queryString;
-
-	@Schema
 	public String[] getSearchableAssetTypes() {
 		return searchableAssetTypes;
 	}
@@ -290,34 +234,6 @@ public class GeneralConfiguration implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] searchableAssetTypes;
-
-	@Schema
-	public String getTimeZoneId() {
-		return timeZoneId;
-	}
-
-	public void setTimeZoneId(String timeZoneId) {
-		this.timeZoneId = timeZoneId;
-	}
-
-	@JsonIgnore
-	public void setTimeZoneId(
-		UnsafeSupplier<String, Exception> timeZoneIdUnsafeSupplier) {
-
-		try {
-			timeZoneId = timeZoneIdUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String timeZoneId;
 
 	@Override
 	public boolean equals(Object object) {
@@ -425,34 +341,6 @@ public class GeneralConfiguration implements Serializable {
 			sb.append(includeResponseString);
 		}
 
-		if (languageId != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"languageId\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(languageId));
-
-			sb.append("\"");
-		}
-
-		if (queryString != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"queryString\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(queryString));
-
-			sb.append("\"");
-		}
-
 		if (searchableAssetTypes != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -475,20 +363,6 @@ public class GeneralConfiguration implements Serializable {
 			}
 
 			sb.append("]");
-		}
-
-		if (timeZoneId != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"timeZoneId\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(timeZoneId));
-
-			sb.append("\"");
 		}
 
 		sb.append("}");

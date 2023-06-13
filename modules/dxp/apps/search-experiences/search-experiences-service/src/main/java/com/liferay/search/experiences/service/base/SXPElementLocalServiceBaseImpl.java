@@ -34,8 +34,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -269,34 +267,6 @@ public abstract class SXPElementLocalServiceBaseImpl
 		return sxpElementPersistence.fetchByUuid_C_First(uuid, companyId, null);
 	}
 
-	@Deprecated
-	@Override
-	public SXPElement fetchSXPElementByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
-
-		return sxpElementPersistence.fetchByC_ERC(
-			companyId, externalReferenceCode);
-	}
-
-	@Deprecated
-	@Override
-	public SXPElement fetchSXPElementByReferenceCode(
-		long companyId, String externalReferenceCode) {
-
-		return fetchSXPElementByExternalReferenceCode(
-			companyId, externalReferenceCode);
-	}
-
-	@Deprecated
-	@Override
-	public SXPElement getSXPElementByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
-		throws PortalException {
-
-		return sxpElementPersistence.findByC_ERC(
-			companyId, externalReferenceCode);
-	}
-
 	/**
 	 * Returns the sxp element with the primary key.
 	 *
@@ -420,6 +390,7 @@ public abstract class SXPElementLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -437,6 +408,7 @@ public abstract class SXPElementLocalServiceBaseImpl
 			(SXPElement)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<SXPElement> getBasePersistence() {
 		return sxpElementPersistence;
 	}
@@ -595,8 +567,5 @@ public abstract class SXPElementLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SXPElementLocalServiceBaseImpl.class);
 
 }

@@ -286,10 +286,6 @@ public class VerifyProperties extends VerifyProcess {
 		{
 			"http.header.secure.x.frame.options.255",
 			"http.header.secure.x.frame.options.255"
-		},
-		{
-			"http.header.secure.x.xss.protection",
-			"http.header.secure.x.xss.protection"
 		}
 	};
 
@@ -1277,34 +1273,6 @@ public class VerifyProperties extends VerifyProcess {
 			"layout.template.unsupported", "com.liferay.nested.portlets.web"
 		},
 
-		// NTLM
-
-		{
-			"ntlm.auth.enabled", "enabled",
-			"com.liferay.portal.security.sso.ntlm"
-		},
-		{"ntlm.auth.domain", "domain", "com.liferay.portal.security.sso.ntlm"},
-		{
-			"ntlm.auth.domain.controller", "domain.controller",
-			"com.liferay.portal.security.sso.ntlm"
-		},
-		{
-			"ntlm.auth.domain.controller.name", "domain.controller.name",
-			"com.liferay.portal.security.sso.ntlm"
-		},
-		{
-			"ntlm.auth.negotiate.flags", "negotiate.flags",
-			"com.liferay.portal.security.sso.ntlm"
-		},
-		{
-			"ntlm.auth.service.account", "service.account",
-			"com.liferay.portal.security.sso.ntlm"
-		},
-		{
-			"ntlm.auth.service.password", "service.password",
-			"com.liferay.portal.security.sso.ntlm"
-		},
-
 		// OpenID
 
 		{
@@ -1608,8 +1576,15 @@ public class VerifyProperties extends VerifyProcess {
 		"asset.publisher.query.form.configuration",
 		"asset.tag.permissions.enabled", "asset.tag.properties.default",
 		"asset.tag.properties.enabled", "asset.tag.suggestions.enabled",
-		"auth.max.failures.limit", "auto.deploy.blacklist.threshold",
-		"blogs.image.small.max.size", "breadcrumb.display.style.options",
+		"auth.login.prompt.enabled", "auth.max.failures.limit",
+		"auto.deploy.blacklist.threshold", "auto.deploy.dest.dir",
+		"auto.deploy.default.dest.dir", "auto.deploy.jboss.dest.dir",
+		"auto.deploy.jboss.dest.dir[5]", "auto.deploy.jboss.prefix",
+		"auto.deploy.tomcat.dest.dir", "auto.deploy.tomcat.lib.dir",
+		"auto.deploy.unpack.war", "auto.deploy.weblogic.dest.dir",
+		"auto.deploy.websphere.dest.dir", "auto.deploy.wildfly.dest.dir",
+		"auto.deploy.wildfly.prefix", "blogs.image.small.max.size",
+		"breadcrumb.display.style.options",
 		"buffered.increment.parallel.queue.size",
 		"buffered.increment.serial.queue.size",
 		"cache.clear.on.context.initialization", "captcha.max.challenges",
@@ -1635,11 +1610,8 @@ public class VerifyProperties extends VerifyProcess {
 		"com.liferay.portal.servlet.filters.doubleclick.DoubleClickFilter",
 		"com.liferay.portal.servlet.filters.charbufferpool." +
 			"CharBufferPoolFilter",
-		"com.liferay.portal.servlet.filters.jsoncontenttype." +
-			"JSONContentTypeFilter",
 		"com.liferay.portal.servlet.filters.monitoring.MonitoringFilter",
 		"com.liferay.portal.servlet.filters.secure.SecureFilter",
-		"com.liferay.portal.servlet.filters.sso.opensso.OpenSSOFilter",
 		"com.liferay.portal.servlet.filters.validhtml.ValidHtmlFilter",
 		"com.liferay.portal.upload.UploadServletRequestImpl.max.size",
 		"com.liferay.portal.upload.UploadServletRequestImpl.temp.dir",
@@ -1659,13 +1631,13 @@ public class VerifyProperties extends VerifyProcess {
 		"dl.file.entry.previewable.processor.max.size",
 		"dl.file.entry.read.count.enabled",
 		"dl.file.entry.type.ig.image.auto.create.on.upgrade",
-		"dl.file.extensions", "dl.file.indexing.interval", "dl.file.max.size",
-		"dl.file.rank.enabled", "dl.folder.menu.visible",
-		"dl.hook.cmis.credentials.password",
+		"dl.file.extensions", "dl.file.max.size", "dl.file.rank.enabled",
+		"dl.folder.menu.visible", "dl.hook.cmis.credentials.password",
 		"dl.hook.cmis.credentials.username", "dl.hook.cmis.repository.url",
 		"dl.hook.cmis.system.root.dir", "dl.hook.file.system.root.dir",
 		"dl.hook.jcr.fetch.delay", "dl.hook.jcr.fetch.max.failures",
-		"dl.hook.jcr.move.version.labels", "dl.store.cmis.credentials.username",
+		"dl.hook.jcr.move.version.labels", "dl.store.antivirus.impl",
+		"dl.store.cmis.credentials.username",
 		"dl.store.cmis.credentials.password", "dl.store.cmis.repository.url",
 		"dl.store.cmis.system.root.dir", "dl.store.file.system.root.dir",
 		"dl.store.jcr.fetch.delay", "dl.store.jcr.fetch.max.failures",
@@ -1703,6 +1675,7 @@ public class VerifyProperties extends VerifyProcess {
 			"edit_message.html.jsp",
 		"editor.wysiwyg.portal-web.docroot.html.portlet.portal_settings." +
 			"email_notifications.jsp",
+		"editor.wysiwyg.portal-web.docroot.html.taglib.ui.discussion.jsp",
 		"ehcache.blocking.cache.allowed",
 		"ehcache.bootstrap.cache.loader.enabled",
 		"ehcache.bootstrap.cache.loader.factory",
@@ -1719,7 +1692,8 @@ public class VerifyProperties extends VerifyProcess {
 		"ehcache.rmi.peer.provider.factory.properties",
 		"ehcache.statistics.enabled",
 		"hot.deploy.hook.custom.jsp.verification.enabled",
-		"hibernate.cache.region.factory_class",
+		"hot.undeploy.enabled", "hot.undeploy.interval",
+		"hot.undeploy.on.redeploy", "hibernate.cache.region.factory_class",
 		"hibernate.cache.use_minimal_puts", "hibernate.cache.use_query_cache",
 		"hibernate.cache.use_second_level_cache",
 		"hibernate.cache.use_structured_entries", "icq.jar", "icq.login",
@@ -1727,9 +1701,9 @@ public class VerifyProperties extends VerifyProcess {
 		"index.portal.field.analyzer.enabled", "index.search.highlight.enabled",
 		"index.read.only", "invitation.email.max.recipients",
 		"invitation.email.message.body", "invitation.email.message.subject",
-		"invoker.filter.chain.cache.size", "javax.persistence.validation.mode",
-		"jbi.workflow.url", "jcr.initialize.on.startup",
-		"jcr.jackrabbit.config.file.path",
+		"invoker.filter.chain.cache.size", "javadoc.manager.enabled",
+		"javax.persistence.validation.mode", "jbi.workflow.url",
+		"jcr.initialize.on.startup", "jcr.jackrabbit.config.file.path",
 		"jcr.jackrabbit.credentials.password",
 		"jcr.jackrabbit.credentials.username", "jcr.jackrabbit.repository.home",
 		"jcr.jackrabbit.repository.root", "jcr.node.documentlibrary",
@@ -1833,24 +1807,29 @@ public class VerifyProperties extends VerifyProcess {
 		"permissions.inline.sql.resource.block.query.threshold",
 		"permissions.list.filter", "permissions.thread.local.cache.max.size",
 		"permissions.user.check.algorithm", "persistence.provider",
-		"ratings.max.score", "ratings.min.score", "sandbox.deploy.dir",
+		"plugin.notifications.enabled", "plugin.notifications.packages.ignored",
+		"plugin.repositories.trusted", "plugin.repositories.untrusted",
+		"plugin.types", "ratings.max.score", "ratings.min.score",
+		"redirect.url.domains.allowed", "redirect.url.ips.allowed",
+		"redirect.url.security.mode", "sandbox.deploy.dir",
 		"sandbox.deploy.enabled", "sandbox.deploy.interval",
 		"sandbox.deploy.listeners", "sc.image.max.size",
 		"sc.image.thumbnail.max.height", "sc.image.thumbnail.max.width",
 		"sc.product.comments.enabled", "scheduler.classes",
 		"schema.run.minimal", "search.container.page.iterator.page.values",
-		"service.builder.service.read.only.prefixes", "setup.database.types",
-		"shard.available.names", "shard.default.name", "shard.selector",
-		"siteminder.auth.enabled", "siteminder.import.from.ldap",
-		"siteminder.user.header", "sites.form.add.advanced",
-		"sites.form.add.main", "sites.form.add.miscellaneous",
-		"sites.form.add.seo", "sites.form.update.advanced",
-		"sites.form.update.main", "sites.form.update.miscellaneous",
-		"sites.form.update.seo", "staging.lock.enabled",
-		"social.activity.sets.bundling.enabled", "social.activity.sets.enabled",
-		"social.bookmark.display.styles", "social.bookmark.types",
-		"spring.hibernate.data.source", "spring.hibernate.session.factory",
-		"spring.portlet.configs", "spring.remoting.servlet.hosts.allowed",
+		"service.builder.service.read.only.prefixes", "session.disabled",
+		"setup.database.types", "shard.available.names", "shard.default.name",
+		"shard.selector", "siteminder.auth.enabled",
+		"siteminder.import.from.ldap", "siteminder.user.header",
+		"sites.form.add.advanced", "sites.form.add.main",
+		"sites.form.add.miscellaneous", "sites.form.add.seo",
+		"sites.form.update.advanced", "sites.form.update.main",
+		"sites.form.update.miscellaneous", "sites.form.update.seo",
+		"staging.lock.enabled", "social.activity.sets.bundling.enabled",
+		"social.activity.sets.enabled", "social.bookmark.display.styles",
+		"social.bookmark.types", "spring.hibernate.data.source",
+		"spring.hibernate.session.factory", "spring.portlet.configs",
+		"spring.remoting.servlet.hosts.allowed",
 		"spring.remoting.servlet.https.required",
 		"staging.delete.temp.lar.on.failure",
 		"staging.delete.temp.lar.on.success",
@@ -1873,7 +1852,17 @@ public class VerifyProperties extends VerifyProcess {
 		"verify.frequency", "verify.processes", "webdav.storage.class",
 		"webdav.storage.show.edit.url", "webdav.storage.show.view.url",
 		"webdav.storage.tokens", "wiki.email.page.added.signature",
-		"wiki.email.page.updated.signature", "xss.allow", "ym.login",
+		"wiki.email.page.updated.signature", "xss.allow", "xuggler.enabled",
+		"xuggler.jar.file", "xuggler.jar.url", "xuggler.jar.options",
+		"xuggler.ffpreset.8x8dct", "xuggler.ffpreset.bf",
+		"xuggler.f.ffpreset.cmp", "xuggler.f.ffpreset.coder",
+		"xuggler.f.ffpreset.flags", "xuggler.f.ffpreset.flags2",
+		"xuggler.f.ffpreset.i_qfactor", "xuggler.f.ffpreset.mbtree",
+		"xuggler.f.ffpreset.me_method", "xuggler.f.ffpreset.me_range",
+		"xuggler.f.ffpreset.qcomp", "xuggler.f.ffpreset.qdiff",
+		"xuggler.f.ffpreset.qmin", "xuggler.f.ffpreset.qmax",
+		"xuggler.f.ffpreset.sc_threshold", "xuggler.f.ffpreset.subq",
+		"xuggler.f.ffpreset.trellis", "xuggler.f.ffpreset.wpredp", "ym.login",
 		"ym.password"
 	};
 

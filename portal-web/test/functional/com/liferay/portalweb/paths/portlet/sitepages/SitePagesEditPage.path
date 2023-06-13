@@ -10,9 +10,7 @@
 </thead>
 
 <tbody>
-
 <!--DETAILS-->
-
 <tr>
 	<td>LAYOUT_CARD</td>
 	<td>//div[contains(@class,'card')]//span[contains(.,'${key_columnName}')]</td>
@@ -40,7 +38,7 @@
 </tr>
 <tr>
 	<td>PAGE_TYPE_TEMPLATE_AUTOMATICALLY_APPLY_CHANGES_CHECKBOX_GENERIC</td>
-	<td>//label[contains(.,'Inherit Changes')]/input</td>
+	<td>//label[contains(.,'Inherit Changes')]//input</td>
 	<td></td>
 </tr>
 <tr>
@@ -63,9 +61,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--SEO-->
-
 <tr>
 	<td>PREVIEW_DESCRIPTION</td>
 	<td>//div[contains(@class,'preview-seo-description')]</td>
@@ -111,9 +107,7 @@
 	<td>portal/screenshots/page/preview_url_ellipses_og.png</td>
 	<td></td>
 </tr>
-
 <!--LOOK_AND_FEEL-->
-
 <tr>
 	<td>CHANGE_CURRENT_THEME_BUTTON</td>
 	<td>//button[contains(.,'Change Current Theme')]</td>
@@ -147,19 +141,6 @@
 <tr>
 	<td></td>
 	<td></td>
-	<td></td>
-</tr>
-
-<!--CUSTOMIZATION_SETTINGS-->
-
-<tr>
-	<td>CUSTOMIZATION_SETTINGS_SHOW_CUSTOMIZABLE_SECTIONS</td>
-	<td>//input[contains(@id,'CUSTOMIZABLE_LAYOUT')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CUSTOMIZATION_SETTINGS_CUSTOMIZABLE_COLUMN_CHECKBOX</td>
-	<td>//input[contains(@name,'column-${key_columnId}-customizable')]/../span[contains(@class,'toggle-switch')]</td>
 	<td></td>
 </tr>
 </tbody>

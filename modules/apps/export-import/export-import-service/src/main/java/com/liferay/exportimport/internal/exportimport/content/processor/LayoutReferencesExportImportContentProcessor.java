@@ -51,7 +51,6 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.staging.StagingGroupHelper;
 
@@ -321,17 +320,19 @@ public class LayoutReferencesExportImportContentProcessor
 					url = url.substring(pathContext.length());
 				}
 
+				if (!url.startsWith(StringPool.SLASH)) {
+					continue;
+				}
+
 				pos = url.indexOf(StringPool.SLASH, 1);
 
-				if (pos == -1) {
-					pos = url.length();
-				}
+				String localePath = StringPool.BLANK;
 
 				Locale locale = null;
 
-				String localePath = url.substring(0, pos);
+				if (pos != -1) {
+					localePath = url.substring(0, pos);
 
-				if (localePath.length() > 1) {
 					locale = LocaleUtil.fromLanguageId(
 						localePath.substring(1), true, false);
 				}
@@ -376,10 +377,6 @@ public class LayoutReferencesExportImportContentProcessor
 							}
 						}
 					}
-				}
-
-				if (!url.startsWith(StringPool.SLASH)) {
-					continue;
 				}
 
 				boolean privateLayout = false;
@@ -701,12 +698,6 @@ public class LayoutReferencesExportImportContentProcessor
 			}
 		}
 
-		StringBundler sb = new StringBundler(3);
-
-		sb.append(VirtualLayoutConstants.CANONICAL_URL_SEPARATOR);
-		sb.append(GroupConstants.CONTROL_PANEL_FRIENDLY_URL);
-		sb.append(PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL);
-
 		content = StringUtil.replace(
 			content, _DATA_HANDLER_COMPANY_DEFAULT_GROUP_URL,
 			companyDefaultGroupPortalURL);
@@ -846,7 +837,11 @@ public class LayoutReferencesExportImportContentProcessor
 			content, _DATA_HANDLER_PUBLIC_SERVLET_MAPPING,
 			PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING);
 		content = StringUtil.replace(
-			content, _DATA_HANDLER_SITE_ADMIN_URL, sb.toString());
+			content, _DATA_HANDLER_SITE_ADMIN_URL,
+			StringBundler.concat(
+				VirtualLayoutConstants.CANONICAL_URL_SEPARATOR,
+				GroupConstants.CONTROL_PANEL_FRIENDLY_URL,
+				PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL));
 		content = StringUtil.replace(
 			content, _DATA_HANDLER_VIRTUAL_HOST_PRIVATE_LAYOUT_FRIENDLY_URL,
 			virtualHostPrivateLayoutFriendlyURLReplacement);
@@ -962,9 +957,7 @@ public class LayoutReferencesExportImportContentProcessor
 
 			url = replaceExportHostname(group, url, urlSB);
 
-			if (!url.startsWith(StringPool.SLASH) ||
-				PortalInstances.isVirtualHostsIgnorePath(url)) {
-
+			if (!url.startsWith(StringPool.SLASH)) {
 				continue;
 			}
 
@@ -978,17 +971,19 @@ public class LayoutReferencesExportImportContentProcessor
 				url = url.substring(pathContext.length());
 			}
 
+			if (!url.startsWith(StringPool.SLASH)) {
+				continue;
+			}
+
 			int pos = url.indexOf(StringPool.SLASH, 1);
 
-			if (pos == -1) {
-				pos = url.length();
-			}
+			String localePath = StringPool.BLANK;
 
 			Locale locale = null;
 
-			String localePath = url.substring(0, pos);
+			if (pos != -1) {
+				localePath = url.substring(0, pos);
 
-			if (localePath.length() > 1) {
 				locale = LocaleUtil.fromLanguageId(
 					localePath.substring(1), true, false);
 			}
@@ -1027,10 +1022,6 @@ public class LayoutReferencesExportImportContentProcessor
 						}
 					}
 				}
-			}
-
-			if (!url.startsWith(StringPool.SLASH)) {
-				continue;
 			}
 
 			boolean privateLayout = false;
@@ -1080,22 +1071,10 @@ public class LayoutReferencesExportImportContentProcessor
 					TreeMap<String, String> publicVirtualHostnames =
 						publicLayoutSet.getVirtualHostnames();
 
-					if (!publicVirtualHostnames.isEmpty()) {
+					if (!publicVirtualHostnames.isEmpty() ||
+						_isDefaultGroup(group)) {
+
 						layoutSet = group.getPublicLayoutSet();
-					}
-					else {
-						LayoutSet privateLayoutSet =
-							group.getPrivateLayoutSet();
-
-						TreeMap<String, String> privateVirtualHostnames =
-							privateLayoutSet.getVirtualHostnames();
-
-						if (!privateVirtualHostnames.isEmpty()) {
-							layoutSet = group.getPrivateLayoutSet();
-						}
-						else if (_isDefaultGroup(group)) {
-							layoutSet = group.getPublicLayoutSet();
-						}
 					}
 				}
 
@@ -1186,23 +1165,13 @@ public class LayoutReferencesExportImportContentProcessor
 		try {
 			URI uri = _http.getURI(url);
 
-			if ((uri != null) && Validator.isIPAddress(uri.getHost())) {
-				InetAddress inetAddress = InetAddressUtil.getInetAddressByName(
-					uri.getHost());
+			if ((uri != null) &&
+				InetAddressUtil.isLocalInetAddress(
+					InetAddress.getByName(uri.getHost()))) {
 
-				if ((inetAddress != null) &&
-					InetAddressUtil.isLocalInetAddress(inetAddress)) {
-
-					StringBundler sb = new StringBundler(5);
-
-					sb.append(uri.getScheme());
-					sb.append("://");
-					sb.append(uri.getHost());
-					sb.append(StringPool.COLON);
-					sb.append(uri.getPort());
-
-					return sb.toString();
-				}
+				return StringBundler.concat(
+					uri.getScheme(), "://", uri.getHost(), StringPool.COLON,
+					uri.getPort());
 			}
 		}
 		catch (UnknownHostException unknownHostException) {
@@ -1342,7 +1311,8 @@ public class LayoutReferencesExportImportContentProcessor
 	private CompanyLocalService _companyLocalService;
 
 	private ConfigurationProvider _configurationProvider;
-	private ExportImportServiceConfiguration _exportImportServiceConfiguration;
+	private volatile ExportImportServiceConfiguration
+		_exportImportServiceConfiguration;
 
 	@Reference
 	private GroupLocalService _groupLocalService;

@@ -204,7 +204,7 @@ public class CommerceShipmentItemLocalServiceImpl
 		throws PortalException {
 
 		List<CommerceShipmentItem> commerceShipmentItems =
-			commerceShipmentItemPersistence.findByCommerceShipment(
+			commerceShipmentItemPersistence.findByCommerceShipmentId(
 				commerceShipmentId);
 
 		for (CommerceShipmentItem commerceShipmentItem :
@@ -242,7 +242,7 @@ public class CommerceShipmentItemLocalServiceImpl
 		long commerceShipmentId, int start, int end,
 		OrderByComparator<CommerceShipmentItem> orderByComparator) {
 
-		return commerceShipmentItemPersistence.findByCommerceShipment(
+		return commerceShipmentItemPersistence.findByCommerceShipmentId(
 			commerceShipmentId, start, end, orderByComparator);
 	}
 
@@ -267,7 +267,7 @@ public class CommerceShipmentItemLocalServiceImpl
 
 	@Override
 	public int getCommerceShipmentItemsCount(long commerceShipmentId) {
-		return commerceShipmentItemPersistence.countByCommerceShipment(
+		return commerceShipmentItemPersistence.countByCommerceShipmentId(
 			commerceShipmentId);
 	}
 
@@ -376,10 +376,6 @@ public class CommerceShipmentItemLocalServiceImpl
 			return;
 		}
 
-		int availableQuantity =
-			commerceOrderItem.getQuantity() -
-				commerceOrderItem.getShippedQuantity();
-
 		CommerceInventoryWarehouse commerceInventoryWarehouse =
 			_commerceInventoryWarehouseLocalService.
 				getCommerceInventoryWarehouse(commerceInventoryWarehouseId);
@@ -387,6 +383,10 @@ public class CommerceShipmentItemLocalServiceImpl
 		if (!commerceInventoryWarehouse.isActive()) {
 			throw new CommerceShipmentInactiveWarehouseException();
 		}
+
+		int availableQuantity =
+			commerceOrderItem.getQuantity() -
+				commerceOrderItem.getShippedQuantity();
 
 		CommerceShipmentItem commerceShipmentItem = fetchCommerceShipmentItem(
 			commerceShipment.getCommerceShipmentId(),

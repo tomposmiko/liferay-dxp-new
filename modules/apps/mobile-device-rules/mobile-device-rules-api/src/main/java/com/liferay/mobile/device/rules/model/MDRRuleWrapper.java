@@ -156,6 +156,11 @@ public class MDRRuleWrapper
 	}
 
 	@Override
+	public MDRRule cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
+	@Override
 	public String[] getAvailableLanguageIds() {
 		return model.getAvailableLanguageIds();
 	}

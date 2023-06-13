@@ -31,9 +31,14 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureLayoutLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
+import com.liferay.google.places.util.GooglePlacesUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -41,6 +46,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,26 +68,29 @@ public class DDMFormPagesTemplateContextFactory {
 		DDMFormRenderingContext ddmFormRenderingContext,
 		DDMStructureLayoutLocalService ddmStructureLayoutLocalService,
 		DDMStructureLocalService ddmStructureLocalService,
-		JSONFactory jsonFactory) {
+		GroupLocalService groupLocalService, JSONFactory jsonFactory) {
 
 		_ddmForm = ddmForm;
 		_ddmFormLayout = ddmFormLayout;
 		_ddmFormRenderingContext = ddmFormRenderingContext;
 		_ddmStructureLayoutLocalService = ddmStructureLayoutLocalService;
 		_ddmStructureLocalService = ddmStructureLocalService;
+		_groupLocalService = groupLocalService;
 		_jsonFactory = jsonFactory;
 
 		DDMFormValues ddmFormValues =
 			ddmFormRenderingContext.getDDMFormValues();
 
+		DefaultDDMFormValuesFactory defaultDDMFormValuesFactory =
+			new DefaultDDMFormValuesFactory(ddmForm);
+
 		if ((ddmFormValues == null) ||
 			ListUtil.isEmpty(ddmFormValues.getDDMFormFieldValues())) {
 
-			DefaultDDMFormValuesFactory defaultDDMFormValuesFactory =
-				new DefaultDDMFormValuesFactory(
-					ddmForm, ddmFormRenderingContext.getLocale());
-
 			ddmFormValues = defaultDDMFormValuesFactory.create();
+		}
+		else {
+			defaultDDMFormValuesFactory.populate(ddmFormValues);
 		}
 
 		_ddmFormValues = ddmFormValues;
@@ -170,8 +179,8 @@ public class DDMFormPagesTemplateContextFactory {
 					getDDMFormFieldsPropertyChanges(),
 				_ddmFormFieldValuesMap.get(ddmFormFieldName),
 				_ddmFormRenderingContext, _ddmStructureLayoutLocalService,
-				_ddmStructureLocalService, _jsonFactory, _pageEnabled,
-				_ddmFormLayout);
+				_ddmStructureLocalService, _groupLocalService, _jsonFactory,
+				_pageEnabled, _ddmFormLayout);
 
 		ddmFormFieldTemplateContextFactory.setDDMFormFieldTypeServicesTracker(
 			_ddmFormFieldTypeServicesTracker);
@@ -339,30 +348,42 @@ public class DDMFormPagesTemplateContextFactory {
 
 	private void _evaluate() {
 		try {
-			DDMFormEvaluatorEvaluateRequest.Builder
-				formEvaluatorEvaluateRequestBuilder =
-					DDMFormEvaluatorEvaluateRequest.Builder.newBuilder(
-						_ddmForm, _ddmFormValues, _locale);
-
 			HttpServletRequest httpServletRequest =
 				_ddmFormRenderingContext.getHttpServletRequest();
 
-			formEvaluatorEvaluateRequestBuilder.withCompanyId(
-				PortalUtil.getCompanyId(httpServletRequest));
+			long companyId = PortalUtil.getCompanyId(httpServletRequest);
 
-			formEvaluatorEvaluateRequestBuilder.withDDMFormLayout(
-				_ddmFormLayout);
-			formEvaluatorEvaluateRequestBuilder.withEditingFieldValue(
-				Validator.isNotNull(
-					httpServletRequest.getParameter("trigger")));
-			formEvaluatorEvaluateRequestBuilder.withGroupId(
-				_ddmFormRenderingContext.getGroupId());
-			formEvaluatorEvaluateRequestBuilder.withUserId(
-				PortalUtil.getUserId(httpServletRequest));
-			formEvaluatorEvaluateRequestBuilder.withViewMode(_isViewMode());
+			DDMFormEvaluatorEvaluateRequest.Builder
+				ddmFormEvaluatorEvaluateRequestBuilder =
+					DDMFormEvaluatorEvaluateRequest.Builder.newBuilder(
+						_ddmForm, _ddmFormValues, _locale);
+
+			ddmFormEvaluatorEvaluateRequestBuilder.withCompanyId(
+				companyId
+			).withDDMFormInstanceId(
+				_ddmFormRenderingContext.getDDMFormInstanceId()
+			).withDDMFormLayout(
+				_ddmFormLayout
+			).withEditingFieldValue(
+				Validator.isNotNull(httpServletRequest.getParameter("trigger"))
+			).withGooglePlacesAPIKey(
+				GooglePlacesUtil.getGooglePlacesAPIKey(
+					companyId, _ddmFormRenderingContext.getGroupId(),
+					_groupLocalService)
+			).withGroupId(
+				_ddmFormRenderingContext.getGroupId()
+			).withObjectFieldsJSONArray(
+				_ddmForm.getObjectFieldsJSONArray()
+			).withTimeZoneId(
+				_getTimeZoneId(httpServletRequest)
+			).withUserId(
+				PortalUtil.getUserId(httpServletRequest)
+			).withViewMode(
+				_isViewMode()
+			);
 
 			_ddmFormEvaluatorEvaluateResponse = _ddmFormEvaluator.evaluate(
-				formEvaluatorEvaluateRequestBuilder.build());
+				ddmFormEvaluatorEvaluateRequestBuilder.build());
 		}
 		catch (Exception exception) {
 			_log.error("Unable to evaluate the form", exception);
@@ -370,6 +391,20 @@ public class DDMFormPagesTemplateContextFactory {
 			throw new IllegalStateException(
 				"Unexpected error occurred during form evaluation", exception);
 		}
+	}
+
+	private String _getTimeZoneId(HttpServletRequest httpServletRequest) {
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		if (themeDisplay == null) {
+			return StringPool.BLANK;
+		}
+
+		User user = themeDisplay.getUser();
+
+		return user.getTimeZoneId();
 	}
 
 	private boolean _isViewMode() {
@@ -409,6 +444,7 @@ public class DDMFormPagesTemplateContextFactory {
 	private final DDMStructureLayoutLocalService
 		_ddmStructureLayoutLocalService;
 	private final DDMStructureLocalService _ddmStructureLocalService;
+	private final GroupLocalService _groupLocalService;
 	private final JSONFactory _jsonFactory;
 	private final Locale _locale;
 	private boolean _pageEnabled;

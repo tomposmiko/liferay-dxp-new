@@ -24,7 +24,7 @@
 	</div>
 </c:if>
 
-<aui:script require="metal-dom/src/all/dom as dom">
+<aui:script require="frontend-js-web/liferay/util/run_scripts_in_element.es as runScriptsInElement">
 	window['<portlet:namespace />saveRuleGroupsPriorities'] = function (dialog) {
 		dialog.hide();
 
@@ -43,10 +43,10 @@
 
 			'<%= HtmlUtil.escapeJS(viewRuleGroupInstancesURL.toString()) %>'
 		)
-			.then(function (response) {
+			.then((response) => {
 				return response.text();
 			})
-			.then(function (response) {
+			.then((response) => {
 				var uniqueRuleGroupInstancesContainer = document.getElementById(
 					'<portlet:namespace />uniqueRuleGroupInstancesContainer'
 				);
@@ -54,9 +54,7 @@
 				if (uniqueRuleGroupInstancesContainer) {
 					uniqueRuleGroupInstancesContainer.innerHTML = response;
 
-					dom.globalEval.runScriptsInElement(
-						uniqueRuleGroupInstancesContainer
-					);
+					runScriptsInElement.default(uniqueRuleGroupInstancesContainer);
 				}
 			});
 	};
@@ -73,7 +71,7 @@
 					userId: themeDisplay.getUserId(),
 				}),
 			},
-			function (response, xhr) {
+			(response, xhr) => {
 				<portlet:namespace />updateRuleGroupInstances();
 			}
 		);
@@ -95,7 +93,7 @@
 					userId: themeDisplay.getUserId(),
 				}),
 			},
-			function (response, xhr) {
+			(response, xhr) => {
 				<portlet:namespace />updateRuleGroupInstances();
 			}
 		);
@@ -108,7 +106,7 @@
 	);
 
 	if (saveInstanceButton) {
-		saveInstanceButton.addEventListener('click', function (event) {
+		saveInstanceButton.addEventListener('click', (event) => {
 			Liferay.Util.openSelectionModal({
 				onSelect: function (event) {
 					<portlet:namespace />saveRuleGroupInstance(
@@ -138,11 +136,8 @@
 	);
 
 	if (managePrioritiesButton) {
-		managePrioritiesButton.addEventListener('click', function (event) {
+		managePrioritiesButton.addEventListener('click', (event) => {
 			Liferay.Util.openWindow({
-				dialog: {
-					destroyOnHide: true,
-				},
 				dialogIframe: {
 					bodyCssClass: 'dialog-with-footer',
 				},
@@ -151,7 +146,7 @@
 					'<%= UnicodeLanguageUtil.get(resourceBundle, "rule-priorities") %>',
 
 				<liferay-portlet:renderURL portletName="<%= MDRPortletKeys.MOBILE_DEVICE_RULES %>" varImpl="managePrioritiesURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-					<portlet:param name="mvcRenderCommandName" value="/mobile_device_rules/edit_rule_group_instance" />
+					<portlet:param name="mvcRenderCommandName" value="/mobile_device_rules/edit_rule_group_instance_priorities" />
 					<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 					<portlet:param name="className" value="<%= className %>" />
 					<portlet:param name="classPK" value="<%= String.valueOf(classPK) %>" />

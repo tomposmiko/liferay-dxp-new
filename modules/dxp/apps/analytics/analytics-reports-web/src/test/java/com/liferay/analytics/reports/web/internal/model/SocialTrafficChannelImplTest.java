@@ -198,7 +198,7 @@ public class SocialTrafficChannelImplTest {
 
 			@Override
 			protected Object handleGetObject(String key) {
-				if (Objects.equals(key, "other")) {
+				if (Objects.equals("other", key)) {
 					return "Other";
 				}
 

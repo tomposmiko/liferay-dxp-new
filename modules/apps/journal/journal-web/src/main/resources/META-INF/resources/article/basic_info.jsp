@@ -27,13 +27,47 @@ DDMStructure ddmStructure = journalEditArticleDisplayContext.getDDMStructure();
 <aui:input name="ddmStructureKey" type="hidden" value="<%= ddmStructure.getStructureKey() %>" />
 
 <c:if test="<%= journalWebConfiguration.changeableDefaultLanguage() %>">
-	<div id="<%= liferayPortletResponse.getNamespace() %>-change-default-language">
+	<div id="<%= liferayPortletResponse.getNamespace() + "-change-default-language" %>">
 		<react:component
 			module="js/ChangeDefaultLanguage.es"
 			props="<%= journalEditArticleDisplayContext.getChangeDefaultLanguageData() %>"
 			servletContext="<%= application %>"
 		/>
 	</div>
+</c:if>
+
+<c:if test="<%= journalEditArticleDisplayContext.isShowSelectFolder() %>">
+	<p class="article-folder"><b><liferay-ui:message key="folder" /></b></p>
+
+	<div class="form-group input-group mb-2">
+		<div class="input-group-item">
+			<input class="field form-control lfr-input-text" id="<portlet:namespace />folderName" readonly="readonly" title="<%= LanguageUtil.get(request, "folder-name") %>" type="text" value="<%= journalEditArticleDisplayContext.getFolderName() %>" />
+		</div>
+	</div>
+
+	<div class="form-group">
+		<aui:button name="selectFolderButton" value="select" />
+	</div>
+
+	<liferay-frontend:component
+		context='<%=
+			HashMapBuilder.<String, Object>put(
+				"inputName", "folderId"
+			).put(
+				"selectFolderURL",
+				PortletURLBuilder.createRenderURL(
+					liferayPortletResponse
+				).setMVCPath(
+					"/select_folder.jsp"
+				).setParameter(
+					"folderId", journalEditArticleDisplayContext.getFolderId()
+				).setWindowState(
+					LiferayWindowState.POP_UP
+				).buildString()
+			).build()
+		%>'
+		module="js/SelectFolderButton.es"
+	/>
 </c:if>
 
 <p class="article-structure">
@@ -87,7 +121,7 @@ DDMStructure ddmStructure = journalEditArticleDisplayContext.getDDMStructure();
 </c:choose>
 
 <div>
-	<label for="<portlet:namespace />descriptionMapAsXML"><liferay-ui:message key="summary" /></label>
+	<label for="<portlet:namespace />descriptionMapAsXML"><liferay-ui:message key="description" /></label>
 
 	<liferay-ui:input-localized
 		availableLocales="<%= journalEditArticleDisplayContext.getAvailableLocales() %>"

@@ -164,7 +164,7 @@ else {
 			if (checkbox) {
 				checkbox.addEventListener(
 					'click',
-					function() {
+					function(event) {
 						var checked = checkbox.checked;
 
 						if (!form) {
@@ -221,35 +221,10 @@ else {
 	Liferay.component(
 		'<%= nameId %>DatePicker',
 		function() {
-			var keysPressed = {};
-
-			var onKeyDown = function (domEvent) {
-				if (domEvent.keyCode === 16) {
-					keysPressed[domEvent.keyCode] = true;
-				}
-			};
-
-			var onKeyUp = function (domEvent) {
-				if (domEvent.keyCode === 16) {
-					delete keysPressed[domEvent.keyCode];
-				}
-			};
-
-			var closePopoverOnKeyboardNavigation = function (instance) {
-				instance.hide();
-
-				keysPressed = {};
-
-				var trigger = A.one('#<%= nameId %>');
-
-				if (trigger) {
-					Liferay.Util.focusFormField(trigger);
-				}
-			}
-
 			var datePicker = new A.DatePicker<%= BrowserSnifferUtil.isMobile(request) ? "Native" : StringPool.BLANK %>(
 				{
 					calendar: {
+
 						<%
 						String calendarOptions = String.format("headerRenderer: '%s'", LanguageUtil.get(resourceBundle, "b-y"));
 
@@ -271,10 +246,6 @@ else {
 					container: '#<%= randomNamespace %>displayDate',
 					mask: '<%= mask %>',
 					on: {
-						destroy: function () {
-							document.removeEventListener('keydown', onKeyDown);
-							document.removeEventListener('keyup', onKeyUp);
-						},
 						disabledChange: function(event) {
 							var instance = this;
 
@@ -287,7 +258,7 @@ else {
 							container.one('#<%= nameId %>').attr('disabled', newVal);
 							container.one('#<%= yearParamId %>').attr('disabled', newVal);
 						},
-						enterKey: function() {
+						enterKey: function(event) {
 							var instance = this;
 
 							var inputVal = instance.get('activeInput').val();
@@ -300,25 +271,6 @@ else {
 							else if (<%= nullable %> && !date) {
 								datePicker.updateValue('');
 							}
-
-							var countInterval = 0;
-
-							var intervalId = setInterval(function () {
-								var trigger = A.one('.datepicker-popover:not(.popover-hidden) .yui3-calendarnav-prevmonth');
-
-								if (trigger) {
-									Liferay.Util.focusFormField(trigger);
-									clearInterval(intervalId);
-								} else if (countInterval > 10) {
-									clearInterval(intervalId);
-								}
-
-								countInterval++;
-							}, 100);
-						},
-						init: function () {
-							document.addEventListener('keydown', onKeyDown);
-							document.addEventListener('keyup', onKeyUp);
 						},
 						selectionChange: function(event) {
 							var newSelection = event.newSelection[0];
@@ -348,41 +300,15 @@ else {
 
 								var domEvent = event.domEvent;
 
-								keysPressed[domEvent.keyCode] = true;
+								if (domEvent.keyCode == 9 && domEvent.target.hasClass('yui3-calendar-grid')) {
+									instance.hide();
 
-								var isTabPressed = domEvent.keyCode === 9 || keysPressed[9];
+									var trigger = A.one('#<%= nameId %>');
 
-								var isShiftPressed = domEvent.keyCode === 16 || keysPressed[16];
-
-								var isForwardNavigation = isTabPressed && !isShiftPressed;
-
-								var isEscapePressed = domEvent.keyCode === 27 || keysPressed[27];
-
-								var hasClassName = domEvent.target.hasClass('yui3-calendar-grid') ||
-								domEvent.target.hasClass('yui3-calendar-day');
-
-								if ((isForwardNavigation && hasClassName) || isEscapePressed) {
-									closePopoverOnKeyboardNavigation(instance);
+									if (trigger) {
+										Liferay.Util.focusFormField(trigger);
+									}
 								}
-							},
-							keyup: function(event) {
-								var instance = this;
-
-								var domEvent = event.domEvent;
-
-								var isTabPressed = domEvent.keyCode === 9 || keysPressed[9];
-
-								var isShiftPressed = domEvent.keyCode === 16 || keysPressed[16];
-
-								var isBackwardNavigation = isTabPressed && isShiftPressed;
-
-								var hasClassName = domEvent.target.hasClass('yui3-calendar-focused');
-
-								if (isBackwardNavigation && hasClassName) {
-									closePopoverOnKeyboardNavigation(instance);
-								}
-
-								delete keysPressed[domEvent.keyCode];
 							}
 						},
 						zIndex: Liferay.zIndex.POPOVER
@@ -421,7 +347,7 @@ else {
 
 			datePicker.after(
 				'selectionChange',
-				function() {
+				function(event) {
 					var input = A.one('#<%= nameId %>');
 
 					if (input) {

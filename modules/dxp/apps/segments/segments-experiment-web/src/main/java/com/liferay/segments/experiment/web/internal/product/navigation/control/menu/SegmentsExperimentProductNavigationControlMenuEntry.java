@@ -14,6 +14,7 @@
 
 package com.liferay.segments.experiment.web.internal.product.navigation.control.menu;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -138,12 +139,13 @@ public class SegmentsExperimentProductNavigationControlMenuEntry
 		else {
 			values.put("cssClass", StringPool.BLANK);
 
-			PortletURL portletURL = _portletURLFactory.create(
-				httpServletRequest, SegmentsPortletKeys.SEGMENTS_EXPERIMENT,
-				RenderRequest.RENDER_PHASE);
-
-			portletURL.setParameter(
-				"mvcPath", "/segments_experiment_panel.jsp");
+			PortletURL portletURL = PortletURLBuilder.create(
+				_portletURLFactory.create(
+					httpServletRequest, SegmentsPortletKeys.SEGMENTS_EXPERIMENT,
+					RenderRequest.RENDER_PHASE)
+			).setMVCPath(
+				"/segments_experiment_panel.jsp"
+			).buildPortletURL();
 
 			try {
 				portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
@@ -191,8 +193,7 @@ public class SegmentsExperimentProductNavigationControlMenuEntry
 
 	public boolean isPanelStateOpen(HttpServletRequest httpServletRequest) {
 		String segmentsExperimentPanelState = SessionClicks.get(
-			httpServletRequest,
-			"com.liferay.segments.experiment.web_panelState", "closed");
+			httpServletRequest, _SESSION_CLICKS_KEY, "closed");
 
 		if (Objects.equals(segmentsExperimentPanelState, "open")) {
 			return true;
@@ -225,19 +226,10 @@ public class SegmentsExperimentProductNavigationControlMenuEntry
 
 		Layout layout = themeDisplay.getLayout();
 
-		if (layout.isTypeControlPanel()) {
-			return false;
-		}
-
-		if (isEmbeddedPersonalApplicationLayout(layout)) {
-			return false;
-		}
-
-		if (!layout.isTypeContent()) {
-			return false;
-		}
-
-		if (!LayoutPermissionUtil.contains(
+		if (layout.isTypeControlPanel() ||
+			isEmbeddedPersonalApplicationLayout(layout) ||
+			!layout.isTypeContent() ||
+			!LayoutPermissionUtil.contains(
 				themeDisplay.getPermissionChecker(), layout,
 				ActionKeys.UPDATE)) {
 
@@ -267,6 +259,12 @@ public class SegmentsExperimentProductNavigationControlMenuEntry
 		}
 
 		return super.isShow(httpServletRequest);
+	}
+
+	public void setPanelState(
+		HttpServletRequest httpServletRequest, String panelState) {
+
+		SessionClicks.put(httpServletRequest, _SESSION_CLICKS_KEY, panelState);
 	}
 
 	@Activate
@@ -310,9 +308,9 @@ public class SegmentsExperimentProductNavigationControlMenuEntry
 
 			jspWriter.write(
 				StringBundler.concat(
-					"d-print-none lfr-admin-panel lfr-product-menu-panel ",
-					"lfr-segments-experiment-panel sidenav-fixed ",
-					"sidenav-menu-slider sidenav-right\" id=\""));
+					"cadmin d-print-none lfr-admin-panel ",
+					"lfr-product-menu-panel lfr-segments-experiment-panel ",
+					"sidenav-fixed sidenav-menu-slider sidenav-right\" id=\""));
 
 			String portletNamespace = _portal.getPortletNamespace(
 				SegmentsPortletKeys.SEGMENTS_EXPERIMENT);
@@ -321,7 +319,7 @@ public class SegmentsExperimentProductNavigationControlMenuEntry
 
 			jspWriter.write("segmentsExperimentPanelId\">");
 			jspWriter.write(
-				"<div class=\"sidebar sidebar-default sidenav-menu " +
+				"<div class=\"sidebar sidebar-light sidenav-menu " +
 					"sidebar-sm\">");
 
 			RuntimeTag runtimeTag = new RuntimeTag();
@@ -339,6 +337,9 @@ public class SegmentsExperimentProductNavigationControlMenuEntry
 
 	private static final String _ICON_TMPL_CONTENT = StringUtil.read(
 		SegmentsExperimentProductNavigationControlMenuEntry.class, "icon.tmpl");
+
+	private static final String _SESSION_CLICKS_KEY =
+		"com.liferay.segments.experiment.web_panelState";
 
 	@Reference
 	private Html _html;

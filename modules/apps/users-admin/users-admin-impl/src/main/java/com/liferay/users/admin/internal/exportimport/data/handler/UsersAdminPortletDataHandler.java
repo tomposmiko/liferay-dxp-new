@@ -48,6 +48,13 @@ public class UsersAdminPortletDataHandler extends BasePortletDataHandler {
 
 	public static final String NAMESPACE = "users_admin";
 
+	public static final String SCHEMA_VERSION = "4.0.0";
+
+	@Override
+	public String getSchemaVersion() {
+		return SCHEMA_VERSION;
+	}
+
 	@Override
 	public boolean isSupportsDataStrategyCopyAsNew() {
 		return false;
@@ -84,7 +91,7 @@ public class UsersAdminPortletDataHandler extends BasePortletDataHandler {
 
 	@Override
 	protected String doExportData(
-			final PortletDataContext portletDataContext, String portletId,
+			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
 		throws Exception {
 

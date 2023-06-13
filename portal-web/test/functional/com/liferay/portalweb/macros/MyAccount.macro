@@ -3,7 +3,7 @@ definition {
 	macro addOrganization {
 		LexiconEntry.gotoAdd();
 
-		PortletEntry.inputName(name = ${organizationName});
+		PortletEntry.inputName(name = "${organizationName}");
 
 		PortletEntry.save();
 	}
@@ -11,17 +11,17 @@ definition {
 	macro changeUserLanguage {
 		Select(
 			locator1 = "MyAccount#LANGUAGE_SELECT",
-			value1 = ${languageName});
+			value1 = "${languageName}");
 
-		var key_saveButton = ${saveButton};
+		var key_saveButton = "${saveButton}";
 
 		ScrollWebElementIntoView(locator1 = "Button#SAVE_LOCALIZED");
 
-		Pause(locator1 = 2000);
+		Pause(locator1 = "2000");
 
 		AssertClick(
 			locator1 = "Button#SAVE_LOCALIZED",
-			value1 = ${saveButton});
+			value1 = "${saveButton}");
 
 		VerifyElementPresent(locator1 = "Message#SUCCESS");
 	}
@@ -33,7 +33,7 @@ definition {
 
 		Select(
 			locator1 = "MyAccount#LANGUAGE_SELECT",
-			value1 = ${languageName});
+			value1 = "${languageName}");
 
 		AssertClick(
 			locator1 = "Button#SAVE",
@@ -44,19 +44,19 @@ definition {
 
 	macro configureDisplaySettingsLanguageLocalized {
 		ProductMenu.gotoPortlet(
-			category = ${category},
+			category = "${category}",
 			panel = "User",
-			portlet = ${portlet});
+			portlet = "${portlet}");
 
 		Select(
 			locator1 = "MyAccount#LANGUAGE_SELECT",
-			value1 = ${languageName});
+			value1 = "${languageName}");
 
-		var key_saveButton = ${saveButton};
+		var key_saveButton = "${saveButton}";
 
 		AssertClick(
 			locator1 = "Button#SAVE_LOCALIZED",
-			value1 = ${saveButton});
+			value1 = "${saveButton}");
 
 		VerifyElementPresent(locator1 = "Message#SUCCESS");
 	}
@@ -67,7 +67,7 @@ definition {
 		if (isSet(currentPassword)) {
 			Type(
 				locator1 = "TextInput#CURRENT_PASSWORD",
-				value1 = ${currentPassword});
+				value1 = "${currentPassword}");
 		}
 		else {
 			Type(
@@ -77,15 +77,15 @@ definition {
 
 		Type(
 			locator1 = "TextInput#NEW_PASSWORD",
-			value1 = ${newPassword});
+			value1 = "${newPassword}");
 
 		Type(
 			locator1 = "TextInput#ENTER_AGAIN",
-			value1 = ${newPassword});
+			value1 = "${newPassword}");
 
 		Button.clickSave();
 
-		if (${changeable} == "false") {
+		if ("${changeable}" == "false") {
 			AssertTextEquals.assertPartialText(
 				locator1 = "Message#ERROR_1",
 				value1 = "Passwords may not be changed under the current password policy.");
@@ -98,7 +98,9 @@ definition {
 	}
 
 	macro openMyAccountAdmin {
-		Navigator.openWithAppendToBaseURL(urlAppend = "group/control_panel/manage?p_p_id=com_liferay_my_account_web_portlet_MyAccountPortlet");
+		Navigator.openWithAppendToBaseURL(
+			baseURL = "${baseURL}",
+			urlAppend = "group/control_panel/manage?p_p_id=com_liferay_my_account_web_portlet_MyAccountPortlet");
 	}
 
 	macro view {

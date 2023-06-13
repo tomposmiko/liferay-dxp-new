@@ -20,7 +20,7 @@
 
 <div class="lfr-ddm-container" id="<%= randomNamespace %>">
 	<c:if test="<%= ddmForm != null %>">
-		<div class="input-group-item input-group-item-shrink input-localized-content <%= hideClass %>" role="menu" style="justify-content: flex-end;">
+		<div class="input-group-item input-group-item-shrink input-localized-content <%= hideCssClass %>" role="menu" style="justify-content: flex-end;">
 
 			<%
 			String defaultLanguageId = null;
@@ -75,33 +75,7 @@
 							String linkCssClass = "dropdown-item palette-item";
 
 							Locale curLocale = LocaleUtil.fromLanguageId(curLanguageId);
-
-							String translationStatusCssClass = "warning";
-							String translationStatusMessage = LanguageUtil.get(request, "untranslated");
-
-							if (ddmFormValues != null) {
-								Set<Locale> ddmFormValuesAvailableLocales = ddmFormValues.getAvailableLocales();
-
-								if (ddmFormValuesAvailableLocales.contains(curLocale)) {
-									translationStatusCssClass = "success";
-									translationStatusMessage = LanguageUtil.get(request, "translated");
-								}
-							}
-
-							if (curLanguageId.equals(defaultLanguageId)) {
-								linkCssClass += " active";
-								translationStatusCssClass = "info";
-								translationStatusMessage = LanguageUtil.get(request, "default");
-							}
 						%>
-
-						<liferay-util:buffer
-							var="messageBuffer"
-						>
-							<%= StringUtil.replace(curLanguageId, '_', '-') %>
-
-							<span class="label label-<%= translationStatusCssClass %>"><%= translationStatusMessage %></span>
-						</liferay-util:buffer>
 
 							<c:if test="<%= showLanguageSelector %>">
 								<liferay-ui:icon
@@ -119,7 +93,7 @@
 									iconCssClass="inline-item inline-item-before"
 									linkCssClass="<%= linkCssClass %>"
 									markupView="lexicon"
-									message="<%= messageBuffer %>"
+									message="<%= StringUtil.replace(curLanguageId, '_', '-') %>"
 									onClick="event.preventDefault(); fireLocaleChanged(event);"
 									url="javascript:;"
 								>
@@ -169,6 +143,8 @@
 
 			<%
 			}
+
+			Group group = themeDisplay.getScopeGroup();
 			%>
 
 			var liferayDDMForm = Liferay.component(
@@ -184,16 +160,14 @@
 					doAsGroupId: <%= scopeGroupId %>,
 					fieldsNamespace: '<%= HtmlUtil.escapeJS(fieldsNamespace) %>',
 					imageSelectorURL: '<%= imageSelectorURL %>',
-					initialChildren: <%= PropsValues.LAYOUT_MANAGE_PAGES_INITIAL_CHILDREN %>,
+					isPrivateLayoutsEnabled: <%= group.isPrivateLayoutsEnabled() %>,
 					mode: '<%= HtmlUtil.escapeJS(mode) %>',
 					p_l_id: <%= themeDisplay.getPlid() %>,
-					portletId: '<%= themeDisplay.getPpid() %>',
 					portletNamespace: '<portlet:namespace />',
 					repeatable: <%= repeatable %>,
 					requestedLocale:
 						'<%= (requestedLocale == null) ? StringPool.BLANK : HtmlUtil.escapeJS(requestedLocale.toString()) %>',
 					synchronousFormSubmission: <%= synchronousFormSubmission %>,
-					webContentSelectorURL: '<%= webContentSelectorURL %>',
 
 					<c:if test="<%= ddmFormValues != null %>">
 						values: <%= DDMUtil.getDDMFormValuesJSONString(ddmFormValues) %>,
@@ -203,30 +177,6 @@
 
 			var onLocaleChange = function (event) {
 				var languageId = event.item.getAttribute('data-value');
-
-				var childrenItems = A.all(
-					'#<portlet:namespace /><%= fieldsNamespace %>PaletteContentBox a'
-				);
-
-				var triggerMenu = A.one('#<portlet:namespace /><%= fieldsNamespace %>Menu');
-
-				var listContainer = triggerMenu.getData('menuListContainer');
-
-				if (childrenItems._nodes && !childrenItems._nodes.length && listContainer) {
-					childrenItems = listContainer.all(childrenItems._query);
-				}
-
-				childrenItems.each(function (item) {
-					if (item.hasClass('active')) {
-						item.removeClass('active');
-					}
-
-					var languageIdActive = item.getAttribute('data-value');
-
-					if (languageId === languageIdActive) {
-						item.addClass('active');
-					}
-				});
 
 				languageId = languageId.replace('_', '-');
 
@@ -238,8 +188,9 @@
 					}
 				);
 
-				triggerMenu.setData('menuListContainer', listContainer);
-				triggerMenu.setHTML(triggerContent);
+				var trigger = A.one('#<portlet:namespace /><%= fieldsNamespace %>Menu');
+
+				trigger.setHTML(triggerContent);
 			};
 
 			Liferay.on('inputLocalized:localeChanged', onLocaleChange);

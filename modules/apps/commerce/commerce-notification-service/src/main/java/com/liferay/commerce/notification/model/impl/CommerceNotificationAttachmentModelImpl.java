@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -73,10 +74,11 @@ public class CommerceNotificationAttachmentModelImpl
 	public static final String TABLE_NAME = "CNotificationAttachment";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"uuid_", Types.VARCHAR}, {"CNotificationAttachmentId", Types.BIGINT},
-		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
-		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
-		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
+		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
+		{"CNotificationAttachmentId", Types.BIGINT}, {"groupId", Types.BIGINT},
+		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
+		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
+		{"modifiedDate", Types.TIMESTAMP},
 		{"CNotificationQueueEntryId", Types.BIGINT},
 		{"fileEntryId", Types.BIGINT}, {"deleteOnSend", Types.BOOLEAN}
 	};
@@ -85,6 +87,7 @@ public class CommerceNotificationAttachmentModelImpl
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("CNotificationAttachmentId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
@@ -99,7 +102,7 @@ public class CommerceNotificationAttachmentModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CNotificationAttachment (uuid_ VARCHAR(75) null,CNotificationAttachmentId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,CNotificationQueueEntryId LONG,fileEntryId LONG,deleteOnSend BOOLEAN)";
+		"create table CNotificationAttachment (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,CNotificationAttachmentId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,CNotificationQueueEntryId LONG,fileEntryId LONG,deleteOnSend BOOLEAN)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table CNotificationAttachment";
@@ -257,9 +260,40 @@ public class CommerceNotificationAttachmentModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CommerceNotificationAttachment>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceNotificationAttachment.class.getClassLoader(),
+			CommerceNotificationAttachment.class, ModelWrapper.class);
+
+		try {
+			Constructor<CommerceNotificationAttachment> constructor =
+				(Constructor<CommerceNotificationAttachment>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map
 		<String, Function<CommerceNotificationAttachment, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommerceNotificationAttachment, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceNotificationAttachment, Object>>
@@ -267,97 +301,108 @@ public class CommerceNotificationAttachmentModelImpl
 				new LinkedHashMap
 					<String,
 					 Function<CommerceNotificationAttachment, Object>>();
-
-		attributeGetterFunctions.put(
-			"uuid", CommerceNotificationAttachment::getUuid);
-		attributeGetterFunctions.put(
-			"commerceNotificationAttachmentId",
-			CommerceNotificationAttachment::
-				getCommerceNotificationAttachmentId);
-		attributeGetterFunctions.put(
-			"groupId", CommerceNotificationAttachment::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceNotificationAttachment::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceNotificationAttachment::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceNotificationAttachment::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceNotificationAttachment::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceNotificationAttachment::getModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceNotificationQueueEntryId",
-			CommerceNotificationAttachment::
-				getCommerceNotificationQueueEntryId);
-		attributeGetterFunctions.put(
-			"fileEntryId", CommerceNotificationAttachment::getFileEntryId);
-		attributeGetterFunctions.put(
-			"deleteOnSend", CommerceNotificationAttachment::getDeleteOnSend);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CommerceNotificationAttachment, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceNotificationAttachment, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceNotificationAttachment, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CommerceNotificationAttachment::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CommerceNotificationAttachment, Long>)
+				CommerceNotificationAttachment::setMvccVersion);
+		attributeGetterFunctions.put(
+			"uuid", CommerceNotificationAttachment::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CommerceNotificationAttachment, String>)
 				CommerceNotificationAttachment::setUuid);
+		attributeGetterFunctions.put(
+			"commerceNotificationAttachmentId",
+			CommerceNotificationAttachment::
+				getCommerceNotificationAttachmentId);
 		attributeSetterBiConsumers.put(
 			"commerceNotificationAttachmentId",
 			(BiConsumer<CommerceNotificationAttachment, Long>)
 				CommerceNotificationAttachment::
 					setCommerceNotificationAttachmentId);
+		attributeGetterFunctions.put(
+			"groupId", CommerceNotificationAttachment::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceNotificationAttachment, Long>)
 				CommerceNotificationAttachment::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceNotificationAttachment::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceNotificationAttachment, Long>)
 				CommerceNotificationAttachment::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceNotificationAttachment::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceNotificationAttachment, Long>)
 				CommerceNotificationAttachment::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceNotificationAttachment::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceNotificationAttachment, String>)
 				CommerceNotificationAttachment::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceNotificationAttachment::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceNotificationAttachment, Date>)
 				CommerceNotificationAttachment::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceNotificationAttachment::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceNotificationAttachment, Date>)
 				CommerceNotificationAttachment::setModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceNotificationQueueEntryId",
+			CommerceNotificationAttachment::
+				getCommerceNotificationQueueEntryId);
 		attributeSetterBiConsumers.put(
 			"commerceNotificationQueueEntryId",
 			(BiConsumer<CommerceNotificationAttachment, Long>)
 				CommerceNotificationAttachment::
 					setCommerceNotificationQueueEntryId);
+		attributeGetterFunctions.put(
+			"fileEntryId", CommerceNotificationAttachment::getFileEntryId);
 		attributeSetterBiConsumers.put(
 			"fileEntryId",
 			(BiConsumer<CommerceNotificationAttachment, Long>)
 				CommerceNotificationAttachment::setFileEntryId);
+		attributeGetterFunctions.put(
+			"deleteOnSend", CommerceNotificationAttachment::getDeleteOnSend);
 		attributeSetterBiConsumers.put(
 			"deleteOnSend",
 			(BiConsumer<CommerceNotificationAttachment, Boolean>)
 				CommerceNotificationAttachment::setDeleteOnSend);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@Override
@@ -658,6 +703,7 @@ public class CommerceNotificationAttachmentModelImpl
 		CommerceNotificationAttachmentImpl commerceNotificationAttachmentImpl =
 			new CommerceNotificationAttachmentImpl();
 
+		commerceNotificationAttachmentImpl.setMvccVersion(getMvccVersion());
 		commerceNotificationAttachmentImpl.setUuid(getUuid());
 		commerceNotificationAttachmentImpl.setCommerceNotificationAttachmentId(
 			getCommerceNotificationAttachmentId());
@@ -673,6 +719,39 @@ public class CommerceNotificationAttachmentModelImpl
 		commerceNotificationAttachmentImpl.setDeleteOnSend(isDeleteOnSend());
 
 		commerceNotificationAttachmentImpl.resetOriginalValues();
+
+		return commerceNotificationAttachmentImpl;
+	}
+
+	@Override
+	public CommerceNotificationAttachment cloneWithOriginalValues() {
+		CommerceNotificationAttachmentImpl commerceNotificationAttachmentImpl =
+			new CommerceNotificationAttachmentImpl();
+
+		commerceNotificationAttachmentImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		commerceNotificationAttachmentImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		commerceNotificationAttachmentImpl.setCommerceNotificationAttachmentId(
+			this.<Long>getColumnOriginalValue("CNotificationAttachmentId"));
+		commerceNotificationAttachmentImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		commerceNotificationAttachmentImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commerceNotificationAttachmentImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commerceNotificationAttachmentImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commerceNotificationAttachmentImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commerceNotificationAttachmentImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commerceNotificationAttachmentImpl.setCommerceNotificationQueueEntryId(
+			this.<Long>getColumnOriginalValue("CNotificationQueueEntryId"));
+		commerceNotificationAttachmentImpl.setFileEntryId(
+			this.<Long>getColumnOriginalValue("fileEntryId"));
+		commerceNotificationAttachmentImpl.setDeleteOnSend(
+			this.<Boolean>getColumnOriginalValue("deleteOnSend"));
 
 		return commerceNotificationAttachmentImpl;
 	}
@@ -755,6 +834,8 @@ public class CommerceNotificationAttachmentModelImpl
 		CommerceNotificationAttachmentCacheModel
 			commerceNotificationAttachmentCacheModel =
 				new CommerceNotificationAttachmentCacheModel();
+
+		commerceNotificationAttachmentCacheModel.mvccVersion = getMvccVersion();
 
 		commerceNotificationAttachmentCacheModel.uuid = getUuid();
 
@@ -904,12 +985,11 @@ public class CommerceNotificationAttachmentModelImpl
 		private static final Function
 			<InvocationHandler, CommerceNotificationAttachment>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						CommerceNotificationAttachment.class,
-						ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private String _uuid;
 	private long _commerceNotificationAttachmentId;
 	private long _groupId;
@@ -952,6 +1032,7 @@ public class CommerceNotificationAttachmentModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put(
 			"CNotificationAttachmentId", _commerceNotificationAttachmentId);
@@ -992,27 +1073,29 @@ public class CommerceNotificationAttachmentModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("uuid_", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("CNotificationAttachmentId", 2L);
+		columnBitmasks.put("uuid_", 2L);
 
-		columnBitmasks.put("groupId", 4L);
+		columnBitmasks.put("CNotificationAttachmentId", 4L);
 
-		columnBitmasks.put("companyId", 8L);
+		columnBitmasks.put("groupId", 8L);
 
-		columnBitmasks.put("userId", 16L);
+		columnBitmasks.put("companyId", 16L);
 
-		columnBitmasks.put("userName", 32L);
+		columnBitmasks.put("userId", 32L);
 
-		columnBitmasks.put("createDate", 64L);
+		columnBitmasks.put("userName", 64L);
 
-		columnBitmasks.put("modifiedDate", 128L);
+		columnBitmasks.put("createDate", 128L);
 
-		columnBitmasks.put("CNotificationQueueEntryId", 256L);
+		columnBitmasks.put("modifiedDate", 256L);
 
-		columnBitmasks.put("fileEntryId", 512L);
+		columnBitmasks.put("CNotificationQueueEntryId", 512L);
 
-		columnBitmasks.put("deleteOnSend", 1024L);
+		columnBitmasks.put("fileEntryId", 1024L);
+
+		columnBitmasks.put("deleteOnSend", 2048L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -29,7 +27,6 @@ import com.liferay.site.navigation.model.SiteNavigationMenuItem;
 import com.liferay.site.navigation.service.SiteNavigationMenuItemService;
 import com.liferay.site.navigation.service.SiteNavigationMenuItemServiceUtil;
 import com.liferay.site.navigation.service.persistence.SiteNavigationMenuItemPersistence;
-import com.liferay.site.navigation.service.persistence.SiteNavigationMenuPersistence;
 
 import java.lang.reflect.Field;
 
@@ -152,18 +149,5 @@ public abstract class SiteNavigationMenuItemServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserService userService;
-
-	@Reference
-	protected SiteNavigationMenuPersistence siteNavigationMenuPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SiteNavigationMenuItemServiceBaseImpl.class);
 
 }

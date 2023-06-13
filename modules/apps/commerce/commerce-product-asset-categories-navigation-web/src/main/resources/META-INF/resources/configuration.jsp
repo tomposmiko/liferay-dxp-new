@@ -33,11 +33,11 @@ if (assetVocabulary != null) {
 	<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
 
 	<div class="portlet-configuration-body-content">
-		<div class="container-fluid-1280">
+		<div class="container-fluid container-fluid-max-xl">
 			<aui:fieldset-group markupView="lexicon">
 				<aui:fieldset>
 					<div class="display-template">
-						<liferay-ddm:template-selector
+						<liferay-template:template-selector
 							className="<%= CPAssetCategoriesNavigationPortlet.class.getName() %>"
 							displayStyle="<%= cpAssetCategoriesNavigationDisplayContext.getDisplayStyle() %>"
 							displayStyleGroupId="<%= cpAssetCategoriesNavigationDisplayContext.getDisplayStyleGroupId() %>"
@@ -115,7 +115,7 @@ if (assetVocabulary != null) {
 </aui:form>
 
 <aui:script use="aui-base,event-input">
-	A.one('#<portlet:namespace />submitButton').on('click', function () {
+	A.one('#<portlet:namespace />submitButton').on('click', () => {
 		if (
 			A.one('#<portlet:namespace />preferencesUseRootCategory').attr(
 				'checked'
@@ -124,12 +124,15 @@ if (assetVocabulary != null) {
 			var preferencesRootAssetCategoryId = A.one(
 				'#<portlet:namespace />preferencesRootAssetCategoryId'
 			);
-			var assetCategoriesSelectorCategoryId = A.one(
-				'#<portlet:namespace />assetCategoriesSelectorCategoryId'
+
+			var form = window.document['<portlet:namespace />fm'];
+
+			var assetCategoryIdsKey = Object.keys(form.elements).filter((input) =>
+				input.includes('assetCategoryIds')
 			);
 
 			preferencesRootAssetCategoryId.val(
-				assetCategoriesSelectorCategoryId.val()
+				form.elements[assetCategoryIdsKey].value
 			);
 		}
 

@@ -25,7 +25,6 @@ import com.liferay.portal.kernel.template.URLTemplateResource;
 import com.liferay.portal.kernel.test.ConsoleTestUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.template.CacheTemplateResource;
@@ -120,7 +119,7 @@ public class TemplateResourceExternalizationTest {
 
 	@Test
 	public void testDDMTemplateResourceExternalization() throws Exception {
-		final long templateId = 100;
+		long templateId = 100;
 
 		Class<?> clazz = DDMTemplate.class;
 
@@ -253,48 +252,6 @@ public class TemplateResourceExternalizationTest {
 	}
 
 	@Test
-	public void testStringTemplateResourceExternalizationWithLargeString()
-		throws Exception {
-
-		String templateId = "testId";
-		String templateContent = RandomTestUtil.randomString(65536);
-
-		StringTemplateResource stringTemplateResource =
-			new StringTemplateResource(templateId, templateContent);
-
-		// writeExternal
-
-		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
-			new UnsyncByteArrayOutputStream();
-
-		try (ObjectOutput objectOutput = new ObjectOutputStream(
-				unsyncByteArrayOutputStream)) {
-
-			stringTemplateResource.writeExternal(objectOutput);
-		}
-
-		// readExternal
-
-		StringTemplateResource newStringTemplateResource =
-			new StringTemplateResource();
-
-		ObjectInputStream objectInputStream = new ObjectInputStream(
-			new DataInputStream(
-				new UnsyncByteArrayInputStream(
-					unsyncByteArrayOutputStream.toByteArray())));
-
-		newStringTemplateResource.readExternal(objectInputStream);
-
-		Assert.assertEquals(
-			stringTemplateResource.getLastModified(),
-			newStringTemplateResource.getLastModified());
-		Assert.assertEquals(
-			templateContent, newStringTemplateResource.getContent());
-		Assert.assertEquals(
-			templateId, newStringTemplateResource.getTemplateId());
-	}
-
-	@Test
 	public void testURLTemplateResourceExternalization() throws IOException {
 		String templateId = "testId";
 
@@ -355,8 +312,8 @@ public class TemplateResourceExternalizationTest {
 		}
 
 		@Override
-		public Object readObject() throws IOException {
-			return readUTF();
+		public Object readObject() {
+			throw new UnsupportedOperationException();
 		}
 
 	}
@@ -369,8 +326,8 @@ public class TemplateResourceExternalizationTest {
 		}
 
 		@Override
-		public void writeObject(Object object) throws IOException {
-			writeUTF(String.valueOf(object));
+		public void writeObject(Object object) {
+			throw new UnsupportedOperationException();
 		}
 
 	}

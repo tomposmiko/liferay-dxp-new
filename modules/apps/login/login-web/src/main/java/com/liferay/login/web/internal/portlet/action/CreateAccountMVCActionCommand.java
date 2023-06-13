@@ -18,6 +18,7 @@ import com.liferay.captcha.configuration.CaptchaConfiguration;
 import com.liferay.captcha.util.CaptchaUtil;
 import com.liferay.login.web.constants.LoginPortletKeys;
 import com.liferay.login.web.internal.portlet.util.LoginUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.captcha.CaptchaConfigurationException;
 import com.liferay.portal.kernel.captcha.CaptchaException;
 import com.liferay.portal.kernel.exception.AddressCityException;
@@ -83,7 +84,6 @@ import com.liferay.portal.util.PropsValues;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -386,12 +386,12 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 				false, null);
 		}
 		else {
-			PortletURL loginURL = LoginUtil.getLoginURL(
-				httpServletRequest, themeDisplay.getPlid());
-
-			loginURL.setParameter("login", login);
-
-			redirect = loginURL.toString();
+			redirect = PortletURLBuilder.create(
+				LoginUtil.getLoginURL(
+					httpServletRequest, themeDisplay.getPlid())
+			).setParameter(
+				"login", login
+			).buildString();
 		}
 
 		actionResponse.sendRedirect(redirect);
@@ -433,13 +433,13 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 		String emailAddress = ParamUtil.getString(
 			actionRequest, "emailAddress");
 
-		HttpSession session = httpServletRequest.getSession();
+		HttpSession httpSession = httpServletRequest.getSession();
 
 		long facebookId = GetterUtil.getLong(
-			session.getAttribute(WebKeys.FACEBOOK_INCOMPLETE_USER_ID));
+			httpSession.getAttribute(WebKeys.FACEBOOK_INCOMPLETE_USER_ID));
 
 		String googleUserId = GetterUtil.getString(
-			session.getAttribute(WebKeys.GOOGLE_INCOMPLETE_USER_ID));
+			httpSession.getAttribute(WebKeys.GOOGLE_INCOMPLETE_USER_ID));
 
 		if (Validator.isNotNull(googleUserId)) {
 			autoPassword = false;
@@ -482,7 +482,7 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 			updateUserInformation, sendEmail, serviceContext);
 
 		if (facebookId > 0) {
-			session.removeAttribute(WebKeys.FACEBOOK_INCOMPLETE_USER_ID);
+			httpSession.removeAttribute(WebKeys.FACEBOOK_INCOMPLETE_USER_ID);
 
 			updateUserAndSendRedirect(
 				actionRequest, actionResponse, themeDisplay, user, password1);
@@ -494,7 +494,7 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 			_userLocalService.updateGoogleUserId(
 				user.getUserId(), googleUserId);
 
-			session.removeAttribute(WebKeys.GOOGLE_INCOMPLETE_USER_ID);
+			httpSession.removeAttribute(WebKeys.GOOGLE_INCOMPLETE_USER_ID);
 
 			updateUserAndSendRedirect(
 				actionRequest, actionResponse, themeDisplay, user, password1);

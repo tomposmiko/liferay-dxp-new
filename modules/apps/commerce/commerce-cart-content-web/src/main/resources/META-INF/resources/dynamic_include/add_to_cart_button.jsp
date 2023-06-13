@@ -18,26 +18,9 @@
 
 <%
 CPContentHelper cpContentHelper = (CPContentHelper)request.getAttribute(CPContentWebKeys.CP_CONTENT_HELPER);
-
-CPCatalogEntry cpCatalogEntry = cpContentHelper.getCPCatalogEntry(request);
-CPInstance cpInstance = cpContentHelper.getDefaultCPInstance(request);
-
-long cpInstanceId = 0;
-
-if (cpInstance != null) {
-	cpInstanceId = cpInstance.getCPInstanceId();
-}
 %>
 
-<liferay-commerce:quantity-input
-	CPDefinitionId="<%= cpCatalogEntry.getCPDefinitionId() %>"
-	useSelect="<%= true %>"
-/>
-
-<liferay-commerce-cart:add-to-cart
-	CPDefinitionId="<%= cpCatalogEntry.getCPDefinitionId() %>"
-	CPInstanceId="<%= cpInstanceId %>"
-	elementClasses="btn-default btn-lg"
-	productContentId='<%= liferayPortletResponse.getNamespace() + cpCatalogEntry.getCPDefinitionId() + "ProductContent" %>'
-	taglibQuantityInputId='<%= liferayPortletResponse.getNamespace() + cpCatalogEntry.getCPDefinitionId() + "Quantity" %>'
+<commerce-ui:add-to-cart
+	CPCatalogEntry="<%= cpContentHelper.getCPCatalogEntry(request) %>"
+	options='<%= "[]" %>'
 />

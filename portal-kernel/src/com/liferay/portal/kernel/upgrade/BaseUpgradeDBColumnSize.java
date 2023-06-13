@@ -32,8 +32,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @author Preston Crary
+ * @author     Preston Crary
+ * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+ *             BaseDBColumnSizeUpgradeProcess}
  */
+@Deprecated
 public abstract class BaseUpgradeDBColumnSize extends UpgradeProcess {
 
 	public BaseUpgradeDBColumnSize(
@@ -86,10 +89,8 @@ public abstract class BaseUpgradeDBColumnSize extends UpgradeProcess {
 					}
 				}
 
-				DB db = DBManagerUtil.getDB();
-
-				try (ResultSet indexResultSet = db.getIndexResultSet(
-						connection, tableName)) {
+				try (ResultSet indexResultSet = databaseMetaData.getIndexInfo(
+						catalog, schema, tableName, false, false)) {
 
 					while (indexResultSet.next()) {
 						invalidColumnNames.add(

@@ -43,7 +43,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("WidgetPermission")
+@GraphQLName(
+	description = "The widget instance's permissions.",
+	value = "WidgetPermission"
+)
 @JsonFilter("Liferay.Vulcan")
 @XmlRootElement(name = "WidgetPermission")
 public class WidgetPermission implements Serializable {
@@ -56,7 +59,9 @@ public class WidgetPermission implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(WidgetPermission.class, json);
 	}
 
-	@Schema
+	@Schema(
+		description = "The keys of the actions the role has permission for."
+	)
 	public String[] getActionKeys() {
 		return actionKeys;
 	}
@@ -80,11 +85,13 @@ public class WidgetPermission implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The keys of the actions the role has permission for."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] actionKeys;
 
-	@Schema
+	@Schema(description = "The role's key.")
 	public String getRoleKey() {
 		return roleKey;
 	}
@@ -108,7 +115,7 @@ public class WidgetPermission implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The role's key.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String roleKey;
 

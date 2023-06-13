@@ -311,6 +311,10 @@ public class CacheFilter extends BasePortalFilter {
 			return layoutTypePortlet.isCacheable();
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return false;
 		}
 	}
@@ -478,9 +482,9 @@ public class CacheFilter extends BasePortalFilter {
 				WebKeys.LAST_PATH);
 
 			if (lastPath != null) {
-				HttpSession session = httpServletRequest.getSession();
+				HttpSession httpSession = httpServletRequest.getSession();
 
-				session.setAttribute(WebKeys.LAST_PATH, lastPath);
+				httpSession.setAttribute(WebKeys.LAST_PATH, lastPath);
 			}
 		}
 

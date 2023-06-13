@@ -25,15 +25,15 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
@@ -104,6 +104,10 @@ public class FragmentCollectionImpl extends FragmentCollectionBaseImpl {
 				String.valueOf(getFragmentCollectionId()));
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			if (createIfAbsent) {
 				ServiceContext serviceContext = new ServiceContext();
 
@@ -111,8 +115,8 @@ public class FragmentCollectionImpl extends FragmentCollectionBaseImpl {
 				serviceContext.setAddGuestPermissions(true);
 
 				folder = PortletFileRepositoryUtil.addPortletFolder(
-					PrincipalThreadLocal.getUserId(),
-					repository.getRepositoryId(), repository.getDlFolderId(),
+					getUserId(), repository.getRepositoryId(),
+					repository.getDlFolderId(),
 					String.valueOf(getFragmentCollectionId()), serviceContext);
 			}
 			else {
@@ -149,16 +153,14 @@ public class FragmentCollectionImpl extends FragmentCollectionBaseImpl {
 
 		path = path + StringPool.SLASH + getFragmentCollectionKey();
 
-		JSONObject jsonObject = JSONUtil.put(
-			"description", getDescription()
-		).put(
-			"name", getName()
-		);
-
 		zipWriter.addEntry(
 			path + StringPool.SLASH +
 				FragmentExportImportConstants.FILE_NAME_COLLECTION,
-			jsonObject.toString());
+			JSONUtil.put(
+				"description", getDescription()
+			).put(
+				"name", getName()
+			).toString());
 
 		List<FragmentComposition> fragmentCompositions =
 			FragmentCompositionLocalServiceUtil.getFragmentCompositions(
@@ -187,16 +189,15 @@ public class FragmentCollectionImpl extends FragmentCollectionBaseImpl {
 		}
 
 		for (FileEntry fileEntry : getResources()) {
-			StringBundler sb = new StringBundler(4);
-
-			sb.append(path);
-			sb.append(StringPool.SLASH);
-			sb.append("resources/");
-			sb.append(fileEntry.getFileName());
-
-			zipWriter.addEntry(sb.toString(), fileEntry.getContentStream());
+			zipWriter.addEntry(
+				StringBundler.concat(
+					path, "/resources/", fileEntry.getFileName()),
+				fileEntry.getContentStream());
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		FragmentCollectionImpl.class);
 
 	private long _resourcesFolderId;
 

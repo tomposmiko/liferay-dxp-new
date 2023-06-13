@@ -23,10 +23,13 @@ String reportName = BeanParamUtil.getString(definition, request, "reportName");
 
 portletDisplay.setShowBackIcon(true);
 
-PortletURL searchDefinitionURL = reportsEngineDisplayContext.getPortletURL();
-
-searchDefinitionURL.setParameter("mvcPath", "/admin/view.jsp");
-searchDefinitionURL.setParameter("tabs1", "definitions");
+PortletURL searchDefinitionURL = PortletURLBuilder.create(
+	reportsEngineDisplayContext.getPortletURL()
+).setMVCPath(
+	"/admin/view.jsp"
+).setTabs1(
+	"definitions"
+).buildPortletURL();
 
 portletDisplay.setURLBack(searchDefinitionURL.toString());
 
@@ -43,7 +46,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "new-report-entry"));
 	<portlet:param name="redirect" value="<%= searchRequestsURL %>" />
 </portlet:actionURL>
 
-<aui:form action="<%= addSchedulerURL %>" cssClass="container-fluid-1280" method="post" name="fm">
+<aui:form action="<%= addSchedulerURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
 	<aui:input name="definitionId" type="hidden" value="<%= definition.getDefinitionId() %>" />
 
 	<portlet:renderURL var="generatedReportsURL">
@@ -80,7 +83,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "new-report-entry"));
 		</aui:fieldset>
 
 		<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="schedule">
-			<liferay-ui:input-scheduler />
+			<liferay-util:include page="/admin/report/input_scheduler.jsp" servletContext="<%= application %>" />
 		</aui:fieldset>
 
 		<%
@@ -149,16 +152,16 @@ renderResponse.setTitle(LanguageUtil.get(request, "new-report-entry"));
 											var A = AUI();
 
 											var type = A.one(
-												'#<%= liferayPortletResponse.getNamespace() %>useVariable<%= HtmlUtil.escapeJS(key) %>'
+												'#<%= liferayPortletResponse.getNamespace() + "useVariable" + HtmlUtil.escapeJS(key) %>'
 											).get('value');
 											var day = A.one(
-												'#<%= liferayPortletResponse.getNamespace() + HtmlUtil.escapeJS(key) %>Day'
+												'#<%= liferayPortletResponse.getNamespace() + HtmlUtil.escapeJS(key) + "Day" %>'
 											);
 											var month = A.one(
-												'#<%= liferayPortletResponse.getNamespace() + HtmlUtil.escapeJS(key) %>Month'
+												'#<%= liferayPortletResponse.getNamespace() + HtmlUtil.escapeJS(key) + "Month" %>'
 											);
 											var year = A.one(
-												'#<%= liferayPortletResponse.getNamespace() + HtmlUtil.escapeJS(key) %>Year'
+												'#<%= liferayPortletResponse.getNamespace() + HtmlUtil.escapeJS(key) + "Year" %>'
 											);
 
 											if (type == 'startDate' || type == 'endDate') {
@@ -191,7 +194,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "new-report-entry"));
 									md="9"
 								>
 									<span class="field field-text" id="aui_3_2_0_1428">
-										<input class="form-control" name="<portlet:namespace />parameterValue<%= HtmlUtil.escapeAttribute(key) %>" type="text" value="<%= HtmlUtil.escapeAttribute(value) %>" /><br />
+										<input class="form-control" name="<portlet:namespace /><%= "parameterValue" + HtmlUtil.escapeAttribute(key) %>" type="text" value="<%= HtmlUtil.escapeAttribute(value) %>" /><br />
 									</span>
 								</clay:col>
 							</c:otherwise>

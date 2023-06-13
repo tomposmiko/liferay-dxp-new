@@ -28,6 +28,10 @@ public class AssetDisplayPageEntryServiceWrapper
 	implements AssetDisplayPageEntryService,
 			   ServiceWrapper<AssetDisplayPageEntryService> {
 
+	public AssetDisplayPageEntryServiceWrapper() {
+		this(null);
+	}
+
 	public AssetDisplayPageEntryServiceWrapper(
 		AssetDisplayPageEntryService assetDisplayPageEntryService) {
 
@@ -77,6 +81,18 @@ public class AssetDisplayPageEntryServiceWrapper
 	}
 
 	@Override
+	public java.util.List<AssetDisplayPageEntry> getAssetDisplayPageEntries(
+		long classNameId, long classTypeId, long layoutPageTemplateEntryId,
+		boolean defaultTemplate, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<AssetDisplayPageEntry>
+			orderByComparator) {
+
+		return _assetDisplayPageEntryService.getAssetDisplayPageEntries(
+			classNameId, classTypeId, layoutPageTemplateEntryId,
+			defaultTemplate, start, end, orderByComparator);
+	}
+
+	@Override
 	public java.util.List<AssetDisplayPageEntry>
 		getAssetDisplayPageEntriesByLayoutPageTemplateEntryId(
 			long layoutPageTemplateEntryId) {
@@ -96,6 +112,16 @@ public class AssetDisplayPageEntryServiceWrapper
 		return _assetDisplayPageEntryService.
 			getAssetDisplayPageEntriesByLayoutPageTemplateEntryId(
 				layoutPageTemplateEntryId, start, end, orderByComparator);
+	}
+
+	@Override
+	public int getAssetDisplayPageEntriesCount(
+		long classNameId, long classTypeId, long layoutPageTemplateEntryId,
+		boolean defaultTemplate) {
+
+		return _assetDisplayPageEntryService.getAssetDisplayPageEntriesCount(
+			classNameId, classTypeId, layoutPageTemplateEntryId,
+			defaultTemplate);
 	}
 
 	@Override

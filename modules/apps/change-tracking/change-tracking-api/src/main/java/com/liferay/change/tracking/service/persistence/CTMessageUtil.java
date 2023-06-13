@@ -125,8 +125,8 @@ public class CTMessageUtil {
 	 * @param ctCollectionId the ct collection ID
 	 * @return the matching ct messages
 	 */
-	public static List<CTMessage> findByCTCollectionId(long ctCollectionId) {
-		return getPersistence().findByCTCollectionId(ctCollectionId);
+	public static List<CTMessage> findByCtCollectionId(long ctCollectionId) {
+		return getPersistence().findByCtCollectionId(ctCollectionId);
 	}
 
 	/**
@@ -141,10 +141,10 @@ public class CTMessageUtil {
 	 * @param end the upper bound of the range of ct messages (not inclusive)
 	 * @return the range of matching ct messages
 	 */
-	public static List<CTMessage> findByCTCollectionId(
+	public static List<CTMessage> findByCtCollectionId(
 		long ctCollectionId, int start, int end) {
 
-		return getPersistence().findByCTCollectionId(
+		return getPersistence().findByCtCollectionId(
 			ctCollectionId, start, end);
 	}
 
@@ -161,11 +161,11 @@ public class CTMessageUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching ct messages
 	 */
-	public static List<CTMessage> findByCTCollectionId(
+	public static List<CTMessage> findByCtCollectionId(
 		long ctCollectionId, int start, int end,
 		OrderByComparator<CTMessage> orderByComparator) {
 
-		return getPersistence().findByCTCollectionId(
+		return getPersistence().findByCtCollectionId(
 			ctCollectionId, start, end, orderByComparator);
 	}
 
@@ -183,12 +183,12 @@ public class CTMessageUtil {
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching ct messages
 	 */
-	public static List<CTMessage> findByCTCollectionId(
+	public static List<CTMessage> findByCtCollectionId(
 		long ctCollectionId, int start, int end,
 		OrderByComparator<CTMessage> orderByComparator,
 		boolean useFinderCache) {
 
-		return getPersistence().findByCTCollectionId(
+		return getPersistence().findByCtCollectionId(
 			ctCollectionId, start, end, orderByComparator, useFinderCache);
 	}
 
@@ -200,11 +200,11 @@ public class CTMessageUtil {
 	 * @return the first matching ct message
 	 * @throws NoSuchMessageException if a matching ct message could not be found
 	 */
-	public static CTMessage findByCTCollectionId_First(
+	public static CTMessage findByCtCollectionId_First(
 			long ctCollectionId, OrderByComparator<CTMessage> orderByComparator)
 		throws com.liferay.change.tracking.exception.NoSuchMessageException {
 
-		return getPersistence().findByCTCollectionId_First(
+		return getPersistence().findByCtCollectionId_First(
 			ctCollectionId, orderByComparator);
 	}
 
@@ -215,10 +215,10 @@ public class CTMessageUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching ct message, or <code>null</code> if a matching ct message could not be found
 	 */
-	public static CTMessage fetchByCTCollectionId_First(
+	public static CTMessage fetchByCtCollectionId_First(
 		long ctCollectionId, OrderByComparator<CTMessage> orderByComparator) {
 
-		return getPersistence().fetchByCTCollectionId_First(
+		return getPersistence().fetchByCtCollectionId_First(
 			ctCollectionId, orderByComparator);
 	}
 
@@ -230,11 +230,11 @@ public class CTMessageUtil {
 	 * @return the last matching ct message
 	 * @throws NoSuchMessageException if a matching ct message could not be found
 	 */
-	public static CTMessage findByCTCollectionId_Last(
+	public static CTMessage findByCtCollectionId_Last(
 			long ctCollectionId, OrderByComparator<CTMessage> orderByComparator)
 		throws com.liferay.change.tracking.exception.NoSuchMessageException {
 
-		return getPersistence().findByCTCollectionId_Last(
+		return getPersistence().findByCtCollectionId_Last(
 			ctCollectionId, orderByComparator);
 	}
 
@@ -245,10 +245,10 @@ public class CTMessageUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching ct message, or <code>null</code> if a matching ct message could not be found
 	 */
-	public static CTMessage fetchByCTCollectionId_Last(
+	public static CTMessage fetchByCtCollectionId_Last(
 		long ctCollectionId, OrderByComparator<CTMessage> orderByComparator) {
 
-		return getPersistence().fetchByCTCollectionId_Last(
+		return getPersistence().fetchByCtCollectionId_Last(
 			ctCollectionId, orderByComparator);
 	}
 
@@ -261,12 +261,12 @@ public class CTMessageUtil {
 	 * @return the previous, current, and next ct message
 	 * @throws NoSuchMessageException if a ct message with the primary key could not be found
 	 */
-	public static CTMessage[] findByCTCollectionId_PrevAndNext(
+	public static CTMessage[] findByCtCollectionId_PrevAndNext(
 			long ctMessageId, long ctCollectionId,
 			OrderByComparator<CTMessage> orderByComparator)
 		throws com.liferay.change.tracking.exception.NoSuchMessageException {
 
-		return getPersistence().findByCTCollectionId_PrevAndNext(
+		return getPersistence().findByCtCollectionId_PrevAndNext(
 			ctMessageId, ctCollectionId, orderByComparator);
 	}
 
@@ -275,8 +275,8 @@ public class CTMessageUtil {
 	 *
 	 * @param ctCollectionId the ct collection ID
 	 */
-	public static void removeByCTCollectionId(long ctCollectionId) {
-		getPersistence().removeByCTCollectionId(ctCollectionId);
+	public static void removeByCtCollectionId(long ctCollectionId) {
+		getPersistence().removeByCtCollectionId(ctCollectionId);
 	}
 
 	/**
@@ -285,8 +285,8 @@ public class CTMessageUtil {
 	 * @param ctCollectionId the ct collection ID
 	 * @return the number of matching ct messages
 	 */
-	public static int countByCTCollectionId(long ctCollectionId) {
-		return getPersistence().countByCTCollectionId(ctCollectionId);
+	public static int countByCtCollectionId(long ctCollectionId) {
+		return getPersistence().countByCtCollectionId(ctCollectionId);
 	}
 
 	/**

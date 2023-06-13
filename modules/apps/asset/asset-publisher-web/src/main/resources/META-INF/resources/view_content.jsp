@@ -47,7 +47,7 @@ if (Validator.isNotNull(assetPublisherViewContentDisplayContext.getReturnToFullP
 			PortalUtil.setPageDescription(summary, request);
 		}
 
-		PortalUtil.setPageKeywords(assetHelper.getAssetKeywords(assetEntry.getClassName(), assetEntry.getClassPK(), locale), request);
+		PortalUtil.setPageKeywords(assetHelper.getAssetKeywords(assetEntry.getClassName(), assetEntry.getClassPK()), request);
 		PortalUtil.setPageTitle(assetRenderer.getTitle(locale), request);
 		%>
 
@@ -60,12 +60,10 @@ if (Validator.isNotNull(assetPublisherViewContentDisplayContext.getReturnToFullP
 
 <c:if test="<%= assetPublisherDisplayContext.isEnabledAutoscroll() %>">
 	<aui:script>
-		Liferay.once('allPortletsReady', function () {
-			if (!Liferay.Browser.isIe()) {
-				document
-					.getElementById('p_p_id_<%= portletDisplay.getId() %>_')
-					.scrollIntoView();
-			}
+		Liferay.once('allPortletsReady', () => {
+			document
+				.getElementById('p_p_id_<%= portletDisplay.getId() %>_')
+				.scrollIntoView();
 		});
 	</aui:script>
 </c:if>

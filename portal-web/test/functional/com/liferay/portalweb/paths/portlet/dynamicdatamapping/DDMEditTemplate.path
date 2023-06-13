@@ -22,7 +22,7 @@
 </tr>
 <tr>
 	<td>SCRIPT_FIELD</td>
-	<td>//*[contains(@class,'palette-section') and contains(@id,'fields')]//ul/li/span[contains(@class,'palette-item') and contains(.,'${key_fieldName}')]</td>
+	<td>//*[contains(@class,'palette-section') and contains(@id,'fields')]//ul/li/span[contains(@class,'palette-item') and contains(.,'${key_fieldName}')] | //div[contains(@class,'ddm_template_editor')]//button[contains(@class,'App-sidebar-button') and contains(.,'${key_fieldName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -60,14 +60,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DETAILS-->
-
-<tr>
-	<td>DETAILS_SELECT_STRUCTURE</td>
-	<td>//button[contains(@id,'selectDDMStructure')]/span</td>
-	<td></td>
-</tr>
 <tr>
 	<td>DETAILS_SMALL_IMAGE</td>
 	<td>//label[contains(@for,'smallImage')]/input[@type='checkbox']</td>
@@ -81,11 +74,6 @@
 <tr>
 	<td>DETAILS_SMALL_IMAGE_URL_INPUT</td>
 	<td>//div[contains(@class,'input-String-wrapper')]/input[contains(@id,'URL')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DETAILS_STRUCTURE</td>
-	<td>//input[contains(@id,'structure') and contains(@type,'text')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -103,12 +91,26 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DATA_LIST_RECORD_FIELDS-->
-
 <tr>
 	<td>DATA_LIST_RECORD_FIELDS_TEXT</td>
 	<td>//div[contains(@class,'palette-section') and contains(.,'Data List Record Fields')]/div[2]//span[contains(.,'Text')]</td>
+	<td></td>
+</tr>
+<!--WEB_CONTENT-->
+<tr>
+	<td>CODE_MIRROR_EDITOR</td>
+	<td>//div[contains(@class,'CodeMirrorEditor')]//div[contains(@class,'CodeMirror cm-s-default')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CODE_MIRROR_EDITOR_CONTENT</td>
+	<td>//div[contains(@class,'CodeMirrorEditor')]//div[contains(@class,'CodeMirror-code')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WEB_CONTENT_SCRIPT_VARIABLE</td>
+	<td>//div[contains(@class,'panel-group')][.//*[normalize-space(text())='${key_panelTitle}']]//button[normalize-space(text())='${key_variableName}']</td>
 	<td></td>
 </tr>
 </tbody>

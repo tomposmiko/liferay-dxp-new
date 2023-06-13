@@ -21,7 +21,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 
@@ -29,13 +29,13 @@ definition {
 	}
 
 	@description = "Validate Login User can view Sites Report page"
-	@priority = 5
+	@priority = "5"
 	test CanViewSiteReportUponLogin {
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud();
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = ${propertyName});
+		ACProperties.switchProperty(propertyName = "${propertyName}");
 
 		ACNavigation.assertPageHeader(headerTitle = "Sites");
 	}

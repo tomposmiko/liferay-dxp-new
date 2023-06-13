@@ -20,7 +20,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -28,80 +28,7 @@ definition {
 		}
 	}
 
-	@description = "LPS-100416 - Non-Repeatable text fields show incorrect translation on label at first load."
-	@priority = 4
-	test AddNonRepeatableTextFieldWithTranslation {
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-		NavItem.gotoStructures();
-
-		WebContentStructures.addCP(structureName = "WC Structure Name");
-
-		DynamicDataMapping.addField(
-			field = "Text",
-			fieldFieldLabel = "English",
-			fieldName = "Text");
-
-		AssertElementPresent(
-			locator1 = "DDMEditStructure#SETTINGS_REPEATABLE",
-			value1 = "No");
-
-		WebContentStructures.saveCP(structureName = "WC Structure Name");
-
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Edit",
-			rowEntry = "WC Structure Name");
-
-		Form.addTranslation(localizedLanguage = "German (Germany)");
-
-		DynamicDataMapping.editField(
-			fieldFieldLabel = "English",
-			fieldFieldLabelEdit = "German");
-
-		WebContentStructures.saveCP(structureName = "WC Structure Name");
-
-		NavItem.gotoTemplates();
-
-		WebContentTemplates.addCP(
-			structureName = "WC Structure Name",
-			templateFieldNames = "English",
-			templateName = "WC Template Name");
-
-		Navigator.openURL();
-
-		PortalSettings.gotoConfiguration(
-			configurationCategory = "Localization",
-			configurationName = "Language",
-			configurationScope = "Virtual Instance Scope");
-
-		PortalSettings.configureCurrentLanguagesCP(defaultPortalLanguage = "German (Germany)");
-
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
-
-		AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
-
-		PortletEntry.viewLocale(locale = "de-DE");
-
-		AssertElementPresent(
-			fieldLabel = "German",
-			locator1 = "FormViewBuilder#FIELD_LABEL");
-
-		PortletEntry.changeLocale(locale = "en-US");
-
-		AssertElementPresent(
-			fieldLabel = "English",
-			locator1 = "FormViewBuilder#FIELD_LABEL");
-
-		PortletEntry.changeLocale(locale = "de-DE");
-
-		AssertElementPresent(
-			fieldLabel = "German",
-			locator1 = "FormViewBuilder#FIELD_LABEL");
-	}
-
-	@priority = 4
+	@priority = "4"
 	test AddWCWithMultipleTranslations {
 		property test.name.skip.portal.instance = "LocalizationWithWebContent#AddWCWithMultipleTranslations";
 		property testray.component.names = "Localization,Web Content Administration";
@@ -199,7 +126,7 @@ definition {
 	}
 
 	@description = "This is a use case for LRQA-61632. Add web content with translated Text field."
-	@priority = 4
+	@priority = "4"
 	test AddWebContentWithTranslatedTextField {
 		task ("Add a structure with Text field") {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
@@ -208,19 +135,13 @@ definition {
 
 			WebContentStructures.addCP(structureName = "WC Structure Name");
 
-			DynamicDataMapping.addField(
-				field = "Text",
+			DataEngine.addField(
 				fieldFieldLabel = "Text1",
-				fieldName = "Text1");
+				fieldName = "Text");
 
-			DynamicDataMapping.addField(
-				field = "Text",
+			DataEngine.addField(
 				fieldFieldLabel = "Text2",
-				fieldName = "Text2");
-		}
-
-		task ("Add the Spanish (Spain) translation to structure") {
-			Form.addTranslation(localizedLanguage = "Spanish (Spain)");
+				fieldName = "Text");
 
 			WebContentStructures.saveCP(structureName = "WC Structure Name");
 		}
@@ -237,8 +158,8 @@ definition {
 
 		task ("Type content in Text field under en-US") {
 			Type(
-				key_fieldName = "Text1",
-				locator1 = "TextInput#DDM",
+				key_fieldFieldLabel = "Text1",
+				locator1 = "WCEditWebContent#TEXT_INPUT",
 				value1 = "This is a Text field");
 		}
 
@@ -246,8 +167,8 @@ definition {
 			PortletEntry.changeLocale(locale = "es-ES");
 
 			Type(
-				key_fieldName = "Text2",
-				locator1 = "TextInput#DDM",
+				key_fieldFieldLabel = "Text2",
+				locator1 = "WCEditWebContent#TEXT_INPUT",
 				value1 = "Este es un campo de texto");
 
 			PortletEntry.publish();
@@ -260,56 +181,22 @@ definition {
 
 			AssertAttributeValue(
 				attribute1 = "value",
-				key_fieldName = "Text1",
-				locator1 = "TextInput#DDM",
+				key_fieldFieldLabel = "Text1",
+				locator1 = "WCEditWebContent#TEXT_INPUT",
 				value1 = "This is a Text field");
 
 			PortletEntry.changeLocale(locale = "es-ES");
 
 			AssertAttributeValue(
 				attribute1 = "value",
-				key_fieldName = "Text2",
-				locator1 = "TextInput#DDM",
+				key_fieldFieldLabel = "Text2",
+				locator1 = "WCEditWebContent#TEXT_INPUT",
 				value1 = "Este es un campo de texto");
 		}
 	}
 
-	@description = "This is a use case for LPS-114001. The placeholder values are the same as the default Language's value."
-	@priority = 4
-	test AssertPlaceholderValuesSameAsTheDefaultLanguage {
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-		WebContentNavigator.gotoAddCP();
-
-		PortletEntry.viewLocale(locale = "en-US");
-
-		WebContent.addCP(
-			webContentContent = "Web Content Content",
-			webContentTitle = "Web Content Title");
-
-		PortletEntry.changeLocale(locale = "ca-ES");
-
-		WebContent.viewCP(
-			webContentContent = "Web Content Content",
-			webContentTitle = "Web Content Title");
-
-		PortletEntry.changeLocale(locale = "zh-CN");
-
-		WebContent.addCP(
-			webContentContent = "网页内容",
-			webContentTitle = "网页内容标题");
-
-		PortletEntry.changeLocale(locale = "nl-NL");
-
-		WebContent.viewCP(
-			webContentContent = "Web Content Content",
-			webContentTitle = "Web Content Title");
-
-		PortletEntry.publish();
-	}
-
 	@description = "This is a use case for LPS-83319. The user could change default language of web content after enable Changeable Default Language."
-	@priority = 5
+	@priority = "5"
 	test ChangeWebContentDefaultLanguage {
 		property test.name.skip.portal.instance = "LocalizationWithWebContent#ChangeWebContentDefaultLanguage";
 
@@ -359,7 +246,7 @@ definition {
 
 			PortletEntry.viewLocale(locale = "es-ES");
 
-			WebContent.viewChangeDefaultLanguageCP(
+			WebContent.viewCP(
 				webContentContent = "Contenido de contenido web",
 				webContentTitle = "Título del contenido web");
 
@@ -367,26 +254,10 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for 119020. Can add web content when the portal change the default language."
-	@priority = 4
+	@priority = "4"
 	test ViewChangedDefaultPortalLanguageViaWebContent {
 		property test.name.skip.portal.instance = "LocalizationWithWebContent#ViewChangedDefaultPortalLanguageViaWebContent";
 		property testray.component.names = "Localization";
-
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-		WebContentNavigator.gotoAddCP();
-
-		WebContent.addCP(
-			webContentContent = "Web Content Content 1",
-			webContentTitle = "Web Content Title 1");
-
-		PortletEntry.publish();
-
-		JSONWebcontent.addBasicWebContentLocalized(
-			contentMap = "en_US:Web Content Content 2,es_ES:Contenido de contenido web 2",
-			groupName = "Test Site Name",
-			titleMap = "en_US:Web Content Title 2,es_ES:Título del contenido web 2");
 
 		PortalSettings.gotoConfiguration(
 			configurationCategory = "Localization",
@@ -402,16 +273,10 @@ definition {
 		PortletEntry.viewLocale(
 			locale = "es-ES",
 			portletName = "Web Content");
-
-		WebContent.addCP(
-			webContentContent = "Web Content Content 3",
-			webContentTitle = "Web Content Title 3");
-
-		PortletEntry.publish();
 	}
 
 	@description = "This is a use case for LPS-110938. The localized Friendly URL of WC is shown in WCD when select template with Friendly URL field and it is displayed in DPT."
-	@priority = 3
+	@priority = "3"
 	test ViewLocalizedFriendlyURLInWCD {
 		task ("Add a display page template with Web Content Article and Basic Web Content") {
 			JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
@@ -478,7 +343,7 @@ definition {
 				locator1 = "WC#LOCALIZED_BUTTON");
 
 			Click(
-				key_locale = "es_ES",
+				key_locale = "es-ES",
 				locator1 = "Translation#LOCALIZATION_NAME");
 
 			Type(
@@ -531,43 +396,8 @@ definition {
 		}
 	}
 
-	@description = "This is a use case for LPS-141460. The Localized friendly URL of web content should not be autogenerated."
-	@priority = 4
-	test ViewLocalizedFriendlyURLNotAutogenerated {
-		task ("Create a Web Content") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-			WebContentNavigator.gotoAddCP();
-
-			WebContent.addCP(
-				webContentContent = "WC WebContent Content",
-				webContentTitle = "WC WebContent Title");
-		}
-
-		task ("Add a translation for the title") {
-			PortletEntry.changeLocale(locale = "pt-BR");
-
-			WebContent.addCP(webContentTitle = "WC WebContent New Title");
-
-			PortletEntry.publish();
-		}
-
-		task ("View localized friendly URL not autogenerated") {
-			WebContentNavigator.gotoEditCP(webContentTitle = "WC WebContent Title");
-
-			Panel.expandPanel(panel = "Friendly URL");
-
-			PortletEntry.changeLocale(locale = "pt-BR");
-
-			AssertTextEquals(
-				inputFieldId = "friendlyURL",
-				locator1 = "TextInput#INPUT_ID",
-				value1 = "");
-		}
-	}
-
 	@description = "This is a use case for LRQA-61632. View structure default value in translated Text field."
-	@priority = 4
+	@priority = "4"
 	test ViewStructureDefaultValueInTranslatedTextField {
 		task ("Add a structure with Text field") {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
@@ -576,14 +406,9 @@ definition {
 
 			WebContentStructures.addCP(structureName = "WC Structure Name");
 
-			DynamicDataMapping.addField(
-				field = "Text",
+			DataEngine.addField(
 				fieldFieldLabel = "Text",
 				fieldName = "Text");
-		}
-
-		task ("Add the Spanish (Spain) translation to structure") {
-			Form.addTranslation(localizedLanguage = "Spanish (Spain)");
 
 			WebContentStructures.saveCP(structureName = "WC Structure Name");
 		}
@@ -596,15 +421,15 @@ definition {
 			AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
 
 			Type(
-				key_fieldName = "Text",
-				locator1 = "TextInput#DDM",
+				key_fieldFieldLabel = "Text",
+				locator1 = "WCEditWebContent#TEXT_INPUT",
 				value1 = "This is a Text field");
 
 			PortletEntry.changeLocale(locale = "es-ES");
 
 			Type(
-				key_fieldName = "Text",
-				locator1 = "TextInput#DDM",
+				key_fieldFieldLabel = "Text",
+				locator1 = "WCEditWebContent#TEXT_INPUT",
 				value1 = "Este es un campo de texto");
 
 			WebContentStructures.saveCP(structureName = "WC Structure Name");
@@ -621,16 +446,16 @@ definition {
 
 			AssertAttributeValue(
 				attribute1 = "value",
-				key_fieldName = "Text",
-				locator1 = "TextInput#DDM",
+				key_fieldFieldLabel = "Text",
+				locator1 = "WCEditWebContent#TEXT_INPUT",
 				value1 = "This is a Text field");
 
 			PortletEntry.changeLocale(locale = "es-ES");
 
 			AssertAttributeValue(
 				attribute1 = "value",
-				key_fieldName = "Text",
-				locator1 = "TextInput#DDM",
+				key_fieldFieldLabel = "Text",
+				locator1 = "WCEditWebContent#TEXT_INPUT",
 				value1 = "Este es un campo de texto");
 		}
 	}

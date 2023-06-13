@@ -33,14 +33,15 @@ renderResponse.setTitle(LanguageUtil.get(request, "feeds"));
 />
 
 <clay:management-toolbar
-	displayContext="<%= journalFeedsManagementToolbarDisplayContext %>"
+	managementToolbarDisplayContext="<%= journalFeedsManagementToolbarDisplayContext %>"
+	propsTransformer="js/FeedsManagementToolbarPropsTransformer"
 />
 
 <portlet:actionURL name="/journal/delete_feeds" var="deleteFeedsURL">
 	<portlet:param name="redirect" value="<%= currentURL %>" />
 </portlet:actionURL>
 
-<aui:form action="<%= deleteFeedsURL %>" cssClass="container-fluid-1280" method="post" name="fm">
+<aui:form action="<%= deleteFeedsURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
 	<liferay-ui:search-container
 		id="feeds"
 		searchContainer="<%= journalFeedsDisplayContext.getFeedsSearchContainer() %>"
@@ -56,14 +57,17 @@ renderResponse.setTitle(LanguageUtil.get(request, "feeds"));
 			String editURL = StringPool.BLANK;
 
 			if (JournalFeedPermission.contains(permissionChecker, feed, ActionKeys.UPDATE)) {
-				PortletURL editFeedURL = liferayPortletResponse.createRenderURL();
-
-				editFeedURL.setParameter("mvcPath", "/edit_feed.jsp");
-				editFeedURL.setParameter("redirect", currentURL);
-				editFeedURL.setParameter("groupId", String.valueOf(feed.getGroupId()));
-				editFeedURL.setParameter("feedId", feed.getFeedId());
-
-				editURL = editFeedURL.toString();
+				editURL = PortletURLBuilder.createRenderURL(
+					liferayPortletResponse
+				).setMVCPath(
+					"/edit_feed.jsp"
+				).setRedirect(
+					currentURL
+				).setParameter(
+					"feedId", feed.getFeedId()
+				).setParameter(
+					"groupId", feed.getGroupId()
+				).buildString();
 			}
 
 			row.setData(
@@ -133,8 +137,3 @@ renderResponse.setTitle(LanguageUtil.get(request, "feeds"));
 		/>
 	</liferay-ui:search-container>
 </aui:form>
-
-<liferay-frontend:component
-	componentId="<%= journalFeedsManagementToolbarDisplayContext.getDefaultEventHandler() %>"
-	module="js/FeedsManagementToolbarDefaultEventHandler.es"
-/>

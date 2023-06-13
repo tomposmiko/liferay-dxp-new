@@ -3,7 +3,7 @@ definition {
 	macro addMasters {
 		LexiconEntry.gotoAdd();
 
-		PortletEntry.inputName(name = ${masterLayoutName});
+		PortletEntry.inputName(name = "${masterLayoutName}");
 
 		Button.clickSave();
 
@@ -12,22 +12,22 @@ definition {
 
 	macro deleteMasters {
 		LexiconCard.clickEllipsisItem(
-			card = ${masterLayoutName},
+			card = "${masterLayoutName}",
 			item = "Delete");
 
 		AssertConfirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
 	}
 
 	macro gotoMasters {
-		LexiconCard.clickCardTitle(card = ${masterLayoutName});
+		LexiconCard.clickCardTitleLink(card = "${masterLayoutName}");
 
 		PageEditor.assertFragmentSidebarLoaded();
 	}
 
 	macro gotoMastersEllipsisItem {
 		LexiconCard.clickEllipsisItem(
-			card = ${masterLayoutName},
-			item = ${item});
+			card = "${masterLayoutName}",
+			item = "${item}");
 	}
 
 	macro importMastersFromTempFolder {
@@ -41,7 +41,7 @@ definition {
 
 		UploadTempFile(
 			locator1 = "TextInput#FILE",
-			value1 = ${mastersZipFileName});
+			value1 = "${mastersZipFileName}");
 
 		Button.clickImport();
 
@@ -55,15 +55,15 @@ definition {
 	}
 
 	macro selectMasters {
-		LexiconCard.viewCardTitle(card = ${masterLayoutName});
+		LexiconCard.viewCardTitle(card = "${masterLayoutName}");
 
 		Check.checkNotVisible(
-			key_card = ${masterLayoutName},
+			key_card = "${masterLayoutName}",
 			locator1 = "Card#CARD_CHECKBOX");
 	}
 
 	macro viewMastersPresent {
-		LexiconCard.viewCardPresent(card = ${masterLayoutName});
+		LexiconCard.viewCardPresent(card = "${masterLayoutName}");
 	}
 
 }

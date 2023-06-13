@@ -32,8 +32,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -42,7 +40,6 @@ import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
-import com.liferay.portal.kernel.service.persistence.ImagePersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -334,6 +331,7 @@ public abstract class CommercePaymentMethodGroupRelLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -353,6 +351,7 @@ public abstract class CommercePaymentMethodGroupRelLocalServiceBaseImpl
 				(CommercePaymentMethodGroupRel)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<CommercePaymentMethodGroupRel> getBasePersistence() {
 		return commercePaymentMethodGroupRelPersistence;
 	}
@@ -530,46 +529,6 @@ public abstract class CommercePaymentMethodGroupRelLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the image local service.
-	 *
-	 * @return the image local service
-	 */
-	public com.liferay.portal.kernel.service.ImageLocalService
-		getImageLocalService() {
-
-		return imageLocalService;
-	}
-
-	/**
-	 * Sets the image local service.
-	 *
-	 * @param imageLocalService the image local service
-	 */
-	public void setImageLocalService(
-		com.liferay.portal.kernel.service.ImageLocalService imageLocalService) {
-
-		this.imageLocalService = imageLocalService;
-	}
-
-	/**
-	 * Returns the image persistence.
-	 *
-	 * @return the image persistence
-	 */
-	public ImagePersistence getImagePersistence() {
-		return imagePersistence;
-	}
-
-	/**
-	 * Sets the image persistence.
-	 *
-	 * @param imagePersistence the image persistence
-	 */
-	public void setImagePersistence(ImagePersistence imagePersistence) {
-		this.imagePersistence = imagePersistence;
-	}
-
-	/**
 	 * Returns the resource local service.
 	 *
 	 * @return the resource local service
@@ -732,15 +691,6 @@ public abstract class CommercePaymentMethodGroupRelLocalServiceBaseImpl
 	protected ClassNamePersistence classNamePersistence;
 
 	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ImageLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ImageLocalService
-		imageLocalService;
-
-	@ServiceReference(type = ImagePersistence.class)
-	protected ImagePersistence imagePersistence;
-
-	@ServiceReference(
 		type = com.liferay.portal.kernel.service.ResourceLocalService.class
 	)
 	protected com.liferay.portal.kernel.service.ResourceLocalService
@@ -754,9 +704,6 @@ public abstract class CommercePaymentMethodGroupRelLocalServiceBaseImpl
 
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommercePaymentMethodGroupRelLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

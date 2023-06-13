@@ -99,9 +99,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.kernel.xml.Attribute;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReader;
 import com.liferay.portal.search.index.IndexStatusManager;
 import com.liferay.portlet.display.template.PortletDisplayTemplate;
@@ -418,7 +415,7 @@ public class FileSystemImporter extends BaseImporter {
 					DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID,
 					portal.getClassNameId(DDLRecordSet.class), getKey(fileName),
 					getMap(name), null, ddmForm, ddmFormLayout,
-					StorageType.JSON.toString(),
+					StorageType.DEFAULT.toString(),
 					DDMStructureConstants.TYPE_DEFAULT, serviceContext);
 			}
 			else {
@@ -505,10 +502,6 @@ public class FileSystemImporter extends BaseImporter {
 		DDMForm ddmForm = null;
 
 		if (language.equals(TemplateConstants.LANG_TYPE_XML)) {
-			if (isJournalStructureXSD(content)) {
-				content = journalConverter.getDDMXSD(content);
-			}
-
 			ddmxml.validateXML(content);
 
 			ddmForm = deserializeXSD(content);
@@ -805,6 +798,7 @@ public class FileSystemImporter extends BaseImporter {
 					mimeTypes.getContentType(fileName), fileName,
 					StringPool.BLANK, StringPool.BLANK,
 					DLVersionNumberIncrease.MAJOR, inputStream, length,
+					fileEntry.getExpirationDate(), fileEntry.getReviewDate(),
 					serviceContext);
 
 				dlFileEntryLocalService.deleteFileVersion(
@@ -950,22 +944,22 @@ public class FileSystemImporter extends BaseImporter {
 				groupId, journalArticleId, WorkflowConstants.STATUS_ANY);
 
 		try {
+			Map<Locale, String> titleMap = getMap(articleDefaultLocale, title);
+
 			if (journalArticle == null) {
 				journalArticle = journalArticleLocalService.addArticle(
-					userId, groupId, folderId, 0, 0, journalArticleId, false,
-					JournalArticleConstants.VERSION_DEFAULT,
-					getMap(articleDefaultLocale, title), descriptionMap,
-					content, ddmStructureKey, ddmTemplateKey, StringPool.BLANK,
-					1, 1, 2010, 0, 0, 0, 0, 0, 0, 0, true, 0, 0, 0, 0, 0, true,
-					indexable, smallImage, smallImageURL, null,
-					new HashMap<String, byte[]>(), StringPool.BLANK,
-					serviceContext);
+					null, userId, groupId, folderId, 0, 0, journalArticleId,
+					false, JournalArticleConstants.VERSION_DEFAULT, titleMap,
+					descriptionMap, titleMap, content, ddmStructureKey,
+					ddmTemplateKey, StringPool.BLANK, 1, 1, 2010, 0, 0, 0, 0, 0,
+					0, 0, true, 0, 0, 0, 0, 0, true, indexable, smallImage,
+					smallImageURL, null, new HashMap<String, byte[]>(),
+					StringPool.BLANK, serviceContext);
 			}
 			else {
 				journalArticle = journalArticleLocalService.updateArticle(
 					userId, groupId, folderId, journalArticleId,
-					journalArticle.getVersion(),
-					getMap(articleDefaultLocale, title), descriptionMap,
+					journalArticle.getVersion(), titleMap, descriptionMap,
 					content, ddmStructureKey, ddmTemplateKey, StringPool.BLANK,
 					1, 1, 2010, 0, 0, 0, 0, 0, 0, 0, true, 0, 0, 0, 0, 0, true,
 					indexable, smallImage, smallImageURL, null,
@@ -1102,7 +1096,7 @@ public class FileSystemImporter extends BaseImporter {
 					parentLayoutId, nameMap, titleMap,
 					layout.getDescriptionMap(), layout.getKeywordsMap(),
 					layout.getRobotsMap(), type, hidden, friendlyURLMap,
-					layout.getIconImage(), null, serviceContext);
+					layout.getIconImage(), null, 0, 0, serviceContext);
 			}
 
 			if (Validator.isNotNull(themeId) ||
@@ -1184,14 +1178,14 @@ public class FileSystemImporter extends BaseImporter {
 			Layout layout, String columnId, JSONObject portletJSONObject)
 		throws Exception {
 
-		LayoutTypePortlet layoutTypePortlet =
-			(LayoutTypePortlet)layout.getLayoutType();
-
 		String rootPortletId = portletJSONObject.getString("portletId");
 
 		if (Validator.isNull(rootPortletId)) {
 			throw new ImporterException("portletId is not specified");
 		}
+
+		LayoutTypePortlet layoutTypePortlet =
+			(LayoutTypePortlet)layout.getLayoutType();
 
 		PortletPreferencesTranslator portletPreferencesTranslator =
 			portletPreferencesTranslators.get(rootPortletId);
@@ -1237,14 +1231,13 @@ public class FileSystemImporter extends BaseImporter {
 			JSONArray columnsJSONArray =
 				portletPreferencesJSONObject.getJSONArray("columns");
 
-			StringBundler sb = new StringBundler(4);
-
-			sb.append(StringPool.UNDERLINE);
-			sb.append(portletId);
-			sb.append(StringPool.DOUBLE_UNDERLINE);
-			sb.append(LayoutTypePortletConstants.COLUMN_PREFIX);
-
-			addLayoutColumns(layout, sb.toString(), columnsJSONArray);
+			addLayoutColumns(
+				layout,
+				StringBundler.concat(
+					StringPool.UNDERLINE, portletId,
+					StringPool.DOUBLE_UNDERLINE,
+					LayoutTypePortletConstants.COLUMN_PREFIX),
+				columnsJSONArray);
 		}
 	}
 
@@ -1489,10 +1482,9 @@ public class FileSystemImporter extends BaseImporter {
 	}
 
 	protected JSONObject getDefaultPortletJSONObject(String journalArticleId) {
-		JSONObject portletJSONObject = JSONUtil.put(
-			"portletId", _JOURNAL_CONTENT_PORTLET_ID);
-
-		portletJSONObject.put(
+		return JSONUtil.put(
+			"portletId", _JOURNAL_CONTENT_PORTLET_ID
+		).put(
 			"portletPreferences",
 			JSONUtil.put(
 				"articleId", journalArticleId
@@ -1500,9 +1492,8 @@ public class FileSystemImporter extends BaseImporter {
 				"groupId", groupId
 			).put(
 				"portletSetupPortletDecoratorId", "borderless"
-			));
-
-		return portletJSONObject;
+			)
+		);
 	}
 
 	protected InputStream getInputStream(File file) throws Exception {
@@ -1674,33 +1665,16 @@ public class FileSystemImporter extends BaseImporter {
 				}
 				catch (SearchException searchException) {
 					if (_log.isWarnEnabled()) {
-						StringBundler sb = new StringBundler(4);
-
-						sb.append("Cannot index entry: className=");
-						sb.append(JournalArticle.class.getName());
-						sb.append(", primaryKey=");
-						sb.append(journalArticle.getPrimaryKey());
-
-						_log.warn(sb.toString(), searchException);
+						_log.warn(
+							StringBundler.concat(
+								"Cannot index entry: className=",
+								JournalArticle.class.getName(), ", primaryKey=",
+								journalArticle.getPrimaryKey()),
+							searchException);
 					}
 				}
 			}
 		}
-	}
-
-	protected boolean isJournalStructureXSD(String xsd) throws Exception {
-		Document document = saxReader.read(xsd);
-
-		Element rootElement = document.getRootElement();
-
-		Attribute availableLocalesAttribute = rootElement.attribute(
-			"available-locales");
-
-		if (availableLocalesAttribute == null) {
-			return true;
-		}
-
-		return false;
 	}
 
 	protected File[] listFiles(File dir) {

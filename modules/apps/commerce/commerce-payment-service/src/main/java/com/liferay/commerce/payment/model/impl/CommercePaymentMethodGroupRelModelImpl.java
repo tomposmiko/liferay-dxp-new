@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -82,6 +83,7 @@ public class CommercePaymentMethodGroupRelModelImpl
 	public static final String TABLE_NAME = "CommercePaymentMethodGroupRel";
 
 	public static final Object[][] TABLE_COLUMNS = {
+		{"mvccVersion", Types.BIGINT},
 		{"CPaymentMethodGroupRelId", Types.BIGINT}, {"groupId", Types.BIGINT},
 		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
 		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
@@ -95,6 +97,7 @@ public class CommercePaymentMethodGroupRelModelImpl
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("CPaymentMethodGroupRelId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -111,7 +114,7 @@ public class CommercePaymentMethodGroupRelModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CommercePaymentMethodGroupRel (CPaymentMethodGroupRelId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null,description STRING null,imageId LONG,engineKey VARCHAR(75) null,priority DOUBLE,active_ BOOLEAN)";
+		"create table CommercePaymentMethodGroupRel (mvccVersion LONG default 0 not null,CPaymentMethodGroupRelId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null,description STRING null,imageId LONG,engineKey VARCHAR(75) null,priority DOUBLE,active_ BOOLEAN)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table CommercePaymentMethodGroupRel";
@@ -189,6 +192,7 @@ public class CommercePaymentMethodGroupRelModelImpl
 		CommercePaymentMethodGroupRel model =
 			new CommercePaymentMethodGroupRelImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setCommercePaymentMethodGroupRelId(
 			soapModel.getCommercePaymentMethodGroupRelId());
 		model.setGroupId(soapModel.getGroupId());
@@ -323,114 +327,157 @@ public class CommercePaymentMethodGroupRelModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CommercePaymentMethodGroupRel>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommercePaymentMethodGroupRel.class.getClassLoader(),
+			CommercePaymentMethodGroupRel.class, ModelWrapper.class);
+
+		try {
+			Constructor<CommercePaymentMethodGroupRel> constructor =
+				(Constructor<CommercePaymentMethodGroupRel>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map
 		<String, Function<CommercePaymentMethodGroupRel, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommercePaymentMethodGroupRel, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommercePaymentMethodGroupRel, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommercePaymentMethodGroupRel, Object>>();
-
-		attributeGetterFunctions.put(
-			"commercePaymentMethodGroupRelId",
-			CommercePaymentMethodGroupRel::getCommercePaymentMethodGroupRelId);
-		attributeGetterFunctions.put(
-			"groupId", CommercePaymentMethodGroupRel::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommercePaymentMethodGroupRel::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommercePaymentMethodGroupRel::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommercePaymentMethodGroupRel::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommercePaymentMethodGroupRel::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommercePaymentMethodGroupRel::getModifiedDate);
-		attributeGetterFunctions.put(
-			"name", CommercePaymentMethodGroupRel::getName);
-		attributeGetterFunctions.put(
-			"description", CommercePaymentMethodGroupRel::getDescription);
-		attributeGetterFunctions.put(
-			"imageId", CommercePaymentMethodGroupRel::getImageId);
-		attributeGetterFunctions.put(
-			"engineKey", CommercePaymentMethodGroupRel::getEngineKey);
-		attributeGetterFunctions.put(
-			"priority", CommercePaymentMethodGroupRel::getPriority);
-		attributeGetterFunctions.put(
-			"active", CommercePaymentMethodGroupRel::getActive);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CommercePaymentMethodGroupRel, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommercePaymentMethodGroupRel, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommercePaymentMethodGroupRel, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CommercePaymentMethodGroupRel::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CommercePaymentMethodGroupRel, Long>)
+				CommercePaymentMethodGroupRel::setMvccVersion);
+		attributeGetterFunctions.put(
+			"commercePaymentMethodGroupRelId",
+			CommercePaymentMethodGroupRel::getCommercePaymentMethodGroupRelId);
 		attributeSetterBiConsumers.put(
 			"commercePaymentMethodGroupRelId",
 			(BiConsumer<CommercePaymentMethodGroupRel, Long>)
 				CommercePaymentMethodGroupRel::
 					setCommercePaymentMethodGroupRelId);
+		attributeGetterFunctions.put(
+			"groupId", CommercePaymentMethodGroupRel::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommercePaymentMethodGroupRel, Long>)
 				CommercePaymentMethodGroupRel::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommercePaymentMethodGroupRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommercePaymentMethodGroupRel, Long>)
 				CommercePaymentMethodGroupRel::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommercePaymentMethodGroupRel::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommercePaymentMethodGroupRel, Long>)
 				CommercePaymentMethodGroupRel::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommercePaymentMethodGroupRel::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommercePaymentMethodGroupRel, String>)
 				CommercePaymentMethodGroupRel::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommercePaymentMethodGroupRel::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommercePaymentMethodGroupRel, Date>)
 				CommercePaymentMethodGroupRel::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommercePaymentMethodGroupRel::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommercePaymentMethodGroupRel, Date>)
 				CommercePaymentMethodGroupRel::setModifiedDate);
+		attributeGetterFunctions.put(
+			"name", CommercePaymentMethodGroupRel::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommercePaymentMethodGroupRel, String>)
 				CommercePaymentMethodGroupRel::setName);
+		attributeGetterFunctions.put(
+			"description", CommercePaymentMethodGroupRel::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<CommercePaymentMethodGroupRel, String>)
 				CommercePaymentMethodGroupRel::setDescription);
+		attributeGetterFunctions.put(
+			"imageId", CommercePaymentMethodGroupRel::getImageId);
 		attributeSetterBiConsumers.put(
 			"imageId",
 			(BiConsumer<CommercePaymentMethodGroupRel, Long>)
 				CommercePaymentMethodGroupRel::setImageId);
+		attributeGetterFunctions.put(
+			"engineKey", CommercePaymentMethodGroupRel::getEngineKey);
 		attributeSetterBiConsumers.put(
 			"engineKey",
 			(BiConsumer<CommercePaymentMethodGroupRel, String>)
 				CommercePaymentMethodGroupRel::setEngineKey);
+		attributeGetterFunctions.put(
+			"priority", CommercePaymentMethodGroupRel::getPriority);
 		attributeSetterBiConsumers.put(
 			"priority",
 			(BiConsumer<CommercePaymentMethodGroupRel, Double>)
 				CommercePaymentMethodGroupRel::setPriority);
+		attributeGetterFunctions.put(
+			"active", CommercePaymentMethodGroupRel::getActive);
 		attributeSetterBiConsumers.put(
 			"active",
 			(BiConsumer<CommercePaymentMethodGroupRel, Boolean>)
 				CommercePaymentMethodGroupRel::setActive);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@JSON
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@JSON
@@ -1031,6 +1078,7 @@ public class CommercePaymentMethodGroupRelModelImpl
 		CommercePaymentMethodGroupRelImpl commercePaymentMethodGroupRelImpl =
 			new CommercePaymentMethodGroupRelImpl();
 
+		commercePaymentMethodGroupRelImpl.setMvccVersion(getMvccVersion());
 		commercePaymentMethodGroupRelImpl.setCommercePaymentMethodGroupRelId(
 			getCommercePaymentMethodGroupRelId());
 		commercePaymentMethodGroupRelImpl.setGroupId(getGroupId());
@@ -1047,6 +1095,43 @@ public class CommercePaymentMethodGroupRelModelImpl
 		commercePaymentMethodGroupRelImpl.setActive(isActive());
 
 		commercePaymentMethodGroupRelImpl.resetOriginalValues();
+
+		return commercePaymentMethodGroupRelImpl;
+	}
+
+	@Override
+	public CommercePaymentMethodGroupRel cloneWithOriginalValues() {
+		CommercePaymentMethodGroupRelImpl commercePaymentMethodGroupRelImpl =
+			new CommercePaymentMethodGroupRelImpl();
+
+		commercePaymentMethodGroupRelImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		commercePaymentMethodGroupRelImpl.setCommercePaymentMethodGroupRelId(
+			this.<Long>getColumnOriginalValue("CPaymentMethodGroupRelId"));
+		commercePaymentMethodGroupRelImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		commercePaymentMethodGroupRelImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commercePaymentMethodGroupRelImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commercePaymentMethodGroupRelImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commercePaymentMethodGroupRelImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commercePaymentMethodGroupRelImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commercePaymentMethodGroupRelImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		commercePaymentMethodGroupRelImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		commercePaymentMethodGroupRelImpl.setImageId(
+			this.<Long>getColumnOriginalValue("imageId"));
+		commercePaymentMethodGroupRelImpl.setEngineKey(
+			this.<String>getColumnOriginalValue("engineKey"));
+		commercePaymentMethodGroupRelImpl.setPriority(
+			this.<Double>getColumnOriginalValue("priority"));
+		commercePaymentMethodGroupRelImpl.setActive(
+			this.<Boolean>getColumnOriginalValue("active_"));
 
 		return commercePaymentMethodGroupRelImpl;
 	}
@@ -1134,6 +1219,8 @@ public class CommercePaymentMethodGroupRelModelImpl
 		CommercePaymentMethodGroupRelCacheModel
 			commercePaymentMethodGroupRelCacheModel =
 				new CommercePaymentMethodGroupRelCacheModel();
+
+		commercePaymentMethodGroupRelCacheModel.mvccVersion = getMvccVersion();
 
 		commercePaymentMethodGroupRelCacheModel.
 			commercePaymentMethodGroupRelId =
@@ -1296,12 +1383,11 @@ public class CommercePaymentMethodGroupRelModelImpl
 		private static final Function
 			<InvocationHandler, CommercePaymentMethodGroupRel>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						CommercePaymentMethodGroupRel.class,
-						ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private long _commercePaymentMethodGroupRelId;
 	private long _groupId;
 	private long _companyId;
@@ -1348,6 +1434,7 @@ public class CommercePaymentMethodGroupRelModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put(
 			"CPaymentMethodGroupRelId", _commercePaymentMethodGroupRelId);
 		_columnOriginalValues.put("groupId", _groupId);
@@ -1387,31 +1474,33 @@ public class CommercePaymentMethodGroupRelModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("CPaymentMethodGroupRelId", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("groupId", 2L);
+		columnBitmasks.put("CPaymentMethodGroupRelId", 2L);
 
-		columnBitmasks.put("companyId", 4L);
+		columnBitmasks.put("groupId", 4L);
 
-		columnBitmasks.put("userId", 8L);
+		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("userName", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("createDate", 32L);
+		columnBitmasks.put("userName", 32L);
 
-		columnBitmasks.put("modifiedDate", 64L);
+		columnBitmasks.put("createDate", 64L);
 
-		columnBitmasks.put("name", 128L);
+		columnBitmasks.put("modifiedDate", 128L);
 
-		columnBitmasks.put("description", 256L);
+		columnBitmasks.put("name", 256L);
 
-		columnBitmasks.put("imageId", 512L);
+		columnBitmasks.put("description", 512L);
 
-		columnBitmasks.put("engineKey", 1024L);
+		columnBitmasks.put("imageId", 1024L);
 
-		columnBitmasks.put("priority", 2048L);
+		columnBitmasks.put("engineKey", 2048L);
 
-		columnBitmasks.put("active_", 4096L);
+		columnBitmasks.put("priority", 4096L);
+
+		columnBitmasks.put("active_", 8192L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

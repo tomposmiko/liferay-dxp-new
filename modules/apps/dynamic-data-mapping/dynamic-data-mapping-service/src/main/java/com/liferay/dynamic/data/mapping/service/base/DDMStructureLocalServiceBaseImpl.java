@@ -17,15 +17,8 @@ package com.liferay.dynamic.data.mapping.service.base;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
-import com.liferay.dynamic.data.mapping.service.persistence.DDMDataProviderInstanceLinkPersistence;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMStructureFinder;
-import com.liferay.dynamic.data.mapping.service.persistence.DDMStructureLayoutPersistence;
-import com.liferay.dynamic.data.mapping.service.persistence.DDMStructureLinkFinder;
-import com.liferay.dynamic.data.mapping.service.persistence.DDMStructureLinkPersistence;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMStructurePersistence;
-import com.liferay.dynamic.data.mapping.service.persistence.DDMStructureVersionPersistence;
-import com.liferay.dynamic.data.mapping.service.persistence.DDMTemplateFinder;
-import com.liferay.dynamic.data.mapping.service.persistence.DDMTemplatePersistence;
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
@@ -49,8 +42,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -432,6 +423,7 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -450,6 +442,7 @@ public abstract class DDMStructureLocalServiceBaseImpl
 			(DDMStructure)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<DDMStructure> getBasePersistence() {
 		return ddmStructurePersistence;
 	}
@@ -659,42 +652,5 @@ public abstract class DDMStructureLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected DDMDataProviderInstanceLinkPersistence
-		ddmDataProviderInstanceLinkPersistence;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.ClassNameLocalService
-		classNameLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@Reference
-	protected DDMStructureLayoutPersistence ddmStructureLayoutPersistence;
-
-	@Reference
-	protected DDMStructureLinkPersistence ddmStructureLinkPersistence;
-
-	@Reference
-	protected DDMStructureLinkFinder ddmStructureLinkFinder;
-
-	@Reference
-	protected DDMStructureVersionPersistence ddmStructureVersionPersistence;
-
-	@Reference
-	protected DDMTemplatePersistence ddmTemplatePersistence;
-
-	@Reference
-	protected DDMTemplateFinder ddmTemplateFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDMStructureLocalServiceBaseImpl.class);
 
 }

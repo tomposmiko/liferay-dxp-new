@@ -17,6 +17,7 @@ package com.liferay.trash.web.internal.display.context;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -102,24 +103,26 @@ public class TrashDisplayContext {
 
 		breadcrumbEntries.add(breadcrumbEntry);
 
-		PortletURL containerModelURL =
-			_liferayPortletResponse.createRenderURL();
-
-		TrashHandler trashHandler = getTrashHandler();
-
-		String trashHandlerContainerModelClassName =
-			trashHandler.getContainerModelClassName(getClassPK());
-
-		containerModelURL.setParameter("mvcPath", "/view_content.jsp");
-		containerModelURL.setParameter(
-			"classNameId",
-			String.valueOf(
-				PortalUtil.getClassNameId(
-					trashHandlerContainerModelClassName)));
-
 		breadcrumbEntries.addAll(
 			getBreadcrumbEntries(
-				getClassName(), getClassPK(), "classPK", containerModelURL,
+				getClassName(), getClassPK(), "classPK",
+				PortletURLBuilder.createRenderURL(
+					_liferayPortletResponse
+				).setMVCPath(
+					"/view_content.jsp"
+				).setParameter(
+					"classNameId",
+					() -> {
+						TrashHandler trashHandler = getTrashHandler();
+
+						String trashHandlerContainerModelClassName =
+							trashHandler.getContainerModelClassName(
+								getClassPK());
+
+						return PortalUtil.getClassNameId(
+							trashHandlerContainerModelClassName);
+					}
+				).buildPortletURL(),
 				true));
 
 		return breadcrumbEntries;
@@ -327,13 +330,6 @@ public class TrashDisplayContext {
 		return NavigationItemListBuilder.add(
 			navigationItem -> {
 				navigationItem.setActive(true);
-
-				ThemeDisplay themeDisplay =
-					(ThemeDisplay)_httpServletRequest.getAttribute(
-						WebKeys.THEME_DISPLAY);
-
-				navigationItem.setHref(themeDisplay.getURLCurrent());
-
 				navigationItem.setLabel(
 					LanguageUtil.get(_httpServletRequest, "details"));
 			}
@@ -392,9 +388,7 @@ public class TrashDisplayContext {
 		breadcrumbEntry.setTitle(
 			LanguageUtil.get(_httpServletRequest, "recycle-bin"));
 
-		PortletURL portletURL = getPortletURL();
-
-		breadcrumbEntry.setURL(portletURL.toString());
+		breadcrumbEntry.setURL(String.valueOf(getPortletURL()));
 
 		breadcrumbEntries.add(breadcrumbEntry);
 
@@ -450,12 +444,15 @@ public class TrashDisplayContext {
 				themeDisplay.getLocale(), getClassName()),
 			false);
 
-		PortletURL iteratorURL = _liferayPortletResponse.createRenderURL();
-
-		iteratorURL.setParameter("mvcPath", "/view_content.jsp");
-		iteratorURL.setParameter(
-			"classNameId", String.valueOf(getClassNameId()));
-		iteratorURL.setParameter("classPK", String.valueOf(getClassPK()));
+		PortletURL iteratorURL = PortletURLBuilder.createRenderURL(
+			_liferayPortletResponse
+		).setMVCPath(
+			"/view_content.jsp"
+		).setParameter(
+			"classNameId", getClassNameId()
+		).setParameter(
+			"classPK", getClassPK()
+		).buildPortletURL();
 
 		SearchContainer<TrashedModel> searchContainer = new SearchContainer(
 			_liferayPortletRequest, iteratorURL, null, emptyResultsMessage);

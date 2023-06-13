@@ -4,8 +4,8 @@ definition {
 		FragmentsAdminNavigator.gotoAddCollection();
 
 		Collection.editCollection(
-			collectionDescription = ${collectionDescription},
-			collectionName = ${collectionName});
+			collectionDescription = "${collectionDescription}",
+			collectionName = "${collectionName}");
 
 		Button.clickSave();
 	}
@@ -15,9 +15,9 @@ definition {
 
 		AssertTextEquals(
 			locator1 = "Modal#HEADER",
-			value1 = "Add Component");
+			value1 = "Add Fragment");
 
-		PortletEntry.inputName(name = ${fragmentName});
+		PortletEntry.inputName(name = "${fragmentName}");
 
 		Button.clickSave();
 	}
@@ -27,13 +27,13 @@ definition {
 
 		IFrame.selectConfigurationFrame();
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		AssertVisible(locator1 = "ItemSelector#SELECT_FILE_UPLOAD_IMAGE");
 
 		UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
 			locator1 = "TextInput#FILE",
-			value1 = ${resourceFile});
+			value1 = "${resourceFile}");
 
 		IFrame.selectConfigurationFrame();
 
@@ -41,22 +41,30 @@ definition {
 	}
 
 	macro deleteEntry {
-		LexiconCard.delete(card = ${entry});
+		LexiconCard.delete(card = "${entry}");
 	}
 
 	macro exportCollection {
-		Navigator.gotoNavNested(navNested = ${collectionName});
+		Navigator.gotoNavNested(navNested = "${collectionName}");
 
 		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Export");
 	}
 
+	macro exportFragment {
+		FragmentsAdminNavigator.gotoCollection(collectionName = "${collectionName}");
+
+		FragmentsAdminNavigator.gotoEntryEllipsisItem(
+			entry = "${fragmentName}",
+			item = "Export");
+	}
+
 	macro exportMultipleCollections {
-		for (var collectionName : list ${collectionNameList}) {
+		for (var collectionName : list "${collectionNameList}") {
 			Check(
-				key_tableEntry = ${collectionName},
+				key_tableEntry = "${collectionName}",
 				locator1 = "LexiconTable#TABLE_ENTRY_CHECKBOX");
 
-			Pause(locator1 = 3000);
+			Pause(locator1 = "3000");
 		}
 
 		SelectFrameTop();
@@ -69,9 +77,7 @@ definition {
 	macro importCollectionFromDependenciesFolder {
 		FragmentsAdminNavigator.gotoImportCollection();
 
-		UploadCommonFile(
-			locator1 = "TextInput#FILE",
-			value1 = ${collectionZipFile});
+		UploadDependencyFile.uploadArchiveFile(fileName = "${collectionZipFile}");
 
 		SelectFrameTop();
 
@@ -93,7 +99,33 @@ definition {
 
 		UploadTempFile(
 			locator1 = "TextInput#FILE",
-			value1 = ${collectionsZipFileName});
+			value1 = "${collectionsZipFileName}");
+
+		SelectFrameTop();
+
+		Button.clickImport();
+
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_IFRAME");
+
+		Alert.viewSuccessMessage();
+
+		SelectFrameTop();
+
+		IFrame.closeFrame();
+	}
+
+	macro importFragmentFromTempFolder {
+		WaitForLiferayEvent.initializeLiferayEventLog();
+
+		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Import");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		var entriesZipFileName = TestCase.getDownloadedTempFileName(fileNamePattern = "entries-*.zip");
+
+		UploadTempFile(
+			locator1 = "TextInput#FILE",
+			value1 = "${entriesZipFileName}");
 
 		SelectFrameTop();
 
@@ -115,21 +147,28 @@ definition {
 	macro selectCollection {
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		LexiconCard.clickCard(card = ${collectionName});
+		LexiconCard.clickCard(card = "${collectionName}");
 	}
 
 	macro viewEntryNotPresent {
-		LexiconCard.viewCardNotPresent(card = ${entry});
+		LexiconCard.viewCardNotPresent(card = "${entry}");
 	}
 
 	macro viewEntryPresent {
-		LexiconCard.viewCardPresent(card = ${entry});
+		LexiconCard.viewCardPresent(card = "${entry}");
 	}
 
 	macro viewEntryWorkflowStatus {
 		LexiconCard.viewCardLabel(
-			card = ${entry},
-			cardLabel = ${workflowStatus});
+			card = "${entry}",
+			cardLabel = "${workflowStatus}");
+	}
+
+	macro viewSiteUsages {
+		LexiconTable.viewTableEntryInfo(
+			columnName = "usages",
+			tableEntry = "${siteName}",
+			tableEntryInfo = "${usages}");
 	}
 
 }

@@ -56,26 +56,36 @@ function SegmentsExperiments({
 		selectedExperienceId,
 		variants,
 	} = useContext(StateContext);
-	const {APIService, assetsPath} = useContext(SegmentsExperimentsContext);
+	const {APIService, imagesPath} = useContext(SegmentsExperimentsContext);
 	const dispatch = useContext(DispatchContext);
 
-	const noExperimentIllustration = `${assetsPath}${NO_EXPERIMENT_ILLUSTRATION_FILE_NAME}`;
+	const noExperimentIllustration = `${imagesPath}${NO_EXPERIMENT_ILLUSTRATION_FILE_NAME}`;
 	const winnerVariant = variants.find((variant) => variant.winner === true);
+	const goalTarget = experiment?.goal?.target?.replace('#', '');
+	const isGoalTargetInDOM = document.getElementById(goalTarget);
+
+	// If the target has been removed from the page we must reset it
+
+	if (goalTarget && !isGoalTargetInDOM) {
+		onTargetChange('');
+	}
 
 	return (
 		<>
 			<ClayTabs justified={true}>
 				<ClayTabs.Item
-					active={activeTab == TABS_STATES.ACTIVE}
+					active={activeTab === TABS_STATES.ACTIVE}
 					onClick={() => setActiveTab(TABS_STATES.ACTIVE)}
 				>
 					{Liferay.Language.get('active-test')}
 				</ClayTabs.Item>
+
 				<ClayTabs.Item
-					active={activeTab == TABS_STATES.HISTORY}
+					active={activeTab === TABS_STATES.HISTORY}
 					onClick={() => setActiveTab(TABS_STATES.HISTORY)}
 				>
 					{Liferay.Language.get('history')}
+
 					{' (' + experimentHistory.length + ')'}
 				</ClayTabs.Item>
 			</ClayTabs>
@@ -117,6 +127,7 @@ function SegmentsExperiments({
 											>
 												{Liferay.Language.get('edit')}
 											</ClayDropDown.Item>
+
 											<ClayDropDown.Item
 												onClick={
 													_handleDeleteActiveExperiment
@@ -157,20 +168,22 @@ function SegmentsExperiments({
 										}}
 									/>
 
-									<div className="mt-3">
-										<ClayButton
-											className="btn-success"
-											onClick={() =>
-												_handlePublishVariant(
-													winnerVariant.segmentsExperienceId
-												)
-											}
-										>
-											{Liferay.Language.get(
-												'publish-winner'
-											)}
-										</ClayButton>
-									</div>
+									<ClayAlert.Footer>
+										<ClayButton.Group>
+											<ClayButton
+												alert
+												onClick={() =>
+													_handlePublishVariant(
+														winnerVariant.segmentsExperienceId
+													)
+												}
+											>
+												{Liferay.Language.get(
+													'publish-winner'
+												)}
+											</ClayButton>
+										</ClayButton.Group>
+									</ClayAlert.Footer>
 								</ClayAlert>
 							)}
 
@@ -186,7 +199,7 @@ function SegmentsExperiments({
 									onSelectClickGoalTarget={(selector) => {
 										onTargetChange(selector);
 									}}
-									target={experiment.goal.target}
+									target={goalTarget}
 								/>
 							)}
 
@@ -213,16 +226,19 @@ function SegmentsExperiments({
 								src={noExperimentIllustration}
 								width="120px"
 							/>
+
 							<h4 className="text-dark">
 								{Liferay.Language.get(
 									'no-active-tests-were-found-for-the-selected-experience'
 								)}
 							</h4>
+
 							<p>
 								{Liferay.Language.get(
 									'create-test-help-message'
 								)}
 							</p>
+
 							<ClayButton
 								displayType="secondary"
 								onClick={() =>
@@ -236,6 +252,7 @@ function SegmentsExperiments({
 						</div>
 					)}
 				</ClayTabs.TabPane>
+
 				<ClayTabs.TabPane>
 					<ExperimentsHistory
 						experimentHistory={experimentHistory}

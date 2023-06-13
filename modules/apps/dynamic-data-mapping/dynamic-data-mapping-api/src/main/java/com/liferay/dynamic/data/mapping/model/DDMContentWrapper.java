@@ -31,8 +31,10 @@ import java.util.function.Function;
  *
  * @author Brian Wing Shun Chan
  * @see DDMContent
+ * @deprecated
  * @generated
  */
+@Deprecated
 public class DDMContentWrapper
 	extends BaseModelWrapper<DDMContent>
 	implements DDMContent, ModelWrapper<DDMContent> {
@@ -141,6 +143,11 @@ public class DDMContentWrapper
 		if (data != null) {
 			setData(data);
 		}
+	}
+
+	@Override
+	public DDMContent cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
 	}
 
 	@Override

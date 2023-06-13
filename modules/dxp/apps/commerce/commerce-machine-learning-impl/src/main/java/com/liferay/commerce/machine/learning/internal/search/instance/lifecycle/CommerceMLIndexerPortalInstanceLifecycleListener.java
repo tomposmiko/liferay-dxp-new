@@ -121,9 +121,8 @@ public class CommerceMLIndexerPortalInstanceLifecycleListener
 	}
 
 	protected void verifyCompanies(CommerceMLIndexer commerceMLIndexer) {
-		for (Company company : _companyLocalService.getCompanies()) {
-			commerceMLIndexer.createIndex(company.getCompanyId());
-		}
+		_companyLocalService.forEachCompanyId(
+			companyId -> commerceMLIndexer.createIndex(companyId));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

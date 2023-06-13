@@ -17,6 +17,7 @@ package com.liferay.microblogs.service.impl;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.microblogs.constants.MicroblogsEntryConstants;
 import com.liferay.microblogs.constants.MicroblogsPortletKeys;
 import com.liferay.microblogs.exception.UnsupportedMicroblogsEntryException;
@@ -36,15 +37,20 @@ import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.kernel.process.ProcessCallable;
 import com.liferay.portal.kernel.process.ProcessException;
 import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
+import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.social.kernel.service.SocialActivityLocalService;
 import com.liferay.subscription.model.Subscription;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
@@ -79,7 +85,7 @@ public class MicroblogsEntryLocalServiceImpl
 
 		User user = userLocalService.getUser(userId);
 
-		Date now = new Date();
+		Date date = new Date();
 
 		validate(type, parentMicroblogsEntryId);
 
@@ -95,8 +101,8 @@ public class MicroblogsEntryLocalServiceImpl
 		microblogsEntry.setCompanyId(user.getCompanyId());
 		microblogsEntry.setUserId(user.getUserId());
 		microblogsEntry.setUserName(user.getFullName());
-		microblogsEntry.setCreateDate(now);
-		microblogsEntry.setModifiedDate(now);
+		microblogsEntry.setCreateDate(date);
+		microblogsEntry.setModifiedDate(date);
 		microblogsEntry.setCreatorClassNameId(creatorClassNameId);
 		microblogsEntry.setCreatorClassPK(creatorClassPK);
 		microblogsEntry.setContent(content);
@@ -129,7 +135,7 @@ public class MicroblogsEntryLocalServiceImpl
 
 		User user = userLocalService.getUser(userId);
 
-		Date now = new Date();
+		Date date = new Date();
 
 		validate(type, parentMicroblogsEntryId);
 
@@ -145,8 +151,8 @@ public class MicroblogsEntryLocalServiceImpl
 		microblogsEntry.setCompanyId(user.getCompanyId());
 		microblogsEntry.setUserId(user.getUserId());
 		microblogsEntry.setUserName(user.getFullName());
-		microblogsEntry.setCreateDate(now);
-		microblogsEntry.setModifiedDate(now);
+		microblogsEntry.setCreateDate(date);
+		microblogsEntry.setModifiedDate(date);
 		microblogsEntry.setCreatorClassNameId(
 			classNameLocalService.getClassNameId(User.class));
 		microblogsEntry.setCreatorClassPK(user.getUserId());
@@ -178,15 +184,14 @@ public class MicroblogsEntryLocalServiceImpl
 			activityKey = MicroblogsActivityKeys.REPOST_ENTRY;
 		}
 
-		JSONObject extraDataJSONObject = JSONUtil.put(
-			"content", microblogsEntry.getContent()
-		).put(
-			"parentMicroblogsEntryId", parentMicroblogsEntryId
-		);
-
-		socialActivityLocalService.addActivity(
+		_socialActivityLocalService.addActivity(
 			userId, 0, MicroblogsEntry.class.getName(), microblogsEntryId,
-			activityKey, extraDataJSONObject.toString(),
+			activityKey,
+			JSONUtil.put(
+				"content", microblogsEntry.getContent()
+			).put(
+				"parentMicroblogsEntryId", parentMicroblogsEntryId
+			).toString(),
 			microblogsEntry.getParentMicroblogsEntryUserId());
 
 		// Notification
@@ -218,6 +223,7 @@ public class MicroblogsEntryLocalServiceImpl
 	}
 
 	@Override
+	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public MicroblogsEntry deleteMicroblogsEntry(
 			MicroblogsEntry microblogsEntry)
 		throws PortalException {
@@ -238,13 +244,13 @@ public class MicroblogsEntryLocalServiceImpl
 
 			// Asset
 
-			assetEntryLocalService.deleteEntry(
+			_assetEntryLocalService.deleteEntry(
 				MicroblogsEntry.class.getName(),
 				curMicroblogsEntry.getMicroblogsEntryId());
 
 			// Social
 
-			socialActivityLocalService.deleteActivities(
+			_socialActivityLocalService.deleteActivities(
 				MicroblogsEntry.class.getName(),
 				curMicroblogsEntry.getMicroblogsEntryId());
 		}
@@ -412,10 +418,10 @@ public class MicroblogsEntryLocalServiceImpl
 			String[] assetTagNames)
 		throws PortalException {
 
-		Group group = groupLocalService.getCompanyGroup(
+		Group group = _groupLocalService.getCompanyGroup(
 			microblogsEntry.getCompanyId());
 
-		assetEntryLocalService.updateEntry(
+		_assetEntryLocalService.updateEntry(
 			microblogsEntry.getUserId(), group.getGroupId(),
 			MicroblogsEntry.class.getName(),
 			microblogsEntry.getMicroblogsEntryId(), assetCategoryIds,
@@ -474,17 +480,6 @@ public class MicroblogsEntryLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		final JSONObject notificationEventJSONObject = JSONUtil.put(
-			"className", MicroblogsEntry.class.getName()
-		).put(
-			"classPK", microblogsEntry.getMicroblogsEntryId()
-		).put(
-			"entryTitle",
-			MicroblogsUtil.getProcessedContent(
-				StringUtil.shorten(microblogsEntry.getContent(), 50),
-				serviceContext)
-		);
-
 		AssetRendererFactory<MicroblogsEntry> assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClass(
 				MicroblogsEntry.class);
@@ -506,7 +501,16 @@ public class MicroblogsEntryLocalServiceImpl
 			}
 		}
 
-		notificationEventJSONObject.put(
+		final JSONObject notificationEventJSONObject = JSONUtil.put(
+			"className", MicroblogsEntry.class.getName()
+		).put(
+			"classPK", microblogsEntry.getMicroblogsEntryId()
+		).put(
+			"entryTitle",
+			MicroblogsUtil.getProcessedContent(
+				StringUtil.shorten(microblogsEntry.getContent(), 50),
+				serviceContext)
+		).put(
 			"entryURL", entryURL
 		).put(
 			"userId", microblogsEntry.getUserId()
@@ -611,10 +615,23 @@ public class MicroblogsEntryLocalServiceImpl
 		MicroblogsEntryLocalServiceImpl.class);
 
 	@Reference
+	private AssetEntryLocalService _assetEntryLocalService;
+
+	@Reference
+	private GroupLocalService _groupLocalService;
+
+	@Reference
 	private MessageBus _messageBus;
 
 	@Reference
+	private SocialActivityLocalService _socialActivityLocalService;
+
+	@Reference
 	private SubscriptionLocalService _subscriptionLocalService;
+
+	@Reference
+	private UserNotificationEventLocalService
+		_userNotificationEventLocalService;
 
 	private class NotificationProcessCallable
 		implements ProcessCallable<Serializable> {
@@ -678,7 +695,7 @@ public class MicroblogsEntryLocalServiceImpl
 						notificationEventJSONObject.put(
 							"notificationType", notificationType);
 
-						userNotificationEventLocalService.
+						_userNotificationEventLocalService.
 							sendUserNotificationEvents(
 								receiverUserIds.get(j),
 								MicroblogsPortletKeys.MICROBLOGS,
@@ -697,7 +714,7 @@ public class MicroblogsEntryLocalServiceImpl
 						notificationEventJSONObject.put(
 							"notificationType", notificationType);
 
-						userNotificationEventLocalService.
+						_userNotificationEventLocalService.
 							sendUserNotificationEvents(
 								receiverUserIds.get(j),
 								MicroblogsPortletKeys.MICROBLOGS,

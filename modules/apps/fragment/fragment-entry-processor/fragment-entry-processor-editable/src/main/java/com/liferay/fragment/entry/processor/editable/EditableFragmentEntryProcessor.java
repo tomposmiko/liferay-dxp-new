@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -140,7 +141,8 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 			jsonObject.put(
 				clazz.getName(),
 				getDefaultEditableValuesJSONObject(
-					html, fragmentEntryLink.getConfiguration()));
+					fragmentEntryLink.getHtml(),
+					fragmentEntryLink.getConfiguration()));
 		}
 
 		Document document = _getDocument(html);
@@ -200,6 +202,19 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 							alt, fragmentEntryProcessorContext);
 
 						mappedValueConfigJSONObject.put("alt", alt);
+					}
+
+					if (mappedValueConfigJSONObject.has("fileEntryId")) {
+						String fileEntryId =
+							mappedValueConfigJSONObject.getString(
+								"fileEntryId", StringPool.BLANK);
+
+						fileEntryId = StringUtil.trim(
+							_fragmentEntryProcessorHelper.processTemplate(
+								fileEntryId, fragmentEntryProcessorContext));
+
+						mappedValueConfigJSONObject.put(
+							"fileEntryId", fileEntryId);
 					}
 
 					value = StringUtil.replace(
@@ -267,21 +282,28 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 					fragmentEntryProcessorContext.getLocale());
 			}
 
-			if (Objects.equals(
+			JSONObject configJSONObject = JSONUtil.merge(
+				editableValueJSONObject.getJSONObject("config"),
+				mappedValueConfigJSONObject);
+
+			JSONObject localizedJSONObject = configJSONObject.getJSONObject(
+				LocaleUtil.toLanguageId(
+					fragmentEntryProcessorContext.getLocale()));
+
+			String mapperType = configJSONObject.getString(
+				"mapperType", element.attr("type"));
+
+			if ((localizedJSONObject != null) &&
+				(localizedJSONObject.length() > 0)) {
+
+				configJSONObject = localizedJSONObject;
+			}
+
+			editableElementParser.replace(element, value, configJSONObject);
+
+			if (!Objects.equals(
 					fragmentEntryProcessorContext.getMode(),
 					FragmentEntryLinkConstants.EDIT)) {
-
-				editableElementParser.replace(element, value);
-			}
-			else {
-				JSONObject configJSONObject = JSONUtil.merge(
-					editableValueJSONObject.getJSONObject("config"),
-					mappedValueConfigJSONObject);
-
-				editableElementParser.replace(element, value, configJSONObject);
-
-				String mapperType = configJSONObject.getString(
-					"mapperType", element.attr("type"));
 
 				if (Validator.isNull(mapperType)) {
 					mapperType = element.attr("data-lfr-editable-type");
@@ -308,16 +330,7 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 			for (Element element : document.select("lfr-editable")) {
 				element.removeAttr("id");
 				element.removeAttr("type");
-
-				String tagName = element.attr("view-tag-name");
-
-				if (!Objects.equals(tagName, "span")) {
-					tagName = "div";
-				}
-
-				element.tagName(tagName);
-
-				element.removeAttr("view-tag-name");
+				element.tagName("div");
 			}
 		}
 

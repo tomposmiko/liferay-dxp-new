@@ -67,11 +67,6 @@ public class WikiDisplayExportImportPortletPreferencesProcessor
 	}
 
 	@Override
-	public boolean isPublishDisplayedContent() {
-		return false;
-	}
-
-	@Override
 	public PortletPreferences processExportPortletPreferences(
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences)
@@ -179,14 +174,13 @@ public class WikiDisplayExportImportPortletPreferencesProcessor
 	}
 
 	protected ActionableDynamicQuery getPageActionableDynamicQuery(
-		final PortletDataContext portletDataContext, final long nodeId,
-		final String portletId) {
+		PortletDataContext portletDataContext, long nodeId, String portletId) {
 
 		ActionableDynamicQuery actionableDynamicQuery =
 			_wikiPageLocalService.getExportActionableDynamicQuery(
 				portletDataContext);
 
-		final ActionableDynamicQuery.AddCriteriaMethod addCriteriaMethod =
+		ActionableDynamicQuery.AddCriteriaMethod addCriteriaMethod =
 			actionableDynamicQuery.getAddCriteriaMethod();
 
 		actionableDynamicQuery.setAddCriteriaMethod(

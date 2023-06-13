@@ -15,12 +15,18 @@
 package com.liferay.analytics.reports.web.internal.model;
 
 import com.liferay.analytics.reports.web.internal.model.util.TrafficChannelUtil;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.stream.Stream;
 
 /**
  * @author David Arques
@@ -30,11 +36,16 @@ public class PaidTrafficChannelImpl implements TrafficChannel {
 	public PaidTrafficChannelImpl(boolean error) {
 		_error = error;
 
+		_countrySearchKeywordsList = Collections.emptyList();
 		_trafficAmount = 0;
 		_trafficShare = 0;
 	}
 
-	public PaidTrafficChannelImpl(long trafficAmount, double trafficShare) {
+	public PaidTrafficChannelImpl(
+		List<CountrySearchKeywords> countrySearchKeywordsList,
+		long trafficAmount, double trafficShare) {
+
+		_countrySearchKeywordsList = countrySearchKeywordsList;
 		_trafficAmount = trafficAmount;
 		_trafficShare = trafficShare;
 
@@ -55,6 +66,9 @@ public class PaidTrafficChannelImpl implements TrafficChannel {
 			(PaidTrafficChannelImpl)object;
 
 		if (Objects.equals(
+				_countrySearchKeywordsList,
+				paidTrafficChannelImpl._countrySearchKeywordsList) &&
+			Objects.equals(
 				getHelpMessageKey(),
 				paidTrafficChannelImpl.getHelpMessageKey()) &&
 			Objects.equals(getName(), paidTrafficChannelImpl.getName()) &&
@@ -67,6 +81,10 @@ public class PaidTrafficChannelImpl implements TrafficChannel {
 		}
 
 		return false;
+	}
+
+	public List<CountrySearchKeywords> getCountrySearchKeywordsList() {
+		return _countrySearchKeywordsList;
 	}
 
 	@Override
@@ -93,7 +111,8 @@ public class PaidTrafficChannelImpl implements TrafficChannel {
 	@Override
 	public int hashCode() {
 		return Objects.hash(
-			getHelpMessageKey(), getName(), _trafficAmount, _trafficShare);
+			_countrySearchKeywordsList, getHelpMessageKey(), getName(),
+			_trafficAmount, _trafficShare);
 	}
 
 	@Override
@@ -104,7 +123,17 @@ public class PaidTrafficChannelImpl implements TrafficChannel {
 			_error,
 			ResourceBundleUtil.getString(resourceBundle, getHelpMessageKey()),
 			getName(), ResourceBundleUtil.getString(resourceBundle, getName()),
-			_trafficAmount, _trafficShare);
+			_trafficAmount, _trafficShare
+		).put(
+			"countryKeywords",
+			() -> {
+				if (!ListUtil.isEmpty(_countrySearchKeywordsList)) {
+					return _getCountryKeywordsJSONArray(locale);
+				}
+
+				return null;
+			}
+		);
 	}
 
 	@Override
@@ -115,6 +144,18 @@ public class PaidTrafficChannelImpl implements TrafficChannel {
 				_trafficAmount, _trafficShare));
 	}
 
+	private JSONArray _getCountryKeywordsJSONArray(Locale locale) {
+		Stream<CountrySearchKeywords> stream =
+			_countrySearchKeywordsList.stream();
+
+		return JSONUtil.putAll(
+			stream.map(
+				countrySearchKeywords -> countrySearchKeywords.toJSONObject(
+					locale)
+			).toArray());
+	}
+
+	private final List<CountrySearchKeywords> _countrySearchKeywordsList;
 	private final boolean _error;
 	private final long _trafficAmount;
 	private final double _trafficShare;

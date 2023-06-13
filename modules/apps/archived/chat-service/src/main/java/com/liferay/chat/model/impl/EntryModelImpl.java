@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -220,44 +221,65 @@ public class EntryModelImpl extends BaseModelImpl<Entry> implements EntryModel {
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Entry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Entry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Entry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Entry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Entry.class.getClassLoader(), Entry.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("entryId", Entry::getEntryId);
-		attributeGetterFunctions.put("createDate", Entry::getCreateDate);
-		attributeGetterFunctions.put("fromUserId", Entry::getFromUserId);
-		attributeGetterFunctions.put("toUserId", Entry::getToUserId);
-		attributeGetterFunctions.put("content", Entry::getContent);
-		attributeGetterFunctions.put("flag", Entry::getFlag);
+		try {
+			Constructor<Entry> constructor =
+				(Constructor<Entry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Entry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Entry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Entry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Entry, Object>>();
 		Map<String, BiConsumer<Entry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Entry, ?>>();
 
+		attributeGetterFunctions.put("entryId", Entry::getEntryId);
 		attributeSetterBiConsumers.put(
 			"entryId", (BiConsumer<Entry, Long>)Entry::setEntryId);
+		attributeGetterFunctions.put("createDate", Entry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<Entry, Long>)Entry::setCreateDate);
+		attributeGetterFunctions.put("fromUserId", Entry::getFromUserId);
 		attributeSetterBiConsumers.put(
 			"fromUserId", (BiConsumer<Entry, Long>)Entry::setFromUserId);
+		attributeGetterFunctions.put("toUserId", Entry::getToUserId);
 		attributeSetterBiConsumers.put(
 			"toUserId", (BiConsumer<Entry, Long>)Entry::setToUserId);
+		attributeGetterFunctions.put("content", Entry::getContent);
 		attributeSetterBiConsumers.put(
 			"content", (BiConsumer<Entry, String>)Entry::setContent);
+		attributeGetterFunctions.put("flag", Entry::getFlag);
 		attributeSetterBiConsumers.put(
 			"flag", (BiConsumer<Entry, Integer>)Entry::setFlag);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -491,6 +513,22 @@ public class EntryModelImpl extends BaseModelImpl<Entry> implements EntryModel {
 	}
 
 	@Override
+	public Entry cloneWithOriginalValues() {
+		EntryImpl entryImpl = new EntryImpl();
+
+		entryImpl.setEntryId(this.<Long>getColumnOriginalValue("entryId"));
+		entryImpl.setCreateDate(
+			this.<Long>getColumnOriginalValue("createDate"));
+		entryImpl.setFromUserId(
+			this.<Long>getColumnOriginalValue("fromUserId"));
+		entryImpl.setToUserId(this.<Long>getColumnOriginalValue("toUserId"));
+		entryImpl.setContent(this.<String>getColumnOriginalValue("content"));
+		entryImpl.setFlag(this.<Integer>getColumnOriginalValue("flag"));
+
+		return entryImpl;
+	}
+
+	@Override
 	public int compareTo(Entry entry) {
 		int value = 0;
 
@@ -671,9 +709,7 @@ public class EntryModelImpl extends BaseModelImpl<Entry> implements EntryModel {
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Entry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Entry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

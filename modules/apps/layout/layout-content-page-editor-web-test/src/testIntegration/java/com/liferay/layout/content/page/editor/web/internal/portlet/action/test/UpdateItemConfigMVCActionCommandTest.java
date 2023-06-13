@@ -166,8 +166,8 @@ public class UpdateItemConfigMVCActionCommandTest {
 
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
-		themeDisplay.setPlid(_layout.getPlid());
 		themeDisplay.setScopeGroupId(_group.getGroupId());
+		themeDisplay.setPlid(_layout.getPlid());
 
 		mockActionRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
 
@@ -209,13 +209,10 @@ public class UpdateItemConfigMVCActionCommandTest {
 		mockActionRequest.setParameter(
 			"itemId", layoutStructureItem.getItemId());
 
-		MockLiferayPortletActionResponse mockActionResponse =
-			new MockLiferayPortletActionResponse();
-
 		ReflectionTestUtil.invoke(
 			_mvcActionCommand, "doProcessAction",
 			new Class<?>[] {ActionRequest.class, ActionResponse.class},
-			mockActionRequest, mockActionResponse);
+			mockActionRequest, new MockLiferayPortletActionResponse());
 
 		layoutStructure = _getLayoutStructure();
 
@@ -255,13 +252,10 @@ public class UpdateItemConfigMVCActionCommandTest {
 		mockActionRequest.setParameter(
 			"itemId", layoutStructureItem.getItemId());
 
-		MockLiferayPortletActionResponse mockActionResponse =
-			new MockLiferayPortletActionResponse();
-
 		ReflectionTestUtil.invoke(
 			_mvcActionCommand, "doProcessAction",
 			new Class<?>[] {ActionRequest.class, ActionResponse.class},
-			mockActionRequest, mockActionResponse);
+			mockActionRequest, new MockLiferayPortletActionResponse());
 
 		layoutStructure = _getLayoutStructure();
 
@@ -287,7 +281,9 @@ public class UpdateItemConfigMVCActionCommandTest {
 	private LayoutPageTemplateStructureLocalService
 		_layoutPageTemplateStructureLocalService;
 
-	@Inject(filter = "mvc.command.name=/content_layout/update_item_config")
+	@Inject(
+		filter = "mvc.command.name=/layout_content_page_editor/update_item_config"
+	)
 	private MVCActionCommand _mvcActionCommand;
 
 	private ObjectMapper _objectMapper;

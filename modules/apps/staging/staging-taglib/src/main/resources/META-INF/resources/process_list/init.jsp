@@ -43,22 +43,29 @@ if (Objects.equals(displayStyle, "list")) {
 	processListListViewCss += " process-list-list-view";
 }
 
-PortletURL renderURL = liferayPortletResponse.createRenderURL();
-
-renderURL.setParameter("mvcRenderCommandName", mvcRenderCommandName);
-renderURL.setParameter("tabs1", "processes");
-
 StagingGroupHelper stagingGroupHelper = StagingGroupHelperUtil.getStagingGroupHelper();
 
 boolean localPublishing = (liveGroup == null) || stagingGroupHelper.isLocalStagingOrLocalLiveGroup(liveGroup);
 
-renderURL.setParameter("localPublishing", String.valueOf(localPublishing));
-
-renderURL.setParameter("displayStyle", displayStyle);
-renderURL.setParameter("navigation", navigation);
-renderURL.setParameter("orderByCol", orderByCol);
-renderURL.setParameter("orderByType", orderByType);
-renderURL.setParameter("searchContainerId", searchContainerId);
+PortletURL renderURL = PortletURLBuilder.createRenderURL(
+	liferayPortletResponse
+).setMVCRenderCommandName(
+	mvcRenderCommandName
+).setNavigation(
+	navigation
+).setTabs1(
+	"processes"
+).setParameter(
+	"displayStyle", displayStyle
+).setParameter(
+	"localPublishing", localPublishing
+).setParameter(
+	"orderByCol", orderByCol
+).setParameter(
+	"orderByType", orderByType
+).setParameter(
+	"searchContainerId", searchContainerId
+).buildPortletURL();
 
 String taskExecutorClassName = localPublishing ? localTaskExecutorClassName : remoteTaskExecutorClassName;
 %>

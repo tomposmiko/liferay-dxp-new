@@ -17,6 +17,7 @@ package com.liferay.frontend.taglib.clay.servlet.taglib;
 import com.liferay.frontend.taglib.clay.internal.servlet.taglib.BaseContainerTag;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.taglib.util.TagResourceBundleUtil;
 
@@ -37,31 +38,16 @@ public class LinkTag extends BaseContainerTag {
 
 		setContainerElement("a");
 
-		if (Validator.isNotNull(_ariaLabel)) {
-			setDynamicAttribute(StringPool.BLANK, "aria-label", _ariaLabel);
-		}
-
 		if (Validator.isNotNull(_href)) {
 			setDynamicAttribute(StringPool.BLANK, "href", _href);
 		}
 
-		if (Validator.isNotNull(_target)) {
-			Map<String, Object> dynamicAttributes = getDynamicAttributes();
+		Map<String, Object> dynamicAttributes = getDynamicAttributes();
 
-			if (dynamicAttributes.get("rel") == null) {
-				setDynamicAttribute(
-					StringPool.BLANK, "rel", "noreferrer noopener");
-			}
+		if ((dynamicAttributes.get("rel") == null) &&
+			(dynamicAttributes.get("target") != null)) {
 
-			setDynamicAttribute(StringPool.BLANK, "target", _target);
-		}
-
-		if (Validator.isNotNull(_title)) {
-			setDynamicAttribute(
-				StringPool.BLANK, "title",
-				LanguageUtil.get(
-					TagResourceBundleUtil.getResourceBundle(pageContext),
-					_title));
+			setDynamicAttribute(StringPool.BLANK, "rel", "noreferrer noopener");
 		}
 
 		if (Validator.isNotNull(_type) &&
@@ -73,29 +59,8 @@ public class LinkTag extends BaseContainerTag {
 		return super.doStartTag();
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public String getAriaLabel() {
-		return _ariaLabel;
-	}
-
-	public boolean getBlock() {
-		return _block;
-	}
-
 	public boolean getBorderless() {
 		return _borderless;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getDisplayType()}
-	 */
-	@Deprecated
-	public String getButtonStyle() {
-		return getDisplayType();
 	}
 
 	public String getDisplayType() {
@@ -114,14 +79,6 @@ public class LinkTag extends BaseContainerTag {
 		return _icon;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public String getIconAlignment() {
-		return _iconAlignment;
-	}
-
 	public String getLabel() {
 		return _label;
 	}
@@ -138,59 +95,12 @@ public class LinkTag extends BaseContainerTag {
 		return _small;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getDisplayType()}
-	 */
-	@Deprecated
-	public String getStyle() {
-		return getDisplayType();
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public String getTarget() {
-		return _target;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public String getTitle() {
-		return _title;
-	}
-
 	public String getType() {
 		return _type;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public void setAriaLabel(String ariaLabel) {
-		_ariaLabel = ariaLabel;
-	}
-
-	public void setBlock(boolean block) {
-		_block = block;
-	}
-
 	public void setBorderless(boolean borderless) {
 		_borderless = borderless;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #setDisplayType(String)}
-	 */
-	@Deprecated
-	public void setButtonStyle(String buttonStyle) {
-		setDisplayType(buttonStyle);
-		setType("button");
 	}
 
 	public void setDisplayType(String displayType) {
@@ -209,14 +119,6 @@ public class LinkTag extends BaseContainerTag {
 		_icon = icon;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public void setIconAlignment(String iconAlignment) {
-		_iconAlignment = iconAlignment;
-	}
-
 	public void setLabel(String label) {
 		_label = label;
 	}
@@ -233,31 +135,6 @@ public class LinkTag extends BaseContainerTag {
 		_small = small;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #setDisplayType(String)}
-	 */
-	@Deprecated
-	public void setStyle(String style) {
-		setDisplayType(style);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public void setTarget(String target) {
-		_target = target;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public void setTitle(String title) {
-		_title = title;
-	}
-
 	public void setType(String type) {
 		_type = type;
 	}
@@ -266,53 +143,16 @@ public class LinkTag extends BaseContainerTag {
 	protected void cleanUp() {
 		super.cleanUp();
 
-		_ariaLabel = null;
-		_block = false;
 		_borderless = false;
 		_displayType = null;
 		_download = null;
 		_href = null;
 		_icon = null;
-		_iconAlignment = null;
 		_label = null;
 		_monospaced = false;
 		_outline = false;
 		_small = false;
-		_target = null;
-		_title = null;
 		_type = "link";
-	}
-
-	@Override
-	protected String getHydratedModuleName() {
-		if ((getAdditionalProps() != null) || (getPropsTransformer() != null)) {
-			return "frontend-taglib-clay/Link";
-		}
-
-		return null;
-	}
-
-	@Override
-	protected Map<String, Object> prepareProps(Map<String, Object> props) {
-		props.put("block", _block);
-		props.put("borderless", _borderless);
-		props.put("button", _type.equals("button"));
-		props.put("displayType", _displayType);
-		props.put("icon", _icon);
-
-		if (Validator.isNotNull(_label)) {
-			props.put(
-				"label",
-				LanguageUtil.get(
-					TagResourceBundleUtil.getResourceBundle(pageContext),
-					_label));
-		}
-
-		props.put("monospaced", _monospaced);
-		props.put("outline", _outline);
-		props.put("small", _small);
-
-		return super.prepareProps(props);
 	}
 
 	@Override
@@ -323,10 +163,6 @@ public class LinkTag extends BaseContainerTag {
 			cssPrefix = "btn-";
 
 			cssClasses.add("btn");
-		}
-
-		if (_block) {
-			cssClasses.add(cssPrefix + "block");
 		}
 
 		if (_borderless) {
@@ -373,10 +209,11 @@ public class LinkTag extends BaseContainerTag {
 			}
 
 			if (Validator.isNotNull(_label)) {
-				jspWriter.write(
-					LanguageUtil.get(
-						TagResourceBundleUtil.getResourceBundle(pageContext),
-						_label));
+				String label = LanguageUtil.get(
+					TagResourceBundleUtil.getResourceBundle(pageContext),
+					_label);
+
+				jspWriter.write(HtmlUtil.escape(label));
 			}
 
 			return SKIP_BODY;
@@ -387,20 +224,15 @@ public class LinkTag extends BaseContainerTag {
 
 	private static final String _ATTRIBUTE_NAMESPACE = "clay:link:";
 
-	private String _ariaLabel;
-	private boolean _block;
 	private boolean _borderless;
 	private String _displayType;
 	private String _download;
 	private String _href;
 	private String _icon;
-	private String _iconAlignment;
 	private String _label;
 	private boolean _monospaced;
 	private boolean _outline;
 	private boolean _small;
-	private String _target;
-	private String _title;
 	private String _type = "link";
 
 }

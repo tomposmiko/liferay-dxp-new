@@ -19,12 +19,19 @@ import com.liferay.taglib.util.IncludeTag;
 
 import java.text.Format;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Brian Wing Shun Chan
  */
 public class InputFieldTag extends IncludeTag {
+
+	public List<String> getActiveLanguageIds() {
+		return _activeLanguageIds;
+	}
 
 	public String getAutoComplete() {
 		return _autoComplete;
@@ -82,12 +89,8 @@ public class InputFieldTag extends IncludeTag {
 		return _placeholder;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getAutoComplete()}
-	 */
-	@Deprecated
-	public boolean isAutoComplete() {
-		return Boolean.valueOf(_autoComplete);
+	public boolean isAdminMode() {
+		return _adminMode;
 	}
 
 	public boolean isAutoFocus() {
@@ -106,12 +109,12 @@ public class InputFieldTag extends IncludeTag {
 		return _ignoreRequestValue;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #setAutoComplete(String)}
-	 */
-	@Deprecated
-	public void setAutoComplete(boolean autoComplete) {
-		_autoComplete = String.valueOf(autoComplete);
+	public void setActiveLanguageIds(List<String> activeLanguageIds) {
+		_activeLanguageIds = activeLanguageIds;
+	}
+
+	public void setAdminMode(boolean adminMode) {
+		_adminMode = adminMode;
 	}
 
 	public void setAutoComplete(String autoComplete) {
@@ -190,6 +193,8 @@ public class InputFieldTag extends IncludeTag {
 	protected void cleanUp() {
 		super.cleanUp();
 
+		_activeLanguageIds = new ArrayList<>();
+		_adminMode = false;
 		_autoComplete = null;
 		_autoFocus = false;
 		_autoSize = false;
@@ -229,6 +234,10 @@ public class InputFieldTag extends IncludeTag {
 			id = fieldParam;
 		}
 
+		httpServletRequest.setAttribute(
+			"liferay-ui:input-field:activeLanguageIds", _activeLanguageIds);
+		httpServletRequest.setAttribute(
+			"liferay-ui:input-field:adminMode", _adminMode);
 		httpServletRequest.setAttribute(
 			"liferay-ui:input-field:autoComplete", _autoComplete);
 		httpServletRequest.setAttribute(
@@ -270,6 +279,8 @@ public class InputFieldTag extends IncludeTag {
 
 	private static final String _PAGE = "/html/taglib/ui/input_field/page.jsp";
 
+	private List<String> _activeLanguageIds = new ArrayList<>();
+	private boolean _adminMode;
 	private String _autoComplete;
 	private boolean _autoFocus;
 	private boolean _autoSize;

@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -238,97 +239,119 @@ public class CPDefinitionLocalizationModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CPDefinitionLocalization>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CPDefinitionLocalization.class.getClassLoader(),
+			CPDefinitionLocalization.class, ModelWrapper.class);
+
+		try {
+			Constructor<CPDefinitionLocalization> constructor =
+				(Constructor<CPDefinitionLocalization>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<CPDefinitionLocalization, Object>>
 		_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CPDefinitionLocalization, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CPDefinitionLocalization, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CPDefinitionLocalization, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", CPDefinitionLocalization::getMvccVersion);
-		attributeGetterFunctions.put(
-			"cpDefinitionLocalizationId",
-			CPDefinitionLocalization::getCpDefinitionLocalizationId);
-		attributeGetterFunctions.put(
-			"companyId", CPDefinitionLocalization::getCompanyId);
-		attributeGetterFunctions.put(
-			"CPDefinitionId", CPDefinitionLocalization::getCPDefinitionId);
-		attributeGetterFunctions.put(
-			"languageId", CPDefinitionLocalization::getLanguageId);
-		attributeGetterFunctions.put("name", CPDefinitionLocalization::getName);
-		attributeGetterFunctions.put(
-			"shortDescription", CPDefinitionLocalization::getShortDescription);
-		attributeGetterFunctions.put(
-			"description", CPDefinitionLocalization::getDescription);
-		attributeGetterFunctions.put(
-			"metaTitle", CPDefinitionLocalization::getMetaTitle);
-		attributeGetterFunctions.put(
-			"metaDescription", CPDefinitionLocalization::getMetaDescription);
-		attributeGetterFunctions.put(
-			"metaKeywords", CPDefinitionLocalization::getMetaKeywords);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CPDefinitionLocalization, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CPDefinitionLocalization, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CPDefinitionLocalization, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CPDefinitionLocalization::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<CPDefinitionLocalization, Long>)
 				CPDefinitionLocalization::setMvccVersion);
+		attributeGetterFunctions.put(
+			"cpDefinitionLocalizationId",
+			CPDefinitionLocalization::getCpDefinitionLocalizationId);
 		attributeSetterBiConsumers.put(
 			"cpDefinitionLocalizationId",
 			(BiConsumer<CPDefinitionLocalization, Long>)
 				CPDefinitionLocalization::setCpDefinitionLocalizationId);
+		attributeGetterFunctions.put(
+			"companyId", CPDefinitionLocalization::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CPDefinitionLocalization, Long>)
 				CPDefinitionLocalization::setCompanyId);
+		attributeGetterFunctions.put(
+			"CPDefinitionId", CPDefinitionLocalization::getCPDefinitionId);
 		attributeSetterBiConsumers.put(
 			"CPDefinitionId",
 			(BiConsumer<CPDefinitionLocalization, Long>)
 				CPDefinitionLocalization::setCPDefinitionId);
+		attributeGetterFunctions.put(
+			"languageId", CPDefinitionLocalization::getLanguageId);
 		attributeSetterBiConsumers.put(
 			"languageId",
 			(BiConsumer<CPDefinitionLocalization, String>)
 				CPDefinitionLocalization::setLanguageId);
+		attributeGetterFunctions.put("name", CPDefinitionLocalization::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CPDefinitionLocalization, String>)
 				CPDefinitionLocalization::setName);
+		attributeGetterFunctions.put(
+			"shortDescription", CPDefinitionLocalization::getShortDescription);
 		attributeSetterBiConsumers.put(
 			"shortDescription",
 			(BiConsumer<CPDefinitionLocalization, String>)
 				CPDefinitionLocalization::setShortDescription);
+		attributeGetterFunctions.put(
+			"description", CPDefinitionLocalization::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<CPDefinitionLocalization, String>)
 				CPDefinitionLocalization::setDescription);
+		attributeGetterFunctions.put(
+			"metaTitle", CPDefinitionLocalization::getMetaTitle);
 		attributeSetterBiConsumers.put(
 			"metaTitle",
 			(BiConsumer<CPDefinitionLocalization, String>)
 				CPDefinitionLocalization::setMetaTitle);
+		attributeGetterFunctions.put(
+			"metaDescription", CPDefinitionLocalization::getMetaDescription);
 		attributeSetterBiConsumers.put(
 			"metaDescription",
 			(BiConsumer<CPDefinitionLocalization, String>)
 				CPDefinitionLocalization::setMetaDescription);
+		attributeGetterFunctions.put(
+			"metaKeywords", CPDefinitionLocalization::getMetaKeywords);
 		attributeSetterBiConsumers.put(
 			"metaKeywords",
 			(BiConsumer<CPDefinitionLocalization, String>)
 				CPDefinitionLocalization::setMetaKeywords);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -618,6 +641,37 @@ public class CPDefinitionLocalizationModelImpl
 	}
 
 	@Override
+	public CPDefinitionLocalization cloneWithOriginalValues() {
+		CPDefinitionLocalizationImpl cpDefinitionLocalizationImpl =
+			new CPDefinitionLocalizationImpl();
+
+		cpDefinitionLocalizationImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		cpDefinitionLocalizationImpl.setCpDefinitionLocalizationId(
+			this.<Long>getColumnOriginalValue("cpDefinitionLocalizationId"));
+		cpDefinitionLocalizationImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		cpDefinitionLocalizationImpl.setCPDefinitionId(
+			this.<Long>getColumnOriginalValue("CPDefinitionId"));
+		cpDefinitionLocalizationImpl.setLanguageId(
+			this.<String>getColumnOriginalValue("languageId"));
+		cpDefinitionLocalizationImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		cpDefinitionLocalizationImpl.setShortDescription(
+			this.<String>getColumnOriginalValue("shortDescription"));
+		cpDefinitionLocalizationImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		cpDefinitionLocalizationImpl.setMetaTitle(
+			this.<String>getColumnOriginalValue("metaTitle"));
+		cpDefinitionLocalizationImpl.setMetaDescription(
+			this.<String>getColumnOriginalValue("metaDescription"));
+		cpDefinitionLocalizationImpl.setMetaKeywords(
+			this.<String>getColumnOriginalValue("metaKeywords"));
+
+		return cpDefinitionLocalizationImpl;
+	}
+
+	@Override
 	public int compareTo(CPDefinitionLocalization cpDefinitionLocalization) {
 		long primaryKey = cpDefinitionLocalization.getPrimaryKey();
 
@@ -849,8 +903,7 @@ public class CPDefinitionLocalizationModelImpl
 		private static final Function
 			<InvocationHandler, CPDefinitionLocalization>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						CPDefinitionLocalization.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 

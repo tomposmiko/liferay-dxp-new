@@ -105,10 +105,6 @@ public abstract class BaseHTMLTag extends com.liferay.taglib.util.IncludeTag {
 		return _synchronousFormSubmission;
 	}
 
-	public java.lang.String getWebContentSelectorURL() {
-		return _webContentSelectorURL;
-	}
-
 	public void setCheckRequired(boolean checkRequired) {
 		_checkRequired = checkRequired;
 	}
@@ -181,10 +177,6 @@ public abstract class BaseHTMLTag extends com.liferay.taglib.util.IncludeTag {
 		_synchronousFormSubmission = synchronousFormSubmission;
 	}
 
-	public void setWebContentSelectorURL(java.lang.String webContentSelectorURL) {
-		_webContentSelectorURL = webContentSelectorURL;
-	}
-
 	@Override
 	public void setPageContext(PageContext pageContext) {
 		super.setPageContext(pageContext);
@@ -214,7 +206,6 @@ public abstract class BaseHTMLTag extends com.liferay.taglib.util.IncludeTag {
 		_showEmptyFieldLabel = true;
 		_showLanguageSelector = true;
 		_synchronousFormSubmission = true;
-		_webContentSelectorURL = null;
 	}
 
 	@Override
@@ -242,7 +233,6 @@ public abstract class BaseHTMLTag extends com.liferay.taglib.util.IncludeTag {
 		setNamespacedAttribute(request, "showEmptyFieldLabel", _showEmptyFieldLabel);
 		setNamespacedAttribute(request, "showLanguageSelector", _showLanguageSelector);
 		setNamespacedAttribute(request, "synchronousFormSubmission", _synchronousFormSubmission);
-		setNamespacedAttribute(request, "webContentSelectorURL", _webContentSelectorURL);
 	}
 
 	protected static final String _ATTRIBUTE_NAMESPACE = "liferay-ddm:html:";
@@ -268,6 +258,5 @@ public abstract class BaseHTMLTag extends com.liferay.taglib.util.IncludeTag {
 	private boolean _showEmptyFieldLabel = true;
 	private boolean _showLanguageSelector = true;
 	private boolean _synchronousFormSubmission = true;
-	private java.lang.String _webContentSelectorURL = null;
 
 }

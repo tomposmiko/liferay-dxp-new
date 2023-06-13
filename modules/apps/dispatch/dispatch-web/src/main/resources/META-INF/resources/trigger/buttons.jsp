@@ -21,15 +21,17 @@ ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_
 
 DispatchTrigger dispatchTrigger = (DispatchTrigger)row.getObject();
 
-String rowId = row.getRowId();
+DispatchTriggerDisplayContext dispatchTriggerDisplayContext = (DispatchTriggerDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 
-String runNowButton = "runNowButton" + rowId;
+DispatchTriggerMetadata dispatchTriggerMetadata = dispatchTriggerDisplayContext.getDispatchTriggerMetadata(dispatchTrigger.getDispatchTriggerId());
+
+String runNowButton = "runNowButton" + row.getRowId();
 %>
 
-<span aria-hidden="true" class="hide icon-spinner icon-spin dispatch-check-row-icon-spinner<%= row.getRowId() %>"></span>
+<span aria-hidden="true" class="<%= "hide icon-spinner icon-spin dispatch-check-row-icon-spinner" + row.getRowId() %>"></span>
 
-<c:if test="<%= DispatchTriggerPermission.contains(permissionChecker, dispatchTrigger, ActionKeys.UPDATE) %>">
-	<aui:button cssClass="btn-lg" name="<%= runNowButton %>" type="cancel" value="run-now" />
+<c:if test="<%= DispatchTriggerPermission.contains(permissionChecker, dispatchTrigger, ActionKeys.UPDATE) && dispatchTriggerMetadata.isDispatchTaskExecutorReady() %>">
+	<aui:button name="<%= runNowButton %>" value="run-now" />
 </c:if>
 
 <aui:script use="aui-io-request,aui-parse-content,liferay-notification">
@@ -40,13 +42,6 @@ String runNowButton = "runNowButton" + rowId;
 			<portlet:namespace /><%= Constants.CMD %>: 'runProcess',
 			<portlet:namespace />dispatchTriggerId:
 				'<%= dispatchTrigger.getDispatchTriggerId() %>',
-		};
-
-		var statuses = {
-			cancelled: '<%= LanguageUtil.get(request, "cancelled") %>',
-			failed: '<%= LanguageUtil.get(request, "failed") %>',
-			'in-progress': '<%= LanguageUtil.get(request, "in-progress") %>',
-			successful: '<%= LanguageUtil.get(request, "successful") %>',
 		};
 
 		this.attr('disabled', true);
@@ -64,25 +59,17 @@ String runNowButton = "runNowButton" + rowId;
 				on: {
 					success: function (event, id, obj) {
 						var response = JSON.parse(obj.response);
-						var status = response.status;
-						var cssClass = response.cssClass;
-						var statusRow = A.one('.status-row-<%= rowId %>');
 
-						statusRow._node.className = '';
-						statusRow.addClass('status-row-<%= rowId %>');
-						statusRow.addClass('background-task-status-row');
-						statusRow.addClass('background-task-status-' + status);
-						statusRow.addClass(cssClass);
-
-						statusRow.setContent(statuses[status]);
-
-						if (!response.success) {
+						if (response.success) {
 							iconSpinnerContainer.addClass('hide');
-
+						}
+						else {
 							A.one('#<portlet:namespace /><%= runNowButton %>').attr(
 								'disabled',
 								false
 							);
+
+							iconSpinnerContainer.addClass('hide');
 
 							new Liferay.Notification({
 								closeable: true,

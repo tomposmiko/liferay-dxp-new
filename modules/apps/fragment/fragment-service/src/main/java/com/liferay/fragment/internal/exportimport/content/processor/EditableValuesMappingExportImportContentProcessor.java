@@ -65,15 +65,13 @@ public class EditableValuesMappingExportImportContentProcessor
 			boolean exportReferencedContent, boolean escapeContent)
 		throws Exception {
 
-		_replaceAllEditableExportContentReferences(
+		JSONObject editableProcessorJSONObject =
 			editableValuesJSONObject.getJSONObject(
-				_KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR),
-			exportReferencedContent, portletDataContext, stagedModel);
+				_KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR);
 
 		_replaceAllEditableExportContentReferences(
-			editableValuesJSONObject.getJSONObject(
-				_KEY_FREEMARKER_FRAGMENT_ENTRY_PROCESSOR),
-			exportReferencedContent, portletDataContext, stagedModel);
+			editableProcessorJSONObject, exportReferencedContent,
+			portletDataContext, stagedModel);
 
 		return editableValuesJSONObject;
 	}
@@ -84,15 +82,12 @@ public class EditableValuesMappingExportImportContentProcessor
 			JSONObject editableValuesJSONObject)
 		throws Exception {
 
-		_replaceAllEditableImportContentReferences(
+		JSONObject editableProcessorJSONObject =
 			editableValuesJSONObject.getJSONObject(
-				_KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR),
-			portletDataContext);
+				_KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR);
 
 		_replaceAllEditableImportContentReferences(
-			editableValuesJSONObject.getJSONObject(
-				_KEY_FREEMARKER_FRAGMENT_ENTRY_PROCESSOR),
-			portletDataContext);
+			editableProcessorJSONObject, portletDataContext);
 
 		return editableValuesJSONObject;
 	}
@@ -243,21 +238,14 @@ public class EditableValuesMappingExportImportContentProcessor
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					StringBundler messageSB = new StringBundler(11);
-
-					messageSB.append("Staged model with class name ");
-					messageSB.append(stagedModel.getModelClassName());
-					messageSB.append(" and primary key ");
-					messageSB.append(stagedModel.getPrimaryKeyObj());
-					messageSB.append(" references asset entry with class ");
-					messageSB.append("primary key ");
-					messageSB.append(classPK);
-					messageSB.append(" and class name ");
-					messageSB.append(_portal.getClassName(classNameId));
-					messageSB.append(" that could not be exported due to ");
-					messageSB.append(exception);
-
-					String errorMessage = messageSB.toString();
+					String errorMessage = StringBundler.concat(
+						"Staged model with class name ",
+						stagedModel.getModelClassName(), " and primary key ",
+						stagedModel.getPrimaryKeyObj(),
+						" references asset entry with class primary key ",
+						classPK, " and class name ",
+						_portal.getClassName(classNameId),
+						" that could not be exported due to ", exception);
 
 					if (Validator.isNotNull(exception.getMessage())) {
 						errorMessage = StringBundler.concat(
@@ -359,10 +347,6 @@ public class EditableValuesMappingExportImportContentProcessor
 	private static final String _KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR =
 		"com.liferay.fragment.entry.processor.editable." +
 			"EditableFragmentEntryProcessor";
-
-	private static final String _KEY_FREEMARKER_FRAGMENT_ENTRY_PROCESSOR =
-		"com.liferay.fragment.entry.processor.freemarker." +
-			"FreeMarkerFragmentEntryProcessor";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		EditableValuesMappingExportImportContentProcessor.class);

@@ -41,11 +41,12 @@ public class ExpandoInfoItemFieldSetProviderImpl
 	public InfoFieldSet getInfoFieldSet(String itemClassName) {
 		return InfoFieldSet.builder(
 		).infoFieldSetEntry(
-			consumer -> {
+			unsafeConsumer -> {
 				for (ExpandoInfoItemFieldReader expandoInfoItemFieldReader :
 						_getExpandoFieldReaders(itemClassName)) {
 
-					consumer.accept(expandoInfoItemFieldReader.getField());
+					unsafeConsumer.accept(
+						expandoInfoItemFieldReader.getInfoField());
 				}
 			}
 		).labelInfoLocalizedValue(
@@ -65,7 +66,7 @@ public class ExpandoInfoItemFieldSetProviderImpl
 				_getExpandoFieldReaders(itemClassName)) {
 
 			InfoFieldValue<Object> infoFieldValue = new InfoFieldValue<>(
-				expandoInfoItemFieldReader.getField(),
+				expandoInfoItemFieldReader.getInfoField(),
 				expandoInfoItemFieldReader.getValue(itemObject));
 
 			infoFieldValues.add(infoFieldValue);

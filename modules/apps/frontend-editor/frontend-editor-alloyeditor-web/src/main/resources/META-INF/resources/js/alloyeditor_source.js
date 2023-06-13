@@ -144,10 +144,10 @@ AUI.add(
 						Liferay.Util.openWindow(
 							{
 								dialog: {
-									constrain: true,
-									cssClass:
+									'constrain': true,
+									'cssClass':
 										'lfr-fulscreen-source-editor-dialog modal-full-screen',
-									modal: true,
+									'modal': true,
 									'toolbars.footer': [
 										{
 											label: strings.cancel,
@@ -195,7 +195,7 @@ AUI.add(
 													dataProcessor: host.getNativeEditor()
 														.dataProcessor,
 													previewCssClass:
-														'alloy-editor',
+														'alloy-editor alloy-editor-placeholder',
 													value: host.getHTML(),
 												}
 											).render();
@@ -298,7 +298,6 @@ AUI.add(
 					var editorSwitchContainer = editorSwitch.ancestor();
 					var editorSwitchTheme = instance._editorSwitchTheme;
 					var editorWrapper = instance._editorWrapper;
-					var editorContent = editorWrapper.one('.alloy-editor');
 
 					editorWrapper.toggleClass(CSS_SHOW_SOURCE);
 					editorSwitchContainer.toggleClass(CSS_SHOW_SOURCE);
@@ -318,13 +317,6 @@ AUI.add(
 							? Liferay.Language.get('text-view')
 							: Liferay.Language.get('code-view')
 					);
-
-					if (editorContent.hasAttribute('hidden')) {
-						editorContent.removeAttribute('hidden');
-					}
-					else {
-						editorContent.setAttribute('hidden');
-					}
 
 					instance._toggleSourceSwitchFn({
 						hidden: true,

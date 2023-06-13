@@ -56,6 +56,7 @@ import java.util.Set;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -64,9 +65,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Peter Fellwock
  */
 @Component(
-	configurationPid = "com.liferay.chat.internal.configuration.ChatGroupServiceConfiguration",
-	enabled = false, immediate = true,
-	property = "javax.portlet.name=" + ChatPortletKeys.CHAT,
+	configurationPid = "com.liferay.chat.configuration.ChatConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, enabled = false,
+	immediate = true, property = "javax.portlet.name=" + ChatPortletKeys.CHAT,
 	service = PollerProcessor.class
 )
 public class ChatPollerProcessor extends BasePollerProcessor {
@@ -122,23 +123,15 @@ public class ChatPollerProcessor extends BasePollerProcessor {
 		JSONArray buddiesJSONArray = JSONFactoryUtil.createJSONArray();
 
 		for (Object[] buddy : buddies) {
-			String firstName = (String)buddy[1];
-			long groupId = (Long)buddy[2];
-			String lastName = (String)buddy[3];
-			boolean male = (Boolean)buddy[4];
-			String middleName = (String)buddy[5];
-			long portraitId = (Long)buddy[6];
-			String screenName = (String)buddy[7];
 			long userId = (Long)buddy[8];
-			String userUuid = (String)buddy[9];
 
 			Status buddyStatus = StatusLocalServiceUtil.getUserStatus(userId);
 
 			boolean awake = buddyStatus.isAwake();
 
-			JSONObject curUserJSONObject = JSONUtil.put("awake", awake);
-
 			String displayURL = StringPool.BLANK;
+
+			long groupId = (Long)buddy[2];
 
 			try {
 				LayoutSet layoutSet = _layoutSetLocalService.getLayoutSet(
@@ -161,37 +154,43 @@ public class ChatPollerProcessor extends BasePollerProcessor {
 				}
 			}
 
-			curUserJSONObject.put("displayURL", displayURL);
+			long portraitId = (Long)buddy[6];
 
-			String fullName = ContactConstants.getFullName(
-				firstName, middleName, lastName);
+			buddiesJSONArray.put(
+				JSONUtil.put(
+					"awake", awake
+				).put(
+					"displayURL", displayURL
+				).put(
+					"fullName",
+					() -> {
+						String firstName = (String)buddy[1];
+						String lastName = (String)buddy[3];
+						String middleName = (String)buddy[5];
 
-			curUserJSONObject.put(
-				"fullName", fullName
-			).put(
-				"groupId", groupId
-			).put(
-				"portraitId", portraitId
-			);
+						return ContactConstants.getFullName(
+							firstName, middleName, lastName);
+					}
+				).put(
+					"groupId", groupId
+				).put(
+					"portraitId", portraitId
+				).put(
+					"portraitURL",
+					() -> {
+						boolean male = (Boolean)buddy[4];
+						String userUuid = (String)buddy[9];
 
-			String portraitURL = UserConstants.getPortraitURL(
-				StringPool.BLANK, male, portraitId, userUuid);
-
-			curUserJSONObject.put(
-				"portraitURL", portraitURL
-			).put(
-				"screenName", screenName
-			);
-
-			String statusMessage = buddyStatus.getMessage();
-
-			curUserJSONObject.put(
-				"statusMessage", statusMessage
-			).put(
-				"userId", userId
-			);
-
-			buddiesJSONArray.put(curUserJSONObject);
+						return UserConstants.getPortraitURL(
+							StringPool.BLANK, male, portraitId, userUuid);
+					}
+				).put(
+					"screenName", (String)buddy[7]
+				).put(
+					"statusMessage", buddyStatus.getMessage()
+				).put(
+					"userId", userId
+				));
 		}
 
 		pollerResponse.setParameter("buddies", buddiesJSONArray);
@@ -322,7 +321,8 @@ public class ChatPollerProcessor extends BasePollerProcessor {
 	@Reference
 	private BuddyFinder _buddyFinder;
 
-	private ChatGroupServiceConfiguration _chatGroupServiceConfiguration;
+	private volatile ChatGroupServiceConfiguration
+		_chatGroupServiceConfiguration;
 
 	@Reference
 	private Http _http;

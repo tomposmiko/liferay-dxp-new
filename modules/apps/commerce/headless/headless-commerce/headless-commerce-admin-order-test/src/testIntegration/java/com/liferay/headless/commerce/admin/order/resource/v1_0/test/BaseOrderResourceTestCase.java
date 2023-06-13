@@ -52,9 +52,8 @@ import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -63,16 +62,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -191,6 +192,7 @@ public abstract class BaseOrderResourceTestCase {
 		order.setCouponCode(regex);
 		order.setCurrencyCode(regex);
 		order.setExternalReferenceCode(regex);
+		order.setOrderTypeExternalReferenceCode(regex);
 		order.setPaymentMethod(regex);
 		order.setPrintedNote(regex);
 		order.setPurchaseOrderNumber(regex);
@@ -223,6 +225,7 @@ public abstract class BaseOrderResourceTestCase {
 		Assert.assertEquals(regex, order.getCouponCode());
 		Assert.assertEquals(regex, order.getCurrencyCode());
 		Assert.assertEquals(regex, order.getExternalReferenceCode());
+		Assert.assertEquals(regex, order.getOrderTypeExternalReferenceCode());
 		Assert.assertEquals(regex, order.getPaymentMethod());
 		Assert.assertEquals(regex, order.getPrintedNote());
 		Assert.assertEquals(regex, order.getPurchaseOrderNumber());
@@ -265,20 +268,11 @@ public abstract class BaseOrderResourceTestCase {
 
 		assertContains(order1, (List<Order>)page.getItems());
 		assertContains(order2, (List<Order>)page.getItems());
-		assertValid(page, testGetOrdersPage_getExpectedActions());
+		assertValid(page);
 
 		orderResource.deleteOrder(order1.getId());
 
 		orderResource.deleteOrder(order2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetOrdersPage_getExpectedActions()
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -297,31 +291,6 @@ public abstract class BaseOrderResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			Page<Order> page = orderResource.getOrdersPage(
 				null, getFilterString(entityField, "between", order1),
-				Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(order1),
-				(List<Order>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetOrdersPageWithFilterDoubleEquals() throws Exception {
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DOUBLE);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		Order order1 = testGetOrdersPage_addOrder(randomOrder());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		Order order2 = testGetOrdersPage_addOrder(randomOrder());
-
-		for (EntityField entityField : entityFields) {
-			Page<Order> page = orderResource.getOrdersPage(
-				null, getFilterString(entityField, "eq", order1),
 				Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -397,19 +366,9 @@ public abstract class BaseOrderResourceTestCase {
 		testGetOrdersPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, order1, order2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					order1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetOrdersPageWithSortDouble() throws Exception {
-		testGetOrdersPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, order1, order2) -> {
-				BeanTestUtil.setProperty(order1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(order2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -418,8 +377,8 @@ public abstract class BaseOrderResourceTestCase {
 		testGetOrdersPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, order1, order2) -> {
-				BeanTestUtil.setProperty(order1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(order2, entityField.getName(), 1);
+				BeanUtils.setProperty(order1, entityField.getName(), 0);
+				BeanUtils.setProperty(order2, entityField.getName(), 1);
 			});
 	}
 
@@ -432,27 +391,27 @@ public abstract class BaseOrderResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						order1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						order2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						order1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						order2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -460,12 +419,12 @@ public abstract class BaseOrderResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						order1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						order2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -539,8 +498,8 @@ public abstract class BaseOrderResourceTestCase {
 
 		long totalCount = ordersJSONObject.getLong("totalCount");
 
-		Order order1 = testGraphQLGetOrdersPage_addOrder();
-		Order order2 = testGraphQLGetOrdersPage_addOrder();
+		Order order1 = testGraphQLOrder_addOrder();
+		Order order2 = testGraphQLOrder_addOrder();
 
 		ordersJSONObject = JSONUtil.getValueAsJSONObject(
 			invokeGraphQLQuery(graphQLField), "JSONObject/data",
@@ -557,10 +516,6 @@ public abstract class BaseOrderResourceTestCase {
 			order2,
 			Arrays.asList(
 				OrderSerDes.toDTOs(ordersJSONObject.getString("items"))));
-	}
-
-	protected Order testGraphQLGetOrdersPage_addOrder() throws Exception {
-		return testGraphQLOrder_addOrder();
 	}
 
 	@Test
@@ -626,7 +581,7 @@ public abstract class BaseOrderResourceTestCase {
 
 	@Test
 	public void testGraphQLGetOrderByExternalReferenceCode() throws Exception {
-		Order order = testGraphQLGetOrderByExternalReferenceCode_addOrder();
+		Order order = testGraphQLOrder_addOrder();
 
 		Assert.assertTrue(
 			equals(
@@ -676,12 +631,6 @@ public abstract class BaseOrderResourceTestCase {
 				"Object/code"));
 	}
 
-	protected Order testGraphQLGetOrderByExternalReferenceCode_addOrder()
-		throws Exception {
-
-		return testGraphQLOrder_addOrder();
-	}
-
 	@Test
 	public void testPatchOrderByExternalReferenceCode() throws Exception {
 		Assert.assertTrue(false);
@@ -709,7 +658,7 @@ public abstract class BaseOrderResourceTestCase {
 
 	@Test
 	public void testGraphQLDeleteOrder() throws Exception {
-		Order order = testGraphQLDeleteOrder_addOrder();
+		Order order = testGraphQLOrder_addOrder();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -722,6 +671,7 @@ public abstract class BaseOrderResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteOrder"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -735,10 +685,6 @@ public abstract class BaseOrderResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected Order testGraphQLDeleteOrder_addOrder() throws Exception {
-		return testGraphQLOrder_addOrder();
 	}
 
 	@Test
@@ -758,7 +704,7 @@ public abstract class BaseOrderResourceTestCase {
 
 	@Test
 	public void testGraphQLGetOrder() throws Exception {
-		Order order = testGraphQLGetOrder_addOrder();
+		Order order = testGraphQLOrder_addOrder();
 
 		Assert.assertTrue(
 			equals(
@@ -795,10 +741,6 @@ public abstract class BaseOrderResourceTestCase {
 						getGraphQLFields())),
 				"JSONArray/errors", "Object/0", "JSONObject/extensions",
 				"Object/code"));
-	}
-
-	protected Order testGraphQLGetOrder_addOrder() throws Exception {
-		return testGraphQLOrder_addOrder();
 	}
 
 	@Test
@@ -1055,6 +997,25 @@ public abstract class BaseOrderResourceTestCase {
 
 			if (Objects.equals("orderStatusInfo", additionalAssertFieldName)) {
 				if (order.getOrderStatusInfo() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"orderTypeExternalReferenceCode",
+					additionalAssertFieldName)) {
+
+				if (order.getOrderTypeExternalReferenceCode() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("orderTypeId", additionalAssertFieldName)) {
+				if (order.getOrderTypeId() == null) {
 					valid = false;
 				}
 
@@ -1561,6 +1522,14 @@ public abstract class BaseOrderResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("taxAmountValue", additionalAssertFieldName)) {
+				if (order.getTaxAmountValue() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("total", additionalAssertFieldName)) {
 				if (order.getTotal() == null) {
 					valid = false;
@@ -1780,12 +1749,6 @@ public abstract class BaseOrderResourceTestCase {
 	}
 
 	protected void assertValid(Page<Order> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<Order> page, Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<Order> orders = page.getItems();
@@ -1800,20 +1763,6 @@ public abstract class BaseOrderResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -2111,6 +2060,30 @@ public abstract class BaseOrderResourceTestCase {
 				if (!Objects.deepEquals(
 						order1.getOrderStatusInfo(),
 						order2.getOrderStatusInfo())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"orderTypeExternalReferenceCode",
+					additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						order1.getOrderTypeExternalReferenceCode(),
+						order2.getOrderTypeExternalReferenceCode())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("orderTypeId", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						order1.getOrderTypeId(), order2.getOrderTypeId())) {
 
 					return false;
 				}
@@ -2757,6 +2730,17 @@ public abstract class BaseOrderResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("taxAmountValue", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						order1.getTaxAmountValue(),
+						order2.getTaxAmountValue())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("total", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(order1.getTotal(), order2.getTotal())) {
 					return false;
@@ -3055,16 +3039,14 @@ public abstract class BaseOrderResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -3081,10 +3063,6 @@ public abstract class BaseOrderResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -3094,18 +3072,18 @@ public abstract class BaseOrderResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -3346,12 +3324,25 @@ public abstract class BaseOrderResourceTestCase {
 		}
 
 		if (entityFieldName.equals("orderStatus")) {
-			sb.append(String.valueOf(order.getOrderStatus()));
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("orderStatusInfo")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("orderTypeExternalReferenceCode")) {
+			sb.append("'");
+			sb.append(
+				String.valueOf(order.getOrderTypeExternalReferenceCode()));
+			sb.append("'");
 
 			return sb.toString();
 		}
 
-		if (entityFieldName.equals("orderStatusInfo")) {
+		if (entityFieldName.equals("orderTypeId")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
 		}
@@ -3365,9 +3356,8 @@ public abstract class BaseOrderResourceTestCase {
 		}
 
 		if (entityFieldName.equals("paymentStatus")) {
-			sb.append(String.valueOf(order.getPaymentStatus()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("paymentStatusInfo")) {
@@ -3448,15 +3438,13 @@ public abstract class BaseOrderResourceTestCase {
 		}
 
 		if (entityFieldName.equals("shippingAmountValue")) {
-			sb.append(String.valueOf(order.getShippingAmountValue()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("shippingDiscountAmount")) {
-			sb.append(String.valueOf(order.getShippingDiscountAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("shippingDiscountAmountFormatted")) {
@@ -3469,77 +3457,56 @@ public abstract class BaseOrderResourceTestCase {
 		}
 
 		if (entityFieldName.equals("shippingDiscountPercentageLevel1")) {
-			sb.append(
-				String.valueOf(order.getShippingDiscountPercentageLevel1()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals(
 				"shippingDiscountPercentageLevel1WithTaxAmount")) {
 
-			sb.append(
-				String.valueOf(
-					order.getShippingDiscountPercentageLevel1WithTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("shippingDiscountPercentageLevel2")) {
-			sb.append(
-				String.valueOf(order.getShippingDiscountPercentageLevel2()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals(
 				"shippingDiscountPercentageLevel2WithTaxAmount")) {
 
-			sb.append(
-				String.valueOf(
-					order.getShippingDiscountPercentageLevel2WithTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("shippingDiscountPercentageLevel3")) {
-			sb.append(
-				String.valueOf(order.getShippingDiscountPercentageLevel3()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals(
 				"shippingDiscountPercentageLevel3WithTaxAmount")) {
 
-			sb.append(
-				String.valueOf(
-					order.getShippingDiscountPercentageLevel3WithTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("shippingDiscountPercentageLevel4")) {
-			sb.append(
-				String.valueOf(order.getShippingDiscountPercentageLevel4()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals(
 				"shippingDiscountPercentageLevel4WithTaxAmount")) {
 
-			sb.append(
-				String.valueOf(
-					order.getShippingDiscountPercentageLevel4WithTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("shippingDiscountWithTaxAmount")) {
-			sb.append(String.valueOf(order.getShippingDiscountWithTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("shippingDiscountWithTaxAmountFormatted")) {
@@ -3583,9 +3550,8 @@ public abstract class BaseOrderResourceTestCase {
 		}
 
 		if (entityFieldName.equals("shippingWithTaxAmountValue")) {
-			sb.append(String.valueOf(order.getShippingWithTaxAmountValue()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("subtotal")) {
@@ -3594,15 +3560,13 @@ public abstract class BaseOrderResourceTestCase {
 		}
 
 		if (entityFieldName.equals("subtotalAmount")) {
-			sb.append(String.valueOf(order.getSubtotalAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("subtotalDiscountAmount")) {
-			sb.append(String.valueOf(order.getSubtotalDiscountAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("subtotalDiscountAmountFormatted")) {
@@ -3615,77 +3579,56 @@ public abstract class BaseOrderResourceTestCase {
 		}
 
 		if (entityFieldName.equals("subtotalDiscountPercentageLevel1")) {
-			sb.append(
-				String.valueOf(order.getSubtotalDiscountPercentageLevel1()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals(
 				"subtotalDiscountPercentageLevel1WithTaxAmount")) {
 
-			sb.append(
-				String.valueOf(
-					order.getSubtotalDiscountPercentageLevel1WithTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("subtotalDiscountPercentageLevel2")) {
-			sb.append(
-				String.valueOf(order.getSubtotalDiscountPercentageLevel2()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals(
 				"subtotalDiscountPercentageLevel2WithTaxAmount")) {
 
-			sb.append(
-				String.valueOf(
-					order.getSubtotalDiscountPercentageLevel2WithTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("subtotalDiscountPercentageLevel3")) {
-			sb.append(
-				String.valueOf(order.getSubtotalDiscountPercentageLevel3()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals(
 				"subtotalDiscountPercentageLevel3WithTaxAmount")) {
 
-			sb.append(
-				String.valueOf(
-					order.getSubtotalDiscountPercentageLevel3WithTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("subtotalDiscountPercentageLevel4")) {
-			sb.append(
-				String.valueOf(order.getSubtotalDiscountPercentageLevel4()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals(
 				"subtotalDiscountPercentageLevel4WithTaxAmount")) {
 
-			sb.append(
-				String.valueOf(
-					order.getSubtotalDiscountPercentageLevel4WithTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("subtotalDiscountWithTaxAmount")) {
-			sb.append(String.valueOf(order.getSubtotalDiscountWithTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("subtotalDiscountWithTaxAmountFormatted")) {
@@ -3721,15 +3664,13 @@ public abstract class BaseOrderResourceTestCase {
 		}
 
 		if (entityFieldName.equals("subtotalWithTaxAmountValue")) {
-			sb.append(String.valueOf(order.getSubtotalWithTaxAmountValue()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("taxAmount")) {
-			sb.append(String.valueOf(order.getTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("taxAmountFormatted")) {
@@ -3740,21 +3681,24 @@ public abstract class BaseOrderResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("taxAmountValue")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("total")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("totalAmount")) {
-			sb.append(String.valueOf(order.getTotalAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("totalDiscountAmount")) {
-			sb.append(String.valueOf(order.getTotalDiscountAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("totalDiscountAmountFormatted")) {
@@ -3766,73 +3710,56 @@ public abstract class BaseOrderResourceTestCase {
 		}
 
 		if (entityFieldName.equals("totalDiscountPercentageLevel1")) {
-			sb.append(String.valueOf(order.getTotalDiscountPercentageLevel1()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals(
 				"totalDiscountPercentageLevel1WithTaxAmount")) {
 
-			sb.append(
-				String.valueOf(
-					order.getTotalDiscountPercentageLevel1WithTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("totalDiscountPercentageLevel2")) {
-			sb.append(String.valueOf(order.getTotalDiscountPercentageLevel2()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals(
 				"totalDiscountPercentageLevel2WithTaxAmount")) {
 
-			sb.append(
-				String.valueOf(
-					order.getTotalDiscountPercentageLevel2WithTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("totalDiscountPercentageLevel3")) {
-			sb.append(String.valueOf(order.getTotalDiscountPercentageLevel3()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals(
 				"totalDiscountPercentageLevel3WithTaxAmount")) {
 
-			sb.append(
-				String.valueOf(
-					order.getTotalDiscountPercentageLevel3WithTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("totalDiscountPercentageLevel4")) {
-			sb.append(String.valueOf(order.getTotalDiscountPercentageLevel4()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals(
 				"totalDiscountPercentageLevel4WithTaxAmount")) {
 
-			sb.append(
-				String.valueOf(
-					order.getTotalDiscountPercentageLevel4WithTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("totalDiscountWithTaxAmount")) {
-			sb.append(String.valueOf(order.getTotalDiscountWithTaxAmount()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("totalDiscountWithTaxAmountFormatted")) {
@@ -3866,9 +3793,8 @@ public abstract class BaseOrderResourceTestCase {
 		}
 
 		if (entityFieldName.equals("totalWithTaxAmountValue")) {
-			sb.append(String.valueOf(order.getTotalWithTaxAmountValue()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("transactionId")) {
@@ -3949,6 +3875,9 @@ public abstract class BaseOrderResourceTestCase {
 				modifiedDate = RandomTestUtil.nextDate();
 				orderDate = RandomTestUtil.nextDate();
 				orderStatus = RandomTestUtil.randomInt();
+				orderTypeExternalReferenceCode = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				orderTypeId = RandomTestUtil.randomLong();
 				paymentMethod = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				paymentStatus = RandomTestUtil.randomInt();
@@ -4018,9 +3947,9 @@ public abstract class BaseOrderResourceTestCase {
 				subtotalWithTaxAmountFormatted = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				subtotalWithTaxAmountValue = RandomTestUtil.randomDouble();
-				taxAmount = RandomTestUtil.randomDouble();
 				taxAmountFormatted = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
+				taxAmountValue = RandomTestUtil.randomDouble();
 				totalAmount = RandomTestUtil.randomDouble();
 				totalDiscountAmount = RandomTestUtil.randomDouble();
 				totalDiscountAmountFormatted = StringUtil.toLowerCase(
@@ -4065,115 +3994,6 @@ public abstract class BaseOrderResourceTestCase {
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
-
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
 
 	protected class GraphQLField {
 
@@ -4249,6 +4069,18 @@ public abstract class BaseOrderResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseOrderResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

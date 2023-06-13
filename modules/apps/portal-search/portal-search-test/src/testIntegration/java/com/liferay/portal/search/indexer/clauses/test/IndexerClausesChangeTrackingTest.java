@@ -27,7 +27,7 @@ import com.liferay.message.boards.constants.MBCategoryConstants;
 import com.liferay.message.boards.constants.MBMessageConstants;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.service.MBMessageLocalService;
-import com.liferay.petra.lang.SafeClosable;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
@@ -37,8 +37,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.SearchEngine;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -46,7 +44,6 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchResponse;
@@ -63,7 +60,6 @@ import java.util.Collections;
 import java.util.function.Consumer;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -87,8 +83,6 @@ public class IndexerClausesChangeTrackingTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Assume.assumeTrue(!isSearchEngine("Solr"));
-
 		GroupSearchFixture groupSearchFixture = new GroupSearchFixture();
 
 		JournalArticleSearchFixture journalArticleSearchFixture =
@@ -121,17 +115,17 @@ public class IndexerClausesChangeTrackingTest {
 			"[Gamma Article, Omega Article]", withoutIndexerClauses(),
 			consumer);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
 					_ctCollection.getCtCollectionId())) {
 
 			updateJournalArticle(journalArticle, "Delta Article");
 
-			assertSearch("[]", consumer);
+			assertSearch("[Gamma Article]", consumer);
 
 			assertSearch(
-				"[Delta Article, Omega Article]", withoutIndexerClauses(),
-				consumer);
+				"[Delta Article, Gamma Article, Omega Article]",
+				withoutIndexerClauses(), consumer);
 		}
 
 		assertSearch("[Gamma Article]", consumer);
@@ -164,8 +158,8 @@ public class IndexerClausesChangeTrackingTest {
 			"[Gamma Message, Omega Message]", withoutIndexerClauses(),
 			consumer);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
 					_ctCollection.getCtCollectionId())) {
 
 			updateMessage(mbMessage, "Delta Message");
@@ -207,17 +201,18 @@ public class IndexerClausesChangeTrackingTest {
 			"[Gamma Article, Gamma Message, Omega Article, Omega Message]",
 			withoutIndexerClauses(), consumer);
 
-		try (SafeClosable safeClosable =
-				CTCollectionThreadLocal.setCTCollectionId(
+		try (SafeCloseable safeCloseable =
+				CTCollectionThreadLocal.setCTCollectionIdWithSafeCloseable(
 					_ctCollection.getCtCollectionId())) {
 
 			updateJournalArticle(journalArticle, "Delta Article");
 			updateMessage(mbMessage, "Delta Message");
 
-			assertSearch("[]", consumer);
+			assertSearch("[Gamma Article]", consumer);
 
 			assertSearch(
-				"[Delta Article, Delta Message, Omega Article, Omega Message]",
+				"[Delta Article, Delta Message, Gamma Article, Omega " +
+					"Article, Omega Message]",
 				withoutIndexerClauses(), consumer);
 		}
 
@@ -268,7 +263,7 @@ public class IndexerClausesChangeTrackingTest {
 
 	protected MBMessage addMessage(String title) throws Exception {
 		return mbMessageLocalService.addMessage(
-			_user.getUserId(), RandomTestUtil.randomString(),
+			null, _user.getUserId(), RandomTestUtil.randomString(),
 			_group.getGroupId(), MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID,
 			0L, MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID, title,
 			RandomTestUtil.randomString(), MBMessageConstants.DEFAULT_FORMAT,
@@ -301,25 +296,6 @@ public class IndexerClausesChangeTrackingTest {
 		DocumentsAssert.assertValuesIgnoreRelevance(
 			searchResponse.getRequestString(),
 			searchResponse.getDocumentsStream(), _TITLE_EN_US, expected);
-	}
-
-	protected boolean isSearchEngine(String engine) {
-		SearchEngine searchEngine = searchEngineHelper.getSearchEngine(
-			searchEngineHelper.getDefaultSearchEngineId());
-
-		String vendor = searchEngine.getVendor();
-
-		if (engine.equals("Elasticsearch7")) {
-			String version = searchEngineInformation.getClientVersionString();
-
-			if (vendor.equals("Elasticsearch") && version.startsWith("7")) {
-				return true;
-			}
-
-			return false;
-		}
-
-		return vendor.equals(engine);
 	}
 
 	protected void updateJournalArticle(
@@ -362,12 +338,6 @@ public class IndexerClausesChangeTrackingTest {
 
 	@Inject
 	protected MBMessageLocalService mbMessageLocalService;
-
-	@Inject
-	protected SearchEngineHelper searchEngineHelper;
-
-	@Inject
-	protected SearchEngineInformation searchEngineInformation;
 
 	@Inject
 	protected Searcher searcher;

@@ -69,6 +69,11 @@ public class CacheFieldEntryWrapper
 		}
 	}
 
+	@Override
+	public CacheFieldEntry cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
 	/**
 	 * Returns the cache field entry ID of this cache field entry.
 	 *

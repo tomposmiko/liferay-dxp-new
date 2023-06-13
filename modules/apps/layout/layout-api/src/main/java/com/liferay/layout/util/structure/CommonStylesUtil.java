@@ -42,7 +42,7 @@ public class CommonStylesUtil {
 
 		List<String> availableStyleNames = new ArrayList<>();
 
-		JSONArray jsonArray = getCommongStylesJSONArray(null);
+		JSONArray jsonArray = getCommonStylesJSONArray(null);
 
 		Iterator<JSONObject> iterator = jsonArray.iterator();
 
@@ -63,7 +63,7 @@ public class CommonStylesUtil {
 		return _availableStyleNames;
 	}
 
-	public static JSONArray getCommongStylesJSONArray(
+	public static JSONArray getCommonStylesJSONArray(
 			ResourceBundle resourceBundle)
 		throws Exception {
 
@@ -154,7 +154,7 @@ public class CommonStylesUtil {
 
 		Map<String, Object> defaultValues = new HashMap<>();
 
-		JSONArray jsonArray = getCommongStylesJSONArray(null);
+		JSONArray jsonArray = getCommonStylesJSONArray(null);
 
 		Iterator<JSONObject> iterator = jsonArray.iterator();
 
@@ -174,6 +174,24 @@ public class CommonStylesUtil {
 		_defaultValues = defaultValues;
 
 		return _defaultValues;
+	}
+
+	public static List<String> getResponsiveStyleNames() throws Exception {
+		if (_responsiveStyleNames != null) {
+			return _responsiveStyleNames;
+		}
+
+		List<String> responsiveStyleNames = new ArrayList<>();
+
+		for (String availableStyleName : getAvailableStyleNames()) {
+			if (isResponsive(availableStyleName)) {
+				responsiveStyleNames.add(availableStyleName);
+			}
+		}
+
+		_responsiveStyleNames = responsiveStyleNames;
+
+		return _responsiveStyleNames;
 	}
 
 	public static String getResponsiveTemplate(String propertyKey)
@@ -201,7 +219,7 @@ public class CommonStylesUtil {
 	private static void _loadResponsiveTemplates() throws Exception {
 		Map<String, String> responsiveTemplates = new HashMap<>();
 
-		JSONArray jsonArray = getCommongStylesJSONArray(null);
+		JSONArray jsonArray = getCommonStylesJSONArray(null);
 
 		Iterator<JSONObject> iterator = jsonArray.iterator();
 
@@ -232,6 +250,7 @@ public class CommonStylesUtil {
 	private static List<String> _availableStyleNames;
 	private static final Map<Locale, JSONArray> _commonStyles = new HashMap<>();
 	private static Map<String, Object> _defaultValues;
+	private static List<String> _responsiveStyleNames;
 	private static Map<String, String> _responsiveTemplates;
 
 }

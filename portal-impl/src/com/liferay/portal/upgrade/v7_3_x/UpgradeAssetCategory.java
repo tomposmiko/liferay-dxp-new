@@ -38,26 +38,29 @@ public class UpgradeAssetCategory extends UpgradeProcess {
 				new AlterTableAddColumn("treePath", "STRING null"));
 		}
 
-		try (PreparedStatement ps = connection.prepareStatement(
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				SQLTransformer.transform(
 					StringBundler.concat(
 						"update AssetCategory set treePath = CONCAT('/', ",
 						"CAST_TEXT(categoryId), '/') where treePath is null ",
 						"and parentCategoryId = 0")))) {
 
-			if (ps.executeUpdate() == 0) {
+			if (preparedStatement.executeUpdate() == 0) {
 				return;
 			}
 		}
 
-		try (PreparedStatement selectPS = connection.prepareStatement(
-				StringBundler.concat(
-					"select AssetCategory.treePath, AssetCategory.categoryId ",
-					"from AssetCategory inner join AssetCategory TEMP_TABLE ",
-					"on AssetCategory.categoryId = ",
-					"TEMP_TABLE.parentCategoryId and AssetCategory.treePath ",
-					"is not null and TEMP_TABLE.treePath is null"));
-			PreparedStatement updatePS =
+		try (PreparedStatement selectPreparedStatement =
+				connection.prepareStatement(
+					StringBundler.concat(
+						"select AssetCategory.treePath, ",
+						"AssetCategory.categoryId from AssetCategory inner ",
+						"join AssetCategory TEMP_TABLE on ",
+						"AssetCategory.categoryId = ",
+						"TEMP_TABLE.parentCategoryId and ",
+						"AssetCategory.treePath is not null and ",
+						"TEMP_TABLE.treePath is null"));
+			PreparedStatement updatePreparedStatement =
 				AutoBatchPreparedStatementUtil.autoBatch(
 					connection.prepareStatement(
 						SQLTransformer.transform(
@@ -67,20 +70,24 @@ public class UpgradeAssetCategory extends UpgradeProcess {
 								"parentCategoryId = ?"))))) {
 
 			while (true) {
-				try (ResultSet rs = selectPS.executeQuery()) {
-					if (!rs.next()) {
+				try (ResultSet resultSet =
+						selectPreparedStatement.executeQuery()) {
+
+					if (!resultSet.next()) {
 						return;
 					}
 
 					do {
-						updatePS.setString(1, rs.getString(1));
-						updatePS.setLong(2, rs.getLong(2));
+						updatePreparedStatement.setString(
+							1, resultSet.getString(1));
+						updatePreparedStatement.setLong(
+							2, resultSet.getLong(2));
 
-						updatePS.addBatch();
+						updatePreparedStatement.addBatch();
 					}
-					while (rs.next());
+					while (resultSet.next());
 
-					updatePS.executeBatch();
+					updatePreparedStatement.executeBatch();
 				}
 			}
 		}

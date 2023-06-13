@@ -14,10 +14,11 @@
 
 package com.liferay.dynamic.data.mapping.uad.exporter;
 
-import com.liferay.dynamic.data.mapping.model.DDMContent;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesSerializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesSerializerSerializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormValuesSerializerSerializeResponse;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
-import com.liferay.dynamic.data.mapping.service.DDMContentLocalService;
 import com.liferay.dynamic.data.mapping.uad.util.DDMUADUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -45,19 +46,14 @@ public class DDMFormInstanceRecordUADExporter
 
 	@Override
 	protected String toXmlString(DDMFormInstanceRecord ddmFormInstanceRecord) {
-		StringBundler sb = new StringBundler(7);
-
-		sb.append(
+		return StringBundler.concat(
 			StringUtil.removeSubstring(
-				super.toXmlString(ddmFormInstanceRecord), "</model>"));
-		sb.append("<column><column-name>");
-		sb.append("formInstanceName</column-name><column-value><![CDATA[");
-		sb.append(_getFormInstanceName(ddmFormInstanceRecord));
-		sb.append("]]></column-value></column>");
-		sb.append(_getFieldValuesXMLString(ddmFormInstanceRecord));
-		sb.append("</model>");
-
-		return sb.toString();
+				super.toXmlString(ddmFormInstanceRecord), "</model>"),
+			"<column><column-name>",
+			"formInstanceName</column-name><column-value><![CDATA[",
+			_getFormInstanceName(ddmFormInstanceRecord),
+			"]]></column-value></column>",
+			_getFieldValuesXMLString(ddmFormInstanceRecord), "</model>");
 	}
 
 	private String _getFieldValuesXMLString(
@@ -70,11 +66,16 @@ public class DDMFormInstanceRecordUADExporter
 			sb.append("com.liferay.dynamic.data.mapping.model.DDMContent");
 			sb.append("</model-name>");
 
-			DDMContent ddmContent = _ddmContentLocalService.getDDMContent(
-				ddmFormInstanceRecord.getStorageId());
+			DDMFormValuesSerializerSerializeResponse
+				ddmFormValuesSerializerSerializeResponse =
+					_ddmFormValuesSerializer.serialize(
+						DDMFormValuesSerializerSerializeRequest.Builder.
+							newBuilder(
+								ddmFormInstanceRecord.getDDMFormValues()
+							).build());
 
 			JSONObject dataJSONObject = JSONFactoryUtil.createJSONObject(
-				ddmContent.getData());
+				ddmFormValuesSerializerSerializeResponse.getContent());
 
 			JSONArray fieldValuesJSONArray = dataJSONObject.getJSONArray(
 				"fieldValues");
@@ -137,7 +138,7 @@ public class DDMFormInstanceRecordUADExporter
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDMFormInstanceRecordUADExporter.class);
 
-	@Reference
-	private DDMContentLocalService _ddmContentLocalService;
+	@Reference(target = "(ddm.form.values.serializer.type=json)")
+	private DDMFormValuesSerializer _ddmFormValuesSerializer;
 
 }

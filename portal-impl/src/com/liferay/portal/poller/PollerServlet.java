@@ -95,11 +95,7 @@ public class PollerServlet extends HttpServlet {
 		PollerHeader pollerHeader = PollerRequestHandlerUtil.getPollerHeader(
 			pollerRequestString);
 
-		if (pollerHeader == null) {
-			return StringPool.BLANK;
-		}
-
-		if (userId != pollerHeader.getUserId()) {
+		if ((pollerHeader == null) || (userId != pollerHeader.getUserId())) {
 			return StringPool.BLANK;
 		}
 
@@ -151,6 +147,9 @@ public class PollerServlet extends HttpServlet {
 				_countDownLatch.await(timeout, TimeUnit.MILLISECONDS);
 			}
 			catch (InterruptedException interruptedException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(interruptedException, interruptedException);
+				}
 			}
 
 			List<NotificationEvent> notificationEvents =

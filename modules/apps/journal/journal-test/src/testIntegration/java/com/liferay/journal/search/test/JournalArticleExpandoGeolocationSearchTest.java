@@ -28,8 +28,6 @@ import com.liferay.journal.test.util.search.JournalArticleSearchFixture;
 import com.liferay.journal.test.util.search.JournalArticleTitle;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.search.SearchEngine;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -37,7 +35,6 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
 import com.liferay.portal.search.geolocation.GeoBuilders;
 import com.liferay.portal.search.query.Queries;
@@ -61,7 +58,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -81,8 +77,6 @@ public class JournalArticleExpandoGeolocationSearchTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Assume.assumeTrue(!isSearchEngine("Solr"));
-
 		_journalArticleSearchFixture = new JournalArticleSearchFixture(
 			journalArticleLocalService);
 
@@ -300,25 +294,6 @@ public class JournalArticleExpandoGeolocationSearchTest {
 			searchResponse.getDocumentsStream(), fieldName, expected);
 	}
 
-	protected boolean isSearchEngine(String engine) {
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
-			_searchEngineHelper.getDefaultSearchEngineId());
-
-		String vendor = searchEngine.getVendor();
-
-		if (engine.equals("Elasticsearch7")) {
-			String version = _searchEngineInformation.getClientVersionString();
-
-			if (vendor.equals("Elasticsearch") && version.startsWith("7")) {
-				return true;
-			}
-
-			return false;
-		}
-
-		return vendor.equals(engine);
-	}
-
 	@Inject
 	protected ClassNameLocalService classNameLocalService;
 
@@ -358,12 +333,6 @@ public class JournalArticleExpandoGeolocationSearchTest {
 
 	private static final String _GEOLOCATION_VALUE =
 		"{\"latitude\":34.013727866113186, \"longitude\":-117.42460448294878}";
-
-	@Inject
-	private static SearchEngineHelper _searchEngineHelper;
-
-	@Inject
-	private static SearchEngineInformation _searchEngineInformation;
 
 	@DeleteAfterTestRun
 	private List<ExpandoColumn> _expandoColumns;

@@ -22,7 +22,6 @@ import com.liferay.commerce.payment.model.impl.CommercePaymentMethodGroupRelMode
 import com.liferay.commerce.payment.service.persistence.CommercePaymentMethodGroupRelPersistence;
 import com.liferay.commerce.payment.service.persistence.CommercePaymentMethodGroupRelUtil;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -32,13 +31,11 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -53,17 +50,10 @@ import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * The persistence implementation for the commerce payment method group rel service.
@@ -192,7 +182,7 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommercePaymentMethodGroupRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommercePaymentMethodGroupRel
@@ -564,7 +554,7 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -683,8 +673,7 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByG_E, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByG_E, finderArgs);
 		}
 
 		if (result instanceof CommercePaymentMethodGroupRel) {
@@ -800,7 +789,7 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, engineKey};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -965,7 +954,7 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommercePaymentMethodGroupRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommercePaymentMethodGroupRel
@@ -1362,7 +1351,7 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, active};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1491,9 +1480,7 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(CommercePaymentMethodGroupRelImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(CommercePaymentMethodGroupRelImpl.class);
 	}
 
 	/**
@@ -1527,9 +1514,7 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(CommercePaymentMethodGroupRelImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(
@@ -1546,11 +1531,10 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 			commercePaymentMethodGroupRelModelImpl.getEngineKey()
 		};
 
+		finderCache.putResult(_finderPathCountByG_E, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathCountByG_E, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByG_E, args, commercePaymentMethodGroupRelModelImpl,
-			false);
+			_finderPathFetchByG_E, args,
+			commercePaymentMethodGroupRelModelImpl);
 	}
 
 	/**
@@ -1900,7 +1884,7 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommercePaymentMethodGroupRel>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1973,7 +1957,7 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -2029,34 +2013,22 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 	 * Initializes the commerce payment method group rel persistence.
 	 */
 	public void afterPropertiesSet() {
-		Bundle bundle = FrameworkUtil.getBundle(
-			CommercePaymentMethodGroupRelPersistenceImpl.class);
-
-		_bundleContext = bundle.getBundleContext();
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class,
-			new CommercePaymentMethodGroupRelModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name",
-				CommercePaymentMethodGroupRel.class.getName()));
-
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByGroupId = _createFinderPath(
+		_finderPathWithPaginationFindByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -2064,27 +2036,27 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 			},
 			new String[] {"groupId"}, true);
 
-		_finderPathWithoutPaginationFindByGroupId = _createFinderPath(
+		_finderPathWithoutPaginationFindByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			true);
 
-		_finderPathCountByGroupId = _createFinderPath(
+		_finderPathCountByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			false);
 
-		_finderPathFetchByG_E = _createFinderPath(
+		_finderPathFetchByG_E = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByG_E",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "engineKey"}, true);
 
-		_finderPathCountByG_E = _createFinderPath(
+		_finderPathCountByG_E = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_E",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "engineKey"}, false);
 
-		_finderPathWithPaginationFindByG_A = _createFinderPath(
+		_finderPathWithPaginationFindByG_A = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_A",
 			new String[] {
 				Long.class.getName(), Boolean.class.getName(),
@@ -2093,12 +2065,12 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 			},
 			new String[] {"groupId", "active_"}, true);
 
-		_finderPathWithoutPaginationFindByG_A = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_A = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_A",
 			new String[] {Long.class.getName(), Boolean.class.getName()},
 			new String[] {"groupId", "active_"}, true);
 
-		_finderPathCountByG_A = _createFinderPath(
+		_finderPathCountByG_A = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_A",
 			new String[] {Long.class.getName(), Boolean.class.getName()},
 			new String[] {"groupId", "active_"}, false);
@@ -2111,14 +2083,6 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 
 		entityCache.removeCache(
 			CommercePaymentMethodGroupRelImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setCommercePaymentMethodGroupRelUtilPersistence(
@@ -2138,8 +2102,6 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
-
-	private BundleContext _bundleContext;
 
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
@@ -2175,132 +2137,9 @@ public class CommercePaymentMethodGroupRelPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"commercePaymentMethodGroupRelId", "active"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
-	}
-
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class CommercePaymentMethodGroupRelModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			CommercePaymentMethodGroupRelModelImpl
-				commercePaymentMethodGroupRelModelImpl =
-					(CommercePaymentMethodGroupRelModelImpl)baseModel;
-
-			long columnBitmask =
-				commercePaymentMethodGroupRelModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					commercePaymentMethodGroupRelModelImpl, columnNames,
-					original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						commercePaymentMethodGroupRelModelImpl.getColumnBitmask(
-							columnName);
-				}
-
-				if (finderPath.isBaseModelResult() &&
-					(CommercePaymentMethodGroupRelPersistenceImpl.
-						FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION ==
-							finderPath.getCacheName())) {
-
-					finderPathColumnBitmask |= _ORDER_BY_COLUMNS_BITMASK;
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					commercePaymentMethodGroupRelModelImpl, columnNames,
-					original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			CommercePaymentMethodGroupRelModelImpl
-				commercePaymentMethodGroupRelModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						commercePaymentMethodGroupRelModelImpl.
-							getColumnOriginalValue(columnName);
-				}
-				else {
-					arguments[i] =
-						commercePaymentMethodGroupRelModelImpl.getColumnValue(
-							columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-		private static final long _ORDER_BY_COLUMNS_BITMASK;
-
-		static {
-			long orderByColumnsBitmask = 0;
-
-			orderByColumnsBitmask |=
-				CommercePaymentMethodGroupRelModelImpl.getColumnBitmask(
-					"priority");
-
-			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
-		}
-
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
 }

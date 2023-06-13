@@ -19,7 +19,7 @@ import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
@@ -34,7 +34,6 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import javax.portlet.ActionRequest;
-import javax.portlet.Portlet;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -124,21 +123,20 @@ public class SiteWorkflowTest {
 			new MockLiferayPortletActionRequest();
 
 		actionRequest.addParameter(
-			"creationType", "CREATION_TYPE_SITE_TEMPLATE");
-		actionRequest.addParameter(
 			"layoutSetPrototypeId",
 			String.valueOf(_layoutSetPrototype.getLayoutSetPrototypeId()));
 		actionRequest.addParameter(
 			"layoutSetVisibilityPrivate",
 			String.valueOf(layoutSetVisibilityPrivate));
 
-		MVCPortlet mvcPortlet = (MVCPortlet)_portlet;
-
 		ReflectionTestUtil.invoke(
-			mvcPortlet, "updateGroupFromSiteTemplate",
+			_addGroupMVCActionCommandTest, "_updateGroupFromSiteTemplate",
 			new Class<?>[] {ActionRequest.class, Group.class}, actionRequest,
 			group);
 	}
+
+	@Inject(filter = "mvc.command.name=/site_admin/add_group")
+	private MVCActionCommand _addGroupMVCActionCommandTest;
 
 	private long _companyId;
 
@@ -147,11 +145,6 @@ public class SiteWorkflowTest {
 
 	@DeleteAfterTestRun
 	private LayoutSetPrototype _layoutSetPrototype;
-
-	@Inject(
-		filter = "javax.portlet.name=com_liferay_site_admin_web_portlet_SiteAdminPortlet"
-	)
-	private Portlet _portlet;
 
 	private User _user;
 

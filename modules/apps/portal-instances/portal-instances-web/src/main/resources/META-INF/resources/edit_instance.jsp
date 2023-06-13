@@ -34,12 +34,12 @@ catch (Exception e) {
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
 
-renderResponse.setTitle((selCompany == null) ? LanguageUtil.get(request, "new-instance") : HtmlUtil.escape(selCompany.getName()));
+renderResponse.setTitle((selCompany == null) ? LanguageUtil.get(request, "new-instance") : HtmlUtil.escape(selCompany.getWebId()));
 %>
 
 <portlet:actionURL name="/portal_instances/edit_instance" var="editInstanceURL" />
 
-<aui:form action="<%= editInstanceURL %>" cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveCompany();" %>'>
+<aui:form action="<%= editInstanceURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveCompany();" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="companyId" type="hidden" value="<%= companyId %>" />
@@ -73,6 +73,31 @@ renderResponse.setTitle((selCompany == null) ? LanguageUtil.get(request, "new-in
 
 			<c:if test="<%= (selCompany == null) || (selCompany.getCompanyId() != PortalInstancesLocalServiceUtil.getDefaultCompanyId()) %>">
 				<aui:input inlineLabel="right" labelCssClass="simple-toggle-switch" name="active" type="toggle-switch" value="<%= (selCompany != null) ? selCompany.isActive() : true %>" />
+			</c:if>
+
+			<c:if test="<%= selCompany == null %>">
+
+				<%
+				SiteInitializerRegistry siteInitializerRegistry = (SiteInitializerRegistry)request.getAttribute(PortalInstancesWebKeys.SITE_INITIALIZER_REGISTRY);
+
+				List<SiteInitializer> siteInitializers = siteInitializerRegistry.getSiteInitializers(company.getCompanyId(), true);
+				%>
+
+				<c:if test="<%= !siteInitializers.isEmpty() %>">
+					<aui:select label="virtual-instance-initializer" name="siteInitializerKey" showEmptyOption="<%= true %>">
+
+						<%
+						for (SiteInitializer siteInitializer : siteInitializers) {
+						%>
+
+							<aui:option label="<%= siteInitializer.getName(locale) %>" value="<%= siteInitializer.getKey() %>" />
+
+						<%
+						}
+						%>
+
+					</aui:select>
+				</c:if>
 			</c:if>
 		</aui:fieldset>
 	</aui:fieldset-group>

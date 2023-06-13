@@ -21,6 +21,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -43,7 +44,7 @@ import com.liferay.portal.reports.engine.console.service.DefinitionServiceUtil;
 import com.liferay.portal.reports.engine.console.service.EntryServiceUtil;
 import com.liferay.portal.reports.engine.console.service.SourceServiceUtil;
 import com.liferay.portal.reports.engine.console.web.internal.admin.configuration.ReportsEngineAdminWebConfiguration;
-import com.liferay.portal.reports.engine.console.web.internal.admin.display.context.util.ReportsEngineRequestHelper;
+import com.liferay.portal.reports.engine.console.web.internal.admin.display.context.helper.ReportsEngineRequestHelper;
 import com.liferay.portal.reports.engine.console.web.internal.admin.search.DefinitionDisplayTerms;
 import com.liferay.portal.reports.engine.console.web.internal.admin.search.DefinitionSearch;
 import com.liferay.portal.reports.engine.console.web.internal.admin.search.EntryDisplayTerms;
@@ -85,11 +86,11 @@ public class ReportsEngineDisplayContext {
 	}
 
 	public String getClearResultsURL() {
-		PortletURL clearResultsURL = getPortletURL();
-
-		clearResultsURL.setParameter("keywords", StringPool.BLANK);
-
-		return clearResultsURL.toString();
+		return PortletURLBuilder.create(
+			getPortletURL()
+		).setKeywords(
+			StringPool.BLANK
+		).buildString();
 	}
 
 	public CreationMenu getCreationMenu() throws PortalException {
@@ -213,18 +214,22 @@ public class ReportsEngineDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
-		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
+		return PortletURLBuilder.createRenderURL(
+			_liferayPortletResponse
+		).setNavigation(
+			() -> {
+				String navigation = ParamUtil.getString(
+					_httpServletRequest, "navigation");
 
-		portletURL.setParameter("tabs1", _getTabs1());
+				if (Validator.isNotNull(navigation)) {
+					return _getNavigation();
+				}
 
-		String navigation = ParamUtil.getString(
-			_httpServletRequest, "navigation");
-
-		if (Validator.isNotNull(navigation)) {
-			portletURL.setParameter("navigation", _getNavigation());
-		}
-
-		return portletURL;
+				return null;
+			}
+		).setTabs1(
+			_getTabs1()
+		).buildPortletURL();
 	}
 
 	public SearchContainer<?> getSearchContainer() throws PortalException {
@@ -244,31 +249,30 @@ public class ReportsEngineDisplayContext {
 	}
 
 	public String getSearchURL() {
-		PortletURL portletURL = getPortletURL();
+		return PortletURLBuilder.create(
+			getPortletURL()
+		).setParameter(
+			"groupId",
+			() -> {
+				ThemeDisplay themeDisplay =
+					_reportsEngineRequestHelper.getThemeDisplay();
 
-		ThemeDisplay themeDisplay =
-			_reportsEngineRequestHelper.getThemeDisplay();
-
-		portletURL.setParameter(
-			"groupId", String.valueOf(themeDisplay.getScopeGroupId()));
-
-		return portletURL.toString();
+				return themeDisplay.getScopeGroupId();
+			}
+		).buildString();
 	}
 
 	public String getSortingURL() {
-		LiferayPortletResponse liferayPortletResponse =
-			_reportsEngineRequestHelper.getLiferayPortletResponse();
-
-		PortletURL portletURL = liferayPortletResponse.createRenderURL();
-
-		portletURL.setParameter("tabs1", _getTabs1());
-		portletURL.setParameter("orderByCol", _getOrderByCol());
-
-		portletURL.setParameter(
+		return PortletURLBuilder.createRenderURL(
+			_reportsEngineRequestHelper.getLiferayPortletResponse()
+		).setTabs1(
+			_getTabs1()
+		).setParameter(
+			"orderByCol", _getOrderByCol()
+		).setParameter(
 			"orderByType",
-			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc");
-
-		return portletURL.toString();
+			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc"
+		).buildString();
 	}
 
 	public int getTotalItems() throws PortalException {

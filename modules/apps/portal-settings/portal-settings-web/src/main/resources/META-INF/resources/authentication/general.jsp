@@ -35,5 +35,5 @@
 
 	<aui:input helpMessage="require-strangers-to-verify-their-email-address-help" label="require-strangers-to-verify-their-email-address" name='<%= "settings--" + PropsKeys.COMPANY_SECURITY_STRANGERS_VERIFY + "--" %>' type="checkbox" value="<%= company.isStrangersVerify() %>" />
 
-	<aui:input helpMessage="require-password-for-email-or-screen-name-updates-help" label="require-password-for-email-or-screen-name-updates" name='<%= "settings--" + PropsKeys.COMPANY_SECURITY_UPDATE_PASSWORD_REQUIRED + "--" %>' type="checkbox" value="<%= PrefsPropsUtil.getBoolean(company.getCompanyId(), PropsKeys.COMPANY_SECURITY_UPDATE_PASSWORD_REQUIRED) %>" />
+	<aui:input helpMessage="require-password-for-email-or-screen-name-updates-help" label="require-password-for-email-or-screen-name-updates" name='<%= "settings--" + PropsKeys.COMPANY_SECURITY_UPDATE_PASSWORD_REQUIRED + "--" %>' type="checkbox" value="<%= company.isUpdatePasswordRequired() %>" />
 </aui:fieldset>

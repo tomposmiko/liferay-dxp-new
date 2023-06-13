@@ -44,6 +44,7 @@ public class JournalArticleSoap implements Serializable {
 		soapModel.setUserName(model.getUserName());
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
+		soapModel.setExternalReferenceCode(model.getExternalReferenceCode());
 		soapModel.setFolderId(model.getFolderId());
 		soapModel.setClassNameId(model.getClassNameId());
 		soapModel.setClassPK(model.getClassPK());
@@ -51,7 +52,6 @@ public class JournalArticleSoap implements Serializable {
 		soapModel.setArticleId(model.getArticleId());
 		soapModel.setVersion(model.getVersion());
 		soapModel.setUrlTitle(model.getUrlTitle());
-		soapModel.setContent(model.getContent());
 		soapModel.setDDMStructureKey(model.getDDMStructureKey());
 		soapModel.setDDMTemplateKey(model.getDDMTemplateKey());
 		soapModel.setDefaultLanguageId(model.getDefaultLanguageId());
@@ -214,6 +214,14 @@ public class JournalArticleSoap implements Serializable {
 		_modifiedDate = modifiedDate;
 	}
 
+	public String getExternalReferenceCode() {
+		return _externalReferenceCode;
+	}
+
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		_externalReferenceCode = externalReferenceCode;
+	}
+
 	public long getFolderId() {
 		return _folderId;
 	}
@@ -268,14 +276,6 @@ public class JournalArticleSoap implements Serializable {
 
 	public void setUrlTitle(String urlTitle) {
 		_urlTitle = urlTitle;
-	}
-
-	public String getContent() {
-		return _content;
-	}
-
-	public void setContent(String content) {
-		_content = content;
 	}
 
 	public String getDDMStructureKey() {
@@ -425,6 +425,7 @@ public class JournalArticleSoap implements Serializable {
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
+	private String _externalReferenceCode;
 	private long _folderId;
 	private long _classNameId;
 	private long _classPK;
@@ -432,7 +433,6 @@ public class JournalArticleSoap implements Serializable {
 	private String _articleId;
 	private double _version;
 	private String _urlTitle;
-	private String _content;
 	private String _DDMStructureKey;
 	private String _DDMTemplateKey;
 	private String _defaultLanguageId;

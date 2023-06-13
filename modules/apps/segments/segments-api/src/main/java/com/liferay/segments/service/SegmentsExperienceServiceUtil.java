@@ -51,6 +51,19 @@ public class SegmentsExperienceServiceUtil {
 			serviceContext);
 	}
 
+	public static SegmentsExperience addSegmentsExperience(
+			long segmentsEntryId, long classNameId, long classPK,
+			Map<java.util.Locale, String> nameMap, boolean active,
+			com.liferay.portal.kernel.util.UnicodeProperties
+				typeSettingsUnicodeProperties,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addSegmentsExperience(
+			segmentsEntryId, classNameId, classPK, nameMap, active,
+			typeSettingsUnicodeProperties, serviceContext);
+	}
+
 	public static SegmentsExperience appendSegmentsExperience(
 			long segmentsEntryId, long classNameId, long classPK,
 			Map<java.util.Locale, String> nameMap, boolean active,
@@ -60,6 +73,19 @@ public class SegmentsExperienceServiceUtil {
 		return getService().appendSegmentsExperience(
 			segmentsEntryId, classNameId, classPK, nameMap, active,
 			serviceContext);
+	}
+
+	public static SegmentsExperience appendSegmentsExperience(
+			long segmentsEntryId, long classNameId, long classPK,
+			Map<java.util.Locale, String> nameMap, boolean active,
+			com.liferay.portal.kernel.util.UnicodeProperties
+				typeSettingsUnicodeProperties,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().appendSegmentsExperience(
+			segmentsEntryId, classNameId, classPK, nameMap, active,
+			typeSettingsUnicodeProperties, serviceContext);
 	}
 
 	public static SegmentsExperience deleteSegmentsExperience(
@@ -127,6 +153,18 @@ public class SegmentsExperienceServiceUtil {
 
 		return getService().updateSegmentsExperience(
 			segmentsExperienceId, segmentsEntryId, nameMap, active);
+	}
+
+	public static SegmentsExperience updateSegmentsExperience(
+			long segmentsExperienceId, long segmentsEntryId,
+			Map<java.util.Locale, String> nameMap, boolean active,
+			com.liferay.portal.kernel.util.UnicodeProperties
+				typeSettingsUnicodeProperties)
+		throws PortalException {
+
+		return getService().updateSegmentsExperience(
+			segmentsExperienceId, segmentsEntryId, nameMap, active,
+			typeSettingsUnicodeProperties);
 	}
 
 	public static void updateSegmentsExperiencePriority(

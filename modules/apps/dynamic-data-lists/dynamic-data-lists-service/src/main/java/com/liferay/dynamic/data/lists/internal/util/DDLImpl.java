@@ -40,6 +40,8 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.LayoutService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -179,30 +181,27 @@ public class DDLImpl implements DDL {
 		List<DDMFormField> ddmFormFields = ddmStructure.getDDMFormFields(false);
 
 		for (DDMFormField ddmFormField : ddmFormFields) {
-			String name = ddmFormField.getName();
+			jsonArray.put(
+				JSONUtil.put(
+					"dataType", ddmFormField.getDataType()
+				).put(
+					"editable", !ddmFormField.isReadOnly()
+				).put(
+					"label",
+					() -> {
+						LocalizedValue label = ddmFormField.getLabel();
 
-			JSONObject jsonObject = JSONUtil.put(
-				"dataType", ddmFormField.getDataType());
-
-			boolean readOnly = ddmFormField.isReadOnly();
-
-			jsonObject.put("editable", !readOnly);
-
-			LocalizedValue label = ddmFormField.getLabel();
-
-			jsonObject.put(
-				"label", label.getString(locale)
-			).put(
-				"name", name
-			).put(
-				"required", ddmFormField.isRequired()
-			).put(
-				"sortable", true
-			).put(
-				"type", ddmFormField.getType()
-			);
-
-			jsonArray.put(jsonObject);
+						return label.getString(locale);
+					}
+				).put(
+					"name", ddmFormField.getName()
+				).put(
+					"required", ddmFormField.isRequired()
+				).put(
+					"sortable", true
+				).put(
+					"type", ddmFormField.getType()
+				));
 		}
 
 		return jsonArray;
@@ -310,6 +309,10 @@ public class DDLImpl implements DDL {
 			return getFileEntryTitle(uuid, groupId);
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return StringPool.BLANK;
 		}
 	}
@@ -336,6 +339,10 @@ public class DDLImpl implements DDL {
 			return fileEntry.getTitle();
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return LanguageUtil.format(
 				LocaleUtil.getSiteDefault(), "is-temporarily-unavailable",
 				"content");
@@ -347,6 +354,10 @@ public class DDLImpl implements DDL {
 			return JSONFactoryUtil.createJSONArray(String.valueOf(fieldValue));
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return JSONFactoryUtil.createJSONArray();
 		}
 	}
@@ -359,6 +370,10 @@ public class DDLImpl implements DDL {
 				groupId, privateLayout, layoutId, languageId);
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return LanguageUtil.format(
 				LocaleUtil.getSiteDefault(), "is-temporarily-unavailable",
 				"content");
@@ -380,6 +395,10 @@ public class DDLImpl implements DDL {
 				LanguageUtil.getLanguageId(locale));
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return StringPool.BLANK;
 		}
 	}
@@ -442,6 +461,8 @@ public class DDLImpl implements DDL {
 	protected void setStorageEngine(StorageEngine storageEngine) {
 		_storageEngine = storageEngine;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(DDLImpl.class);
 
 	private DDLRecordLocalService _ddlRecordLocalService;
 	private DDLRecordService _ddlRecordService;

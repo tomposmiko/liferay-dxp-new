@@ -143,13 +143,13 @@ public class DDLRecordStagedModelRepository
 	}
 
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		PortletDataContext portletDataContext, final int scope) {
+		PortletDataContext portletDataContext, int scope) {
 
 		ExportActionableDynamicQuery exportActionableDynamicQuery =
 			_ddlRecordLocalService.getExportActionableDynamicQuery(
 				portletDataContext);
 
-		final ActionableDynamicQuery.AddCriteriaMethod addCriteriaMethod =
+		ActionableDynamicQuery.AddCriteriaMethod addCriteriaMethod =
 			exportActionableDynamicQuery.getAddCriteriaMethod();
 
 		exportActionableDynamicQuery.setAddCriteriaMethod(

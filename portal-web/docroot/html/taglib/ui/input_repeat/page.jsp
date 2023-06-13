@@ -66,7 +66,7 @@ int yearlyMonth1 = ParamUtil.getInteger(request, "yearlyMonth1", Calendar.JANUAR
 			String[] days = CalendarUtil.getDays(locale);
 			%>
 
-			<aui:row cssClass="weekdays">
+			<aui:row cssClass="clearfix pt-3 weekdays">
 				<aui:col width="<%= 25 %>">
 					<aui:input inlineLabel="right" label="<%= days[0] %>" name='<%= "weeklyDayPos" + Calendar.SUNDAY %>' type="checkbox" value="<%= _getWeeklyDayPos(request, Calendar.SUNDAY, recurrence) %>" />
 
@@ -192,13 +192,15 @@ int yearlyMonth1 = ParamUtil.getInteger(request, "yearlyMonth1", Calendar.JANUAR
 	</aui:col>
 </aui:fieldset>
 
-<aui:script require="metal-dom/src/dom as dom">
+<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
 	var tables = document.querySelectorAll('#<portlet:namespace />recurrenceTypeDailyTable, #<portlet:namespace />recurrenceTypeMonthlyTable, #<portlet:namespace />recurrenceTypeNeverTable, #<portlet:namespace />recurrenceTypeWeeklyTable, #<portlet:namespace />recurrenceTypeYearlyTable');
 
 	var eventsContainer = document.getElementById('<portlet:namespace />eventsContainer');
 
 	if (eventsContainer) {
-		dom.delegate(
+		var delegate = delegateModule.default;
+
+		delegate(
 			eventsContainer,
 			'change',
 			'.field',

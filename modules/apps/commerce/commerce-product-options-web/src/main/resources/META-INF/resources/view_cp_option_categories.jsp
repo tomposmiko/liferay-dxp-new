@@ -23,9 +23,11 @@ CPOptionCategoryDisplayContext cpOptionCategoryDisplayContext = (CPOptionCategor
 
 String displayStyle = cpOptionCategoryDisplayContext.getDisplayStyle();
 
-PortletURL portletURL = cpOptionCategoryDisplayContext.getPortletURL();
-
-portletURL.setParameter("searchContainerId", "cpOptionCategories");
+PortletURL portletURL = PortletURLBuilder.create(
+	cpOptionCategoryDisplayContext.getPortletURL()
+).setParameter(
+	"searchContainerId", "cpOptionCategories"
+).buildPortletURL();
 
 request.setAttribute("view.jsp-portletURL", portletURL);
 
@@ -52,7 +54,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "specifications"));
 			selectedDisplayStyle="<%= displayStyle %>"
 		/>
 
-		<c:if test="<%= PortalPermissionUtil.contains(permissionChecker, CPActionKeys.ADD_COMMERCE_PRODUCT_OPTION_CATEGORY) %>">
+		<c:if test="<%= cpOptionCategoryDisplayContext.hasPermission(CPActionKeys.ADD_COMMERCE_PRODUCT_OPTION_CATEGORY) %>">
 			<liferay-portlet:renderURL var="addProductOptionCategoryURL">
 				<portlet:param name="mvcRenderCommandName" value="/cp_specification_options/edit_cp_option_category" />
 				<portlet:param name="redirect" value="<%= currentURL %>" />
@@ -100,7 +102,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "specifications"));
 </liferay-frontend:management-bar>
 
 <div id="<portlet:namespace />productOptionCategoriesContainer">
-	<div class="closed container-fluid-1280 sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
+	<div class="closed sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
 		<c:if test="<%= cpOptionCategoryDisplayContext.isShowInfoPanel() %>">
 			<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/cp_specification_options/cp_option_category_info_panel" var="sidebarPanelURL" />
 
@@ -113,63 +115,68 @@ renderResponse.setTitle(LanguageUtil.get(request, "specifications"));
 		</c:if>
 
 		<div class="sidenav-content">
-			<aui:form action="<%= portletURL %>" method="post" name="fm">
-				<aui:input name="<%= Constants.CMD %>" type="hidden" />
-				<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
-				<aui:input name="deleteCPOptionCategoryIds" type="hidden" />
+			<clay:container-fluid>
+				<aui:form action="<%= portletURL %>" method="post" name="fm">
+					<aui:input name="<%= Constants.CMD %>" type="hidden" />
+					<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
+					<aui:input name="deleteCPOptionCategoryIds" type="hidden" />
 
-				<div class="product-option-categories-container" id="<portlet:namespace />entriesContainer">
-					<liferay-ui:search-container
-						id="cpOptionCategories"
-						iteratorURL="<%= portletURL %>"
-						searchContainer="<%= cpOptionCategoryDisplayContext.getSearchContainer() %>"
-					>
-						<liferay-ui:search-container-row
-							className="com.liferay.commerce.product.model.CPOptionCategory"
-							cssClass="entry-display-style"
-							keyProperty="CPOptionCategoryId"
-							modelVar="cpOptionCategory"
+					<div class="product-option-categories-container" id="<portlet:namespace />entriesContainer">
+						<liferay-ui:search-container
+							id="cpOptionCategories"
+							iteratorURL="<%= portletURL %>"
+							searchContainer="<%= cpOptionCategoryDisplayContext.getSearchContainer() %>"
 						>
+							<liferay-ui:search-container-row
+								className="com.liferay.commerce.product.model.CPOptionCategory"
+								keyProperty="CPOptionCategoryId"
+								modelVar="cpOptionCategory"
+							>
 
-							<%
-							PortletURL rowURL = renderResponse.createRenderURL();
+								<%
+								PortletURL rowURL = PortletURLBuilder.createRenderURL(
+									renderResponse
+								).setMVCRenderCommandName(
+									"/cp_specification_options/edit_cp_option_category"
+								).setRedirect(
+									currentURL
+								).setParameter(
+									"cpOptionCategoryId", cpOptionCategory.getCPOptionCategoryId()
+								).buildPortletURL();
+								%>
 
-							rowURL.setParameter("mvcRenderCommandName", "/cp_specification_options/edit_cp_option_category");
-							rowURL.setParameter("redirect", currentURL);
-							rowURL.setParameter("cpOptionCategoryId", String.valueOf(cpOptionCategory.getCPOptionCategoryId()));
-							%>
+								<liferay-ui:search-container-column-text
+									cssClass="important table-cell-expand"
+									href="<%= rowURL %>"
+									name="group"
+									value="<%= HtmlUtil.escape(cpOptionCategory.getTitle(locale)) %>"
+								/>
 
-							<liferay-ui:search-container-column-text
-								cssClass="important table-cell-content"
-								href="<%= rowURL %>"
-								name="group"
-								value="<%= HtmlUtil.escape(cpOptionCategory.getTitle(locale)) %>"
+								<liferay-ui:search-container-column-text
+									cssClass="table-cell-expand"
+									property="priority"
+								/>
+
+								<liferay-ui:search-container-column-date
+									cssClass="table-cell-expand"
+									name="modified-date"
+									property="modifiedDate"
+								/>
+
+								<liferay-ui:search-container-column-jsp
+									cssClass="entry-action-column"
+									path="/option_category_action.jsp"
+								/>
+							</liferay-ui:search-container-row>
+
+							<liferay-ui:search-iterator
+								displayStyle="<%= displayStyle %>"
+								markupView="lexicon"
 							/>
-
-							<liferay-ui:search-container-column-text
-								cssClass="table-cell-content"
-								property="priority"
-							/>
-
-							<liferay-ui:search-container-column-date
-								cssClass="table-cell-content"
-								name="modified-date"
-								property="modifiedDate"
-							/>
-
-							<liferay-ui:search-container-column-jsp
-								cssClass="entry-action-column"
-								path="/option_category_action.jsp"
-							/>
-						</liferay-ui:search-container-row>
-
-						<liferay-ui:search-iterator
-							displayStyle="<%= displayStyle %>"
-							markupView="lexicon"
-						/>
-					</liferay-ui:search-container>
-				</div>
-			</aui:form>
+						</liferay-ui:search-container>
+					</div>
+				</aui:form>
+			</clay:container-fluid>
 		</div>
 	</div>
 </div>

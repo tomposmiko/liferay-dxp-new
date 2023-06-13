@@ -276,4 +276,164 @@ describe('Treeview', () => {
 			);
 		});
 	});
+
+	describe('Treeview with filter prop', () => {
+		it('filters the node comparing the node name ignoring case when a string is supplied', () => {
+			const nodes = [
+				{
+					icon: 'cog',
+					id: '1',
+					name: 'Sandro',
+				},
+				{
+					icon: 'cog',
+					id: '2',
+					name: 'sandro polo',
+				},
+				{
+					icon: 'cog',
+					id: '3',
+					name: 'Pablo',
+				},
+			];
+
+			const {getByText} = render(
+				<Treeview filter="Sandro" nodes={nodes} />
+			);
+
+			expect(getByText('Sandro')).toBeInTheDocument();
+			expect(getByText('sandro polo')).toBeInTheDocument();
+		});
+
+		it('uses custom filter function if passed', () => {
+			const nodes = [
+				{
+					icon: 'cog',
+					id: '1',
+					name: 'Sandro',
+				},
+				{
+					icon: 'cog',
+					id: '2',
+					name: 'sandro polo',
+				},
+			];
+
+			const exactMatchFilter = (node) => node.name === 'Sandro';
+
+			const {getByText, queryByText} = render(
+				<Treeview filter={exactMatchFilter} nodes={nodes} />
+			);
+
+			expect(getByText('Sandro')).toBeInTheDocument();
+			expect(queryByText('sandro polo')).not.toBeInTheDocument();
+		});
+	});
+
+	describe('Treeview controls icon visibility in TreeviewCard', () => {
+		it('rendering the icon if present', () => {
+			const nodes = [
+				{
+					icon: 'emoji',
+					id: '1',
+					name: 'Belt',
+				},
+				{
+					icon: 'react',
+					id: '2',
+					name: 'Clara',
+				},
+			];
+
+			const {container} = render(
+				<Treeview NodeComponent={Treeview.Card} nodes={nodes} />
+			);
+
+			expect(
+				container.getElementsByClassName('lexicon-icon').length
+			).toBe(2);
+			expect(
+				container.getElementsByClassName('lexicon-icon-emoji').length
+			).toBe(1);
+			expect(
+				container.getElementsByClassName('lexicon-icon-react').length
+			).toBe(1);
+		});
+
+		it('not rendering icon if not present or falsy', () => {
+			const nodes = [
+				{
+					id: '1',
+					name: 'Belt',
+				},
+				{
+					icon: null,
+					id: '2',
+					name: 'Clara',
+				},
+			];
+
+			const {container} = render(
+				<Treeview NodeComponent={Treeview.Card} nodes={nodes} />
+			);
+
+			expect(
+				container.getElementsByClassName('lexicon-icon').length
+			).toBe(0);
+		});
+	});
+
+	describe('Treeview controls icon css class in TreeviewCard', () => {
+		it('rendering the icon with the corresponding class if the class property is present', () => {
+			const nodes = [
+				{
+					icon: 'emoji',
+					iconCssClass: 'emoji-specific-class',
+					id: '1',
+					name: 'Belt',
+				},
+				{
+					icon: 'react',
+					iconCssClass: 'react-specific-class',
+					id: '2',
+					name: 'Clara',
+				},
+			];
+
+			const {container} = render(
+				<Treeview NodeComponent={Treeview.Card} nodes={nodes} />
+			);
+
+			expect(
+				container.getElementsByClassName('emoji-specific-class').length
+			).toBe(1);
+			expect(
+				container.getElementsByClassName('react-specific-class').length
+			).toBe(1);
+		});
+
+		it('rendering the icon if the class is not present or falsy', () => {
+			const nodes = [
+				{
+					icon: 'emoji',
+					iconCssClass: '',
+					id: '1',
+					name: 'Belt',
+				},
+				{
+					icon: 'react',
+					id: '2',
+					name: 'Clara',
+				},
+			];
+
+			const {container} = render(
+				<Treeview NodeComponent={Treeview.Card} nodes={nodes} />
+			);
+
+			expect(
+				container.getElementsByClassName('lexicon-icon').length
+			).toBe(2);
+		});
+	});
 });

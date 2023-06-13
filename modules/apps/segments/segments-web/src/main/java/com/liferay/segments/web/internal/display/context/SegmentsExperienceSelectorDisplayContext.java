@@ -190,28 +190,25 @@ public class SegmentsExperienceSelectorDisplayContext {
 		return firstSegmentsExperienceJSONObject;
 	}
 
-	private String _getSegmentsEntryName(
-		SegmentsExperience segmentsExperience) {
-
-		SegmentsEntry segmentsEntry =
-			SegmentsEntryLocalServiceUtil.fetchSegmentsEntry(
-				segmentsExperience.getSegmentsEntryId());
-
-		if (segmentsEntry != null) {
-			return segmentsEntry.getName(_themeDisplay.getLocale());
-		}
-
-		return SegmentsEntryConstants.getDefaultSegmentsEntryName(
-			_themeDisplay.getLocale());
-	}
-
 	private JSONObject _getSegmentsExperienceJSONObject(
 		SegmentsExperience segmentsExperience) {
 
 		return JSONUtil.put(
 			"segmentsEntryId", segmentsExperience.getSegmentsEntryId()
 		).put(
-			"segmentsEntryName", _getSegmentsEntryName(segmentsExperience)
+			"segmentsEntryName",
+			() -> {
+				SegmentsEntry segmentsEntry =
+					SegmentsEntryLocalServiceUtil.fetchSegmentsEntry(
+						segmentsExperience.getSegmentsEntryId());
+
+				if (segmentsEntry != null) {
+					return segmentsEntry.getName(_themeDisplay.getLocale());
+				}
+
+				return SegmentsEntryConstants.getDefaultSegmentsEntryName(
+					_themeDisplay.getLocale());
+			}
 		).put(
 			"segmentsExperienceId", segmentsExperience.getSegmentsExperienceId()
 		).put(

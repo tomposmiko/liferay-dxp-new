@@ -57,8 +57,6 @@ import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -310,15 +308,9 @@ public class ComboServlet extends HttpServlet {
 			resourcePath = portlet.getContextPath() + resourcePath;
 		}
 
-		StringBundler sb = new StringBundler(5);
-
-		sb.append(resourcePath);
-		sb.append(StringPool.QUESTION);
-		sb.append(minifierType);
-		sb.append("&languageId=");
-		sb.append(ParamUtil.getString(httpServletRequest, "languageId"));
-
-		String fileContentKey = sb.toString();
+		String fileContentKey = StringBundler.concat(
+			resourcePath, StringPool.QUESTION, minifierType, "&languageId=",
+			ParamUtil.getString(httpServletRequest, "languageId"));
 
 		FileContentBag fileContentBag = _fileContentBagPortalCache.get(
 			fileContentKey);
@@ -355,18 +347,12 @@ public class ComboServlet extends HttpServlet {
 
 			String stringFileContent = objectValuePair.getKey();
 
-			Pattern pattern = Pattern.compile(_BUNDLER_MODULE_PATTERN);
-
-			Matcher matcher = pattern.matcher(resourcePath);
-
-			if (matcher.find() ||
-				(!StringUtil.endsWith(
-					resourcePath, _CSS_MINIFIED_DASH_SUFFIX) &&
-				 !StringUtil.endsWith(resourcePath, _CSS_MINIFIED_DOT_SUFFIX) &&
-				 !StringUtil.endsWith(
-					 resourcePath, _JAVASCRIPT_MINIFIED_DASH_SUFFIX) &&
-				 !StringUtil.endsWith(
-					 resourcePath, _JAVASCRIPT_MINIFIED_DOT_SUFFIX))) {
+			if (!StringUtil.endsWith(resourcePath, _CSS_MINIFIED_DASH_SUFFIX) &&
+				!StringUtil.endsWith(resourcePath, _CSS_MINIFIED_DOT_SUFFIX) &&
+				!StringUtil.endsWith(
+					resourcePath, _JAVASCRIPT_MINIFIED_DASH_SUFFIX) &&
+				!StringUtil.endsWith(
+					resourcePath, _JAVASCRIPT_MINIFIED_DOT_SUFFIX)) {
 
 				if (minifierType.equals("css")) {
 					try {
@@ -521,9 +507,6 @@ public class ComboServlet extends HttpServlet {
 		return FileUtil.getExtension(resourcePath);
 	}
 
-	private static final String _BUNDLER_MODULE_PATTERN =
-		"\\/o\\/js\\/resolved-module.*\\$.*";
-
 	private static final String _CSS_CHARSET_UTF_8 = "@charset \"UTF-8\";";
 
 	private static final String _CSS_EXTENSION = "css";
@@ -549,9 +532,7 @@ public class ComboServlet extends HttpServlet {
 			PortalCacheManagerNames.SINGLE_VM, FileContentBag.class.getName());
 
 	private final Set<String> _protectedParameters = SetUtil.fromArray(
-		new String[] {
-			"browserId", "minifierType", "languageId", "t", "themeId", "zx"
-		});
+		"b", "browserId", "minifierType", "languageId", "t", "themeId", "zx");
 
 	private static class FileContentBag implements Serializable {
 

@@ -22,7 +22,7 @@ import com.liferay.portal.kernel.messaging.DestinationConfiguration;
 import com.liferay.portal.kernel.messaging.DestinationFactory;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.MessageBus;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.monitoring.internal.configuration.MonitoringConfiguration;
 
 import java.util.Dictionary;
@@ -34,6 +34,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
@@ -42,8 +43,8 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.monitoring.internal.configuration.MonitoringConfiguration",
-	enabled = false, immediate = true,
-	service = MonitoringMessagingConfigurator.class
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, enabled = false,
+	immediate = true, service = MonitoringMessagingConfigurator.class
 )
 public class MonitoringMessagingConfigurator {
 
@@ -90,9 +91,9 @@ public class MonitoringMessagingConfigurator {
 			destinationConfiguration);
 
 		Dictionary<String, Object> destinationProperties =
-			new HashMapDictionary<>();
-
-		destinationProperties.put("destination.name", destination.getName());
+			HashMapDictionaryBuilder.<String, Object>put(
+				"destination.name", destination.getName()
+			).build();
 
 		_destinationServiceRegistration = _bundleContext.registerService(
 			Destination.class, destination, destinationProperties);

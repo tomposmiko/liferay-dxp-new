@@ -38,12 +38,15 @@ X509Certificate x509Certificate = (X509Certificate)request.getAttribute(SamlWebK
 		navigationItems='<%=
 			new JSPNavigationItemList(pageContext) {
 				{
-					PortletURL portletURL = renderResponse.createRenderURL();
-
-					portletURL.setParameter("mvcRenderCommandName", "/admin/update_certificate");
-					portletURL.setParameter("certificateUsage", certificateUsage.name());
-
-					portletURL.setParameter(Constants.CMD, "replace");
+					PortletURL portletURL = PortletURLBuilder.createRenderURL(
+						renderResponse
+					).setMVCRenderCommandName(
+						"/admin/update_certificate"
+					).setCMD(
+						"replace"
+					).setParameter(
+						"certificateUsage", certificateUsage.name()
+					).buildPortletURL();
 
 					add(
 						navigationItem -> {

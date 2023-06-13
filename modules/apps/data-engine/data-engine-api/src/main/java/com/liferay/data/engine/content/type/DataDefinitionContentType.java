@@ -26,6 +26,14 @@ public interface DataDefinitionContentType {
 		return false;
 	}
 
+	public default boolean allowInvalidAvailableLocalesForProperty() {
+		return false;
+	}
+
+	public default boolean allowReferencedDataDefinitionDeletion() {
+		return false;
+	}
+
 	public long getClassNameId();
 
 	public default String getContentType() {

@@ -16,27 +16,26 @@ import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
-import {useIsMounted} from 'frontend-js-react-web';
-import {fetch, objectToFormData} from 'frontend-js-web';
-import {globalEval} from 'metal-dom';
+import {useIsMounted} from '@liferay/frontend-js-react-web';
+import {fetch, objectToFormData, runScriptsInElement} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useRef, useState} from 'react';
 
 import {useConstants} from '../contexts/ConstantsContext';
-import {useSelectedMenuItemId} from '../contexts/SelectedMenuItemIdContext';
+import {
+	useSelectedMenuItemId,
+	useSetSelectedMenuItemId,
+} from '../contexts/SelectedMenuItemIdContext';
 import {useSetSidebarPanelId} from '../contexts/SidebarPanelIdContext';
 
-export const SidebarPanelContent = ({
-	contentRequestBody,
-	contentUrl,
-	title,
-}) => {
+export function SidebarPanelContent({contentRequestBody, contentUrl, title}) {
 	const [body, setBody] = useState(null);
 
 	const changedRef = useRef(false);
 
 	const isMounted = useIsMounted();
 	const selectedMenuItemId = useSelectedMenuItemId();
+	const setSelectedMenuItemId = useSetSelectedMenuItemId();
 	const setSidebarPanelId = useSetSidebarPanelId();
 
 	const {portletId, redirect} = useConstants();
@@ -98,6 +97,7 @@ export const SidebarPanelContent = ({
 									confirmUnsavedChanges();
 								}
 
+								setSelectedMenuItemId(null);
 								setSidebarPanelId(null);
 							}}
 						>
@@ -121,7 +121,7 @@ export const SidebarPanelContent = ({
 			</div>
 		</>
 	);
-};
+}
 
 SidebarPanelContent.propTypes = {
 	contentRequestBody: PropTypes.object,
@@ -139,7 +139,7 @@ class SidebarBody extends React.Component {
 
 	componentDidMount() {
 		if (this._ref.current) {
-			globalEval.runScriptsInElement(this._ref.current);
+			runScriptsInElement(this._ref.current);
 
 			this._ref.current.addEventListener('change', this._handleOnChange);
 		}

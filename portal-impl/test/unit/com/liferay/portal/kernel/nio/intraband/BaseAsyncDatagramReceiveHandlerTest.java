@@ -15,25 +15,27 @@
 package com.liferay.portal.kernel.nio.intraband;
 
 import com.liferay.petra.executor.PortalExecutorManager;
-import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LogEntry;
+import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.registry.BasicRegistryImpl;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
 
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Shuyang Zhou
@@ -48,39 +50,42 @@ public class BaseAsyncDatagramReceiveHandlerTest {
 
 	@Before
 	public void setUp() {
-		RegistryUtil.setRegistry(new BasicRegistryImpl());
+		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
 
-		Registry registry = RegistryUtil.getRegistry();
-
-		registry.registerService(
+		_serviceRegistration = bundleContext.registerService(
 			PortalExecutorManager.class,
 			(PortalExecutorManager)ProxyUtil.newProxyInstance(
 				BaseAsyncDatagramReceiveHandlerTest.class.getClassLoader(),
 				new Class<?>[] {PortalExecutorManager.class},
-				new PortalExecutorManagerInvocationHandler()));
+				new PortalExecutorManagerInvocationHandler()),
+			null);
+	}
+
+	@After
+	public void tearDown() {
+		_serviceRegistration.unregister();
 	}
 
 	@Test
 	public void testErrorDispatch() {
-		try (CaptureHandler captureHandler =
-				JDKLoggerTestUtil.configureJDKLogger(
-					BaseAsyncDatagramReceiveHandler.class.getName(),
-					Level.SEVERE)) {
+		try (LogCapture logCapture = LoggerTestUtil.configureJDKLogger(
+				BaseAsyncDatagramReceiveHandler.class.getName(),
+				Level.SEVERE)) {
 
-			List<LogRecord> logRecords = captureHandler.getLogRecords();
+			List<LogEntry> logEntries = logCapture.getLogEntries();
 
 			ErrorAsyncDatagramReceiveHandler errorAsyncDatagramReceiveHandler =
 				new ErrorAsyncDatagramReceiveHandler();
 
 			errorAsyncDatagramReceiveHandler.receive(null, null);
 
-			Assert.assertEquals(logRecords.toString(), 1, logRecords.size());
+			Assert.assertEquals(logEntries.toString(), 1, logEntries.size());
 
-			LogRecord logRecord = logRecords.get(0);
+			LogEntry logEntry = logEntries.get(0);
 
-			Assert.assertEquals("Unable to dispatch", logRecord.getMessage());
+			Assert.assertEquals("Unable to dispatch", logEntry.getMessage());
 
-			Throwable throwable = logRecord.getThrown();
+			Throwable throwable = logEntry.getThrowable();
 
 			Assert.assertEquals(Exception.class, throwable.getClass());
 		}
@@ -95,6 +100,8 @@ public class BaseAsyncDatagramReceiveHandlerTest {
 
 		Assert.assertTrue(dummyAsyncDatagramReceiveHandler._received);
 	}
+
+	private ServiceRegistration<?> _serviceRegistration;
 
 	private static class DummyAsyncDatagramReceiveHandler
 		extends BaseAsyncDatagramReceiveHandler {

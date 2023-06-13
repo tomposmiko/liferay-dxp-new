@@ -51,6 +51,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -69,12 +70,15 @@ public class BlogsEntryServiceTest {
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeClass
+	public static void setUpClass() throws Exception {
 		_company = CompanyTestUtil.addCompany();
 
 		_user = UserTestUtil.addCompanyAdminUser(_company);
+	}
 
+	@Before
+	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup(
 			_company.getCompanyId(), _user.getUserId(),
 			GroupConstants.DEFAULT_PARENT_GROUP_ID);
@@ -136,9 +140,9 @@ public class BlogsEntryServiceTest {
 			BlogsEntryServiceUtil.addEntry(
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-				RandomTestUtil.randomString(), 1, 1, 1990, 1, 1, true, false,
-				new String[0], RandomTestUtil.randomString(), null, null,
-				serviceContext);
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(), 1,
+				1, 1990, 1, 1, true, false, new String[0],
+				RandomTestUtil.randomString(), null, null, serviceContext);
 		}
 	}
 
@@ -177,9 +181,9 @@ public class BlogsEntryServiceTest {
 			BlogsEntryServiceUtil.addEntry(
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-				RandomTestUtil.randomString(), 1, 1, 1990, 1, 1, true, false,
-				new String[0], RandomTestUtil.randomString(), null, null,
-				serviceContext);
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(), 1,
+				1, 1990, 1, 1, true, false, new String[0],
+				RandomTestUtil.randomString(), null, null, serviceContext);
 		}
 	}
 
@@ -1534,11 +1538,12 @@ public class BlogsEntryServiceTest {
 		}
 	}
 
-	@DeleteAfterTestRun
-	private Company _company;
+	private static Company _company;
 
-	private Group _group;
-	private User _groupUser;
-	private User _user;
+	@DeleteAfterTestRun
+	private static Group _group;
+
+	private static User _groupUser;
+	private static User _user;
 
 }

@@ -15,6 +15,8 @@
 package com.liferay.message.boards.search.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.message.boards.model.MBCategory;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.model.MBThread;
@@ -24,8 +26,8 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil;
+import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -37,8 +39,6 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
-import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
 import com.liferay.portal.search.test.util.IndexedFieldsFixture;
 import com.liferay.portal.search.test.util.IndexerFixture;
@@ -94,12 +94,13 @@ public class MBMessageIndexerIndexedFieldsTest {
 		MBMessage mbMessage = mbMessageFixture.createMBMessageWithCategory(
 			searchTerm);
 
-		SearchResponse searchResponse =
-			mbMessageIndexerFixture.searchOnlyOneSearchResponse(
-				searchTerm, locale);
+		Document document = mbMessageIndexerFixture.searchOnlyOne(
+			searchTerm, locale);
+
+		indexedFieldsFixture.postProcessDocument(document);
 
 		FieldValuesAssert.assertFieldValues(
-			_expectedFieldValues(mbMessage), searchResponse);
+			_expectedFieldValues(mbMessage), document, searchTerm);
 	}
 
 	@Rule
@@ -107,7 +108,7 @@ public class MBMessageIndexerIndexedFieldsTest {
 
 	protected void setUpIndexedFieldsFixture() {
 		indexedFieldsFixture = new IndexedFieldsFixture(
-			resourcePermissionLocalService, searchEngineHelper);
+			resourcePermissionLocalService);
 	}
 
 	protected void setUpMBMessageFixture() throws PortalException {
@@ -121,8 +122,7 @@ public class MBMessageIndexerIndexedFieldsTest {
 	}
 
 	protected void setUpMBMessageIndexerFixture() {
-		mbMessageIndexerFixture = new IndexerFixture<>(
-			MBMessage.class, _searchRequestBuilderFactory);
+		mbMessageIndexerFixture = new IndexerFixture<>(MBMessage.class);
 	}
 
 	protected void setUpUserSearchFixture() throws Exception {
@@ -147,15 +147,14 @@ public class MBMessageIndexerIndexedFieldsTest {
 	@Inject
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
 
-	@Inject
-	protected SearchEngineHelper searchEngineHelper;
-
 	protected UserSearchFixture userSearchFixture;
 
 	private Map<String, String> _expectedFieldValues(MBMessage mbMessage)
 		throws Exception {
 
 		Map<String, String> map = HashMapBuilder.put(
+			Field.ASSET_ENTRY_ID, String.valueOf(_getAssetEntryId(mbMessage))
+		).put(
 			Field.CATEGORY_ID, String.valueOf(mbMessage.getCategoryId())
 		).put(
 			Field.CLASS_NAME_ID, String.valueOf(mbMessage.getClassNameId())
@@ -187,6 +186,8 @@ public class MBMessageIndexerIndexedFieldsTest {
 		).put(
 			"answer_String_sortable", "false"
 		).put(
+			"assetEntryId_sortable", String.valueOf(_getAssetEntryId(mbMessage))
+		).put(
 			"discussion", "false"
 		).put(
 			"parentMessageId", String.valueOf(mbMessage.getParentMessageId())
@@ -214,6 +215,17 @@ public class MBMessageIndexerIndexedFieldsTest {
 		_populateTreePath(mbMessage, map);
 
 		return map;
+	}
+
+	private long _getAssetEntryId(MBMessage mbMessage) {
+		AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
+			MBMessage.class.getName(), mbMessage.getMessageId());
+
+		if (assetEntry == null) {
+			return 0;
+		}
+
+		return assetEntry.getEntryId();
 	}
 
 	private void _populateDates(MBMessage mbMessage, Map<String, String> map) {
@@ -284,6 +296,9 @@ public class MBMessageIndexerIndexedFieldsTest {
 		return HtmlUtil.extractText(content);
 	}
 
+	@Inject
+	private AssetEntryLocalService _assetEntryLocalService;
+
 	private Group _group;
 
 	@DeleteAfterTestRun
@@ -297,9 +312,6 @@ public class MBMessageIndexerIndexedFieldsTest {
 
 	@DeleteAfterTestRun
 	private List<MBThread> _mbThreads;
-
-	@Inject
-	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
 
 	private User _user;
 

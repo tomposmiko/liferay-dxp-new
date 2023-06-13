@@ -24,6 +24,7 @@
 
 .actions-cell-editor-hidden,
 .assignments-cell-editor-hidden,
+.base-cell-editor-hidden,
 .forms-cell-editor-hidden,
 .notifications-cell-editor-hidden,
 .script-cell-editor-hidden,
@@ -249,27 +250,31 @@
 	}
 }
 
-.diagram-node-suggest-connector .popover-content {
-	.diagram-node-label {
-		font-size: 14px;
-		text-align: center;
-		white-space: nowrap;
+.full-width-content {
+	&,
+	> * {
+		width: 100%;
 	}
 
-	.property-builder-field {
-		margin: 5px 0;
-		position: relative;
-		width: 50%;
-
-		.property-builder-field-icon {
-			font-size: 32px;
-		}
+	.button-holder,
+	.sheet {
+		margin-top: 20px;
 	}
 }
 
 .portal-popup,
 .info-bar-container {
 	background: #fff;
+}
+
+.info-bar-container .management-bar-header-right {
+	float: right;
+	margin-right: 0;
+	position: relative;
+
+	> a {
+		padding: 0;
+	}
 }
 
 .info-bar-container .info-bar-default .btn-secondary.sidenav-transition {
@@ -400,6 +405,7 @@
 .lfr-sidebar-list-group-workflow {
 	&.sidebar-list-group {
 		margin-top: 0;
+		padding-top: 0;
 	}
 
 	.list-group-item {

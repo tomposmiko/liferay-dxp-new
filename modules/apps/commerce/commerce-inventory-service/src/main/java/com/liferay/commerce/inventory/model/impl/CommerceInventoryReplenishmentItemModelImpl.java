@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -321,9 +322,41 @@ public class CommerceInventoryReplenishmentItemModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function
+		<InvocationHandler, CommerceInventoryReplenishmentItem>
+			_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceInventoryReplenishmentItem.class.getClassLoader(),
+			CommerceInventoryReplenishmentItem.class, ModelWrapper.class);
+
+		try {
+			Constructor<CommerceInventoryReplenishmentItem> constructor =
+				(Constructor<CommerceInventoryReplenishmentItem>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map
 		<String, Function<CommerceInventoryReplenishmentItem, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommerceInventoryReplenishmentItem, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceInventoryReplenishmentItem, Object>>
@@ -331,98 +364,89 @@ public class CommerceInventoryReplenishmentItemModelImpl
 				new LinkedHashMap
 					<String,
 					 Function<CommerceInventoryReplenishmentItem, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", CommerceInventoryReplenishmentItem::getMvccVersion);
-		attributeGetterFunctions.put(
-			"commerceInventoryReplenishmentItemId",
-			CommerceInventoryReplenishmentItem::
-				getCommerceInventoryReplenishmentItemId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceInventoryReplenishmentItem::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceInventoryReplenishmentItem::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceInventoryReplenishmentItem::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceInventoryReplenishmentItem::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate",
-			CommerceInventoryReplenishmentItem::getModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceInventoryWarehouseId",
-			CommerceInventoryReplenishmentItem::
-				getCommerceInventoryWarehouseId);
-		attributeGetterFunctions.put(
-			"sku", CommerceInventoryReplenishmentItem::getSku);
-		attributeGetterFunctions.put(
-			"availabilityDate",
-			CommerceInventoryReplenishmentItem::getAvailabilityDate);
-		attributeGetterFunctions.put(
-			"quantity", CommerceInventoryReplenishmentItem::getQuantity);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CommerceInventoryReplenishmentItem, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceInventoryReplenishmentItem, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String,
 					 BiConsumer<CommerceInventoryReplenishmentItem, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CommerceInventoryReplenishmentItem::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<CommerceInventoryReplenishmentItem, Long>)
 				CommerceInventoryReplenishmentItem::setMvccVersion);
+		attributeGetterFunctions.put(
+			"commerceInventoryReplenishmentItemId",
+			CommerceInventoryReplenishmentItem::
+				getCommerceInventoryReplenishmentItemId);
 		attributeSetterBiConsumers.put(
 			"commerceInventoryReplenishmentItemId",
 			(BiConsumer<CommerceInventoryReplenishmentItem, Long>)
 				CommerceInventoryReplenishmentItem::
 					setCommerceInventoryReplenishmentItemId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceInventoryReplenishmentItem::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceInventoryReplenishmentItem, Long>)
 				CommerceInventoryReplenishmentItem::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceInventoryReplenishmentItem::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceInventoryReplenishmentItem, Long>)
 				CommerceInventoryReplenishmentItem::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceInventoryReplenishmentItem::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceInventoryReplenishmentItem, String>)
 				CommerceInventoryReplenishmentItem::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceInventoryReplenishmentItem::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceInventoryReplenishmentItem, Date>)
 				CommerceInventoryReplenishmentItem::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate",
+			CommerceInventoryReplenishmentItem::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceInventoryReplenishmentItem, Date>)
 				CommerceInventoryReplenishmentItem::setModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceInventoryWarehouseId",
+			CommerceInventoryReplenishmentItem::
+				getCommerceInventoryWarehouseId);
 		attributeSetterBiConsumers.put(
 			"commerceInventoryWarehouseId",
 			(BiConsumer<CommerceInventoryReplenishmentItem, Long>)
 				CommerceInventoryReplenishmentItem::
 					setCommerceInventoryWarehouseId);
+		attributeGetterFunctions.put(
+			"sku", CommerceInventoryReplenishmentItem::getSku);
 		attributeSetterBiConsumers.put(
 			"sku",
 			(BiConsumer<CommerceInventoryReplenishmentItem, String>)
 				CommerceInventoryReplenishmentItem::setSku);
+		attributeGetterFunctions.put(
+			"availabilityDate",
+			CommerceInventoryReplenishmentItem::getAvailabilityDate);
 		attributeSetterBiConsumers.put(
 			"availabilityDate",
 			(BiConsumer<CommerceInventoryReplenishmentItem, Date>)
 				CommerceInventoryReplenishmentItem::setAvailabilityDate);
+		attributeGetterFunctions.put(
+			"quantity", CommerceInventoryReplenishmentItem::getQuantity);
 		attributeSetterBiConsumers.put(
 			"quantity",
 			(BiConsumer<CommerceInventoryReplenishmentItem, Integer>)
 				CommerceInventoryReplenishmentItem::setQuantity);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -749,6 +773,39 @@ public class CommerceInventoryReplenishmentItemModelImpl
 	}
 
 	@Override
+	public CommerceInventoryReplenishmentItem cloneWithOriginalValues() {
+		CommerceInventoryReplenishmentItemImpl
+			commerceInventoryReplenishmentItemImpl =
+				new CommerceInventoryReplenishmentItemImpl();
+
+		commerceInventoryReplenishmentItemImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		commerceInventoryReplenishmentItemImpl.
+			setCommerceInventoryReplenishmentItemId(
+				this.<Long>getColumnOriginalValue("CIReplenishmentItemId"));
+		commerceInventoryReplenishmentItemImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commerceInventoryReplenishmentItemImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commerceInventoryReplenishmentItemImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commerceInventoryReplenishmentItemImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commerceInventoryReplenishmentItemImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commerceInventoryReplenishmentItemImpl.setCommerceInventoryWarehouseId(
+			this.<Long>getColumnOriginalValue("commerceInventoryWarehouseId"));
+		commerceInventoryReplenishmentItemImpl.setSku(
+			this.<String>getColumnOriginalValue("sku"));
+		commerceInventoryReplenishmentItemImpl.setAvailabilityDate(
+			this.<Date>getColumnOriginalValue("availabilityDate"));
+		commerceInventoryReplenishmentItemImpl.setQuantity(
+			this.<Integer>getColumnOriginalValue("quantity"));
+
+		return commerceInventoryReplenishmentItemImpl;
+	}
+
+	@Override
 	public int compareTo(
 		CommerceInventoryReplenishmentItem commerceInventoryReplenishmentItem) {
 
@@ -984,9 +1041,7 @@ public class CommerceInventoryReplenishmentItemModelImpl
 		private static final Function
 			<InvocationHandler, CommerceInventoryReplenishmentItem>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						CommerceInventoryReplenishmentItem.class,
-						ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 

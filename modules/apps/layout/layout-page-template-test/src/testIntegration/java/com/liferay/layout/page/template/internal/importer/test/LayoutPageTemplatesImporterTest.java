@@ -38,6 +38,7 @@ import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.layout.util.structure.RowStyledLayoutStructureItem;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -50,10 +51,10 @@ import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.PortletPreferenceValueLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
@@ -179,6 +180,10 @@ public class LayoutPageTemplatesImporterTest {
 			2, collectionStyledLayoutStructureItem.getNumberOfColumns());
 		Assert.assertEquals(
 			4, collectionStyledLayoutStructureItem.getNumberOfItems());
+		Assert.assertEquals(
+			1, collectionStyledLayoutStructureItem.getNumberOfItemsPerPage());
+		Assert.assertEquals(
+			"simple", collectionStyledLayoutStructureItem.getPaginationType());
 	}
 
 	@Test
@@ -263,13 +268,14 @@ public class LayoutPageTemplatesImporterTest {
 		Assert.assertEquals(
 			"fluid", containerStyledLayoutStructureItem.getContainerType());
 		Assert.assertEquals(
-			0, containerStyledLayoutStructureItem.getMarginRight());
+			StringPool.BLANK,
+			containerStyledLayoutStructureItem.getMarginRight());
 		Assert.assertEquals(
-			5, containerStyledLayoutStructureItem.getPaddingBottom());
+			"5", containerStyledLayoutStructureItem.getPaddingBottom());
 		Assert.assertEquals(
-			5, containerStyledLayoutStructureItem.getPaddingLeft());
+			"5", containerStyledLayoutStructureItem.getPaddingLeft());
 		Assert.assertEquals(
-			5, containerStyledLayoutStructureItem.getPaddingTop());
+			"5", containerStyledLayoutStructureItem.getPaddingTop());
 		Assert.assertEquals(
 			"fluid", containerStyledLayoutStructureItem.getWidthType());
 
@@ -348,8 +354,8 @@ public class LayoutPageTemplatesImporterTest {
 				PortletIdCodec.encode(portletId, instanceId));
 
 		javax.portlet.PortletPreferences jxPortletPreferences =
-			PortletPreferencesFactoryUtil.fromDefaultXML(
-				portletPreferences.getPreferences());
+			_portletPreferenceValueLocalService.getPreferences(
+				portletPreferences);
 
 		Assert.assertEquals(
 			configProperty1,
@@ -642,9 +648,9 @@ public class LayoutPageTemplatesImporterTest {
 		_fragmentEntryLocalService.addFragmentEntry(
 			TestPropsValues.getUserId(), _group.getGroupId(),
 			fragmentCollection.getFragmentCollectionId(), key, name,
-			StringPool.BLANK, html, StringPool.BLANK, StringPool.BLANK, 0,
-			FragmentConstants.TYPE_COMPONENT, WorkflowConstants.STATUS_APPROVED,
-			serviceContext);
+			StringPool.BLANK, html, StringPool.BLANK, false, StringPool.BLANK,
+			null, 0, FragmentConstants.TYPE_COMPONENT,
+			WorkflowConstants.STATUS_APPROVED, serviceContext);
 	}
 
 	private File _generateZipFile(String type, Map<String, String> valuesMap)
@@ -652,14 +658,11 @@ public class LayoutPageTemplatesImporterTest {
 
 		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
 
-		StringBuilder sb = new StringBuilder(3);
-
-		sb.append(_LAYOUT_PATE_TEMPLATES_PATH + type);
-		sb.append(StringPool.FORWARD_SLASH + _ROOT_FOLDER);
-		sb.append(StringPool.FORWARD_SLASH);
-
 		Enumeration<URL> enumeration = _bundle.findEntries(
-			sb.toString(),
+			StringBundler.concat(
+				_LAYOUT_PATE_TEMPLATES_PATH + type,
+				StringPool.FORWARD_SLASH + _ROOT_FOLDER,
+				StringPool.FORWARD_SLASH),
 			LayoutPageTemplateExportImportConstants.
 				FILE_NAME_PAGE_TEMPLATE_COLLECTION,
 			true);
@@ -876,7 +879,7 @@ public class LayoutPageTemplatesImporterTest {
 		}
 	}
 
-	private void _registerTestPortlet(final String portletId) throws Exception {
+	private void _registerTestPortlet(String portletId) throws Exception {
 		_serviceRegistrations.add(
 			_bundleContext.registerService(
 				Portlet.class,
@@ -1086,6 +1089,10 @@ public class LayoutPageTemplatesImporterTest {
 
 	@Inject
 	private PortletPreferencesLocalService _portletPreferencesLocalService;
+
+	@Inject
+	private PortletPreferenceValueLocalService
+		_portletPreferenceValueLocalService;
 
 	@Inject
 	private ResourceActionLocalService _resourceActionLocalService;

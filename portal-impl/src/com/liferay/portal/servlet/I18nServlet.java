@@ -136,7 +136,7 @@ public class I18nServlet extends HttpServlet {
 
 		int pos = i18nLanguageId.lastIndexOf(CharPool.SLASH);
 
-		i18nLanguageId = StringUtil.replace(
+		i18nLanguageId = StringUtil.replaceFirst(
 			i18nLanguageId.substring(pos + 1), CharPool.DASH,
 			CharPool.UNDERLINE);
 
@@ -156,7 +156,7 @@ public class I18nServlet extends HttpServlet {
 			i18nLanguageCode = i18nLanguageId.substring(0, pos);
 		}
 
-		Locale targetLocale = LanguageUtil.getLocale(i18nLanguageCode);
+		Locale siteDefaultLocale = LanguageUtil.getLocale(i18nLanguageCode);
 
 		Group siteGroup = null;
 
@@ -188,26 +188,20 @@ public class I18nServlet extends HttpServlet {
 					return null;
 				}
 
-				targetLocale = LanguageUtil.getLocale(
+				siteDefaultLocale = LanguageUtil.getLocale(
 					siteGroup.getGroupId(), i18nLanguageCode);
-
-				if ((targetLocale == null) &&
-					PortalUtil.isGroupControlPanelPath(path)) {
-
-					targetLocale = LanguageUtil.getLocale(i18nLanguageCode);
-				}
 			}
 		}
 
-		if (targetLocale == null) {
+		if (siteDefaultLocale == null) {
 			if (PropsValues.LOCALE_USE_DEFAULT_IF_NOT_AVAILABLE) {
-				targetLocale = PortalUtil.getSiteDefaultLocale(siteGroup);
+				siteDefaultLocale = PortalUtil.getSiteDefaultLocale(siteGroup);
 
-				i18nLanguageCode = targetLocale.getLanguage();
+				i18nLanguageCode = siteDefaultLocale.getLanguage();
 
 				i18nPath = StringPool.SLASH + i18nLanguageCode;
 
-				i18nLanguageId = LocaleUtil.toLanguageId(targetLocale);
+				i18nLanguageId = LocaleUtil.toLanguageId(siteDefaultLocale);
 			}
 			else {
 				return null;
@@ -215,7 +209,7 @@ public class I18nServlet extends HttpServlet {
 		}
 		else {
 			String siteDefaultLanguageId = LocaleUtil.toLanguageId(
-				targetLocale);
+				siteDefaultLocale);
 
 			if (siteDefaultLanguageId.startsWith(i18nLanguageId)) {
 				i18nPath = StringPool.SLASH + i18nLanguageCode;
@@ -383,9 +377,9 @@ public class I18nServlet extends HttpServlet {
 		Locale locale = LocaleUtil.fromLanguageId(
 			i18nData.getLanguageId(), false, false);
 
-		HttpSession session = httpServletRequest.getSession();
+		HttpSession httpSession = httpServletRequest.getSession();
 
-		session.setAttribute(WebKeys.LOCALE, locale);
+		httpSession.setAttribute(WebKeys.LOCALE, locale);
 
 		LanguageUtil.updateCookie(
 			httpServletRequest, httpServletResponse, locale);

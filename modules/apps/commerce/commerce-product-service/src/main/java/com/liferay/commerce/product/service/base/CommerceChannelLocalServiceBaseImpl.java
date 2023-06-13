@@ -57,8 +57,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -67,7 +65,6 @@ import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
-import com.liferay.portal.kernel.service.persistence.GroupPersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -276,7 +273,13 @@ public abstract class CommerceChannelLocalServiceBaseImpl
 		return commerceChannelPersistence.fetchByPrimaryKey(commerceChannelId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce channel with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce channel's external reference code
+	 * @return the matching commerce channel, or <code>null</code> if a matching commerce channel could not be found
+	 */
 	@Override
 	public CommerceChannel fetchCommerceChannelByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -285,6 +288,9 @@ public abstract class CommerceChannelLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceChannelByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public CommerceChannel fetchCommerceChannelByReferenceCode(
@@ -294,7 +300,14 @@ public abstract class CommerceChannelLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce channel with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce channel's external reference code
+	 * @return the matching commerce channel
+	 * @throws PortalException if a matching commerce channel could not be found
+	 */
 	@Override
 	public CommerceChannel getCommerceChannelByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -363,6 +376,7 @@ public abstract class CommerceChannelLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -381,6 +395,7 @@ public abstract class CommerceChannelLocalServiceBaseImpl
 			(CommerceChannel)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<CommerceChannel> getBasePersistence() {
 		return commerceChannelPersistence;
 	}
@@ -1498,46 +1513,6 @@ public abstract class CommerceChannelLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the group local service.
-	 *
-	 * @return the group local service
-	 */
-	public com.liferay.portal.kernel.service.GroupLocalService
-		getGroupLocalService() {
-
-		return groupLocalService;
-	}
-
-	/**
-	 * Sets the group local service.
-	 *
-	 * @param groupLocalService the group local service
-	 */
-	public void setGroupLocalService(
-		com.liferay.portal.kernel.service.GroupLocalService groupLocalService) {
-
-		this.groupLocalService = groupLocalService;
-	}
-
-	/**
-	 * Returns the group persistence.
-	 *
-	 * @return the group persistence
-	 */
-	public GroupPersistence getGroupPersistence() {
-		return groupPersistence;
-	}
-
-	/**
-	 * Sets the group persistence.
-	 *
-	 * @param groupPersistence the group persistence
-	 */
-	public void setGroupPersistence(GroupPersistence groupPersistence) {
-		this.groupPersistence = groupPersistence;
-	}
-
-	/**
 	 * Returns the resource local service.
 	 *
 	 * @return the resource local service
@@ -1892,15 +1867,6 @@ public abstract class CommerceChannelLocalServiceBaseImpl
 	protected ClassNamePersistence classNamePersistence;
 
 	@ServiceReference(
-		type = com.liferay.portal.kernel.service.GroupLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.GroupLocalService
-		groupLocalService;
-
-	@ServiceReference(type = GroupPersistence.class)
-	protected GroupPersistence groupPersistence;
-
-	@ServiceReference(
 		type = com.liferay.portal.kernel.service.ResourceLocalService.class
 	)
 	protected com.liferay.portal.kernel.service.ResourceLocalService
@@ -1914,9 +1880,6 @@ public abstract class CommerceChannelLocalServiceBaseImpl
 
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommerceChannelLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

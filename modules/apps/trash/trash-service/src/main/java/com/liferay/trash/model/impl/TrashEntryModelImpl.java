@@ -38,6 +38,7 @@ import com.liferay.trash.model.TrashEntrySoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -304,76 +305,98 @@ public class TrashEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<TrashEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, TrashEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<TrashEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<TrashEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			TrashEntry.class.getClassLoader(), TrashEntry.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", TrashEntry::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", TrashEntry::getCtCollectionId);
-		attributeGetterFunctions.put("entryId", TrashEntry::getEntryId);
-		attributeGetterFunctions.put("groupId", TrashEntry::getGroupId);
-		attributeGetterFunctions.put("companyId", TrashEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", TrashEntry::getUserId);
-		attributeGetterFunctions.put("userName", TrashEntry::getUserName);
-		attributeGetterFunctions.put("createDate", TrashEntry::getCreateDate);
-		attributeGetterFunctions.put("classNameId", TrashEntry::getClassNameId);
-		attributeGetterFunctions.put("classPK", TrashEntry::getClassPK);
-		attributeGetterFunctions.put(
-			"systemEventSetKey", TrashEntry::getSystemEventSetKey);
-		attributeGetterFunctions.put(
-			"typeSettings", TrashEntry::getTypeSettings);
-		attributeGetterFunctions.put("status", TrashEntry::getStatus);
+		try {
+			Constructor<TrashEntry> constructor =
+				(Constructor<TrashEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<TrashEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<TrashEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<TrashEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<TrashEntry, Object>>();
 		Map<String, BiConsumer<TrashEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<TrashEntry, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", TrashEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<TrashEntry, Long>)TrashEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", TrashEntry::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<TrashEntry, Long>)TrashEntry::setCtCollectionId);
+		attributeGetterFunctions.put("entryId", TrashEntry::getEntryId);
 		attributeSetterBiConsumers.put(
 			"entryId", (BiConsumer<TrashEntry, Long>)TrashEntry::setEntryId);
+		attributeGetterFunctions.put("groupId", TrashEntry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<TrashEntry, Long>)TrashEntry::setGroupId);
+		attributeGetterFunctions.put("companyId", TrashEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<TrashEntry, Long>)TrashEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", TrashEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<TrashEntry, Long>)TrashEntry::setUserId);
+		attributeGetterFunctions.put("userName", TrashEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<TrashEntry, String>)TrashEntry::setUserName);
+		attributeGetterFunctions.put("createDate", TrashEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<TrashEntry, Date>)TrashEntry::setCreateDate);
+		attributeGetterFunctions.put("classNameId", TrashEntry::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<TrashEntry, Long>)TrashEntry::setClassNameId);
+		attributeGetterFunctions.put("classPK", TrashEntry::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK", (BiConsumer<TrashEntry, Long>)TrashEntry::setClassPK);
+		attributeGetterFunctions.put(
+			"systemEventSetKey", TrashEntry::getSystemEventSetKey);
 		attributeSetterBiConsumers.put(
 			"systemEventSetKey",
 			(BiConsumer<TrashEntry, Long>)TrashEntry::setSystemEventSetKey);
+		attributeGetterFunctions.put(
+			"typeSettings", TrashEntry::getTypeSettings);
 		attributeSetterBiConsumers.put(
 			"typeSettings",
 			(BiConsumer<TrashEntry, String>)TrashEntry::setTypeSettings);
+		attributeGetterFunctions.put("status", TrashEntry::getStatus);
 		attributeSetterBiConsumers.put(
 			"status", (BiConsumer<TrashEntry, Integer>)TrashEntry::setStatus);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -742,6 +765,36 @@ public class TrashEntryModelImpl
 	}
 
 	@Override
+	public TrashEntry cloneWithOriginalValues() {
+		TrashEntryImpl trashEntryImpl = new TrashEntryImpl();
+
+		trashEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		trashEntryImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		trashEntryImpl.setEntryId(this.<Long>getColumnOriginalValue("entryId"));
+		trashEntryImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		trashEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		trashEntryImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		trashEntryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		trashEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		trashEntryImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		trashEntryImpl.setClassPK(this.<Long>getColumnOriginalValue("classPK"));
+		trashEntryImpl.setSystemEventSetKey(
+			this.<Long>getColumnOriginalValue("systemEventSetKey"));
+		trashEntryImpl.setTypeSettings(
+			this.<String>getColumnOriginalValue("typeSettings"));
+		trashEntryImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
+
+		return trashEntryImpl;
+	}
+
+	@Override
 	public int compareTo(TrashEntry trashEntry) {
 		int value = 0;
 
@@ -943,9 +996,7 @@ public class TrashEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, TrashEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					TrashEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

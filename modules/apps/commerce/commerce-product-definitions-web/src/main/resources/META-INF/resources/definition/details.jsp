@@ -154,6 +154,7 @@ if ((cpDefinition != null) && (cpDefinition.getExpirationDate() != null)) {
 						className="<%= CPDefinition.class.getName() %>"
 						classPK="<%= cpDefinitionId %>"
 						groupIds="<%= new long[] {company.getGroupId()} %>"
+						visibilityTypes="<%= AssetVocabularyConstants.VISIBILITY_TYPES %>"
 					/>
 				</aui:field-wrapper>
 
@@ -226,7 +227,7 @@ if ((cpDefinition != null) && (cpDefinition.getExpirationDate() != null)) {
 								headers: headers,
 								method: 'POST',
 							}
-						).then(function () {
+						).then(() => {
 							Liferay.fire(events.UPDATE_DATASET_DISPLAY, {
 								id:
 									'<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_DEFINITION_SPECIFICATIONS %>',
@@ -255,12 +256,12 @@ if ((cpDefinition != null) && (cpDefinition.getExpirationDate() != null)) {
 								method: 'POST',
 							}
 						)
-							.then(function (response) {
+							.then((response) => {
 								if (response.ok) {
 									return response.json();
 								}
 
-								return response.json().then(function (data) {
+								return response.json().then((data) => {
 									return Promise.reject(data.errorDescription);
 								});
 							})
@@ -299,7 +300,7 @@ if ((cpDefinition != null) && (cpDefinition.getExpirationDate() != null)) {
 								fieldName: 'key',
 							},
 						],
-						spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
+						spritemap: '<%= themeDisplay.getPathThemeImages() %>/clay/icons.svg',
 						titleLabel:
 							'<%= LanguageUtil.get(request, "add-existing-specification") %>',
 					});
@@ -318,12 +319,13 @@ if ((cpDefinition != null) && (cpDefinition.getExpirationDate() != null)) {
 							).build()
 						%>'
 						dataProviderKey="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_DEFINITION_SPECIFICATIONS %>"
-						formId="fm"
+						formName="fm"
 						id="<%= CommerceProductDataSetConstants.COMMERCE_DATA_SET_KEY_PRODUCT_DEFINITION_SPECIFICATIONS %>"
 						itemsPerPage="<%= 10 %>"
 						namespace="<%= liferayPortletResponse.getNamespace() %>"
 						pageNumber="<%= 1 %>"
 						portletURL="<%= currentURLObj %>"
+						selectedItemsKey="cpdefinitionSpecificationOptionValueId"
 						showManagementBar="<%= false %>"
 					/>
 				</commerce-ui:panel>
@@ -355,7 +357,7 @@ if ((cpDefinition != null) && (cpDefinition.getExpirationDate() != null)) {
 	<aui:script>
 		document
 			.getElementById('<portlet:namespace />commerceCatalogGroupId')
-			.addEventListener('change', function (event) {
+			.addEventListener('change', (event) => {
 				var languageId = event.target.querySelector(
 					'[value="' + event.target.value + '"]'
 				).dataset.languageid;

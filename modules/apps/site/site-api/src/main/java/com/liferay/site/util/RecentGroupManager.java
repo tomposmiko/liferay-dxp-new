@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.SessionClicks;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.site.constants.SiteWebKeys;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -151,8 +152,7 @@ public class RecentGroupManager {
 		for (long groupId : groupIds) {
 			Group group = _groupLocalService.fetchGroup(groupId);
 
-			if ((group == null) ||
-				!GroupPermissionUtil.contains(
+			if (!GroupPermissionUtil.contains(
 					permissionChecker, group.getGroupId(), ActionKeys.VIEW) ||
 				!_groupLocalService.isLiveGroupActive(group)) {
 
@@ -177,6 +177,9 @@ public class RecentGroupManager {
 					}
 				}
 			}
+
+			portletRequest.setAttribute(
+				SiteWebKeys.GROUP_URL_PROVIDER_CONTROL_PANEL, Boolean.TRUE);
 
 			String groupURL = _groupURLProvider.getGroupURL(
 				group, portletRequest);

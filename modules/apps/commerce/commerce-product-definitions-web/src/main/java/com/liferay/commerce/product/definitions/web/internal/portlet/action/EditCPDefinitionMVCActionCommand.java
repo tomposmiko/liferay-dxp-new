@@ -38,6 +38,7 @@ import com.liferay.commerce.product.servlet.taglib.ui.constants.CPDefinitionScre
 import com.liferay.commerce.service.CPDAvailabilityEstimateService;
 import com.liferay.commerce.service.CPDefinitionInventoryService;
 import com.liferay.friendly.url.exception.FriendlyURLLengthException;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -64,7 +65,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -73,7 +73,6 @@ import java.util.concurrent.Callable;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
-import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -134,8 +133,7 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 		}
 		else {
 			deleteCPDefinitionIds = StringUtil.split(
-				ParamUtil.getString(actionRequest, "deleteCPDefinitionIds"),
-				0L);
+				ParamUtil.getString(actionRequest, "id"), 0L);
 		}
 
 		for (long deleteCPDefinitionId : deleteCPDefinitionIds) {
@@ -168,9 +166,6 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 			}
 			else if (cmd.equals("deleteChannel")) {
 				deleteChannel(actionRequest);
-			}
-			else if (cmd.equals("updateCPDisplayLayout")) {
-				updateCPDisplayLayout(actionRequest);
 			}
 			else if (cmd.equals("updateConfiguration")) {
 				Callable<Object> cpDefinitionConfigurationCallable =
@@ -242,18 +237,17 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		PortletURL portletURL = PortletProviderUtil.getPortletURL(
-			actionRequest, themeDisplay.getScopeGroup(),
-			CPDefinition.class.getName(), PortletProvider.Action.EDIT);
-
-		portletURL.setParameter(
-			"mvcRenderCommandName", "/cp_definitions/edit_cp_definition");
-		portletURL.setParameter(
-			"cpDefinitionId", String.valueOf(cpDefinition.getCPDefinitionId()));
-		portletURL.setParameter(
-			"screenNavigationCategoryKey", screenNavigationCategoryKey);
-
-		return portletURL.toString();
+		return PortletURLBuilder.create(
+			PortletProviderUtil.getPortletURL(
+				actionRequest, themeDisplay.getScopeGroup(),
+				CPDefinition.class.getName(), PortletProvider.Action.EDIT)
+		).setMVCRenderCommandName(
+			"/cp_definitions/edit_cp_definition"
+		).setParameter(
+			"cpDefinitionId", cpDefinition.getCPDefinitionId()
+		).setParameter(
+			"screenNavigationCategoryKey", screenNavigationCategoryKey
+		).buildString();
 	}
 
 	protected void reindexCPDefinition(long cpDefinitionId)
@@ -361,16 +355,16 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 			// Add commerce product definition
 
 			cpDefinition = _cpDefinitionService.addCPDefinition(
-				null, commerceCatalogGroupId, serviceContext.getUserId(),
-				nameMap, shortDescriptionMap, descriptionMap, urlTitleMap,
-				metaTitleMap, metaDescriptionMap, metaKeywordsMap,
-				productTypeName, true, true, false, false, 0D, 0D, 0D, 0D, 0D,
-				0L, false, false, null, published, displayDateMonth,
-				displayDateDay, displayDateYear, displayDateHour,
-				displayDateMinute, expirationDateMonth, expirationDateDay,
-				expirationDateYear, expirationDateHour, expirationDateMinute,
-				neverExpire, CPInstanceConstants.DEFAULT_SKU, false, 1, null,
-				null, 0L, WorkflowConstants.STATUS_DRAFT, serviceContext);
+				null, commerceCatalogGroupId, nameMap, shortDescriptionMap,
+				descriptionMap, urlTitleMap, metaTitleMap, metaDescriptionMap,
+				metaKeywordsMap, productTypeName, true, true, false, false, 0D,
+				0D, 0D, 0D, 0D, 0L, false, false, null, published,
+				displayDateMonth, displayDateDay, displayDateYear,
+				displayDateHour, displayDateMinute, expirationDateMonth,
+				expirationDateDay, expirationDateYear, expirationDateHour,
+				expirationDateMinute, neverExpire,
+				CPInstanceConstants.DEFAULT_SKU, false, 1, null, null, 0L,
+				serviceContext);
 		}
 		else {
 
@@ -431,8 +425,7 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 
 		if (cpDefinitionInventoryId <= 0) {
 			_cpDefinitionInventoryService.addCPDefinitionInventory(
-				serviceContext.getUserId(), cpDefinitionId,
-				cpDefinitionInventoryEngine, lowStockActivity,
+				cpDefinitionId, cpDefinitionInventoryEngine, lowStockActivity,
 				displayAvailability, displayStockQuantity, minStockQuantity,
 				backOrders, minOrderQuantity, maxOrderQuantity,
 				allowedOrderQuantities, multipleOrderQuantity);
@@ -449,21 +442,6 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 		_cpdAvailabilityEstimateService.updateCPDAvailabilityEstimate(
 			cpdAvailabilityEstimateEntryId, cpDefinitionId,
 			commerceAvailabilityEstimateId, serviceContext);
-	}
-
-	protected void updateCPDisplayLayout(ActionRequest actionRequest)
-		throws PortalException {
-
-		long cpDefinitionId = ParamUtil.getLong(
-			actionRequest, "cpDefinitionId");
-
-		String layoutUuid = ParamUtil.getString(actionRequest, "layoutUuid");
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			CPDefinition.class.getName(), actionRequest);
-
-		_cpDefinitionService.updateCPDisplayLayout(
-			cpDefinitionId, layoutUuid, serviceContext);
 	}
 
 	protected void updateShippingInfo(ActionRequest actionRequest)

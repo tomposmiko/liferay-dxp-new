@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -24,19 +24,21 @@ definition {
 
 			DDLDataDefinition.tearDownCP();
 
-			Page.tearDownCP();
+			PagesAdmin.tearDownCP();
 		}
 	}
 
-	@priority = 3
+	@priority = "3"
 	test Demo1 {
+		property portal.upstream = "quarantine";
+
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Company Picnic");
+		PagesAdmin.addPublicPage(pageName = "Company Picnic");
 
-		SitePages.configurePage(
+		PagesAdmin.configurePage(
 			columnName = "1 Column",
 			pageName = "Company Picnic",
 			privacy = "Public Pages",
@@ -124,19 +126,19 @@ definition {
 
 		for (var ddlRecordFieldData : list "John,Jane") {
 			DDLRecord.viewViaDDLDisplayTable(
-				ddlRecordFieldData = ${ddlRecordFieldData},
+				ddlRecordFieldData = "${ddlRecordFieldData}",
 				fieldFieldLabel = "First Name");
 		}
 
 		for (var ddlRecordFieldData : list "Doe,Smith") {
 			DDLRecord.viewViaDDLDisplayTable(
-				ddlRecordFieldData = ${ddlRecordFieldData},
+				ddlRecordFieldData = "${ddlRecordFieldData}",
 				fieldFieldLabel = "Last Name");
 		}
 
 		for (var ddlRecordFieldData : list "Beef Jerky,Carrots") {
 			DDLRecord.viewViaDDLDisplayTable(
-				ddlRecordFieldData = ${ddlRecordFieldData},
+				ddlRecordFieldData = "${ddlRecordFieldData}",
 				fieldFieldLabel = "What are you bringing");
 		}
 
@@ -158,17 +160,17 @@ definition {
 
 		DDLRecord.populateFieldTextViaSpreadsheetView(
 			ddlRecordFieldData = "Joe",
-			ddlRecordRow = 3,
+			ddlRecordRow = "3",
 			fieldName = "FirstName");
 
 		DDLRecord.populateFieldTextViaSpreadsheetView(
 			ddlRecordFieldData = "Perkins",
-			ddlRecordRow = 3,
+			ddlRecordRow = "3",
 			fieldName = "LastName");
 
 		DDLRecord.populateFieldSelectViaSpreadsheetView(
 			ddlRecordFieldData = "Chips",
-			ddlRecordRow = 3,
+			ddlRecordRow = "3",
 			fieldName = "WhatAreYouBringing");
 	}
 

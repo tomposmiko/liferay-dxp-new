@@ -15,7 +15,6 @@
 package com.liferay.commerce.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.exception.DuplicateCommerceOrderExternalReferenceCodeException;
 import com.liferay.commerce.exception.NoSuchOrderException;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.service.CommerceOrderLocalServiceUtil;
@@ -127,6 +126,8 @@ public class CommerceOrderPersistenceTest {
 
 		CommerceOrder newCommerceOrder = _persistence.create(pk);
 
+		newCommerceOrder.setMvccVersion(RandomTestUtil.nextLong());
+
 		newCommerceOrder.setUuid(RandomTestUtil.randomString());
 
 		newCommerceOrder.setExternalReferenceCode(
@@ -147,6 +148,8 @@ public class CommerceOrderPersistenceTest {
 		newCommerceOrder.setCommerceAccountId(RandomTestUtil.nextLong());
 
 		newCommerceOrder.setCommerceCurrencyId(RandomTestUtil.nextLong());
+
+		newCommerceOrder.setCommerceOrderTypeId(RandomTestUtil.nextLong());
 
 		newCommerceOrder.setBillingAddressId(RandomTestUtil.nextLong());
 
@@ -305,6 +308,9 @@ public class CommerceOrderPersistenceTest {
 			newCommerceOrder.getPrimaryKey());
 
 		Assert.assertEquals(
+			existingCommerceOrder.getMvccVersion(),
+			newCommerceOrder.getMvccVersion());
+		Assert.assertEquals(
 			existingCommerceOrder.getUuid(), newCommerceOrder.getUuid());
 		Assert.assertEquals(
 			existingCommerceOrder.getExternalReferenceCode(),
@@ -334,6 +340,9 @@ public class CommerceOrderPersistenceTest {
 		Assert.assertEquals(
 			existingCommerceOrder.getCommerceCurrencyId(),
 			newCommerceOrder.getCommerceCurrencyId());
+		Assert.assertEquals(
+			existingCommerceOrder.getCommerceOrderTypeId(),
+			newCommerceOrder.getCommerceOrderTypeId());
 		Assert.assertEquals(
 			existingCommerceOrder.getBillingAddressId(),
 			newCommerceOrder.getBillingAddressId());
@@ -528,26 +537,6 @@ public class CommerceOrderPersistenceTest {
 			Time.getShortTimestamp(newCommerceOrder.getStatusDate()));
 	}
 
-	@Test(expected = DuplicateCommerceOrderExternalReferenceCodeException.class)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CommerceOrder commerceOrder = addCommerceOrder();
-
-		CommerceOrder newCommerceOrder = addCommerceOrder();
-
-		newCommerceOrder.setCompanyId(commerceOrder.getCompanyId());
-
-		newCommerceOrder = _persistence.update(newCommerceOrder);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCommerceOrder);
-
-		newCommerceOrder.setExternalReferenceCode(
-			commerceOrder.getExternalReferenceCode());
-
-		_persistence.update(newCommerceOrder);
-	}
-
 	@Test
 	public void testCountByUuid() throws Exception {
 		_persistence.countByUuid("");
@@ -697,15 +686,15 @@ public class CommerceOrderPersistenceTest {
 
 	protected OrderByComparator<CommerceOrder> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CommerceOrder", "uuid", true, "externalReferenceCode", true,
-			"commerceOrderId", true, "groupId", true, "companyId", true,
-			"userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "commerceAccountId", true,
-			"commerceCurrencyId", true, "billingAddressId", true,
-			"shippingAddressId", true, "commercePaymentMethodKey", true,
-			"commerceShippingMethodId", true, "shippingOptionName", true,
-			"purchaseOrderNumber", true, "couponCode", true,
-			"lastPriceUpdateDate", true, "subtotal", true,
+			"CommerceOrder", "mvccVersion", true, "uuid", true,
+			"externalReferenceCode", true, "commerceOrderId", true, "groupId",
+			true, "companyId", true, "userId", true, "userName", true,
+			"createDate", true, "modifiedDate", true, "commerceAccountId", true,
+			"commerceCurrencyId", true, "commerceOrderTypeId", true,
+			"billingAddressId", true, "shippingAddressId", true,
+			"commercePaymentMethodKey", true, "commerceShippingMethodId", true,
+			"shippingOptionName", true, "purchaseOrderNumber", true,
+			"couponCode", true, "lastPriceUpdateDate", true, "subtotal", true,
 			"subtotalDiscountAmount", true, "subtotalDiscountPercentageLevel1",
 			true, "subtotalDiscountPercentageLevel2", true,
 			"subtotalDiscountPercentageLevel3", true,
@@ -1032,6 +1021,8 @@ public class CommerceOrderPersistenceTest {
 
 		CommerceOrder commerceOrder = _persistence.create(pk);
 
+		commerceOrder.setMvccVersion(RandomTestUtil.nextLong());
+
 		commerceOrder.setUuid(RandomTestUtil.randomString());
 
 		commerceOrder.setExternalReferenceCode(RandomTestUtil.randomString());
@@ -1051,6 +1042,8 @@ public class CommerceOrderPersistenceTest {
 		commerceOrder.setCommerceAccountId(RandomTestUtil.nextLong());
 
 		commerceOrder.setCommerceCurrencyId(RandomTestUtil.nextLong());
+
+		commerceOrder.setCommerceOrderTypeId(RandomTestUtil.nextLong());
 
 		commerceOrder.setBillingAddressId(RandomTestUtil.nextLong());
 

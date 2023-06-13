@@ -42,6 +42,7 @@ import com.liferay.portal.reports.engine.console.model.DefinitionSoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -308,81 +309,103 @@ public class DefinitionModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Definition, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Definition>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Definition, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Definition, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Definition.class.getClassLoader(), Definition.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("uuid", Definition::getUuid);
-		attributeGetterFunctions.put(
-			"definitionId", Definition::getDefinitionId);
-		attributeGetterFunctions.put("groupId", Definition::getGroupId);
-		attributeGetterFunctions.put("companyId", Definition::getCompanyId);
-		attributeGetterFunctions.put("userId", Definition::getUserId);
-		attributeGetterFunctions.put("userName", Definition::getUserName);
-		attributeGetterFunctions.put("createDate", Definition::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", Definition::getModifiedDate);
-		attributeGetterFunctions.put("name", Definition::getName);
-		attributeGetterFunctions.put("description", Definition::getDescription);
-		attributeGetterFunctions.put("sourceId", Definition::getSourceId);
-		attributeGetterFunctions.put("reportName", Definition::getReportName);
-		attributeGetterFunctions.put(
-			"reportParameters", Definition::getReportParameters);
-		attributeGetterFunctions.put(
-			"lastPublishDate", Definition::getLastPublishDate);
+		try {
+			Constructor<Definition> constructor =
+				(Constructor<Definition>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Definition, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Definition, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Definition, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Definition, Object>>();
 		Map<String, BiConsumer<Definition, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Definition, ?>>();
 
+		attributeGetterFunctions.put("uuid", Definition::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<Definition, String>)Definition::setUuid);
+		attributeGetterFunctions.put(
+			"definitionId", Definition::getDefinitionId);
 		attributeSetterBiConsumers.put(
 			"definitionId",
 			(BiConsumer<Definition, Long>)Definition::setDefinitionId);
+		attributeGetterFunctions.put("groupId", Definition::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<Definition, Long>)Definition::setGroupId);
+		attributeGetterFunctions.put("companyId", Definition::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<Definition, Long>)Definition::setCompanyId);
+		attributeGetterFunctions.put("userId", Definition::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<Definition, Long>)Definition::setUserId);
+		attributeGetterFunctions.put("userName", Definition::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<Definition, String>)Definition::setUserName);
+		attributeGetterFunctions.put("createDate", Definition::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<Definition, Date>)Definition::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", Definition::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<Definition, Date>)Definition::setModifiedDate);
+		attributeGetterFunctions.put("name", Definition::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<Definition, String>)Definition::setName);
+		attributeGetterFunctions.put("description", Definition::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<Definition, String>)Definition::setDescription);
+		attributeGetterFunctions.put("sourceId", Definition::getSourceId);
 		attributeSetterBiConsumers.put(
 			"sourceId", (BiConsumer<Definition, Long>)Definition::setSourceId);
+		attributeGetterFunctions.put("reportName", Definition::getReportName);
 		attributeSetterBiConsumers.put(
 			"reportName",
 			(BiConsumer<Definition, String>)Definition::setReportName);
+		attributeGetterFunctions.put(
+			"reportParameters", Definition::getReportParameters);
 		attributeSetterBiConsumers.put(
 			"reportParameters",
 			(BiConsumer<Definition, String>)Definition::setReportParameters);
+		attributeGetterFunctions.put(
+			"lastPublishDate", Definition::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<Definition, Date>)Definition::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -1027,6 +1050,38 @@ public class DefinitionModelImpl
 	}
 
 	@Override
+	public Definition cloneWithOriginalValues() {
+		DefinitionImpl definitionImpl = new DefinitionImpl();
+
+		definitionImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		definitionImpl.setDefinitionId(
+			this.<Long>getColumnOriginalValue("definitionId"));
+		definitionImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		definitionImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		definitionImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		definitionImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		definitionImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		definitionImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		definitionImpl.setName(this.<String>getColumnOriginalValue("name"));
+		definitionImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		definitionImpl.setSourceId(
+			this.<Long>getColumnOriginalValue("sourceId"));
+		definitionImpl.setReportName(
+			this.<String>getColumnOriginalValue("reportName"));
+		definitionImpl.setReportParameters(
+			this.<String>getColumnOriginalValue("reportParameters"));
+		definitionImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+
+		return definitionImpl;
+	}
+
+	@Override
 	public int compareTo(Definition definition) {
 		int value = 0;
 
@@ -1269,9 +1324,7 @@ public class DefinitionModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Definition>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Definition.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

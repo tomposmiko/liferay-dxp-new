@@ -24,7 +24,6 @@ import com.liferay.portal.background.task.service.persistence.BackgroundTaskPers
 import com.liferay.portal.background.task.service.persistence.BackgroundTaskUtil;
 import com.liferay.portal.background.task.service.persistence.impl.constants.BackgroundTaskPersistenceConstants;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -35,14 +34,13 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -55,17 +53,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -81,7 +75,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = BackgroundTaskPersistence.class)
+@Component(service = {BackgroundTaskPersistence.class, BasePersistence.class})
 public class BackgroundTaskPersistenceImpl
 	extends BasePersistenceImpl<BackgroundTask>
 	implements BackgroundTaskPersistence {
@@ -199,7 +193,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -558,7 +552,7 @@ public class BackgroundTaskPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -696,7 +690,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -1055,7 +1049,7 @@ public class BackgroundTaskPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1193,7 +1187,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -1556,7 +1550,7 @@ public class BackgroundTaskPersistenceImpl
 
 		Object[] finderArgs = new Object[] {completed};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1689,7 +1683,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -2048,7 +2042,7 @@ public class BackgroundTaskPersistenceImpl
 
 		Object[] finderArgs = new Object[] {status};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -2198,7 +2192,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -2655,8 +2649,8 @@ public class BackgroundTaskPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>BackgroundTaskModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
-	 * @param taskExecutorClassNames the task executor class names
+	 * @param groupId the group ID
+	 * @param taskExecutorClassName the task executor class name
 	 * @param start the lower bound of the range of background tasks
 	 * @param end the upper bound of the range of background tasks (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -2719,7 +2713,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_T, finderArgs, this);
+				_finderPathWithPaginationFindByG_T, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -2860,7 +2854,7 @@ public class BackgroundTaskPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, taskExecutorClassName};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2946,7 +2940,7 @@ public class BackgroundTaskPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByG_T, finderArgs, this);
+			_finderPathWithPaginationCountByG_T, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -3140,7 +3134,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -3530,7 +3524,7 @@ public class BackgroundTaskPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, status};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3686,7 +3680,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -4142,7 +4136,7 @@ public class BackgroundTaskPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>BackgroundTaskModelImpl</code>.
 	 * </p>
 	 *
-	 * @param taskExecutorClassNames the task executor class names
+	 * @param taskExecutorClassName the task executor class name
 	 * @param status the status
 	 * @param start the lower bound of the range of background tasks
 	 * @param end the upper bound of the range of background tasks (not inclusive)
@@ -4197,7 +4191,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				_finderPathWithPaginationFindByT_S, finderArgs, this);
+				_finderPathWithPaginationFindByT_S, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -4329,7 +4323,7 @@ public class BackgroundTaskPersistenceImpl
 
 		Object[] finderArgs = new Object[] {taskExecutorClassName, status};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -4408,7 +4402,7 @@ public class BackgroundTaskPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByT_S, finderArgs, this);
+			_finderPathWithPaginationCountByT_S, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -4617,7 +4611,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -5124,9 +5118,9 @@ public class BackgroundTaskPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>BackgroundTaskModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param name the name
-	 * @param taskExecutorClassNames the task executor class names
+	 * @param taskExecutorClassName the task executor class name
 	 * @param start the lower bound of the range of background tasks
 	 * @param end the upper bound of the range of background tasks (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -5191,7 +5185,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_N_T, finderArgs, this);
+				_finderPathWithPaginationFindByG_N_T, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -5357,7 +5351,7 @@ public class BackgroundTaskPersistenceImpl
 			groupId, name, taskExecutorClassName
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -5464,7 +5458,7 @@ public class BackgroundTaskPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByG_N_T, finderArgs, this);
+			_finderPathWithPaginationCountByG_N_T, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -5697,7 +5691,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -6181,8 +6175,8 @@ public class BackgroundTaskPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>BackgroundTaskModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
-	 * @param taskExecutorClassNames the task executor class names
+	 * @param groupId the group ID
+	 * @param taskExecutorClassName the task executor class name
 	 * @param completed the completed
 	 * @param start the lower bound of the range of background tasks
 	 * @param end the upper bound of the range of background tasks (not inclusive)
@@ -6246,7 +6240,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_T_C, finderArgs, this);
+				_finderPathWithPaginationFindByG_T_C, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -6402,7 +6396,7 @@ public class BackgroundTaskPersistenceImpl
 			groupId, taskExecutorClassName, completed
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -6496,7 +6490,7 @@ public class BackgroundTaskPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByG_T_C, finderArgs, this);
+			_finderPathWithPaginationCountByG_T_C, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -6724,7 +6718,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -7207,7 +7201,7 @@ public class BackgroundTaskPersistenceImpl
 	 * </p>
 	 *
 	 * @param groupId the group ID
-	 * @param taskExecutorClassNames the task executor class names
+	 * @param taskExecutorClassName the task executor class name
 	 * @param status the status
 	 * @param start the lower bound of the range of background tasks
 	 * @param end the upper bound of the range of background tasks (not inclusive)
@@ -7262,7 +7256,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_T_S, finderArgs, this);
+				_finderPathWithPaginationFindByG_T_S, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -7407,7 +7401,7 @@ public class BackgroundTaskPersistenceImpl
 			groupId, taskExecutorClassName, status
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -7493,7 +7487,7 @@ public class BackgroundTaskPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByG_T_S, finderArgs, this);
+			_finderPathWithPaginationCountByG_T_S, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -7716,7 +7710,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -8253,7 +8247,7 @@ public class BackgroundTaskPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>BackgroundTaskModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param name the name
 	 * @param taskExecutorClassName the task executor class name
 	 * @param completed the completed
@@ -8309,7 +8303,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_N_T_C, finderArgs, this);
+				_finderPathWithPaginationFindByG_N_T_C, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BackgroundTask backgroundTask : list) {
@@ -8470,7 +8464,7 @@ public class BackgroundTaskPersistenceImpl
 			groupId, name, taskExecutorClassName, completed
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(5);
@@ -8570,7 +8564,7 @@ public class BackgroundTaskPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByG_N_T_C, finderArgs, this);
+			_finderPathWithPaginationCountByG_N_T_C, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -8734,9 +8728,7 @@ public class BackgroundTaskPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(BackgroundTaskImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(BackgroundTaskImpl.class);
 	}
 
 	/**
@@ -8760,9 +8752,7 @@ public class BackgroundTaskPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(BackgroundTaskImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(BackgroundTaskImpl.class, primaryKey);
@@ -9087,7 +9077,7 @@ public class BackgroundTaskPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<BackgroundTask>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -9157,7 +9147,7 @@ public class BackgroundTaskPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -9207,30 +9197,23 @@ public class BackgroundTaskPersistenceImpl
 	 * Initializes the background task persistence.
 	 */
 	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class, new BackgroundTaskModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", BackgroundTask.class.getName()));
-
+	public void activate() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByGroupId = _createFinderPath(
+		_finderPathWithPaginationFindByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -9238,17 +9221,17 @@ public class BackgroundTaskPersistenceImpl
 			},
 			new String[] {"groupId"}, true);
 
-		_finderPathWithoutPaginationFindByGroupId = _createFinderPath(
+		_finderPathWithoutPaginationFindByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			true);
 
-		_finderPathCountByGroupId = _createFinderPath(
+		_finderPathCountByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			false);
 
-		_finderPathWithPaginationFindByCompanyId = _createFinderPath(
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -9256,17 +9239,17 @@ public class BackgroundTaskPersistenceImpl
 			},
 			new String[] {"companyId"}, true);
 
-		_finderPathWithoutPaginationFindByCompanyId = _createFinderPath(
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			true);
 
-		_finderPathCountByCompanyId = _createFinderPath(
+		_finderPathCountByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
 
-		_finderPathWithPaginationFindByCompleted = _createFinderPath(
+		_finderPathWithPaginationFindByCompleted = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompleted",
 			new String[] {
 				Boolean.class.getName(), Integer.class.getName(),
@@ -9274,17 +9257,17 @@ public class BackgroundTaskPersistenceImpl
 			},
 			new String[] {"completed"}, true);
 
-		_finderPathWithoutPaginationFindByCompleted = _createFinderPath(
+		_finderPathWithoutPaginationFindByCompleted = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompleted",
 			new String[] {Boolean.class.getName()}, new String[] {"completed"},
 			true);
 
-		_finderPathCountByCompleted = _createFinderPath(
+		_finderPathCountByCompleted = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompleted",
 			new String[] {Boolean.class.getName()}, new String[] {"completed"},
 			false);
 
-		_finderPathWithPaginationFindByStatus = _createFinderPath(
+		_finderPathWithPaginationFindByStatus = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByStatus",
 			new String[] {
 				Integer.class.getName(), Integer.class.getName(),
@@ -9292,17 +9275,17 @@ public class BackgroundTaskPersistenceImpl
 			},
 			new String[] {"status"}, true);
 
-		_finderPathWithoutPaginationFindByStatus = _createFinderPath(
+		_finderPathWithoutPaginationFindByStatus = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByStatus",
 			new String[] {Integer.class.getName()}, new String[] {"status"},
 			true);
 
-		_finderPathCountByStatus = _createFinderPath(
+		_finderPathCountByStatus = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByStatus",
 			new String[] {Integer.class.getName()}, new String[] {"status"},
 			false);
 
-		_finderPathWithPaginationFindByG_T = _createFinderPath(
+		_finderPathWithPaginationFindByG_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_T",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9311,22 +9294,22 @@ public class BackgroundTaskPersistenceImpl
 			},
 			new String[] {"groupId", "taskExecutorClassName"}, true);
 
-		_finderPathWithoutPaginationFindByG_T = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_T",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "taskExecutorClassName"}, true);
 
-		_finderPathCountByG_T = _createFinderPath(
+		_finderPathCountByG_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_T",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "taskExecutorClassName"}, false);
 
-		_finderPathWithPaginationCountByG_T = _createFinderPath(
+		_finderPathWithPaginationCountByG_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_T",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "taskExecutorClassName"}, false);
 
-		_finderPathWithPaginationFindByG_S = _createFinderPath(
+		_finderPathWithPaginationFindByG_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_S",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -9335,17 +9318,17 @@ public class BackgroundTaskPersistenceImpl
 			},
 			new String[] {"groupId", "status"}, true);
 
-		_finderPathWithoutPaginationFindByG_S = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"groupId", "status"}, true);
 
-		_finderPathCountByG_S = _createFinderPath(
+		_finderPathCountByG_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"groupId", "status"}, false);
 
-		_finderPathWithPaginationFindByT_S = _createFinderPath(
+		_finderPathWithPaginationFindByT_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByT_S",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
@@ -9354,22 +9337,22 @@ public class BackgroundTaskPersistenceImpl
 			},
 			new String[] {"taskExecutorClassName", "status"}, true);
 
-		_finderPathWithoutPaginationFindByT_S = _createFinderPath(
+		_finderPathWithoutPaginationFindByT_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByT_S",
 			new String[] {String.class.getName(), Integer.class.getName()},
 			new String[] {"taskExecutorClassName", "status"}, true);
 
-		_finderPathCountByT_S = _createFinderPath(
+		_finderPathCountByT_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByT_S",
 			new String[] {String.class.getName(), Integer.class.getName()},
 			new String[] {"taskExecutorClassName", "status"}, false);
 
-		_finderPathWithPaginationCountByT_S = _createFinderPath(
+		_finderPathWithPaginationCountByT_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByT_S",
 			new String[] {String.class.getName(), Integer.class.getName()},
 			new String[] {"taskExecutorClassName", "status"}, false);
 
-		_finderPathWithPaginationFindByG_N_T = _createFinderPath(
+		_finderPathWithPaginationFindByG_N_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_N_T",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9378,7 +9361,7 @@ public class BackgroundTaskPersistenceImpl
 			},
 			new String[] {"groupId", "name", "taskExecutorClassName"}, true);
 
-		_finderPathWithoutPaginationFindByG_N_T = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_N_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_N_T",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9386,7 +9369,7 @@ public class BackgroundTaskPersistenceImpl
 			},
 			new String[] {"groupId", "name", "taskExecutorClassName"}, true);
 
-		_finderPathCountByG_N_T = _createFinderPath(
+		_finderPathCountByG_N_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_N_T",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9394,7 +9377,7 @@ public class BackgroundTaskPersistenceImpl
 			},
 			new String[] {"groupId", "name", "taskExecutorClassName"}, false);
 
-		_finderPathWithPaginationCountByG_N_T = _createFinderPath(
+		_finderPathWithPaginationCountByG_N_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_N_T",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9402,7 +9385,7 @@ public class BackgroundTaskPersistenceImpl
 			},
 			new String[] {"groupId", "name", "taskExecutorClassName"}, false);
 
-		_finderPathWithPaginationFindByG_T_C = _createFinderPath(
+		_finderPathWithPaginationFindByG_T_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_T_C",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9412,7 +9395,7 @@ public class BackgroundTaskPersistenceImpl
 			new String[] {"groupId", "taskExecutorClassName", "completed"},
 			true);
 
-		_finderPathWithoutPaginationFindByG_T_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_T_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_T_C",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9421,7 +9404,7 @@ public class BackgroundTaskPersistenceImpl
 			new String[] {"groupId", "taskExecutorClassName", "completed"},
 			true);
 
-		_finderPathCountByG_T_C = _createFinderPath(
+		_finderPathCountByG_T_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_T_C",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9430,7 +9413,7 @@ public class BackgroundTaskPersistenceImpl
 			new String[] {"groupId", "taskExecutorClassName", "completed"},
 			false);
 
-		_finderPathWithPaginationCountByG_T_C = _createFinderPath(
+		_finderPathWithPaginationCountByG_T_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_T_C",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9439,7 +9422,7 @@ public class BackgroundTaskPersistenceImpl
 			new String[] {"groupId", "taskExecutorClassName", "completed"},
 			false);
 
-		_finderPathWithPaginationFindByG_T_S = _createFinderPath(
+		_finderPathWithPaginationFindByG_T_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_T_S",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9448,7 +9431,7 @@ public class BackgroundTaskPersistenceImpl
 			},
 			new String[] {"groupId", "taskExecutorClassName", "status"}, true);
 
-		_finderPathWithoutPaginationFindByG_T_S = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_T_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_T_S",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9456,7 +9439,7 @@ public class BackgroundTaskPersistenceImpl
 			},
 			new String[] {"groupId", "taskExecutorClassName", "status"}, true);
 
-		_finderPathCountByG_T_S = _createFinderPath(
+		_finderPathCountByG_T_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_T_S",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9464,7 +9447,7 @@ public class BackgroundTaskPersistenceImpl
 			},
 			new String[] {"groupId", "taskExecutorClassName", "status"}, false);
 
-		_finderPathWithPaginationCountByG_T_S = _createFinderPath(
+		_finderPathWithPaginationCountByG_T_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_T_S",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9472,7 +9455,7 @@ public class BackgroundTaskPersistenceImpl
 			},
 			new String[] {"groupId", "taskExecutorClassName", "status"}, false);
 
-		_finderPathWithPaginationFindByG_N_T_C = _createFinderPath(
+		_finderPathWithPaginationFindByG_N_T_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_N_T_C",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9485,7 +9468,7 @@ public class BackgroundTaskPersistenceImpl
 			},
 			true);
 
-		_finderPathWithoutPaginationFindByG_N_T_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_N_T_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_N_T_C",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9496,7 +9479,7 @@ public class BackgroundTaskPersistenceImpl
 			},
 			true);
 
-		_finderPathCountByG_N_T_C = _createFinderPath(
+		_finderPathCountByG_N_T_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_N_T_C",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9507,7 +9490,7 @@ public class BackgroundTaskPersistenceImpl
 			},
 			false);
 
-		_finderPathWithPaginationCountByG_N_T_C = _createFinderPath(
+		_finderPathWithPaginationCountByG_N_T_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_N_T_C",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -9526,14 +9509,6 @@ public class BackgroundTaskPersistenceImpl
 		_setBackgroundTaskUtilPersistence(null);
 
 		entityCache.removeCache(BackgroundTaskImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setBackgroundTaskUtilPersistence(
@@ -9578,8 +9553,6 @@ public class BackgroundTaskPersistenceImpl
 		super.setSessionFactory(sessionFactory);
 	}
 
-	private BundleContext _bundleContext;
-
 	@Reference
 	protected EntityCache entityCache;
 
@@ -9609,124 +9582,13 @@ public class BackgroundTaskPersistenceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		BackgroundTaskPersistenceImpl.class);
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class BackgroundTaskModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			BackgroundTaskModelImpl backgroundTaskModelImpl =
-				(BackgroundTaskModelImpl)baseModel;
-
-			long columnBitmask = backgroundTaskModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					backgroundTaskModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						backgroundTaskModelImpl.getColumnBitmask(columnName);
-				}
-
-				if (finderPath.isBaseModelResult() &&
-					(BackgroundTaskPersistenceImpl.
-						FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION ==
-							finderPath.getCacheName())) {
-
-					finderPathColumnBitmask |= _ORDER_BY_COLUMNS_BITMASK;
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					backgroundTaskModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			BackgroundTaskModelImpl backgroundTaskModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						backgroundTaskModelImpl.getColumnOriginalValue(
-							columnName);
-				}
-				else {
-					arguments[i] = backgroundTaskModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-		private static final long _ORDER_BY_COLUMNS_BITMASK;
-
-		static {
-			long orderByColumnsBitmask = 0;
-
-			orderByColumnsBitmask |= BackgroundTaskModelImpl.getColumnBitmask(
-				"createDate");
-
-			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
-		}
-
-	}
+	@Reference
+	private BackgroundTaskModelArgumentsResolver
+		_backgroundTaskModelArgumentsResolver;
 
 }

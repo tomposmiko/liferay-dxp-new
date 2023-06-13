@@ -33,12 +33,8 @@ import com.liferay.portal.kernel.util.GroupThreadLocal;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.NamedThreadFactory;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.ServiceProxyFactory;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceReference;
-import com.liferay.registry.ServiceTracker;
-import com.liferay.registry.ServiceTrackerCustomizer;
 
 import java.util.Locale;
 import java.util.Set;
@@ -46,6 +42,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author     Michael C. Han
@@ -60,13 +57,7 @@ public abstract class BaseAsyncDestination extends BaseDestination {
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 
-		Registry registry = RegistryUtil.getRegistry();
-
-		serviceTracker = registry.trackServices(
-			PortalExecutorManager.class,
-			new PortalExecutorManagerServiceTrackerCustomizer());
-
-		serviceTracker.open();
+		open();
 	}
 
 	@Override
@@ -86,13 +77,6 @@ public abstract class BaseAsyncDestination extends BaseDestination {
 	}
 
 	@Override
-	public void destroy() {
-		super.destroy();
-
-		serviceTracker.close();
-	}
-
-	@Override
 	public DestinationStatistics getDestinationStatistics() {
 		DestinationStatistics destinationStatistics =
 			new DestinationStatistics();
@@ -109,6 +93,8 @@ public abstract class BaseAsyncDestination extends BaseDestination {
 			_noticeableThreadPoolExecutor.getCorePoolSize());
 		destinationStatistics.setPendingMessageCount(
 			_noticeableThreadPoolExecutor.getPendingTaskCount());
+		destinationStatistics.setRejectedMessageCount(
+			_rejectedTaskCounter.get());
 		destinationStatistics.setSentMessageCount(
 			_noticeableThreadPoolExecutor.getCompletedTaskCount());
 
@@ -138,6 +124,9 @@ public abstract class BaseAsyncDestination extends BaseDestination {
 		if (_rejectedExecutionHandler == null) {
 			_rejectedExecutionHandler = _createRejectionExecutionHandler();
 		}
+		else {
+			_rejectedTaskCounter.set(0);
+		}
 
 		NoticeableThreadPoolExecutor noticeableThreadPoolExecutor =
 			new NoticeableThreadPoolExecutor(
@@ -149,7 +138,7 @@ public abstract class BaseAsyncDestination extends BaseDestination {
 				_rejectedExecutionHandler, new ThreadPoolHandlerAdapter());
 
 		NoticeableExecutorService oldNoticeableExecutorService =
-			portalExecutorManager.registerPortalExecutor(
+			_portalExecutorManager.registerPortalExecutor(
 				getName(), noticeableThreadPoolExecutor);
 
 		if (oldNoticeableExecutorService != null) {
@@ -207,7 +196,12 @@ public abstract class BaseAsyncDestination extends BaseDestination {
 	public void setRejectedExecutionHandler(
 		RejectedExecutionHandler rejectedExecutionHandler) {
 
-		_rejectedExecutionHandler = rejectedExecutionHandler;
+		_rejectedExecutionHandler = (runnable, threadPoolExecutor) -> {
+			_rejectedTaskCounter.incrementAndGet();
+
+			rejectedExecutionHandler.rejectedExecution(
+				runnable, threadPoolExecutor);
+		};
 	}
 
 	public void setWorkersCoreSize(int workersCoreSize) {
@@ -354,16 +348,14 @@ public abstract class BaseAsyncDestination extends BaseDestination {
 		}
 	}
 
-	protected volatile PortalExecutorManager portalExecutorManager;
-	protected ServiceTracker<PortalExecutorManager, PortalExecutorManager>
-		serviceTracker;
-
 	private RejectedExecutionHandler _createRejectionExecutionHandler() {
 		return new RejectedExecutionHandler() {
 
 			@Override
 			public void rejectedExecution(
 				Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
+
+				_rejectedTaskCounter.incrementAndGet();
 
 				if (!_log.isWarnEnabled()) {
 					return;
@@ -388,43 +380,16 @@ public abstract class BaseAsyncDestination extends BaseDestination {
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseAsyncDestination.class);
 
+	private static volatile PortalExecutorManager _portalExecutorManager =
+		ServiceProxyFactory.newServiceTrackedInstance(
+			PortalExecutorManager.class, BaseAsyncDestination.class,
+			"_portalExecutorManager", true, false);
+
 	private int _maximumQueueSize = Integer.MAX_VALUE;
 	private NoticeableThreadPoolExecutor _noticeableThreadPoolExecutor;
 	private RejectedExecutionHandler _rejectedExecutionHandler;
+	private final AtomicLong _rejectedTaskCounter = new AtomicLong();
 	private int _workersCoreSize = _WORKERS_CORE_SIZE;
 	private int _workersMaxSize = _WORKERS_MAX_SIZE;
-
-	private class PortalExecutorManagerServiceTrackerCustomizer
-		implements ServiceTrackerCustomizer
-			<PortalExecutorManager, PortalExecutorManager> {
-
-		@Override
-		public PortalExecutorManager addingService(
-			ServiceReference<PortalExecutorManager> serviceReference) {
-
-			Registry registry = RegistryUtil.getRegistry();
-
-			portalExecutorManager = registry.getService(serviceReference);
-
-			open();
-
-			return portalExecutorManager;
-		}
-
-		@Override
-		public void modifiedService(
-			ServiceReference<PortalExecutorManager> serviceReference,
-			PortalExecutorManager portalExecutorManager) {
-		}
-
-		@Override
-		public void removedService(
-			ServiceReference<PortalExecutorManager> serviceReference,
-			PortalExecutorManager portalExecutorManager) {
-
-			portalExecutorManager = null;
-		}
-
-	}
 
 }

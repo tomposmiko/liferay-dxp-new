@@ -92,7 +92,8 @@ public class ProductSpecificationResourceImpl
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"Unable to find productSpecification with ID: " +
-							productSpecificationId);
+							productSpecificationId,
+						noSuchCPDefinitionSpecificationOptionValueException);
 				}
 			}
 		}
@@ -132,8 +133,7 @@ public class ProductSpecificationResourceImpl
 		return ProductSpecificationUtil.
 			updateCPDefinitionSpecificationOptionValue(
 				_cpDefinitionSpecificationOptionValueService,
-				cpDefinitionSpecificationOptionValue,
-				_cpSpecificationOptionService, productSpecification,
+				cpDefinitionSpecificationOptionValue, productSpecification,
 				_serviceContextHelper.getServiceContext());
 	}
 

@@ -131,6 +131,16 @@ public class OrganizationServiceUtil {
 			comments, site, serviceContext);
 	}
 
+	public static com.liferay.portal.kernel.model.User
+			addOrganizationUserByEmailAddress(
+				String emailAddress, long organizationId,
+				ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addOrganizationUserByEmailAddress(
+			emailAddress, organizationId, serviceContext);
+	}
+
 	/**
 	 * Assigns the password policy to the organizations, removing any other
 	 * currently assigned password policies.
@@ -144,6 +154,14 @@ public class OrganizationServiceUtil {
 
 		getService().addPasswordPolicyOrganizations(
 			passwordPolicyId, organizationIds);
+	}
+
+	public static void addUserOrganizationByEmailAddress(
+			String emailAddress, long organizationId)
+		throws PortalException {
+
+		getService().addUserOrganizationByEmailAddress(
+			emailAddress, organizationId);
 	}
 
 	/**
@@ -165,6 +183,14 @@ public class OrganizationServiceUtil {
 		throws PortalException {
 
 		getService().deleteOrganization(organizationId);
+	}
+
+	public static void deleteUserOrganizationByEmailAddress(
+			String emailAddress, long organizationId)
+		throws PortalException {
+
+		getService().deleteUserOrganizationByEmailAddress(
+			emailAddress, organizationId);
 	}
 
 	/**

@@ -21,14 +21,12 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.AssumeTestRule;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.store.test.util.BaseStoreTestCase;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-
-import java.util.Dictionary;
 
 import org.junit.AfterClass;
 import org.junit.Assume;
@@ -69,21 +67,31 @@ public class GCSStoreTest extends BaseStoreTestCase {
 			"com.liferay.portal.store.gcs.configuration.GCSStoreConfiguration",
 			StringPool.QUESTION);
 
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-		properties.put("aes256Key", "");
-		properties.put("bucketName", "test");
-		properties.put("initialRPCTimeout", "120000");
-		properties.put("initialRetryDelay", "400");
-		properties.put("maxRPCTimeout", "600000");
-		properties.put("maxRetryAttempts", "5");
-		properties.put("maxRetryDelay", "10000");
-		properties.put("retryDelayMultiplier", "1.5");
-		properties.put("retryJitter", "false");
-		properties.put("rpcTimeoutMultiplier", "1.0");
-		properties.put("serviceAccountKey", "");
-
-		ConfigurationTestUtil.saveConfiguration(_configuration, properties);
+		ConfigurationTestUtil.saveConfiguration(
+			_configuration,
+			HashMapDictionaryBuilder.<String, Object>put(
+				"aes256Key", ""
+			).put(
+				"bucketName", "test"
+			).put(
+				"initialRetryDelay", "400"
+			).put(
+				"initialRPCTimeout", "120000"
+			).put(
+				"maxRetryAttempts", "5"
+			).put(
+				"maxRetryDelay", "10000"
+			).put(
+				"maxRPCTimeout", "600000"
+			).put(
+				"retryDelayMultiplier", "1.5"
+			).put(
+				"retryJitter", "false"
+			).put(
+				"rpcTimeoutMultiplier", "1.0"
+			).put(
+				"serviceAccountKey", ""
+			).build());
 	}
 
 	@AfterClass

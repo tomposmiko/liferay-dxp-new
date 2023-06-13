@@ -28,13 +28,13 @@ public class LayoutSetTable {
 	public static final String TABLE_NAME = "LayoutSet";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
-		{"layoutSetId", Types.BIGINT}, {"groupId", Types.BIGINT},
-		{"companyId", Types.BIGINT}, {"createDate", Types.TIMESTAMP},
-		{"modifiedDate", Types.TIMESTAMP}, {"privateLayout", Types.BOOLEAN},
-		{"logoId", Types.BIGINT}, {"themeId", Types.VARCHAR},
-		{"colorSchemeId", Types.VARCHAR}, {"css", Types.CLOB},
-		{"settings_", Types.CLOB}, {"layoutSetPrototypeUuid", Types.VARCHAR},
+		{"mvccVersion", Types.BIGINT}, {"layoutSetId", Types.BIGINT},
+		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
+		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
+		{"privateLayout", Types.BOOLEAN}, {"logoId", Types.BIGINT},
+		{"themeId", Types.VARCHAR}, {"colorSchemeId", Types.VARCHAR},
+		{"css", Types.CLOB}, {"settings_", Types.CLOB},
+		{"layoutSetPrototypeUuid", Types.VARCHAR},
 		{"layoutSetPrototypeLinkEnabled", Types.BOOLEAN}
 	};
 
@@ -43,8 +43,6 @@ new HashMap<String, Integer>();
 
 static {
 TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
-
-TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
 
 TABLE_COLUMNS_MAP.put("layoutSetId", Types.BIGINT);
 
@@ -74,16 +72,15 @@ TABLE_COLUMNS_MAP.put("layoutSetPrototypeLinkEnabled", Types.BOOLEAN);
 
 }
 	public static final String TABLE_SQL_CREATE =
-"create table LayoutSet (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,layoutSetId LONG not null,groupId LONG,companyId LONG,createDate DATE null,modifiedDate DATE null,privateLayout BOOLEAN,logoId LONG,themeId VARCHAR(75) null,colorSchemeId VARCHAR(75) null,css TEXT null,settings_ TEXT null,layoutSetPrototypeUuid VARCHAR(75) null,layoutSetPrototypeLinkEnabled BOOLEAN,primary key (layoutSetId, ctCollectionId))";
+"create table LayoutSet (mvccVersion LONG default 0 not null,layoutSetId LONG not null primary key,groupId LONG,companyId LONG,createDate DATE null,modifiedDate DATE null,privateLayout BOOLEAN,logoId LONG,themeId VARCHAR(75) null,colorSchemeId VARCHAR(75) null,css TEXT null,settings_ TEXT null,layoutSetPrototypeUuid VARCHAR(75) null,layoutSetPrototypeLinkEnabled BOOLEAN)";
 
 	public static final String TABLE_SQL_DROP = "drop table LayoutSet";
 
 	public static final String[] TABLE_SQL_ADD_INDEXES = {
-		"create index IX_20615181 on LayoutSet (companyId, layoutSetPrototypeUuid[$COLUMN_LENGTH:75$], ctCollectionId)",
-		"create index IX_5B990A4A on LayoutSet (groupId, ctCollectionId)",
-		"create unique index IX_3F2A9AEF on LayoutSet (groupId, privateLayout, ctCollectionId)",
-		"create index IX_55443115 on LayoutSet (layoutSetPrototypeUuid[$COLUMN_LENGTH:75$], ctCollectionId)",
-		"create index IX_A6EE9D37 on LayoutSet (privateLayout, logoId, ctCollectionId)"
+		"create index IX_BC1F2123 on LayoutSet (companyId, layoutSetPrototypeUuid[$COLUMN_LENGTH:75$])",
+		"create unique index IX_48550691 on LayoutSet (groupId, privateLayout)",
+		"create index IX_72BBA8B7 on LayoutSet (layoutSetPrototypeUuid[$COLUMN_LENGTH:75$])",
+		"create index IX_1B698D9 on LayoutSet (privateLayout, logoId)"
 	};
 
 }

@@ -135,6 +135,10 @@ public class DDMTemplateStagedModelDataHandler
 				template.getCompanyId());
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return referenceAttributes;
 		}
 
@@ -230,14 +234,11 @@ public class DDMTemplateStagedModelDataHandler
 				}
 				else {
 					if (_log.isWarnEnabled()) {
-						StringBundler sb = new StringBundler(4);
-
-						sb.append("Unable to export small image ");
-						sb.append(template.getSmallImageId());
-						sb.append(" to template ");
-						sb.append(template.getTemplateKey());
-
-						_log.warn(sb.toString());
+						_log.warn(
+							StringBundler.concat(
+								"Unable to export small image ",
+								template.getSmallImageId(), " to template ",
+								template.getTemplateKey()));
 					}
 
 					template.setSmallImage(false);
@@ -251,7 +252,8 @@ public class DDMTemplateStagedModelDataHandler
 				replaceExportContentReferences(
 					portletDataContext, template, template.getScript(),
 					portletDataContext.getBooleanParameter(
-						DDMPortletDataHandler.NAMESPACE, "referenced-content"),
+						BaseDDMPortletDataHandler.NAMESPACE,
+						"referenced-content"),
 					false);
 
 		template.setScript(script);

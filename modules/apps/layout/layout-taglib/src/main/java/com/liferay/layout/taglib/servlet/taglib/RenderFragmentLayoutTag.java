@@ -15,7 +15,6 @@
 package com.liferay.layout.taglib.servlet.taglib;
 
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
-import com.liferay.layout.constants.LayoutWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
@@ -92,7 +91,7 @@ public class RenderFragmentLayoutTag extends IncludeTag {
 	public void setPageContext(PageContext pageContext) {
 		super.setPageContext(pageContext);
 
-		servletContext = ServletContextUtil.getServletContext();
+		setServletContext(ServletContextUtil.getServletContext());
 	}
 
 	public void setPlid(long plid) {
@@ -158,13 +157,6 @@ public class RenderFragmentLayoutTag extends IncludeTag {
 			return _layoutStructure;
 		}
 
-		_layoutStructure = (LayoutStructure)httpServletRequest.getAttribute(
-			LayoutWebKeys.LAYOUT_STRUCTURE);
-
-		if (_layoutStructure != null) {
-			return _layoutStructure;
-		}
-
 		try {
 			Layout layout = _getLayout(httpServletRequest);
 
@@ -174,7 +166,7 @@ public class RenderFragmentLayoutTag extends IncludeTag {
 						layout.getGroupId(), layout.getPlid(), true);
 
 			String data = layoutPageTemplateStructure.getData(
-				_getSegmentsExperienceIds());
+				_getSegmentsExperienceId());
 
 			if (Validator.isNull(data)) {
 				return _layoutStructure;
@@ -217,6 +209,10 @@ public class RenderFragmentLayoutTag extends IncludeTag {
 					masterLayoutPageTemplateEntry.getGroupId(),
 					masterLayoutPageTemplateEntry.getPlid());
 
+		if (masterLayoutPageTemplateStructure == null) {
+			return null;
+		}
+
 		return masterLayoutPageTemplateStructure.getData(
 			SegmentsExperienceConstants.ID_DEFAULT);
 	}
@@ -235,17 +231,22 @@ public class RenderFragmentLayoutTag extends IncludeTag {
 		return themeDisplay.getPlid();
 	}
 
-	private long[] _getSegmentsExperienceIds() {
-		long[] selectedSegmentsExperienceIds = ParamUtil.getLongValues(
-			request, "segmentsExperienceId");
+	private long _getSegmentsExperienceId() {
+		HttpServletRequest httpServletRequest = getRequest();
 
-		if (selectedSegmentsExperienceIds.length > 0) {
-			return selectedSegmentsExperienceIds;
+		long selectedSegmentsExperienceId = ParamUtil.getLong(
+			httpServletRequest, "segmentsExperienceId", -1);
+
+		if (selectedSegmentsExperienceId != -1) {
+			return selectedSegmentsExperienceId;
 		}
 
-		return GetterUtil.getLongValues(
-			request.getAttribute(SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS),
+		long[] segmentsExperienceIds = GetterUtil.getLongValues(
+			httpServletRequest.getAttribute(
+				SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS),
 			new long[] {SegmentsExperienceConstants.ID_DEFAULT});
+
+		return segmentsExperienceIds[0];
 	}
 
 	private LayoutStructure _mergeLayoutStructure(

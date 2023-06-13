@@ -27,7 +27,7 @@ DLViewFileVersionDisplayContext dlViewFileVersionDisplayContext = dlDisplayConte
 <liferay-util:html-top
 	outputKey="document_library_preview_css"
 >
-	<link href="<%= PortalUtil.getStaticResourceURL(request, PortalUtil.getPathProxy() + application.getContextPath() + "/document_library/css/document_library_preview.css") %>" rel="stylesheet" type="text/css" />
+	<link href="<%= PortalUtil.getStaticResourceURL(request, application.getContextPath() + "/document_library/css/document_library_preview.css") %>" rel="stylesheet" type="text/css" />
 </liferay-util:html-top>
 
 <c:choose>
@@ -35,6 +35,13 @@ DLViewFileVersionDisplayContext dlViewFileVersionDisplayContext = dlDisplayConte
 		<liferay-util:include page="/document_library/view_file_entry_simple_view.jsp" servletContext="<%= application %>" />
 	</c:when>
 	<c:otherwise>
+
+		<%
+		DLAdminDisplayContextProvider dlAdminDisplayContextProvider = dlWebComponentProvider.getDlAdminDisplayContextProvider();
+
+		renderRequest.setAttribute(DLViewFileEntryDisplayContext.class.getName(), new DLViewFileEntryDisplayContext(dlAdminDisplayContextProvider.getDLAdminDisplayContext(request, response), dlDisplayContextProvider, HtmlUtil.getHtml(), request, LanguageUtil.getLanguage(), PortalUtil.getPortal(), renderRequest, renderResponse));
+		%>
+
 		<liferay-util:include page="/document_library/view_file_entry.jsp" servletContext="<%= application %>">
 			<liferay-util:param name="addPortletBreadcrumbEntries" value="<%= Boolean.FALSE.toString() %>" />
 		</liferay-util:include>

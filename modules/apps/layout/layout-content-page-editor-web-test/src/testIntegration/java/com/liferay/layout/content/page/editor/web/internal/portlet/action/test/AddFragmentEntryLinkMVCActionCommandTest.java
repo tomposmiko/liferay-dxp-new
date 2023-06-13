@@ -223,7 +223,7 @@ public class AddFragmentEntryLinkMVCActionCommandTest {
 			fragmentCollection.getFragmentCollectionId(),
 			StringUtil.randomString(), StringUtil.randomString(),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			RandomTestUtil.randomString(), "{fieldSets: []}", 0,
+			RandomTestUtil.randomString(), false, "{fieldSets: []}", null, 0,
 			FragmentConstants.TYPE_COMPONENT, WorkflowConstants.STATUS_APPROVED,
 			serviceContext);
 	}
@@ -282,7 +282,9 @@ public class AddFragmentEntryLinkMVCActionCommandTest {
 	@Inject
 	private LayoutLocalService _layoutLocalService;
 
-	@Inject(filter = "mvc.command.name=/content_layout/add_fragment_entry_link")
+	@Inject(
+		filter = "mvc.command.name=/layout_content_page_editor/add_fragment_entry_link"
+	)
 	private MVCActionCommand _mvcActionCommand;
 
 }

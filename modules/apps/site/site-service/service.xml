@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.3.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_3_0.dtd">
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.4.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_4_0.dtd">
 
 <service-builder auto-import-default-references="false" auto-namespace-tables="false" dependency-injector="ds" mvcc-enabled="true" package-path="com.liferay.site">
 	<namespace>Site</namespace>
@@ -29,7 +29,7 @@
 
 		<!-- Finder methods -->
 
-		<finder name="C_G" return-type="Collection">
+		<finder name="G_C" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column name="companyId" />
 		</finder>
@@ -37,7 +37,7 @@
 			<finder-column name="companyId" />
 			<finder-column name="friendlyURL" />
 		</finder>
-		<finder name="C_G_L" return-type="SiteFriendlyURL" unique="true">
+		<finder name="G_C_L" return-type="SiteFriendlyURL" unique="true">
 			<finder-column name="groupId" />
 			<finder-column name="companyId" />
 			<finder-column name="languageId" />
@@ -47,9 +47,5 @@
 			<finder-column name="friendlyURL" />
 			<finder-column name="languageId" />
 		</finder>
-
-		<!-- References -->
-
-		<reference entity="User" package-path="com.liferay.portal" />
 	</entity>
 </service-builder>

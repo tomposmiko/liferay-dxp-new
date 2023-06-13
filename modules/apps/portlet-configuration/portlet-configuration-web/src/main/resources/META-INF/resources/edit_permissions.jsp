@@ -40,7 +40,7 @@ if (Validator.isNotNull(portletConfigurationPermissionsDisplayContext.getModelRe
 			selectable="<%= false %>"
 		/>
 
-		<aui:form action="<%= portletConfigurationPermissionsDisplayContext.getUpdateRolePermissionsURL() %>" cssClass="container-fluid-1280" method="post" name="fm">
+		<aui:form action="<%= portletConfigurationPermissionsDisplayContext.getUpdateRolePermissionsURL() %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
 			<aui:input name="resourceId" type="hidden" value="<%= resource.getResourceId() %>" />
 
 			<liferay-ui:search-container
@@ -79,7 +79,7 @@ if (Validator.isNotNull(portletConfigurationPermissionsDisplayContext.getModelRe
 								<%= role.getTitle(locale) %>
 							</span>
 
-							<c:if test="<%= layout.isPrivateLayout() && name.equals(RoleConstants.GUEST) && PropsValues.PERMISSIONS_CHECK_GUEST_ENABLED %>">
+							<c:if test="<%= layout.isPrivateLayout() && name.equals(RoleConstants.GUEST) %>">
 								<span class="inline-item-after">
 									<liferay-ui:icon-help message="under-the-current-configuration-all-users-automatically-inherit-permissions-from-the-guest-role" />
 								</span>
@@ -135,7 +135,7 @@ if (Validator.isNotNull(portletConfigurationPermissionsDisplayContext.getModelRe
 								type = ResourceActionsUtil.getModelResource(locale, resource.getName());
 							}
 
-							dataMessage = HtmlUtil.escapeAttribute(LanguageUtil.format(request, preselectedMsg, new Object[] {role.getTitle(locale), ResourceActionsUtil.getAction(request, action), type, HtmlUtil.escape(portletConfigurationPermissionsDisplayContext.getGroupDescriptiveName())}, false));
+							dataMessage = HtmlUtil.escapeAttribute(LanguageUtil.format(request, preselectedMsg, new Object[] {role.getTitle(locale), _getActionLabel(request, resource.getName(), action), type, HtmlUtil.escape(portletConfigurationPermissionsDisplayContext.getGroupDescriptiveName())}, false));
 						}
 
 						String actionSeparator = Validator.isNotNull(preselectedMsg) ? ActionUtil.PRESELECTED : ActionUtil.ACTION;
@@ -143,7 +143,7 @@ if (Validator.isNotNull(portletConfigurationPermissionsDisplayContext.getModelRe
 
 						<liferay-ui:search-container-column-text
 							cssClass="table-column-text-center"
-							name="<%= ResourceActionsUtil.getAction(request, action) %>"
+							name="<%= _getActionLabel(request, resource.getName(), action) %>"
 						>
 							<c:if test="<%= disabled && checked %>">
 								<input name="<%= liferayPortletResponse.getNamespace() + role.getRoleId() + actionSeparator + action %>" type="hidden" value="<%= true %>" />
@@ -179,7 +179,7 @@ if (Validator.isNotNull(portletConfigurationPermissionsDisplayContext.getModelRe
 	);
 
 	if (<portlet:namespace />saveButton) {
-		<portlet:namespace />saveButton.addEventListener('click', function (event) {
+		<portlet:namespace />saveButton.addEventListener('click', (event) => {
 			event.preventDefault();
 
 			if (

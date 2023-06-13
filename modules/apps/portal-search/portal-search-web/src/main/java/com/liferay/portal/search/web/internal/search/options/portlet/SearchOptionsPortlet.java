@@ -66,7 +66,7 @@ public class SearchOptionsPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		if (!SearchPortletPermissionUtil.containsConfiguration(
-				_portletPermission, renderRequest, _portal)) {
+				portletPermission, renderRequest, portal)) {
 
 			renderRequest.setAttribute(
 				WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.TRUE);
@@ -76,9 +76,9 @@ public class SearchOptionsPortlet extends MVCPortlet {
 	}
 
 	@Reference
-	private Portal _portal;
+	protected Portal portal;
 
 	@Reference
-	private PortletPermission _portletPermission;
+	protected PortletPermission portletPermission;
 
 }

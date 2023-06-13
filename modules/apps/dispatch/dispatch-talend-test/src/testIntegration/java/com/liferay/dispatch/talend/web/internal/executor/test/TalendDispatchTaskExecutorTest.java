@@ -26,11 +26,14 @@ import com.liferay.dispatch.service.DispatchTriggerLocalService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -95,6 +98,54 @@ public class TalendDispatchTaskExecutorTest {
 			DispatchTaskStatus.valueOf(dispatchLog.getStatus()));
 	}
 
+	@Test
+	public void testExecuteLiferayOutputBlog() throws Exception {
+		DispatchTrigger dispatchTrigger =
+			_dispatchTriggerLocalService.addDispatchTrigger(
+				TestPropsValues.getUserId(), "talend",
+				UnicodePropertiesBuilder.put(
+					"liferayUser", "test@liferay.com"
+				).put(
+					"liferayUserPassword", "test"
+				).put(
+					"siteId",
+					() -> {
+						Group testGroup = GroupTestUtil.addGroup();
+
+						return String.valueOf(testGroup.getGroupId());
+					}
+				).build(),
+				"TalendDispatchTrigger", false);
+
+		_dispatchFileRepository.addFileEntry(
+			dispatchTrigger.getUserId(), dispatchTrigger.getDispatchTriggerId(),
+			_TALEND_LIFERAY_OUTPUT_BLOG_SAMPLE_ZIP, 0, "application/zip",
+			TalendDispatchTaskExecutorTest.class.getResourceAsStream(
+				"/" + _TALEND_LIFERAY_OUTPUT_BLOG_SAMPLE_ZIP));
+
+		Calendar calendar = Calendar.getInstance();
+
+		int year = calendar.get(Calendar.YEAR) + 1;
+
+		dispatchTrigger = _dispatchTriggerLocalService.updateDispatchTrigger(
+			dispatchTrigger.getDispatchTriggerId(), false, "* * * * * *",
+			DispatchTaskClusterMode.SINGLE_NODE, 5, 5, year, 11, 11, false,
+			false, 4, 4, year, 0, 0);
+
+		_simulateSchedulerEvent(dispatchTrigger.getDispatchTriggerId());
+
+		List<DispatchLog> dispatchLogs =
+			_dispatchLogLocalService.getDispatchLogs(
+				dispatchTrigger.getDispatchTriggerId(), QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS);
+
+		DispatchLog dispatchLog = dispatchLogs.get(0);
+
+		Assert.assertEquals(
+			DispatchTaskStatus.SUCCESSFUL,
+			DispatchTaskStatus.valueOf(dispatchLog.getStatus()));
+	}
+
 	private void _simulateSchedulerEvent(long dispatchTriggerId)
 		throws Exception {
 
@@ -108,6 +159,9 @@ public class TalendDispatchTaskExecutorTest {
 
 	private static final String _TALEND_CONTEXT_PRINTER_SAMPLE_ZIP =
 		"etl-talend-context-printer-sample-1.0.zip";
+
+	private static final String _TALEND_LIFERAY_OUTPUT_BLOG_SAMPLE_ZIP =
+		"etl-talend-liferay-output-blog-sample-1.0.zip";
 
 	@Inject
 	private DispatchFileRepository _dispatchFileRepository;

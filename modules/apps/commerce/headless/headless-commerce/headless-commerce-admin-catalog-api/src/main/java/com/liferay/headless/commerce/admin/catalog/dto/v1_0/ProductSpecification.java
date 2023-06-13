@@ -64,7 +64,7 @@ public class ProductSpecification implements Serializable {
 	}
 
 	@DecimalMin("0")
-	@Schema(example = "31130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -90,9 +90,7 @@ public class ProductSpecification implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@Schema(
-		example = "{en_US=Hand Saw, hr_HR=Product Name HR, hu_HU=Product Name HU}"
-	)
+	@Schema
 	@Valid
 	public Map<String, String> getLabel() {
 		return label;
@@ -122,7 +120,7 @@ public class ProductSpecification implements Serializable {
 	protected Map<String, String> label;
 
 	@DecimalMin("0")
-	@Schema(example = "30129")
+	@Schema
 	public Long getOptionCategoryId() {
 		return optionCategoryId;
 	}
@@ -151,7 +149,7 @@ public class ProductSpecification implements Serializable {
 	protected Long optionCategoryId;
 
 	@DecimalMin("0")
-	@Schema(example = "1.2")
+	@Schema
 	public Double getPriority() {
 		return priority;
 	}
@@ -180,7 +178,7 @@ public class ProductSpecification implements Serializable {
 	protected Double priority;
 
 	@DecimalMin("0")
-	@Schema(example = "30129")
+	@Schema
 	public Long getProductId() {
 		return productId;
 	}
@@ -209,7 +207,7 @@ public class ProductSpecification implements Serializable {
 	protected Long productId;
 
 	@DecimalMin("0")
-	@Schema(example = "30129")
+	@Schema
 	public Long getSpecificationId() {
 		return specificationId;
 	}
@@ -237,7 +235,7 @@ public class ProductSpecification implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long specificationId;
 
-	@Schema(example = "specification-key")
+	@Schema
 	public String getSpecificationKey() {
 		return specificationKey;
 	}
@@ -266,7 +264,7 @@ public class ProductSpecification implements Serializable {
 	@NotEmpty
 	protected String specificationKey;
 
-	@Schema(example = "{en_US=Croatia, hr_HR=Hrvatska, hu_HU=Horvatorszag}")
+	@Schema
 	@Valid
 	public Map<String, String> getValue() {
 		return value;

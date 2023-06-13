@@ -19,6 +19,7 @@ import com.liferay.headless.delivery.client.dto.v1_0.Rating;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
 import com.liferay.headless.delivery.client.pagination.Page;
 import com.liferay.headless.delivery.client.pagination.Pagination;
+import com.liferay.headless.delivery.client.permission.Permission;
 import com.liferay.headless.delivery.client.problem.Problem;
 import com.liferay.headless.delivery.client.serdes.v1_0.KnowledgeBaseArticleSerDes;
 import com.liferay.headless.delivery.client.serdes.v1_0.RatingSerDes;
@@ -27,9 +28,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -124,6 +126,24 @@ public interface KnowledgeBaseArticleResource {
 
 	public HttpInvoker.HttpResponse putKnowledgeBaseArticleMyRatingHttpResponse(
 			Long knowledgeBaseArticleId, Rating rating)
+		throws Exception;
+
+	public Page<Permission> getKnowledgeBaseArticlePermissionsPage(
+			Long knowledgeBaseArticleId, String roleNames)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			getKnowledgeBaseArticlePermissionsPageHttpResponse(
+				Long knowledgeBaseArticleId, String roleNames)
+		throws Exception;
+
+	public Page<Permission> putKnowledgeBaseArticlePermissionsPage(
+			Long knowledgeBaseArticleId, Permission[] permissions)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			putKnowledgeBaseArticlePermissionsPageHttpResponse(
+				Long knowledgeBaseArticleId, Permission[] permissions)
 		throws Exception;
 
 	public void putKnowledgeBaseArticleSubscribe(Long knowledgeBaseArticleId)
@@ -231,6 +251,55 @@ public interface KnowledgeBaseArticleResource {
 				Long siteId, String callbackURL, Object object)
 		throws Exception;
 
+	public void deleteSiteKnowledgeBaseArticleByExternalReferenceCode(
+			Long siteId, String externalReferenceCode)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			deleteSiteKnowledgeBaseArticleByExternalReferenceCodeHttpResponse(
+				Long siteId, String externalReferenceCode)
+		throws Exception;
+
+	public KnowledgeBaseArticle
+			getSiteKnowledgeBaseArticleByExternalReferenceCode(
+				Long siteId, String externalReferenceCode)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			getSiteKnowledgeBaseArticleByExternalReferenceCodeHttpResponse(
+				Long siteId, String externalReferenceCode)
+		throws Exception;
+
+	public KnowledgeBaseArticle
+			putSiteKnowledgeBaseArticleByExternalReferenceCode(
+				Long siteId, String externalReferenceCode,
+				KnowledgeBaseArticle knowledgeBaseArticle)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			putSiteKnowledgeBaseArticleByExternalReferenceCodeHttpResponse(
+				Long siteId, String externalReferenceCode,
+				KnowledgeBaseArticle knowledgeBaseArticle)
+		throws Exception;
+
+	public Page<Permission> getSiteKnowledgeBaseArticlePermissionsPage(
+			Long siteId, String roleNames)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			getSiteKnowledgeBaseArticlePermissionsPageHttpResponse(
+				Long siteId, String roleNames)
+		throws Exception;
+
+	public Page<Permission> putSiteKnowledgeBaseArticlePermissionsPage(
+			Long siteId, Permission[] permissions)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse
+			putSiteKnowledgeBaseArticlePermissionsPageHttpResponse(
+				Long siteId, Permission[] permissions)
+		throws Exception;
+
 	public void putSiteKnowledgeBaseArticleSubscribe(Long siteId)
 		throws Exception;
 
@@ -254,40 +323,8 @@ public interface KnowledgeBaseArticleResource {
 			return this;
 		}
 
-		public Builder bearerToken(String token) {
-			return header("Authorization", "Bearer " + token);
-		}
-
 		public KnowledgeBaseArticleResource build() {
 			return new KnowledgeBaseArticleResourceImpl(this);
-		}
-
-		public Builder contextPath(String contextPath) {
-			_contextPath = contextPath;
-
-			return this;
-		}
-
-		public Builder endpoint(String address, String scheme) {
-			String[] addressParts = address.split(":");
-
-			String host = addressParts[0];
-
-			int port = 443;
-
-			if (addressParts.length > 1) {
-				String portString = addressParts[1];
-
-				try {
-					port = Integer.parseInt(portString);
-				}
-				catch (NumberFormatException numberFormatException) {
-					throw new IllegalArgumentException(
-						"Unable to parse port from " + portString);
-				}
-			}
-
-			return endpoint(host, port, scheme);
 		}
 
 		public Builder endpoint(String host, int port, String scheme) {
@@ -335,7 +372,6 @@ public interface KnowledgeBaseArticleResource {
 		private Builder() {
 		}
 
-		private String _contextPath = "";
 		private Map<String, String> _headers = new LinkedHashMap<>();
 		private String _host = "localhost";
 		private Locale _locale;
@@ -370,29 +406,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -442,7 +456,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-articles/{knowledgeBaseArticleId}");
 
 			httpInvoker.path("knowledgeBaseArticleId", knowledgeBaseArticleId);
@@ -475,29 +489,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -544,7 +536,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-articles/batch");
 
 			httpInvoker.userNameAndPassword(
@@ -574,29 +566,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -646,7 +616,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-articles/{knowledgeBaseArticleId}");
 
 			httpInvoker.path("knowledgeBaseArticleId", knowledgeBaseArticleId);
@@ -680,29 +650,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -756,7 +704,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-articles/{knowledgeBaseArticleId}");
 
 			httpInvoker.path("knowledgeBaseArticleId", knowledgeBaseArticleId);
@@ -790,29 +738,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -866,7 +792,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-articles/{knowledgeBaseArticleId}");
 
 			httpInvoker.path("knowledgeBaseArticleId", knowledgeBaseArticleId);
@@ -898,29 +824,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -967,7 +871,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-articles/batch");
 
 			httpInvoker.userNameAndPassword(
@@ -998,29 +902,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1071,7 +953,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-articles/{knowledgeBaseArticleId}/my-rating");
 
 			httpInvoker.path("knowledgeBaseArticleId", knowledgeBaseArticleId);
@@ -1104,29 +986,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1177,7 +1037,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-articles/{knowledgeBaseArticleId}/my-rating");
 
 			httpInvoker.path("knowledgeBaseArticleId", knowledgeBaseArticleId);
@@ -1210,29 +1070,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1285,7 +1123,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-articles/{knowledgeBaseArticleId}/my-rating");
 
 			httpInvoker.path("knowledgeBaseArticleId", knowledgeBaseArticleId);
@@ -1318,29 +1156,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1393,8 +1209,190 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-articles/{knowledgeBaseArticleId}/my-rating");
+
+			httpInvoker.path("knowledgeBaseArticleId", knowledgeBaseArticleId);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		public Page<Permission> getKnowledgeBaseArticlePermissionsPage(
+				Long knowledgeBaseArticleId, String roleNames)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				getKnowledgeBaseArticlePermissionsPageHttpResponse(
+					knowledgeBaseArticleId, roleNames);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+
+			try {
+				return Page.of(content, Permission::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				getKnowledgeBaseArticlePermissionsPageHttpResponse(
+					Long knowledgeBaseArticleId, String roleNames)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+			if (roleNames != null) {
+				httpInvoker.parameter("roleNames", String.valueOf(roleNames));
+			}
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port +
+						"/o/headless-delivery/v1.0/knowledge-base-articles/{knowledgeBaseArticleId}/permissions");
+
+			httpInvoker.path("knowledgeBaseArticleId", knowledgeBaseArticleId);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		public Page<Permission> putKnowledgeBaseArticlePermissionsPage(
+				Long knowledgeBaseArticleId, Permission[] permissions)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				putKnowledgeBaseArticlePermissionsPageHttpResponse(
+					knowledgeBaseArticleId, permissions);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+
+			try {
+				return Page.of(content, Permission::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				putKnowledgeBaseArticlePermissionsPageHttpResponse(
+					Long knowledgeBaseArticleId, Permission[] permissions)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			httpInvoker.body(
+				Stream.of(
+					permissions
+				).map(
+					value -> String.valueOf(value)
+				).collect(
+					Collectors.toList()
+				).toString(),
+				"application/json");
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.PUT);
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port +
+						"/o/headless-delivery/v1.0/knowledge-base-articles/{knowledgeBaseArticleId}/permissions");
 
 			httpInvoker.path("knowledgeBaseArticleId", knowledgeBaseArticleId);
 
@@ -1426,29 +1424,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1499,7 +1475,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-articles/{knowledgeBaseArticleId}/subscribe");
 
 			httpInvoker.path("knowledgeBaseArticleId", knowledgeBaseArticleId);
@@ -1532,29 +1508,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1605,7 +1559,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-articles/{knowledgeBaseArticleId}/unsubscribe");
 
 			httpInvoker.path("knowledgeBaseArticleId", knowledgeBaseArticleId);
@@ -1643,29 +1597,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1742,7 +1674,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-articles/{parentKnowledgeBaseArticleId}/knowledge-base-articles");
 
 			httpInvoker.path(
@@ -1778,29 +1710,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1855,7 +1765,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-articles/{parentKnowledgeBaseArticleId}/knowledge-base-articles");
 
 			httpInvoker.path(
@@ -1893,29 +1803,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1991,7 +1879,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-folders/{knowledgeBaseFolderId}/knowledge-base-articles");
 
 			httpInvoker.path("knowledgeBaseFolderId", knowledgeBaseFolderId);
@@ -2025,29 +1913,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -2102,7 +1968,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-folders/{knowledgeBaseFolderId}/knowledge-base-articles");
 
 			httpInvoker.path("knowledgeBaseFolderId", knowledgeBaseFolderId);
@@ -2135,29 +2001,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -2205,7 +2049,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/knowledge-base-folders/{knowledgeBaseFolderId}/knowledge-base-articles/batch");
 
 			httpInvoker.path("knowledgeBaseFolderId", knowledgeBaseFolderId);
@@ -2241,29 +2085,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -2339,7 +2161,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/sites/{siteId}/knowledge-base-articles");
 
 			httpInvoker.path("siteId", siteId);
@@ -2372,29 +2194,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -2448,7 +2248,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/sites/{siteId}/knowledge-base-articles");
 
 			httpInvoker.path("siteId", siteId);
@@ -2481,29 +2281,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -2550,8 +2328,452 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/sites/{siteId}/knowledge-base-articles/batch");
+
+			httpInvoker.path("siteId", siteId);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		public void deleteSiteKnowledgeBaseArticleByExternalReferenceCode(
+				Long siteId, String externalReferenceCode)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				deleteSiteKnowledgeBaseArticleByExternalReferenceCodeHttpResponse(
+					siteId, externalReferenceCode);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+
+			try {
+				return;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				deleteSiteKnowledgeBaseArticleByExternalReferenceCodeHttpResponse(
+					Long siteId, String externalReferenceCode)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.DELETE);
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port +
+						"/o/headless-delivery/v1.0/sites/{siteId}/knowledge-base-articles/by-external-reference-code/{externalReferenceCode}");
+
+			httpInvoker.path("siteId", siteId);
+			httpInvoker.path("externalReferenceCode", externalReferenceCode);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		public KnowledgeBaseArticle
+				getSiteKnowledgeBaseArticleByExternalReferenceCode(
+					Long siteId, String externalReferenceCode)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				getSiteKnowledgeBaseArticleByExternalReferenceCodeHttpResponse(
+					siteId, externalReferenceCode);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+
+			try {
+				return KnowledgeBaseArticleSerDes.toDTO(content);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				getSiteKnowledgeBaseArticleByExternalReferenceCodeHttpResponse(
+					Long siteId, String externalReferenceCode)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port +
+						"/o/headless-delivery/v1.0/sites/{siteId}/knowledge-base-articles/by-external-reference-code/{externalReferenceCode}");
+
+			httpInvoker.path("siteId", siteId);
+			httpInvoker.path("externalReferenceCode", externalReferenceCode);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		public KnowledgeBaseArticle
+				putSiteKnowledgeBaseArticleByExternalReferenceCode(
+					Long siteId, String externalReferenceCode,
+					KnowledgeBaseArticle knowledgeBaseArticle)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				putSiteKnowledgeBaseArticleByExternalReferenceCodeHttpResponse(
+					siteId, externalReferenceCode, knowledgeBaseArticle);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+
+			try {
+				return KnowledgeBaseArticleSerDes.toDTO(content);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				putSiteKnowledgeBaseArticleByExternalReferenceCodeHttpResponse(
+					Long siteId, String externalReferenceCode,
+					KnowledgeBaseArticle knowledgeBaseArticle)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			httpInvoker.body(
+				knowledgeBaseArticle.toString(), "application/json");
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.PUT);
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port +
+						"/o/headless-delivery/v1.0/sites/{siteId}/knowledge-base-articles/by-external-reference-code/{externalReferenceCode}");
+
+			httpInvoker.path("siteId", siteId);
+			httpInvoker.path("externalReferenceCode", externalReferenceCode);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		public Page<Permission> getSiteKnowledgeBaseArticlePermissionsPage(
+				Long siteId, String roleNames)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				getSiteKnowledgeBaseArticlePermissionsPageHttpResponse(
+					siteId, roleNames);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+
+			try {
+				return Page.of(content, Permission::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				getSiteKnowledgeBaseArticlePermissionsPageHttpResponse(
+					Long siteId, String roleNames)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+			if (roleNames != null) {
+				httpInvoker.parameter("roleNames", String.valueOf(roleNames));
+			}
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port +
+						"/o/headless-delivery/v1.0/sites/{siteId}/knowledge-base-articles/permissions");
+
+			httpInvoker.path("siteId", siteId);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		public Page<Permission> putSiteKnowledgeBaseArticlePermissionsPage(
+				Long siteId, Permission[] permissions)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				putSiteKnowledgeBaseArticlePermissionsPageHttpResponse(
+					siteId, permissions);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
+
+			try {
+				return Page.of(content, Permission::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				putSiteKnowledgeBaseArticlePermissionsPageHttpResponse(
+					Long siteId, Permission[] permissions)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			httpInvoker.body(
+				Stream.of(
+					permissions
+				).map(
+					value -> String.valueOf(value)
+				).collect(
+					Collectors.toList()
+				).toString(),
+				"application/json");
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.PUT);
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port +
+						"/o/headless-delivery/v1.0/sites/{siteId}/knowledge-base-articles/permissions");
 
 			httpInvoker.path("siteId", siteId);
 
@@ -2581,29 +2803,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -2653,7 +2853,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/sites/{siteId}/knowledge-base-articles/subscribe");
 
 			httpInvoker.path("siteId", siteId);
@@ -2684,29 +2884,7 @@ public interface KnowledgeBaseArticleResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -2756,7 +2934,7 @@ public interface KnowledgeBaseArticleResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/sites/{siteId}/knowledge-base-articles/unsubscribe");
 
 			httpInvoker.path("siteId", siteId);

@@ -128,10 +128,10 @@ public class CTAutoResolutionInfoUtil {
 	 * @param ctCollectionId the ct collection ID
 	 * @return the matching ct auto resolution infos
 	 */
-	public static List<CTAutoResolutionInfo> findByCTCollectionId(
+	public static List<CTAutoResolutionInfo> findByCtCollectionId(
 		long ctCollectionId) {
 
-		return getPersistence().findByCTCollectionId(ctCollectionId);
+		return getPersistence().findByCtCollectionId(ctCollectionId);
 	}
 
 	/**
@@ -146,10 +146,10 @@ public class CTAutoResolutionInfoUtil {
 	 * @param end the upper bound of the range of ct auto resolution infos (not inclusive)
 	 * @return the range of matching ct auto resolution infos
 	 */
-	public static List<CTAutoResolutionInfo> findByCTCollectionId(
+	public static List<CTAutoResolutionInfo> findByCtCollectionId(
 		long ctCollectionId, int start, int end) {
 
-		return getPersistence().findByCTCollectionId(
+		return getPersistence().findByCtCollectionId(
 			ctCollectionId, start, end);
 	}
 
@@ -166,11 +166,11 @@ public class CTAutoResolutionInfoUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching ct auto resolution infos
 	 */
-	public static List<CTAutoResolutionInfo> findByCTCollectionId(
+	public static List<CTAutoResolutionInfo> findByCtCollectionId(
 		long ctCollectionId, int start, int end,
 		OrderByComparator<CTAutoResolutionInfo> orderByComparator) {
 
-		return getPersistence().findByCTCollectionId(
+		return getPersistence().findByCtCollectionId(
 			ctCollectionId, start, end, orderByComparator);
 	}
 
@@ -188,12 +188,12 @@ public class CTAutoResolutionInfoUtil {
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching ct auto resolution infos
 	 */
-	public static List<CTAutoResolutionInfo> findByCTCollectionId(
+	public static List<CTAutoResolutionInfo> findByCtCollectionId(
 		long ctCollectionId, int start, int end,
 		OrderByComparator<CTAutoResolutionInfo> orderByComparator,
 		boolean useFinderCache) {
 
-		return getPersistence().findByCTCollectionId(
+		return getPersistence().findByCtCollectionId(
 			ctCollectionId, start, end, orderByComparator, useFinderCache);
 	}
 
@@ -205,13 +205,13 @@ public class CTAutoResolutionInfoUtil {
 	 * @return the first matching ct auto resolution info
 	 * @throws NoSuchAutoResolutionInfoException if a matching ct auto resolution info could not be found
 	 */
-	public static CTAutoResolutionInfo findByCTCollectionId_First(
+	public static CTAutoResolutionInfo findByCtCollectionId_First(
 			long ctCollectionId,
 			OrderByComparator<CTAutoResolutionInfo> orderByComparator)
 		throws com.liferay.change.tracking.exception.
 			NoSuchAutoResolutionInfoException {
 
-		return getPersistence().findByCTCollectionId_First(
+		return getPersistence().findByCtCollectionId_First(
 			ctCollectionId, orderByComparator);
 	}
 
@@ -222,11 +222,11 @@ public class CTAutoResolutionInfoUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching ct auto resolution info, or <code>null</code> if a matching ct auto resolution info could not be found
 	 */
-	public static CTAutoResolutionInfo fetchByCTCollectionId_First(
+	public static CTAutoResolutionInfo fetchByCtCollectionId_First(
 		long ctCollectionId,
 		OrderByComparator<CTAutoResolutionInfo> orderByComparator) {
 
-		return getPersistence().fetchByCTCollectionId_First(
+		return getPersistence().fetchByCtCollectionId_First(
 			ctCollectionId, orderByComparator);
 	}
 
@@ -238,13 +238,13 @@ public class CTAutoResolutionInfoUtil {
 	 * @return the last matching ct auto resolution info
 	 * @throws NoSuchAutoResolutionInfoException if a matching ct auto resolution info could not be found
 	 */
-	public static CTAutoResolutionInfo findByCTCollectionId_Last(
+	public static CTAutoResolutionInfo findByCtCollectionId_Last(
 			long ctCollectionId,
 			OrderByComparator<CTAutoResolutionInfo> orderByComparator)
 		throws com.liferay.change.tracking.exception.
 			NoSuchAutoResolutionInfoException {
 
-		return getPersistence().findByCTCollectionId_Last(
+		return getPersistence().findByCtCollectionId_Last(
 			ctCollectionId, orderByComparator);
 	}
 
@@ -255,11 +255,11 @@ public class CTAutoResolutionInfoUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching ct auto resolution info, or <code>null</code> if a matching ct auto resolution info could not be found
 	 */
-	public static CTAutoResolutionInfo fetchByCTCollectionId_Last(
+	public static CTAutoResolutionInfo fetchByCtCollectionId_Last(
 		long ctCollectionId,
 		OrderByComparator<CTAutoResolutionInfo> orderByComparator) {
 
-		return getPersistence().fetchByCTCollectionId_Last(
+		return getPersistence().fetchByCtCollectionId_Last(
 			ctCollectionId, orderByComparator);
 	}
 
@@ -272,13 +272,13 @@ public class CTAutoResolutionInfoUtil {
 	 * @return the previous, current, and next ct auto resolution info
 	 * @throws NoSuchAutoResolutionInfoException if a ct auto resolution info with the primary key could not be found
 	 */
-	public static CTAutoResolutionInfo[] findByCTCollectionId_PrevAndNext(
+	public static CTAutoResolutionInfo[] findByCtCollectionId_PrevAndNext(
 			long ctAutoResolutionInfoId, long ctCollectionId,
 			OrderByComparator<CTAutoResolutionInfo> orderByComparator)
 		throws com.liferay.change.tracking.exception.
 			NoSuchAutoResolutionInfoException {
 
-		return getPersistence().findByCTCollectionId_PrevAndNext(
+		return getPersistence().findByCtCollectionId_PrevAndNext(
 			ctAutoResolutionInfoId, ctCollectionId, orderByComparator);
 	}
 
@@ -287,8 +287,8 @@ public class CTAutoResolutionInfoUtil {
 	 *
 	 * @param ctCollectionId the ct collection ID
 	 */
-	public static void removeByCTCollectionId(long ctCollectionId) {
-		getPersistence().removeByCTCollectionId(ctCollectionId);
+	public static void removeByCtCollectionId(long ctCollectionId) {
+		getPersistence().removeByCtCollectionId(ctCollectionId);
 	}
 
 	/**
@@ -297,8 +297,8 @@ public class CTAutoResolutionInfoUtil {
 	 * @param ctCollectionId the ct collection ID
 	 * @return the number of matching ct auto resolution infos
 	 */
-	public static int countByCTCollectionId(long ctCollectionId) {
-		return getPersistence().countByCTCollectionId(ctCollectionId);
+	public static int countByCtCollectionId(long ctCollectionId) {
+		return getPersistence().countByCtCollectionId(ctCollectionId);
 	}
 
 	/**
@@ -567,7 +567,7 @@ public class CTAutoResolutionInfoUtil {
 	 *
 	 * @param ctCollectionId the ct collection ID
 	 * @param modelClassNameId the model class name ID
-	 * @param sourceModelClassPKs the source model class pks
+	 * @param sourceModelClassPK the source model class pk
 	 * @param start the lower bound of the range of ct auto resolution infos
 	 * @param end the upper bound of the range of ct auto resolution infos (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)

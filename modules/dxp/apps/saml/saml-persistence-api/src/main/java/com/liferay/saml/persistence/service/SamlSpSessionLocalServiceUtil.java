@@ -60,17 +60,17 @@ public class SamlSpSessionLocalServiceUtil {
 	}
 
 	public static SamlSpSession addSamlSpSession(
-			String samlIdpEntityId, String samlSpSessionKey,
 			String assertionXml, String jSessionId, String nameIdFormat,
 			String nameIdNameQualifier, String nameIdSPNameQualifier,
-			String nameIdValue, String sessionIndex,
+			String nameIdValue, String samlIdpEntityId, String samlSpSessionKey,
+			String sessionIndex,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addSamlSpSession(
-			samlIdpEntityId, samlSpSessionKey, assertionXml, jSessionId,
-			nameIdFormat, nameIdNameQualifier, nameIdSPNameQualifier,
-			nameIdValue, sessionIndex, serviceContext);
+			assertionXml, jSessionId, nameIdFormat, nameIdNameQualifier,
+			nameIdSPNameQualifier, nameIdValue, samlIdpEntityId,
+			samlSpSessionKey, sessionIndex, serviceContext);
 	}
 
 	/**
@@ -245,17 +245,6 @@ public class SamlSpSessionLocalServiceUtil {
 			companyId, sessionIndex);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 #fetchSamlSpSessionBySessionIndex(long, String)}
-	 */
-	@Deprecated
-	public static SamlSpSession fetchSamlSpSessionBySessionIndex(
-		String sessionIndex) {
-
-		return getService().fetchSamlSpSessionBySessionIndex(sessionIndex);
-	}
-
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 
@@ -315,10 +304,11 @@ public class SamlSpSessionLocalServiceUtil {
 	}
 
 	public static SamlSpSession getSamlSpSessionBySessionIndex(
-			String sessionIndex)
+			long companyId, String sessionIndex)
 		throws PortalException {
 
-		return getService().getSamlSpSessionBySessionIndex(sessionIndex);
+		return getService().getSamlSpSessionBySessionIndex(
+			companyId, sessionIndex);
 	}
 
 	/**
@@ -336,8 +326,14 @@ public class SamlSpSessionLocalServiceUtil {
 		return getService().getSamlSpSessions(start, end);
 	}
 
-	public static List<SamlSpSession> getSamlSpSessions(String nameIdValue) {
-		return getService().getSamlSpSessions(nameIdValue);
+	public static List<SamlSpSession> getSamlSpSessions(
+		long companyId, String nameIdFormat, String nameIdNameQualifier,
+		String nameIdSPNameQualifier, String nameIdValue,
+		String samlIdpEntityId) {
+
+		return getService().getSamlSpSessions(
+			companyId, nameIdFormat, nameIdNameQualifier, nameIdSPNameQualifier,
+			nameIdValue, samlIdpEntityId);
 	}
 
 	/**
@@ -357,18 +353,18 @@ public class SamlSpSessionLocalServiceUtil {
 	}
 
 	public static SamlSpSession updateSamlSpSession(
-			long samlSpSessionId, String samlIdpEntityId,
-			String samlSpSessionKey, String assertionXml, String jSessionId,
+			long samlSpSessionId, String assertionXml, String jSessionId,
 			String nameIdFormat, String nameIdNameQualifier,
 			String nameIdSPNameQualifier, String nameIdValue,
+			String samlIdpEntityId, String samlSpSessionKey,
 			String sessionIndex,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().updateSamlSpSession(
-			samlSpSessionId, samlIdpEntityId, samlSpSessionKey, assertionXml,
-			jSessionId, nameIdFormat, nameIdNameQualifier,
-			nameIdSPNameQualifier, nameIdValue, sessionIndex, serviceContext);
+			samlSpSessionId, assertionXml, jSessionId, nameIdFormat,
+			nameIdNameQualifier, nameIdSPNameQualifier, nameIdValue,
+			samlIdpEntityId, samlSpSessionKey, sessionIndex, serviceContext);
 	}
 
 	/**

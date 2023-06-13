@@ -35,9 +35,11 @@ CommerceAddressDisplayContext commerceAddressDisplayContext = (CommerceAddressDi
 
 		SearchContainer<CommerceAddress> commerceAddressSearchContainer = commerceAddressDisplayContext.getSearchContainer();
 
-		PortletURL portletURL = commerceAddressDisplayContext.getPortletURL();
-
-		portletURL.setParameter("searchContainerId", "commerceAddresses");
+		PortletURL portletURL = PortletURLBuilder.create(
+			commerceAddressDisplayContext.getPortletURL()
+		).setParameter(
+			"searchContainerId", "commerceAddresses"
+		).buildPortletURL();
 
 		request.setAttribute("view.jsp-portletURL", portletURL);
 		%>
@@ -49,8 +51,8 @@ CommerceAddressDisplayContext commerceAddressDisplayContext = (CommerceAddressDi
 			displayStyleGroupId="<%= commerceAddressDisplayContext.getDisplayStyleGroupId() %>"
 			entries="<%= commerceAddressSearchContainer.getResults() %>"
 		>
-			<div class="container-fluid-1280" id="<portlet:namespace />addressesContainer">
-				<aui:form action="<%= portletURL %>" cssClass="container-fluid-1280" method="post" name="fm">
+			<div class="container-fluid container-fluid-max-xl" id="<portlet:namespace />addressesContainer">
+				<aui:form action="<%= portletURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
 					<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.DELETE %>" />
 					<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
 
@@ -62,7 +64,6 @@ CommerceAddressDisplayContext commerceAddressDisplayContext = (CommerceAddressDi
 						>
 							<liferay-ui:search-container-row
 								className="com.liferay.commerce.model.CommerceAddress"
-								cssClass="entry-display-style"
 								keyProperty="commerceAddressId"
 								modelVar="commerceAddress"
 							>
@@ -72,7 +73,7 @@ CommerceAddressDisplayContext commerceAddressDisplayContext = (CommerceAddressDi
 								/>
 
 								<liferay-ui:search-container-column-text
-									cssClass="table-cell-content"
+									cssClass="table-cell-expand"
 									property="street1"
 								/>
 
@@ -86,16 +87,16 @@ CommerceAddressDisplayContext commerceAddressDisplayContext = (CommerceAddressDi
 
 								<liferay-ui:search-container-column-text
 									name="country"
-									property="commerceCountry.name"
+									property="country.name"
 								/>
 
 								<%
-								CommerceRegion commerceRegion = commerceAddress.getCommerceRegion();
+								Region region = commerceAddress.getRegion();
 								%>
 
 								<liferay-ui:search-container-column-text
 									name="region"
-									value="<%= (commerceRegion != null) ? HtmlUtil.escape(commerceRegion.getName()) : StringPool.BLANK %>"
+									value="<%= (region != null) ? HtmlUtil.escape(region.getName()) : StringPool.BLANK %>"
 								/>
 
 								<liferay-ui:search-container-column-jsp

@@ -30,6 +30,10 @@ public class LayoutPageTemplateEntryLocalServiceWrapper
 	implements LayoutPageTemplateEntryLocalService,
 			   ServiceWrapper<LayoutPageTemplateEntryLocalService> {
 
+	public LayoutPageTemplateEntryLocalServiceWrapper() {
+		this(null);
+	}
+
 	public LayoutPageTemplateEntryLocalServiceWrapper(
 		LayoutPageTemplateEntryLocalService
 			layoutPageTemplateEntryLocalService) {
@@ -644,6 +648,16 @@ public class LayoutPageTemplateEntryLocalServiceWrapper
 
 		return _layoutPageTemplateEntryLocalService.getLayoutPageTemplateEntry(
 			layoutPageTemplateEntryId);
+	}
+
+	@Override
+	public LayoutPageTemplateEntry getLayoutPageTemplateEntry(
+			long groupId, String layoutPageTemplateEntryKey)
+		throws com.liferay.layout.page.template.exception.
+			NoSuchPageTemplateEntryException {
+
+		return _layoutPageTemplateEntryLocalService.getLayoutPageTemplateEntry(
+			groupId, layoutPageTemplateEntryKey);
 	}
 
 	/**

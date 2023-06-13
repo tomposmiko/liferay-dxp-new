@@ -242,7 +242,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {sXPBlueprint(sxpBlueprintId: ___){actions, configuration, createDate, description, description_i18n, elementInstances, externalReferenceCode, id, modifiedDate, schemaVersion, title, title_i18n, userName, version}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {sXPBlueprint(sxpBlueprintId: ___){configuration, createDate, description, description_i18n, elementInstances, id, modifiedDate, title, title_i18n, userName}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public SXPBlueprint sXPBlueprint(
@@ -301,7 +301,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {sXPElement(sxpElementId: ___){actions, createDate, description, description_i18n, elementDefinition, externalReferenceCode, hidden, id, modifiedDate, readOnly, schemaVersion, title, title_i18n, type, userName, version}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {sXPElement(sxpElementId: ___){createDate, description, description_i18n, elementDefinition, hidden, id, modifiedDate, readOnly, title, title_i18n, type, userName}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public SXPElement sXPElement(@GraphQLName("sxpElementId") Long sxpElementId)
@@ -458,7 +458,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<FieldMappingInfo> items;
@@ -491,7 +491,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<KeywordQueryContributor> items;
@@ -526,7 +526,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<ModelPrefilterContributor> items;
@@ -561,7 +561,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<QueryPrefilterContributor> items;
@@ -594,7 +594,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<SXPBlueprint> items;
@@ -627,7 +627,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<SXPElement> items;
@@ -662,7 +662,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<SXPParameterContributorDefinition> items;
@@ -695,7 +695,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<SearchableAssetName> items;
@@ -730,7 +730,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<SearchableAssetNameDisplay> items;

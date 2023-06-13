@@ -15,18 +15,18 @@
 package com.liferay.account.model.impl;
 
 import com.liferay.account.model.AccountEntry;
+import com.liferay.portal.kernel.model.Address;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
+import com.liferay.portal.kernel.service.AddressLocalServiceUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 /**
  * @author Brian Wing Shun Chan
  */
 public class AccountEntryImpl extends AccountEntryBaseImpl {
-
-	public AccountEntryImpl() {
-	}
 
 	@Override
 	public Group getAccountEntryGroup() {
@@ -42,6 +42,23 @@ public class AccountEntryImpl extends AccountEntryBaseImpl {
 		}
 
 		return group.getGroupId();
+	}
+
+	@Override
+	public Address getDefaultBillingAddress() {
+		return AddressLocalServiceUtil.fetchAddress(
+			getDefaultBillingAddressId());
+	}
+
+	@Override
+	public Address getDefaultShippingAddress() {
+		return AddressLocalServiceUtil.fetchAddress(
+			getDefaultShippingAddressId());
+	}
+
+	@Override
+	public String[] getDomainsArray() {
+		return StringUtil.split(getDomains());
 	}
 
 	private Group _getAccountEntryGroup() {

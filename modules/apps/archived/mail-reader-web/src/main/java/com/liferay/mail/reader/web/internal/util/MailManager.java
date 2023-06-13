@@ -56,7 +56,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.portlet.PortletConfig;
 
@@ -201,6 +200,10 @@ public class MailManager {
 			return createJSONResult("success", StringPool.BLANK, "false");
 		}
 		catch (MailException mailException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(mailException, mailException);
+			}
+
 			return createJSONResult("failure", StringPool.BLANK);
 		}
 	}
@@ -761,6 +764,10 @@ public class MailManager {
 				return createJSONResult("success", "logged-in-successfully");
 			}
 			catch (MailException mailException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(mailException, mailException);
+				}
+
 				return createJSONResult("failure", "incorrect-password");
 			}
 		}
@@ -876,20 +883,22 @@ public class MailManager {
 	protected JSONObject createJSONResult(
 		String status, String message, String value) {
 
-		ResourceBundle resourceBundle = _portletConfig.getResourceBundle(
-			_user.getLocale());
-
-		JSONObject jsonObject = JSONUtil.put(
-			"message", LanguageUtil.get(resourceBundle, message)
+		return JSONUtil.put(
+			"message",
+			LanguageUtil.get(
+				_portletConfig.getResourceBundle(_user.getLocale()), message)
 		).put(
 			"status", status
+		).put(
+			"value",
+			() -> {
+				if (Validator.isNotNull(value)) {
+					return value;
+				}
+
+				return null;
+			}
 		);
-
-		if (Validator.isNotNull(value)) {
-			jsonObject.put("value", value);
-		}
-
-		return jsonObject;
 	}
 
 	protected void synchronize(

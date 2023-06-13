@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -219,60 +220,82 @@ public class AttachmentModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Attachment, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Attachment>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Attachment, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Attachment, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Attachment.class.getClassLoader(), Attachment.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"attachmentId", Attachment::getAttachmentId);
-		attributeGetterFunctions.put("companyId", Attachment::getCompanyId);
-		attributeGetterFunctions.put("userId", Attachment::getUserId);
-		attributeGetterFunctions.put("accountId", Attachment::getAccountId);
-		attributeGetterFunctions.put("folderId", Attachment::getFolderId);
-		attributeGetterFunctions.put("messageId", Attachment::getMessageId);
-		attributeGetterFunctions.put("contentPath", Attachment::getContentPath);
-		attributeGetterFunctions.put("fileName", Attachment::getFileName);
-		attributeGetterFunctions.put("size", Attachment::getSize);
+		try {
+			Constructor<Attachment> constructor =
+				(Constructor<Attachment>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Attachment, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Attachment, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Attachment, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Attachment, Object>>();
 		Map<String, BiConsumer<Attachment, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Attachment, ?>>();
 
+		attributeGetterFunctions.put(
+			"attachmentId", Attachment::getAttachmentId);
 		attributeSetterBiConsumers.put(
 			"attachmentId",
 			(BiConsumer<Attachment, Long>)Attachment::setAttachmentId);
+		attributeGetterFunctions.put("companyId", Attachment::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<Attachment, Long>)Attachment::setCompanyId);
+		attributeGetterFunctions.put("userId", Attachment::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<Attachment, Long>)Attachment::setUserId);
+		attributeGetterFunctions.put("accountId", Attachment::getAccountId);
 		attributeSetterBiConsumers.put(
 			"accountId",
 			(BiConsumer<Attachment, Long>)Attachment::setAccountId);
+		attributeGetterFunctions.put("folderId", Attachment::getFolderId);
 		attributeSetterBiConsumers.put(
 			"folderId", (BiConsumer<Attachment, Long>)Attachment::setFolderId);
+		attributeGetterFunctions.put("messageId", Attachment::getMessageId);
 		attributeSetterBiConsumers.put(
 			"messageId",
 			(BiConsumer<Attachment, Long>)Attachment::setMessageId);
+		attributeGetterFunctions.put("contentPath", Attachment::getContentPath);
 		attributeSetterBiConsumers.put(
 			"contentPath",
 			(BiConsumer<Attachment, String>)Attachment::setContentPath);
+		attributeGetterFunctions.put("fileName", Attachment::getFileName);
 		attributeSetterBiConsumers.put(
 			"fileName",
 			(BiConsumer<Attachment, String>)Attachment::setFileName);
+		attributeGetterFunctions.put("size", Attachment::getSize);
 		attributeSetterBiConsumers.put(
 			"size", (BiConsumer<Attachment, Long>)Attachment::setSize);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -511,6 +534,30 @@ public class AttachmentModelImpl
 	}
 
 	@Override
+	public Attachment cloneWithOriginalValues() {
+		AttachmentImpl attachmentImpl = new AttachmentImpl();
+
+		attachmentImpl.setAttachmentId(
+			this.<Long>getColumnOriginalValue("attachmentId"));
+		attachmentImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		attachmentImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		attachmentImpl.setAccountId(
+			this.<Long>getColumnOriginalValue("accountId"));
+		attachmentImpl.setFolderId(
+			this.<Long>getColumnOriginalValue("folderId"));
+		attachmentImpl.setMessageId(
+			this.<Long>getColumnOriginalValue("messageId"));
+		attachmentImpl.setContentPath(
+			this.<String>getColumnOriginalValue("contentPath"));
+		attachmentImpl.setFileName(
+			this.<String>getColumnOriginalValue("fileName"));
+		attachmentImpl.setSize(this.<Long>getColumnOriginalValue("size_"));
+
+		return attachmentImpl;
+	}
+
+	@Override
 	public int compareTo(Attachment attachment) {
 		long primaryKey = attachment.getPrimaryKey();
 
@@ -697,9 +744,7 @@ public class AttachmentModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Attachment>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Attachment.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

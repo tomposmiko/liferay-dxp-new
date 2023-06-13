@@ -22,8 +22,8 @@
 taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
 taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
 taglib uri="http://liferay.com/tld/expando" prefix="liferay-expando" %><%@
+taglib uri="http://liferay.com/tld/friendly-url" prefix="liferay-friendly-url" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
-taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/react" prefix="react" %><%@
 taglib uri="http://liferay.com/tld/site-navigation" prefix="liferay-site-navigation" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
@@ -37,6 +37,7 @@ page import="com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys" %><%@
 page import="com.liferay.exportimport.kernel.staging.LayoutStagingUtil" %><%@
 page import="com.liferay.exportimport.kernel.staging.StagingUtil" %><%@
 page import="com.liferay.friendly.url.exception.DuplicateFriendlyURLEntryException" %><%@
+page import="com.liferay.frontend.taglib.form.navigator.constants.FormNavigatorConstants" %><%@
 page import="com.liferay.layout.admin.constants.LayoutScreenNavigationEntryConstants" %><%@
 page import="com.liferay.layout.admin.web.internal.constants.LayoutAdminWebKeys" %><%@
 page import="com.liferay.layout.admin.web.internal.display.context.LayoutsAdminDisplayContext" %><%@
@@ -52,7 +53,7 @@ page import="com.liferay.layout.admin.web.internal.display.context.SelectThemeMa
 page import="com.liferay.layout.admin.web.internal.servlet.taglib.clay.CollectionProvidersVerticalCard" %><%@
 page import="com.liferay.layout.admin.web.internal.servlet.taglib.clay.CollectionsVerticalCard" %><%@
 page import="com.liferay.layout.admin.web.internal.servlet.taglib.clay.DefaultStylebookLayoutVerticalCard" %><%@
-page import="com.liferay.layout.admin.web.internal.servlet.taglib.clay.SelectBasicTemplatesHorizontalCard" %><%@
+page import="com.liferay.layout.admin.web.internal.servlet.taglib.clay.SelectBasicTemplatesNavigationCard" %><%@
 page import="com.liferay.layout.admin.web.internal.servlet.taglib.clay.SelectBasicTemplatesVerticalCard" %><%@
 page import="com.liferay.layout.admin.web.internal.servlet.taglib.clay.SelectGlobalTemplatesVerticalCard" %><%@
 page import="com.liferay.layout.admin.web.internal.servlet.taglib.clay.SelectLayoutMasterLayoutVerticalCard" %><%@
@@ -60,6 +61,8 @@ page import="com.liferay.layout.admin.web.internal.servlet.taglib.clay.SelectLay
 page import="com.liferay.layout.admin.web.internal.servlet.taglib.clay.SelectMasterLayoutVerticalCard" %><%@
 page import="com.liferay.layout.admin.web.internal.servlet.taglib.clay.SelectStylebookLayoutVerticalCard" %><%@
 page import="com.liferay.layout.admin.web.internal.servlet.taglib.clay.SelectThemeVerticalCard" %><%@
+page import="com.liferay.layout.admin.web.internal.servlet.taglib.util.LayoutActionDropdownItemsProvider" %><%@
+page import="com.liferay.layout.admin.web.internal.util.CustomizationSettingsUtil" %><%@
 page import="com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants" %><%@
 page import="com.liferay.layout.page.template.model.LayoutPageTemplateCollection" %><%@
 page import="com.liferay.layout.page.template.model.LayoutPageTemplateEntry" %><%@
@@ -82,7 +85,6 @@ page import="com.liferay.portal.kernel.exception.NoSuchRoleException" %><%@
 page import="com.liferay.portal.kernel.exception.RequiredLayoutException" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
-page import="com.liferay.portal.kernel.layoutconfiguration.util.RuntimePageUtil" %><%@
 page import="com.liferay.portal.kernel.model.ColorScheme" %><%@
 page import="com.liferay.portal.kernel.model.Group" %><%@
 page import="com.liferay.portal.kernel.model.GroupConstants" %><%@
@@ -104,7 +106,6 @@ page import="com.liferay.portal.kernel.model.LayoutTypePortlet" %><%@
 page import="com.liferay.portal.kernel.model.Portlet" %><%@
 page import="com.liferay.portal.kernel.model.Theme" %><%@
 page import="com.liferay.portal.kernel.model.ThemeSetting" %><%@
-page import="com.liferay.portal.kernel.model.User" %><%@
 page import="com.liferay.portal.kernel.model.UserGroup" %><%@
 page import="com.liferay.portal.kernel.plugin.PluginPackage" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
@@ -125,8 +126,8 @@ page import="com.liferay.portal.kernel.service.permission.LayoutPermissionUtil" 
 page import="com.liferay.portal.kernel.servlet.HttpHeaders" %><%@
 page import="com.liferay.portal.kernel.servlet.ServletContextPool" %><%@
 page import="com.liferay.portal.kernel.servlet.SessionErrors" %><%@
-page import="com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorConstants" %><%@
 page import="com.liferay.portal.kernel.template.StringTemplateResource" %><%@
+page import="com.liferay.portal.kernel.util.AggregateResourceBundle" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
 page import="com.liferay.portal.kernel.util.GetterUtil" %><%@
 page import="com.liferay.portal.kernel.util.HashMapBuilder" %><%@

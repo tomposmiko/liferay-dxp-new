@@ -13,6 +13,7 @@ import '@testing-library/jest-dom/extend-expect';
 import {
 	cleanup,
 	fireEvent,
+	wait,
 	waitForDomChange,
 	waitForElement,
 	waitForElementToBeRemoved,
@@ -74,6 +75,9 @@ describe('SegmentsExperimentsSidebar', () => {
 		});
 
 		getByText(segmentsExperiment.name);
+		getByText(segmentsExperiment.description);
+		getByText(segmentsExperiment.segmentsEntryName);
+		getByText(segmentsExperiment.goal.label);
 
 		getByText('edit');
 		getByText('delete');
@@ -175,12 +179,7 @@ describe('Variants', () => {
 	});
 
 	it('Create variant button', async () => {
-		const {
-			APIServiceMocks,
-			findByText,
-			getByLabelText,
-			getByText,
-		} = renderApp({
+		const {APIServiceMocks, getByLabelText, getByText} = renderApp({
 			initialSegmentsExperiment: segmentsExperiment,
 			initialSegmentsVariants: segmentsVariants,
 			selectedSegmentsExperienceId:
@@ -195,18 +194,17 @@ describe('Variants', () => {
 
 		await waitForElement(() => getByText('create-new-variant'));
 
-		const variantNameInput = getByLabelText(/name/);
+		const variantNameInput = getByLabelText('name');
 		expect(variantNameInput.value).toBe('');
 
-		fireEvent.focus(variantNameInput);
 		await userEvent.type(variantNameInput, 'Variant Name');
 
 		const saveButton = getByText('save');
 
-		fireEvent.click(saveButton);
+		userEvent.click(saveButton);
 
-		await waitForElementToBeRemoved(() => getByLabelText(/name/));
-		await findByText('Variant Name');
+		await waitForElementToBeRemoved(() => getByLabelText('name'));
+		await wait(() => getByText('Variant Name'));
 
 		expect(createVariant).toHaveBeenCalledWith(
 			expect.objectContaining({
@@ -273,7 +271,7 @@ describe('Review and Run test', () => {
 
 		userEvent.click(reviewAndRunTestButton);
 
-		getByText('an-element-needs-to-be-set');
+		getByText('an-element-needs-to-be-selected');
 	});
 
 	it('Error messages appears when the user clicks in review and run and there is only the control variant created', async () => {

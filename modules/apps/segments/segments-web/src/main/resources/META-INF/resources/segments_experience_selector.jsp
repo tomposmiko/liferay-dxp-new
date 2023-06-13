@@ -22,7 +22,7 @@ SegmentsExperienceSelectorDisplayContext segmentsExperienceSelectorDisplayContex
 
 <li class="border-left border-secondary control-menu-nav-item ml-3 pl-3">
 	<div class="dropdown">
-		<button aria-expanded="false" aria-haspopup="true" class="btn btn-unstyled dropdown-toggle" id="<portlet:namespace />dropdownToggle" type="button">
+		<button aria-expanded="false" aria-haspopup="true" class="btn btn-sm btn-unstyled dropdown-toggle" id="<portlet:namespace />dropdownToggle" type="button">
 			<span class="align-items-center c-inner d-flex" tabindex="-1">
 				<span class="lfr-portal-tooltip mr-2 text-truncate" title="<%= HtmlUtil.escapeAttribute(segmentsExperienceSelectorDisplayContext.getSelectedSegmentsExperienceName()) %>">
 					<%= segmentsExperienceSelectorDisplayContext.getSelectedSegmentsExperienceName() %>
@@ -45,7 +45,7 @@ SegmentsExperienceSelectorDisplayContext segmentsExperienceSelectorDisplayContex
 			%>
 
 				<li>
-					<a class="border-0 d-flex dropdown-item list-group-item list-group-item-flex rounded-0" href="<%= segmentsExperiencesJSONObject.getString("url") %>">
+					<a class="border-0 dropdown-item list-group-item list-group-item-flex rounded-0" href="<%= segmentsExperiencesJSONObject.getString("url") %>">
 						<div class="autofit-col autofit-col-expand">
 							<p class="lfr-portal-tooltip list-group-title text-truncate" title="<%= HtmlUtil.escapeAttribute(segmentsExperiencesJSONObject.getString("segmentsExperienceName")) %>">
 								<%= segmentsExperiencesJSONObject.getString("segmentsExperienceName") %>

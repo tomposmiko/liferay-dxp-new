@@ -50,7 +50,7 @@ AUI.add(
 		var TPL_ICON = '<i class="{iconClass}"></i>';
 
 		var TPL_SIMPLE_MENU_ITEM =
-			'<li class="{cssClass}" data-id="{id}" role="{role}" tabindex="-1"></li>';
+			'<li class="{cssClass}" data-id="{id}">{icon} {caption}</li>';
 
 		var getItemHandler = A.cached((id, items) => {
 			var found = null;
@@ -87,6 +87,7 @@ AUI.add(
 				},
 
 				toggler: {
+					// eslint-disable-next-line @liferay/aui/no-one
 					setter: A.one,
 					value: null,
 				},
@@ -109,42 +110,11 @@ AUI.add(
 				_closeMenu() {
 					var instance = this;
 
-					instance._focusItem();
-
 					instance.hide();
-
-					instance._insideHandler.detach();
-
-					instance._insideHandler = null;
 
 					instance._outsideHandler.detach();
 
 					instance._outsideHandler = null;
-				},
-
-				_focusItem(index) {
-					const instance = this;
-
-					const visibleItems = instance.items.filter(
-						':not(.' + CSS_SIMPLE_MENU_ITEM_HIDDEN + ')'
-					);
-
-					if (index !== undefined) {
-						index =
-							(index + visibleItems.size()) % visibleItems.size();
-
-						const item = visibleItems.item(index);
-
-						item.setAttribute('tabindex', 0);
-
-						item.getDOMNode().focus();
-					}
-
-					for (let i = 0; i < visibleItems.size(); i++) {
-						visibleItems
-							.item(i)
-							.setAttribute('tabindex', i === index ? 0 : -1);
-					}
 				},
 
 				_onClickItems(event) {
@@ -173,56 +143,11 @@ AUI.add(
 					}
 				},
 
-				_onKeyDown(event) {
-					const instance = this;
-
-					if (
-						event.keyCode === A.Event.KeyMap.ESC ||
-						event.keyCode === A.Event.KeyMap.TAB
-					) {
-						instance._closeMenu();
-
-						return;
-					}
-
-					const activeElement = document.activeElement;
-
-					const visibleItems = instance.items.filter(
-						':not(.' + CSS_SIMPLE_MENU_ITEM_HIDDEN + ')'
-					);
-
-					for (let i = 0; i < visibleItems.size(); i++) {
-						const item = visibleItems.item(i);
-
-						if (item.getDOMNode() !== activeElement) {
-							continue;
-						}
-
-						if (event.keyCode === A.Event.KeyMap.UP) {
-							instance._focusItem(i - 1);
-						}
-						else if (event.keyCode === A.Event.KeyMap.DOWN) {
-							instance._focusItem(i + 1);
-						}
-						else if (event.keyCode === A.Event.KeyMap.ENTER) {
-							visibleItems.item(i).simulate('click');
-						}
-
-						break;
-					}
-				},
-
 				_onVisibleChange(event) {
 					var instance = this;
 
 					if (event.newVal) {
 						var contentBox = instance.get('contentBox');
-
-						instance._insideHandler = contentBox.on(
-							['keydown'],
-							instance._onKeyDown,
-							instance
-						);
 
 						instance._outsideHandler = contentBox.on(
 							['mouseupoutside', 'touchendoutside'],
@@ -231,15 +156,6 @@ AUI.add(
 						);
 
 						instance._positionMenu();
-					}
-
-					const toggler = instance.get('toggler');
-
-					if (!event.newVal) {
-						toggler.setAttribute('aria-expanded', false);
-					}
-					else {
-						toggler.setAttribute('aria-expanded', true);
 					}
 				},
 
@@ -271,12 +187,6 @@ AUI.add(
 							modal,
 							width,
 						});
-
-						const contentBox = instance.get('contentBox');
-
-						contentBox.getDOMNode().focus();
-
-						this._focusItem(0);
 					}
 				},
 
@@ -299,11 +209,8 @@ AUI.add(
 
 						var cssClass = CSS_SIMPLE_MENU_ITEM;
 
-						var role = 'menuitem';
-
 						if (caption === STR_DASH) {
 							cssClass = CSS_SIMPLE_MENU_SEPARATOR;
-							role = '';
 						}
 
 						if (hiddenItems.indexOf(id) > -1) {
@@ -329,7 +236,6 @@ AUI.add(
 								cssClass,
 								icon,
 								id,
-								role,
 							})
 						);
 
@@ -364,8 +270,7 @@ AUI.add(
 					}
 				},
 
-				CONTENT_TEMPLATE:
-					'<ul aria-live="polite" role="menu" tabindex="0"></ul>',
+				CONTENT_TEMPLATE: '<ul></ul>',
 
 				bindUI() {
 					var instance = this;
@@ -415,7 +320,6 @@ AUI.add(
 	{
 		requires: [
 			'aui-base',
-			'aui-event-base',
 			'aui-template-deprecated',
 			'event-outside',
 			'event-touch',

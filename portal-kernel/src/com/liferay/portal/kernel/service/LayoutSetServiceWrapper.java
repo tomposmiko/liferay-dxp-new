@@ -26,6 +26,10 @@ import com.liferay.portal.kernel.model.LayoutSet;
 public class LayoutSetServiceWrapper
 	implements LayoutSetService, ServiceWrapper<LayoutSetService> {
 
+	public LayoutSetServiceWrapper() {
+		this(null);
+	}
+
 	public LayoutSetServiceWrapper(LayoutSetService layoutSetService) {
 		_layoutSetService = layoutSetService;
 	}
@@ -124,20 +128,6 @@ public class LayoutSetServiceWrapper
 
 		return _layoutSetService.updateSettings(
 			groupId, privateLayout, settings);
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #updateVirtualHosts(long, boolean, TreeMap)}
-	 */
-	@Deprecated
-	@Override
-	public LayoutSet updateVirtualHost(
-			long groupId, boolean privateLayout, String virtualHostname)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _layoutSetService.updateVirtualHost(
-			groupId, privateLayout, virtualHostname);
 	}
 
 	@Override

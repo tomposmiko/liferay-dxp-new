@@ -38,6 +38,7 @@ exports[`DatePicker has a predefinedValue 1`] = `
             class="input-group-inset-item input-group-inset-item-after"
           >
             <button
+              aria-label="Choose date"
               class="date-picker-dropdown-toggle btn btn-unstyled"
               type="button"
             >
@@ -54,6 +55,11 @@ exports[`DatePicker has a predefinedValue 1`] = `
         </div>
       </div>
     </div>
+    <input
+      name="dateField_edited"
+      type="hidden"
+      value="false"
+    />
     
   </div>
 </div>

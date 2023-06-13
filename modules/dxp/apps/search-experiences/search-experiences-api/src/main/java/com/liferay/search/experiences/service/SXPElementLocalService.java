@@ -70,9 +70,8 @@ public interface SXPElementLocalService
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public SXPElement addSXPElement(
-			String externalReferenceCode, long userId,
-			Map<Locale, String> descriptionMap, String elementDefinitionJSON,
-			boolean readOnly, String schemaVersion,
+			long userId, Map<Locale, String> descriptionMap,
+			String elementDefinitionJSON, boolean readOnly,
 			Map<Locale, String> titleMap, int type,
 			ServiceContext serviceContext)
 		throws PortalException;
@@ -220,16 +219,6 @@ public interface SXPElementLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public SXPElement fetchSXPElement(long sxpElementId);
 
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public SXPElement fetchSXPElementByExternalReferenceCode(
-		long companyId, String externalReferenceCode);
-
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public SXPElement fetchSXPElementByReferenceCode(
-		long companyId, String externalReferenceCode);
-
 	/**
 	 * Returns the sxp element with the matching UUID and company.
 	 *
@@ -276,12 +265,6 @@ public interface SXPElementLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public SXPElement getSXPElement(long sxpElementId) throws PortalException;
 
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public SXPElement getSXPElementByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
-		throws PortalException;
-
 	/**
 	 * Returns the sxp element with the matching UUID and company.
 	 *
@@ -327,7 +310,7 @@ public interface SXPElementLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public SXPElement updateSXPElement(
 			long userId, long sxpElementId, Map<Locale, String> descriptionMap,
-			String elementDefinitionJSON, boolean hidden, String schemaVersion,
+			String elementDefinitionJSON, boolean hidden,
 			Map<Locale, String> titleMap, ServiceContext serviceContext)
 		throws PortalException;
 

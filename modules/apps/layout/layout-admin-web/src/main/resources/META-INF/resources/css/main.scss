@@ -1,8 +1,12 @@
-@import './miller_columns/DragPreview';
-@import './miller_columns/MillerColumns';
+@import 'atlas-variables';
+
+@import 'miller_columns/DragPreview';
+@import 'miller_columns/MillerColumns';
 
 .portlet-layouts-admin {
-	@import './FriendlyURLHistory';
+	.active > .card {
+		box-shadow: 0 0 0 2px $primary-l1;
+	}
 
 	.card-page-item-directory {
 		@include media-breakpoint-up(lg) {
@@ -37,15 +41,6 @@
 	.friendly-url {
 		.input-group-item-shrink {
 			max-width: 50%;
-		}
-	}
-
-	.lfr-layout-template {
-		.checkbox-card,
-		.checkbox-card label,
-		.checkbox-card .card {
-			display: flex;
-			flex-grow: 1;
 		}
 	}
 

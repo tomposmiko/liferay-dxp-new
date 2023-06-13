@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -60,7 +61,7 @@ public class PriceEntrySerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (priceEntry.getActions() != null) {
 			if (sb.length() > 1) {
@@ -371,7 +372,7 @@ public class PriceEntrySerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (priceEntry.getActions() == null) {
 			map.put("actions", null);
@@ -748,18 +749,14 @@ public class PriceEntrySerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "tierPrices")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					TierPrice[] tierPricesArray =
-						new TierPrice[jsonParserFieldValues.length];
-
-					for (int i = 0; i < tierPricesArray.length; i++) {
-						tierPricesArray[i] = TierPriceSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					priceEntry.setTierPrices(tierPricesArray);
+					priceEntry.setTierPrices(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> TierPriceSerDes.toDTO((String)object)
+						).toArray(
+							size -> new TierPrice[size]
+						));
 				}
 			}
 		}

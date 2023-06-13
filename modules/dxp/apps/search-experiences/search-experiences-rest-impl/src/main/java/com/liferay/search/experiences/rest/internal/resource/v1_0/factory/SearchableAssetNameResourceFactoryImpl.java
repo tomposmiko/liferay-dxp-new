@@ -32,20 +32,15 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.search.experiences.rest.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.search.experiences.rest.resource.v1_0.SearchableAssetNameResource;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -53,7 +48,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -62,8 +59,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @generated
  */
 @Component(
-	property = "resource.locator.key=/search-experiences-rest/v1.0/SearchableAssetName",
-	service = SearchableAssetNameResource.Factory.class
+	immediate = true, service = SearchableAssetNameResource.Factory.class
 )
 @Generated("")
 public class SearchableAssetNameResourceFactoryImpl
@@ -79,7 +75,9 @@ public class SearchableAssetNameResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return _searchableAssetNameResourceProxyProviderFunction.apply(
+				return (SearchableAssetNameResource)ProxyUtil.newProxyInstance(
+					SearchableAssetNameResource.class.getClassLoader(),
+					new Class<?>[] {SearchableAssetNameResource.class},
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -138,32 +136,14 @@ public class SearchableAssetNameResourceFactoryImpl
 		};
 	}
 
-	private static Function<InvocationHandler, SearchableAssetNameResource>
-		_getProxyProviderFunction() {
+	@Activate
+	protected void activate() {
+		SearchableAssetNameResource.FactoryHolder.factory = this;
+	}
 
-		Class<?> proxyClass = ProxyUtil.getProxyClass(
-			SearchableAssetNameResource.class.getClassLoader(),
-			SearchableAssetNameResource.class);
-
-		try {
-			Constructor<SearchableAssetNameResource> constructor =
-				(Constructor<SearchableAssetNameResource>)
-					proxyClass.getConstructor(InvocationHandler.class);
-
-			return invocationHandler -> {
-				try {
-					return constructor.newInstance(invocationHandler);
-				}
-				catch (ReflectiveOperationException
-							reflectiveOperationException) {
-
-					throw new InternalError(reflectiveOperationException);
-				}
-			};
-		}
-		catch (NoSuchMethodException noSuchMethodException) {
-			throw new InternalError(noSuchMethodException);
-		}
+	@Deactivate
+	protected void deactivate() {
+		SearchableAssetNameResource.FactoryHolder.factory = null;
 	}
 
 	private Object _invoke(
@@ -186,7 +166,7 @@ public class SearchableAssetNameResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		SearchableAssetNameResource searchableAssetNameResource =
@@ -213,7 +193,6 @@ public class SearchableAssetNameResourceFactoryImpl
 		searchableAssetNameResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		searchableAssetNameResource.setRoleLocalService(_roleLocalService);
-		searchableAssetNameResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(searchableAssetNameResource, arguments);
@@ -229,11 +208,6 @@ public class SearchableAssetNameResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
-
-	private static final Function
-		<InvocationHandler, SearchableAssetNameResource>
-			_searchableAssetNameResourceProxyProviderFunction =
-				_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
@@ -256,6 +230,9 @@ public class SearchableAssetNameResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -264,9 +241,6 @@ public class SearchableAssetNameResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

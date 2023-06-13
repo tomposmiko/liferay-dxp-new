@@ -20,12 +20,14 @@ import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.model.CommerceMoney;
 import com.liferay.commerce.currency.util.CommercePriceFormatter;
 import com.liferay.commerce.model.CommerceOrder;
+import com.liferay.commerce.model.CommerceOrderType;
 import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.order.status.CommerceOrderStatus;
 import com.liferay.commerce.order.status.CommerceOrderStatusRegistry;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.service.CommerceOrderService;
+import com.liferay.commerce.service.CommerceOrderTypeService;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.Order;
 import com.liferay.headless.commerce.admin.order.dto.v1_0.Status;
@@ -49,7 +51,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	enabled = false,
-	property = "model.class.name=com.liferay.commerce.model.CommerceOrder",
+	property = "dto.class.name=com.liferay.commerce.model.CommerceOrder",
 	service = {DTOConverter.class, OrderDTOConverter.class}
 )
 public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
@@ -124,10 +126,15 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 				id = commerceOrder.getCommerceOrderId();
 				lastPriceUpdateDate = commerceOrder.getLastPriceUpdateDate();
 				modifiedDate = commerceOrder.getModifiedDate();
+				orderDate = commerceOrder.getOrderDate();
 				orderStatus = commerceOrder.getOrderStatus();
 				orderStatusInfo = _getOrderStatusInfo(
 					commerceOrder.getOrderStatus(), commerceOrderStatusLabel,
 					commerceOrderStatusLabelI18n);
+				orderTypeExternalReferenceCode =
+					_getOrderTypeExternalReferenceCode(
+						commerceOrder.getCommerceOrderTypeId());
+				orderTypeId = commerceOrder.getCommerceOrderTypeId();
 				paymentMethod = commerceOrder.getCommercePaymentMethodKey();
 				paymentStatus = commerceOrder.getPaymentStatus();
 				paymentStatusInfo = _getPaymentStatusInfo(
@@ -143,7 +150,7 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 					commerceShippingMethod);
 				shippingOption = commerceOrder.getShippingOptionName();
 				transactionId = commerceOrder.getTransactionId();
-				workflowStatusInfo = _getWorkflowStatusInfo(
+				workflowStatusInfo = _toStatus(
 					commerceOrder.getStatus(), commerceOrderWorkflowStatusLabel,
 					commerceOrderWorkflowStatusLabelI18n);
 			}
@@ -156,9 +163,10 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 		BigDecimal taxAmount = commerceOrder.getTaxAmount();
 
 		if (taxAmount != null) {
-			order.setTaxAmount(taxAmount.doubleValue());
+			order.setTaxAmount(taxAmount);
 			order.setTaxAmountFormatted(
 				_formatPrice(taxAmount, commerceCurrency, locale));
+			order.setTaxAmountValue(taxAmount.doubleValue());
 		}
 
 		_setOrderTotal(commerceCurrency, commerceOrder, order, locale);
@@ -231,6 +239,20 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 		};
 	}
 
+	private String _getOrderTypeExternalReferenceCode(long commerceOrderTypeId)
+		throws Exception {
+
+		CommerceOrderType commerceOrderType =
+			_commerceOrderTypeService.fetchCommerceOrderType(
+				commerceOrderTypeId);
+
+		if (commerceOrderType == null) {
+			return null;
+		}
+
+		return commerceOrderType.getExternalReferenceCode();
+	}
+
 	private Status _getPaymentStatusInfo(
 		int paymentStatus, String commerceOrderPaymentStatusLabel,
 		String commerceOrderPaymentStatusLabelI18n) {
@@ -252,19 +274,6 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 		}
 
 		return commerceShippingMethod.getEngineKey();
-	}
-
-	private Status _getWorkflowStatusInfo(
-		int orderStatus, String commerceOrderWorkflowStatusLabel,
-		String commerceOrderWorkflowStatusLabelI18n) {
-
-		return new Status() {
-			{
-				code = orderStatus;
-				label = commerceOrderWorkflowStatusLabel;
-				label_i18n = commerceOrderWorkflowStatusLabelI18n;
-			}
-		};
 	}
 
 	private void _setOrderShipping(
@@ -308,10 +317,8 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 		if (shippingDiscountAmount != null) {
 			order.setShippingDiscountAmount(
 				shippingDiscountAmount.doubleValue());
-
 			order.setShippingDiscountAmountFormatted(
 				_formatPrice(shippingDiscountAmount, commerceCurrency, locale));
-
 			order.setShippingDiscountPercentageLevel1(
 				_getDoubleValue(
 					commerceOrder.getShippingDiscountPercentageLevel1()));
@@ -332,11 +339,9 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 		if (shippingDiscountWithTaxAmount != null) {
 			order.setShippingDiscountWithTaxAmount(
 				shippingDiscountWithTaxAmount.doubleValue());
-
 			order.setShippingDiscountWithTaxAmountFormatted(
 				_formatPrice(
 					shippingDiscountWithTaxAmount, commerceCurrency, locale));
-
 			order.setShippingDiscountPercentageLevel1WithTaxAmount(
 				_getDoubleValue(
 					commerceOrder.
@@ -399,10 +404,8 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 		if (subtotalDiscountAmount != null) {
 			order.setSubtotalDiscountAmount(
 				subtotalDiscountAmount.doubleValue());
-
 			order.setSubtotalDiscountAmountFormatted(
 				_formatPrice(subtotalDiscountAmount, commerceCurrency, locale));
-
 			order.setSubtotalDiscountPercentageLevel1(
 				_getDoubleValue(
 					commerceOrder.getSubtotalDiscountPercentageLevel1()));
@@ -423,11 +426,9 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 		if (subtotalDiscountWithTaxAmount != null) {
 			order.setSubtotalDiscountWithTaxAmount(
 				subtotalDiscountWithTaxAmount.doubleValue());
-
 			order.setSubtotalDiscountWithTaxAmountFormatted(
 				_formatPrice(
 					subtotalDiscountWithTaxAmount, commerceCurrency, locale));
-
 			order.setSubtotalDiscountPercentageLevel1WithTaxAmount(
 				_getDoubleValue(
 					commerceOrder.
@@ -487,10 +488,8 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 
 		if (totalDiscountAmount != null) {
 			order.setTotalDiscountAmount(totalDiscountAmount.doubleValue());
-
 			order.setTotalDiscountAmountFormatted(
 				_formatPrice(totalDiscountAmount, commerceCurrency, locale));
-
 			order.setTotalDiscountPercentageLevel1(
 				_getDoubleValue(
 					commerceOrder.getTotalDiscountPercentageLevel1()));
@@ -511,11 +510,9 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 		if (totalDiscountWithTaxAmount != null) {
 			order.setTotalDiscountWithTaxAmount(
 				totalDiscountWithTaxAmount.doubleValue());
-
 			order.setTotalDiscountWithTaxAmountFormatted(
 				_formatPrice(
 					totalDiscountWithTaxAmount, commerceCurrency, locale));
-
 			order.setSubtotalDiscountPercentageLevel1WithTaxAmount(
 				_getDoubleValue(
 					commerceOrder.
@@ -535,6 +532,19 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 		}
 	}
 
+	private Status _toStatus(
+		int orderStatus, String commerceOrderWorkflowStatusLabel,
+		String commerceOrderWorkflowStatusLabelI18n) {
+
+		return new Status() {
+			{
+				code = orderStatus;
+				label = commerceOrderWorkflowStatusLabel;
+				label_i18n = commerceOrderWorkflowStatusLabelI18n;
+			}
+		};
+	}
+
 	@Reference
 	private CommerceChannelLocalService _commerceChannelLocalService;
 
@@ -543,6 +553,9 @@ public class OrderDTOConverter implements DTOConverter<CommerceOrder, Order> {
 
 	@Reference
 	private CommerceOrderStatusRegistry _commerceOrderStatusRegistry;
+
+	@Reference
+	private CommerceOrderTypeService _commerceOrderTypeService;
 
 	@Reference
 	private CommercePriceFormatter _commercePriceFormatter;

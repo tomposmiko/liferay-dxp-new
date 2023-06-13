@@ -45,13 +45,11 @@
 		<field name="blob" type="Blob" />
 	</model>
 	<model name="com.liferay.portal.tools.service.builder.test.model.ERCCompanyEntry">
-		<field name="uuid" type="String" />
 		<field name="externalReferenceCode" type="String" />
 		<field name="ercCompanyEntryId" type="long" />
 		<field name="companyId" type="long" />
 	</model>
 	<model name="com.liferay.portal.tools.service.builder.test.model.ERCGroupEntry">
-		<field name="uuid" type="String" />
 		<field name="externalReferenceCode" type="String" />
 		<field name="ercGroupEntryId" type="long" />
 		<field name="groupId" type="long" />
@@ -198,16 +196,6 @@
 	<model name="com.liferay.portal.tools.service.builder.test.model.NullConvertibleEntry">
 		<field name="nullConvertibleEntryId" type="long" />
 		<field name="name" type="String" />
-	</model>
-	<model name="com.liferay.portal.tools.service.builder.test.model.RedundantIndexEntry">
-		<field name="redundantIndexEntryId" type="long" />
-		<field name="companyId" type="long" />
-		<field name="name" type="String" />
-	</model>
-	<model name="com.liferay.portal.tools.service.builder.test.model.RenameFinderColumnEntry">
-		<field name="renameFinderColumnEntryId" type="long" />
-		<field name="groupId" type="long" />
-		<field name="renamedColumn" type="String" />
 	</model>
 	<model name="com.liferay.portal.tools.service.builder.test.model.UADPartialEntry">
 		<field name="uadPartialEntryId" type="long" />

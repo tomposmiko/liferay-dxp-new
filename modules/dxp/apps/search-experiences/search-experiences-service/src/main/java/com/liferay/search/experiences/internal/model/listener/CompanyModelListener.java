@@ -25,6 +25,8 @@ import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPElement;
@@ -51,7 +53,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  */
 @Component(
-	immediate = true,
+	enabled = false, immediate = true,
 	service = {CompanyModelListener.class, ModelListener.class}
 )
 public class CompanyModelListener extends BaseModelListener<Company> {
@@ -60,18 +62,21 @@ public class CompanyModelListener extends BaseModelListener<Company> {
 			Company company, SXPElementLocalService sxpElementLocalService)
 		throws PortalException {
 
-		Set<String> externalReferenceCodes = new HashSet<>();
+		Set<String> titles = new HashSet<>();
 
 		for (com.liferay.search.experiences.model.SXPElement sxpPElement :
 				sxpElementLocalService.getSXPElements(
 					company.getCompanyId(), true)) {
 
-			externalReferenceCodes.add(sxpPElement.getExternalReferenceCode());
+			titles.add(sxpPElement.getTitle(LocaleUtil.US));
 		}
 
-		for (SXPElement sxpElement : _getSXPElements()) {
-			if (externalReferenceCodes.contains(
-					sxpElement.getExternalReferenceCode())) {
+		for (SXPElement sxpElement : _sxpElements) {
+
+			// TODO Should this be en_US or en-US?
+
+			if (titles.contains(
+					MapUtil.getString(sxpElement.getTitle_i18n(), "en_US"))) {
 
 				continue;
 			}
@@ -79,14 +84,14 @@ public class CompanyModelListener extends BaseModelListener<Company> {
 			User user = company.getDefaultUser();
 
 			sxpElementLocalService.addSXPElement(
-				sxpElement.getExternalReferenceCode(), user.getUserId(),
+				user.getUserId(),
 				LocalizedMapUtil.getLocalizedMap(
 					sxpElement.getDescription_i18n()),
 				String.valueOf(sxpElement.getElementDefinition()), true,
-				_SCHEMA_VERSION,
 				LocalizedMapUtil.getLocalizedMap(sxpElement.getTitle_i18n()), 0,
 				new ServiceContext() {
 					{
+						setAddGroupPermissions(true);
 						setAddGuestPermissions(true);
 						setCompanyId(company.getCompanyId());
 						setScopeGroupId(company.getGroupId());
@@ -154,20 +159,6 @@ public class CompanyModelListener extends BaseModelListener<Company> {
 		return sxpElements;
 	}
 
-	private List<SXPElement> _getSXPElements() {
-		if (_sxpElements == null) {
-			_sxpElements = _createSXPElements();
-		}
-
-		return _sxpElements;
-	}
-
-	private static final String _SCHEMA_VERSION = StringUtil.replace(
-		StringUtil.extractFirst(
-			StringUtil.extractLast(SXPElement.class.getName(), ".v"),
-			CharPool.PERIOD),
-		CharPool.UNDERLINE, CharPool.PERIOD);
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		CompanyModelListener.class);
 
@@ -177,6 +168,6 @@ public class CompanyModelListener extends BaseModelListener<Company> {
 	@Reference
 	private SXPElementLocalService _sxpElementLocalService;
 
-	private List<SXPElement> _sxpElements;
+	private final List<SXPElement> _sxpElements = _createSXPElements();
 
 }

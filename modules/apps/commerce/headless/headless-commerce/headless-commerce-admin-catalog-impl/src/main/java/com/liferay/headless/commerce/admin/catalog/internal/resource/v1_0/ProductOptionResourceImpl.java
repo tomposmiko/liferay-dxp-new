@@ -27,6 +27,8 @@ import com.liferay.headless.commerce.admin.catalog.internal.util.v1_0.ProductOpt
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductOptionResource;
 import com.liferay.headless.commerce.core.util.LanguageUtils;
 import com.liferay.headless.commerce.core.util.ServiceContextHelper;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
@@ -73,37 +75,45 @@ public class ProductOptionResourceImpl
 	@Override
 	public Page<ProductOption>
 			getProductByExternalReferenceCodeProductOptionsPage(
-				String externalReferenceCode, Pagination pagination)
+				String externalReferenceCode, String search,
+				Pagination pagination, Sort[] sorts)
 		throws Exception {
 
 		CPDefinition cpDefinition =
 			_cpDefinitionService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
-					contextCompany.getCompanyId(), externalReferenceCode);
+					externalReferenceCode, contextCompany.getCompanyId());
 
 		if (cpDefinition == null) {
 			throw new NoSuchCPDefinitionException(
-				"Unable to find Product with externalReferenceCode: " +
+				"Unable to find product with external reference code " +
 					externalReferenceCode);
 		}
 
-		List<CPDefinitionOptionRel> cpDefinitionOptionRels =
-			_cpDefinitionOptionRelService.getCPDefinitionOptionRels(
-				cpDefinition.getCPDefinitionId(), pagination.getStartPosition(),
-				pagination.getEndPosition());
+		BaseModelSearchResult<CPDefinitionOptionRel>
+			cpDefinitionOptionRelBaseModelSearchResult =
+				_cpDefinitionOptionRelService.searchCPDefinitionOptionRels(
+					cpDefinition.getCompanyId(), cpDefinition.getGroupId(),
+					cpDefinition.getCPDefinitionId(), search,
+					pagination.getStartPosition(), pagination.getEndPosition(),
+					sorts);
 
 		int totalItems =
-			_cpDefinitionOptionRelService.getCPDefinitionOptionRelsCount(
-				cpDefinition.getCPDefinitionId());
+			_cpDefinitionOptionRelService.searchCPDefinitionOptionRelsCount(
+				cpDefinition.getCompanyId(), cpDefinition.getGroupId(),
+				cpDefinition.getCPDefinitionId(), search);
 
 		return Page.of(
-			_toProductOptions(cpDefinitionOptionRels), pagination, totalItems);
+			_toProductOptions(
+				cpDefinitionOptionRelBaseModelSearchResult.getBaseModels()),
+			pagination, totalItems);
 	}
 
-	@NestedField(parentClass = Product.class, value = "options")
+	@NestedField(parentClass = Product.class, value = "productOptions")
 	@Override
 	public Page<ProductOption> getProductIdProductOptionsPage(
-			@NestedFieldId(value = "productId") Long id, Pagination pagination)
+			@NestedFieldId(value = "productId") Long id, String search,
+			Pagination pagination, Sort[] sorts)
 		throws Exception {
 
 		CPDefinition cpDefinition =
@@ -114,17 +124,23 @@ public class ProductOptionResourceImpl
 				"Unable to find Product with ID: " + id);
 		}
 
-		List<CPDefinitionOptionRel> cpDefinitionOptionRels =
-			_cpDefinitionOptionRelService.getCPDefinitionOptionRels(
-				cpDefinition.getCPDefinitionId(), pagination.getStartPosition(),
-				pagination.getEndPosition());
+		BaseModelSearchResult<CPDefinitionOptionRel>
+			cpDefinitionOptionRelBaseModelSearchResult =
+				_cpDefinitionOptionRelService.searchCPDefinitionOptionRels(
+					cpDefinition.getCompanyId(), cpDefinition.getGroupId(),
+					cpDefinition.getCPDefinitionId(), search,
+					pagination.getStartPosition(), pagination.getEndPosition(),
+					sorts);
 
 		int totalItems =
-			_cpDefinitionOptionRelService.getCPDefinitionOptionRelsCount(
-				cpDefinition.getCPDefinitionId());
+			_cpDefinitionOptionRelService.searchCPDefinitionOptionRelsCount(
+				cpDefinition.getCompanyId(), cpDefinition.getGroupId(),
+				cpDefinition.getCPDefinitionId(), search);
 
 		return Page.of(
-			_toProductOptions(cpDefinitionOptionRels), pagination, totalItems);
+			_toProductOptions(
+				cpDefinitionOptionRelBaseModelSearchResult.getBaseModels()),
+			pagination, totalItems);
 	}
 
 	@Override
@@ -152,11 +168,11 @@ public class ProductOptionResourceImpl
 		CPDefinition cpDefinition =
 			_cpDefinitionService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
-					contextCompany.getCompanyId(), externalReferenceCode);
+					externalReferenceCode, contextCompany.getCompanyId());
 
 		if (cpDefinition == null) {
 			throw new NoSuchCPDefinitionException(
-				"Unable to find Product with externalReferenceCode: " +
+				"Unable to find product with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -186,7 +202,7 @@ public class ProductOptionResourceImpl
 		throws Exception {
 
 		for (ProductOption productOption : productOptions) {
-			ProductOptionUtil.upsertCPDefinitionOptionRel(
+			ProductOptionUtil.addOrUpdateCPDefinitionOptionRel(
 				_cpDefinitionOptionRelService, _cpOptionService, productOption,
 				cpDefinition.getCPDefinitionId(),
 				_serviceContextHelper.getServiceContext(

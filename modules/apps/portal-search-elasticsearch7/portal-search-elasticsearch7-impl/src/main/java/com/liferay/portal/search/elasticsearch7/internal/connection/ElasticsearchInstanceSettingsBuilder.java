@@ -41,9 +41,6 @@ public class ElasticsearchInstanceSettingsBuilder {
 		return new ElasticsearchInstanceSettingsBuilder();
 	}
 
-	public ElasticsearchInstanceSettingsBuilder() {
-	}
-
 	public Settings build() {
 		load();
 
@@ -188,7 +185,7 @@ public class ElasticsearchInstanceSettingsBuilder {
 			_elasticsearchConfigurationWrapper.networkPublishHost();
 
 		if (Validator.isNotNull(networkBindHost)) {
-			put("network.bind.host", networkBindHost);
+			put("network.bind_host", networkBindHost);
 		}
 
 		if (!Validator.isBlank(_networkHost)) {
@@ -300,9 +297,7 @@ public class ElasticsearchInstanceSettingsBuilder {
 
 		configureTestMode();
 
-		_disableGeoipDownloader();
-
-		_disableXpack();
+		put("transport.type", "netty4");
 	}
 
 	protected void loadSettingsContributors() {
@@ -336,18 +331,6 @@ public class ElasticsearchInstanceSettingsBuilder {
 
 	protected void put(String key, String value) {
 		_settingsBuilder.put(key, value);
-	}
-
-	private void _disableGeoipDownloader() {
-		put("ingest.geoip.downloader.enabled", false);
-	}
-
-	private void _disableXpack() {
-		put("xpack.ml.enabled", false);
-		put("xpack.monitoring.enabled", false);
-		put("xpack.security.enabled", false);
-		put("xpack.sql.enabled", false);
-		put("xpack.watcher.enabled", false);
 	}
 
 	private String _clusterInitialMasterNodes;

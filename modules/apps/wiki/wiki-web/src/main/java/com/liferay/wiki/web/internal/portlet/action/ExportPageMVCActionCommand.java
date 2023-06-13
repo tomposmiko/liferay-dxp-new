@@ -15,6 +15,7 @@
 package com.liferay.wiki.web.internal.portlet.action;
 
 import com.liferay.document.library.kernel.document.conversion.DocumentConversionUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
@@ -82,7 +83,6 @@ public class ExportPageMVCActionCommand extends BaseMVCActionCommand {
 
 		try {
 			long nodeId = ParamUtil.getLong(actionRequest, "nodeId");
-			String nodeName = ParamUtil.getString(actionRequest, "nodeName");
 			String title = ParamUtil.getString(actionRequest, "title");
 			double version = ParamUtil.getDouble(actionRequest, "version");
 
@@ -92,25 +92,37 @@ public class ExportPageMVCActionCommand extends BaseMVCActionCommand {
 			ThemeDisplay themeDisplay =
 				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-			PortletURL viewPageURL = PortletURLFactoryUtil.create(
-				actionRequest, portletConfig.getPortletName(),
-				PortletRequest.RENDER_PHASE);
+			PortletURL viewPageURL = PortletURLBuilder.create(
+				PortletURLFactoryUtil.create(
+					actionRequest, portletConfig.getPortletName(),
+					PortletRequest.RENDER_PHASE)
+			).setMVCRenderCommandName(
+				"/wiki/view"
+			).setParameter(
+				"nodeName", ParamUtil.getString(actionRequest, "nodeName")
+			).setParameter(
+				"title", title
+			).setPortletMode(
+				PortletMode.VIEW
+			).setWindowState(
+				WindowState.MAXIMIZED
+			).buildPortletURL();
 
-			viewPageURL.setParameter("mvcRenderCommandName", "/wiki/view");
-			viewPageURL.setParameter("nodeName", nodeName);
-			viewPageURL.setParameter("title", title);
-			viewPageURL.setPortletMode(PortletMode.VIEW);
-			viewPageURL.setWindowState(WindowState.MAXIMIZED);
-
-			PortletURL editPageURL = PortletURLFactoryUtil.create(
-				actionRequest, portletConfig.getPortletName(),
-				PortletRequest.RENDER_PHASE);
-
-			editPageURL.setParameter("mvcRenderCommandName", "/wiki/edit_page");
-			editPageURL.setParameter("nodeId", String.valueOf(nodeId));
-			editPageURL.setParameter("title", title);
-			editPageURL.setPortletMode(PortletMode.VIEW);
-			editPageURL.setWindowState(WindowState.MAXIMIZED);
+			PortletURL editPageURL = PortletURLBuilder.create(
+				PortletURLFactoryUtil.create(
+					actionRequest, portletConfig.getPortletName(),
+					PortletRequest.RENDER_PHASE)
+			).setMVCRenderCommandName(
+				"/wiki/edit_page"
+			).setParameter(
+				"nodeId", nodeId
+			).setParameter(
+				"title", title
+			).setPortletMode(
+				PortletMode.VIEW
+			).setWindowState(
+				WindowState.MAXIMIZED
+			).buildPortletURL();
 
 			getFile(
 				nodeId, title, version, targetExtension, viewPageURL,
@@ -209,25 +221,16 @@ public class ExportPageMVCActionCommand extends BaseMVCActionCommand {
 			MimeTypesUtil.getContentType(fileName));
 	}
 
-	@Reference(unbind = "-")
-	protected void setWikiEngineRenderer(
-		WikiEngineRenderer wikiEngineRenderer) {
-
-		_wikiEngineRenderer = wikiEngineRenderer;
-	}
-
-	@Reference(unbind = "-")
-	protected void setWikiPageService(WikiPageService wikiPageService) {
-		_wikiPageService = wikiPageService;
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		ExportPageMVCActionCommand.class);
 
 	@Reference
 	private Portal _portal;
 
+	@Reference
 	private WikiEngineRenderer _wikiEngineRenderer;
+
+	@Reference
 	private WikiPageService _wikiPageService;
 
 }

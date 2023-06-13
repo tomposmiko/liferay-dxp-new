@@ -72,6 +72,18 @@ public class FragmentImageSerDes {
 			}
 		}
 
+		if (fragmentImage.getFragmentImageClassPKReference() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"fragmentImageClassPKReference\": ");
+
+			sb.append(
+				String.valueOf(
+					fragmentImage.getFragmentImageClassPKReference()));
+		}
+
 		if (fragmentImage.getTitle() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -133,6 +145,16 @@ public class FragmentImageSerDes {
 				"description", String.valueOf(fragmentImage.getDescription()));
 		}
 
+		if (fragmentImage.getFragmentImageClassPKReference() == null) {
+			map.put("fragmentImageClassPKReference", null);
+		}
+		else {
+			map.put(
+				"fragmentImageClassPKReference",
+				String.valueOf(
+					fragmentImage.getFragmentImageClassPKReference()));
+		}
+
 		if (fragmentImage.getTitle() == null) {
 			map.put("title", null);
 		}
@@ -171,6 +193,15 @@ public class FragmentImageSerDes {
 			if (Objects.equals(jsonParserFieldName, "description")) {
 				if (jsonParserFieldValue != null) {
 					fragmentImage.setDescription((Object)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "fragmentImageClassPKReference")) {
+
+				if (jsonParserFieldValue != null) {
+					fragmentImage.setFragmentImageClassPKReference(
+						FragmentImageClassPKReferenceSerDes.toDTO(
+							(String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "title")) {

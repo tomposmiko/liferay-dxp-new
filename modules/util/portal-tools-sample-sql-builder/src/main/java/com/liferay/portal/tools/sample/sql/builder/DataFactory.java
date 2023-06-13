@@ -14,6 +14,11 @@
 
 package com.liferay.portal.tools.sample.sql.builder;
 
+import com.liferay.account.model.AccountEntry;
+import com.liferay.account.model.AccountEntryModel;
+import com.liferay.account.model.AccountEntryUserRelModel;
+import com.liferay.account.model.impl.AccountEntryModelImpl;
+import com.liferay.account.model.impl.AccountEntryUserRelModelImpl;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetCategoryConstants;
 import com.liferay.asset.kernel.model.AssetCategoryModel;
@@ -24,30 +29,68 @@ import com.liferay.asset.kernel.model.AssetVocabularyModel;
 import com.liferay.blogs.constants.BlogsPortletKeys;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.model.BlogsEntryModel;
-import com.liferay.blogs.model.BlogsStatsUserModel;
 import com.liferay.blogs.model.impl.BlogsEntryModelImpl;
-import com.liferay.blogs.model.impl.BlogsStatsUserModelImpl;
 import com.liferay.blogs.social.BlogsActivityKeys;
+import com.liferay.commerce.account.constants.CommerceAccountConstants;
+import com.liferay.commerce.account.model.CommerceAccount;
+import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.currency.model.CommerceCurrencyModel;
 import com.liferay.commerce.currency.model.impl.CommerceCurrencyModelImpl;
-import com.liferay.commerce.product.constants.CPPortletKeys;
+import com.liferay.commerce.inventory.model.CommerceInventoryWarehouse;
+import com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItemModel;
+import com.liferay.commerce.inventory.model.CommerceInventoryWarehouseModel;
+import com.liferay.commerce.inventory.model.impl.CommerceInventoryWarehouseItemModelImpl;
+import com.liferay.commerce.inventory.model.impl.CommerceInventoryWarehouseModelImpl;
+import com.liferay.commerce.model.CommerceOrderItemModel;
+import com.liferay.commerce.model.CommerceOrderModel;
+import com.liferay.commerce.model.CommerceShippingMethod;
+import com.liferay.commerce.model.CommerceShippingMethodModel;
+import com.liferay.commerce.model.impl.CommerceOrderItemModelImpl;
+import com.liferay.commerce.model.impl.CommerceOrderModelImpl;
+import com.liferay.commerce.model.impl.CommerceShippingMethodModelImpl;
+import com.liferay.commerce.price.list.model.CommercePriceEntryModel;
+import com.liferay.commerce.price.list.model.CommercePriceList;
+import com.liferay.commerce.price.list.model.CommercePriceListModel;
+import com.liferay.commerce.price.list.model.impl.CommercePriceEntryModelImpl;
+import com.liferay.commerce.price.list.model.impl.CommercePriceListModelImpl;
+import com.liferay.commerce.product.model.CPAttachmentFileEntryModel;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPDefinitionLocalizationModel;
 import com.liferay.commerce.product.model.CPDefinitionModel;
+import com.liferay.commerce.product.model.CPDefinitionSpecificationOptionValueModel;
 import com.liferay.commerce.product.model.CPInstanceModel;
+import com.liferay.commerce.product.model.CPOption;
+import com.liferay.commerce.product.model.CPOptionCategory;
+import com.liferay.commerce.product.model.CPOptionCategoryModel;
+import com.liferay.commerce.product.model.CPOptionModel;
+import com.liferay.commerce.product.model.CPOptionValueModel;
+import com.liferay.commerce.product.model.CPSpecificationOption;
+import com.liferay.commerce.product.model.CPSpecificationOptionModel;
 import com.liferay.commerce.product.model.CPTaxCategoryModel;
+import com.liferay.commerce.product.model.CProduct;
 import com.liferay.commerce.product.model.CProductModel;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.model.CommerceCatalogModel;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.model.CommerceChannelModel;
+import com.liferay.commerce.product.model.CommerceChannelRelModel;
+import com.liferay.commerce.product.model.impl.CPAttachmentFileEntryModelImpl;
 import com.liferay.commerce.product.model.impl.CPDefinitionLocalizationModelImpl;
 import com.liferay.commerce.product.model.impl.CPDefinitionModelImpl;
+import com.liferay.commerce.product.model.impl.CPDefinitionSpecificationOptionValueModelImpl;
 import com.liferay.commerce.product.model.impl.CPInstanceModelImpl;
+import com.liferay.commerce.product.model.impl.CPOptionCategoryModelImpl;
+import com.liferay.commerce.product.model.impl.CPOptionModelImpl;
+import com.liferay.commerce.product.model.impl.CPOptionValueModelImpl;
+import com.liferay.commerce.product.model.impl.CPSpecificationOptionModelImpl;
 import com.liferay.commerce.product.model.impl.CPTaxCategoryModelImpl;
 import com.liferay.commerce.product.model.impl.CProductModelImpl;
 import com.liferay.commerce.product.model.impl.CommerceCatalogModelImpl;
 import com.liferay.commerce.product.model.impl.CommerceChannelModelImpl;
+import com.liferay.commerce.product.model.impl.CommerceChannelRelModelImpl;
+import com.liferay.commerce.shipping.engine.fixed.model.CommerceShippingFixedOption;
+import com.liferay.commerce.shipping.engine.fixed.model.CommerceShippingFixedOptionModel;
+import com.liferay.commerce.shipping.engine.fixed.model.impl.CommerceShippingFixedOptionModelImpl;
 import com.liferay.counter.kernel.model.Counter;
 import com.liferay.counter.kernel.model.CounterModel;
 import com.liferay.counter.model.impl.CounterModelImpl;
@@ -76,8 +119,10 @@ import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.dynamic.data.mapping.constants.DDMStructureConstants;
 import com.liferay.dynamic.data.mapping.constants.DDMTemplateConstants;
 import com.liferay.dynamic.data.mapping.model.DDMContent;
-import com.liferay.dynamic.data.mapping.model.DDMContentModel;
-import com.liferay.dynamic.data.mapping.model.DDMStorageLink;
+import com.liferay.dynamic.data.mapping.model.DDMField;
+import com.liferay.dynamic.data.mapping.model.DDMFieldAttribute;
+import com.liferay.dynamic.data.mapping.model.DDMFieldAttributeModel;
+import com.liferay.dynamic.data.mapping.model.DDMFieldModel;
 import com.liferay.dynamic.data.mapping.model.DDMStorageLinkModel;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureLayoutModel;
@@ -88,7 +133,9 @@ import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.model.DDMTemplateLinkModel;
 import com.liferay.dynamic.data.mapping.model.DDMTemplateModel;
 import com.liferay.dynamic.data.mapping.model.DDMTemplateVersionModel;
-import com.liferay.dynamic.data.mapping.model.impl.DDMContentModelImpl;
+import com.liferay.dynamic.data.mapping.model.impl.DDMFieldAttributeImpl;
+import com.liferay.dynamic.data.mapping.model.impl.DDMFieldAttributeModelImpl;
+import com.liferay.dynamic.data.mapping.model.impl.DDMFieldModelImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMStorageLinkModelImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMStructureLayoutModelImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMStructureLinkModelImpl;
@@ -112,7 +159,6 @@ import com.liferay.friendly.url.model.FriendlyURLEntryModel;
 import com.liferay.friendly.url.model.impl.FriendlyURLEntryLocalizationModelImpl;
 import com.liferay.friendly.url.model.impl.FriendlyURLEntryMappingModelImpl;
 import com.liferay.friendly.url.model.impl.FriendlyURLEntryModelImpl;
-import com.liferay.hello.world.web.internal.constants.HelloWorldPortletKeys;
 import com.liferay.journal.constants.JournalActivityKeys;
 import com.liferay.journal.constants.JournalArticleConstants;
 import com.liferay.journal.constants.JournalContentPortletKeys;
@@ -126,11 +172,13 @@ import com.liferay.journal.model.impl.JournalArticleLocalizationModelImpl;
 import com.liferay.journal.model.impl.JournalArticleModelImpl;
 import com.liferay.journal.model.impl.JournalArticleResourceModelImpl;
 import com.liferay.journal.model.impl.JournalContentSearchModelImpl;
+import com.liferay.layout.model.LayoutClassedModelUsageModel;
+import com.liferay.layout.model.impl.LayoutClassedModelUsageModelImpl;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructureModel;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructureRelModel;
 import com.liferay.layout.page.template.model.impl.LayoutPageTemplateStructureModelImpl;
 import com.liferay.layout.page.template.model.impl.LayoutPageTemplateStructureRelModelImpl;
-import com.liferay.login.web.constants.LoginPortletKeys;
+import com.liferay.layout.util.constants.LayoutClassedModelUsageConstants;
 import com.liferay.message.boards.constants.MBCategoryConstants;
 import com.liferay.message.boards.constants.MBMessageConstants;
 import com.liferay.message.boards.constants.MBPortletKeys;
@@ -141,7 +189,6 @@ import com.liferay.message.boards.model.MBDiscussionModel;
 import com.liferay.message.boards.model.MBMailingListModel;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.model.MBMessageModel;
-import com.liferay.message.boards.model.MBStatsUserModel;
 import com.liferay.message.boards.model.MBThread;
 import com.liferay.message.boards.model.MBThreadFlagModel;
 import com.liferay.message.boards.model.MBThreadModel;
@@ -149,7 +196,6 @@ import com.liferay.message.boards.model.impl.MBCategoryModelImpl;
 import com.liferay.message.boards.model.impl.MBDiscussionModelImpl;
 import com.liferay.message.boards.model.impl.MBMailingListModelImpl;
 import com.liferay.message.boards.model.impl.MBMessageModelImpl;
-import com.liferay.message.boards.model.impl.MBStatsUserModelImpl;
 import com.liferay.message.boards.model.impl.MBThreadFlagModelImpl;
 import com.liferay.message.boards.model.impl.MBThreadModelImpl;
 import com.liferay.message.boards.social.MBActivityKeys;
@@ -159,14 +205,22 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.metadata.RawMetadataProcessor;
-import com.liferay.portal.kernel.model.AccountModel;
+import com.liferay.portal.kernel.model.Address;
+import com.liferay.portal.kernel.model.AddressModel;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.ClassNameModel;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.CompanyModel;
 import com.liferay.portal.kernel.model.ContactConstants;
 import com.liferay.portal.kernel.model.ContactModel;
+import com.liferay.portal.kernel.model.Country;
+import com.liferay.portal.kernel.model.CountryModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.GroupModel;
@@ -174,10 +228,14 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutFriendlyURLModel;
 import com.liferay.portal.kernel.model.LayoutModel;
+import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetModel;
 import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
-import com.liferay.portal.kernel.model.PortletConstants;
+import com.liferay.portal.kernel.model.PortalPreferencesModel;
+import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.model.PortletPreferenceValue;
+import com.liferay.portal.kernel.model.PortletPreferenceValueModel;
 import com.liferay.portal.kernel.model.PortletPreferencesModel;
 import com.liferay.portal.kernel.model.ReleaseConstants;
 import com.liferay.portal.kernel.model.ReleaseModel;
@@ -197,6 +255,7 @@ import com.liferay.portal.kernel.security.auth.FullNameGenerator;
 import com.liferay.portal.kernel.security.auth.FullNameGeneratorFactory;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.template.TemplateConstants;
+import com.liferay.portal.kernel.theme.NavItem;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
@@ -211,23 +270,39 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.version.Version;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.model.impl.AccountModelImpl;
+import com.liferay.portal.model.impl.AddressModelImpl;
 import com.liferay.portal.model.impl.ClassNameModelImpl;
 import com.liferay.portal.model.impl.CompanyModelImpl;
 import com.liferay.portal.model.impl.ContactModelImpl;
+import com.liferay.portal.model.impl.CountryModelImpl;
 import com.liferay.portal.model.impl.GroupModelImpl;
 import com.liferay.portal.model.impl.LayoutFriendlyURLModelImpl;
 import com.liferay.portal.model.impl.LayoutModelImpl;
 import com.liferay.portal.model.impl.LayoutSetModelImpl;
+import com.liferay.portal.model.impl.PortalPreferencesModelImpl;
+import com.liferay.portal.model.impl.PortletPreferenceValueImpl;
+import com.liferay.portal.model.impl.PortletPreferenceValueModelImpl;
 import com.liferay.portal.model.impl.PortletPreferencesModelImpl;
 import com.liferay.portal.model.impl.ReleaseModelImpl;
 import com.liferay.portal.model.impl.ResourcePermissionModelImpl;
 import com.liferay.portal.model.impl.RoleModelImpl;
 import com.liferay.portal.model.impl.UserModelImpl;
 import com.liferay.portal.model.impl.VirtualHostModelImpl;
+import com.liferay.portal.search.web.constants.SearchBarPortletKeys;
+import com.liferay.portal.search.web.internal.category.facet.constants.CategoryFacetPortletKeys;
+import com.liferay.portal.search.web.internal.folder.facet.constants.FolderFacetPortletKeys;
+import com.liferay.portal.search.web.internal.modified.facet.constants.ModifiedFacetPortletKeys;
+import com.liferay.portal.search.web.internal.search.options.constants.SearchOptionsPortletKeys;
+import com.liferay.portal.search.web.internal.search.results.constants.SearchResultsPortletKeys;
+import com.liferay.portal.search.web.internal.site.facet.constants.SiteFacetPortletKeys;
+import com.liferay.portal.search.web.internal.suggestions.constants.SuggestionsPortletKeys;
+import com.liferay.portal.search.web.internal.tag.facet.constants.TagFacetPortletKeys;
+import com.liferay.portal.search.web.internal.type.facet.constants.TypeFacetPortletKeys;
+import com.liferay.portal.search.web.internal.user.facet.constants.UserFacetPortletKeys;
+import com.liferay.portal.service.impl.LayoutLocalServiceImpl;
 import com.liferay.portal.upgrade.PortalUpgradeProcess;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.PortletPreferencesFactoryImpl;
@@ -236,6 +311,7 @@ import com.liferay.portlet.asset.model.impl.AssetCategoryModelImpl;
 import com.liferay.portlet.asset.model.impl.AssetEntryModelImpl;
 import com.liferay.portlet.asset.model.impl.AssetTagModelImpl;
 import com.liferay.portlet.asset.model.impl.AssetVocabularyModelImpl;
+import com.liferay.portlet.display.template.PortletDisplayTemplate;
 import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryMetadataModelImpl;
 import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryModelImpl;
 import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryTypeModelImpl;
@@ -243,6 +319,12 @@ import com.liferay.portlet.documentlibrary.model.impl.DLFileVersionModelImpl;
 import com.liferay.portlet.documentlibrary.model.impl.DLFolderModelImpl;
 import com.liferay.portlet.documentlibrary.social.DLActivityKeys;
 import com.liferay.portlet.social.model.impl.SocialActivityModelImpl;
+import com.liferay.segments.constants.SegmentsEntryConstants;
+import com.liferay.segments.criteria.Criteria;
+import com.liferay.segments.criteria.CriteriaSerializer;
+import com.liferay.segments.model.SegmentsEntry;
+import com.liferay.segments.model.SegmentsEntryModel;
+import com.liferay.segments.model.impl.SegmentsEntryImpl;
 import com.liferay.social.kernel.model.SocialActivity;
 import com.liferay.social.kernel.model.SocialActivityConstants;
 import com.liferay.social.kernel.model.SocialActivityModel;
@@ -265,7 +347,6 @@ import com.liferay.wiki.social.WikiActivityKeys;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -282,8 +363,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.portlet.PortletPreferences;
@@ -297,20 +381,25 @@ public class DataFactory {
 		_simpleDateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat(
 			"yyyy-MM-dd HH:mm:ss", TimeZone.getDefault());
 
-		_counter = new SimpleCounter(BenchmarksPropsValues.MAX_GROUP_COUNT + 1);
+		_counter = new SimpleCounter(
+			BenchmarksPropsValues.MAX_GROUP_COUNT +
+				BenchmarksPropsValues.MAX_COMMERCE_GROUP_COUNT + 1);
+		_dLFileEntryIdCounter = new SimpleCounter();
 		_timeCounter = new SimpleCounter();
 		_futureDateCounter = new SimpleCounter();
-		_resourcePermissionCounter = new SimpleCounter();
-		_socialActivityCounter = new SimpleCounter();
+		_layoutPlidCounter = new SimpleCounter();
+		_layoutSetIdCounter = new SimpleCounter();
+		_portletPreferenceValueIdCounter = new SimpleCounter();
+		_resourcePermissionIdCounter = new SimpleCounter();
+		_socialActivityIdCounter = new SimpleCounter();
 		_userScreenNameCounter = new SimpleCounter();
 
 		List<String> models = ModelHintsUtil.getModels();
 
 		models.add(Layout.class.getName());
+		models.add(NavItem.class.getName());
+		models.add(PortletDisplayTemplate.class.getName());
 		models.add(UserPersonalSite.class.getName());
-
-		models.add(_getMBDiscussionCombinedClassName(BlogsEntry.class));
-		models.add(_getMBDiscussionCombinedClassName(WikiPage.class));
 
 		for (String model : models) {
 			ClassNameModel classNameModel = new ClassNameModelImpl();
@@ -326,40 +415,27 @@ public class DataFactory {
 			getClassNameId(JournalArticle.class), getClassNameId(WikiPage.class)
 		};
 
-		_accountId = _counter.get();
 		_companyId = _counter.get();
-		_defaultDLDDMStructureId = _counter.get();
-		_defaultDLDDMStructureVersionId = _counter.get();
-		_defaultJournalDDMStructureId = _counter.get();
-		_defaultJournalDDMStructureVersionId = _counter.get();
-		_defaultJournalDDMTemplateId = _counter.get();
-		_defaultUserId = _counter.get();
-		_globalGroupId = _counter.get();
-		_guestGroupId = _counter.get();
-		_sampleUserId = _counter.get();
-		_userPersonalSiteGroupId = _counter.get();
 
-		_dlDDMStructureContent = _readFile("ddm_structure_basic_document.json");
+		_dlDDMStructureContent = _readFile(
+			"ddm_structure/ddm_structure_basic_document.json");
 		_dlDDMStructureLayoutContent = _readFile(
-			"ddm_structure_layout_basic_document.json");
+			"ddm_structure/ddm_structure_layout_basic_document.json");
 		_journalDDMStructureContent = _readFile(
-			"ddm_structure_basic_web_content.json");
+			"ddm_structure/ddm_structure_basic_web_content.json");
 		_journalDDMStructureLayoutContent = _readFile(
-			"ddm_structure_layout_basic_web_content.json");
+			"ddm_structure/ddm_structure_layout_basic_web_content.json");
 		_layoutPageTemplateStructureRelData = _readFile(
-			"layout_page_template_structure_rel_data.json");
+			"layout_page_template_structure_rel.json");
 
 		_defaultAssetPublisherPortletPreferencesImpl =
 			(PortletPreferencesImpl)_portletPreferencesFactory.fromDefaultXML(
 				_readFile("default_asset_publisher_preference.xml"));
 
-		initAssetCategoryModels();
-		initAssetTagModels();
-
 		initJournalArticleContent();
 
-		initRoleModels();
-		initUserNames();
+		_firstNames = _readLines("user_name/first_names.txt");
+		_lastNames = _readLines("user_name/last_names.txt");
 	}
 
 	public RoleModel getAdministratorRoleModel() {
@@ -411,22 +487,6 @@ public class DataFactory {
 		return assetCategoryIds;
 	}
 
-	public List<AssetCategoryModel> getAssetCategoryModels() {
-		List<AssetCategoryModel> allAssetCategoryModels = new ArrayList<>();
-
-		for (Map<Long, List<AssetCategoryModel>> assetCategoryModelsMap :
-				_assetCategoryModelsMaps) {
-
-			for (List<AssetCategoryModel> assetCategoryModels :
-					assetCategoryModelsMap.values()) {
-
-				allAssetCategoryModels.addAll(assetCategoryModels);
-			}
-		}
-
-		return allAssetCategoryModels;
-	}
-
 	public List<Long> getAssetTagIds(AssetEntryModel assetEntryModel) {
 		Map<Long, List<AssetTagModel>> assetTagModelsMap =
 			_assetTagModelsMaps[(int)assetEntryModel.getGroupId() - 1];
@@ -469,36 +529,6 @@ public class DataFactory {
 		return assetTagIds;
 	}
 
-	public List<AssetTagModel> getAssetTagModels() {
-		List<AssetTagModel> allAssetTagModels = new ArrayList<>();
-
-		for (Map<Long, List<AssetTagModel>> assetTagModelsMap :
-				_assetTagModelsMaps) {
-
-			for (List<AssetTagModel> assetTagModels :
-					assetTagModelsMap.values()) {
-
-				allAssetTagModels.addAll(assetTagModels);
-			}
-		}
-
-		return allAssetTagModels;
-	}
-
-	public List<AssetVocabularyModel> getAssetVocabularyModels() {
-		List<AssetVocabularyModel> allAssetVocabularyModels = new ArrayList<>();
-
-		allAssetVocabularyModels.add(_defaultAssetVocabularyModel);
-
-		for (List<AssetVocabularyModel> assetVocabularyModels :
-				_assetVocabularyModelsArray) {
-
-			allAssetVocabularyModels.addAll(assetVocabularyModels);
-		}
-
-		return allAssetVocabularyModels;
-	}
-
 	public long getBlogsEntryClassNameId() {
 		return getClassNameId(BlogsEntry.class);
 	}
@@ -513,8 +543,26 @@ public class DataFactory {
 		return _classNameModels.values();
 	}
 
+	public long getCommerceInventoryWarehouseClassNameId() {
+		return getClassNameId(CommerceInventoryWarehouse.class);
+	}
+
 	public long getCounterNext() {
 		return _counter.get();
+	}
+
+	public long getCPDefinitionClassNameId() {
+		return getClassNameId(CPDefinition.class);
+	}
+
+	public long getCPInstanceId(long cpDefinitionId) {
+		CPInstanceModel cpInstanceModel = _cpInstanceModels.get(cpDefinitionId);
+
+		return cpInstanceModel.getCPInstanceId();
+	}
+
+	public long getCProductClassNameId() {
+		return getClassNameId(CProduct.class);
 	}
 
 	public long getDefaultDLDDMStructureId() {
@@ -552,16 +600,27 @@ public class DataFactory {
 		return BenchmarksPropsValues.MAX_BLOGS_ENTRY_COMMENT_COUNT;
 	}
 
-	public int getMaxCommerceProductCount() {
-		return BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_COUNT;
+	public int getMaxCommerceGroupCount() {
+		return BenchmarksPropsValues.MAX_COMMERCE_GROUP_COUNT;
 	}
 
-	public int getMaxCommerceProductDefinitionCount() {
-		return BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_DEFINITION_COUNT;
+	public int getMaxContentLayoutCount() {
+		return BenchmarksPropsValues.MAX_CONTENT_LAYOUT_COUNT;
 	}
 
-	public int getMaxCommerceProductInstanceCount() {
-		return BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_INSTANCE_COUNT;
+	public int getMaxCPDefinitionAttachmentTypeImageCount() {
+		return BenchmarksPropsValues.
+			MAX_CP_DEFINITION_ATTACHMENT_TYPE_IMAGE_COUNT;
+	}
+
+	public int getMaxCPDefinitionAttachmentTypePDFCount() {
+		return BenchmarksPropsValues.
+			MAX_CP_DEFINITION_ATTACHMENT_TYPE_PDF_COUNT;
+	}
+
+	public int getMaxCPDefinitionSpecificationOptionValueCount() {
+		return BenchmarksPropsValues.
+			MAX_CP_DEFINITION_SPECIFICATION_OPTION_VALUE_COUNT;
 	}
 
 	public int getMaxDDLRecordCount() {
@@ -590,6 +649,10 @@ public class DataFactory {
 
 	public int getMaxJournalArticleVersionCount() {
 		return BenchmarksPropsValues.MAX_JOURNAL_ARTICLE_VERSION_COUNT;
+	}
+
+	public int getMaxSegmentsEntryCount() {
+		return BenchmarksPropsValues.MAX_SEGMENTS_ENTRY_COUNT;
 	}
 
 	public int getMaxWikiPageCommentCount() {
@@ -643,8 +706,20 @@ public class DataFactory {
 		return _powerUserRoleModel;
 	}
 
-	public List<RoleModel> getRoleModels() {
-		return _roleModels;
+	public int getRandomCProductModelIndex() {
+		Random random = new Random();
+
+		int count = (int)Math.ceil(
+			BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_COUNT /
+				BenchmarksPropsValues.MAX_COMMERCE_CATALOG_COUNT);
+
+		if (BenchmarksPropsValues.MAX_COMMERCE_CATALOG_COUNT >
+				BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_COUNT) {
+
+			count = BenchmarksPropsValues.MAX_COMMERCE_CATALOG_COUNT;
+		}
+
+		return random.nextInt(count);
 	}
 
 	public List<Integer> getSequence(int size) {
@@ -665,151 +740,9 @@ public class DataFactory {
 		return getClassNameId(WikiPage.class);
 	}
 
-	public void initAssetCategoryModels() {
-		_assetCategoryModelsMaps =
-			(Map<Long, List<AssetCategoryModel>>[])
-				new HashMap<?, ?>[BenchmarksPropsValues.MAX_GROUP_COUNT];
-		_assetVocabularyModelsArray =
-			(List<AssetVocabularyModel>[])
-				new List<?>[BenchmarksPropsValues.MAX_GROUP_COUNT];
-		_defaultAssetVocabularyModel = newAssetVocabularyModel(
-			_globalGroupId, _defaultUserId, null,
-			PropsValues.ASSET_VOCABULARY_DEFAULT);
-
-		StringBundler sb = new StringBundler(4);
-
-		for (int i = 1; i <= BenchmarksPropsValues.MAX_GROUP_COUNT; i++) {
-			List<AssetVocabularyModel> assetVocabularyModels = new ArrayList<>(
-				BenchmarksPropsValues.MAX_ASSET_VUCABULARY_COUNT);
-			List<AssetCategoryModel> assetCategoryModels = new ArrayList<>(
-				BenchmarksPropsValues.MAX_ASSET_VUCABULARY_COUNT *
-					BenchmarksPropsValues.MAX_ASSET_CATEGORY_COUNT);
-
-			for (int j = 0;
-				 j < BenchmarksPropsValues.MAX_ASSET_VUCABULARY_COUNT; j++) {
-
-				sb.setIndex(0);
-
-				sb.append("TestVocabulary_");
-				sb.append(i);
-				sb.append(StringPool.UNDERLINE);
-				sb.append(j);
-
-				AssetVocabularyModel assetVocabularyModel =
-					newAssetVocabularyModel(
-						i, _sampleUserId, _SAMPLE_USER_NAME, sb.toString());
-
-				assetVocabularyModels.add(assetVocabularyModel);
-
-				for (int k = 0;
-					 k < BenchmarksPropsValues.MAX_ASSET_CATEGORY_COUNT; k++) {
-
-					sb.setIndex(0);
-
-					sb.append("TestCategory_");
-					sb.append(assetVocabularyModel.getVocabularyId());
-					sb.append(StringPool.UNDERLINE);
-					sb.append(k);
-
-					assetCategoryModels.add(
-						newAssetCategoryModel(
-							i, sb.toString(),
-							assetVocabularyModel.getVocabularyId()));
-				}
-			}
-
-			_assetVocabularyModelsArray[i - 1] = assetVocabularyModels;
-
-			Map<Long, List<AssetCategoryModel>> assetCategoryModelsMap =
-				new HashMap<>();
-
-			int pageSize =
-				assetCategoryModels.size() / _assetClassNameIds.length;
-
-			for (int j = 0; j < _assetClassNameIds.length; j++) {
-				int fromIndex = j * pageSize;
-
-				int toIndex = (j + 1) * pageSize;
-
-				if (j == (_assetClassNameIds.length - 1)) {
-					toIndex = assetCategoryModels.size();
-				}
-
-				assetCategoryModelsMap.put(
-					_assetClassNameIds[j],
-					assetCategoryModels.subList(fromIndex, toIndex));
-			}
-
-			_assetCategoryModelsMaps[i - 1] = assetCategoryModelsMap;
-		}
-	}
-
-	public void initAssetTagModels() {
-		_assetTagModelsArray =
-			(List<AssetTagModel>[])
-				new List<?>[BenchmarksPropsValues.MAX_GROUP_COUNT];
-		_assetTagModelsMaps =
-			(Map<Long, List<AssetTagModel>>[])
-				new HashMap<?, ?>[BenchmarksPropsValues.MAX_GROUP_COUNT];
-
-		for (int i = 1; i <= BenchmarksPropsValues.MAX_GROUP_COUNT; i++) {
-			List<AssetTagModel> assetTagModels = new ArrayList<>(
-				BenchmarksPropsValues.MAX_ASSET_TAG_COUNT);
-
-			for (int j = 0; j < BenchmarksPropsValues.MAX_ASSET_TAG_COUNT;
-				 j++) {
-
-				AssetTagModel assetTagModel = new AssetTagModelImpl();
-
-				assetTagModel.setUuid(SequentialUUID.generate());
-				assetTagModel.setTagId(_counter.get());
-				assetTagModel.setGroupId(i);
-				assetTagModel.setCompanyId(_companyId);
-				assetTagModel.setUserId(_sampleUserId);
-				assetTagModel.setUserName(_SAMPLE_USER_NAME);
-				assetTagModel.setCreateDate(new Date());
-				assetTagModel.setModifiedDate(new Date());
-				assetTagModel.setName(
-					StringBundler.concat("TestTag_", i, "_", j));
-				assetTagModel.setLastPublishDate(new Date());
-
-				assetTagModels.add(assetTagModel);
-			}
-
-			_assetTagModelsArray[i - 1] = assetTagModels;
-
-			Map<Long, List<AssetTagModel>> assetTagModelsMap = new HashMap<>();
-
-			int pageSize = assetTagModels.size() / _assetClassNameIds.length;
-
-			for (int j = 0; j < _assetClassNameIds.length; j++) {
-				int fromIndex = j * pageSize;
-
-				int toIndex = (j + 1) * pageSize;
-
-				if (j == (_assetClassNameIds.length - 1)) {
-					toIndex = assetTagModels.size();
-				}
-
-				assetTagModelsMap.put(
-					_assetClassNameIds[j],
-					assetTagModels.subList(fromIndex, toIndex));
-			}
-
-			_assetTagModelsMaps[i - 1] = assetTagModelsMap;
-		}
-	}
-
 	public void initJournalArticleContent() {
 		int maxJournalArticleSize =
 			BenchmarksPropsValues.MAX_JOURNAL_ARTICLE_SIZE;
-
-		StringBundler sb = new StringBundler(6);
-
-		sb.append("<?xml version=\"1.0\"?><root available-locales=\"en_US\" ");
-		sb.append("default-locale=\"en_US\"><dynamic-element name=\"content");
-		sb.append("\" type=\"text_area\" index-type=\"keyword\" index=\"0\">");
-		sb.append("<dynamic-content language-id=\"en_US\"><![CDATA[");
 
 		if (maxJournalArticleSize <= 0) {
 			maxJournalArticleSize = 1;
@@ -821,136 +754,145 @@ public class DataFactory {
 			chars[i] = (char)(CharPool.LOWER_CASE_A + (i % 26));
 		}
 
-		sb.append(new String(chars));
-
-		sb.append("]]></dynamic-content></dynamic-element></root>");
-
-		_journalArticleContent = sb.toString();
+		_journalArticleContent = new String(chars);
 	}
 
-	public void initRoleModels() {
-		_roleModels = new ArrayList<>();
-
-		// Administrator
-
-		_administratorRoleModel = newRoleModel(
-			RoleConstants.ADMINISTRATOR, RoleConstants.TYPE_REGULAR);
-
-		_roleModels.add(_administratorRoleModel);
-
-		// Guest
-
-		_guestRoleModel = newRoleModel(
-			RoleConstants.GUEST, RoleConstants.TYPE_REGULAR);
-
-		_roleModels.add(_guestRoleModel);
-
-		// Organization Administrator
-
-		_roleModels.add(
-			newRoleModel(
-				RoleConstants.ORGANIZATION_ADMINISTRATOR,
-				RoleConstants.TYPE_ORGANIZATION));
-
-		// Organization Owner
-
-		_roleModels.add(
-			newRoleModel(
-				RoleConstants.ORGANIZATION_OWNER,
-				RoleConstants.TYPE_ORGANIZATION));
-
-		// Organization User
-
-		_roleModels.add(
-			newRoleModel(
-				RoleConstants.ORGANIZATION_USER,
-				RoleConstants.TYPE_ORGANIZATION));
-
-		// Owner
-
-		_ownerRoleModel = newRoleModel(
-			RoleConstants.OWNER, RoleConstants.TYPE_REGULAR);
-
-		_roleModels.add(_ownerRoleModel);
-
-		// Power User
-
-		_powerUserRoleModel = newRoleModel(
-			RoleConstants.POWER_USER, RoleConstants.TYPE_REGULAR);
-
-		_roleModels.add(_powerUserRoleModel);
-
-		// Site Administrator
-
-		_roleModels.add(
-			newRoleModel(
-				RoleConstants.SITE_ADMINISTRATOR, RoleConstants.TYPE_SITE));
-
-		// Site Member
-
-		_siteMemberRoleModel = newRoleModel(
-			RoleConstants.SITE_MEMBER, RoleConstants.TYPE_SITE);
-
-		_roleModels.add(_siteMemberRoleModel);
-
-		// Site Owner
-
-		_roleModels.add(
-			newRoleModel(RoleConstants.SITE_OWNER, RoleConstants.TYPE_SITE));
-
-		// User
-
-		_userRoleModel = newRoleModel(
-			RoleConstants.USER, RoleConstants.TYPE_REGULAR);
-
-		_roleModels.add(_userRoleModel);
-	}
-
-	public void initUserNames() throws IOException {
-		_firstNames = new ArrayList<>();
-
-		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
-			new InputStreamReader(getResourceInputStream("first_names.txt")));
-
-		String line = null;
-
-		while ((line = unsyncBufferedReader.readLine()) != null) {
-			_firstNames.add(line);
-		}
-
-		unsyncBufferedReader.close();
-
-		_lastNames = new ArrayList<>();
-
-		unsyncBufferedReader = new UnsyncBufferedReader(
-			new InputStreamReader(getResourceInputStream("last_names.txt")));
-
-		while ((line = unsyncBufferedReader.readLine()) != null) {
-			_lastNames.add(line);
-		}
-
-		unsyncBufferedReader.close();
-	}
-
-	public AccountModel newAccountModel() {
-		AccountModel accountModel = new AccountModelImpl();
+	public AccountEntryModel newAccountEntryModel(String type, int index) {
+		AccountEntryModel accountEntryModel = new AccountEntryModelImpl();
 
 		// PK fields
 
-		accountModel.setAccountId(_accountId);
+		accountEntryModel.setAccountEntryId(_counter.get());
 
 		// Audit fields
 
-		accountModel.setCompanyId(_companyId);
-		accountModel.setCreateDate(new Date());
-		accountModel.setModifiedDate(new Date());
+		accountEntryModel.setCompanyId(_companyId);
+		accountEntryModel.setUserId(_sampleUserId);
+		accountEntryModel.setUserName(_SAMPLE_USER_NAME);
+		accountEntryModel.setCreateDate(new Date());
+		accountEntryModel.setModifiedDate(new Date());
 
 		// Other fields
 
-		accountModel.setName("Liferay");
-		accountModel.setLegalName("Liferay, Inc.");
+		accountEntryModel.setDefaultBillingAddressId(0);
+		accountEntryModel.setDefaultShippingAddressId(0);
+		accountEntryModel.setParentAccountEntryId(0);
+		accountEntryModel.setDescription(null);
+		accountEntryModel.setDomains(null);
+		accountEntryModel.setEmailAddress(null);
+		accountEntryModel.setName("Account Entry" + index);
+		accountEntryModel.setTaxExemptionCode(null);
+		accountEntryModel.setTaxIdNumber(null);
+		accountEntryModel.setLogoId(0);
+		accountEntryModel.setType("business");
+		accountEntryModel.setStatus(0);
 
-		return accountModel;
+		return accountEntryModel;
+	}
+
+	public AccountEntryUserRelModel newAccountEntryUserRelModel(
+		UserModel user, long accountEntryId) {
+
+		AccountEntryUserRelModel accountEntryUserRelModel =
+			new AccountEntryUserRelModelImpl();
+
+		// PK fields
+
+		accountEntryUserRelModel.setAccountEntryUserRelId(_counter.get());
+
+		// Audit fields
+
+		accountEntryUserRelModel.setCompanyId(_companyId);
+
+		// Other fields
+
+		accountEntryUserRelModel.setAccountEntryId(accountEntryId);
+		accountEntryUserRelModel.setAccountUserId(user.getUserId());
+
+		return accountEntryUserRelModel;
+	}
+
+	public AddressModel newAddressModel(long accountEntryId, long countryId) {
+		AddressModel addressModel = new AddressModelImpl();
+
+		// PK fields
+
+		addressModel.setAddressId(_counter.get());
+
+		// Audit fields
+
+		addressModel.setCompanyId(_companyId);
+		addressModel.setUserId(_sampleUserId);
+		addressModel.setUserName(_SAMPLE_USER_NAME);
+		addressModel.setCreateDate(new Date());
+		addressModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		addressModel.setClassNameId(getClassNameId(CommerceAccount.class));
+		addressModel.setClassPK(accountEntryId);
+		addressModel.setName("Sample Address");
+		addressModel.setDescription(null);
+		addressModel.setStreet1("123 Sample Street");
+		addressModel.setCity("Los Angeles");
+		addressModel.setZip("1234");
+		addressModel.setCountryId(countryId);
+		addressModel.setTypeId(14001);
+
+		return addressModel;
+	}
+
+	public List<AssetCategoryModel> newAssetCategoryModels(
+		long groupId, List<AssetVocabularyModel> assetVocabularyModels) {
+
+		List<AssetCategoryModel> assetCategoryModels = new ArrayList<>();
+
+		List<AssetCategoryModel> groupAssetCategoryModels = new ArrayList<>(
+			BenchmarksPropsValues.MAX_ASSET_VUCABULARY_COUNT *
+				BenchmarksPropsValues.MAX_ASSET_CATEGORY_COUNT);
+
+		for (AssetVocabularyModel assetVocabularyModel :
+				assetVocabularyModels) {
+
+			for (int k = 0; k < BenchmarksPropsValues.MAX_ASSET_CATEGORY_COUNT;
+				 k++) {
+
+				AssetCategoryModel assetCategoryModel = newAssetCategoryModel(
+					groupId,
+					StringBundler.concat(
+						"TestCategory_", assetVocabularyModel.getVocabularyId(),
+						StringPool.UNDERLINE, k),
+					assetVocabularyModel.getVocabularyId());
+
+				groupAssetCategoryModels.add(assetCategoryModel);
+
+				assetCategoryModels.add(assetCategoryModel);
+			}
+		}
+
+		Map<Long, List<AssetCategoryModel>> assetCategoryModelsMap =
+			new HashMap<>();
+
+		int pageSize =
+			groupAssetCategoryModels.size() / _assetClassNameIds.length;
+
+		for (int j = 0; j < _assetClassNameIds.length; j++) {
+			int fromIndex = j * pageSize;
+
+			int toIndex = (j + 1) * pageSize;
+
+			if (j == (_assetClassNameIds.length - 1)) {
+				toIndex = groupAssetCategoryModels.size();
+			}
+
+			assetCategoryModelsMap.put(
+				_assetClassNameIds[j],
+				groupAssetCategoryModels.subList(fromIndex, toIndex));
+		}
+
+		_assetCategoryModelsMaps[(int)groupId - 1] = assetCategoryModelsMap;
+
+		return assetCategoryModels;
 	}
 
 	public AssetEntryModel newAssetEntryModel(BlogsEntryModel blogsEntryModel) {
@@ -1045,15 +987,171 @@ public class DataFactory {
 		newAssetPublisherPortletPreferencesModels(long plid) {
 
 		return ListUtil.fromArray(
-			newPortletPreferencesModel(
-				plid, BlogsPortletKeys.BLOGS,
-				PortletConstants.DEFAULT_PREFERENCES),
-			newPortletPreferencesModel(
-				plid, JournalPortletKeys.JOURNAL,
-				PortletConstants.DEFAULT_PREFERENCES),
-			newPortletPreferencesModel(
-				plid, WikiPortletKeys.WIKI,
-				PortletConstants.DEFAULT_PREFERENCES));
+			newPortletPreferencesModel(plid, BlogsPortletKeys.BLOGS),
+			newPortletPreferencesModel(plid, JournalPortletKeys.JOURNAL),
+			newPortletPreferencesModel(plid, WikiPortletKeys.WIKI));
+	}
+
+	public List<PortletPreferenceValueModel>
+			newAssetPublisherPortletPreferenceValueModels(
+				PortletPreferencesModel portletPreferencesModel, long groupId,
+				int currentIndex)
+		throws Exception {
+
+		if (currentIndex == 1) {
+			return Collections.emptyList();
+		}
+
+		String assetPublisherQueryName = "assetCategories";
+
+		if ((currentIndex % 2) == 0) {
+			assetPublisherQueryName = "assetTags";
+		}
+
+		ObjectValuePair<String[], Integer> objectValuePair = null;
+
+		Integer startIndex = _assetPublisherQueryStartIndexes.get(groupId);
+
+		if (startIndex == null) {
+			startIndex = 0;
+		}
+
+		if (assetPublisherQueryName.equals("assetCategories")) {
+			Map<Long, List<AssetCategoryModel>> assetCategoryModelsMap =
+				_assetCategoryModelsMaps[(int)groupId - 1];
+
+			List<AssetCategoryModel> assetCategoryModels =
+				assetCategoryModelsMap.get(getNextAssetClassNameId(groupId));
+
+			if (ListUtil.isEmpty(assetCategoryModels)) {
+				return Collections.emptyList();
+			}
+
+			objectValuePair = getAssetPublisherAssetCategoriesQueryValues(
+				assetCategoryModels, startIndex);
+		}
+		else {
+			Map<Long, List<AssetTagModel>> assetTagModelsMap =
+				_assetTagModelsMaps[(int)groupId - 1];
+
+			List<AssetTagModel> assetTagModels = assetTagModelsMap.get(
+				getNextAssetClassNameId(groupId));
+
+			if (ListUtil.isEmpty(assetTagModels)) {
+				return Collections.emptyList();
+			}
+
+			objectValuePair = getAssetPublisherAssetTagsQueryValues(
+				assetTagModels, startIndex);
+		}
+
+		String[] assetPublisherQueryValues = objectValuePair.getKey();
+
+		PortletPreferences jxPortletPreferences =
+			(PortletPreferences)
+				_defaultAssetPublisherPortletPreferencesImpl.clone();
+
+		jxPortletPreferences.setValue("queryAndOperator0", "false");
+		jxPortletPreferences.setValue("queryContains0", "true");
+		jxPortletPreferences.setValue("queryName0", assetPublisherQueryName);
+		jxPortletPreferences.setValues(
+			"queryValues0",
+			new String[] {
+				assetPublisherQueryValues[0], assetPublisherQueryValues[1],
+				assetPublisherQueryValues[2]
+			});
+		jxPortletPreferences.setValue("queryAndOperator1", "false");
+		jxPortletPreferences.setValue("queryContains1", "false");
+		jxPortletPreferences.setValue("queryName1", assetPublisherQueryName);
+		jxPortletPreferences.setValue(
+			"queryValues1", assetPublisherQueryValues[3]);
+
+		List<PortletPreferenceValueModel> portletPreferenceValueModels =
+			new ArrayList<>();
+
+		Map<String, String[]> map = jxPortletPreferences.getMap();
+
+		for (Map.Entry<String, String[]> entry : map.entrySet()) {
+			String[] values = entry.getValue();
+
+			if (values == null) {
+				continue;
+			}
+
+			for (int i = 0; i < values.length; i++) {
+				portletPreferenceValueModels.add(
+					newPortletPreferenceValueModel(
+						portletPreferencesModel, entry.getKey(), i, values[i]));
+			}
+		}
+
+		return portletPreferenceValueModels;
+	}
+
+	public List<AssetTagModel> newAssetTagModels(long groupId) {
+		List<AssetTagModel> assetTagModels = new ArrayList<>();
+
+		List<AssetTagModel> groupAssetTagModels = new ArrayList<>(
+			BenchmarksPropsValues.MAX_ASSET_TAG_COUNT);
+
+		for (int j = 0; j < BenchmarksPropsValues.MAX_ASSET_TAG_COUNT; j++) {
+			AssetTagModel assetTagModel = new AssetTagModelImpl();
+
+			assetTagModel.setUuid(SequentialUUID.generate());
+			assetTagModel.setTagId(_counter.get());
+			assetTagModel.setGroupId(groupId);
+			assetTagModel.setCompanyId(_companyId);
+			assetTagModel.setUserId(_sampleUserId);
+			assetTagModel.setUserName(_SAMPLE_USER_NAME);
+			assetTagModel.setCreateDate(new Date());
+			assetTagModel.setModifiedDate(new Date());
+			assetTagModel.setName(
+				StringBundler.concat("TestTag_", groupId, "_", j));
+			assetTagModel.setLastPublishDate(new Date());
+
+			groupAssetTagModels.add(assetTagModel);
+
+			assetTagModels.add(assetTagModel);
+		}
+
+		Map<Long, List<AssetTagModel>> assetTagModelsMap = new HashMap<>();
+
+		int pageSize = groupAssetTagModels.size() / _assetClassNameIds.length;
+
+		for (int j = 0; j < _assetClassNameIds.length; j++) {
+			int fromIndex = j * pageSize;
+
+			int toIndex = (j + 1) * pageSize;
+
+			if (j == (_assetClassNameIds.length - 1)) {
+				toIndex = groupAssetTagModels.size();
+			}
+
+			assetTagModelsMap.put(
+				_assetClassNameIds[j],
+				groupAssetTagModels.subList(fromIndex, toIndex));
+		}
+
+		_assetTagModelsMaps[(int)groupId - 1] = assetTagModelsMap;
+
+		return assetTagModels;
+	}
+
+	public List<AssetVocabularyModel> newAssetVocabularyModels(long groupId) {
+		List<AssetVocabularyModel> assetVocabularyModels = new ArrayList<>();
+
+		for (int j = 0; j < BenchmarksPropsValues.MAX_ASSET_VUCABULARY_COUNT;
+			 j++) {
+
+			AssetVocabularyModel assetVocabularyModel = newAssetVocabularyModel(
+				groupId, _sampleUserId, _SAMPLE_USER_NAME,
+				StringBundler.concat(
+					"TestVocabulary_", groupId, StringPool.UNDERLINE, j));
+
+			assetVocabularyModels.add(assetVocabularyModel);
+		}
+
+		return assetVocabularyModels;
 	}
 
 	public List<BlogsEntryModel> newBlogsEntryModels(long groupId) {
@@ -1067,29 +1165,43 @@ public class DataFactory {
 		return blogEntryModels;
 	}
 
-	public BlogsStatsUserModel newBlogsStatsUserModel(long groupId) {
-		BlogsStatsUserModel blogsStatsUserModel = new BlogsStatsUserModelImpl();
+	public GroupModel newCommerceAccountEntryGroupModel(
+		AccountEntryModel accountEntryModel) {
 
-		// PK fields
+		return newGroupModel(
+			_counter.get(), getClassNameId(AccountEntry.class),
+			accountEntryModel.getAccountEntryId(), accountEntryModel.getName(),
+			GroupConstants.TYPE_SITE_PRIVATE, false);
+	}
 
-		blogsStatsUserModel.setStatsUserId(_counter.get());
+	public List<AccountEntryModel> newCommerceAccountEntryModels() {
+		List<AccountEntryModel> accountEntryModels = new ArrayList<>(
+			BenchmarksPropsValues.MAX_COMMERCE_ACCOUNT_ENTRY_COUNT);
 
-		// Group instance
+		for (int i = 1;
+			 i <= BenchmarksPropsValues.MAX_COMMERCE_ACCOUNT_ENTRY_COUNT; i++) {
 
-		blogsStatsUserModel.setGroupId(groupId);
+			accountEntryModels.add(newAccountEntryModel("business", i));
+		}
 
-		// Audit fields
+		return accountEntryModels;
+	}
 
-		blogsStatsUserModel.setCompanyId(_companyId);
-		blogsStatsUserModel.setUserId(_sampleUserId);
+	public PortletPreferencesModel
+		newCommerceB2BSiteTypePortletPreferencesModel(long ownerId) {
 
-		// Other fields
+		return newPortletPreferencesModel(
+			ownerId, PortletKeys.PREFS_OWNER_TYPE_GROUP, 0,
+			CommerceAccountConstants.SERVICE_NAME);
+	}
 
-		blogsStatsUserModel.setEntryCount(
-			BenchmarksPropsValues.MAX_BLOGS_ENTRY_COUNT);
-		blogsStatsUserModel.setLastPostDate(new Date());
+	public PortletPreferenceValueModel
+		newCommerceB2BSiteTypePortletPreferenceValueModel(
+			PortletPreferencesModel portletPreferencesModel) {
 
-		return blogsStatsUserModel;
+		return newPortletPreferenceValueModel(
+			portletPreferencesModel, "commerceSiteType", 0,
+			String.valueOf(CommerceAccountConstants.SITE_TYPE_B2B));
 	}
 
 	public GroupModel newCommerceCatalogGroupModel(
@@ -1102,7 +1214,7 @@ public class DataFactory {
 	}
 
 	public CommerceCatalogModel newCommerceCatalogModel(
-		CommerceCurrencyModel commerceCurrencyModel) {
+		CommerceCurrencyModel commerceCurrencyModel, int count) {
 
 		CommerceCatalogModel commerceCatalogModel =
 			new CommerceCatalogModelImpl();
@@ -1114,19 +1226,36 @@ public class DataFactory {
 		// Audit fields
 
 		commerceCatalogModel.setCompanyId(_companyId);
+		commerceCatalogModel.setUserId(_sampleUserId);
 		commerceCatalogModel.setUserName(_SAMPLE_USER_NAME);
 		commerceCatalogModel.setCreateDate(new Date());
 		commerceCatalogModel.setModifiedDate(new Date());
 
 		// Other fields
 
-		commerceCatalogModel.setName("Master");
+		commerceCatalogModel.setName("Master" + count);
 		commerceCatalogModel.setCommerceCurrencyCode(
 			commerceCurrencyModel.getCode());
 		commerceCatalogModel.setCatalogDefaultLanguageId("en_US");
 		commerceCatalogModel.setSystem(true);
 
 		return commerceCatalogModel;
+	}
+
+	public List<CommerceCatalogModel> newCommerceCatalogModels(
+		CommerceCurrencyModel commerceCurrencyModel) {
+
+		List<CommerceCatalogModel> commerceCatalogModels = new ArrayList<>(
+			BenchmarksPropsValues.MAX_COMMERCE_CATALOG_COUNT);
+
+		for (int i = 1; i <= BenchmarksPropsValues.MAX_COMMERCE_CATALOG_COUNT;
+			 i++) {
+
+			commerceCatalogModels.add(
+				newCommerceCatalogModel(commerceCurrencyModel, i));
+		}
+
+		return commerceCatalogModels;
 	}
 
 	public ResourcePermissionModel newCommerceCatalogResourcePermissionModel(
@@ -1147,8 +1276,27 @@ public class DataFactory {
 			commerceChannelModel.getName(), false);
 	}
 
+	public List<GroupModel> newCommerceChannelGroupModels(
+		List<CommerceChannelModel> commerceChannelModels) {
+
+		List<GroupModel> groupModels = new ArrayList<>(
+			commerceChannelModels.size());
+
+		for (CommerceChannelModel commerceChannelModel :
+				commerceChannelModels) {
+
+			groupModels.add(
+				newGroupModel(
+					_counter.get(), getClassNameId(CommerceChannel.class),
+					commerceChannelModel.getCommerceChannelId(),
+					commerceChannelModel.getName(), false));
+		}
+
+		return groupModels;
+	}
+
 	public CommerceChannelModel newCommerceChannelModel(
-		CommerceCurrencyModel commerceCurrencyModel) {
+		long groupId, CommerceCurrencyModel commerceCurrencyModel, int count) {
 
 		CommerceChannelModel commerceChannelModel =
 			new CommerceChannelModelImpl();
@@ -1167,14 +1315,59 @@ public class DataFactory {
 
 		// Other fields
 
-		commerceChannelModel.setSiteGroupId(1);
-		commerceChannelModel.setName(_SAMPLE_USER_NAME + " Channel");
+		commerceChannelModel.setSiteGroupId(groupId);
+		commerceChannelModel.setName(_SAMPLE_USER_NAME + " Channel" + count);
 		commerceChannelModel.setType("site");
 		commerceChannelModel.setTypeSettings(String.valueOf(_guestGroupId));
 		commerceChannelModel.setCommerceCurrencyCode(
 			commerceCurrencyModel.getCode());
 
 		return commerceChannelModel;
+	}
+
+	public List<CommerceChannelModel> newCommerceChannelModels(
+		List<GroupModel> groupModels,
+		CommerceCurrencyModel commerceCurrencyModel) {
+
+		List<CommerceChannelModel> commerceChannelModels = new ArrayList<>(
+			groupModels.size());
+
+		for (int i = 1; i <= groupModels.size(); i++) {
+			GroupModel groupModel = groupModels.get(i - 1);
+
+			commerceChannelModels.add(
+				newCommerceChannelModel(
+					groupModel.getGroupId(), commerceCurrencyModel, i));
+		}
+
+		return commerceChannelModels;
+	}
+
+	public CommerceChannelRelModel newCommerceChannelRelModel(
+		long classNameId, long classPK, long commerceChannelId) {
+
+		CommerceChannelRelModel commerceChannelRelModel =
+			new CommerceChannelRelModelImpl();
+
+		// PK fields
+
+		commerceChannelRelModel.setCommerceChannelRelId(_counter.get());
+
+		// Audit fields
+
+		commerceChannelRelModel.setCompanyId(_companyId);
+		commerceChannelRelModel.setUserId(_sampleUserId);
+		commerceChannelRelModel.setUserName(_SAMPLE_USER_NAME);
+		commerceChannelRelModel.setCreateDate(new Date());
+		commerceChannelRelModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		commerceChannelRelModel.setClassNameId(classNameId);
+		commerceChannelRelModel.setClassPK(classPK);
+		commerceChannelRelModel.setCommerceChannelId(commerceChannelId);
+
+		return commerceChannelRelModel;
 	}
 
 	public CommerceCurrencyModel newCommerceCurrencyModel() {
@@ -1226,6 +1419,683 @@ public class DataFactory {
 		return commerceCurrencyModel;
 	}
 
+	public List<GroupModel> newCommerceGroupModels() {
+		List<GroupModel> groupModels = new ArrayList<>(
+			BenchmarksPropsValues.MAX_COMMERCE_GROUP_COUNT);
+
+		for (int i = 1; i <= BenchmarksPropsValues.MAX_COMMERCE_GROUP_COUNT;
+			 i++) {
+
+			long id = _counter.get();
+
+			groupModels.add(
+				newGroupModel(
+					id, getClassNameId(Group.class), id, "Commerce Site " + i,
+					true));
+		}
+
+		return groupModels;
+	}
+
+	public CommerceInventoryWarehouseItemModel
+		newCommerceInventoryWarehouseItemModel(
+			CommerceInventoryWarehouseModel commerceInventoryWarehouseModel,
+			CPInstanceModel cpInstanceModel) {
+
+		CommerceInventoryWarehouseItemModel
+			commerceInventoryWarehouseItemModel =
+				new CommerceInventoryWarehouseItemModelImpl();
+
+		// PK fields
+
+		commerceInventoryWarehouseItemModel.setCommerceInventoryWarehouseItemId(
+			_counter.get());
+
+		// Audit fields
+
+		commerceInventoryWarehouseItemModel.setCompanyId(_companyId);
+		commerceInventoryWarehouseItemModel.setUserId(_sampleUserId);
+		commerceInventoryWarehouseItemModel.setUserName(_SAMPLE_USER_NAME);
+		commerceInventoryWarehouseItemModel.setCreateDate(new Date());
+		commerceInventoryWarehouseItemModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		commerceInventoryWarehouseItemModel.setCommerceInventoryWarehouseId(
+			commerceInventoryWarehouseModel.getCommerceInventoryWarehouseId());
+		commerceInventoryWarehouseItemModel.setSku(cpInstanceModel.getSku());
+		commerceInventoryWarehouseItemModel.setQuantity(
+			BenchmarksPropsValues.
+				MAX_COMMERCE_INVENTORY_WAREHOUSE_ITEM_QUANTITY);
+		commerceInventoryWarehouseItemModel.setReservedQuantity(0);
+
+		return commerceInventoryWarehouseItemModel;
+	}
+
+	public CommerceInventoryWarehouseModel newCommerceInventoryWarehouseModel(
+		int index) {
+
+		CommerceInventoryWarehouseModel commerceInventoryWarehouseModel =
+			new CommerceInventoryWarehouseModelImpl();
+
+		// PK fields
+
+		long warehouseId = _counter.get();
+
+		commerceInventoryWarehouseModel.setCommerceInventoryWarehouseId(
+			warehouseId);
+
+		// Audit fields
+
+		commerceInventoryWarehouseModel.setCompanyId(_companyId);
+		commerceInventoryWarehouseModel.setUserId(_sampleUserId);
+		commerceInventoryWarehouseModel.setUserName(_SAMPLE_USER_NAME);
+		commerceInventoryWarehouseModel.setCreateDate(new Date());
+		commerceInventoryWarehouseModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		commerceInventoryWarehouseModel.setName("Warehouse " + index);
+		commerceInventoryWarehouseModel.setDescription(
+			"Description for warehouse with ID " + warehouseId);
+		commerceInventoryWarehouseModel.setActive(true);
+		commerceInventoryWarehouseModel.setStreet1("Street1");
+		commerceInventoryWarehouseModel.setStreet2("Street2");
+		commerceInventoryWarehouseModel.setStreet3("Street3");
+		commerceInventoryWarehouseModel.setCity("City");
+		commerceInventoryWarehouseModel.setZip("Zip");
+		commerceInventoryWarehouseModel.setCommerceRegionCode("CA");
+		commerceInventoryWarehouseModel.setCountryTwoLettersISOCode("US");
+		commerceInventoryWarehouseModel.setLatitude(0);
+		commerceInventoryWarehouseModel.setLongitude(0);
+		commerceInventoryWarehouseModel.setType(null);
+
+		return commerceInventoryWarehouseModel;
+	}
+
+	public List<CommerceInventoryWarehouseModel>
+		newCommerceInventoryWarehouseModels() {
+
+		List<CommerceInventoryWarehouseModel> commerceInventoryWarehouseModels =
+			new ArrayList<>(
+				BenchmarksPropsValues.MAX_COMMERCE_INVENTORY_WAREHOUSE_COUNT);
+
+		for (int i = 1;
+			 i <= BenchmarksPropsValues.MAX_COMMERCE_INVENTORY_WAREHOUSE_COUNT;
+			 i++) {
+
+			commerceInventoryWarehouseModels.add(
+				newCommerceInventoryWarehouseModel(i));
+		}
+
+		return commerceInventoryWarehouseModels;
+	}
+
+	public List<LayoutModel> newCommerceLayoutModels(long groupId)
+		throws Exception {
+
+		List<LayoutModel> layoutModels = new ArrayList<>();
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray(
+			StringUtil.read(
+				getResourceInputStream("commerce/commerce_layouts.json")));
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			LayoutModel layoutModel = newLayoutModel(
+				groupId,
+				StringUtil.replace(
+					StringUtil.toLowerCase(jsonObject.getString("name")),
+					CharPool.SPACE, CharPool.DASH),
+				jsonObject.getBoolean("privateLayout"),
+				jsonObject.getString("layoutTemplateId"),
+				getPortletNames(jsonObject.getJSONArray("portlets")));
+
+			layoutModels.add(layoutModel);
+
+			JSONArray subLayoutsJSONArray = jsonObject.getJSONArray(
+				"subLayouts");
+
+			if ((subLayoutsJSONArray != null) &&
+				(subLayoutsJSONArray.length() > 0)) {
+
+				for (int k = 0; k < subLayoutsJSONArray.length(); k++) {
+					JSONObject sublayoutJSONObject =
+						subLayoutsJSONArray.getJSONObject(k);
+
+					layoutModels.add(
+						newLayoutModel(
+							groupId, layoutModel.getLayoutId(),
+							StringUtil.replace(
+								StringUtil.toLowerCase(
+									sublayoutJSONObject.getString("name")),
+								CharPool.SPACE, CharPool.DASH),
+							sublayoutJSONObject.getBoolean("privateLayout"),
+							sublayoutJSONObject.getBoolean("hidden"),
+							sublayoutJSONObject.getString("layoutTemplateId"),
+							getPortletNames(
+								sublayoutJSONObject.getJSONArray("portlets"))));
+				}
+			}
+		}
+
+		return layoutModels;
+	}
+
+	public List<PortletPreferenceValueModel>
+			newCommerceLayoutPortletPreferenceValueModels(
+				List<PortletPreferencesModel> portletPreferencesModels)
+		throws Exception {
+
+		List<PortletPreferenceValueModel> portletPreferenceValueModels =
+			new ArrayList<>();
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray(
+			StringUtil.read(
+				getResourceInputStream("commerce/commerce_layouts.json")));
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			portletPreferenceValueModels.addAll(
+				newCommercePortletPreferenceValueModels(
+					portletPreferencesModels,
+					jsonObject.getJSONArray("portlets")));
+
+			JSONArray sublayoutsJSONArray = jsonObject.getJSONArray(
+				"subLayouts");
+
+			if (sublayoutsJSONArray != null) {
+				for (int j = 0; j < sublayoutsJSONArray.length(); j++) {
+					JSONObject sublayoutJSONObject =
+						sublayoutsJSONArray.getJSONObject(j);
+
+					portletPreferenceValueModels.addAll(
+						newCommercePortletPreferenceValueModels(
+							portletPreferencesModels,
+							sublayoutJSONObject.getJSONArray("portlets")));
+				}
+			}
+		}
+
+		portletPreferenceValueModels.addAll(
+			newCommercePortletPreferenceValueModels(
+				portletPreferencesModels,
+				JSONFactoryUtil.createJSONArray(
+					StringUtil.read(
+						getResourceInputStream(
+							"commerce/commerce_portlet_settings.json")))));
+
+		return portletPreferenceValueModels;
+	}
+
+	public CommerceOrderItemModel newCommerceOrderItemModel(
+		CommerceOrderModel commerceOrderModel, long commercePriceListId,
+		CProductModel cProductModel) {
+
+		CommerceOrderItemModel commerceOrderItemModel =
+			new CommerceOrderItemModelImpl();
+
+		// PK fields
+
+		commerceOrderItemModel.setCommerceOrderItemId(_counter.get());
+
+		// Group instance
+
+		commerceOrderItemModel.setGroupId(commerceOrderModel.getGroupId());
+
+		// Audit fields
+
+		commerceOrderItemModel.setCompanyId(_companyId);
+		commerceOrderItemModel.setUserId(_sampleUserId);
+		commerceOrderItemModel.setUserName(_SAMPLE_USER_NAME);
+		commerceOrderItemModel.setCreateDate(new Date());
+		commerceOrderItemModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		commerceOrderItemModel.setBookedQuantityId(0);
+		commerceOrderItemModel.setCommerceOrderId(
+			commerceOrderModel.getCommerceOrderId());
+		commerceOrderItemModel.setCommercePriceListId(commercePriceListId);
+		commerceOrderItemModel.setCProductId(cProductModel.getCProductId());
+
+		CPInstanceModel cpInstanceModel = _cpInstanceModels.get(
+			cProductModel.getPublishedCPDefinitionId());
+
+		commerceOrderItemModel.setCPInstanceId(
+			cpInstanceModel.getCPInstanceId());
+
+		commerceOrderItemModel.setParentCommerceOrderItemId(0);
+		commerceOrderItemModel.setName("Commerce Order Item Name");
+		commerceOrderItemModel.setQuantity(1);
+		commerceOrderItemModel.setShippedQuantity(0);
+		commerceOrderItemModel.setShipSeparately(true);
+		commerceOrderItemModel.setShippable(true);
+		commerceOrderItemModel.setDiscountAmount(BigDecimal.valueOf(0));
+		commerceOrderItemModel.setDiscountPercentageLevel1(
+			BigDecimal.valueOf(0));
+		commerceOrderItemModel.setDiscountPercentageLevel2(
+			BigDecimal.valueOf(0));
+		commerceOrderItemModel.setDiscountPercentageLevel3(
+			BigDecimal.valueOf(0));
+		commerceOrderItemModel.setDiscountPercentageLevel4(
+			BigDecimal.valueOf(0));
+		commerceOrderItemModel.setDiscountPercentageLevel1WithTaxAmount(
+			BigDecimal.valueOf(0));
+		commerceOrderItemModel.setDiscountPercentageLevel2WithTaxAmount(
+			BigDecimal.valueOf(0));
+		commerceOrderItemModel.setDiscountPercentageLevel3WithTaxAmount(
+			BigDecimal.valueOf(0));
+		commerceOrderItemModel.setDiscountPercentageLevel4WithTaxAmount(
+			BigDecimal.valueOf(0));
+		commerceOrderItemModel.setDiscountWithTaxAmount(BigDecimal.valueOf(0));
+		commerceOrderItemModel.setFinalPrice(BigDecimal.valueOf(0));
+		commerceOrderItemModel.setFinalPriceWithTaxAmount(
+			BigDecimal.valueOf(0));
+		commerceOrderItemModel.setJson("[]");
+		commerceOrderItemModel.setPromoPrice(BigDecimal.valueOf(0));
+		commerceOrderItemModel.setPromoPriceWithTaxAmount(
+			BigDecimal.valueOf(0));
+		commerceOrderItemModel.setUnitPrice(BigDecimal.valueOf(0));
+		commerceOrderItemModel.setUnitPriceWithTaxAmount(BigDecimal.valueOf(0));
+		commerceOrderItemModel.setSku(cpInstanceModel.getSku());
+		commerceOrderItemModel.setDeliveryGroup(null);
+		commerceOrderItemModel.setShippingAddressId(0);
+		commerceOrderItemModel.setPrintedNote(null);
+		commerceOrderItemModel.setRequestedDeliveryDate(null);
+		commerceOrderItemModel.setManuallyAdjusted(false);
+
+		return commerceOrderItemModel;
+	}
+
+	public CommerceOrderModel newCommerceOrderModel(
+		long groupId, long commerceAccountId, long commerceCurrencyId,
+		long billingAddressId, long shippingAddressId,
+		long commerceShippingMethodId, String shippingOptionName,
+		int orderStatus) {
+
+		CommerceOrderModel commerceOrderModel = new CommerceOrderModelImpl();
+
+		// UUID
+
+		commerceOrderModel.setUuid(SequentialUUID.generate());
+
+		// PK fields
+
+		commerceOrderModel.setCommerceOrderId(_counter.get());
+
+		// Group instance
+
+		commerceOrderModel.setGroupId(groupId);
+
+		// Audit fields
+
+		commerceOrderModel.setCompanyId(_companyId);
+		commerceOrderModel.setUserId(_sampleUserId);
+		commerceOrderModel.setUserName(_SAMPLE_USER_NAME);
+		commerceOrderModel.setCreateDate(new Date());
+		commerceOrderModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		commerceOrderModel.setCommerceAccountId(commerceAccountId);
+		commerceOrderModel.setCommerceCurrencyId(commerceCurrencyId);
+		commerceOrderModel.setBillingAddressId(billingAddressId);
+		commerceOrderModel.setShippingAddressId(shippingAddressId);
+		commerceOrderModel.setCommerceShippingMethodId(
+			commerceShippingMethodId);
+		commerceOrderModel.setShippingOptionName(shippingOptionName);
+		commerceOrderModel.setShippingAddressId(shippingAddressId);
+		commerceOrderModel.setSubtotal(BigDecimal.valueOf(0));
+		commerceOrderModel.setShippingAmount(BigDecimal.valueOf(0));
+		commerceOrderModel.setTotal(BigDecimal.valueOf(0));
+		commerceOrderModel.setSubtotalWithTaxAmount(BigDecimal.valueOf(0));
+		commerceOrderModel.setShippingWithTaxAmount(BigDecimal.valueOf(0));
+		commerceOrderModel.setTotalWithTaxAmount(BigDecimal.valueOf(0));
+		commerceOrderModel.setPaymentStatus(1);
+		commerceOrderModel.setOrderDate(null);
+		commerceOrderModel.setOrderStatus(orderStatus);
+		commerceOrderModel.setPrintedNote(null);
+		commerceOrderModel.setRequestedDeliveryDate(null);
+		commerceOrderModel.setStatus(0);
+		commerceOrderModel.setStatusByUserId(_sampleUserId);
+		commerceOrderModel.setStatusByUserName(_SAMPLE_USER_NAME);
+		commerceOrderModel.setStatusDate(new Date());
+
+		return commerceOrderModel;
+	}
+
+	public List<CommerceOrderModel> newCommerceOrderModels(
+		long groupId, long commerceAccountId, long commerceCurrencyId,
+		long billingAddressId, long shippingAddressId,
+		long commerceShippingMethodId, String commerceShippingOptionName,
+		int orderStatus) {
+
+		int maxCommerceOrderCount = 0;
+
+		if (orderStatus == CommerceOrderConstants.ORDER_STATUS_CANCELLED) {
+			maxCommerceOrderCount =
+				BenchmarksPropsValues.MAX_COMMERCE_ORDER_STATUS_CANCELLED_COUNT;
+
+			if (BenchmarksPropsValues.MAX_COMMERCE_GROUP_COUNT > 1) {
+				maxCommerceOrderCount =
+					maxCommerceOrderCount /
+						BenchmarksPropsValues.MAX_COMMERCE_GROUP_COUNT;
+			}
+		}
+		else if (orderStatus == CommerceOrderConstants.ORDER_STATUS_PENDING) {
+			maxCommerceOrderCount =
+				BenchmarksPropsValues.MAX_COMMERCE_ORDER_STATUS_PENDING_COUNT;
+
+			if (BenchmarksPropsValues.MAX_COMMERCE_GROUP_COUNT > 1) {
+				maxCommerceOrderCount =
+					maxCommerceOrderCount /
+						BenchmarksPropsValues.MAX_COMMERCE_GROUP_COUNT;
+			}
+		}
+		else if (orderStatus == CommerceOrderConstants.ORDER_STATUS_OPEN) {
+			maxCommerceOrderCount =
+				BenchmarksPropsValues.MAX_COMMERCE_ORDER_STATUS_OPEN_COUNT;
+		}
+
+		List<CommerceOrderModel> commerceOrderModels = new ArrayList<>(
+			maxCommerceOrderCount);
+
+		for (int i = 1; i <= maxCommerceOrderCount; i++) {
+			commerceOrderModels.add(
+				newCommerceOrderModel(
+					groupId, commerceAccountId, commerceCurrencyId,
+					billingAddressId, shippingAddressId,
+					commerceShippingMethodId, commerceShippingOptionName,
+					orderStatus));
+		}
+
+		return commerceOrderModels;
+	}
+
+	public List<PortletPreferencesModel> newCommercePortletPreferencesModels(
+			LayoutModel layoutModel)
+		throws IOException {
+
+		List<PortletPreferencesModel> portletPreferencesModels =
+			new ArrayList<>();
+
+		UnicodeProperties typeSettingsUnicodeProperties =
+			UnicodePropertiesBuilder.create(
+				true
+			).load(
+				StringUtil.replace(
+					layoutModel.getTypeSettings(), "\\n", StringPool.NEW_LINE)
+			).build();
+
+		Set<String> typeSettingPropertiesKeys =
+			typeSettingsUnicodeProperties.keySet();
+
+		for (String typeSettingPropertiesKey : typeSettingPropertiesKeys) {
+			if (typeSettingPropertiesKey.startsWith("column-")) {
+				String[] portletIds = StringUtil.split(
+					typeSettingsUnicodeProperties.getProperty(
+						typeSettingPropertiesKey));
+
+				for (String portletId : portletIds) {
+					portletPreferencesModels.add(
+						newPortletPreferencesModel(
+							layoutModel.getPlid(), portletId));
+				}
+			}
+		}
+
+		return portletPreferencesModels;
+	}
+
+	public CommercePriceEntryModel newCommercePriceEntryModel(
+		long commercePriceListId, String cpInstanceUuid, long cProductId) {
+
+		CommercePriceEntryModel commercePriceEntryModel =
+			new CommercePriceEntryModelImpl();
+
+		// UUID
+
+		commercePriceEntryModel.setUuid(SequentialUUID.generate());
+
+		// PK fields
+
+		commercePriceEntryModel.setCommercePriceEntryId(_counter.get());
+
+		// Audit fields
+
+		commercePriceEntryModel.setCompanyId(_companyId);
+		commercePriceEntryModel.setUserId(_sampleUserId);
+		commercePriceEntryModel.setUserName(_SAMPLE_USER_NAME);
+		commercePriceEntryModel.setCreateDate(new Date());
+		commercePriceEntryModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		commercePriceEntryModel.setCommercePriceListId(commercePriceListId);
+		commercePriceEntryModel.setCPInstanceUuid(cpInstanceUuid);
+		commercePriceEntryModel.setCProductId(cProductId);
+		commercePriceEntryModel.setPrice(BigDecimal.valueOf(0));
+		commercePriceEntryModel.setPromoPrice(BigDecimal.valueOf(0));
+		commercePriceEntryModel.setDiscountDiscovery(true);
+		commercePriceEntryModel.setDisplayDate(new Date());
+		commercePriceEntryModel.setStatus(0);
+		commercePriceEntryModel.setStatusByUserId(_sampleUserId);
+		commercePriceEntryModel.setStatusByUserName(_SAMPLE_USER_NAME);
+		commercePriceEntryModel.setStatusDate(new Date());
+
+		return commercePriceEntryModel;
+	}
+
+	public CommercePriceListModel newCommercePriceListModel(
+		long groupId, long commerceCurrencyId, boolean catalogBasePriceList,
+		boolean netPrice, String type) {
+
+		CommercePriceListModel commercePriceListModel =
+			new CommercePriceListModelImpl();
+
+		// UUID
+
+		commercePriceListModel.setUuid(SequentialUUID.generate());
+
+		// PK fields
+
+		commercePriceListModel.setCommercePriceListId(_counter.get());
+
+		// Group instance
+
+		commercePriceListModel.setGroupId(groupId);
+
+		// Audit fields
+
+		commercePriceListModel.setCompanyId(_companyId);
+		commercePriceListModel.setUserId(_sampleUserId);
+		commercePriceListModel.setUserName(_SAMPLE_USER_NAME);
+		commercePriceListModel.setCreateDate(new Date());
+		commercePriceListModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		commercePriceListModel.setCommerceCurrencyId(commerceCurrencyId);
+		commercePriceListModel.setParentCommercePriceListId(0);
+		commercePriceListModel.setCatalogBasePriceList(catalogBasePriceList);
+		commercePriceListModel.setNetPrice(netPrice);
+		commercePriceListModel.setType(type);
+		commercePriceListModel.setName("Price List");
+		commercePriceListModel.setPriority(0);
+		commercePriceListModel.setDisplayDate(new Date());
+		commercePriceListModel.setExpirationDate(null);
+		commercePriceListModel.setLastPublishDate(new Date());
+		commercePriceListModel.setStatus(0);
+		commercePriceListModel.setStatusByUserId(_sampleUserId);
+		commercePriceListModel.setStatusByUserName(_SAMPLE_USER_NAME);
+		commercePriceListModel.setStatusDate(new Date());
+
+		return commercePriceListModel;
+	}
+
+	public CommerceShippingFixedOptionModel newCommerceShippingFixedOptionModel(
+		long groupId, long commerceShippingMethodId) {
+
+		CommerceShippingFixedOptionModel commerceShippingFixedOptionModel =
+			new CommerceShippingFixedOptionModelImpl();
+
+		// PK fields
+
+		commerceShippingFixedOptionModel.setCommerceShippingFixedOptionId(
+			_counter.get());
+
+		// Group instance
+
+		commerceShippingFixedOptionModel.setGroupId(groupId);
+
+		// Audit fields
+
+		commerceShippingFixedOptionModel.setCompanyId(_companyId);
+		commerceShippingFixedOptionModel.setUserId(_sampleUserId);
+		commerceShippingFixedOptionModel.setUserName(_SAMPLE_USER_NAME);
+		commerceShippingFixedOptionModel.setCreateDate(new Date());
+		commerceShippingFixedOptionModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		commerceShippingFixedOptionModel.setCommerceShippingMethodId(
+			commerceShippingMethodId);
+		commerceShippingFixedOptionModel.setName(
+			StringBundler.concat(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><root ",
+				"available-locales=\"en_US\" default-locale=\"en_US\"><Name ",
+				"language-id=\"en_US\">Standard Delivery</Name></root>"));
+		commerceShippingFixedOptionModel.setDescription(null);
+		commerceShippingFixedOptionModel.setAmount(BigDecimal.valueOf(15));
+		commerceShippingFixedOptionModel.setPriority(0);
+
+		return commerceShippingFixedOptionModel;
+	}
+
+	public CommerceShippingMethodModel newCommerceShippingMethodModel(
+		long groupId) {
+
+		CommerceShippingMethodModel commerceShippingMethodModel =
+			new CommerceShippingMethodModelImpl();
+
+		// PK fields
+
+		commerceShippingMethodModel.setCommerceShippingMethodId(_counter.get());
+
+		// Group instance
+
+		commerceShippingMethodModel.setGroupId(groupId);
+
+		// Audit fields
+
+		commerceShippingMethodModel.setCompanyId(_companyId);
+		commerceShippingMethodModel.setUserId(_sampleUserId);
+		commerceShippingMethodModel.setUserName(_SAMPLE_USER_NAME);
+		commerceShippingMethodModel.setCreateDate(new Date());
+		commerceShippingMethodModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		commerceShippingMethodModel.setName(
+			StringBundler.concat(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><root ",
+				"available-locales=\"en_US\" default-locale=\"en_US\"><Name ",
+				"language-id=\"en_US\">Flat Rate</Name></root>"));
+		commerceShippingMethodModel.setDescription(
+			StringBundler.concat(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><root ",
+				"available-locales=\"en_US\" default-locale=\"en_US\">",
+				"<Description language-id=\"en_US\">Ship for a fixed price",
+				"</Description></root>"));
+		commerceShippingMethodModel.setImageId(0);
+		commerceShippingMethodModel.setEngineKey("fixed");
+		commerceShippingMethodModel.setPriority(0);
+		commerceShippingMethodModel.setActive(true);
+
+		return commerceShippingMethodModel;
+	}
+
+	public List<DDMTemplateModel>
+			newCommerceSiteNavigationPortletDDMTemplateModels(long groupId)
+		throws Exception {
+
+		List<DDMTemplateModel> ddmTemplateModels = new ArrayList<>();
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray(
+			StringUtil.read(
+				getResourceInputStream(
+					"commerce/commerce_theme_portlet_settings.json")));
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			JSONObject portletPreferencesJSONObject = jsonObject.getJSONObject(
+				"portletPreferences");
+
+			JSONObject displayStyleJSONObject =
+				portletPreferencesJSONObject.getJSONObject("displayStyle");
+
+			String fileName =
+				"commerce/" + displayStyleJSONObject.getString("FileName");
+
+			ddmTemplateModels.add(
+				newDDMTemplateModel(
+					groupId, _sampleUserId,
+					DDMTemplateConstants.TEMPLATE_MODE_CREATE,
+					displayStyleJSONObject.getString("Name"),
+					StringUtil.read(getResourceInputStream(fileName)),
+					getClassNameId(NavItem.class), 0,
+					getClassNameId(PortletDisplayTemplate.class),
+					_counter.get(),
+					StringUtil.removeSubstring(fileName, ".ftl")));
+		}
+
+		return ddmTemplateModels;
+	}
+
+	public List<PortletPreferencesModel>
+			newCommerceSiteNavigationPortletPreferencesModels(
+				GroupModel groupModel)
+		throws Exception {
+
+		List<PortletPreferencesModel> portletPreferencesModels =
+			new ArrayList<>();
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray(
+			StringUtil.read(
+				getResourceInputStream(
+					"commerce/commerce_theme_portlet_settings.json")));
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			portletPreferencesModels.add(
+				newPortletPreferencesModel(
+					groupModel.getGroupId(),
+					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, 0,
+					jsonObject.getString("portletName") + "_INSTANCE_" +
+						jsonObject.getString("instanceId")));
+		}
+
+		return portletPreferencesModels;
+	}
+
+	public List<PortletPreferenceValueModel>
+			newCommerceSiteNavigationPortletPreferenceValueModels(
+				List<PortletPreferencesModel> portletPreferencesModels)
+		throws Exception {
+
+		return newCommercePortletPreferenceValueModels(
+			portletPreferencesModels,
+			JSONFactoryUtil.createJSONArray(
+				StringUtil.read(
+					getResourceInputStream(
+						"commerce/commerce_theme_portlet_settings.json"))));
+	}
+
 	public CompanyModel newCompanyModel() {
 		CompanyModel companyModel = new CompanyModelImpl();
 
@@ -1233,12 +2103,18 @@ public class DataFactory {
 
 		companyModel.setCompanyId(_companyId);
 
+		// Audit fields
+
+		companyModel.setCreateDate(new Date());
+		companyModel.setModifiedDate(new Date());
+
 		// Other fields
 
-		companyModel.setAccountId(_accountId);
 		companyModel.setWebId("liferay.com");
 		companyModel.setMx("liferay.com");
 		companyModel.setActive(true);
+		companyModel.setName("Liferay");
+		companyModel.setLegalName("Liferay, Inc.");
 
 		return companyModel;
 	}
@@ -1270,7 +2146,6 @@ public class DataFactory {
 
 		contactModel.setClassNameId(getClassNameId(User.class));
 		contactModel.setClassPK(userModel.getUserId());
-		contactModel.setAccountId(_accountId);
 		contactModel.setParentContactId(
 			ContactConstants.DEFAULT_PARENT_CONTACT_ID);
 		contactModel.setEmailAddress(userModel.getEmailAddress());
@@ -1285,13 +2160,9 @@ public class DataFactory {
 	public LayoutModel newContentLayoutModel(
 		long groupId, String name, String fragmentEntries) {
 
-		SimpleCounter simpleCounter = _layoutCounters.get(groupId);
-
-		if (simpleCounter == null) {
-			simpleCounter = new SimpleCounter();
-
-			_layoutCounters.put(groupId, simpleCounter);
-		}
+		SimpleCounter simpleCounter = _layoutIdCounters.computeIfAbsent(
+			LayoutLocalServiceImpl.getCounterName(groupId, false),
+			counterName -> new SimpleCounter());
 
 		LayoutModel layoutModel = new LayoutModelImpl();
 
@@ -1301,7 +2172,7 @@ public class DataFactory {
 
 		// PK fields
 
-		layoutModel.setPlid(_counter.get());
+		layoutModel.setPlid(_layoutPlidCounter.get());
 
 		// Group instance
 
@@ -1352,46 +2223,155 @@ public class DataFactory {
 		return layoutModels;
 	}
 
+	public List<LayoutModel> newContentPageLayoutModels(
+		long groupId, String name) {
+
+		List<LayoutModel> layoutModels = new ArrayList<>();
+
+		LayoutModel publicLayoutModel = _newContentPageLayoutModel(
+			groupId, name, 0, 0);
+
+		layoutModels.add(publicLayoutModel);
+		layoutModels.add(
+			_newContentPageLayoutModel(
+				groupId, name + "1", getClassNameId(Layout.class),
+				publicLayoutModel.getPlid()));
+
+		return layoutModels;
+	}
+
 	public List<CounterModel> newCounterModels() {
 		List<CounterModel> counterModels = new ArrayList<>();
 
-		// Counter
+		counterModels.add(
+			_newCounterModel(Counter.class.getName(), _counter.get()));
+		counterModels.add(
+			_newCounterModel(DDMField.class.getName(), _counter.get()));
+		counterModels.add(
+			_newCounterModel(
+				DDMFieldAttribute.class.getName(), _counter.get()));
+		counterModels.add(
+			_newCounterModel(
+				DLFileEntry.class.getName(), _dLFileEntryIdCounter.get()));
+		counterModels.add(
+			_newCounterModel(
+				FriendlyURLEntryLocalization.class.getName(), _counter.get()));
+		counterModels.add(
+			_newCounterModel(
+				PortletPreferenceValue.class.getName(),
+				_portletPreferenceValueIdCounter.get()));
+		counterModels.add(
+			_newCounterModel(
+				ResourcePermission.class.getName(),
+				_resourcePermissionIdCounter.get()));
+		counterModels.add(
+			_newCounterModel(
+				SocialActivity.class.getName(),
+				_socialActivityIdCounter.get()));
 
-		CounterModel counterModel = new CounterModelImpl();
+		for (Map.Entry<String, SimpleCounter> entry :
+				_layoutIdCounters.entrySet()) {
 
-		counterModel.setName(Counter.class.getName());
-		counterModel.setCurrentId(_counter.get());
+			SimpleCounter simpleCounter = entry.getValue();
 
-		counterModels.add(counterModel);
+			counterModels.add(
+				_newCounterModel(entry.getKey(), simpleCounter.get()));
+		}
 
-		// FriendlyURLEntryLocalization
+		counterModels.add(
+			_newCounterModel(Layout.class.getName(), _layoutPlidCounter.get()));
 
-		counterModel = new CounterModelImpl();
-
-		counterModel.setName(FriendlyURLEntryLocalization.class.getName());
-		counterModel.setCurrentId(_counter.get());
-
-		counterModels.add(counterModel);
-
-		// ResourcePermission
-
-		counterModel = new CounterModelImpl();
-
-		counterModel.setName(ResourcePermission.class.getName());
-		counterModel.setCurrentId(_resourcePermissionCounter.get());
-
-		counterModels.add(counterModel);
-
-		// SocialActivity
-
-		counterModel = new CounterModelImpl();
-
-		counterModel.setName(SocialActivity.class.getName());
-		counterModel.setCurrentId(_socialActivityCounter.get());
-
-		counterModels.add(counterModel);
+		counterModels.add(
+			_newCounterModel(
+				LayoutSet.class.getName(), _layoutSetIdCounter.get()));
 
 		return counterModels;
+	}
+
+	public CountryModel newCountryModel() {
+		CountryModel countryModel = new CountryModelImpl();
+
+		// UUID
+
+		countryModel.setUuid(SequentialUUID.generate());
+
+		// PK fields
+
+		countryModel.setCountryId(_counter.get());
+
+		// Audit fields
+
+		countryModel.setCompanyId(_companyId);
+		countryModel.setUserId(_sampleUserId);
+		countryModel.setUserName(_SAMPLE_USER_NAME);
+		countryModel.setCreateDate(new Date());
+		countryModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		countryModel.setA2("SP");
+		countryModel.setA3("SAM");
+		countryModel.setActive(true);
+		countryModel.setBillingAllowed(true);
+		countryModel.setIdd("0");
+		countryModel.setName("sample-country");
+		countryModel.setNumber("0");
+		countryModel.setShippingAllowed(true);
+
+		return countryModel;
+	}
+
+	public CPAttachmentFileEntryModel newCPAttachmentFileEntryModel(
+		long groupId, long cpDefinitionId, int index, int type) {
+
+		CPAttachmentFileEntryModel cpAttachmentFileEntryModel =
+			new CPAttachmentFileEntryModelImpl();
+
+		// UUID
+
+		cpAttachmentFileEntryModel.setUuid(SequentialUUID.generate());
+
+		// PK fields
+
+		cpAttachmentFileEntryModel.setCPAttachmentFileEntryId(_counter.get());
+
+		// Group instance
+
+		cpAttachmentFileEntryModel.setGroupId(groupId);
+
+		// Audit fields
+
+		cpAttachmentFileEntryModel.setCompanyId(_companyId);
+		cpAttachmentFileEntryModel.setUserId(_sampleUserId);
+		cpAttachmentFileEntryModel.setUserName(_SAMPLE_USER_NAME);
+		cpAttachmentFileEntryModel.setCreateDate(new Date());
+		cpAttachmentFileEntryModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		cpAttachmentFileEntryModel.setClassNameId(
+			getClassNameId(CPDefinition.class));
+		cpAttachmentFileEntryModel.setClassPK(cpDefinitionId);
+		cpAttachmentFileEntryModel.setFileEntryId(_counter.get());
+		cpAttachmentFileEntryModel.setDisplayDate(null);
+		cpAttachmentFileEntryModel.setExpirationDate(null);
+
+		String title = StringBundler.concat(
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?><root available-locales",
+			"=\"en_US\" default-locale=\"en_US\"><Title language-id=\"en_US\">",
+			"Attachment file Entry  ", index, "</Title></root>");
+
+		cpAttachmentFileEntryModel.setTitle(title);
+
+		cpAttachmentFileEntryModel.setPriority(0);
+		cpAttachmentFileEntryModel.setType(type);
+		cpAttachmentFileEntryModel.setLastPublishDate(new Date());
+		cpAttachmentFileEntryModel.setStatus(0);
+		cpAttachmentFileEntryModel.setStatusByUserId(_sampleUserId);
+		cpAttachmentFileEntryModel.setStatusByUserName(_SAMPLE_USER_NAME);
+		cpAttachmentFileEntryModel.setStatusDate(new Date());
+
+		return cpAttachmentFileEntryModel;
 	}
 
 	public CPDefinitionLocalizationModel newCPDefinitionLocalizationModel(
@@ -1430,7 +2410,7 @@ public class DataFactory {
 
 	public CPDefinitionModel newCPDefinitionModel(
 		CPTaxCategoryModel cpTaxCategoryModel, CProductModel cProductModel,
-		GroupModel commerceCatalogGroupModel, int version) {
+		int version) {
 
 		CPDefinitionModel cpDefinitionModel = new CPDefinitionModelImpl();
 
@@ -1440,13 +2420,19 @@ public class DataFactory {
 
 		// PK fields
 
-		long cpDefinitionId = _counter.get();
+		if (version ==
+				BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_DEFINITION_COUNT) {
 
-		cpDefinitionModel.setCPDefinitionId(cpDefinitionId);
+			cpDefinitionModel.setCPDefinitionId(
+				cProductModel.getPublishedCPDefinitionId());
+		}
+		else {
+			cpDefinitionModel.setCPDefinitionId(_counter.get());
+		}
 
 		// Group instance
 
-		cpDefinitionModel.setGroupId(commerceCatalogGroupModel.getGroupId());
+		cpDefinitionModel.setGroupId(cProductModel.getGroupId());
 
 		// Audit fields
 
@@ -1484,37 +2470,118 @@ public class DataFactory {
 		cpDefinitionModel.setSubscriptionType(null);
 		cpDefinitionModel.setSubscriptionTypeSettings(null);
 		cpDefinitionModel.setMaxSubscriptionCycles(0);
+		cpDefinitionModel.setChannelFilterEnabled(true);
 		cpDefinitionModel.setVersion(version);
 		cpDefinitionModel.setStatus(WorkflowConstants.STATUS_APPROVED);
 		cpDefinitionModel.setStatusByUserId(_sampleUserId);
 		cpDefinitionModel.setStatusByUserName(_SAMPLE_USER_NAME);
 		cpDefinitionModel.setStatusDate(new Date());
 
-		if (version ==
-				(BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_DEFINITION_COUNT -
-					1)) {
-
-			cProductModel.setPublishedCPDefinitionId(cpDefinitionId);
-		}
-
 		return cpDefinitionModel;
 	}
 
 	public AssetEntryModel newCPDefinitionModelAssetEntryModel(
-		CPDefinitionModel cpDefinitionModel,
-		GroupModel commerceCatalogGroupModel) {
+		CPDefinitionModel cpDefinitionModel, long groupId) {
 
 		return newAssetEntryModel(
-			commerceCatalogGroupModel.getGroupId(), new Date(), new Date(),
-			getClassNameId(CPDefinition.class),
+			groupId, new Date(), new Date(), getClassNameId(CPDefinition.class),
 			cpDefinitionModel.getCPDefinitionId(), SequentialUUID.generate(), 0,
 			true, true, "text/plain",
 			"Definition " + cpDefinitionModel.getCPDefinitionId());
 	}
 
+	public List<CPDefinitionModel> newCPDefinitionModels(
+		CPTaxCategoryModel cpTaxCategoryModel, CProductModel cProductModel) {
+
+		List<CPDefinitionModel> cPDefinitionModels = new ArrayList<>(
+			BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_DEFINITION_COUNT);
+
+		for (int i = 1;
+			 i <= BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_DEFINITION_COUNT;
+			 i++) {
+
+			cPDefinitionModels.add(
+				newCPDefinitionModel(cpTaxCategoryModel, cProductModel, i));
+		}
+
+		return cPDefinitionModels;
+	}
+
+	public CPDefinitionSpecificationOptionValueModel
+		newCPDefinitionSpecificationOptionValueModel(
+			long cpDefinitionId, long cpSpecificationOptionId,
+			long cpOptionCategoryId, int index) {
+
+		CPDefinitionSpecificationOptionValueModel
+			cpDefinitionSpecificationOptionValueModel =
+				new CPDefinitionSpecificationOptionValueModelImpl();
+
+		// UUID
+
+		cpDefinitionSpecificationOptionValueModel.setUuid(
+			SequentialUUID.generate());
+
+		// PK fields
+
+		cpDefinitionSpecificationOptionValueModel.
+			setCPDefinitionSpecificationOptionValueId(_counter.get());
+
+		// Audit fields
+
+		cpDefinitionSpecificationOptionValueModel.setCompanyId(_companyId);
+		cpDefinitionSpecificationOptionValueModel.setUserId(_sampleUserId);
+		cpDefinitionSpecificationOptionValueModel.setUserName(
+			_SAMPLE_USER_NAME);
+		cpDefinitionSpecificationOptionValueModel.setCreateDate(new Date());
+		cpDefinitionSpecificationOptionValueModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		cpDefinitionSpecificationOptionValueModel.setCPDefinitionId(
+			cpDefinitionId);
+		cpDefinitionSpecificationOptionValueModel.setCPSpecificationOptionId(
+			cpSpecificationOptionId);
+		cpDefinitionSpecificationOptionValueModel.setCPOptionCategoryId(
+			cpOptionCategoryId);
+		cpDefinitionSpecificationOptionValueModel.setValue(
+			StringBundler.concat(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><root ",
+				"available-locales=\"en_US\" default-locale=\"en_US\"><Value ",
+				"language-id=\"en_US\">Specification Option Value ", index,
+				"</Value></root>"));
+		cpDefinitionSpecificationOptionValueModel.setPriority(index - 1);
+		cpDefinitionSpecificationOptionValueModel.setLastPublishDate(null);
+
+		return cpDefinitionSpecificationOptionValueModel;
+	}
+
+	public List<CPDefinitionSpecificationOptionValueModel>
+		newCPDefinitionSpecificationOptionValueModels(
+			long cpDefinitionId, long cpSpecificationOptionId,
+			long cpOptionCategoryId, int index) {
+
+		List<CPDefinitionSpecificationOptionValueModel>
+			cpDefinitionSpecificationOptionValueModels = new ArrayList<>(
+				BenchmarksPropsValues.
+					MAX_CP_DEFINITION_SPECIFICATION_OPTION_VALUE_COUNT);
+
+		for (int i = 1;
+			 i <=
+				 BenchmarksPropsValues.
+					 MAX_CP_DEFINITION_SPECIFICATION_OPTION_VALUE_COUNT;
+			 i++) {
+
+			cpDefinitionSpecificationOptionValueModels.add(
+				newCPDefinitionSpecificationOptionValueModel(
+					cpDefinitionId, cpSpecificationOptionId, cpOptionCategoryId,
+					i));
+		}
+
+		return cpDefinitionSpecificationOptionValueModels;
+	}
+
 	public CPInstanceModel newCPInstanceModel(
-		CPDefinitionModel cpDefinitionModel,
-		GroupModel commerceCatalogGroupModel, int index) {
+		CPDefinitionModel cpDefinitionModel, int index) {
 
 		CPInstanceModel cpInstanceModel = new CPInstanceModelImpl();
 
@@ -1528,7 +2595,7 @@ public class DataFactory {
 
 		// Group instance
 
-		cpInstanceModel.setGroupId(commerceCatalogGroupModel.getGroupId());
+		cpInstanceModel.setGroupId(cpDefinitionModel.getGroupId());
 
 		// Audit fields
 
@@ -1575,12 +2642,148 @@ public class DataFactory {
 		cpInstanceModel.setStatusByUserName(_SAMPLE_USER_NAME);
 		cpInstanceModel.setStatusDate(new Date());
 
+		_cpInstanceModels.put(cpDefinitionId, cpInstanceModel);
+
 		return cpInstanceModel;
 	}
 
-	public CProductModel newCProductModel(
-		GroupModel commerceCatalogGroupModel) {
+	public List<CPInstanceModel> newCPInstanceModels(
+		CPDefinitionModel cpDefinitionModel) {
 
+		List<CPInstanceModel> cPInstanceModels = new ArrayList<>(
+			BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_INSTANCE_COUNT);
+
+		for (int i = 1;
+			 i <= BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_INSTANCE_COUNT;
+			 i++) {
+
+			cPInstanceModels.add(newCPInstanceModel(cpDefinitionModel, i));
+		}
+
+		return cPInstanceModels;
+	}
+
+	public CPOptionCategoryModel newCPOptionCategoryModel(int index) {
+		CPOptionCategoryModel cpOptionCategoryModel =
+			new CPOptionCategoryModelImpl();
+
+		// PK fields
+
+		long cpOptionCategoryId = _counter.get();
+
+		cpOptionCategoryModel.setCPOptionCategoryId(cpOptionCategoryId);
+
+		// Audit fields
+
+		cpOptionCategoryModel.setCompanyId(_companyId);
+		cpOptionCategoryModel.setUserId(_sampleUserId);
+		cpOptionCategoryModel.setUserName(_SAMPLE_USER_NAME);
+		cpOptionCategoryModel.setCreateDate(new Date());
+		cpOptionCategoryModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		cpOptionCategoryModel.setTitle("Option Category" + index);
+		cpOptionCategoryModel.setDescription(
+			"Description for option category with ID " + cpOptionCategoryId);
+		cpOptionCategoryModel.setPriority(index - 1);
+		cpOptionCategoryModel.setKey("key" + index);
+		cpOptionCategoryModel.setLastPublishDate(null);
+
+		return cpOptionCategoryModel;
+	}
+
+	public List<CPOptionCategoryModel> newCPOptionCategoryModels() {
+		List<CPOptionCategoryModel> cpOptionCategoryModels = new ArrayList<>(
+			BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_OPTION_CATEGORY_COUNT);
+
+		for (int i = 1;
+			 i <=
+				 BenchmarksPropsValues.
+					 MAX_COMMERCE_PRODUCT_OPTION_CATEGORY_COUNT;
+			 i++) {
+
+			cpOptionCategoryModels.add(newCPOptionCategoryModel(i));
+		}
+
+		return cpOptionCategoryModels;
+	}
+
+	public CPOptionModel newCPOptionModel(
+		String ddmFormFieldTypeName, int index) {
+
+		CPOptionModel cpOptionModel = new CPOptionModelImpl();
+
+		// UUID
+
+		cpOptionModel.setUuid(SequentialUUID.generate());
+
+		// PK fields
+
+		cpOptionModel.setCPOptionId(_counter.get());
+
+		// Audit fields
+
+		cpOptionModel.setCompanyId(_companyId);
+		cpOptionModel.setUserId(_sampleUserId);
+		cpOptionModel.setUserName(_SAMPLE_USER_NAME);
+		cpOptionModel.setCreateDate(new Date());
+		cpOptionModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		cpOptionModel.setName(
+			StringBundler.concat(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><root ",
+				"available-locales=\"en_US\" default-locale=\"en_US\">",
+				"<Name language-id=\"en_US\">Option Name ", index,
+				"</Name></root>"));
+		cpOptionModel.setDescription("Option Description");
+		cpOptionModel.setDDMFormFieldTypeName(ddmFormFieldTypeName);
+		cpOptionModel.setFacetable(true);
+		cpOptionModel.setRequired(true);
+		cpOptionModel.setSkuContributor(true);
+		cpOptionModel.setKey("option-name-" + index);
+
+		return cpOptionModel;
+	}
+
+	public CPOptionValueModel newCPOptionValueModel(
+		long cpOptionId, int index) {
+
+		CPOptionValueModel cpOptionValueModel = new CPOptionValueModelImpl();
+
+		// UUID
+
+		cpOptionValueModel.setUuid(SequentialUUID.generate());
+
+		// PK fields
+
+		cpOptionValueModel.setCPOptionValueId(_counter.get());
+
+		// Audit fields
+
+		cpOptionValueModel.setCompanyId(_companyId);
+		cpOptionValueModel.setUserId(_sampleUserId);
+		cpOptionValueModel.setUserName(_SAMPLE_USER_NAME);
+		cpOptionValueModel.setCreateDate(new Date());
+		cpOptionValueModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		cpOptionValueModel.setCPOptionId(cpOptionId);
+		cpOptionValueModel.setName(
+			StringBundler.concat(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><root available-",
+				"locales=\"en_US\" default-locale=\"en_US\"><Name language-id",
+				"=\"en_US\">Option Value Name ", index, "</Name></root>"));
+		cpOptionValueModel.setPriority(index - 1);
+		cpOptionValueModel.setKey("option-value-" + index);
+
+		return cpOptionValueModel;
+	}
+
+	public CProductModel newCProductModel(long groupId) {
 		CProductModel cProductModel = new CProductModelImpl();
 
 		// UUID
@@ -1593,7 +2796,7 @@ public class DataFactory {
 
 		// Group instance
 
-		cProductModel.setGroupId(commerceCatalogGroupModel.getGroupId());
+		cProductModel.setGroupId(groupId);
 
 		// Audit fields
 
@@ -1605,10 +2808,92 @@ public class DataFactory {
 
 		// Other fields
 
+		cProductModel.setPublishedCPDefinitionId(_counter.get());
 		cProductModel.setLatestVersion(
 			BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_DEFINITION_COUNT);
 
 		return cProductModel;
+	}
+
+	public List<CProductModel> newCProductModels(long groupId) {
+		List<CProductModel> cProductModels = new ArrayList<>(
+			BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_COUNT);
+
+		int count = (int)Math.ceil(
+			BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_COUNT /
+				BenchmarksPropsValues.MAX_COMMERCE_CATALOG_COUNT);
+
+		if (BenchmarksPropsValues.MAX_COMMERCE_CATALOG_COUNT >
+				BenchmarksPropsValues.MAX_COMMERCE_PRODUCT_COUNT) {
+
+			count = BenchmarksPropsValues.MAX_COMMERCE_CATALOG_COUNT;
+		}
+
+		for (int i = 1; i <= count; i++) {
+			cProductModels.add(newCProductModel(groupId));
+		}
+
+		return cProductModels;
+	}
+
+	public CPSpecificationOptionModel newCPSpecificationOptionModel(
+		long cpOptionCategoryId, int index) {
+
+		CPSpecificationOptionModel cpSpecificationOptionModel =
+			new CPSpecificationOptionModelImpl();
+
+		// PK fields
+
+		long cpSpecificationOptionId = _counter.get();
+
+		cpSpecificationOptionModel.setCPSpecificationOptionId(
+			cpSpecificationOptionId);
+
+		// Audit fields
+
+		cpSpecificationOptionModel.setCompanyId(_companyId);
+		cpSpecificationOptionModel.setUserId(_sampleUserId);
+		cpSpecificationOptionModel.setUserName(_SAMPLE_USER_NAME);
+		cpSpecificationOptionModel.setCreateDate(new Date());
+		cpSpecificationOptionModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		cpSpecificationOptionModel.setCPOptionCategoryId(cpOptionCategoryId);
+		cpSpecificationOptionModel.setTitle("Specification Option " + index);
+		cpSpecificationOptionModel.setDescription(
+			"Description for specification option with ID " +
+				cpSpecificationOptionId);
+		cpSpecificationOptionModel.setFacetable(false);
+		cpSpecificationOptionModel.setKey("specification-option-" + index);
+		cpSpecificationOptionModel.setLastPublishDate(null);
+
+		return cpSpecificationOptionModel;
+	}
+
+	public List<CPSpecificationOptionModel> newCPSpecificationOptionModels(
+		List<CPOptionCategoryModel> cpOptionCategoryModels) {
+
+		List<CPSpecificationOptionModel> cpSpecificationOptionModels =
+			new ArrayList<>(
+				BenchmarksPropsValues.MAX_CP_SPECIFICATION_OPTION_COUNT);
+
+		CPOptionCategoryModel cpOptionCategoryModel = null;
+
+		for (int i = 1;
+			 i <= BenchmarksPropsValues.MAX_CP_SPECIFICATION_OPTION_COUNT;
+			 i++) {
+
+			if (cpOptionCategoryModels.size() >= i) {
+				cpOptionCategoryModel = cpOptionCategoryModels.get(i - 1);
+			}
+
+			cpSpecificationOptionModels.add(
+				newCPSpecificationOptionModel(
+					cpOptionCategoryModel.getCPOptionCategoryId(), i));
+		}
+
+		return cpSpecificationOptionModels;
 	}
 
 	public CPTaxCategoryModel newCPTaxCategoryModel() {
@@ -1706,14 +2991,24 @@ public class DataFactory {
 
 		return ListUtil.fromArray(
 			newPortletPreferencesModel(
-				plid, DDLPortletKeys.DYNAMIC_DATA_LISTS_DISPLAY,
-				PortletConstants.DEFAULT_PREFERENCES),
+				plid, DDLPortletKeys.DYNAMIC_DATA_LISTS_DISPLAY),
+			newPortletPreferencesModel(plid, DDLPortletKeys.DYNAMIC_DATA_LISTS),
 			newPortletPreferencesModel(
-				plid, DDLPortletKeys.DYNAMIC_DATA_LISTS,
-				PortletConstants.DEFAULT_PREFERENCES),
-			newPortletPreferencesModel(
-				plid, DDMPortletKeys.DYNAMIC_DATA_MAPPING,
-				PortletConstants.DEFAULT_PREFERENCES));
+				plid, DDMPortletKeys.DYNAMIC_DATA_MAPPING));
+	}
+
+	public List<PortletPreferenceValueModel> newDDLPortletPreferenceValueModels(
+		PortletPreferencesModel portletPreferencesModel,
+		DDLRecordSetModel ddlRecordSetModel) {
+
+		return Arrays.asList(
+			newPortletPreferenceValueModel(
+				portletPreferencesModel, "editable", 0, "true"),
+			newPortletPreferenceValueModel(
+				portletPreferencesModel, "recordSetId", 0,
+				String.valueOf(ddlRecordSetModel.getRecordSetId())),
+			newPortletPreferenceValueModel(
+				portletPreferencesModel, "spreadsheet", 0, "false"));
 	}
 
 	public DDLRecordModel newDDLRecordModel(
@@ -1785,15 +3080,11 @@ public class DataFactory {
 		ddlRecordSetModel.setDDMStructureId(ddmStructureModel.getStructureId());
 		ddlRecordSetModel.setRecordSetKey(String.valueOf(_counter.get()));
 
-		StringBundler sb = new StringBundler(5);
-
-		sb.append("<?xml version=\"1.0\"?><root available-locales=\"en_US\" ");
-		sb.append("default-locale=\"en_US\"><name language-id=\"en_US\">");
-		sb.append("Test DDL Record Set ");
-		sb.append(currentIndex);
-		sb.append("</name></root>");
-
-		ddlRecordSetModel.setName(sb.toString());
+		ddlRecordSetModel.setName(
+			StringBundler.concat(
+				"<?xml version=\"1.0\"?><root available-locales=\"en_US\" ",
+				"default-locale=\"en_US\"><Name language-id=\"en_US\">",
+				"Test DDL Record Set ", currentIndex, "</Name></root>"));
 
 		ddlRecordSetModel.setMinDisplayRows(
 			DDLRecordSetConstants.MIN_DISPLAY_ROWS_DEFAULT);
@@ -1839,52 +3130,157 @@ public class DataFactory {
 		return ddlRecordVersionModel;
 	}
 
-	public DDMContentModel newDDMContentModel(
-		DDLRecordModel ddlRecordModel, int currentIndex) {
+	public List<DDMFieldAttributeModel> newDDMFieldAttributeModels(
+		DLFileEntryModel dlFileEntryModel, List<DDMFieldModel> ddmFieldModels,
+		DDMStorageLinkModel ddmStorageLinkModel) {
 
-		StringBundler sb = new StringBundler(
-			3 + (BenchmarksPropsValues.MAX_DDL_CUSTOM_FIELD_COUNT * 7));
-
-		sb.append("{\"availableLanguageIds\": [\"en_US\"],");
-		sb.append("\"defaultLanguageId\": \"en_US\", \"fieldValues\": [");
-
-		for (int i = 0; i < BenchmarksPropsValues.MAX_DDL_CUSTOM_FIELD_COUNT;
-			 i++) {
-
-			sb.append("{\"instanceId\": \"");
-			sb.append(StringUtil.randomId());
-			sb.append("\", \"name\": \"");
-			sb.append(nextDDLCustomFieldName(ddlRecordModel.getGroupId(), i));
-			sb.append("\", \"value\": {\"en_US\": \"Test Record ");
-			sb.append(currentIndex);
-			sb.append("\"}},");
-		}
-
-		if (BenchmarksPropsValues.MAX_DDL_CUSTOM_FIELD_COUNT > 0) {
-			sb.setIndex(sb.index() - 1);
-		}
-
-		sb.append("]}");
-
-		return newDDMContentModel(
-			ddlRecordModel.getDDMStorageId(), ddlRecordModel.getGroupId(),
-			sb.toString());
+		return Arrays.asList(
+			newDDMFieldAttributeModel(
+				ddmFieldModels.get(0), ddmStorageLinkModel.getClassPK(),
+				"availableLanguageIds", StringPool.BLANK, "en_US"),
+			newDDMFieldAttributeModel(
+				ddmFieldModels.get(0), ddmStorageLinkModel.getClassPK(),
+				"defaultLanguageId", StringPool.BLANK, "en_US"),
+			newDDMFieldAttributeModel(
+				ddmFieldModels.get(1), ddmStorageLinkModel.getClassPK(),
+				StringPool.BLANK, "en_US", "text/plain"));
 	}
 
-	public DDMContentModel newDDMContentModel(
-		DLFileEntryModel dlFileEntryModel) {
+	public List<DDMFieldAttributeModel> newDDMFieldAttributeModels(
+		int currentIndex, DDLRecordModel ddlRecordModel,
+		List<DDMFieldModel> ddmFieldModels,
+		DDMStorageLinkModel ddmStorageLinkModel) {
 
-		StringBundler sb = new StringBundler(6);
+		List<DDMFieldAttributeModel> ddmFieldAttributeModels =
+			new ArrayList<>();
 
-		sb.append("{\"availableLanguageIds\": [\"en_US\"],");
-		sb.append("\"defaultLanguageId\": \"en_US\", \"fieldValues\": [{");
-		sb.append("\"instanceId\": \"");
-		sb.append(StringUtil.randomId());
-		sb.append("\", \"name\": \"CONTENT_TYPE\", \"value\": {\"en_US\": ");
-		sb.append("\"text/plain\"}}]}");
+		ddmFieldAttributeModels.add(
+			newDDMFieldAttributeModel(
+				ddmFieldModels.get(0), ddmStorageLinkModel.getClassPK(),
+				"availableLanguageIds", StringPool.BLANK, "en_US"));
+		ddmFieldAttributeModels.add(
+			newDDMFieldAttributeModel(
+				ddmFieldModels.get(0), ddmStorageLinkModel.getClassPK(),
+				"defaultLanguageId", StringPool.BLANK, "en_US"));
 
-		return newDDMContentModel(
-			_counter.get(), dlFileEntryModel.getGroupId(), sb.toString());
+		for (int i = 1; i < ddmFieldModels.size(); i++) {
+			DDMFieldModel ddmFieldModel = ddmFieldModels.get(i);
+
+			ddmFieldAttributeModels.add(
+				newDDMFieldAttributeModel(
+					ddmFieldModel, ddmStorageLinkModel.getClassPK(),
+					StringPool.BLANK, "en_US", "Test Record " + currentIndex));
+		}
+
+		return ddmFieldAttributeModels;
+	}
+
+	public List<DDMFieldAttributeModel> newDDMFieldAttributeModels(
+		JournalArticleModel journalArticleModel,
+		List<DDMFieldModel> ddmFieldModels) {
+
+		List<DDMFieldAttributeModel> ddmFieldAttributeModels =
+			new ArrayList<>();
+
+		ddmFieldAttributeModels.add(
+			newDDMFieldAttributeModel(
+				ddmFieldModels.get(0), journalArticleModel.getId(),
+				"availableLanguageIds", StringPool.BLANK, "en_US"));
+		ddmFieldAttributeModels.add(
+			newDDMFieldAttributeModel(
+				ddmFieldModels.get(0), journalArticleModel.getId(),
+				"defaultLanguageId", StringPool.BLANK, "en_US"));
+
+		if (_journalArticleContent.length() >
+				DDMFieldAttributeImpl.SMALL_ATTRIBUTE_VALUE_MAX_LENGTH) {
+
+			ddmFieldAttributeModels.add(
+				newDDMFieldAttributeModel(
+					ddmFieldModels.get(1), journalArticleModel.getId(),
+					StringPool.BLANK, "en_US", "", _journalArticleContent));
+		}
+		else {
+			ddmFieldAttributeModels.add(
+				newDDMFieldAttributeModel(
+					ddmFieldModels.get(1), journalArticleModel.getId(),
+					StringPool.BLANK, "en_US", _journalArticleContent));
+		}
+
+		return ddmFieldAttributeModels;
+	}
+
+	public List<DDMFieldModel> newDDMFieldModels(
+		DLFileEntryModel dlFileEntryModel,
+		DDMStorageLinkModel ddmStorageLinkModel) {
+
+		return Arrays.asList(
+			newDDMFieldModel(
+				ddmStorageLinkModel.getClassPK(),
+				_defaultDLDDMStructureVersionId, StringPool.BLANK,
+				StringPool.BLANK, StringPool.BLANK, false, 0),
+			newDDMFieldModel(
+				ddmStorageLinkModel.getClassPK(),
+				_defaultDLDDMStructureVersionId, "CONTENT_TYPE", "string",
+				StringUtil.randomId(), true, 1));
+	}
+
+	public List<DDMFieldModel> newDDMFieldModels(
+		int currentIndex, DDLRecordModel ddlRecordModel,
+		DDMStorageLinkModel ddmStorageLinkModel) {
+
+		List<DDMFieldModel> ddmFieldModels = new ArrayList<>(
+			BenchmarksPropsValues.MAX_DDL_CUSTOM_FIELD_COUNT + 1);
+
+		ddmFieldModels.add(
+			newDDMFieldModel(
+				ddmStorageLinkModel.getClassPK(),
+				ddmStorageLinkModel.getStructureVersionId(), StringPool.BLANK,
+				StringPool.BLANK, StringPool.BLANK, false, 0));
+
+		for (int i = 1; i <= BenchmarksPropsValues.MAX_DDL_CUSTOM_FIELD_COUNT;
+			 i++) {
+
+			ddmFieldModels.add(
+				newDDMFieldModel(
+					ddmStorageLinkModel.getClassPK(),
+					ddmStorageLinkModel.getStructureVersionId(),
+					nextDDLCustomFieldName(ddlRecordModel.getGroupId(), i - 1),
+					"string", StringUtil.randomString(), true, i));
+		}
+
+		return ddmFieldModels;
+	}
+
+	public List<DDMFieldModel> newDDMFieldModels(
+		JournalArticleModel journalArticleModel) {
+
+		return Arrays.asList(
+			newDDMFieldModel(
+				journalArticleModel.getId(),
+				_defaultJournalDDMStructureVersionId, StringPool.BLANK,
+				StringPool.BLANK, StringPool.BLANK, false, 0),
+			newDDMFieldModel(
+				journalArticleModel.getId(),
+				_defaultJournalDDMStructureVersionId, "content", "rich_text",
+				StringUtil.randomId(), true, 1));
+	}
+
+	public DDMStorageLinkModel newDDMStorageLinkModel(
+		DDLRecordModel ddlRecordModel, long ddmStorageLinkId, long structureId,
+		long structureVersionId) {
+
+		return newDDMStorageLinkModel(
+			ddmStorageLinkId, ddlRecordModel.getDDMStorageId(), structureId,
+			structureVersionId);
+	}
+
+	public DDMStorageLinkModel newDDMStorageLinkModel(
+		DLFileEntryModel dlFileEntryModel, long ddmStorageLinkId,
+		long structureId) {
+
+		return newDDMStorageLinkModel(
+			ddmStorageLinkId, _counter.get(), structureId,
+			_defaultDLDDMStructureVersionId);
 	}
 
 	public DDMStorageLinkModel newDDMStorageLinkModel(
@@ -1908,31 +3304,6 @@ public class DataFactory {
 		ddmStorageLinkModel.setStructureId(structureId);
 		ddmStorageLinkModel.setStructureVersionId(
 			_defaultJournalDDMStructureVersionId);
-
-		return ddmStorageLinkModel;
-	}
-
-	public DDMStorageLinkModel newDDMStorageLinkModel(
-		long ddmStorageLinkId, DDMContentModel ddmContentModel,
-		long structureId) {
-
-		DDMStorageLinkModel ddmStorageLinkModel = new DDMStorageLinkModelImpl();
-
-		// UUID
-
-		ddmStorageLinkModel.setUuid(SequentialUUID.generate());
-
-		// PK fields
-
-		ddmStorageLinkModel.setStorageLinkId(ddmStorageLinkId);
-
-		// Other fields
-
-		ddmStorageLinkModel.setClassNameId(getClassNameId(DDMContent.class));
-		ddmStorageLinkModel.setClassPK(ddmContentModel.getContentId());
-		ddmStorageLinkModel.setStructureId(structureId);
-		ddmStorageLinkModel.setStructureVersionId(
-			_defaultDLDDMStructureVersionId);
 
 		return ddmStorageLinkModel;
 	}
@@ -1989,18 +3360,15 @@ public class DataFactory {
 		ddmStructureVersionModel.setVersion(
 			DDMStructureConstants.VERSION_DEFAULT);
 
-		StringBundler sb = new StringBundler(4);
-
-		sb.append("<?xml version=\"1.0\"?><root available-locales=\"en_US\" ");
-		sb.append("default-locale=\"en_US\"><name language-id=\"en_US\">");
-		sb.append(ddmStructureModel.getStructureKey());
-		sb.append("</name></root>");
-
-		ddmStructureVersionModel.setName(sb.toString());
+		ddmStructureVersionModel.setName(
+			StringBundler.concat(
+				"<?xml version=\"1.0\"?><root available-locales=\"en_US\" ",
+				"default-locale=\"en_US\"><name language-id=\"en_US\">",
+				ddmStructureModel.getStructureKey(), "</name></root>"));
 
 		ddmStructureVersionModel.setDefinition(
 			ddmStructureModel.getDefinition());
-		ddmStructureVersionModel.setStorageType(StorageType.JSON.toString());
+		ddmStructureVersionModel.setStorageType(StorageType.DEFAULT.toString());
 		ddmStructureVersionModel.setStatusByUserId(
 			ddmStructureModel.getUserId());
 		ddmStructureVersionModel.setStatusByUserName(_SAMPLE_USER_NAME);
@@ -2033,6 +3401,12 @@ public class DataFactory {
 		return ddmTemplateLinkModel;
 	}
 
+	public AssetVocabularyModel newDefaultAssetVocabularyModel() {
+		return newAssetVocabularyModel(
+			_globalGroupId, _defaultUserId, null,
+			PropsValues.ASSET_VOCABULARY_DEFAULT);
+	}
+
 	public DDMStructureLayoutModel newDefaultDLDDMStructureLayoutModel() {
 		return newDDMStructureLayoutModel(
 			_globalGroupId, _defaultUserId, _defaultDLDDMStructureVersionId,
@@ -2040,6 +3414,8 @@ public class DataFactory {
 	}
 
 	public DDMStructureModel newDefaultDLDDMStructureModel() {
+		_defaultDLDDMStructureId = _counter.get();
+
 		return newDDMStructureModel(
 			_globalGroupId, _defaultUserId, getClassNameId(DLFileEntry.class),
 			RawMetadataProcessor.TIKA_RAW_METADATA, _dlDDMStructureContent,
@@ -2049,6 +3425,8 @@ public class DataFactory {
 	public DDMStructureVersionModel newDefaultDLDDMStructureVersionModel(
 		DDMStructureModel ddmStructureModel) {
 
+		_defaultDLDDMStructureVersionId = _counter.get();
+
 		return newDDMStructureVersionModel(
 			ddmStructureModel, _defaultDLDDMStructureVersionId);
 	}
@@ -2057,10 +3435,13 @@ public class DataFactory {
 		return newDDMStructureLayoutModel(
 			_globalGroupId, _defaultUserId,
 			_defaultJournalDDMStructureVersionId,
-			_journalDDMStructureLayoutContent);
+			_journalDDMStructureLayoutContent,
+			getClassNameId(JournalArticle.class), _JOURNAL_STRUCTURE_KEY);
 	}
 
 	public DDMStructureModel newDefaultJournalDDMStructureModel() {
+		_defaultJournalDDMStructureId = _counter.get();
+
 		return newDDMStructureModel(
 			_globalGroupId, _defaultUserId,
 			getClassNameId(JournalArticle.class), _JOURNAL_STRUCTURE_KEY,
@@ -2070,11 +3451,15 @@ public class DataFactory {
 	public DDMStructureVersionModel newDefaultJournalDDMStructureVersionModel(
 		DDMStructureModel ddmStructureModel) {
 
+		_defaultJournalDDMStructureVersionId = _counter.get();
+
 		return newDDMStructureVersionModel(
 			ddmStructureModel, _defaultJournalDDMStructureVersionId);
 	}
 
 	public DDMTemplateModel newDefaultJournalDDMTemplateModel() {
+		_defaultJournalDDMTemplateId = _counter.get();
+
 		return newDDMTemplateModel(
 			_globalGroupId, _defaultUserId, _defaultJournalDDMStructureId,
 			getClassNameId(JournalArticle.class), _defaultJournalDDMTemplateId);
@@ -2107,14 +3492,11 @@ public class DataFactory {
 		ddmTemplateVersionModelImpl.setVersion(
 			DDMTemplateConstants.VERSION_DEFAULT);
 
-		StringBundler sb = new StringBundler(4);
-
-		sb.append("<?xml version=\"1.0\"?><root available-locales=\"en_US\" ");
-		sb.append("default-locale=\"en_US\"><name language-id=\"en_US\">");
-		sb.append(_JOURNAL_STRUCTURE_KEY);
-		sb.append("</name></root>");
-
-		ddmTemplateVersionModelImpl.setName(sb.toString());
+		ddmTemplateVersionModelImpl.setName(
+			StringBundler.concat(
+				"<?xml version=\"1.0\"?><root available-locales=\"en_US\" ",
+				"default-locale=\"en_US\"><name language-id=\"en_US\">",
+				_JOURNAL_STRUCTURE_KEY, "</name></root>"));
 
 		ddmTemplateVersionModelImpl.setStatusByUserId(_defaultUserId);
 		ddmTemplateVersionModelImpl.setStatusDate(nextFutureDate());
@@ -2123,6 +3505,8 @@ public class DataFactory {
 	}
 
 	public UserModel newDefaultUserModel() {
+		_defaultUserId = _counter.get();
+
 		return newUserModel(
 			_defaultUserId, StringPool.BLANK, StringPool.BLANK,
 			StringPool.BLANK, true);
@@ -2153,6 +3537,63 @@ public class DataFactory {
 			dlFileVersionModel.getFileVersionId());
 
 		return dlFileEntryMetadataModel;
+	}
+
+	public DLFileEntryModel newDlFileEntryModel(
+		DLFolderModel dlFolderModel, String name, String extension,
+		String mimeType) {
+
+		return newDlFileEntryModel(
+			dlFolderModel, name, extension, mimeType, _counter.get());
+	}
+
+	public DLFileEntryModel newDlFileEntryModel(
+		DLFolderModel dlFolderModel, String name, String extension,
+		String mimeType, long fileEntryId) {
+
+		DLFileEntryModel dlFileEntryModel = new DLFileEntryModelImpl();
+
+		// UUID
+
+		dlFileEntryModel.setUuid(SequentialUUID.generate());
+
+		// PK fields
+
+		dlFileEntryModel.setFileEntryId(fileEntryId);
+
+		// Group instance
+
+		dlFileEntryModel.setGroupId(dlFolderModel.getGroupId());
+
+		// Audit fields
+
+		dlFileEntryModel.setCompanyId(_companyId);
+		dlFileEntryModel.setUserId(_sampleUserId);
+		dlFileEntryModel.setUserName(_SAMPLE_USER_NAME);
+		dlFileEntryModel.setCreateDate(nextFutureDate());
+		dlFileEntryModel.setModifiedDate(nextFutureDate());
+
+		// Other fields
+
+		dlFileEntryModel.setRepositoryId(dlFolderModel.getRepositoryId());
+		dlFileEntryModel.setFolderId(dlFolderModel.getFolderId());
+		dlFileEntryModel.setTreePath(dlFolderModel.getTreePath());
+		dlFileEntryModel.setName(String.valueOf(_dLFileEntryIdCounter.get()));
+		dlFileEntryModel.setFileName(name + "." + extension);
+		dlFileEntryModel.setExtension(extension);
+		dlFileEntryModel.setMimeType(mimeType);
+		dlFileEntryModel.setTitle(name);
+		dlFileEntryModel.setFileEntryTypeId(
+			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT);
+		dlFileEntryModel.setVersion(DLFileEntryConstants.VERSION_DEFAULT);
+		dlFileEntryModel.setSize(BenchmarksPropsValues.MAX_DL_FILE_ENTRY_SIZE);
+		dlFileEntryModel.setLastPublishDate(nextFutureDate());
+
+		// Autogenerated fields
+
+		dlFileEntryModel.setExternalReferenceCode(String.valueOf(fileEntryId));
+
+		return dlFileEntryModel;
 	}
 
 	public List<DLFileEntryModel> newDlFileEntryModels(
@@ -2194,14 +3635,12 @@ public class DataFactory {
 			StringUtil.toUpperCase(
 				DLFileEntryTypeConstants.NAME_BASIC_DOCUMENT));
 
-		StringBundler sb = new StringBundler(4);
-
-		sb.append("<?xml version=\"1.0\"?><root available-locales=\"en_US\" ");
-		sb.append("default-locale=\"en_US\"><name language-id=\"en_US\">");
-		sb.append(DLFileEntryTypeConstants.NAME_BASIC_DOCUMENT);
-		sb.append("</name></root>");
-
-		defaultDLFileEntryTypeModel.setName(sb.toString());
+		defaultDLFileEntryTypeModel.setName(
+			StringBundler.concat(
+				"<?xml version=\"1.0\"?><root available-locales=\"en_US\" ",
+				"default-locale=\"en_US\"><name language-id=\"en_US\">",
+				DLFileEntryTypeConstants.NAME_BASIC_DOCUMENT,
+				"</name></root>"));
 
 		defaultDLFileEntryTypeModel.setLastPublishDate(nextFutureDate());
 
@@ -2251,14 +3690,48 @@ public class DataFactory {
 		return dlFileVersionModel;
 	}
 
+	public DLFolderModel newDLFolderModel(
+		long groupId, long parentFolderId, String name) {
+
+		return newDLFolderModel(
+			_counter.get(), groupId, parentFolderId, "", name);
+	}
+
 	public List<DLFolderModel> newDLFolderModels(
-		long groupId, long parentFolderId) {
+		long groupId, long parentFolderId, int depth) {
 
 		List<DLFolderModel> dlFolderModels = new ArrayList<>(
 			BenchmarksPropsValues.MAX_DL_FOLDER_COUNT);
 
+		Map<Long, String> treePaths = _treePathsMap.computeIfAbsent(
+			depth, HashMap::new);
+
 		for (int i = 1; i <= BenchmarksPropsValues.MAX_DL_FOLDER_COUNT; i++) {
-			dlFolderModels.add(newDLFolderModel(groupId, parentFolderId, i));
+			long folderId = _counter.get();
+
+			StringBundler sb = new StringBundler(3);
+
+			if (depth == 1) {
+				sb.append(StringPool.FORWARD_SLASH);
+				sb.append(folderId);
+				sb.append(StringPool.FORWARD_SLASH);
+			}
+			else {
+				Map<Long, String> parentTreePaths = _treePathsMap.get(
+					depth - 1);
+
+				sb.append(parentTreePaths.get(parentFolderId));
+
+				sb.append(folderId);
+				sb.append(StringPool.FORWARD_SLASH);
+			}
+
+			treePaths.put(folderId, sb.toString());
+
+			dlFolderModels.add(
+				newDLFolderModel(
+					folderId, groupId, parentFolderId, sb.toString(),
+					"Test Folder " + i));
 		}
 
 		return dlFolderModels;
@@ -2337,6 +3810,65 @@ public class DataFactory {
 		return fragmentEntryLinkModel;
 	}
 
+	public List<FragmentEntryLinkModel> newFragmentEntryLinkModels(
+			List<LayoutModel> layoutModels)
+		throws Exception {
+
+		List<FragmentEntryLinkModel> fragmentEntryLinkModels =
+			new ArrayList<>();
+
+		String headingRenderNamespace = StringUtil.randomId();
+		String imageRenderNamespace = StringUtil.randomId();
+		String paragraphRenderNamespace = StringUtil.randomId();
+
+		for (LayoutModel layoutModel : layoutModels) {
+			fragmentEntryLinkModels.add(
+				newFragmentEntryLinkModel(
+					layoutModel, _FRAGMENT_COMPONENT_RENDER_KEY_HEADING,
+					_readFile(
+						_getFragmentComponentInputStream("heading", "css")),
+					_readFile(
+						_getFragmentComponentInputStream("heading", "html")),
+					_readFile(
+						"fragment_component" +
+							"/fragment_component_heading_configuration.json"),
+					_readFile(
+						"fragment_component" +
+							"/fragment_component_heading_editValue.json"),
+					0, headingRenderNamespace));
+			fragmentEntryLinkModels.add(
+				newFragmentEntryLinkModel(
+					layoutModel, _FRAGMENT_COMPONENT_RENDER_KEY_PARAGRAPH,
+					_readFile(
+						_getFragmentComponentInputStream("paragraph", "css")),
+					_readFile(
+						_getFragmentComponentInputStream("paragraph", "html")),
+					_readFile(
+						"fragment_component" +
+							"/fragment_component_paragraph_configuration.json"),
+					_replaceReleaseInfo(
+						_readFile(
+							"fragment_component" +
+								"/fragment_component_paragraph_editValue." +
+									"json")),
+					0, paragraphRenderNamespace));
+			fragmentEntryLinkModels.add(
+				newFragmentEntryLinkModel(
+					layoutModel, _FRAGMENT_COMPONENT_RENDER_KEY_IMAGE, "",
+					_readFile(
+						_getFragmentComponentInputStream("image", "html")),
+					_readFile(
+						"fragment_component" +
+							"/fragment_component_image_configuration.json"),
+					_readFile(
+						"fragment_component" +
+							"/fragment_component_image_editValue.json"),
+					0, imageRenderNamespace));
+		}
+
+		return fragmentEntryLinkModels;
+	}
+
 	public FragmentEntryModel newFragmentEntryModel(
 			long groupId, FragmentCollectionModel fragmentCollectionModel)
 		throws Exception {
@@ -2384,8 +3916,7 @@ public class DataFactory {
 
 	public FriendlyURLEntryLocalizationModel
 		newFriendlyURLEntryLocalizationModel(
-			FriendlyURLEntryModel friendlyURLEntryModel,
-			BlogsEntryModel blogsEntryModel) {
+			FriendlyURLEntryModel friendlyURLEntryModel, String urlTitle) {
 
 		FriendlyURLEntryLocalizationModel friendlyURLEntryLocalizationModel =
 			new FriendlyURLEntryLocalizationModelImpl();
@@ -2411,8 +3942,7 @@ public class DataFactory {
 			friendlyURLEntryModel.getClassNameId());
 		friendlyURLEntryLocalizationModel.setClassPK(
 			friendlyURLEntryModel.getClassPK());
-		friendlyURLEntryLocalizationModel.setUrlTitle(
-			blogsEntryModel.getUrlTitle());
+		friendlyURLEntryLocalizationModel.setUrlTitle(urlTitle);
 
 		// Autogenerated fields
 
@@ -2448,7 +3978,7 @@ public class DataFactory {
 	}
 
 	public FriendlyURLEntryModel newFriendlyURLEntryModel(
-		BlogsEntryModel blogsEntryModel) {
+		long groupId, long classNameId, long classPK) {
 
 		FriendlyURLEntryModel friendlyURLEntryModel =
 			new FriendlyURLEntryModelImpl();
@@ -2463,7 +3993,7 @@ public class DataFactory {
 
 		// Group instance
 
-		friendlyURLEntryModel.setGroupId(blogsEntryModel.getGroupId());
+		friendlyURLEntryModel.setGroupId(groupId);
 
 		// Audit fields
 
@@ -2473,8 +4003,8 @@ public class DataFactory {
 
 		// Other fields
 
-		friendlyURLEntryModel.setClassNameId(getClassNameId(BlogsEntry.class));
-		friendlyURLEntryModel.setClassPK(blogsEntryModel.getEntryId());
+		friendlyURLEntryModel.setClassNameId(classNameId);
+		friendlyURLEntryModel.setClassPK(classPK);
 
 		// Autogenerated fields
 
@@ -2484,9 +4014,57 @@ public class DataFactory {
 	}
 
 	public GroupModel newGlobalGroupModel() {
+		_globalGroupId = _counter.get();
+
 		return newGroupModel(
 			_globalGroupId, getClassNameId(Company.class), _companyId,
 			GroupConstants.GLOBAL, false);
+	}
+
+	public List<LayoutModel> newGroupLayoutModels(long groupId) {
+		List<LayoutModel> layoutModels = new ArrayList<>();
+
+		layoutModels.add(
+			newLayoutModel(groupId, "blogs", "", BlogsPortletKeys.BLOGS + ","));
+		layoutModels.add(
+			newLayoutModel(
+				groupId, "document_library", "",
+				DLPortletKeys.DOCUMENT_LIBRARY + ","));
+		layoutModels.add(
+			newLayoutModel(
+				groupId, "forums", "", MBPortletKeys.MESSAGE_BOARDS + ","));
+		layoutModels.add(
+			newLayoutModel(groupId, "wiki", "", WikiPortletKeys.WIKI + ","));
+
+		if (BenchmarksPropsValues.SEARCH_BAR_ENABLED) {
+			layoutModels.add(
+				newLayoutModel(
+					groupId, "search", false, "1_2_columns_i",
+					new String[] {
+						StringBundler.concat(
+							SearchBarPortletKeys.SEARCH_BAR, StringPool.COMMA,
+							SuggestionsPortletKeys.SUGGESTIONS,
+							StringPool.COMMA),
+						StringBundler.concat(
+							SiteFacetPortletKeys.SITE_FACET, StringPool.COMMA,
+							TypeFacetPortletKeys.TYPE_FACET, StringPool.COMMA,
+							TagFacetPortletKeys.TAG_FACET, StringPool.COMMA,
+							CategoryFacetPortletKeys.CATEGORY_FACET,
+							StringPool.COMMA,
+							FolderFacetPortletKeys.FOLDER_FACET,
+							StringPool.COMMA, UserFacetPortletKeys.USER_FACET,
+							StringPool.COMMA,
+							ModifiedFacetPortletKeys.MODIFIED_FACET,
+							StringPool.COMMA),
+						StringBundler.concat(
+							SearchResultsPortletKeys.SEARCH_RESULTS,
+							StringPool.COMMA,
+							SearchOptionsPortletKeys.SEARCH_OPTIONS,
+							StringPool.COMMA)
+					}));
+		}
+
+		return layoutModels;
 	}
 
 	public GroupModel newGroupModel(UserModel userModel) {
@@ -2509,9 +4087,17 @@ public class DataFactory {
 	}
 
 	public GroupModel newGuestGroupModel() {
+		_guestGroupId = _counter.get();
+
+		String typeSettings = StringPool.BLANK;
+
+		if (!BenchmarksPropsValues.SEARCH_BAR_ENABLED) {
+			typeSettings = "searchLayoutCreated=true";
+		}
+
 		return newGroupModel(
 			_guestGroupId, getClassNameId(Group.class), _guestGroupId,
-			GroupConstants.GUEST, true);
+			GroupConstants.GUEST, 0, typeSettings, true);
 	}
 
 	public UserModel newGuestUserModel() {
@@ -2519,18 +4105,10 @@ public class DataFactory {
 	}
 
 	public JournalArticleLocalizationModel newJournalArticleLocalizationModel(
-		JournalArticleModel journalArticleModel, int articleIndex,
-		int versionIndex) {
+		JournalArticleModel journalArticleModel) {
 
 		JournalArticleLocalizationModel journalArticleLocalizationModel =
 			new JournalArticleLocalizationModelImpl();
-
-		StringBundler sb = new StringBundler(4);
-
-		sb.append("TestJournalArticle_");
-		sb.append(articleIndex);
-		sb.append(StringPool.UNDERLINE);
-		sb.append(versionIndex);
 
 		// PK fields
 
@@ -2546,7 +4124,8 @@ public class DataFactory {
 
 		journalArticleLocalizationModel.setArticlePK(
 			journalArticleModel.getId());
-		journalArticleLocalizationModel.setTitle(sb.toString());
+		journalArticleLocalizationModel.setTitle(
+			journalArticleModel.getUrlTitle());
 		journalArticleLocalizationModel.setLanguageId(
 			journalArticleModel.getDefaultLanguageId());
 
@@ -2595,16 +4174,11 @@ public class DataFactory {
 			journalArticleResourceModel.getArticleId());
 		journalArticleModel.setVersion(versionIndex);
 
-		StringBundler sb = new StringBundler(4);
+		journalArticleModel.setUrlTitle(
+			StringBundler.concat(
+				"TestJournalArticle_", articleIndex, StringPool.UNDERLINE,
+				versionIndex));
 
-		sb.append("TestJournalArticle_");
-		sb.append(articleIndex);
-		sb.append(StringPool.UNDERLINE);
-		sb.append(versionIndex);
-
-		journalArticleModel.setUrlTitle(sb.toString());
-
-		journalArticleModel.setContent(_journalArticleContent);
 		journalArticleModel.setDDMStructureKey(_JOURNAL_STRUCTURE_KEY);
 		journalArticleModel.setDDMTemplateKey(_JOURNAL_STRUCTURE_KEY);
 		journalArticleModel.setDefaultLanguageId("en_US");
@@ -2614,10 +4188,6 @@ public class DataFactory {
 		journalArticleModel.setIndexable(true);
 		journalArticleModel.setLastPublishDate(new Date());
 		journalArticleModel.setStatusDate(new Date());
-
-		if (Validator.isNull(_defaultJournalArticleId)) {
-			_defaultJournalArticleId = journalArticleModel.getArticleId();
-		}
 
 		return journalArticleModel;
 	}
@@ -2656,13 +4226,22 @@ public class DataFactory {
 		return journalArticleResourceModel;
 	}
 
+	public List<PortletPreferenceValueModel>
+		newJournalArticleResourcePortletPreferenceValueModels(
+			PortletPreferencesModel portletPreferencesModel,
+			JournalArticleResourceModel journalArticleResourceModel) {
+
+		return Arrays.asList(
+			newPortletPreferenceValueModel(
+				portletPreferencesModel, "articleId", 0,
+				journalArticleResourceModel.getArticleId()),
+			newPortletPreferenceValueModel(
+				portletPreferencesModel, "groupId", 0,
+				String.valueOf(journalArticleResourceModel.getGroupId())));
+	}
+
 	public PortletPreferencesModel newJournalContentPortletPreferencesModel(
-			FragmentEntryLinkModel fragmentEntryLinkModel)
-		throws Exception {
-
-		PortletPreferences portletPreferences = new PortletPreferencesImpl();
-
-		portletPreferences.setValue("articleId", _defaultJournalArticleId);
+		FragmentEntryLinkModel fragmentEntryLinkModel) {
 
 		PortletPreferencesModel portletPreferencesModel =
 			new PortletPreferencesModelImpl();
@@ -2681,10 +4260,18 @@ public class DataFactory {
 			PortletIdCodec.encode(
 				JournalContentPortletKeys.JOURNAL_CONTENT,
 				fragmentEntryLinkModel.getNamespace()));
-		portletPreferencesModel.setPreferences(
-			_portletPreferencesFactory.toXML(portletPreferences));
 
 		return portletPreferencesModel;
+	}
+
+	public PortletPreferenceValueModel
+		newJournalContentPortletPreferenceValueModel(
+			PortletPreferencesModel portletPreferencesModel,
+			JournalArticleModel journalArticleModel) {
+
+		return newPortletPreferenceValueModel(
+			portletPreferencesModel, "articleId", 0,
+			journalArticleModel.getArticleId());
 	}
 
 	public JournalContentSearchModel newJournalContentSearchModel(
@@ -2716,13 +4303,47 @@ public class DataFactory {
 		return journalContentSearchModel;
 	}
 
-	public List<PortletPreferencesModel> newJournalPortletPreferencesModels(
-		long plid) {
+	public LayoutClassedModelUsageModel newLayoutClassedModelUsageModel(
+		long groupId, long plid, String containerKey,
+		JournalArticleResourceModel journalArticleResourceModel) {
 
-		return Collections.singletonList(
-			newPortletPreferencesModel(
-				plid, JournalPortletKeys.JOURNAL,
-				PortletConstants.DEFAULT_PREFERENCES));
+		LayoutClassedModelUsageModel layoutClassedModelUsageModel =
+			new LayoutClassedModelUsageModelImpl();
+
+		// UUID
+
+		layoutClassedModelUsageModel.setUuid(SequentialUUID.generate());
+
+		// PK fields
+
+		layoutClassedModelUsageModel.setLayoutClassedModelUsageId(
+			_counter.get());
+
+		// Group instance
+
+		layoutClassedModelUsageModel.setGroupId(groupId);
+
+		// Audit fields
+
+		layoutClassedModelUsageModel.setCompanyId(_companyId);
+		layoutClassedModelUsageModel.setCreateDate(new Date());
+		layoutClassedModelUsageModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		layoutClassedModelUsageModel.setClassNameId(
+			getClassNameId(JournalArticle.class));
+		layoutClassedModelUsageModel.setClassPK(
+			journalArticleResourceModel.getResourcePrimKey());
+		layoutClassedModelUsageModel.setContainerKey(containerKey);
+		layoutClassedModelUsageModel.setContainerType(
+			getClassNameId(Portlet.class));
+		layoutClassedModelUsageModel.setPlid(plid);
+		layoutClassedModelUsageModel.setType(
+			LayoutClassedModelUsageConstants.TYPE_LAYOUT);
+		layoutClassedModelUsageModel.setLastPublishDate(new Date());
+
+		return layoutClassedModelUsageModel;
 	}
 
 	public LayoutFriendlyURLModel newLayoutFriendlyURLModel(
@@ -2754,6 +4375,8 @@ public class DataFactory {
 		// Other fields
 
 		layoutFriendlyURLEntryModel.setPlid(layoutModel.getPlid());
+		layoutFriendlyURLEntryModel.setPrivateLayout(
+			layoutModel.getPrivateLayout());
 		layoutFriendlyURLEntryModel.setFriendlyURL(
 			layoutModel.getFriendlyURL());
 		layoutFriendlyURLEntryModel.setLanguageId("en_US");
@@ -2765,59 +4388,8 @@ public class DataFactory {
 	public LayoutModel newLayoutModel(
 		long groupId, String name, String column1, String column2) {
 
-		SimpleCounter simpleCounter = _layoutCounters.get(groupId);
-
-		if (simpleCounter == null) {
-			simpleCounter = new SimpleCounter();
-
-			_layoutCounters.put(groupId, simpleCounter);
-		}
-
-		LayoutModel layoutModel = new LayoutModelImpl();
-
-		// UUID
-
-		layoutModel.setUuid(SequentialUUID.generate());
-
-		// PK fields
-
-		layoutModel.setPlid(_counter.get());
-
-		// Group instance
-
-		layoutModel.setGroupId(groupId);
-
-		// Audit fields
-
-		layoutModel.setCompanyId(_companyId);
-		layoutModel.setUserId(_sampleUserId);
-		layoutModel.setUserName(_SAMPLE_USER_NAME);
-		layoutModel.setCreateDate(new Date());
-		layoutModel.setModifiedDate(new Date());
-
-		// Other fields
-
-		layoutModel.setLayoutId(simpleCounter.get());
-		layoutModel.setName(
-			"<?xml version=\"1.0\"?><root><name>" + name + "</name></root>");
-		layoutModel.setType(LayoutConstants.TYPE_PORTLET);
-
-		UnicodeProperties typeSettingsUnicodeProperties = new UnicodeProperties(
-			true);
-
-		typeSettingsUnicodeProperties.setProperty(
-			LayoutTypePortletConstants.LAYOUT_TEMPLATE_ID, "2_columns_ii");
-		typeSettingsUnicodeProperties.setProperty("column-1", column1);
-		typeSettingsUnicodeProperties.setProperty("column-2", column2);
-
-		layoutModel.setTypeSettings(
-			StringUtil.replace(
-				typeSettingsUnicodeProperties.toString(), '\n', "\\n"));
-
-		layoutModel.setFriendlyURL(StringPool.FORWARD_SLASH + name);
-		layoutModel.setLastPublishDate(new Date());
-
-		return layoutModel;
+		return newLayoutModel(
+			groupId, name, false, "2_columns_ii", column1, column2);
 	}
 
 	public LayoutPageTemplateStructureModel newLayoutPageTemplateStructureModel(
@@ -2905,10 +4477,73 @@ public class DataFactory {
 		return layoutPageTemplateStructureRelModel;
 	}
 
+	public LayoutPageTemplateStructureRelModel
+			newLayoutPageTemplateStructureRelModel(
+				LayoutModel layoutModel,
+				LayoutPageTemplateStructureModel
+					layoutPageTemplateStructureModel,
+				List<FragmentEntryLinkModel> fragmentEntryLinkModels,
+				String templateFileName)
+		throws Exception {
+
+		List<FragmentEntryLinkModel> targetFragmentEntryLinkModels =
+			new ArrayList<>();
+
+		for (FragmentEntryLinkModel model : fragmentEntryLinkModels) {
+			if (model.getPlid() == layoutModel.getPlid()) {
+				targetFragmentEntryLinkModels.add(model);
+			}
+		}
+
+		LayoutPageTemplateStructureRelModel
+			layoutPageTemplateStructureRelModel =
+				new LayoutPageTemplateStructureRelModelImpl();
+
+		// UUID
+
+		layoutPageTemplateStructureRelModel.setUuid(SequentialUUID.generate());
+
+		// PK fields
+
+		layoutPageTemplateStructureRelModel.setLayoutPageTemplateStructureRelId(
+			_counter.get());
+
+		// Group instance
+
+		layoutPageTemplateStructureRelModel.setGroupId(
+			layoutPageTemplateStructureModel.getGroupId());
+
+		// Audit fields
+
+		layoutPageTemplateStructureRelModel.setCompanyId(_companyId);
+		layoutPageTemplateStructureRelModel.setUserId(_sampleUserId);
+		layoutPageTemplateStructureRelModel.setUserName(_SAMPLE_USER_NAME);
+		layoutPageTemplateStructureRelModel.setCreateDate(new Date());
+		layoutPageTemplateStructureRelModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		layoutPageTemplateStructureRelModel.setLayoutPageTemplateStructureId(
+			layoutPageTemplateStructureModel.
+				getLayoutPageTemplateStructureId());
+		layoutPageTemplateStructureRelModel.setSegmentsExperienceId(0L);
+
+		layoutPageTemplateStructureRelModel.setData(
+			_generateJsonData(targetFragmentEntryLinkModels, templateFileName));
+
+		return layoutPageTemplateStructureRelModel;
+	}
+
 	public List<LayoutSetModel> newLayoutSetModels(long groupId) {
+		return newLayoutSetModels(groupId, "classic_WAR_classictheme");
+	}
+
+	public List<LayoutSetModel> newLayoutSetModels(
+		long groupId, String themeId) {
+
 		return ListUtil.fromArray(
-			newLayoutSetModel(groupId, true),
-			newLayoutSetModel(groupId, false));
+			newLayoutSetModel(groupId, true, themeId),
+			newLayoutSetModel(groupId, false, themeId));
 	}
 
 	public List<MBCategoryModel> newMBCategoryModels(long groupId) {
@@ -2920,32 +4555,6 @@ public class DataFactory {
 		}
 
 		return mbCategoryModels;
-	}
-
-	public AssetEntryModel newMBDiscussionAssetEntryModel(
-		BlogsEntryModel blogsEntryModel) {
-
-		ClassNameModel classNameModel = _classNameModels.get(
-			_getMBDiscussionCombinedClassName(BlogsEntry.class));
-
-		return newAssetEntryModel(
-			blogsEntryModel.getGroupId(), blogsEntryModel.getCreateDate(),
-			blogsEntryModel.getModifiedDate(), classNameModel.getClassNameId(),
-			blogsEntryModel.getEntryId(), "", 0, true, false, "",
-			String.valueOf(blogsEntryModel.getGroupId()));
-	}
-
-	public AssetEntryModel newMBDiscussionAssetEntryModel(
-		WikiPageModel wikiPageModel) {
-
-		ClassNameModel classNameModel = _classNameModels.get(
-			_getMBDiscussionCombinedClassName(WikiPage.class));
-
-		return newAssetEntryModel(
-			wikiPageModel.getGroupId(), wikiPageModel.getCreateDate(),
-			wikiPageModel.getModifiedDate(), classNameModel.getClassNameId(),
-			wikiPageModel.getResourcePrimKey(), "", 0, true, false, "",
-			String.valueOf(wikiPageModel.getGroupId()));
 	}
 
 	public MBDiscussionModel newMBDiscussionModel(
@@ -3095,32 +4704,6 @@ public class DataFactory {
 		return mbMessageModels;
 	}
 
-	public MBStatsUserModel newMBStatsUserModel(long groupId) {
-		MBStatsUserModel mbStatsUserModel = new MBStatsUserModelImpl();
-
-		// PK fields
-
-		mbStatsUserModel.setStatsUserId(_counter.get());
-
-		// Group instance
-
-		mbStatsUserModel.setGroupId(groupId);
-
-		// Audit fields
-
-		mbStatsUserModel.setUserId(_sampleUserId);
-
-		// Other fields
-
-		mbStatsUserModel.setMessageCount(
-			BenchmarksPropsValues.MAX_MB_CATEGORY_COUNT *
-				BenchmarksPropsValues.MAX_MB_THREAD_COUNT *
-					BenchmarksPropsValues.MAX_MB_MESSAGE_COUNT);
-		mbStatsUserModel.setLastPostDate(new Date());
-
-		return mbStatsUserModel;
-	}
-
 	public MBThreadFlagModel newMBThreadFlagModel(MBThreadModel mbThreadModel) {
 		MBThreadFlagModel mbThreadFlagModel = new MBThreadFlagModelImpl();
 
@@ -3180,13 +4763,41 @@ public class DataFactory {
 		return new ObjectValuePair<>(key, value);
 	}
 
+	public List<PortalPreferencesModel> newPortalPreferencesModels() {
+		return ListUtil.fromArray(
+			newPortalPreferencesModel(_companyId),
+			newPortalPreferencesModel(0));
+	}
+
 	public PortletPreferencesModel newPortletPreferencesModel(
-			long plid, long groupId, String portletId, int currentIndex)
-		throws Exception {
+		long ownerId, int ownerType, long plid, String portletId) {
+
+		PortletPreferencesModel portletPreferencesModel =
+			new PortletPreferencesModelImpl();
+
+		// PK fields
+
+		portletPreferencesModel.setPortletPreferencesId(_counter.get());
+
+		// Audit fields
+
+		portletPreferencesModel.setCompanyId(_companyId);
+
+		// Other fields
+
+		portletPreferencesModel.setOwnerId(ownerId);
+		portletPreferencesModel.setOwnerType(ownerType);
+		portletPreferencesModel.setPlid(plid);
+		portletPreferencesModel.setPortletId(portletId);
+
+		return portletPreferencesModel;
+	}
+
+	public PortletPreferencesModel newPortletPreferencesModel(
+		long plid, long groupId, String portletId, int currentIndex) {
 
 		if (currentIndex == 1) {
-			return newPortletPreferencesModel(
-				plid, portletId, PortletConstants.DEFAULT_PREFERENCES);
+			return newPortletPreferencesModel(plid, portletId);
 		}
 
 		String assetPublisherQueryName = "assetCategories";
@@ -3211,8 +4822,7 @@ public class DataFactory {
 				assetCategoryModelsMap.get(getNextAssetClassNameId(groupId));
 
 			if (ListUtil.isEmpty(assetCategoryModels)) {
-				return newPortletPreferencesModel(
-					plid, portletId, PortletConstants.DEFAULT_PREFERENCES);
+				return newPortletPreferencesModel(plid, portletId);
 			}
 
 			objectValuePair = getAssetPublisherAssetCategoriesQueryValues(
@@ -3226,131 +4836,100 @@ public class DataFactory {
 				getNextAssetClassNameId(groupId));
 
 			if (ListUtil.isEmpty(assetTagModels)) {
-				return newPortletPreferencesModel(
-					plid, portletId, PortletConstants.DEFAULT_PREFERENCES);
+				return newPortletPreferencesModel(plid, portletId);
 			}
 
 			objectValuePair = getAssetPublisherAssetTagsQueryValues(
 				assetTagModels, startIndex);
 		}
 
-		String[] assetPublisherQueryValues = objectValuePair.getKey();
-
 		_assetPublisherQueryStartIndexes.put(
 			groupId, objectValuePair.getValue());
 
-		PortletPreferences jxPortletPreferences =
-			(PortletPreferences)
-				_defaultAssetPublisherPortletPreferencesImpl.clone();
-
-		jxPortletPreferences.setValue("queryAndOperator0", "false");
-		jxPortletPreferences.setValue("queryContains0", "true");
-		jxPortletPreferences.setValue("queryName0", assetPublisherQueryName);
-		jxPortletPreferences.setValues(
-			"queryValues0",
-			new String[] {
-				assetPublisherQueryValues[0], assetPublisherQueryValues[1],
-				assetPublisherQueryValues[2]
-			});
-		jxPortletPreferences.setValue("queryAndOperator1", "false");
-		jxPortletPreferences.setValue("queryContains1", "false");
-		jxPortletPreferences.setValue("queryName1", assetPublisherQueryName);
-		jxPortletPreferences.setValue(
-			"queryValues1", assetPublisherQueryValues[3]);
-
-		return newPortletPreferencesModel(
-			plid, portletId,
-			_portletPreferencesFactory.toXML(jxPortletPreferences));
+		return newPortletPreferencesModel(plid, portletId);
 	}
 
 	public PortletPreferencesModel newPortletPreferencesModel(
-			long plid, String portletId, DDLRecordSetModel ddlRecordSetModel)
-		throws Exception {
-
-		PortletPreferences jxPortletPreferences = new PortletPreferencesImpl();
-
-		jxPortletPreferences.setValue("editable", "true");
-		jxPortletPreferences.setValue(
-			"recordSetId", String.valueOf(ddlRecordSetModel.getRecordSetId()));
-		jxPortletPreferences.setValue("spreadsheet", "false");
+		long plid, String portletId) {
 
 		return newPortletPreferencesModel(
-			plid, portletId,
-			_portletPreferencesFactory.toXML(jxPortletPreferences));
+			PortletKeys.PREFS_OWNER_ID_DEFAULT,
+			PortletKeys.PREFS_OWNER_TYPE_LAYOUT, plid, portletId);
 	}
 
-	public PortletPreferencesModel newPortletPreferencesModel(
-			long plid, String portletId,
-			JournalArticleResourceModel journalArticleResourceModel)
-		throws Exception {
+	public PortletPreferenceValueModel newPortletPreferenceValueModel(
+		PortletPreferencesModel portletPreferencesModel, String name, int index,
+		String value) {
 
-		PortletPreferences jxPortletPreferences = new PortletPreferencesImpl();
+		PortletPreferenceValueModel portletPreferenceValueModel =
+			new PortletPreferenceValueModelImpl();
 
-		jxPortletPreferences.setValue(
-			"articleId", journalArticleResourceModel.getArticleId());
-		jxPortletPreferences.setValue(
-			"groupId",
-			String.valueOf(journalArticleResourceModel.getGroupId()));
+		portletPreferenceValueModel.setPortletPreferenceValueId(
+			_portletPreferenceValueIdCounter.get());
+		portletPreferenceValueModel.setPortletPreferencesId(
+			portletPreferencesModel.getPortletPreferencesId());
+		portletPreferenceValueModel.setName(name);
+		portletPreferenceValueModel.setIndex(index);
 
-		return newPortletPreferencesModel(
-			plid, portletId,
-			_portletPreferencesFactory.toXML(jxPortletPreferences));
+		if (value.length() >
+				PortletPreferenceValueImpl.SMALL_VALUE_MAX_LENGTH) {
+
+			portletPreferenceValueModel.setLargeValue(value);
+		}
+		else {
+			portletPreferenceValueModel.setSmallValue(value);
+		}
+
+		return portletPreferenceValueModel;
 	}
 
-	public List<LayoutModel> newPublicLayoutModels(long groupId) {
-		return ListUtil.fromArray(
-			newLayoutModel(
-				groupId, "welcome", LoginPortletKeys.LOGIN + ",",
-				HelloWorldPortletKeys.HELLO_WORLD + ","),
-			newLayoutModel(groupId, "blogs", "", BlogsPortletKeys.BLOGS + ","),
-			newLayoutModel(
-				groupId, "commerce_product", "",
-				CPPortletKeys.CP_CONTENT_WEB + ","),
-			newLayoutModel(
-				groupId, "document_library", "",
-				DLPortletKeys.DOCUMENT_LIBRARY + ","),
-			newLayoutModel(
-				groupId, "forums", "", MBPortletKeys.MESSAGE_BOARDS + ","),
-			newLayoutModel(groupId, "wiki", "", WikiPortletKeys.WIKI + ","));
-	}
-
-	public List<ReleaseModel> newReleaseModels() throws IOException {
+	public List<ReleaseModel> newReleaseModels() throws Exception {
 		List<ReleaseModel> releases = new ArrayList<>();
-
-		Version latestSchemaVersion =
-			PortalUpgradeProcess.getLatestSchemaVersion();
 
 		releases.add(
 			newReleaseModel(
 				ReleaseConstants.DEFAULT_ID,
 				ReleaseConstants.DEFAULT_SERVLET_CONTEXT_NAME,
-				latestSchemaVersion.toString(), ReleaseInfo.getBuildNumber(),
-				false, ReleaseConstants.TEST_STRING));
+				String.valueOf(PortalUpgradeProcess.getLatestSchemaVersion()),
+				ReleaseInfo.getBuildNumber(), false,
+				ReleaseConstants.TEST_STRING));
 
-		try (InputStream inputStream = DataFactory.class.getResourceAsStream(
-				"dependencies/releases.txt");
-			Reader reader = new InputStreamReader(inputStream);
-			UnsyncBufferedReader unsyncBufferedReader =
-				new UnsyncBufferedReader(reader)) {
+		for (String release :
+				_readLines(
+					DataFactory.class.getResourceAsStream(
+						"dependencies/releases.txt"))) {
 
-			String line = null;
+			String[] parts = StringUtil.split(release, CharPool.COLON);
 
-			while ((line = unsyncBufferedReader.readLine()) != null) {
-				String[] parts = StringUtil.split(line, CharPool.COLON);
+			if (parts.length > 0) {
+				String servletContextName = parts[0];
+				String schemaVersion = parts[1];
 
-				if (parts.length > 0) {
-					String servletContextName = parts[0];
-					String schemaVersion = parts[1];
-
-					releases.add(
-						newReleaseModel(
-							_counter.get(), servletContextName, schemaVersion,
-							0, true, null));
-				}
+				releases.add(
+					newReleaseModel(
+						_counter.get(), servletContextName, schemaVersion, 0,
+						true, null));
 			}
 		}
 
 		return releases;
+	}
+
+	public List<ResourcePermissionModel> newResourcePermissionModels(
+		AccountEntryModel accountEntryModel) {
+
+		return newResourcePermissionModels(
+			AccountEntry.class.getName(),
+			String.valueOf(accountEntryModel.getAccountEntryId()),
+			_sampleUserId);
+	}
+
+	public List<ResourcePermissionModel> newResourcePermissionModels(
+		AddressModel addressModel) {
+
+		return newResourcePermissionModels(
+			Address.class.getName(),
+			String.valueOf(addressModel.getAddressId()), _sampleUserId);
 	}
 
 	public List<ResourcePermissionModel> newResourcePermissionModels(
@@ -3387,63 +4966,116 @@ public class DataFactory {
 	}
 
 	public List<ResourcePermissionModel> newResourcePermissionModels(
+		CommerceInventoryWarehouseModel commerceInventoryWarehouseModel) {
+
+		return newResourcePermissionModels(
+			CommerceInventoryWarehouse.class.getName(),
+			String.valueOf(
+				commerceInventoryWarehouseModel.
+					getCommerceInventoryWarehouseId()),
+			_sampleUserId);
+	}
+
+	public List<ResourcePermissionModel> newResourcePermissionModels(
+		CommercePriceListModel commercePriceListModel) {
+
+		return newResourcePermissionModels(
+			CommercePriceList.class.getName(),
+			String.valueOf(commercePriceListModel.getCommercePriceListId()),
+			_sampleUserId);
+	}
+
+	public List<ResourcePermissionModel> newResourcePermissionModels(
+		CommerceShippingFixedOptionModel commerceShippingFixedOptionModel) {
+
+		return newResourcePermissionModels(
+			CommerceShippingFixedOption.class.getName(),
+			String.valueOf(
+				commerceShippingFixedOptionModel.
+					getCommerceShippingFixedOptionId()),
+			_sampleUserId);
+	}
+
+	public List<ResourcePermissionModel> newResourcePermissionModels(
+		CommerceShippingMethodModel commerceShippingMethodModel) {
+
+		return newResourcePermissionModels(
+			CommerceShippingMethod.class.getName(),
+			String.valueOf(
+				commerceShippingMethodModel.getCommerceShippingMethodId()),
+			_sampleUserId);
+	}
+
+	public List<ResourcePermissionModel> newResourcePermissionModels(
+		CountryModel countryModel) {
+
+		return newResourcePermissionModels(
+			Country.class.getName(),
+			String.valueOf(countryModel.getCountryId()), _sampleUserId);
+	}
+
+	public List<ResourcePermissionModel> newResourcePermissionModels(
+		CPOptionCategoryModel cpOptionCategoryModel) {
+
+		return newResourcePermissionModels(
+			CPOptionCategory.class.getName(),
+			String.valueOf(cpOptionCategoryModel.getCPOptionCategoryId()),
+			_sampleUserId);
+	}
+
+	public List<ResourcePermissionModel> newResourcePermissionModels(
+		CPOptionModel cpOptionModel) {
+
+		return newResourcePermissionModels(
+			CPOption.class.getName(),
+			String.valueOf(cpOptionModel.getCPOptionId()), _sampleUserId);
+	}
+
+	public List<ResourcePermissionModel> newResourcePermissionModels(
+		CPSpecificationOptionModel cpSpecificationOptionModel) {
+
+		return newResourcePermissionModels(
+			CPSpecificationOption.class.getName(),
+			String.valueOf(
+				cpSpecificationOptionModel.getCPSpecificationOptionId()),
+			_sampleUserId);
+	}
+
+	public List<ResourcePermissionModel> newResourcePermissionModels(
 		DDLRecordSetModel ddlRecordSetModel) {
 
-		return Collections.singletonList(
-			newResourcePermissionModel(
-				DDLRecordSet.class.getName(),
-				String.valueOf(ddlRecordSetModel.getRecordSetId()),
-				_ownerRoleModel.getRoleId(), _defaultUserId));
+		return newResourcePermissionModels(
+			DDLRecordSet.class.getName(),
+			String.valueOf(ddlRecordSetModel.getRecordSetId()), _sampleUserId);
 	}
 
 	public List<ResourcePermissionModel> newResourcePermissionModels(
 		DDMStructureModel ddmStructureModel) {
-
-		List<ResourcePermissionModel> resourcePermissionModels =
-			new ArrayList<>(3);
 
 		String name = _getResourcePermissionModelName(
 			DDMStructure.class.getName(),
 			getClassName(ddmStructureModel.getClassNameId()));
 		String primKey = String.valueOf(ddmStructureModel.getStructureId());
 
-		resourcePermissionModels.add(
-			newResourcePermissionModel(
-				name, primKey, _guestRoleModel.getRoleId(), 0));
-		resourcePermissionModels.add(
-			newResourcePermissionModel(
-				name, primKey, _ownerRoleModel.getRoleId(),
-				ddmStructureModel.getUserId()));
-		resourcePermissionModels.add(
-			newResourcePermissionModel(
-				name, primKey, _userRoleModel.getRoleId(), 0));
-
-		return resourcePermissionModels;
+		return newResourcePermissionModels(name, primKey, _sampleUserId);
 	}
 
 	public List<ResourcePermissionModel> newResourcePermissionModels(
 		DDMTemplateModel ddmTemplateModel) {
 
-		List<ResourcePermissionModel> resourcePermissionModels =
-			new ArrayList<>(3);
+		String className = getClassName(
+			ddmTemplateModel.getResourceClassNameId());
 
 		String name = _getResourcePermissionModelName(
-			DDMTemplate.class.getName(),
-			getClassName(ddmTemplateModel.getResourceClassNameId()));
+			DDMTemplate.class.getName(), className);
+
+		if (className.equals(PortletDisplayTemplate.class.getName())) {
+			name = DDMTemplate.class.getName();
+		}
+
 		String primKey = String.valueOf(ddmTemplateModel.getTemplateId());
 
-		resourcePermissionModels.add(
-			newResourcePermissionModel(
-				name, primKey, _guestRoleModel.getRoleId(), 0));
-		resourcePermissionModels.add(
-			newResourcePermissionModel(
-				name, primKey, _ownerRoleModel.getRoleId(),
-				ddmTemplateModel.getUserId()));
-		resourcePermissionModels.add(
-			newResourcePermissionModel(
-				name, primKey, _userRoleModel.getRoleId(), 0));
-
-		return resourcePermissionModels;
+		return newResourcePermissionModels(name, primKey, _sampleUserId);
 	}
 
 	public List<ResourcePermissionModel> newResourcePermissionModels(
@@ -3510,14 +5142,12 @@ public class DataFactory {
 
 		String name = portletId;
 
-		int index = portletId.indexOf(StringPool.UNDERLINE);
-
-		if (index > 0) {
-			name = portletId.substring(0, index);
-		}
-
 		String primKey = PortletPermissionUtil.getPrimaryKey(
 			portletPreferencesModel.getPlid(), portletId);
+
+		if (portletPreferencesModel.getPlid() <= 0) {
+			primKey = String.valueOf(portletPreferencesModel.getOwnerId());
+		}
 
 		return newResourcePermissionModels(name, primKey, 0);
 	}
@@ -3529,6 +5159,16 @@ public class DataFactory {
 			newResourcePermissionModel(
 				Role.class.getName(), String.valueOf(roleModel.getRoleId()),
 				_ownerRoleModel.getRoleId(), _sampleUserId));
+	}
+
+	public List<ResourcePermissionModel> newResourcePermissionModels(
+		SegmentsEntryModel segmentsEntryModel) {
+
+		return Collections.singletonList(
+			newResourcePermissionModel(
+				SegmentsEntry.class.getName(),
+				String.valueOf(segmentsEntryModel.getSegmentsEntryId()),
+				_guestRoleModel.getRoleId(), _sampleUserId));
 	}
 
 	public List<ResourcePermissionModel> newResourcePermissionModels(
@@ -3563,10 +5203,147 @@ public class DataFactory {
 			String.valueOf(wikiPageModel.getResourcePrimKey()), _sampleUserId);
 	}
 
+	public List<RoleModel> newRoleModels() {
+		List<RoleModel> roleModels = new ArrayList<>();
+
+		// Administrator
+
+		_administratorRoleModel = newRoleModel(
+			RoleConstants.ADMINISTRATOR, RoleConstants.TYPE_REGULAR);
+
+		roleModels.add(_administratorRoleModel);
+
+		// Guest
+
+		_guestRoleModel = newRoleModel(
+			RoleConstants.GUEST, RoleConstants.TYPE_REGULAR);
+
+		roleModels.add(_guestRoleModel);
+
+		// Organization Administrator
+
+		roleModels.add(
+			newRoleModel(
+				RoleConstants.ORGANIZATION_ADMINISTRATOR,
+				RoleConstants.TYPE_ORGANIZATION));
+
+		// Organization Owner
+
+		roleModels.add(
+			newRoleModel(
+				RoleConstants.ORGANIZATION_OWNER,
+				RoleConstants.TYPE_ORGANIZATION));
+
+		// Organization User
+
+		roleModels.add(
+			newRoleModel(
+				RoleConstants.ORGANIZATION_USER,
+				RoleConstants.TYPE_ORGANIZATION));
+
+		// Owner
+
+		_ownerRoleModel = newRoleModel(
+			RoleConstants.OWNER, RoleConstants.TYPE_REGULAR);
+
+		roleModels.add(_ownerRoleModel);
+
+		// Power User
+
+		_powerUserRoleModel = newRoleModel(
+			RoleConstants.POWER_USER, RoleConstants.TYPE_REGULAR);
+
+		roleModels.add(_powerUserRoleModel);
+
+		// Site Administrator
+
+		roleModels.add(
+			newRoleModel(
+				RoleConstants.SITE_ADMINISTRATOR, RoleConstants.TYPE_SITE));
+
+		// Site Member
+
+		_siteMemberRoleModel = newRoleModel(
+			RoleConstants.SITE_MEMBER, RoleConstants.TYPE_SITE);
+
+		roleModels.add(_siteMemberRoleModel);
+
+		// Site Owner
+
+		roleModels.add(
+			newRoleModel(RoleConstants.SITE_OWNER, RoleConstants.TYPE_SITE));
+
+		// User
+
+		_userRoleModel = newRoleModel(
+			RoleConstants.USER, RoleConstants.TYPE_REGULAR);
+
+		roleModels.add(_userRoleModel);
+
+		return roleModels;
+	}
+
 	public UserModel newSampleUserModel() {
+		_sampleUserId = _counter.get();
+
 		return newUserModel(
 			_sampleUserId, _SAMPLE_USER_NAME, _SAMPLE_USER_NAME,
 			_SAMPLE_USER_NAME, false);
+	}
+
+	public SegmentsEntry newSegmentsEntry(long groupId, int index) {
+		SegmentsEntry segmentsEntry = new SegmentsEntryImpl();
+
+		// UUID
+
+		segmentsEntry.setUuid(SequentialUUID.generate());
+
+		// PK fields
+
+		segmentsEntry.setSegmentsEntryId(_counter.get());
+
+		// Group instance
+
+		segmentsEntry.setGroupId(groupId);
+
+		// Audit fields
+
+		segmentsEntry.setCompanyId(_companyId);
+		segmentsEntry.setUserId(_sampleUserId);
+		segmentsEntry.setUserName(_SAMPLE_USER_NAME);
+		segmentsEntry.setCreateDate(new Date());
+		segmentsEntry.setModifiedDate(new Date());
+
+		// Other fields
+
+		segmentsEntry.setSegmentsEntryKey(_counter.getString());
+
+		segmentsEntry.setName(
+			StringBundler.concat(
+				"<?xml version=\"1.0\"?><root available-locales=\"en_US\" ",
+				"default-locale=\"en_US\"><Name language-id=\"en_US\">",
+				"SampleSegment", index, "</Name></root>"));
+
+		segmentsEntry.setActive(true);
+
+		Criteria criteria = new Criteria();
+
+		String filterString = StringBundler.concat(
+			"(firstName eq ''", _SAMPLE_USER_NAME, index, "'')");
+
+		criteria.addCriterion(
+			"user", Criteria.Type.MODEL, filterString,
+			Criteria.Conjunction.AND);
+
+		criteria.addFilter(
+			Criteria.Type.MODEL, filterString, Criteria.Conjunction.AND);
+
+		segmentsEntry.setCriteria(CriteriaSerializer.serialize(criteria));
+
+		segmentsEntry.setSource(SegmentsEntryConstants.SOURCE_DEFAULT);
+		segmentsEntry.setType(User.class.getName());
+
+		return segmentsEntry;
 	}
 
 	public SocialActivityModel newSocialActivityModel(
@@ -3628,15 +5405,9 @@ public class DataFactory {
 			classPK = mbMessageModel.getMessageId();
 		}
 		else {
-			StringBundler sb = new StringBundler(5);
-
-			sb.append("{\"messageId\": \"");
-			sb.append(mbMessageModel.getMessageId());
-			sb.append("\", \"title\": ");
-			sb.append(mbMessageModel.getSubject());
-			sb.append("}");
-
-			extraData = sb.toString();
+			extraData = StringBundler.concat(
+				"{\"messageId\": \"", mbMessageModel.getMessageId(),
+				"\", \"title\": ", mbMessageModel.getSubject(), "}");
 
 			type = SocialActivityConstants.TYPE_ADD_COMMENT;
 		}
@@ -3680,7 +5451,7 @@ public class DataFactory {
 
 	public GroupModel newUserPersonalSiteGroupModel() {
 		return newGroupModel(
-			_userPersonalSiteGroupId, getClassNameId(UserPersonalSite.class),
+			_counter.get(), getClassNameId(UserPersonalSite.class),
 			_defaultUserId, GroupConstants.USER_PERSONAL_SITE, false);
 	}
 
@@ -3780,6 +5551,10 @@ public class DataFactory {
 					}
 				}
 				catch (NoSuchMethodException noSuchMethodException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							noSuchMethodException, noSuchMethodException);
+					}
 				}
 			}
 
@@ -3794,19 +5569,9 @@ public class DataFactory {
 		String mappingTableName, long companyId, long leftPrimaryKey,
 		long rightPrimaryKey) {
 
-		StringBundler sb = new StringBundler(9);
-
-		sb.append("insert into ");
-		sb.append(mappingTableName);
-		sb.append(" values (");
-		sb.append(companyId);
-		sb.append(", ");
-		sb.append(leftPrimaryKey);
-		sb.append(", ");
-		sb.append(rightPrimaryKey);
-		sb.append(", 0, null);");
-
-		return sb.toString();
+		return StringBundler.concat(
+			"insert into ", mappingTableName, " values (", companyId, ", ",
+			leftPrimaryKey, ", ", rightPrimaryKey, ", 0, null);");
 	}
 
 	protected ObjectValuePair<String[], Integer>
@@ -3868,12 +5633,38 @@ public class DataFactory {
 			"Unable to find class name for id " + classNameId);
 	}
 
+	protected String[] getPortletNames(JSONArray jsonArray) {
+		Map<String, String> portletNames = new LinkedHashMap<>();
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			String portletName = jsonObject.getString("portletName");
+
+			if (ArrayUtil.contains(
+					BenchmarksPropsValues.COMMERCE_LAYOUT_EXCLUDED_PORTLETS,
+					portletName)) {
+
+				continue;
+			}
+
+			String key = jsonObject.getString("layoutColumnId");
+
+			if (portletNames.containsKey(key)) {
+				portletNames.put(
+					key,
+					portletNames.get(key) + StringPool.COMMA + portletName);
+			}
+			else {
+				portletNames.put(key, portletName);
+			}
+		}
+
+		return ArrayUtil.toStringArray(portletNames.values());
+	}
+
 	protected InputStream getResourceInputStream(String resourceName) {
-		Class<?> clazz = getClass();
-
-		ClassLoader classLoader = clazz.getClassLoader();
-
-		return classLoader.getResourceAsStream(
+		return DataFactory.class.getResourceAsStream(
 			_DEPENDENCIES_DIR + resourceName);
 	}
 
@@ -3934,14 +5725,11 @@ public class DataFactory {
 			"/" + assetCategoryModel.getCategoryId() + "/");
 		assetCategoryModel.setName(name);
 
-		StringBundler sb = new StringBundler(4);
-
-		sb.append("<?xml version=\"1.0\"?><root available-locales=\"en_US\" ");
-		sb.append("default-locale=\"en_US\"><Title language-id=\"en_US\">");
-		sb.append(name);
-		sb.append("</Title></root>");
-
-		assetCategoryModel.setTitle(sb.toString());
+		assetCategoryModel.setTitle(
+			StringBundler.concat(
+				"<?xml version=\"1.0\"?><root available-locales=\"en_US\" ",
+				"default-locale=\"en_US\"><Title language-id=\"en_US\">", name,
+				"</Title></root>"));
 
 		assetCategoryModel.setVocabularyId(vocabularyId);
 		assetCategoryModel.setLastPublishDate(new Date());
@@ -4020,14 +5808,11 @@ public class DataFactory {
 
 		assetVocabularyModel.setName(name);
 
-		StringBundler sb = new StringBundler(4);
-
-		sb.append("<?xml version=\"1.0\"?><root available-locales=\"en_US\" ");
-		sb.append("default-locale=\"en_US\"><Title language-id=\"en_US\">");
-		sb.append(name);
-		sb.append("</Title></root>");
-
-		assetVocabularyModel.setTitle(sb.toString());
+		assetVocabularyModel.setTitle(
+			StringBundler.concat(
+				"<?xml version=\"1.0\"?><root available-locales=\"en_US\" ",
+				"default-locale=\"en_US\"><Title language-id=\"en_US\">", name,
+				"</Title></root>"));
 
 		assetVocabularyModel.setSettings(
 			"multiValued=true\\nselectedClassNameIds=0");
@@ -4073,41 +5858,169 @@ public class DataFactory {
 		return blogsEntryModel;
 	}
 
-	protected DDMContentModel newDDMContentModel(
-		long contentId, long groupId, String data) {
+	protected List<PortletPreferenceValueModel>
+			newCommercePortletPreferenceValueModels(
+				List<PortletPreferencesModel> portletPreferencesModels,
+				JSONArray jsonArray)
+		throws Exception {
 
-		DDMContentModel ddmContentModel = new DDMContentModelImpl();
+		List<PortletPreferenceValueModel> portletPreferenceValueModels =
+			new ArrayList<>();
 
-		// UUID
+		for (PortletPreferencesModel portletPreferencesModel :
+				portletPreferencesModels) {
 
-		ddmContentModel.setUuid(SequentialUUID.generate());
+			for (int i = 0; i < jsonArray.length(); i++) {
+				JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-		// PK fields
+				String portletId = jsonObject.getString("portletName");
 
-		ddmContentModel.setContentId(contentId);
+				if (jsonObject.getString("instanceId") != null) {
+					portletId =
+						portletId + "_INSTANCE_" +
+							jsonObject.getString("instanceId");
+				}
 
-		// Group instance
+				if (portletId.equals(portletPreferencesModel.getPortletId())) {
+					JSONObject portletPreferencesJSONObject =
+						jsonObject.getJSONObject("portletPreferences");
 
-		ddmContentModel.setGroupId(groupId);
+					if (portletPreferencesJSONObject == null) {
+						continue;
+					}
+
+					for (String key : portletPreferencesJSONObject.keySet()) {
+						String value = portletPreferencesJSONObject.getString(
+							key);
+
+						if (key.equals("displayStyle")) {
+							JSONObject displayStyleJSONObject =
+								portletPreferencesJSONObject.getJSONObject(key);
+
+							String name = StringUtil.removeSubstring(
+								displayStyleJSONObject.getString("FileName"),
+								".ftl");
+
+							value = "ddmTemplate_" + name;
+						}
+
+						portletPreferenceValueModels.add(
+							newPortletPreferenceValueModel(
+								portletPreferencesModel, key, 0, value));
+					}
+
+					break;
+				}
+			}
+		}
+
+		return portletPreferenceValueModels;
+	}
+
+	protected DDMFieldAttributeModel newDDMFieldAttributeModel(
+		DDMFieldModel ddmFieldModel, long storageId, String attributeName,
+		String languageId, String smallAttributeValue) {
+
+		return newDDMFieldAttributeModel(
+			ddmFieldModel, storageId, attributeName, languageId,
+			smallAttributeValue, "");
+	}
+
+	protected DDMFieldAttributeModel newDDMFieldAttributeModel(
+		DDMFieldModel ddmFieldModel, long storageId, String attributeName,
+		String languageId, String smallAttributeValue,
+		String largeAttributeValue) {
+
+		DDMFieldAttributeModel ddmFieldAttributeModel =
+			new DDMFieldAttributeModelImpl();
+
+		//  PK fields
+
+		ddmFieldAttributeModel.setFieldAttributeId(_counter.get());
 
 		// Audit fields
 
-		ddmContentModel.setCompanyId(_companyId);
-		ddmContentModel.setUserId(_sampleUserId);
-		ddmContentModel.setUserName(_SAMPLE_USER_NAME);
-		ddmContentModel.setCreateDate(nextFutureDate());
-		ddmContentModel.setModifiedDate(nextFutureDate());
+		ddmFieldAttributeModel.setCompanyId(_companyId);
 
 		// Other fields
 
-		ddmContentModel.setName(DDMStorageLink.class.getName());
-		ddmContentModel.setData(data);
+		ddmFieldAttributeModel.setFieldId(ddmFieldModel.getFieldId());
+		ddmFieldAttributeModel.setStorageId(storageId);
+		ddmFieldAttributeModel.setAttributeName(attributeName);
+		ddmFieldAttributeModel.setLanguageId(languageId);
+		ddmFieldAttributeModel.setLargeAttributeValue(largeAttributeValue);
+		ddmFieldAttributeModel.setSmallAttributeValue(smallAttributeValue);
 
-		return ddmContentModel;
+		return ddmFieldAttributeModel;
+	}
+
+	protected DDMFieldModel newDDMFieldModel(
+		long storageId, long structureVersionId, String fieldName,
+		String fieldType, String instanceId, boolean localizable,
+		int priority) {
+
+		DDMFieldModel ddmFieldModel = new DDMFieldModelImpl();
+
+		// PK fields
+
+		ddmFieldModel.setFieldId(_counter.get());
+
+		// Audit fields
+
+		ddmFieldModel.setCompanyId(_companyId);
+
+		// Other fields
+
+		ddmFieldModel.setParentFieldId(0);
+		ddmFieldModel.setStorageId(storageId);
+		ddmFieldModel.setStructureVersionId(structureVersionId);
+		ddmFieldModel.setFieldName(fieldName);
+		ddmFieldModel.setFieldType(fieldType);
+		ddmFieldModel.setInstanceId(instanceId);
+		ddmFieldModel.setLocalizable(localizable);
+		ddmFieldModel.setPriority(priority);
+
+		return ddmFieldModel;
+	}
+
+	protected DDMStorageLinkModel newDDMStorageLinkModel(
+		long ddmStorageLinkId, long classPK, long structureId, long versionId) {
+
+		DDMStorageLinkModel ddmStorageLinkModel = new DDMStorageLinkModelImpl();
+
+		// UUID
+
+		ddmStorageLinkModel.setUuid(SequentialUUID.generate());
+
+		// PK fields
+
+		ddmStorageLinkModel.setStorageLinkId(ddmStorageLinkId);
+
+		// Audit fields
+
+		ddmStorageLinkModel.setCompanyId(_companyId);
+
+		// Other fields
+
+		ddmStorageLinkModel.setClassNameId(getClassNameId(DDMContent.class));
+		ddmStorageLinkModel.setClassPK(classPK);
+		ddmStorageLinkModel.setStructureId(structureId);
+		ddmStorageLinkModel.setStructureVersionId(versionId);
+
+		return ddmStorageLinkModel;
 	}
 
 	protected DDMStructureLayoutModel newDDMStructureLayoutModel(
 		long groupId, long userId, long structureVersionId, String definition) {
+
+		return newDDMStructureLayoutModel(
+			groupId, userId, structureVersionId, definition, 0,
+			String.valueOf(_counter.get()));
+	}
+
+	protected DDMStructureLayoutModel newDDMStructureLayoutModel(
+		long groupId, long userId, long structureVersionId, String definition,
+		long classNameId, String structureLayoutKey) {
 
 		DDMStructureLayoutModel ddmStructureLayoutModel =
 			new DDMStructureLayoutModelImpl();
@@ -4134,8 +6047,8 @@ public class DataFactory {
 
 		// Other fields
 
-		ddmStructureLayoutModel.setStructureLayoutKey(
-			String.valueOf(_counter.get()));
+		ddmStructureLayoutModel.setClassNameId(classNameId);
+		ddmStructureLayoutModel.setStructureLayoutKey(structureLayoutKey);
 		ddmStructureLayoutModel.setStructureVersionId(structureVersionId);
 		ddmStructureLayoutModel.setDefinition(definition);
 
@@ -4151,6 +6064,10 @@ public class DataFactory {
 		// PK fields
 
 		ddmStructureLinkModel.setStructureLinkId(_counter.get());
+
+		// Audit fields
+
+		ddmStructureLinkModel.setCompanyId(_companyId);
 
 		// Other fields
 
@@ -4195,17 +6112,14 @@ public class DataFactory {
 		ddmStructureModel.setStructureKey(structureKey);
 		ddmStructureModel.setVersion(DDMStructureConstants.VERSION_DEFAULT);
 
-		StringBundler sb = new StringBundler(4);
-
-		sb.append("<?xml version=\"1.0\"?><root available-locales=\"en_US\" ");
-		sb.append("default-locale=\"en_US\"><name language-id=\"en_US\">");
-		sb.append(structureKey);
-		sb.append("</name></root>");
-
-		ddmStructureModel.setName(sb.toString());
+		ddmStructureModel.setName(
+			StringBundler.concat(
+				"<?xml version=\"1.0\"?><root available-locales=\"en_US\" ",
+				"default-locale=\"en_US\"><name language-id=\"en_US\">",
+				structureKey, "</name></root>"));
 
 		ddmStructureModel.setDefinition(definition);
-		ddmStructureModel.setStorageType(StorageType.JSON.toString());
+		ddmStructureModel.setStorageType(StorageType.DEFAULT.toString());
 		ddmStructureModel.setLastPublishDate(nextFutureDate());
 
 		return ddmStructureModel;
@@ -4214,6 +6128,18 @@ public class DataFactory {
 	protected DDMTemplateModel newDDMTemplateModel(
 		long groupId, long userId, long structureId, long sourceClassNameId,
 		long templateId) {
+
+		return newDDMTemplateModel(
+			groupId, userId, DDMTemplateConstants.TEMPLATE_MODE_CREATE,
+			"Basic Web Content", "${content.getData()}",
+			getClassNameId(DDMStructure.class), structureId, sourceClassNameId,
+			templateId, _JOURNAL_STRUCTURE_KEY);
+	}
+
+	protected DDMTemplateModel newDDMTemplateModel(
+		long groupId, long userId, String mode, String name, String script,
+		long classNameId, long classPK, long resourceClassNameId,
+		long templateId, String templateKey) {
 
 		DDMTemplateModel ddmTemplateModel = new DDMTemplateModelImpl();
 
@@ -4240,24 +6166,22 @@ public class DataFactory {
 
 		// Other fields
 
-		ddmTemplateModel.setClassNameId(getClassNameId(DDMStructure.class));
-		ddmTemplateModel.setClassPK(structureId);
-		ddmTemplateModel.setResourceClassNameId(sourceClassNameId);
-		ddmTemplateModel.setTemplateKey(_JOURNAL_STRUCTURE_KEY);
+		ddmTemplateModel.setClassNameId(classNameId);
+		ddmTemplateModel.setClassPK(classPK);
+		ddmTemplateModel.setResourceClassNameId(resourceClassNameId);
+		ddmTemplateModel.setTemplateKey(templateKey);
 		ddmTemplateModel.setVersion(DDMTemplateConstants.VERSION_DEFAULT);
 
-		StringBundler sb = new StringBundler(3);
-
-		sb.append("<?xml version=\"1.0\"?><root available-locales=\"en_US\" ");
-		sb.append("default-locale=\"en_US\"><name language-id=\"en_US\">");
-		sb.append("Basic Web Content</name></root>");
-
-		ddmTemplateModel.setName(sb.toString());
+		ddmTemplateModel.setName(
+			StringBundler.concat(
+				"<?xml version=\"1.0\"?><root available-locales=\"en_US\" ",
+				"default-locale=\"en_US\"><name language-id=\"en_US\">", name,
+				"</name></root>"));
 
 		ddmTemplateModel.setType(DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY);
-		ddmTemplateModel.setMode(DDMTemplateConstants.TEMPLATE_MODE_CREATE);
+		ddmTemplateModel.setMode(mode);
 		ddmTemplateModel.setLanguage(TemplateConstants.LANG_TYPE_FTL);
-		ddmTemplateModel.setScript("${content.getData()}");
+		ddmTemplateModel.setScript(script);
 		ddmTemplateModel.setCacheable(true);
 		ddmTemplateModel.setSmallImage(false);
 		ddmTemplateModel.setLastPublishDate(nextFutureDate());
@@ -4268,48 +6192,13 @@ public class DataFactory {
 	protected DLFileEntryModel newDlFileEntryModel(
 		DLFolderModel dlFolderModel, int index) {
 
-		DLFileEntryModel dlFileEntryModel = new DLFileEntryModelImpl();
-
-		// UUID
-
-		dlFileEntryModel.setUuid(SequentialUUID.generate());
-
-		// PK fields
-
-		dlFileEntryModel.setFileEntryId(_counter.get());
-
-		// Group instance
-
-		dlFileEntryModel.setGroupId(dlFolderModel.getGroupId());
-
-		// Audit fields
-
-		dlFileEntryModel.setCompanyId(_companyId);
-		dlFileEntryModel.setUserId(_sampleUserId);
-		dlFileEntryModel.setUserName(_SAMPLE_USER_NAME);
-		dlFileEntryModel.setCreateDate(nextFutureDate());
-		dlFileEntryModel.setModifiedDate(nextFutureDate());
-
-		// Other fields
-
-		dlFileEntryModel.setRepositoryId(dlFolderModel.getRepositoryId());
-		dlFileEntryModel.setFolderId(dlFolderModel.getFolderId());
-		dlFileEntryModel.setName("TestFile" + index);
-		dlFileEntryModel.setFileName("TestFile" + index + ".txt");
-		dlFileEntryModel.setExtension("txt");
-		dlFileEntryModel.setMimeType(ContentTypes.TEXT_PLAIN);
-		dlFileEntryModel.setTitle("TestFile" + index + ".txt");
-		dlFileEntryModel.setFileEntryTypeId(
-			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT);
-		dlFileEntryModel.setVersion(DLFileEntryConstants.VERSION_DEFAULT);
-		dlFileEntryModel.setSize(BenchmarksPropsValues.MAX_DL_FILE_ENTRY_SIZE);
-		dlFileEntryModel.setLastPublishDate(nextFutureDate());
-
-		return dlFileEntryModel;
+		return newDlFileEntryModel(
+			dlFolderModel, "TestFile" + index, "txt", ContentTypes.TEXT_PLAIN);
 	}
 
 	protected DLFolderModel newDLFolderModel(
-		long groupId, long parentFolderId, int index) {
+		long folderId, long groupId, long parentFolderId, String treePath,
+		String name) {
 
 		DLFolderModel dlFolderModel = new DLFolderModelImpl();
 
@@ -4319,7 +6208,7 @@ public class DataFactory {
 
 		// PK fields
 
-		dlFolderModel.setFolderId(_counter.get());
+		dlFolderModel.setFolderId(folderId);
 
 		// Group instance
 
@@ -4337,7 +6226,8 @@ public class DataFactory {
 
 		dlFolderModel.setRepositoryId(groupId);
 		dlFolderModel.setParentFolderId(parentFolderId);
-		dlFolderModel.setName("Test Folder " + index);
+		dlFolderModel.setTreePath(treePath);
+		dlFolderModel.setName(name);
 		dlFolderModel.setLastPostDate(nextFutureDate());
 		dlFolderModel.setDefaultFileEntryTypeId(_DEFAULT_DL_FILE_ENTRY_TYPE_ID);
 		dlFolderModel.setLastPublishDate(nextFutureDate());
@@ -4346,9 +6236,71 @@ public class DataFactory {
 		return dlFolderModel;
 	}
 
+	protected FragmentEntryLinkModel newFragmentEntryLinkModel(
+		LayoutModel layoutModel, String renderKey, String css, String html,
+		String configuration, String editValue, int position,
+		String nameSpace) {
+
+		FragmentEntryLinkModel fragmentEntryLinkModel =
+			new FragmentEntryLinkModelImpl();
+
+		// UUID
+
+		fragmentEntryLinkModel.setUuid(SequentialUUID.generate());
+
+		// PK fields
+
+		fragmentEntryLinkModel.setFragmentEntryLinkId(_counter.get());
+
+		// Group instance
+
+		fragmentEntryLinkModel.setGroupId(layoutModel.getGroupId());
+
+		// Audit fields
+
+		fragmentEntryLinkModel.setCompanyId(_companyId);
+		fragmentEntryLinkModel.setUserId(_sampleUserId);
+		fragmentEntryLinkModel.setUserName(_SAMPLE_USER_NAME);
+		fragmentEntryLinkModel.setCreateDate(new Date());
+		fragmentEntryLinkModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		fragmentEntryLinkModel.setFragmentEntryId(0);
+		fragmentEntryLinkModel.setClassNameId(getClassNameId(Layout.class));
+		fragmentEntryLinkModel.setClassPK(layoutModel.getPlid());
+		fragmentEntryLinkModel.setPlid(layoutModel.getPlid());
+		fragmentEntryLinkModel.setRendererKey(renderKey);
+		fragmentEntryLinkModel.setConfiguration(configuration);
+		fragmentEntryLinkModel.setCss(css);
+		fragmentEntryLinkModel.setHtml(html);
+		fragmentEntryLinkModel.setConfiguration(configuration);
+		fragmentEntryLinkModel.setEditableValues(editValue);
+		fragmentEntryLinkModel.setNamespace(nameSpace);
+		fragmentEntryLinkModel.setPosition(position);
+
+		return fragmentEntryLinkModel;
+	}
+
 	protected GroupModel newGroupModel(
 		long groupId, long classNameId, long classPK, String name,
 		boolean site) {
+
+		return newGroupModel(
+			groupId, classNameId, classPK, name, 0, StringPool.BLANK, site);
+	}
+
+	protected GroupModel newGroupModel(
+		long groupId, long classNameId, long classPK, String name, int type,
+		boolean site) {
+
+		return newGroupModel(
+			groupId, classNameId, classPK, name, type, StringPool.BLANK, site);
+	}
+
+	protected GroupModel newGroupModel(
+		long groupId, long classNameId, long classPK, String name, int type,
+		String typeSettings, boolean site) {
 
 		GroupModel groupModel = new GroupModelImpl();
 
@@ -4373,6 +6325,8 @@ public class DataFactory {
 			StringPool.SLASH + groupModel.getGroupId() + StringPool.SLASH);
 		groupModel.setGroupKey(name);
 		groupModel.setName(name);
+		groupModel.setType(type);
+		groupModel.setTypeSettings(typeSettings);
 		groupModel.setManualMembership(true);
 		groupModel.setMembershipRestriction(
 			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION);
@@ -4385,14 +6339,98 @@ public class DataFactory {
 		return groupModel;
 	}
 
+	protected LayoutModel newLayoutModel(
+		long groupId, long parentLayoutId, String name, boolean privateLayout,
+		boolean hidden, String layoutTemplateId, String... columns) {
+
+		SimpleCounter simpleCounter = _layoutIdCounters.computeIfAbsent(
+			LayoutLocalServiceImpl.getCounterName(groupId, privateLayout),
+			counterName -> new SimpleCounter());
+
+		LayoutModel layoutModel = new LayoutModelImpl();
+
+		// UUID
+
+		layoutModel.setUuid(SequentialUUID.generate());
+
+		// PK fields
+
+		layoutModel.setPlid(_layoutPlidCounter.get());
+
+		// Group instance
+
+		layoutModel.setGroupId(groupId);
+
+		// Audit fields
+
+		layoutModel.setCompanyId(_companyId);
+		layoutModel.setUserId(_sampleUserId);
+		layoutModel.setUserName(_SAMPLE_USER_NAME);
+		layoutModel.setCreateDate(new Date());
+		layoutModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		layoutModel.setLayoutId(simpleCounter.get());
+		layoutModel.setParentLayoutId(parentLayoutId);
+		layoutModel.setPrivateLayout(privateLayout);
+		layoutModel.setName(
+			"<?xml version=\"1.0\"?><root><name>" + name + "</name></root>");
+		layoutModel.setType(LayoutConstants.TYPE_PORTLET);
+		layoutModel.setHidden(hidden);
+
+		UnicodeProperties typeSettingsUnicodeProperties = new UnicodeProperties(
+			true);
+
+		typeSettingsUnicodeProperties.setProperty(
+			LayoutTypePortletConstants.LAYOUT_TEMPLATE_ID, layoutTemplateId);
+
+		for (int i = 0; i < columns.length; i++) {
+			if (!columns[i].equals("")) {
+				typeSettingsUnicodeProperties.setProperty(
+					"column-" + (i + 1), columns[i]);
+			}
+		}
+
+		if (privateLayout) {
+			typeSettingsUnicodeProperties.setProperty(
+				"privateLayout", String.valueOf(privateLayout));
+		}
+
+		layoutModel.setTypeSettings(
+			StringUtil.replace(
+				typeSettingsUnicodeProperties.toString(), '\n', "\\n"));
+
+		layoutModel.setFriendlyURL(StringPool.FORWARD_SLASH + name);
+
+		layoutModel.setLastPublishDate(new Date());
+
+		return layoutModel;
+	}
+
+	protected LayoutModel newLayoutModel(
+		long groupId, String name, boolean privateLayout,
+		String layoutTemplateId, String... columns) {
+
+		return newLayoutModel(
+			groupId, 0, name, privateLayout, false, layoutTemplateId, columns);
+	}
+
 	protected LayoutSetModel newLayoutSetModel(
 		long groupId, boolean privateLayout) {
+
+		return newLayoutSetModel(
+			groupId, privateLayout, "classic_WAR_classictheme");
+	}
+
+	protected LayoutSetModel newLayoutSetModel(
+		long groupId, boolean privateLayout, String themeId) {
 
 		LayoutSetModel layoutSetModel = new LayoutSetModelImpl();
 
 		// PK fields
 
-		layoutSetModel.setLayoutSetId(_counter.get());
+		layoutSetModel.setLayoutSetId(_layoutSetIdCounter.get());
 
 		// Group instance
 
@@ -4407,7 +6445,7 @@ public class DataFactory {
 		// Other fields
 
 		layoutSetModel.setPrivateLayout(privateLayout);
-		layoutSetModel.setThemeId("classic_WAR_classictheme");
+		layoutSetModel.setThemeId(themeId);
 		layoutSetModel.setColorSchemeId("01");
 
 		return layoutSetModel;
@@ -4532,30 +6570,25 @@ public class DataFactory {
 		return mbThreadModel;
 	}
 
-	protected PortletPreferencesModel newPortletPreferencesModel(
-		long plid, String portletId, String preferences) {
-
-		PortletPreferencesModel portletPreferencesModel =
-			new PortletPreferencesModelImpl();
+	protected PortalPreferencesModel newPortalPreferencesModel(long ownerId) {
+		PortalPreferencesModel portalPreferencesModel =
+			new PortalPreferencesModelImpl();
 
 		// PK fields
 
-		portletPreferencesModel.setPortletPreferencesId(_counter.get());
+		portalPreferencesModel.setPortalPreferencesId(_counter.get());
 
 		// Audit fields
 
-		portletPreferencesModel.setCompanyId(_companyId);
+		portalPreferencesModel.setCompanyId(_companyId);
 
 		// Other fields
 
-		portletPreferencesModel.setOwnerId(PortletKeys.PREFS_OWNER_ID_DEFAULT);
-		portletPreferencesModel.setOwnerType(
-			PortletKeys.PREFS_OWNER_TYPE_LAYOUT);
-		portletPreferencesModel.setPlid(plid);
-		portletPreferencesModel.setPortletId(portletId);
-		portletPreferencesModel.setPreferences(preferences);
+		portalPreferencesModel.setOwnerId(ownerId);
+		portalPreferencesModel.setOwnerType(
+			PortletKeys.PREFS_OWNER_TYPE_COMPANY);
 
-		return portletPreferencesModel;
+		return portalPreferencesModel;
 	}
 
 	protected ReleaseModelImpl newReleaseModel(
@@ -4595,7 +6628,7 @@ public class DataFactory {
 		// PK fields
 
 		resourcePermissionModel.setResourcePermissionId(
-			_resourcePermissionCounter.get());
+			_resourcePermissionIdCounter.get());
 
 		// Audit fields
 
@@ -4664,7 +6697,7 @@ public class DataFactory {
 
 		// PK fields
 
-		socialActivityModel.setActivityId(_socialActivityCounter.get());
+		socialActivityModel.setActivityId(_socialActivityIdCounter.get());
 
 		// Group instance
 
@@ -4841,14 +6874,8 @@ public class DataFactory {
 	protected String nextDDLCustomFieldName(
 		long groupId, int customFieldIndex) {
 
-		StringBundler sb = new StringBundler(4);
-
-		sb.append("custom_field_text_");
-		sb.append(groupId);
-		sb.append("_");
-		sb.append(customFieldIndex);
-
-		return sb.toString();
+		return StringBundler.concat(
+			"custom_field_text_", groupId, "_", customFieldIndex);
 	}
 
 	protected Date nextFutureDate() {
@@ -4879,11 +6906,98 @@ public class DataFactory {
 				if (name.endsWith(StringPool.UNDERLINE)) {
 					name = name.substring(0, name.length() - 1);
 				}
+				else if (name.equals("CIWarehouseId")) {
+					name = "CommerceInventoryWarehouseId";
+				}
+				else if (name.equals("CIWarehouseItemId")) {
+					name = "CommerceInventoryWarehouseItemId";
+				}
+				else if (name.equals("CPDSpecificationOptionValueId")) {
+					name = "CPDefinitionSpecificationOptionValueId";
+				}
+				else if (name.equals("CdnEnabled")) {
+					name = "CDNEnabled";
+				}
+				else if (name.equals("CdnURL")) {
+					name = "CDNURL";
+				}
 				else if (name.equals("DeliverySubTypeSettings")) {
 					name = "DeliverySubscriptionTypeSettings";
 				}
+				else if (name.equals("DiscountPctLevel1WithTaxAmount")) {
+					name = "DiscountPercentageLevel1WithTaxAmount";
+				}
+				else if (name.equals("DiscountPctLevel2WithTaxAmount")) {
+					name = "DiscountPercentageLevel2WithTaxAmount";
+				}
+				else if (name.equals("DiscountPctLevel3WithTaxAmount")) {
+					name = "DiscountPercentageLevel3WithTaxAmount";
+				}
+				else if (name.equals("DiscountPctLevel4WithTaxAmount")) {
+					name = "DiscountPercentageLevel4WithTaxAmount";
+				}
 				else if (name.equals("LPageTemplateStructureRelId")) {
 					name = "LayoutPageTemplateStructureRelId";
+				}
+				else if (name.equals("ShippingDiscountPercentLevel1")) {
+					name = "ShippingDiscountPercentageLevel1";
+				}
+				else if (name.equals("ShippingDiscountPercentLevel2")) {
+					name = "ShippingDiscountPercentageLevel2";
+				}
+				else if (name.equals("ShippingDiscountPercentLevel3")) {
+					name = "ShippingDiscountPercentageLevel3";
+				}
+				else if (name.equals("ShippingDiscountPercentLevel4")) {
+					name = "ShippingDiscountPercentageLevel4";
+				}
+				else if (name.equals("ShippingDiscountPctLev1WithTax")) {
+					name = "ShippingDiscountPercentageLevel1WithTaxAmount";
+				}
+				else if (name.equals("ShippingDiscountPctLev2WithTax")) {
+					name = "ShippingDiscountPercentageLevel2WithTaxAmount";
+				}
+				else if (name.equals("ShippingDiscountPctLev3WithTax")) {
+					name = "ShippingDiscountPercentageLevel3WithTaxAmount";
+				}
+				else if (name.equals("ShippingDiscountPctLev4WithTax")) {
+					name = "ShippingDiscountPercentageLevel4WithTaxAmount";
+				}
+				else if (name.equals("SubtotalDiscountPercentLevel1")) {
+					name = "SubtotalDiscountPercentageLevel1";
+				}
+				else if (name.equals("SubtotalDiscountPercentLevel2")) {
+					name = "SubtotalDiscountPercentageLevel2";
+				}
+				else if (name.equals("SubtotalDiscountPercentLevel3")) {
+					name = "SubtotalDiscountPercentageLevel3";
+				}
+				else if (name.equals("SubtotalDiscountPercentLevel4")) {
+					name = "SubtotalDiscountPercentageLevel4";
+				}
+				else if (name.equals("SubtotalDiscountPctLev1WithTax")) {
+					name = "SubtotalDiscountPercentageLevel1WithTaxAmount";
+				}
+				else if (name.equals("SubtotalDiscountPctLev2WithTax")) {
+					name = "SubtotalDiscountPercentageLevel2WithTaxAmount";
+				}
+				else if (name.equals("SubtotalDiscountPctLev3WithTax")) {
+					name = "SubtotalDiscountPercentageLevel3WithTaxAmount";
+				}
+				else if (name.equals("SubtotalDiscountPctLev4WithTax")) {
+					name = "SubtotalDiscountPercentageLevel4WithTaxAmount";
+				}
+				else if (name.equals("TotalDiscountPctLev1WithTax")) {
+					name = "TotalDiscountPercentageLevel1WithTaxAmount";
+				}
+				else if (name.equals("TotalDiscountPctLev2WithTax")) {
+					name = "TotalDiscountPercentageLevel2WithTaxAmount";
+				}
+				else if (name.equals("TotalDiscountPctLev3WithTax")) {
+					name = "TotalDiscountPercentageLevel3WithTaxAmount";
+				}
+				else if (name.equals("TotalDiscountPctLev4WithTax")) {
+					name = "TotalDiscountPercentageLevel4WithTaxAmount";
 				}
 
 				int type = (int)tableColumn[1];
@@ -4932,10 +7046,57 @@ public class DataFactory {
 		}
 	}
 
-	private String _getMBDiscussionCombinedClassName(Class<?> clazz) {
-		return StringBundler.concat(
-			MBDiscussion.class.getName(), StringPool.UNDERLINE,
-			clazz.getName());
+	private String _generateJsonData(
+			List<FragmentEntryLinkModel> fragmentEntryLinkModels,
+			String templateFileName)
+		throws Exception {
+
+		String data = _readFile("home_page_template/" + templateFileName);
+
+		for (FragmentEntryLinkModel fragmentEntryLinkModel :
+				fragmentEntryLinkModels) {
+
+			String rendererKey = fragmentEntryLinkModel.getRendererKey();
+
+			if (rendererKey.equals(_FRAGMENT_COMPONENT_RENDER_KEY_HEADING)) {
+				data = StringUtil.replace(
+					data, "${headingFragmentEntryLinkId}",
+					String.valueOf(
+						fragmentEntryLinkModel.getFragmentEntryLinkId()));
+			}
+			else if (rendererKey.equals(
+						_FRAGMENT_COMPONENT_RENDER_KEY_PARAGRAPH)) {
+
+				data = StringUtil.replace(
+					data, "${paragraphFragmentEntryLinkId}",
+					String.valueOf(
+						fragmentEntryLinkModel.getFragmentEntryLinkId()));
+			}
+			else if (rendererKey.equals(_FRAGMENT_COMPONENT_RENDER_KEY_IMAGE)) {
+				data = StringUtil.replace(
+					data, "${imageFragmentEntryLinkId}",
+					String.valueOf(
+						fragmentEntryLinkModel.getFragmentEntryLinkId()));
+			}
+			else {
+				data = StringUtil.replace(
+					data, "${loginPortletFragmentEntryLinkId}",
+					String.valueOf(
+						fragmentEntryLinkModel.getFragmentEntryLinkId()));
+			}
+		}
+
+		return data;
+	}
+
+	private InputStream _getFragmentComponentInputStream(
+			String fragmentName, String suffix)
+		throws Exception {
+
+		return DataFactory.class.getResourceAsStream(
+			StringBundler.concat(
+				"/com/liferay/fragment/collection/contributor/basic/component",
+				"/dependencies/", fragmentName, "/index.", suffix));
 	}
 
 	private String _getResourcePermissionModelName(String... classNames) {
@@ -4957,12 +7118,113 @@ public class DataFactory {
 		return sb.toString();
 	}
 
-	private String _readFile(String resourceName) throws Exception {
+	private LayoutModel _newContentPageLayoutModel(
+		long groupId, String name, long classNameId, long classPK) {
+
+		SimpleCounter simpleCounter = _layoutIdCounters.computeIfAbsent(
+			LayoutLocalServiceImpl.getCounterName(groupId, false),
+			counterName -> new SimpleCounter());
+
+		LayoutModel layoutModel = new LayoutModelImpl();
+
+		// UUID
+
+		layoutModel.setUuid(SequentialUUID.generate());
+
+		// PK fields
+
+		layoutModel.setPlid(_layoutPlidCounter.get());
+
+		// Group instance
+
+		layoutModel.setGroupId(groupId);
+
+		// Audit fields
+
+		layoutModel.setCompanyId(_companyId);
+		layoutModel.setUserId(_sampleUserId);
+		layoutModel.setUserName(_SAMPLE_USER_NAME);
+		layoutModel.setCreateDate(new Date());
+		layoutModel.setModifiedDate(new Date());
+
+		// Other fields
+
+		layoutModel.setLayoutId(simpleCounter.get());
+		layoutModel.setName(
+			"<?xml version=\"1.0\"?><root><name>" + name + "</name></root>");
+		layoutModel.setType(LayoutConstants.TYPE_CONTENT);
+		layoutModel.setFriendlyURL(StringPool.FORWARD_SLASH + name);
+		layoutModel.setClassNameId(classNameId);
+		layoutModel.setClassPK(classPK);
+
+		if (classNameId != 0) {
+			layoutModel.setHidden(true);
+			layoutModel.setSystem(true);
+		}
+
+		UnicodeProperties typeSettingsUnicodeProperties = new UnicodeProperties(
+			true);
+
+		typeSettingsUnicodeProperties.setProperty("published", "true");
+
+		layoutModel.setTypeSettings(
+			StringUtil.replace(
+				typeSettingsUnicodeProperties.toString(), '\n', "\\n"));
+
+		layoutModel.setLastPublishDate(new Date());
+
+		return layoutModel;
+	}
+
+	private CounterModel _newCounterModel(String name, long currentId) {
+		CounterModel counterModel = new CounterModelImpl();
+
+		counterModel.setName(name);
+		counterModel.setCurrentId(currentId);
+
+		return counterModel;
+	}
+
+	private String _readFile(InputStream inputStream) throws Exception {
 		List<String> lines = new ArrayList<>();
 
-		StringUtil.readLines(getResourceInputStream(resourceName), lines);
+		StringUtil.readLines(inputStream, lines);
 
 		return StringUtil.merge(lines, StringPool.SPACE);
+	}
+
+	private String _readFile(String resourceName) throws Exception {
+		return _readFile(getResourceInputStream(resourceName));
+	}
+
+	private List<String> _readLines(InputStream inputStream) throws Exception {
+		List<String> lines = new ArrayList<>();
+
+		try (UnsyncBufferedReader unsyncBufferedReader =
+				new UnsyncBufferedReader(new InputStreamReader(inputStream))) {
+
+			String line = null;
+
+			while ((line = unsyncBufferedReader.readLine()) != null) {
+				lines.add(line);
+			}
+		}
+
+		return lines;
+	}
+
+	private List<String> _readLines(String resourceName) throws Exception {
+		return _readLines(getResourceInputStream(resourceName));
+	}
+
+	private String _replaceReleaseInfo(String resource) throws Exception {
+		StringBundler sb = new StringBundler(3);
+
+		sb.append("Welcome to");
+		sb.append(ReleaseInfo.getReleaseInfo());
+		sb.append(StringPool.PERIOD);
+
+		return StringUtil.replace(resource, "${paragraphValue}", sb.toString());
 	}
 
 	private static final long _CURRENT_TIME = System.currentTimeMillis();
@@ -4971,7 +7233,16 @@ public class DataFactory {
 		DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT;
 
 	private static final String _DEPENDENCIES_DIR =
-		"com/liferay/portal/tools/sample/sql/builder/dependencies/data/";
+		"/com/liferay/portal/tools/sample/sql/builder/dependencies/data/";
+
+	private static final String _FRAGMENT_COMPONENT_RENDER_KEY_HEADING =
+		"BASIC_COMPONENT-heading";
+
+	private static final String _FRAGMENT_COMPONENT_RENDER_KEY_IMAGE =
+		"BASIC_COMPONENT-image";
+
+	private static final String _FRAGMENT_COMPONENT_RENDER_KEY_PARAGRAPH =
+		"BASIC_COMPONENT-paragraph";
 
 	private static final long _FUTURE_TIME =
 		System.currentTimeMillis() + Time.YEAR;
@@ -4980,61 +7251,70 @@ public class DataFactory {
 
 	private static final String _SAMPLE_USER_NAME = "Sample";
 
+	private static final Log _log = LogFactoryUtil.getLog(DataFactory.class);
+
 	private static final PortletPreferencesFactory _portletPreferencesFactory =
 		new PortletPreferencesFactoryImpl();
 
-	private final long _accountId;
 	private RoleModel _administratorRoleModel;
 	private Map<Long, SimpleCounter>[] _assetCategoryCounters;
-	private Map<Long, List<AssetCategoryModel>>[] _assetCategoryModelsMaps;
+	private final Map<Long, List<AssetCategoryModel>>[]
+		_assetCategoryModelsMaps =
+			(Map<Long, List<AssetCategoryModel>>[])
+				new HashMap<?, ?>[BenchmarksPropsValues.MAX_GROUP_COUNT];
 	private final long[] _assetClassNameIds;
 	private final Map<Long, Integer> _assetClassNameIdsIndexes =
 		new HashMap<>();
 	private final Map<Long, Integer> _assetPublisherQueryStartIndexes =
 		new HashMap<>();
 	private Map<Long, SimpleCounter>[] _assetTagCounters;
-	private List<AssetTagModel>[] _assetTagModelsArray;
-	private Map<Long, List<AssetTagModel>>[] _assetTagModelsMaps;
-	private List<AssetVocabularyModel>[] _assetVocabularyModelsArray;
+	private final Map<Long, List<AssetTagModel>>[] _assetTagModelsMaps =
+		(Map<Long, List<AssetTagModel>>[])
+			new HashMap<?, ?>[BenchmarksPropsValues.MAX_GROUP_COUNT];
 	private final Map<String, ClassNameModel> _classNameModels =
 		new HashMap<>();
 	private final long _companyId;
 	private final SimpleCounter _counter;
+	private final Map<Long, CPInstanceModel> _cpInstanceModels =
+		new HashMap<>();
 	private final PortletPreferencesImpl
 		_defaultAssetPublisherPortletPreferencesImpl;
-	private AssetVocabularyModel _defaultAssetVocabularyModel;
-	private final long _defaultDLDDMStructureId;
-	private final long _defaultDLDDMStructureVersionId;
-	private String _defaultJournalArticleId;
-	private final long _defaultJournalDDMStructureId;
-	private final long _defaultJournalDDMStructureVersionId;
-	private final long _defaultJournalDDMTemplateId;
-	private final long _defaultUserId;
+	private long _defaultDLDDMStructureId;
+	private long _defaultDLDDMStructureVersionId;
+	private long _defaultJournalDDMStructureId;
+	private long _defaultJournalDDMStructureVersionId;
+	private long _defaultJournalDDMTemplateId;
+	private long _defaultUserId;
 	private final String _dlDDMStructureContent;
 	private final String _dlDDMStructureLayoutContent;
-	private List<String> _firstNames;
+	private final SimpleCounter _dLFileEntryIdCounter;
+	private final List<String> _firstNames;
 	private final SimpleCounter _futureDateCounter;
-	private final long _globalGroupId;
-	private final long _guestGroupId;
+	private long _globalGroupId;
+	private long _guestGroupId;
 	private RoleModel _guestRoleModel;
 	private String _journalArticleContent;
 	private final Map<Long, String> _journalArticleResourceUUIDs =
 		new HashMap<>();
 	private final String _journalDDMStructureContent;
 	private final String _journalDDMStructureLayoutContent;
-	private List<String> _lastNames;
-	private final Map<Long, SimpleCounter> _layoutCounters = new HashMap<>();
+	private final List<String> _lastNames;
+	private final Map<String, SimpleCounter> _layoutIdCounters =
+		new HashMap<>();
 	private final String _layoutPageTemplateStructureRelData;
+	private final SimpleCounter _layoutPlidCounter;
+	private final SimpleCounter _layoutSetIdCounter;
 	private RoleModel _ownerRoleModel;
+	private final SimpleCounter _portletPreferenceValueIdCounter;
 	private RoleModel _powerUserRoleModel;
-	private final SimpleCounter _resourcePermissionCounter;
-	private List<RoleModel> _roleModels;
-	private final long _sampleUserId;
+	private final SimpleCounter _resourcePermissionIdCounter;
+	private long _sampleUserId;
 	private final Format _simpleDateFormat;
 	private RoleModel _siteMemberRoleModel;
-	private final SimpleCounter _socialActivityCounter;
+	private final SimpleCounter _socialActivityIdCounter;
 	private final SimpleCounter _timeCounter;
-	private final long _userPersonalSiteGroupId;
+	private final Map<Integer, Map<Long, String>> _treePathsMap =
+		new HashMap<>();
 	private RoleModel _userRoleModel;
 	private final SimpleCounter _userScreenNameCounter;
 

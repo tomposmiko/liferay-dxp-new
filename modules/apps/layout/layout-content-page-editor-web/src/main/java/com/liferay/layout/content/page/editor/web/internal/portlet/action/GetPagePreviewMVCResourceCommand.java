@@ -21,6 +21,7 @@ import com.liferay.info.item.provider.InfoItemDetailsProvider;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
+import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Layout;
@@ -29,12 +30,7 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
-import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -47,6 +43,8 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.constants.SegmentsWebKeys;
 import com.liferay.taglib.util.ThemeUtil;
+
+import java.util.Locale;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -69,7 +67,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
-		"mvc.command.name=/content_layout/get_page_preview"
+		"mvc.command.name=/layout_content_page_editor/get_page_preview"
 	},
 	service = MVCResourceCommand.class
 )
@@ -80,41 +78,10 @@ public class GetPagePreviewMVCResourceCommand extends BaseMVCResourceCommand {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		ThemeDisplay currentThemeDisplay =
-			(ThemeDisplay)resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)currentThemeDisplay.clone();
-
-		long selPlid = ParamUtil.getLong(resourceRequest, "selPlid");
-
-		if (selPlid > 0) {
-			Layout layout = _layoutLocalService.fetchLayout(selPlid);
-
-			themeDisplay.setLayout(layout);
-
-			LayoutSet layoutSet = layout.getLayoutSet();
-
-			themeDisplay.setLayoutSet(layoutSet);
-			themeDisplay.setLookAndFeel(
-				layoutSet.getTheme(), layoutSet.getColorScheme());
-
-			themeDisplay.setPlid(layout.getPlid());
-		}
-
-		PermissionChecker permissionChecker =
-			PermissionCheckerFactoryUtil.create(themeDisplay.getRealUser());
-
-		if (!LayoutPermissionUtil.contains(
-				permissionChecker, themeDisplay.getLayout(),
-				ActionKeys.UPDATE) &&
-			!LayoutPermissionUtil.contains(
-				permissionChecker, themeDisplay.getLayout(),
-				ActionKeys.UPDATE_LAYOUT_CONTENT)) {
-
-			resourceResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
-
-			return;
-		}
+		Locale currentLocale = themeDisplay.getLocale();
 
 		long[] currentSegmentsExperienceIds = GetterUtil.getLongValues(
 			resourceRequest.getAttribute(
@@ -122,11 +89,11 @@ public class GetPagePreviewMVCResourceCommand extends BaseMVCResourceCommand {
 			new long[] {SegmentsExperienceConstants.ID_DEFAULT});
 		boolean currentPortletDecorate = GetterUtil.getBoolean(
 			resourceRequest.getAttribute(WebKeys.PORTLET_DECORATE));
+		User currentUser = (User)resourceRequest.getAttribute(WebKeys.USER);
 
 		try {
 			long segmentsExperienceId = ParamUtil.getLong(
-				resourceRequest, "segmentsExperienceId",
-				SegmentsExperienceConstants.ID_DEFAULT);
+				resourceRequest, "segmentsExperienceId");
 
 			resourceRequest.setAttribute(
 				SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS,
@@ -154,7 +121,6 @@ public class GetPagePreviewMVCResourceCommand extends BaseMVCResourceCommand {
 
 			String className = ParamUtil.getString(
 				resourceRequest, "className");
-
 			long classPK = ParamUtil.getLong(resourceRequest, "classPK");
 
 			if (layout.isTypeAssetDisplay() &&
@@ -165,9 +131,6 @@ public class GetPagePreviewMVCResourceCommand extends BaseMVCResourceCommand {
 
 			HttpServletRequest httpServletRequest =
 				_portal.getHttpServletRequest(resourceRequest);
-
-			httpServletRequest.setAttribute(
-				WebKeys.THEME_DISPLAY, themeDisplay);
 
 			if (Validator.isNotNull(className) && (classPK > 0)) {
 				_includeInfoItemObjects(className, classPK, httpServletRequest);
@@ -204,8 +167,9 @@ public class GetPagePreviewMVCResourceCommand extends BaseMVCResourceCommand {
 			resourceRequest.setAttribute(
 				WebKeys.PORTLET_DECORATE, currentPortletDecorate);
 
-			resourceRequest.setAttribute(
-				WebKeys.THEME_DISPLAY, currentThemeDisplay);
+			themeDisplay.setLocale(currentLocale);
+			themeDisplay.setSignedIn(true);
+			themeDisplay.setUser(currentUser);
 		}
 	}
 
@@ -218,17 +182,8 @@ public class GetPagePreviewMVCResourceCommand extends BaseMVCResourceCommand {
 			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemObjectProvider.class, className);
 
-		ClassPKInfoItemIdentifier classPKInfoItemIdentifier =
-			new ClassPKInfoItemIdentifier(classPK);
-
-		String version = ParamUtil.getString(httpServletRequest, "version");
-
-		if (Validator.isNotNull(version)) {
-			classPKInfoItemIdentifier.setVersion(version);
-		}
-
 		Object infoItem = infoItemObjectProvider.getInfoItem(
-			classPKInfoItemIdentifier);
+			new ClassPKInfoItemIdentifier(classPK));
 
 		httpServletRequest.setAttribute(InfoDisplayWebKeys.INFO_ITEM, infoItem);
 
@@ -250,7 +205,7 @@ public class GetPagePreviewMVCResourceCommand extends BaseMVCResourceCommand {
 	private InfoItemServiceTracker _infoItemServiceTracker;
 
 	@Reference
-	private LayoutLocalService _layoutLocalService;
+	private LayoutDisplayPageProviderTracker _layoutDisplayPageProviderTracker;
 
 	@Reference
 	private Portal _portal;

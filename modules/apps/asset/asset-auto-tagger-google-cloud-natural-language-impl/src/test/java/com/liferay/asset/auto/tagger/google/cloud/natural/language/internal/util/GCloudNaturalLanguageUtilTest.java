@@ -30,7 +30,6 @@ import java.nio.charset.StandardCharsets;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mock;
@@ -43,8 +42,7 @@ import org.mockito.MockitoAnnotations;
 public class GCloudNaturalLanguageUtilTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@Before

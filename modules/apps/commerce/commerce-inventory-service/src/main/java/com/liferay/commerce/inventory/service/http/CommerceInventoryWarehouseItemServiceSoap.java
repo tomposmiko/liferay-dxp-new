@@ -66,63 +66,6 @@ public class CommerceInventoryWarehouseItemServiceSoap {
 	public static
 		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItemSoap
 				addCommerceInventoryWarehouseItem(
-					long userId, long commerceInventoryWarehouseId, String sku,
-					int quantity)
-			throws RemoteException {
-
-		try {
-			com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
-				returnValue =
-					CommerceInventoryWarehouseItemServiceUtil.
-						addCommerceInventoryWarehouseItem(
-							userId, commerceInventoryWarehouseId, sku,
-							quantity);
-
-			return com.liferay.commerce.inventory.model.
-				CommerceInventoryWarehouseItemSoap.toSoapModel(returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
-	 #addCommerceInventoryWarehouseItem(String,
-	 long, long, String, int)}
-	 */
-	@Deprecated
-	public static
-		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItemSoap
-				addCommerceInventoryWarehouseItem(
-					long userId, long commerceInventoryWarehouseId,
-					String externalReferenceCode, String sku, int quantity)
-			throws RemoteException {
-
-		try {
-			com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
-				returnValue =
-					CommerceInventoryWarehouseItemServiceUtil.
-						addCommerceInventoryWarehouseItem(
-							userId, commerceInventoryWarehouseId,
-							externalReferenceCode, sku, quantity);
-
-			return com.liferay.commerce.inventory.model.
-				CommerceInventoryWarehouseItemSoap.toSoapModel(returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	public static
-		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItemSoap
-				addCommerceInventoryWarehouseItem(
-					String externalReferenceCode, long userId,
 					long commerceInventoryWarehouseId, String sku, int quantity)
 			throws RemoteException {
 
@@ -131,7 +74,79 @@ public class CommerceInventoryWarehouseItemServiceSoap {
 				returnValue =
 					CommerceInventoryWarehouseItemServiceUtil.
 						addCommerceInventoryWarehouseItem(
-							externalReferenceCode, userId,
+							commerceInventoryWarehouseId, sku, quantity);
+
+			return com.liferay.commerce.inventory.model.
+				CommerceInventoryWarehouseItemSoap.toSoapModel(returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static
+		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItemSoap
+				addCommerceInventoryWarehouseItem(
+					String externalReferenceCode,
+					long commerceInventoryWarehouseId, String sku, int quantity)
+			throws RemoteException {
+
+		try {
+			com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
+				returnValue =
+					CommerceInventoryWarehouseItemServiceUtil.
+						addCommerceInventoryWarehouseItem(
+							externalReferenceCode, commerceInventoryWarehouseId,
+							sku, quantity);
+
+			return com.liferay.commerce.inventory.model.
+				CommerceInventoryWarehouseItemSoap.toSoapModel(returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static
+		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItemSoap
+				addOrUpdateCommerceInventoryWarehouseItem(
+					long commerceInventoryWarehouseId, String sku, int quantity)
+			throws RemoteException {
+
+		try {
+			com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
+				returnValue =
+					CommerceInventoryWarehouseItemServiceUtil.
+						addOrUpdateCommerceInventoryWarehouseItem(
+							commerceInventoryWarehouseId, sku, quantity);
+
+			return com.liferay.commerce.inventory.model.
+				CommerceInventoryWarehouseItemSoap.toSoapModel(returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static
+		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItemSoap
+				addOrUpdateCommerceInventoryWarehouseItem(
+					String externalReferenceCode, long companyId,
+					long commerceInventoryWarehouseId, String sku, int quantity)
+			throws RemoteException {
+
+		try {
+			com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
+				returnValue =
+					CommerceInventoryWarehouseItemServiceUtil.
+						addOrUpdateCommerceInventoryWarehouseItem(
+							externalReferenceCode, companyId,
 							commerceInventoryWarehouseId, sku, quantity);
 
 			return com.liferay.commerce.inventory.model.
@@ -200,16 +215,16 @@ public class CommerceInventoryWarehouseItemServiceSoap {
 
 	public static
 		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItemSoap
-				fetchCommerceInventoryWarehouseItemByReferenceCode(
-					long companyId, String externalReferenceCode)
+				fetchCommerceInventoryWarehouseItemByExternalReferenceCode(
+					String externalReferenceCode, long companyId)
 			throws RemoteException {
 
 		try {
 			com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
 				returnValue =
 					CommerceInventoryWarehouseItemServiceUtil.
-						fetchCommerceInventoryWarehouseItemByReferenceCode(
-							companyId, externalReferenceCode);
+						fetchCommerceInventoryWarehouseItemByExternalReferenceCode(
+							externalReferenceCode, companyId);
 
 			return com.liferay.commerce.inventory.model.
 				CommerceInventoryWarehouseItemSoap.toSoapModel(returnValue);
@@ -577,88 +592,6 @@ public class CommerceInventoryWarehouseItemServiceSoap {
 						updateCommerceInventoryWarehouseItem(
 							commerceInventoryWarehouseItemId, quantity,
 							mvccVersion);
-
-			return com.liferay.commerce.inventory.model.
-				CommerceInventoryWarehouseItemSoap.toSoapModel(returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
-	 #upsertCommerceInventoryWarehouseItem(String,
-	 long, long, long, String, int)}
-	 */
-	@Deprecated
-	public static
-		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItemSoap
-				upsertCommerceInventoryWarehouseItem(
-					long companyId, long userId,
-					long commerceInventoryWarehouseId,
-					String externalReferenceCode, String sku, int quantity)
-			throws RemoteException {
-
-		try {
-			com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
-				returnValue =
-					CommerceInventoryWarehouseItemServiceUtil.
-						upsertCommerceInventoryWarehouseItem(
-							companyId, userId, commerceInventoryWarehouseId,
-							externalReferenceCode, sku, quantity);
-
-			return com.liferay.commerce.inventory.model.
-				CommerceInventoryWarehouseItemSoap.toSoapModel(returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	public static
-		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItemSoap
-				upsertCommerceInventoryWarehouseItem(
-					long userId, long commerceInventoryWarehouseId, String sku,
-					int quantity)
-			throws RemoteException {
-
-		try {
-			com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
-				returnValue =
-					CommerceInventoryWarehouseItemServiceUtil.
-						upsertCommerceInventoryWarehouseItem(
-							userId, commerceInventoryWarehouseId, sku,
-							quantity);
-
-			return com.liferay.commerce.inventory.model.
-				CommerceInventoryWarehouseItemSoap.toSoapModel(returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	public static
-		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItemSoap
-				upsertCommerceInventoryWarehouseItem(
-					String externalReferenceCode, long companyId, long userId,
-					long commerceInventoryWarehouseId, String sku, int quantity)
-			throws RemoteException {
-
-		try {
-			com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
-				returnValue =
-					CommerceInventoryWarehouseItemServiceUtil.
-						upsertCommerceInventoryWarehouseItem(
-							externalReferenceCode, companyId, userId,
-							commerceInventoryWarehouseId, sku, quantity);
 
 			return com.liferay.commerce.inventory.model.
 				CommerceInventoryWarehouseItemSoap.toSoapModel(returnValue);

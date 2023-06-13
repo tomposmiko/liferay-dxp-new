@@ -165,8 +165,8 @@ public class ExportImportStyleBookEntriesMVCResourceCommandTest {
 				targetGroupStyleBookEntry.getFrontendTokensValues());
 
 		Assert.assertEquals(
-			expectedFrontendTokensValuesJSONObject.toString(),
-			actualFrontendTokensValuesJSONObject.toString());
+			expectedFrontendTokensValuesJSONObject.toJSONString(),
+			actualFrontendTokensValuesJSONObject.toJSONString());
 	}
 
 	@Test(expected = DuplicateStyleBookEntryKeyException.class)
@@ -274,8 +274,8 @@ public class ExportImportStyleBookEntriesMVCResourceCommandTest {
 				updatedTargetGroupStyleBookEntry.getFrontendTokensValues());
 
 		Assert.assertEquals(
-			expectedFrontendTokensValuesJSONObject.toString(),
-			actualFrontendTokensValuesJSONObject.toString());
+			expectedFrontendTokensValuesJSONObject.toJSONString(),
+			actualFrontendTokensValuesJSONObject.toJSONString());
 	}
 
 	@Test
@@ -408,8 +408,8 @@ public class ExportImportStyleBookEntriesMVCResourceCommandTest {
 					StringUtil.read(zipFile.getInputStream(zipEntry)));
 
 			Assert.assertEquals(
-				expectedFrontendTokensValuesJSONObject.toString(),
-				actualFrontendTokensValuesJSONObject.toString());
+				expectedFrontendTokensValuesJSONObject.toJSONString(),
+				actualFrontendTokensValuesJSONObject.toJSONString());
 		}
 
 		if (_isStyleBookThumbnailFile(zipEntry.getName())) {

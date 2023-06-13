@@ -17,18 +17,13 @@ package com.liferay.asset.list.service.base;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryService;
 import com.liferay.asset.list.service.AssetListEntryServiceUtil;
-import com.liferay.asset.list.service.persistence.AssetListEntryAssetEntryRelFinder;
-import com.liferay.asset.list.service.persistence.AssetListEntryAssetEntryRelPersistence;
 import com.liferay.asset.list.service.persistence.AssetListEntryPersistence;
-import com.liferay.asset.list.service.persistence.AssetListEntrySegmentsEntryRelPersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -149,31 +144,5 @@ public abstract class AssetListEntryServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserService userService;
-
-	@Reference
-	protected AssetListEntryAssetEntryRelPersistence
-		assetListEntryAssetEntryRelPersistence;
-
-	@Reference
-	protected AssetListEntryAssetEntryRelFinder
-		assetListEntryAssetEntryRelFinder;
-
-	@Reference
-	protected AssetListEntrySegmentsEntryRelPersistence
-		assetListEntrySegmentsEntryRelPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AssetListEntryServiceBaseImpl.class);
 
 }

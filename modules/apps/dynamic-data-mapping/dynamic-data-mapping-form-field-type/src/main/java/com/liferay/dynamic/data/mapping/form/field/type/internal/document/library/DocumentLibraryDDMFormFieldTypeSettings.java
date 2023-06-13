@@ -30,8 +30,9 @@ import com.liferay.dynamic.data.mapping.form.field.type.DefaultDDMFormFieldTypeS
 	rules = {
 		@DDMFormRule(
 			actions = {
+				"setVisible('dataType', false)",
 				"setVisible('predefinedValue', false)",
-				"setVisible('validation', false)"
+				"setVisible('requiredErrorMessage', getValue('required'))"
 			},
 			condition = "TRUE"
 		)
@@ -48,7 +49,8 @@ import com.liferay.dynamic.data.mapping.form.field.type.DefaultDDMFormFieldTypeS
 						@DDMFormLayoutColumn(
 							size = 12,
 							value = {
-								"label", "tip", "required", "allowGuestUsers"
+								"label", "tip", "required",
+								"requiredErrorMessage", "allowGuestUsers"
 							}
 						)
 					}
@@ -64,8 +66,9 @@ import com.liferay.dynamic.data.mapping.form.field.type.DefaultDDMFormFieldTypeS
 							size = 12,
 							value = {
 								"name", "fieldReference", "predefinedValue",
-								"visibilityExpression", "validation",
-								"fieldNamespace", "indexType", "localizable",
+								"objectFieldName", "visibilityExpression",
+								"fieldNamespace", "indexType",
+								"labelAtStructureLevel", "localizable",
 								"readOnly", "dataType", "type", "showLabel",
 								"repeatable"
 							}
@@ -84,6 +87,10 @@ public interface DocumentLibraryDDMFormFieldTypeSettings
 		properties = "showAsSwitcher=true", type = "checkbox"
 	)
 	public boolean allowGuestUsers();
+
+	@DDMFormField(predefinedValue = "document-library", required = true)
+	@Override
+	public String dataType();
 
 	@DDMFormField(
 		label = "%repeatable",

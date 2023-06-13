@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -293,77 +294,99 @@ public class DispatchLogModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<DispatchLog, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, DispatchLog>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<DispatchLog, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<DispatchLog, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DispatchLog.class.getClassLoader(), DispatchLog.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", DispatchLog::getMvccVersion);
-		attributeGetterFunctions.put(
-			"dispatchLogId", DispatchLog::getDispatchLogId);
-		attributeGetterFunctions.put("companyId", DispatchLog::getCompanyId);
-		attributeGetterFunctions.put("userId", DispatchLog::getUserId);
-		attributeGetterFunctions.put("userName", DispatchLog::getUserName);
-		attributeGetterFunctions.put("createDate", DispatchLog::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", DispatchLog::getModifiedDate);
-		attributeGetterFunctions.put(
-			"dispatchTriggerId", DispatchLog::getDispatchTriggerId);
-		attributeGetterFunctions.put("endDate", DispatchLog::getEndDate);
-		attributeGetterFunctions.put("error", DispatchLog::getError);
-		attributeGetterFunctions.put("output", DispatchLog::getOutput);
-		attributeGetterFunctions.put("startDate", DispatchLog::getStartDate);
-		attributeGetterFunctions.put("status", DispatchLog::getStatus);
+		try {
+			Constructor<DispatchLog> constructor =
+				(Constructor<DispatchLog>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<DispatchLog, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<DispatchLog, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<DispatchLog, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DispatchLog, Object>>();
 		Map<String, BiConsumer<DispatchLog, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<DispatchLog, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", DispatchLog::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DispatchLog, Long>)DispatchLog::setMvccVersion);
+		attributeGetterFunctions.put(
+			"dispatchLogId", DispatchLog::getDispatchLogId);
 		attributeSetterBiConsumers.put(
 			"dispatchLogId",
 			(BiConsumer<DispatchLog, Long>)DispatchLog::setDispatchLogId);
+		attributeGetterFunctions.put("companyId", DispatchLog::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DispatchLog, Long>)DispatchLog::setCompanyId);
+		attributeGetterFunctions.put("userId", DispatchLog::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<DispatchLog, Long>)DispatchLog::setUserId);
+		attributeGetterFunctions.put("userName", DispatchLog::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<DispatchLog, String>)DispatchLog::setUserName);
+		attributeGetterFunctions.put("createDate", DispatchLog::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<DispatchLog, Date>)DispatchLog::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", DispatchLog::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<DispatchLog, Date>)DispatchLog::setModifiedDate);
+		attributeGetterFunctions.put(
+			"dispatchTriggerId", DispatchLog::getDispatchTriggerId);
 		attributeSetterBiConsumers.put(
 			"dispatchTriggerId",
 			(BiConsumer<DispatchLog, Long>)DispatchLog::setDispatchTriggerId);
+		attributeGetterFunctions.put("endDate", DispatchLog::getEndDate);
 		attributeSetterBiConsumers.put(
 			"endDate", (BiConsumer<DispatchLog, Date>)DispatchLog::setEndDate);
+		attributeGetterFunctions.put("error", DispatchLog::getError);
 		attributeSetterBiConsumers.put(
 			"error", (BiConsumer<DispatchLog, String>)DispatchLog::setError);
+		attributeGetterFunctions.put("output", DispatchLog::getOutput);
 		attributeSetterBiConsumers.put(
 			"output", (BiConsumer<DispatchLog, String>)DispatchLog::setOutput);
+		attributeGetterFunctions.put("startDate", DispatchLog::getStartDate);
 		attributeSetterBiConsumers.put(
 			"startDate",
 			(BiConsumer<DispatchLog, Date>)DispatchLog::setStartDate);
+		attributeGetterFunctions.put("status", DispatchLog::getStatus);
 		attributeSetterBiConsumers.put(
 			"status", (BiConsumer<DispatchLog, Integer>)DispatchLog::setStatus);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -686,6 +709,38 @@ public class DispatchLogModelImpl
 	}
 
 	@Override
+	public DispatchLog cloneWithOriginalValues() {
+		DispatchLogImpl dispatchLogImpl = new DispatchLogImpl();
+
+		dispatchLogImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		dispatchLogImpl.setDispatchLogId(
+			this.<Long>getColumnOriginalValue("dispatchLogId"));
+		dispatchLogImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		dispatchLogImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		dispatchLogImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		dispatchLogImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		dispatchLogImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		dispatchLogImpl.setDispatchTriggerId(
+			this.<Long>getColumnOriginalValue("dispatchTriggerId"));
+		dispatchLogImpl.setEndDate(
+			this.<Date>getColumnOriginalValue("endDate"));
+		dispatchLogImpl.setError(this.<String>getColumnOriginalValue("error"));
+		dispatchLogImpl.setOutput(
+			this.<String>getColumnOriginalValue("output_"));
+		dispatchLogImpl.setStartDate(
+			this.<Date>getColumnOriginalValue("startDate"));
+		dispatchLogImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
+
+		return dispatchLogImpl;
+	}
+
+	@Override
 	public int compareTo(DispatchLog dispatchLog) {
 		int value = 0;
 
@@ -918,9 +973,7 @@ public class DispatchLogModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DispatchLog>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DispatchLog.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

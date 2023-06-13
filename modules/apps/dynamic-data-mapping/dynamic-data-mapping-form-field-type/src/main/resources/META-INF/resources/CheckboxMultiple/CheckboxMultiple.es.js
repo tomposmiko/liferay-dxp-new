@@ -14,7 +14,7 @@
 
 import {ClayCheckbox} from '@clayui/form';
 import classNames from 'classnames';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {FieldBase} from '../FieldBase/ReactFieldBase.es';
 import {setJSONArrayValue} from '../util/setters.es';
@@ -47,9 +47,11 @@ const Switcher = ({
 				type="checkbox"
 				value={value}
 			/>
+
 			<span aria-hidden="true" className="toggle-switch-bar">
 				<span className="toggle-switch-handle"></span>
 			</span>
+
 			<span className="toggle-switch-label">{label}</span>
 		</label>
 	</div>
@@ -69,6 +71,10 @@ const CheckboxMultiple = ({
 	value: initialValue,
 }) => {
 	const [value, setValue] = useState(initialValue);
+
+	useEffect(() => {
+		setValue(initialValue);
+	}, [initialValue]);
 
 	const displayValues =
 		value?.length || (value?.length === 0 && localizedValueEdited)
@@ -92,20 +98,22 @@ const CheckboxMultiple = ({
 
 	return (
 		<div className="lfr-ddm-checkbox-multiple">
-			{options.map((option) => (
+			{options.map((option, index) => (
 				<Toggle
 					checked={displayValues.includes(option.value)}
 					disabled={disabled}
 					inline={inline}
 					key={option.value}
 					label={option.label}
-					name={name}
+					name={`${name}_${index}`}
 					onBlur={onBlur}
 					onChange={handleChange}
 					onFocus={onFocus}
 					value={option.value}
 				/>
 			))}
+
+			<input name={name} type="hidden" value={value} />
 		</div>
 	);
 };

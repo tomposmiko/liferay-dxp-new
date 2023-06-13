@@ -9,12 +9,15 @@
  * distribution rights of the Software.
  */
 
+import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
 import ClayEmptyState from '@clayui/empty-state';
 import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import ClayLink from '@clayui/link';
+import ClaySticker from '@clayui/sticker';
 import ClayToolbar from '@clayui/toolbar';
+import {ClayTooltipProvider} from '@clayui/tooltip';
 import getCN from 'classnames';
 import {fetch, navigate} from 'frontend-js-web';
 import {PropTypes} from 'prop-types';
@@ -26,25 +29,17 @@ import React, {
 	useState,
 } from 'react';
 
-import sxpElementSchema from '../../schemas/sxpQueryElementSchema';
-import useShouldConfirmBeforeNavigate from '../hooks/useShouldConfirmBeforeNavigate';
 import CodeMirrorEditor from '../shared/CodeMirrorEditor';
 import ErrorBoundary from '../shared/ErrorBoundary';
-import JSONSXPElement from '../shared/JSONSXPElement';
-import LearnMessage from '../shared/LearnMessage';
 import PreviewModal from '../shared/PreviewModal';
 import SearchInput from '../shared/SearchInput';
-import Sidebar from '../shared/Sidebar';
 import SubmitWarningModal from '../shared/SubmitWarningModal';
 import ThemeContext from '../shared/ThemeContext';
 import SXPElement from '../shared/sxp_element/index';
-import {CONFIG_PREFIX} from '../utils/constants';
-import {DEFAULT_ERROR} from '../utils/errorMessages';
-import {DEFAULT_HEADERS} from '../utils/fetch/fetch_data';
-import sub from '../utils/language/sub';
-import getUIConfigurationValues from '../utils/sxp_element/get_ui_configuration_values';
-import isCustomJSONSXPElement from '../utils/sxp_element/is_custom_json_sxp_element';
-import {openErrorToast, setInitialSuccessToast} from '../utils/toasts';
+import {CONFIG_PREFIX, DEFAULT_ERROR} from '../utils/constants';
+import {sub} from '../utils/language';
+import {openErrorToast} from '../utils/toasts';
+import {getUIConfigurationValues} from '../utils/utils';
 import SidebarPanel from './SidebarPanel';
 
 /**
@@ -80,7 +75,7 @@ const validateConfigKeys = (
 		...JSON.stringify(configurationJSONObject).matchAll(regex),
 	].map((item) => item[1]);
 
-	const uiConfigKeys = uiConfigurationJSONObject?.fieldSets
+	const uiConfigKeys = uiConfigurationJSONObject.fieldSets
 		? uiConfigurationJSONObject.fieldSets.reduce((acc, curr) => {
 
 				// Find names within each fields array
@@ -130,20 +125,13 @@ function EditSXPElementForm({
 	const formRef = useRef();
 	const elementJSONEditorRef = useRef();
 
-	const initialElementJSONEditorValueString = JSON.stringify(
-		initialElementJSONEditorValue,
-		null,
-		'\t'
-	);
-
 	const [errors, setErrors] = useState([]);
 	const [expandAllVariables, setExpandAllVariables] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [showInfoSidebar, setShowInfoSidebar] = useState(false);
+	const [showSidebar, setShowSidebar] = useState(false);
 	const [showSubmitWarningModal, setShowSubmitWarningModal] = useState(false);
-	const [showVariablesSidebar, setShowVariablesSidebar] = useState(false);
 	const [elementJSONEditorValue, setElementJSONEditorValue] = useState(
-		initialElementJSONEditorValueString
+		JSON.stringify(initialElementJSONEditorValue, null, '\t')
 	);
 
 	const filteredCategories = {};
@@ -159,18 +147,13 @@ function EditSXPElementForm({
 
 	const [variables, setVariables] = useState(filteredCategories);
 
-	useShouldConfirmBeforeNavigate(
-		initialElementJSONEditorValueString !== elementJSONEditorValue &&
-			!isSubmitting
-	);
-
 	/**
 	 * Workaround to force a re-render so `elementJSONEditorRef` will be
 	 * defined when calling `_handleVariableClick`
 	 */
 	useEffect(() => {
 		if (!readOnly) {
-			setShowVariablesSidebar(true);
+			setShowSidebar(true);
 		}
 	}, [readOnly]);
 
@@ -181,11 +164,7 @@ function EditSXPElementForm({
 			predefinedVariables.map((variable) => {
 				const category = variable.templateVariable.match(/\w+/g)[0];
 
-				if (
-					variable.description
-						.toLowerCase()
-						.includes(value.toLowerCase())
-				) {
+				if (variable.description.toLowerCase().includes(value)) {
 					filteredCategories[category] = [
 						...(filteredCategories[category] || []),
 						variable,
@@ -199,7 +178,7 @@ function EditSXPElementForm({
 		[predefinedVariables]
 	);
 
-	const _handleSubmit = (event) => {
+	const _handleSubmit = async (event) => {
 		event.preventDefault();
 
 		setIsSubmitting(true);
@@ -279,7 +258,7 @@ function EditSXPElementForm({
 				}
 			}
 
-			fetch(
+			const responseContent = await fetch(
 				`/o/search-experiences-rest/v1.0/sxp-elements/${sxpElementId}`,
 				{
 					body: JSON.stringify({
@@ -288,42 +267,33 @@ function EditSXPElementForm({
 						title_i18n,
 						type,
 					}),
-					headers: DEFAULT_HEADERS,
+					headers: new Headers({
+						'Content-Type': 'application/json',
+					}),
 					method: 'PATCH',
 				}
-			)
-				.then((response) => {
-					if (!response.ok) {
-						setShowSubmitWarningModal(false);
+			).then((response) => {
+				if (!response.ok) {
+					setShowSubmitWarningModal(false);
 
-						throw DEFAULT_ERROR;
-					}
+					throw DEFAULT_ERROR;
+				}
 
-					return response.json();
-				})
-				.then((responseContent) => {
-					if (
-						Object.prototype.hasOwnProperty.call(
-							responseContent,
-							'errors'
-						)
-					) {
-						responseContent.errors.forEach((message) =>
-							openErrorToast({message})
-						);
+				return response.json();
+			});
 
-						setIsSubmitting(false);
-					}
-					else {
-						setInitialSuccessToast(
-							Liferay.Language.get(
-								'the-element-was-saved-successfully'
-							)
-						);
+			if (
+				Object.prototype.hasOwnProperty.call(responseContent, 'errors')
+			) {
+				responseContent.errors.forEach((message) =>
+					openErrorToast({message})
+				);
 
-						navigate(redirectURL);
-					}
-				});
+				setIsSubmitting(false);
+			}
+			else {
+				navigate(redirectURL);
+			}
 		}
 		catch (error) {
 			openErrorToast();
@@ -345,14 +315,9 @@ function EditSXPElementForm({
 
 	function _renderPreviewBody() {
 		let previewSXPElementJSON = {};
-		let uiConfigurationValues = {};
 
 		try {
 			previewSXPElementJSON = JSON.parse(elementJSONEditorValue);
-
-			uiConfigurationValues = getUIConfigurationValues(
-				previewSXPElementJSON
-			);
 		}
 		catch (error) {
 			return (
@@ -369,20 +334,13 @@ function EditSXPElementForm({
 		return (
 			<div className="portlet-sxp-blueprint-admin">
 				<ErrorBoundary>
-					{isCustomJSONSXPElement(uiConfigurationValues) ? (
-						<JSONSXPElement
-							collapseAll={false}
-							readOnly={true}
-							sxpElement={previewSXPElementJSON}
-							uiConfigurationValues={uiConfigurationValues}
-						/>
-					) : (
-						<SXPElement
-							collapseAll={false}
-							sxpElement={previewSXPElementJSON}
-							uiConfigurationValues={uiConfigurationValues}
-						/>
-					)}
+					<SXPElement
+						collapseAll={false}
+						sxpElement={previewSXPElementJSON}
+						uiConfigurationValues={getUIConfigurationValues(
+							previewSXPElementJSON
+						)}
+					/>
 				</ErrorBoundary>
 			</div>
 		);
@@ -428,27 +386,14 @@ function EditSXPElementForm({
 
 								{readOnly && (
 									<ClayToolbar.Item>
-										<div
-											className="alert alert-feedback alert-info m-0"
-											role="alert"
-										>
-											<div className="alert-autofit-row autofit-row">
-												<div className="autofit-col">
-													<div className="autofit-section">
-														<ClayIcon symbol="info-circle" />
-													</div>
-												</div>
-												<div className="autofit-col autofit-col-expand">
-													<div className="autofit-section">
-														<strong className="lead">
-															{Liferay.Language.get(
-																'read-only'
-															)}
-														</strong>
-													</div>
-												</div>
-											</div>
-										</div>
+										<ClayAlert
+											className="m-0"
+											displayType="info"
+											title={Liferay.Language.get(
+												'read-only'
+											)}
+											variant="feedback"
+										/>
 									</ClayToolbar.Item>
 								)}
 
@@ -514,62 +459,7 @@ function EditSXPElementForm({
 				</div>
 			</form>
 
-			<Sidebar
-				className="info-sidebar"
-				onClose={() => setShowInfoSidebar(false)}
-				title={Liferay.Language.get('element-source')}
-				visible={showInfoSidebar}
-			>
-				<div className="container-fluid">
-					<span className="help-text text-secondary">
-						{Liferay.Language.get('element-source-description')}
-					</span>
-
-					<LearnMessage resourceKey="element-source" />
-				</div>
-
-				{!readOnly && (
-					<>
-						<div className="sidebar-header">
-							<h4 className="component-title">
-								<span className="text-truncate-inline">
-									<span className="text-truncate">
-										{Liferay.Language.get(
-											'json-autocomplete'
-										)}
-									</span>
-								</span>
-							</h4>
-						</div>
-
-						<div className="container-fluid">
-							<div className="help-text text-secondary">
-								{Liferay.Language.get(
-									'begin-typing-inside-double-quotes-to-see-the-autocomplete-options'
-								)}
-							</div>
-
-							<div className="help-text text-secondary">
-								{Liferay.Language.get(
-									'use-the-arrow-keys-or-the-mouse-to-navigate-the-menu'
-								)}
-							</div>
-
-							<div className="help-text text-secondary">
-								{Liferay.Language.get(
-									'use-the-enter-key-to-select-a-menu-item'
-								)}
-							</div>
-						</div>
-					</>
-				)}
-			</Sidebar>
-
-			<div
-				className={getCN('sxp-element-row', {
-					shifted: showInfoSidebar,
-				})}
-			>
+			<div className="sxp-element-row">
 				<ClayLayout.Row>
 					<ClayLayout.Col size={12}>
 						<div className="sxp-element-section">
@@ -577,16 +467,12 @@ function EditSXPElementForm({
 								{!readOnly && (
 									<ClayButton
 										borderless
-										className={getCN({
-											active: showVariablesSidebar,
-										})}
+										className={showSidebar && 'active'}
 										disabled={false}
 										displayType="secondary"
 										monospaced
 										onClick={() =>
-											setShowVariablesSidebar(
-												!showVariablesSidebar
-											)
+											setShowSidebar(!showSidebar)
 										}
 										small
 										title={Liferay.Language.get(
@@ -604,28 +490,30 @@ function EditSXPElementForm({
 											{Liferay.Language.get(
 												'element-source-json'
 											)}
+
+											<ClayTooltipProvider>
+												<ClaySticker
+													displayType="unstyled"
+													size="sm"
+													title={Liferay.Language.get(
+														'element-source-json-help'
+													)}
+												>
+													<ClayIcon
+														data-tooltip-align="top"
+														symbol="info-circle"
+													/>
+												</ClaySticker>
+											</ClayTooltipProvider>
 										</label>
 									</div>
 								</div>
-
-								<ClayButton
-									borderless
-									className={getCN({active: showInfoSidebar})}
-									displayType="secondary"
-									monospaced
-									onClick={() =>
-										setShowInfoSidebar(!showInfoSidebar)
-									}
-									small
-								>
-									<ClayIcon symbol="info-circle-open" />
-								</ClayButton>
 							</div>
 
 							<ClayLayout.Row>
 								<ClayLayout.Col
 									className={getCN('json-section', {
-										hide: !showVariablesSidebar,
+										hide: !showSidebar,
 									})}
 									size={3}
 								>
@@ -688,10 +576,9 @@ function EditSXPElementForm({
 
 								<ClayLayout.Col
 									className="json-section"
-									size={showVariablesSidebar ? 9 : 12}
+									size={showSidebar ? 9 : 12}
 								>
 									<CodeMirrorEditor
-										autocompleteSchema={sxpElementSchema}
 										onChange={(value) =>
 											setElementJSONEditorValue(value)
 										}

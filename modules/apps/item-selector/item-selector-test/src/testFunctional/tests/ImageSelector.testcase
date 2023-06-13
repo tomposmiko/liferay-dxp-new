@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -27,26 +27,16 @@ definition {
 	}
 
 	@description = "This makes sure that multiple blog images can be previewed by using the keyboard."
-	@priority = 5
-	test PreviewMultipleImagesInBlogsImages {
-		for (var i : list "1,2,3") {
-			BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
-
-			Blogs.addEntryWithUploadedCoverImage(
-				coverImageName = "Document_${i}",
-				entryContent = "Blogs Entry Content",
-				entryTitle = "Blogs Entry Title ${i}",
-				navTab = "Blog Images",
-				uploadFileName = "Document_${i}.jpg");
-
-			Button.clickPublish();
-
-			Pause(locator1 = 10000);
+	@priority = "5"
+	@refactordone
+	test CanPreviewMultipleImagesInBlogsImages {
+		for (var num : list "1,2,3") {
+			JSONBlog.uploadBlogImage(
+				groupName = "Guest",
+				sourceFileName = "Document_${num}.jpg");
 		}
 
-		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
-
-		BlogsNavigator.gotoAddEntry();
+		BlogsNavigator.openToAddEntry(siteURLKey = "guest");
 
 		BlogsNavigator.gotoSelectFile();
 
@@ -84,23 +74,25 @@ definition {
 
 		for (var coverImageName : list "Document_1,Document_2,Document_3") {
 			AssertElementNotPresent(
-				key_coverImageName = ${coverImageName},
+				key_coverImageName = "${coverImageName}",
 				locator1 = "BlogsEntry#ENTRY_COVER_IMAGE_UNPUBLISHED");
 		}
 	}
 
 	@description = "This makes sure that multiple DM images can be previewed by using the keyboard."
-	@priority = 5
-	test PreviewMultipleImagesInDM {
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+	@priority = "5"
+	@refactordone
+	test CanPreviewMultipleImagesInDM {
+		for (var documentTitle : list "Document_1,Document_2,Document_3") {
+			JSONDocument.addFileWithUploadedFile(
+				dmDocumentDescription = "DM Document Description",
+				dmDocumentTitle = "${documentTitle}",
+				groupName = "Guest",
+				mimeType = "image/jpeg",
+				sourceFileName = "${documentTitle}.jpg");
+		}
 
-		DMDocument.addMultipleCP(dmDocumentFileList = "Document_1.jpg,Document_2.jpg,Document_3.jpg");
-
-		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
-
-		BlogsNavigator.gotoAddEntry();
-
-		Pause(locator1 = 3000);
+		BlogsNavigator.openToAddEntry(siteURLKey = "guest");
 
 		BlogsNavigator.gotoSelectFile();
 
@@ -108,7 +100,7 @@ definition {
 
 		ItemSelector.viewPreview(
 			footer = "1 of 3",
-			imageFileName = "Document_1.jpg");
+			imageFileName = "Document_1");
 
 		AssertVisible(locator1 = "ItemSelector#VIEWER_LEFT");
 
@@ -128,7 +120,7 @@ definition {
 
 		ItemSelector.viewPreview(
 			footer = "3 of 3",
-			imageFileName = "Document_3.jpg");
+			imageFileName = "Document_3");
 
 		KeyPress(
 			locator1 = "ItemSelector#VIEWER_INFO",
@@ -142,32 +134,22 @@ definition {
 
 		for (var coverImageName : list "Document_1,Document_2,Document_3") {
 			AssertElementNotPresent(
-				key_coverImageName = ${coverImageName},
+				key_coverImageName = "${coverImageName}",
 				locator1 = "BlogsEntry#ENTRY_COVER_IMAGE_UNPUBLISHED");
 		}
 	}
 
 	@description = "This ensures that navigation arrows do not appear in image preview when there is only one image in the library."
-	@priority = 5
-	test PreviewSingleImage {
+	@priority = "5"
+	@refactordone
+	test CanPreviewSingleImage {
 		property portal.acceptance = "true";
 
-		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
+		Blogs.addImageToBlogImages(
+			siteURLKey = "guest",
+			uploadFileNames = "Document_1.jpg");
 
-		Blogs.addEntryWithUploadedCoverImage(
-			coverImageName = "Document_1",
-			entryContent = "Blogs Entry Content",
-			entryTitle = "Blogs Entry Title 1",
-			navTab = "Blog Images",
-			uploadFileName = "Document_1.jpg");
-
-		Button.clickPublish();
-
-		Pause(locator1 = 10000);
-
-		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
-
-		BlogsNavigator.gotoAddEntry();
+		BlogsNavigator.openToAddEntry(siteURLKey = "guest");
 
 		BlogsNavigator.gotoSelectFile();
 
@@ -180,56 +162,6 @@ definition {
 		AssertElementNotPresent(locator1 = "ItemSelector#VIEWER_LEFT");
 
 		AssertElementNotPresent(locator1 = "ItemSelector#VIEWER_RIGHT");
-	}
-
-	@priority = 4
-	test RotateImageViaDMSiteAdmin {
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "Document_2.jpg",
-			groupName = "Guest",
-			mimeType = "image/jpeg",
-			sourceFileName = "Document_2.jpg");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		AssertVisible(
-			locator1 = "Portlet#HEADER",
-			value1 = "Documents and Media");
-
-		ImageEditor.gotoImageEditorViaDM(dmDocumentTitle = "Document_2.jpg");
-
-		ImageEditor.rotateImage(rotateDirection = "left");
-
-		Pause(locator1 = 3000);
-
-		ImageEditor.applyChangesAndSaveFile();
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_2.jpg");
-
-		DMDocument.viewDocumentVersionNumberCmdPG(dmDocumentVersionNumber = "1.1");
-	}
-
-	@priority = 5
-	test ViewImageEditorControls {
-		property environment.acceptance = "true";
-		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
-		property portal.acceptance = "true";
-
-		JSONDocument.addFileWithUploadedFile(
-			dmDocumentDescription = "DM Document Description",
-			dmDocumentTitle = "Document_1.jpg",
-			groupName = "Guest",
-			mimeType = "image/jpeg",
-			sourceFileName = "Document_1.jpg");
-
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		ImageEditor.gotoImageEditorViaDM(dmDocumentTitle = "Document_1.jpg");
-
-		ImageEditor.viewBaseControls();
 	}
 
 }

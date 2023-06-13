@@ -24,7 +24,10 @@ import com.liferay.knowledge.base.constants.KBPortletKeys;
 import com.liferay.knowledge.base.exception.NoSuchArticleException;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.service.KBArticleLocalService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -118,14 +121,14 @@ public class KBArticleAssetRendererFactory
 			LiferayPortletResponse liferayPortletResponse, long classTypeId)
 		throws PortalException {
 
-		PortletURL portletURL = _portal.getControlPanelPortletURL(
-			liferayPortletRequest, getGroup(liferayPortletRequest),
-			KBPortletKeys.KNOWLEDGE_BASE_ADMIN, 0, 0,
-			PortletRequest.RENDER_PHASE);
-
-		portletURL.setParameter("mvcPath", "/admin/edit_article.jsp");
-
-		return portletURL;
+		return PortletURLBuilder.create(
+			_portal.getControlPanelPortletURL(
+				liferayPortletRequest, getGroup(liferayPortletRequest),
+				KBPortletKeys.KNOWLEDGE_BASE_ADMIN, 0, 0,
+				PortletRequest.RENDER_PHASE)
+		).setMVCPath(
+			"/admin/edit_article.jsp"
+		).buildPortletURL();
 	}
 
 	@Override
@@ -162,6 +165,10 @@ public class KBArticleAssetRendererFactory
 			kbArticle = _kbArticleLocalService.getKBArticle(classPK);
 		}
 		catch (NoSuchArticleException noSuchArticleException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(noSuchArticleException, noSuchArticleException);
+			}
+
 			kbArticle = _kbArticleLocalService.getLatestKBArticle(
 				classPK, status);
 		}
@@ -175,6 +182,9 @@ public class KBArticleAssetRendererFactory
 
 		_kbArticleLocalService = kbArticleLocalService;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		KBArticleAssetRendererFactory.class);
 
 	private KBArticleLocalService _kbArticleLocalService;
 

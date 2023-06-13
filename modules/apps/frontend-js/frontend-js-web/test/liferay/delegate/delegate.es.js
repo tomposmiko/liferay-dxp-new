@@ -71,7 +71,7 @@ describe('delegate', () => {
 
 		document
 			.querySelector('.match')
-			.addEventListener('click', (e) => e.stopPropagation());
+			.addEventListener('click', (event) => event.stopPropagation());
 
 		userEvent.click(getByTestId(document, 'match'));
 
@@ -180,5 +180,62 @@ describe('delegate', () => {
 		userEvent.click(getByTestId(document, 'most-inner-match'));
 
 		expect(delegateTarget).toBe(document.querySelector('.match'));
+	});
+
+	it('works with comma-delimited selector lists', () => {
+		document.body.innerHTML = `<div class="match" data-testid="match">
+				<div>
+					<div class="one" data-testid="one"></div>
+					<div class="two" data-testid="two"></div>
+				</div>
+			</div >`;
+
+		const listener = jest.fn();
+
+		const selector = '.one,.two';
+
+		delegate(document.body, 'mouseover', selector, listener);
+
+		const event = new Event('mouseover', {
+			bubbles: true,
+			cancelable: true,
+		});
+
+		let element = getByTestId(document, 'one');
+		element.dispatchEvent(event);
+
+		expect(listener).toHaveBeenCalledTimes(1);
+
+		element = getByTestId(document, 'two');
+		element.dispatchEvent(event);
+
+		expect(listener).toHaveBeenCalledTimes(2);
+	});
+
+	it('sets delegateTarget when using a selector list', () => {
+		document.body.innerHTML = `<div class="match" data-testid="match">
+				<div>
+					<div class="one" data-testid="one"></div>
+					<div class="two" data-testid="two"></div>
+				</div>
+			</div >`;
+
+		let delegateTarget;
+
+		const listener = (event) => {
+			delegateTarget = event.delegateTarget;
+		};
+
+		const selector = '.one,.two';
+
+		delegate(document.body, 'click', selector, listener);
+
+		userEvent.click(getByTestId(document, 'one'));
+
+		expect(delegateTarget).toBe(document.querySelector('.one'));
+
+		userEvent.click(getByTestId(document, 'two'));
+
+		expect(delegateTarget).toBe(document.querySelector('.two'));
 	});
 });

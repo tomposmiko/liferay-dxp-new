@@ -269,6 +269,10 @@ public interface OAuth2AuthorizationLocalService
 		String refreshTokenContent);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public OAuth2Authorization fetchOAuth2AuthorizationByRememberDeviceContent(
+		long userId, long oAuth2ApplicationId, String rememberDeviceContent);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -404,5 +408,8 @@ public interface OAuth2AuthorizationLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public OAuth2Authorization updateOAuth2Authorization(
 		OAuth2Authorization oAuth2Authorization);
+
+	public OAuth2Authorization updateRememberDeviceContent(
+		String refreshTokenContent, String rememberDeviceContent);
 
 }

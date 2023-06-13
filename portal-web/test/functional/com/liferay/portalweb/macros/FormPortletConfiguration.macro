@@ -2,9 +2,19 @@ definition {
 
 	var formName = "Created Form Name";
 
+	macro changeLanguage {
+		Click(
+			key_language = "${currentLanguage}",
+			locator1 = "FormPortletConfiguration#SELECT_LANGUAGE");
+
+		Click(
+			key_language = "${newLanguage}",
+			locator1 = "FormPortletConfiguration#SELECT_LANGUAGE");
+	}
+
 	macro configureScopePG {
 		Portlet.gotoPortletOptions(
-			portletName = ${portletName},
+			portletName = "${portletName}",
 			portletOption = "Configuration");
 
 		SelectFrame(locator1 = "IFrame#CONFIGURATION");
@@ -13,22 +23,32 @@ definition {
 
 		Select(
 			locator1 = "Select#SCOPE",
-			value1 = ${scopeSelection});
+			value1 = "${scopeSelection}");
 
 		PortletEntry.save();
 	}
 
 	macro selectForm {
+		if (isSet(formTitle)) {
+			var formName = "${formTitle}";
+		}
+
 		Navigator.gotoNavItem(navItem = "Setup");
 
 		AssertClick(
-			key_formName = ${formName},
+			key_formName = "${formName}",
 			locator1 = "FormPortletConfiguration#FORMS_TABLE_NAME",
-			value1 = ${formName});
+			value1 = "${formName}");
 
 		AssertTextEquals(
 			locator1 = "Message#INFO",
 			value1 = "Displaying Form: ${formName} (Modified)");
+	}
+
+	macro viewTranslationLanguage {
+		AssertElementPresent(
+			key_language = "${language}",
+			locator1 = "FormPortletConfiguration#SELECT_LANGUAGE");
 	}
 
 }

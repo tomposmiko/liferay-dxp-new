@@ -24,21 +24,19 @@ import com.liferay.item.selector.criteria.upload.criterion.UploadItemSelectorCri
 import com.liferay.item.selector.criteria.url.criterion.URLItemSelectorCriterion;
 import com.liferay.knowledge.base.constants.KBPortletKeys;
 import com.liferay.knowledge.base.item.selector.criterion.KBAttachmentItemSelectorCriterion;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.editor.configuration.BaseEditorConfigContributor;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.language.LanguageResources;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
@@ -153,26 +151,19 @@ public class KBAttachmentEditorConfigContributor
 		long resourcePrimKey, ThemeDisplay themeDisplay,
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory) {
 
-		PortletURL portletURL = requestBackedPortletURLFactory.createActionURL(
-			KBPortletKeys.KNOWLEDGE_BASE_ADMIN);
-
-		portletURL.setParameter(
-			ActionRequest.ACTION_NAME, "uploadKBArticleAttachments");
-		portletURL.setParameter(
-			"resourcePrimKey", String.valueOf(resourcePrimKey));
-
-		ResourceBundleLoader resourceBundleLoader =
-			ResourceBundleLoaderUtil.
-				getResourceBundleLoaderByBundleSymbolicName(
-					"com.liferay.knowledge.base.item.selector.web");
-
 		ItemSelectorCriterion itemSelectorCriterion =
 			new UploadItemSelectorCriterion(
-				null, portletURL.toString(),
-				ResourceBundleUtil.getString(
-					resourceBundleLoader.loadResourceBundle(
-						themeDisplay.getLocale()),
-					"article-attachments"));
+				null,
+				PortletURLBuilder.create(
+					requestBackedPortletURLFactory.createActionURL(
+						KBPortletKeys.KNOWLEDGE_BASE_ADMIN)
+				).setActionName(
+					"uploadKBArticleAttachments"
+				).setParameter(
+					"resourcePrimKey", resourcePrimKey
+				).buildString(),
+				LanguageResources.getMessage(
+					themeDisplay.getLocale(), "article-attachments"));
 
 		itemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			new FileEntryItemSelectorReturnType());

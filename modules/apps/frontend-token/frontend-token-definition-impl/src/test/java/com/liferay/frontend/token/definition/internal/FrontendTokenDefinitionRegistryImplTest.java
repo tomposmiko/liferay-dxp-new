@@ -15,10 +15,11 @@
 package com.liferay.frontend.token.definition.internal;
 
 import com.liferay.frontend.token.definition.FrontendTokenDefinition;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
@@ -56,8 +57,6 @@ public class FrontendTokenDefinitionRegistryImplTest {
 				new FrontendTokenDefinitionRegistryImpl();
 
 		frontendTokenDefinitionRegistryImpl.jsonFactory = new JSONFactoryImpl();
-		frontendTokenDefinitionRegistryImpl.resourceBundleLoaders =
-			Mockito.mock(ServiceTrackerMap.class);
 
 		Bundle bundle = Mockito.mock(Bundle.class);
 
@@ -71,6 +70,12 @@ public class FrontendTokenDefinitionRegistryImplTest {
 			bundle.getHeaders(Mockito.anyString())
 		).thenReturn(
 			new HashMapDictionary<>()
+		);
+
+		Mockito.when(
+			bundle.getSymbolicName()
+		).thenReturn(
+			StringPool.BLANK
 		);
 
 		FrontendTokenDefinition frontendTokenDefinition =
@@ -97,9 +102,9 @@ public class FrontendTokenDefinitionRegistryImplTest {
 
 		Bundle bundle = Mockito.mock(Bundle.class);
 
-		Dictionary<String, String> headers = new HashMapDictionary<>();
-
-		headers.put("Web-ContextPath", "/my-theme");
+		Dictionary<String, String> headers = HashMapDictionaryBuilder.put(
+			"Web-ContextPath", "/my-theme"
+		).build();
 
 		Mockito.when(
 			bundle.getHeaders(Mockito.anyString())
@@ -164,9 +169,9 @@ public class FrontendTokenDefinitionRegistryImplTest {
 			_liferayLookAndFeelXMLURL
 		);
 
-		Dictionary<String, String> headers = new HashMapDictionary<>();
-
-		headers.put("Web-ContextPath", "/classic-theme");
+		Dictionary<String, String> headers = HashMapDictionaryBuilder.put(
+			"Web-ContextPath", "/classic-theme"
+		).build();
 
 		Mockito.when(
 			bundle.getHeaders(Mockito.anyString())

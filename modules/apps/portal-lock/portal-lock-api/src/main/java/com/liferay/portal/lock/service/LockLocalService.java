@@ -15,6 +15,7 @@
 package com.liferay.portal.lock.service;
 
 import com.liferay.petra.sql.dsl.query.DSLQuery;
+import com.liferay.portal.kernel.dao.jdbc.aop.MasterDataSource;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
@@ -320,8 +321,10 @@ public interface LockLocalService
 			boolean inheritable, long expirationTime, boolean renew)
 		throws PortalException;
 
+	@MasterDataSource
 	public Lock lock(String className, String key, String owner);
 
+	@MasterDataSource
 	public Lock lock(
 		String className, String key, String expectedOwner,
 		String updatedOwner);
@@ -333,6 +336,7 @@ public interface LockLocalService
 
 	public void unlock(String className, String key);
 
+	@MasterDataSource
 	public void unlock(String className, String key, String owner);
 
 	/**

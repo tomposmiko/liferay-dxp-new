@@ -31,7 +31,7 @@ int mfaCheckerIndex = ParamUtil.getInteger(request, "mfaCheckerIndex");
 	<portlet:param name="mvcRenderCommandName" value="/mfa_verify/view" />
 </portlet:actionURL>
 
-<aui:form action="<%= verifyURL %>" cssClass="container-fluid-1280 sign-in-form" data-senna-off="true" method="post" name="fm">
+<aui:form action="<%= verifyURL %>" cssClass="container-fluid container-fluid-max-xl sign-in-form" data-senna-off="true" method="post" name="fm">
 	<aui:input name="saveLastPath" type="hidden" value="<%= false %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="mfaCheckerIndex" type="hidden" value="<%= mfaCheckerIndex %>" />
@@ -39,7 +39,7 @@ int mfaCheckerIndex = ParamUtil.getInteger(request, "mfaCheckerIndex");
 	<liferay-ui:error key="mfaVerificationFailed" message="multi-factor-authentication-has-failed" />
 
 	<%
-	browserMFAChecker.includeBrowserVerification(request, PipingServletResponse.createPipingServletResponse(pageContext), mfaUserId);
+	browserMFAChecker.includeBrowserVerification(request, response, mfaUserId);
 	%>
 
 	<c:if test="<%= browserMFACheckers.size() > 1 %>">

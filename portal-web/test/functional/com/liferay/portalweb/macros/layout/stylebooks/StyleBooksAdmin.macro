@@ -3,19 +3,51 @@ definition {
 	macro addStyleBooks {
 		LexiconEntry.gotoAdd();
 
-		PortletEntry.inputName(name = ${styleBookName});
+		PortletEntry.inputName(name = "${styleBookName}");
 
 		Button.clickSave();
 	}
 
 	macro gotoStyleBook {
-		LexiconCard.clickCardTitle(card = ${styleBookName});
+		LexiconCard.clickCardTitle(card = "${styleBookName}");
 	}
 
 	macro gotoStyleBookEllipsisItem {
 		LexiconCard.clickEllipsisItem(
-			card = ${styleBookName},
-			item = ${item});
+			card = "${styleBookName}",
+			item = "${item}");
+	}
+
+	macro importStyleBookFromTempFolder {
+		Click.waitForMenuToggleJSClick(locator1 = "Icon#HEADER_VERTICAL_ELLIPSIS");
+
+		MenuItem.click(menuItem = "Import");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		var stylebookZipFileName = TestCase.getDownloadedTempFileName(fileNamePattern = "style-book-*.zip");
+
+		UploadTempFile(
+			locator1 = "TextInput#FILE",
+			value1 = "${stylebookZipFileName}");
+
+		Button.clickImport();
+
+		Alert.viewSuccessMessage();
+
+		IFrame.closeFrame();
+	}
+
+	macro markStyleBookAsDefault {
+		StyleBooksAdmin.gotoStyleBookEllipsisItem(
+			item = "Mark as Default",
+			styleBookName = "${styleBookName}");
+
+		AssertConfirm(value1 = "${confirmMessage}");
+
+		LexiconCard.viewCardSticker(
+			card = "${styleBookName}",
+			icon = "check-circle");
 	}
 
 	macro openStyleBooksAdmin {
@@ -23,7 +55,7 @@ definition {
 	}
 
 	macro viewStyleBooksPresent {
-		LexiconCard.viewCardPresent(card = ${styleBookName});
+		LexiconCard.viewCardPresent(card = "${styleBookName}");
 	}
 
 }

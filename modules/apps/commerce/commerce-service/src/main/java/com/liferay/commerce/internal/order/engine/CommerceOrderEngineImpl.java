@@ -17,7 +17,6 @@ package com.liferay.commerce.internal.order.engine;
 import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.configuration.CommerceOrderCheckoutConfiguration;
 import com.liferay.commerce.constants.CommerceConstants;
-import com.liferay.commerce.constants.CommerceDestinationNames;
 import com.liferay.commerce.constants.CommerceOrderActionKeys;
 import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.constants.CommercePaymentConstants;
@@ -58,6 +57,9 @@ import com.liferay.commerce.service.CommerceShippingMethodLocalService;
 import com.liferay.commerce.subscription.CommerceSubscriptionEntryHelperUtil;
 import com.liferay.commerce.util.CommerceShippingHelper;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.model.User;
@@ -72,7 +74,11 @@ import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.vulcan.dto.converter.DTOConverter;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
+import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -161,8 +167,20 @@ public class CommerceOrderEngineImpl implements CommerceOrderEngine {
 			currentCommerceOrderStatus);
 
 		if (currentOrderStatusIndex != (commerceOrderStatuses.size() - 1)) {
-			CommerceOrderStatus nextCommerceOrderStatus =
-				commerceOrderStatuses.get(currentOrderStatusIndex + 1);
+			CommerceOrderStatus nextCommerceOrderStatus = null;
+
+			for (int i = currentOrderStatusIndex + 1;
+				 i < commerceOrderStatuses.size(); i++) {
+
+				if ((nextCommerceOrderStatus != null) &&
+					(nextCommerceOrderStatus.getPriority() >
+						currentCommerceOrderStatus.getPriority())) {
+
+					break;
+				}
+
+				nextCommerceOrderStatus = commerceOrderStatuses.get(i);
+			}
 
 			for (CommerceOrderStatus commerceOrderStatus :
 					commerceOrderStatuses) {
@@ -330,15 +348,10 @@ public class CommerceOrderEngineImpl implements CommerceOrderEngine {
 			commerceOrderId, commerceOrder.getCommerceAccountId());
 
 		TransactionCommitCallbackUtil.registerCallback(
-			new Callable<Void>() {
+			() -> {
+				_bookQuantities(commerceOrderId);
 
-				@Override
-				public Void call() throws Exception {
-					_bookQuantities(commerceOrderId);
-
-					return null;
-				}
-
+				return null;
 			});
 
 		commerceOrder = _commerceOrderLocalService.recalculatePrice(
@@ -415,7 +428,7 @@ public class CommerceOrderEngineImpl implements CommerceOrderEngine {
 			_configurationProvider.getConfiguration(
 				CommerceOrderCheckoutConfiguration.class,
 				new GroupServiceSettingsLocator(
-					groupId, CommerceConstants.ORDER_SERVICE_NAME));
+					groupId, CommerceConstants.SERVICE_NAME_COMMERCE_ORDER));
 
 		return commerceOrderCheckoutConfiguration.guestCheckoutEnabled();
 	}
@@ -424,43 +437,50 @@ public class CommerceOrderEngineImpl implements CommerceOrderEngine {
 		CommerceOrder commerceOrder, int orderStatus) {
 
 		TransactionCommitCallbackUtil.registerCallback(
-			new Callable<Void>() {
+			() -> {
+				if ((orderStatus ==
+						CommerceOrderConstants.ORDER_STATUS_PENDING) &&
+					(commerceOrder.getPaymentStatus() ==
+						CommerceOrderConstants.PAYMENT_STATUS_PAID)) {
 
-				@Override
-				public Void call() throws Exception {
-
-					// Commerce Subscription
-
-					if ((orderStatus ==
-							CommerceOrderConstants.ORDER_STATUS_PENDING) &&
-						(commerceOrder.getPaymentStatus() ==
-							CommerceOrderConstants.PAYMENT_STATUS_PAID)) {
-
-						CommerceSubscriptionEntryHelperUtil.
-							checkCommerceSubscriptions(commerceOrder);
-					}
-
-					// Commerce Notification
-
-					_commerceNotificationHelper.sendNotifications(
-						commerceOrder.getGroupId(), commerceOrder.getUserId(),
-						CommerceOrderConstants.getNotificationKey(orderStatus),
-						commerceOrder);
-
-					// Commerce Order Status Message
-
-					Message message = new Message();
-
-					message.put(
-						"commerceOrderId", commerceOrder.getCommerceOrderId());
-					message.put("orderStatus", commerceOrder.getOrderStatus());
-
-					MessageBusUtil.sendMessage(
-						CommerceDestinationNames.ORDER_STATUS, message);
-
-					return null;
+					CommerceSubscriptionEntryHelperUtil.
+						checkCommerceSubscriptions(commerceOrder);
 				}
 
+				_commerceNotificationHelper.sendNotifications(
+					commerceOrder.getGroupId(), commerceOrder.getUserId(),
+					CommerceOrderConstants.getNotificationKey(orderStatus),
+					commerceOrder);
+
+				Message message = new Message();
+
+				message.setPayload(
+					JSONUtil.put(
+						"commerceOrder",
+						() -> {
+							DTOConverter<?, ?> dtoConverter =
+								_dtoConverterRegistry.getDTOConverter(
+									CommerceOrder.class.getName());
+
+							Object object = dtoConverter.toDTO(
+								new DefaultDTOConverterContext(
+									_dtoConverterRegistry,
+									commerceOrder.getCommerceOrderId(),
+									LocaleUtil.getSiteDefault(), null, null));
+
+							return JSONFactoryUtil.createJSONObject(
+								object.toString());
+						}
+					).put(
+						"commerceOrderId", commerceOrder.getCommerceOrderId()
+					).put(
+						"orderStatus", commerceOrder.getOrderStatus()
+					));
+
+				MessageBusUtil.sendMessage(
+					DestinationNames.COMMERCE_ORDER_STATUS, message);
+
+				return null;
 			});
 	}
 
@@ -534,7 +554,9 @@ public class CommerceOrderEngineImpl implements CommerceOrderEngine {
 	private void _validateCheckout(CommerceOrder commerceOrder)
 		throws Exception {
 
-		if (!_commerceOrderValidatorRegistry.isValid(null, commerceOrder)) {
+		if (!_commerceOrderValidatorRegistry.isValid(
+				LocaleUtil.getSiteDefault(), commerceOrder)) {
+
 			throw new CommerceOrderValidatorException();
 		}
 
@@ -631,6 +653,9 @@ public class CommerceOrderEngineImpl implements CommerceOrderEngine {
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;
+
+	@Reference
+	private DTOConverterRegistry _dtoConverterRegistry;
 
 	@Reference
 	private UserLocalService _userLocalService;

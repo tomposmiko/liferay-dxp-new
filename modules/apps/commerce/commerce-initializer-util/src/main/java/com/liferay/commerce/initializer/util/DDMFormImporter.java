@@ -132,7 +132,7 @@ public class DDMFormImporter {
 			ServiceContext serviceContext)
 		throws Exception {
 
-		// DDM Form
+		//DDM Form
 
 		Locale locale = serviceContext.getLocale();
 
@@ -203,12 +203,12 @@ public class DDMFormImporter {
 			DDMForm ddmForm, String jsonFormSettings)
 		throws Exception {
 
-		final List<DDMFormField> ddmFormFields = ddmForm.getDDMFormFields();
+		List<DDMFormField> ddmFormFields = ddmForm.getDDMFormFields();
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 			jsonFormSettings);
 
-		final Stream<DDMFormField> ddmFormFieldsStream = ddmFormFields.stream();
+		Stream<DDMFormField> ddmFormFieldsStream = ddmFormFields.stream();
 
 		return ddmFormFieldsStream.map(
 			formField -> {
@@ -264,7 +264,7 @@ public class DDMFormImporter {
 		DDMStructure ddmStructure = _ddmStructureLocalService.addStructure(
 			userId, groupId, DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID,
 			classNameId, StringPool.BLANK, nameMap, descriptionMap, ddmForm,
-			defaultDDMFormLayout, StorageType.JSON.toString(),
+			defaultDDMFormLayout, StorageType.DEFAULT.toString(),
 			DDMStructureConstants.TYPE_AUTO, serviceContext);
 
 		DDLRecordSet ddlRecordSet = _ddlRecordSetLocalService.addRecordSet(

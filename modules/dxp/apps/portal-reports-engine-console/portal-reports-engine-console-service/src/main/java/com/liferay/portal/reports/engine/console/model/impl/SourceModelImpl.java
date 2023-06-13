@@ -41,6 +41,7 @@ import com.liferay.portal.reports.engine.console.model.SourceSoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -303,76 +304,97 @@ public class SourceModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Source, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Source>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Source, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Source, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Source.class.getClassLoader(), Source.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("uuid", Source::getUuid);
-		attributeGetterFunctions.put("sourceId", Source::getSourceId);
-		attributeGetterFunctions.put("groupId", Source::getGroupId);
-		attributeGetterFunctions.put("companyId", Source::getCompanyId);
-		attributeGetterFunctions.put("userId", Source::getUserId);
-		attributeGetterFunctions.put("userName", Source::getUserName);
-		attributeGetterFunctions.put("createDate", Source::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", Source::getModifiedDate);
-		attributeGetterFunctions.put(
-			"lastPublishDate", Source::getLastPublishDate);
-		attributeGetterFunctions.put("name", Source::getName);
-		attributeGetterFunctions.put(
-			"driverClassName", Source::getDriverClassName);
-		attributeGetterFunctions.put("driverUrl", Source::getDriverUrl);
-		attributeGetterFunctions.put(
-			"driverUserName", Source::getDriverUserName);
-		attributeGetterFunctions.put(
-			"driverPassword", Source::getDriverPassword);
+		try {
+			Constructor<Source> constructor =
+				(Constructor<Source>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Source, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Source, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Source, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Source, Object>>();
 		Map<String, BiConsumer<Source, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Source, ?>>();
 
+		attributeGetterFunctions.put("uuid", Source::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<Source, String>)Source::setUuid);
+		attributeGetterFunctions.put("sourceId", Source::getSourceId);
 		attributeSetterBiConsumers.put(
 			"sourceId", (BiConsumer<Source, Long>)Source::setSourceId);
+		attributeGetterFunctions.put("groupId", Source::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<Source, Long>)Source::setGroupId);
+		attributeGetterFunctions.put("companyId", Source::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<Source, Long>)Source::setCompanyId);
+		attributeGetterFunctions.put("userId", Source::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<Source, Long>)Source::setUserId);
+		attributeGetterFunctions.put("userName", Source::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<Source, String>)Source::setUserName);
+		attributeGetterFunctions.put("createDate", Source::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<Source, Date>)Source::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", Source::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate", (BiConsumer<Source, Date>)Source::setModifiedDate);
+		attributeGetterFunctions.put(
+			"lastPublishDate", Source::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<Source, Date>)Source::setLastPublishDate);
+		attributeGetterFunctions.put("name", Source::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<Source, String>)Source::setName);
+		attributeGetterFunctions.put(
+			"driverClassName", Source::getDriverClassName);
 		attributeSetterBiConsumers.put(
 			"driverClassName",
 			(BiConsumer<Source, String>)Source::setDriverClassName);
+		attributeGetterFunctions.put("driverUrl", Source::getDriverUrl);
 		attributeSetterBiConsumers.put(
 			"driverUrl", (BiConsumer<Source, String>)Source::setDriverUrl);
+		attributeGetterFunctions.put(
+			"driverUserName", Source::getDriverUserName);
 		attributeSetterBiConsumers.put(
 			"driverUserName",
 			(BiConsumer<Source, String>)Source::setDriverUserName);
+		attributeGetterFunctions.put(
+			"driverPassword", Source::getDriverPassword);
 		attributeSetterBiConsumers.put(
 			"driverPassword",
 			(BiConsumer<Source, String>)Source::setDriverPassword);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -908,6 +930,35 @@ public class SourceModelImpl
 	}
 
 	@Override
+	public Source cloneWithOriginalValues() {
+		SourceImpl sourceImpl = new SourceImpl();
+
+		sourceImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		sourceImpl.setSourceId(this.<Long>getColumnOriginalValue("sourceId"));
+		sourceImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		sourceImpl.setCompanyId(this.<Long>getColumnOriginalValue("companyId"));
+		sourceImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		sourceImpl.setUserName(this.<String>getColumnOriginalValue("userName"));
+		sourceImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		sourceImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		sourceImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+		sourceImpl.setName(this.<String>getColumnOriginalValue("name"));
+		sourceImpl.setDriverClassName(
+			this.<String>getColumnOriginalValue("driverClassName"));
+		sourceImpl.setDriverUrl(
+			this.<String>getColumnOriginalValue("driverUrl"));
+		sourceImpl.setDriverUserName(
+			this.<String>getColumnOriginalValue("driverUserName"));
+		sourceImpl.setDriverPassword(
+			this.<String>getColumnOriginalValue("driverPassword"));
+
+		return sourceImpl;
+	}
+
+	@Override
 	public int compareTo(Source source) {
 		long primaryKey = source.getPrimaryKey();
 
@@ -1155,9 +1206,7 @@ public class SourceModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Source>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Source.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

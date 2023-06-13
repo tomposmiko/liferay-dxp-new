@@ -96,7 +96,7 @@ if (stageableGroup.isLayout()) {
 							continue;
 						}
 
-						String viewURL = assetPublisherHelper.getAssetViewURL(liferayPortletRequest, liferayPortletResponse, assetRenderer, assetEntry, assetPublisherDisplayContext.isAssetLinkBehaviorViewInPortlet());
+						String viewURL = HttpUtil.addParameter(assetPublisherHelper.getAssetViewURL(liferayPortletRequest, liferayPortletResponse, assetRenderer, assetEntry, assetPublisherDisplayContext.isAssetLinkBehaviorViewInPortlet()), liferayPortletResponse.getNamespace() + "viewSingleAsset", true);
 
 						request.setAttribute("view.jsp-assetEntry", assetEntry);
 						request.setAttribute("view.jsp-assetRenderer", assetRenderer);
@@ -222,5 +222,5 @@ if (stageableGroup.isLayout()) {
 </clay:sheet>
 
 <%!
-private static Log _log = LogFactoryUtil.getLog("com_liferay_asset_publisher_web.view_asset_entries_table_jsp");
+private static final Log _log = LogFactoryUtil.getLog("com_liferay_asset_publisher_web.view_asset_entries_table_jsp");
 %>

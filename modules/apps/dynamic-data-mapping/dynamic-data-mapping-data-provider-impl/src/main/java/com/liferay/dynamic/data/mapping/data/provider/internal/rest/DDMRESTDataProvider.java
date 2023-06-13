@@ -292,6 +292,24 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 			ArrayList::addAll);
 	}
 
+	private String _getCacheKey(
+		String ddmDataProviderId, List<KeyValuePair> keyValuePairs,
+		String url) {
+
+		Stream<KeyValuePair> stream = keyValuePairs.stream();
+
+		return StringBundler.concat(
+			ddmDataProviderId, StringPool.AT, url, StringPool.QUESTION,
+			stream.sorted(
+			).map(
+				keyValuePair -> StringBundler.concat(
+					keyValuePair.getKey(), StringPool.EQUAL,
+					keyValuePair.getValue())
+			).collect(
+				Collectors.joining(StringPool.AMPERSAND)
+			));
+	}
+
 	private DDMDataProviderResponse _getData(
 			DDMDataProviderRequest ddmDataProviderRequest,
 			DDMRESTDataProviderSettings ddmRESTDataProviderSettings)
@@ -321,12 +339,12 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 
 		String absoluteURL = _getAbsoluteURL(uri.getQuery(), url);
 
-		String portalCacheKey = _getPortalCacheKey(
+		String cacheKey = _getCacheKey(
 			ddmDataProviderRequest.getDDMDataProviderId(), allParameters,
 			absoluteURL);
 
 		DDMDataProviderResponse ddmDataProviderResponse = _portalCache.get(
-			portalCacheKey);
+			cacheKey);
 
 		if ((ddmDataProviderResponse != null) &&
 			ddmRESTDataProviderSettings.cacheable()) {
@@ -356,15 +374,8 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 				).build(),
 				false);
 
-		String response = null;
-
-		try {
-			response = jsonWebServiceClient.doGet(
-				absoluteURL, _getParametersArray(allParameters));
-		}
-		finally {
-			jsonWebServiceClient.destroy();
-		}
+		String response = jsonWebServiceClient.doGet(
+			absoluteURL, _getParametersArray(allParameters));
 
 		String sanitizedResponse = IOUtils.toString(
 			new BOMInputStream(new ByteArrayInputStream(response.getBytes())),
@@ -375,7 +386,7 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 			DDMDataProviderResponseStatus.OK, ddmRESTDataProviderSettings);
 
 		if (ddmRESTDataProviderSettings.cacheable()) {
-			_portalCache.put(portalCacheKey, ddmDataProviderResponse);
+			_portalCache.put(cacheKey, ddmDataProviderResponse);
 		}
 
 		return ddmDataProviderResponse;
@@ -508,24 +519,6 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 		}
 
 		return pathInputParametersMap;
-	}
-
-	private String _getPortalCacheKey(
-		String ddmDataProviderId, List<KeyValuePair> keyValuePairs,
-		String url) {
-
-		Stream<KeyValuePair> stream = keyValuePairs.stream();
-
-		return StringBundler.concat(
-			ddmDataProviderId, StringPool.AT, url, StringPool.QUESTION,
-			stream.sorted(
-			).map(
-				keyValuePair -> StringBundler.concat(
-					keyValuePair.getKey(), StringPool.EQUAL,
-					keyValuePair.getValue())
-			).collect(
-				Collectors.joining(StringPool.AMPERSAND)
-			));
 	}
 
 	private Map<String, Object> _getProxySettingsMap() {

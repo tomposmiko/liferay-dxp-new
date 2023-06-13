@@ -14,6 +14,7 @@
 
 package com.liferay.portal.util;
 
+import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.ConfigurationFactoryImpl;
@@ -31,7 +32,6 @@ import com.liferay.portal.kernel.servlet.WebDirDetector;
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
@@ -369,7 +369,7 @@ public class PropsUtil {
 
 		// Global lib directory
 
-		String globalLibDir = _getLibDir(ReleaseInfo.class);
+		String globalLibDir = _getLibDir(CentralizedThreadLocal.class);
 
 		if (_log.isInfoEnabled()) {
 			_log.info("Global lib directory " + globalLibDir);
@@ -399,6 +399,19 @@ public class PropsUtil {
 		}
 
 		SystemProperties.set(PropsKeys.LIFERAY_LIB_PORTAL_DIR, portalLibDir);
+
+		// Portal shielded container lib directory
+
+		String portalShieldedContainerLibDirProperty = System.getProperty(
+			PropsKeys.LIFERAY_SHIELDED_CONTAINER_LIB_PORTAL_DIR);
+
+		if (portalShieldedContainerLibDirProperty == null) {
+			portalShieldedContainerLibDirProperty = portalLibDir;
+		}
+
+		SystemProperties.set(
+			PropsKeys.LIFERAY_SHIELDED_CONTAINER_LIB_PORTAL_DIR,
+			portalShieldedContainerLibDirProperty);
 
 		// Portal web directory
 

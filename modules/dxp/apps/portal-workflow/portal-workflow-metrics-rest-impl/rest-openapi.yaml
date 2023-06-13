@@ -158,6 +158,8 @@ components:
             description:
                 https://www.schema.org/Instance
             properties:
+                active:
+                    type: boolean
                 assetTitle:
                     readOnly: true
                     type: string
@@ -337,6 +339,13 @@ components:
                     format: int64
                     type: integer
             type: object
+        ProcessVersion:
+            description:
+                https://www.schema.org/ProcessVersion
+            properties:
+                name:
+                    type: string
+            type: object
         ReindexStatus:
             description:
                 https://www.schema.org/ReindexStatus
@@ -421,6 +430,9 @@ components:
             description:
                 https://www.schema.org/SLA
             properties:
+                dateModified:
+                    format: date-time
+                    type: string
                 dateOverdue:
                     format: date-time
                     type: string
@@ -435,7 +447,7 @@ components:
                     format: int64
                     type: integer
                 status:
-                    enum: [Paused, Running, Stopped]
+                    enum: [NEW, PAUSED, RUNNING, STOPPED]
                     type: string
             type: object
         Task:
@@ -558,7 +570,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.portal.workflow.metrics.rest.client', and version '2.0.27'."
+        'com.liferay.portal.workflow.metrics.rest.client', and version '3.0.11'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -600,9 +612,9 @@ paths:
                                     $ref: "#/components/schemas/Index"
                                 type: array
             tags: ["Index"]
-    "/indexes/reindex":
+    "/indexes/refresh":
         patch:
-            operationId: patchIndexesReindex
+            operationId: patchIndexRefresh
             requestBody:
                 content:
                     application/json:
@@ -617,23 +629,23 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["Index"]
-    "/indexes/reindex/status":
-        get:
-            operationId: getReindexStatusPage
+    "/indexes/reindex":
+        patch:
+            operationId: patchIndexReindex
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Index"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Index"
             responses:
-                200:
+                204:
                     content:
-                        application/json:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/ReindexStatus"
-                                type: array
-                        application/xml:
-                            schema:
-                                items:
-                                    $ref: "#/components/schemas/ReindexStatus"
-                                type: array
-            tags: ["ReindexStatus"]
+                        application/json: {}
+                        application/xml: {}
+            tags: ["Index"]
     "/processes":
         post:
             operationId: postProcess
@@ -884,10 +896,6 @@ paths:
                           type: integer
                       type: array
                 - in: query
-                  name: completed
-                  schema:
-                      type: boolean
-                - in: query
                   name: dateEnd
                   schema:
                       format: date-time
@@ -905,6 +913,13 @@ paths:
                           type: string
                       type: array
                 - in: query
+                  name: statuses
+                  schema:
+                      items:
+                          enum: [Completed, Pending]
+                          type: string
+                      type: array
+                - in: query
                   name: taskNames
                   schema:
                       items:
@@ -918,6 +933,10 @@ paths:
                   name: pageSize
                   schema:
                       type: integer
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
             responses:
                 200:
                     content:
@@ -1065,6 +1084,26 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["Instance"]
+    "/processes/{processId}/last-sla-result":
+        get:
+            operationId: getProcessLastSLAResult
+            parameters:
+                - in: path
+                  name: processId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/SLAResult"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/SLAResult"
+            tags: ["SLAResult"]
     "/processes/{processId}/metrics":
         get:
             operationId: getProcessMetric
@@ -1179,6 +1218,10 @@ paths:
                   schema:
                       type: string
                 - in: query
+                  name: processVersion
+                  schema:
+                      type: string
+                - in: query
                   name: page
                   schema:
                       type: integer
@@ -1226,6 +1269,30 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["Node"]
+    "/processes/{processId}/process-versions":
+        get:
+            operationId: getProcessProcessVersionsPage
+            parameters:
+                - in: path
+                  name: processId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ProcessVersion"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ProcessVersion"
+                                type: array
+            tags: ["ProcessVersion"]
     "/processes/{processId}/roles":
         get:
             operationId: getProcessRolesPage
@@ -1500,6 +1567,23 @@ paths:
                             schema:
                                 type: string
             tags: ["Process"]
+    "/reindex/statuses":
+        get:
+            operationId: getReindexStatusesPage
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ReindexStatus"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ReindexStatus"
+                                type: array
+            tags: ["ReindexStatus"]
     "/slas/{slaId}":
         delete:
             operationId: deleteSLA
@@ -1572,7 +1656,7 @@ paths:
             tags: ["SLA"]
     "/tasks":
         post:
-            operationId: postProcessTasksPage
+            operationId: postTasksPage
             parameters:
                 - in: query
                   name: page

@@ -23,6 +23,7 @@ import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -40,15 +41,15 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.change.tracking.CTService;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -447,6 +448,7 @@ public abstract class DEDataDefinitionFieldLinkLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -466,6 +468,7 @@ public abstract class DEDataDefinitionFieldLinkLocalServiceBaseImpl
 				(DEDataDefinitionFieldLink)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<DEDataDefinitionFieldLink> getBasePersistence() {
 		return deDataDefinitionFieldLinkPersistence;
 	}
@@ -590,7 +593,8 @@ public abstract class DEDataDefinitionFieldLinkLocalServiceBaseImpl
 	public Class<?>[] getAopInterfaces() {
 		return new Class<?>[] {
 			DEDataDefinitionFieldLinkLocalService.class,
-			IdentifiableOSGiService.class, PersistedModelLocalService.class
+			IdentifiableOSGiService.class, CTService.class,
+			PersistedModelLocalService.class
 		};
 	}
 
@@ -612,8 +616,23 @@ public abstract class DEDataDefinitionFieldLinkLocalServiceBaseImpl
 		return DEDataDefinitionFieldLinkLocalService.class.getName();
 	}
 
-	protected Class<?> getModelClass() {
+	@Override
+	public CTPersistence<DEDataDefinitionFieldLink> getCTPersistence() {
+		return deDataDefinitionFieldLinkPersistence;
+	}
+
+	@Override
+	public Class<DEDataDefinitionFieldLink> getModelClass() {
 		return DEDataDefinitionFieldLink.class;
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<DEDataDefinitionFieldLink>, R, E>
+				updateUnsafeFunction)
+		throws E {
+
+		return updateUnsafeFunction.apply(deDataDefinitionFieldLinkPersistence);
 	}
 
 	protected String getModelClassName() {
@@ -673,12 +692,5 @@ public abstract class DEDataDefinitionFieldLinkLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.GroupLocalService
-		groupLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DEDataDefinitionFieldLinkLocalServiceBaseImpl.class);
 
 }

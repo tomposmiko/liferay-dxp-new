@@ -84,7 +84,10 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author Tomas Polesovsky
  * @author Marta Medio
  */
-@Component(immediate = true, service = SafePortalLDAP.class)
+@Component(
+	configurationPid = "com.liferay.portal.security.ldap.configuration.LDAPConfiguration",
+	immediate = true, service = SafePortalLDAP.class
+)
 public class SafePortalLDAPImpl implements SafePortalLDAP {
 
 	@Override
@@ -318,7 +321,7 @@ public class SafePortalLDAPImpl implements SafePortalLDAP {
 			}
 		}
 
-		if (ListUtil.isNotEmpty(ldapServerConfigurations)) {
+		if (!ListUtil.isEmpty(ldapServerConfigurations)) {
 			LDAPServerConfiguration ldapServerConfiguration =
 				ldapServerConfigurations.get(0);
 
@@ -928,6 +931,12 @@ public class SafePortalLDAPImpl implements SafePortalLDAP {
 			}
 		}
 		catch (OperationNotSupportedException operationNotSupportedException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					operationNotSupportedException,
+					operationNotSupportedException);
+			}
+
 			if (enumeration != null) {
 				enumeration.close();
 			}
@@ -1086,16 +1095,8 @@ public class SafePortalLDAPImpl implements SafePortalLDAP {
 			end += systemLDAPConfiguration.rangeSize();
 		}
 
-		StringBundler sb = new StringBundler(6);
-
-		sb.append(originalAttributeId);
-		sb.append(StringPool.SEMICOLON);
-		sb.append("range=");
-		sb.append(start);
-		sb.append(StringPool.DASH);
-		sb.append(end);
-
-		return sb.toString();
+		return StringBundler.concat(
+			originalAttributeId, ";range=", start, StringPool.DASH, end);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

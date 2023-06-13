@@ -21,10 +21,10 @@ FragmentCollectionsDisplayContext fragmentCollectionsDisplayContext = new Fragme
 %>
 
 <clay:management-toolbar
-	displayContext="<%= new FragmentCollectionsManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, fragmentCollectionsDisplayContext) %>"
+	managementToolbarDisplayContext="<%= new FragmentCollectionsManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, fragmentCollectionsDisplayContext) %>"
 />
 
-<aui:form cssClass="container-fluid-1280" name="fm">
+<aui:form cssClass="container-fluid container-fluid-max-xl" name="fm">
 	<liferay-ui:search-container
 		id="fragmentCollections"
 		searchContainer="<%= fragmentCollectionsDisplayContext.getSearchContainer() %>"
@@ -64,18 +64,3 @@ FragmentCollectionsDisplayContext fragmentCollectionsDisplayContext = new Fragme
 		/>
 	</liferay-ui:search-container>
 </aui:form>
-
-<aui:script use="liferay-search-container">
-	var searchContainer = Liferay.SearchContainer.get(
-		'<portlet:namespace />fragmentCollections'
-	);
-
-	searchContainer.on('rowToggled', function (event) {
-		Liferay.Util.getOpener().Liferay.fire(
-			'<%= HtmlUtil.escapeJS(fragmentCollectionsDisplayContext.getEventName()) %>',
-			{
-				data: event.elements.allSelectedElements.getDOMNodes(),
-			}
-		);
-	});
-</aui:script>

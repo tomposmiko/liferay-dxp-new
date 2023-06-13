@@ -18,13 +18,12 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.LayoutFriendlyURLException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
+import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.util.DateUtil;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -64,7 +63,7 @@ public class RedirectEntryLocalServiceImpl
 			boolean addGuestPermissions)
 		throws PortalException {
 
-		resourceLocalService.addResources(
+		_resourceLocalService.addResources(
 			entry.getCompanyId(), entry.getGroupId(), entry.getUserId(),
 			RedirectEntry.class.getName(), entry.getRedirectEntryId(), false,
 			addGroupPermissions, addGuestPermissions);
@@ -75,7 +74,7 @@ public class RedirectEntryLocalServiceImpl
 			RedirectEntry entry, ModelPermissions modelPermissions)
 		throws PortalException {
 
-		resourceLocalService.addModelResources(
+		_resourceLocalService.addModelResources(
 			entry.getCompanyId(), entry.getGroupId(), entry.getUserId(),
 			RedirectEntry.class.getName(), entry.getRedirectEntryId(),
 			modelPermissions);
@@ -87,8 +86,6 @@ public class RedirectEntryLocalServiceImpl
 			long groupId, String destinationURL, Date expirationDate,
 			boolean permanent, String sourceURL, ServiceContext serviceContext)
 		throws PortalException {
-
-		sourceURL = _friendlyURLNormalizer.normalizeWithEncoding(sourceURL);
 
 		_validate(destinationURL, sourceURL);
 
@@ -144,8 +141,6 @@ public class RedirectEntryLocalServiceImpl
 			boolean updateChainedRedirectEntries, ServiceContext serviceContext)
 		throws PortalException {
 
-		sourceURL = _friendlyURLNormalizer.normalizeWithEncoding(sourceURL);
-
 		_checkDestinationURLMustNotBeEqualToSourceURL(
 			destinationURL, groupBaseURL, sourceURL);
 
@@ -161,33 +156,6 @@ public class RedirectEntryLocalServiceImpl
 		}
 
 		return redirectEntry;
-	}
-
-	@Indexable(type = IndexableType.DELETE)
-	@Override
-	public RedirectEntry deleteRedirectEntry(long redirectEntryId)
-		throws PortalException {
-
-		RedirectEntry redirectEntry = fetchRedirectEntry(redirectEntryId);
-
-		if (redirectEntry == null) {
-			return null;
-		}
-
-		return deleteRedirectEntry(redirectEntry);
-	}
-
-	@Indexable(type = IndexableType.DELETE)
-	@Override
-	public RedirectEntry deleteRedirectEntry(RedirectEntry redirectEntry)
-		throws PortalException {
-
-		resourceLocalService.deleteResource(
-			redirectEntry.getCompanyId(), RedirectEntry.class.getName(),
-			ResourceConstants.SCOPE_INDIVIDUAL,
-			redirectEntry.getRedirectEntryId());
-
-		return super.deleteRedirectEntry(redirectEntry);
 	}
 
 	@Override
@@ -254,8 +222,6 @@ public class RedirectEntryLocalServiceImpl
 			boolean permanent, String sourceURL)
 		throws PortalException {
 
-		sourceURL = _friendlyURLNormalizer.normalizeWithEncoding(sourceURL);
-
 		_validate(destinationURL, sourceURL);
 
 		RedirectEntry redirectEntry = getRedirectEntry(redirectEntryId);
@@ -285,8 +251,6 @@ public class RedirectEntryLocalServiceImpl
 			String groupBaseURL, boolean permanent, String sourceURL,
 			boolean updateChainedRedirectEntries)
 		throws PortalException {
-
-		sourceURL = _friendlyURLNormalizer.normalizeWithEncoding(sourceURL);
 
 		_checkDestinationURLMustNotBeEqualToSourceURL(
 			destinationURL, groupBaseURL, sourceURL);
@@ -462,10 +426,10 @@ public class RedirectEntryLocalServiceImpl
 	}
 
 	@Reference
-	private FriendlyURLNormalizer _friendlyURLNormalizer;
-
-	@Reference
 	private RedirectNotFoundEntryLocalService
 		_redirectNotFoundEntryLocalService;
+
+	@Reference
+	private ResourceLocalService _resourceLocalService;
 
 }

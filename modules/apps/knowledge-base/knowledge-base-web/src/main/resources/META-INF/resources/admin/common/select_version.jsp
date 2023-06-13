@@ -23,14 +23,18 @@ int status = (Integer)request.getAttribute(KBWebKeys.KNOWLEDGE_BASE_STATUS);
 int selStatus = KBArticlePermission.contains(permissionChecker, kbArticle, KBActionKeys.UPDATE) ? WorkflowConstants.STATUS_ANY : status;
 
 int sourceVersion = ParamUtil.getInteger(request, "sourceVersion");
-String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectVersionFm");
 
-PortletURL portletURL = renderResponse.createRenderURL();
-
-portletURL.setParameter("mvcPath", "/admin/common/select_version.jsp");
-portletURL.setParameter("redirect", currentURL);
-portletURL.setParameter("resourcePrimKey", String.valueOf(kbArticle.getResourcePrimKey()));
-portletURL.setParameter("sourceVersion", String.valueOf(sourceVersion));
+PortletURL portletURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCPath(
+	"/admin/common/select_version.jsp"
+).setRedirect(
+	currentURL
+).setParameter(
+	"resourcePrimKey", kbArticle.getResourcePrimKey()
+).setParameter(
+	"sourceVersion", sourceVersion
+).buildPortletURL();
 %>
 
 <clay:container-fluid>
@@ -98,10 +102,3 @@ portletURL.setParameter("sourceVersion", String.valueOf(sourceVersion));
 		</liferay-ui:search-container>
 	</aui:form>
 </clay:container-fluid>
-
-<script>
-	Liferay.Util.selectEntityHandler(
-		'#<portlet:namespace />selectVersionFm',
-		'<%= HtmlUtil.escapeJS(eventName) %>'
-	);
-</script>

@@ -14,12 +14,20 @@
 
 package com.liferay.portal.upgrade.v7_3_x;
 
-import com.liferay.portal.kernel.upgrade.UpgradeMVCCVersion;
+import com.liferay.portal.kernel.upgrade.MVCCVersionUpgradeProcess;
 
 /**
  * @author Preston Crary
  */
-public class UpgradeRatingsMVCCVersion extends UpgradeMVCCVersion {
+public class UpgradeRatingsMVCCVersion extends MVCCVersionUpgradeProcess {
+
+	@Override
+	protected String[] getExcludedTableNames() {
+		return new String[] {
+			"CountryLocalization", "PortalPreferenceValue",
+			"PortletPreferenceValue", "RegionLocalization"
+		};
+	}
 
 	@Override
 	protected String[] getModuleTableNames() {

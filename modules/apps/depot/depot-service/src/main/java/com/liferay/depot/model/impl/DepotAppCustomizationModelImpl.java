@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -228,67 +229,89 @@ public class DepotAppCustomizationModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, DepotAppCustomization>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DepotAppCustomization.class.getClassLoader(),
+			DepotAppCustomization.class, ModelWrapper.class);
+
+		try {
+			Constructor<DepotAppCustomization> constructor =
+				(Constructor<DepotAppCustomization>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<DepotAppCustomization, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DepotAppCustomization, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<DepotAppCustomization, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<DepotAppCustomization, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", DepotAppCustomization::getMvccVersion);
-		attributeGetterFunctions.put(
-			"depotAppCustomizationId",
-			DepotAppCustomization::getDepotAppCustomizationId);
-		attributeGetterFunctions.put(
-			"companyId", DepotAppCustomization::getCompanyId);
-		attributeGetterFunctions.put(
-			"depotEntryId", DepotAppCustomization::getDepotEntryId);
-		attributeGetterFunctions.put(
-			"enabled", DepotAppCustomization::getEnabled);
-		attributeGetterFunctions.put(
-			"portletId", DepotAppCustomization::getPortletId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<DepotAppCustomization, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<DepotAppCustomization, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<DepotAppCustomization, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", DepotAppCustomization::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DepotAppCustomization, Long>)
 				DepotAppCustomization::setMvccVersion);
+		attributeGetterFunctions.put(
+			"depotAppCustomizationId",
+			DepotAppCustomization::getDepotAppCustomizationId);
 		attributeSetterBiConsumers.put(
 			"depotAppCustomizationId",
 			(BiConsumer<DepotAppCustomization, Long>)
 				DepotAppCustomization::setDepotAppCustomizationId);
+		attributeGetterFunctions.put(
+			"companyId", DepotAppCustomization::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DepotAppCustomization, Long>)
 				DepotAppCustomization::setCompanyId);
+		attributeGetterFunctions.put(
+			"depotEntryId", DepotAppCustomization::getDepotEntryId);
 		attributeSetterBiConsumers.put(
 			"depotEntryId",
 			(BiConsumer<DepotAppCustomization, Long>)
 				DepotAppCustomization::setDepotEntryId);
+		attributeGetterFunctions.put(
+			"enabled", DepotAppCustomization::getEnabled);
 		attributeSetterBiConsumers.put(
 			"enabled",
 			(BiConsumer<DepotAppCustomization, Boolean>)
 				DepotAppCustomization::setEnabled);
+		attributeGetterFunctions.put(
+			"portletId", DepotAppCustomization::getPortletId);
 		attributeSetterBiConsumers.put(
 			"portletId",
 			(BiConsumer<DepotAppCustomization, String>)
 				DepotAppCustomization::setPortletId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -488,6 +511,27 @@ public class DepotAppCustomizationModelImpl
 	}
 
 	@Override
+	public DepotAppCustomization cloneWithOriginalValues() {
+		DepotAppCustomizationImpl depotAppCustomizationImpl =
+			new DepotAppCustomizationImpl();
+
+		depotAppCustomizationImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		depotAppCustomizationImpl.setDepotAppCustomizationId(
+			this.<Long>getColumnOriginalValue("depotAppCustomizationId"));
+		depotAppCustomizationImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		depotAppCustomizationImpl.setDepotEntryId(
+			this.<Long>getColumnOriginalValue("depotEntryId"));
+		depotAppCustomizationImpl.setEnabled(
+			this.<Boolean>getColumnOriginalValue("enabled"));
+		depotAppCustomizationImpl.setPortletId(
+			this.<String>getColumnOriginalValue("portletId"));
+
+		return depotAppCustomizationImpl;
+	}
+
+	@Override
 	public int compareTo(DepotAppCustomization depotAppCustomization) {
 		long primaryKey = depotAppCustomization.getPrimaryKey();
 
@@ -667,9 +711,7 @@ public class DepotAppCustomizationModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DepotAppCustomization>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DepotAppCustomization.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

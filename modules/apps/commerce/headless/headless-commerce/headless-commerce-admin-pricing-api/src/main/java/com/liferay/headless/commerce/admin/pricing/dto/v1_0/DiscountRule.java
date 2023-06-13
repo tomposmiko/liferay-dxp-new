@@ -61,7 +61,7 @@ public class DiscountRule implements Serializable {
 	}
 
 	@DecimalMin("0")
-	@Schema(example = "30324")
+	@Schema
 	public Long getDiscountId() {
 		return discountId;
 	}
@@ -90,7 +90,7 @@ public class DiscountRule implements Serializable {
 	protected Long discountId;
 
 	@DecimalMin("0")
-	@Schema(example = "30643")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -116,7 +116,7 @@ public class DiscountRule implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	@Schema(example = "cart-total")
+	@Schema
 	public String getType() {
 		return type;
 	}
@@ -143,7 +143,7 @@ public class DiscountRule implements Serializable {
 	@NotEmpty
 	protected String type;
 
-	@Schema(example = "22.50")
+	@Schema
 	public String getTypeSettings() {
 		return typeSettings;
 	}

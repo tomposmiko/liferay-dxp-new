@@ -22,7 +22,6 @@ import com.liferay.commerce.product.model.impl.CPDisplayLayoutModelImpl;
 import com.liferay.commerce.product.service.persistence.CPDisplayLayoutPersistence;
 import com.liferay.commerce.product.service.persistence.CPDisplayLayoutUtil;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -32,13 +31,11 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -55,17 +52,10 @@ import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * The persistence implementation for the cp display layout service.
@@ -193,7 +183,7 @@ public class CPDisplayLayoutPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CPDisplayLayout>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CPDisplayLayout cpDisplayLayout : list) {
@@ -577,7 +567,7 @@ public class CPDisplayLayoutPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -707,7 +697,7 @@ public class CPDisplayLayoutPersistenceImpl
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof CPDisplayLayout) {
@@ -818,7 +808,7 @@ public class CPDisplayLayoutPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, groupId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -984,7 +974,7 @@ public class CPDisplayLayoutPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CPDisplayLayout>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CPDisplayLayout cpDisplayLayout : list) {
@@ -1400,7 +1390,7 @@ public class CPDisplayLayoutPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1557,7 +1547,7 @@ public class CPDisplayLayoutPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CPDisplayLayout>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CPDisplayLayout cpDisplayLayout : list) {
@@ -1917,7 +1907,7 @@ public class CPDisplayLayoutPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -2060,7 +2050,7 @@ public class CPDisplayLayoutPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CPDisplayLayout>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CPDisplayLayout cpDisplayLayout : list) {
@@ -2450,7 +2440,7 @@ public class CPDisplayLayoutPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, classNameId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2602,7 +2592,7 @@ public class CPDisplayLayoutPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CPDisplayLayout>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CPDisplayLayout cpDisplayLayout : list) {
@@ -3018,7 +3008,7 @@ public class CPDisplayLayoutPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, layoutUuid};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3079,101 +3069,148 @@ public class CPDisplayLayoutPersistenceImpl
 	private static final String _FINDER_COLUMN_G_L_LAYOUTUUID_3 =
 		"(cpDisplayLayout.layoutUuid IS NULL OR cpDisplayLayout.layoutUuid = '')";
 
-	private FinderPath _finderPathFetchByC_C;
+	private FinderPath _finderPathWithPaginationFindByC_C;
+	private FinderPath _finderPathWithoutPaginationFindByC_C;
 	private FinderPath _finderPathCountByC_C;
 
 	/**
-	 * Returns the cp display layout where classNameId = &#63; and classPK = &#63; or throws a <code>NoSuchCPDisplayLayoutException</code> if it could not be found.
+	 * Returns all the cp display layouts where classNameId = &#63; and classPK = &#63;.
 	 *
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
-	 * @return the matching cp display layout
-	 * @throws NoSuchCPDisplayLayoutException if a matching cp display layout could not be found
+	 * @return the matching cp display layouts
 	 */
 	@Override
-	public CPDisplayLayout findByC_C(long classNameId, long classPK)
-		throws NoSuchCPDisplayLayoutException {
-
-		CPDisplayLayout cpDisplayLayout = fetchByC_C(classNameId, classPK);
-
-		if (cpDisplayLayout == null) {
-			StringBundler sb = new StringBundler(6);
-
-			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-			sb.append("classNameId=");
-			sb.append(classNameId);
-
-			sb.append(", classPK=");
-			sb.append(classPK);
-
-			sb.append("}");
-
-			if (_log.isDebugEnabled()) {
-				_log.debug(sb.toString());
-			}
-
-			throw new NoSuchCPDisplayLayoutException(sb.toString());
-		}
-
-		return cpDisplayLayout;
+	public List<CPDisplayLayout> findByC_C(long classNameId, long classPK) {
+		return findByC_C(
+			classNameId, classPK, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
-	 * Returns the cp display layout where classNameId = &#63; and classPK = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns a range of all the cp display layouts where classNameId = &#63; and classPK = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CPDisplayLayoutModelImpl</code>.
+	 * </p>
 	 *
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
-	 * @return the matching cp display layout, or <code>null</code> if a matching cp display layout could not be found
+	 * @param start the lower bound of the range of cp display layouts
+	 * @param end the upper bound of the range of cp display layouts (not inclusive)
+	 * @return the range of matching cp display layouts
 	 */
 	@Override
-	public CPDisplayLayout fetchByC_C(long classNameId, long classPK) {
-		return fetchByC_C(classNameId, classPK, true);
+	public List<CPDisplayLayout> findByC_C(
+		long classNameId, long classPK, int start, int end) {
+
+		return findByC_C(classNameId, classPK, start, end, null);
 	}
 
 	/**
-	 * Returns the cp display layout where classNameId = &#63; and classPK = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns an ordered range of all the cp display layouts where classNameId = &#63; and classPK = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CPDisplayLayoutModelImpl</code>.
+	 * </p>
 	 *
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
+	 * @param start the lower bound of the range of cp display layouts
+	 * @param end the upper bound of the range of cp display layouts (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching cp display layouts
+	 */
+	@Override
+	public List<CPDisplayLayout> findByC_C(
+		long classNameId, long classPK, int start, int end,
+		OrderByComparator<CPDisplayLayout> orderByComparator) {
+
+		return findByC_C(
+			classNameId, classPK, start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the cp display layouts where classNameId = &#63; and classPK = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CPDisplayLayoutModelImpl</code>.
+	 * </p>
+	 *
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param start the lower bound of the range of cp display layouts
+	 * @param end the upper bound of the range of cp display layouts (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching cp display layout, or <code>null</code> if a matching cp display layout could not be found
+	 * @return the ordered range of matching cp display layouts
 	 */
 	@Override
-	public CPDisplayLayout fetchByC_C(
-		long classNameId, long classPK, boolean useFinderCache) {
+	public List<CPDisplayLayout> findByC_C(
+		long classNameId, long classPK, int start, int end,
+		OrderByComparator<CPDisplayLayout> orderByComparator,
+		boolean useFinderCache) {
 
+		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
-		if (useFinderCache) {
-			finderArgs = new Object[] {classNameId, classPK};
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+			(orderByComparator == null)) {
+
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_C;
+				finderArgs = new Object[] {classNameId, classPK};
+			}
+		}
+		else if (useFinderCache) {
+			finderPath = _finderPathWithPaginationFindByC_C;
+			finderArgs = new Object[] {
+				classNameId, classPK, start, end, orderByComparator
+			};
 		}
 
-		Object result = null;
+		List<CPDisplayLayout> list = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_C, finderArgs, this);
-		}
+			list = (List<CPDisplayLayout>)finderCache.getResult(
+				finderPath, finderArgs);
 
-		if (result instanceof CPDisplayLayout) {
-			CPDisplayLayout cpDisplayLayout = (CPDisplayLayout)result;
+			if ((list != null) && !list.isEmpty()) {
+				for (CPDisplayLayout cpDisplayLayout : list) {
+					if ((classNameId != cpDisplayLayout.getClassNameId()) ||
+						(classPK != cpDisplayLayout.getClassPK())) {
 
-			if ((classNameId != cpDisplayLayout.getClassNameId()) ||
-				(classPK != cpDisplayLayout.getClassPK())) {
+						list = null;
 
-				result = null;
+						break;
+					}
+				}
 			}
 		}
 
-		if (result == null) {
-			StringBundler sb = new StringBundler(4);
+		if (list == null) {
+			StringBundler sb = null;
+
+			if (orderByComparator != null) {
+				sb = new StringBundler(
+					4 + (orderByComparator.getOrderByFields().length * 2));
+			}
+			else {
+				sb = new StringBundler(4);
+			}
 
 			sb.append(_SQL_SELECT_CPDISPLAYLAYOUT_WHERE);
 
 			sb.append(_FINDER_COLUMN_C_C_CLASSNAMEID_2);
 
 			sb.append(_FINDER_COLUMN_C_C_CLASSPK_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+			}
+			else {
+				sb.append(CPDisplayLayoutModelImpl.ORDER_BY_JPQL);
+			}
 
 			String sql = sb.toString();
 
@@ -3190,20 +3227,13 @@ public class CPDisplayLayoutPersistenceImpl
 
 				queryPos.add(classPK);
 
-				List<CPDisplayLayout> list = query.list();
+				list = (List<CPDisplayLayout>)QueryUtil.list(
+					query, getDialect(), start, end);
 
-				if (list.isEmpty()) {
-					if (useFinderCache) {
-						finderCache.putResult(
-							_finderPathFetchByC_C, finderArgs, list);
-					}
-				}
-				else {
-					CPDisplayLayout cpDisplayLayout = list.get(0);
+				cacheResult(list);
 
-					result = cpDisplayLayout;
-
-					cacheResult(cpDisplayLayout);
+				if (useFinderCache) {
+					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
 			catch (Exception exception) {
@@ -3214,28 +3244,309 @@ public class CPDisplayLayoutPersistenceImpl
 			}
 		}
 
-		if (result instanceof List<?>) {
+		return list;
+	}
+
+	/**
+	 * Returns the first cp display layout in the ordered set where classNameId = &#63; and classPK = &#63;.
+	 *
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching cp display layout
+	 * @throws NoSuchCPDisplayLayoutException if a matching cp display layout could not be found
+	 */
+	@Override
+	public CPDisplayLayout findByC_C_First(
+			long classNameId, long classPK,
+			OrderByComparator<CPDisplayLayout> orderByComparator)
+		throws NoSuchCPDisplayLayoutException {
+
+		CPDisplayLayout cpDisplayLayout = fetchByC_C_First(
+			classNameId, classPK, orderByComparator);
+
+		if (cpDisplayLayout != null) {
+			return cpDisplayLayout;
+		}
+
+		StringBundler sb = new StringBundler(6);
+
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		sb.append("classNameId=");
+		sb.append(classNameId);
+
+		sb.append(", classPK=");
+		sb.append(classPK);
+
+		sb.append("}");
+
+		throw new NoSuchCPDisplayLayoutException(sb.toString());
+	}
+
+	/**
+	 * Returns the first cp display layout in the ordered set where classNameId = &#63; and classPK = &#63;.
+	 *
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching cp display layout, or <code>null</code> if a matching cp display layout could not be found
+	 */
+	@Override
+	public CPDisplayLayout fetchByC_C_First(
+		long classNameId, long classPK,
+		OrderByComparator<CPDisplayLayout> orderByComparator) {
+
+		List<CPDisplayLayout> list = findByC_C(
+			classNameId, classPK, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last cp display layout in the ordered set where classNameId = &#63; and classPK = &#63;.
+	 *
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching cp display layout
+	 * @throws NoSuchCPDisplayLayoutException if a matching cp display layout could not be found
+	 */
+	@Override
+	public CPDisplayLayout findByC_C_Last(
+			long classNameId, long classPK,
+			OrderByComparator<CPDisplayLayout> orderByComparator)
+		throws NoSuchCPDisplayLayoutException {
+
+		CPDisplayLayout cpDisplayLayout = fetchByC_C_Last(
+			classNameId, classPK, orderByComparator);
+
+		if (cpDisplayLayout != null) {
+			return cpDisplayLayout;
+		}
+
+		StringBundler sb = new StringBundler(6);
+
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		sb.append("classNameId=");
+		sb.append(classNameId);
+
+		sb.append(", classPK=");
+		sb.append(classPK);
+
+		sb.append("}");
+
+		throw new NoSuchCPDisplayLayoutException(sb.toString());
+	}
+
+	/**
+	 * Returns the last cp display layout in the ordered set where classNameId = &#63; and classPK = &#63;.
+	 *
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching cp display layout, or <code>null</code> if a matching cp display layout could not be found
+	 */
+	@Override
+	public CPDisplayLayout fetchByC_C_Last(
+		long classNameId, long classPK,
+		OrderByComparator<CPDisplayLayout> orderByComparator) {
+
+		int count = countByC_C(classNameId, classPK);
+
+		if (count == 0) {
 			return null;
 		}
+
+		List<CPDisplayLayout> list = findByC_C(
+			classNameId, classPK, count - 1, count, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the cp display layouts before and after the current cp display layout in the ordered set where classNameId = &#63; and classPK = &#63;.
+	 *
+	 * @param CPDisplayLayoutId the primary key of the current cp display layout
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next cp display layout
+	 * @throws NoSuchCPDisplayLayoutException if a cp display layout with the primary key could not be found
+	 */
+	@Override
+	public CPDisplayLayout[] findByC_C_PrevAndNext(
+			long CPDisplayLayoutId, long classNameId, long classPK,
+			OrderByComparator<CPDisplayLayout> orderByComparator)
+		throws NoSuchCPDisplayLayoutException {
+
+		CPDisplayLayout cpDisplayLayout = findByPrimaryKey(CPDisplayLayoutId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			CPDisplayLayout[] array = new CPDisplayLayoutImpl[3];
+
+			array[0] = getByC_C_PrevAndNext(
+				session, cpDisplayLayout, classNameId, classPK,
+				orderByComparator, true);
+
+			array[1] = cpDisplayLayout;
+
+			array[2] = getByC_C_PrevAndNext(
+				session, cpDisplayLayout, classNameId, classPK,
+				orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected CPDisplayLayout getByC_C_PrevAndNext(
+		Session session, CPDisplayLayout cpDisplayLayout, long classNameId,
+		long classPK, OrderByComparator<CPDisplayLayout> orderByComparator,
+		boolean previous) {
+
+		StringBundler sb = null;
+
+		if (orderByComparator != null) {
+			sb = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
 		else {
-			return (CPDisplayLayout)result;
+			sb = new StringBundler(4);
+		}
+
+		sb.append(_SQL_SELECT_CPDISPLAYLAYOUT_WHERE);
+
+		sb.append(_FINDER_COLUMN_C_C_CLASSNAMEID_2);
+
+		sb.append(_FINDER_COLUMN_C_C_CLASSPK_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				sb.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			sb.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						sb.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC);
+					}
+					else {
+						sb.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			sb.append(CPDisplayLayoutModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = sb.toString();
+
+		Query query = session.createQuery(sql);
+
+		query.setFirstResult(0);
+		query.setMaxResults(2);
+
+		QueryPos queryPos = QueryPos.getInstance(query);
+
+		queryPos.add(classNameId);
+
+		queryPos.add(classPK);
+
+		if (orderByComparator != null) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						cpDisplayLayout)) {
+
+				queryPos.add(orderByConditionValue);
+			}
+		}
+
+		List<CPDisplayLayout> list = query.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
 		}
 	}
 
 	/**
-	 * Removes the cp display layout where classNameId = &#63; and classPK = &#63; from the database.
+	 * Removes all the cp display layouts where classNameId = &#63; and classPK = &#63; from the database.
 	 *
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
-	 * @return the cp display layout that was removed
 	 */
 	@Override
-	public CPDisplayLayout removeByC_C(long classNameId, long classPK)
-		throws NoSuchCPDisplayLayoutException {
+	public void removeByC_C(long classNameId, long classPK) {
+		for (CPDisplayLayout cpDisplayLayout :
+				findByC_C(
+					classNameId, classPK, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					null)) {
 
-		CPDisplayLayout cpDisplayLayout = findByC_C(classNameId, classPK);
-
-		return remove(cpDisplayLayout);
+			remove(cpDisplayLayout);
+		}
 	}
 
 	/**
@@ -3251,7 +3562,7 @@ public class CPDisplayLayoutPersistenceImpl
 
 		Object[] finderArgs = new Object[] {classNameId, classPK};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3298,6 +3609,250 @@ public class CPDisplayLayoutPersistenceImpl
 	private static final String _FINDER_COLUMN_C_C_CLASSPK_2 =
 		"cpDisplayLayout.classPK = ?";
 
+	private FinderPath _finderPathFetchByG_C_C;
+	private FinderPath _finderPathCountByG_C_C;
+
+	/**
+	 * Returns the cp display layout where groupId = &#63; and classNameId = &#63; and classPK = &#63; or throws a <code>NoSuchCPDisplayLayoutException</code> if it could not be found.
+	 *
+	 * @param groupId the group ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @return the matching cp display layout
+	 * @throws NoSuchCPDisplayLayoutException if a matching cp display layout could not be found
+	 */
+	@Override
+	public CPDisplayLayout findByG_C_C(
+			long groupId, long classNameId, long classPK)
+		throws NoSuchCPDisplayLayoutException {
+
+		CPDisplayLayout cpDisplayLayout = fetchByG_C_C(
+			groupId, classNameId, classPK);
+
+		if (cpDisplayLayout == null) {
+			StringBundler sb = new StringBundler(8);
+
+			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			sb.append("groupId=");
+			sb.append(groupId);
+
+			sb.append(", classNameId=");
+			sb.append(classNameId);
+
+			sb.append(", classPK=");
+			sb.append(classPK);
+
+			sb.append("}");
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(sb.toString());
+			}
+
+			throw new NoSuchCPDisplayLayoutException(sb.toString());
+		}
+
+		return cpDisplayLayout;
+	}
+
+	/**
+	 * Returns the cp display layout where groupId = &#63; and classNameId = &#63; and classPK = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @return the matching cp display layout, or <code>null</code> if a matching cp display layout could not be found
+	 */
+	@Override
+	public CPDisplayLayout fetchByG_C_C(
+		long groupId, long classNameId, long classPK) {
+
+		return fetchByG_C_C(groupId, classNameId, classPK, true);
+	}
+
+	/**
+	 * Returns the cp display layout where groupId = &#63; and classNameId = &#63; and classPK = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching cp display layout, or <code>null</code> if a matching cp display layout could not be found
+	 */
+	@Override
+	public CPDisplayLayout fetchByG_C_C(
+		long groupId, long classNameId, long classPK, boolean useFinderCache) {
+
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {groupId, classNameId, classPK};
+		}
+
+		Object result = null;
+
+		if (useFinderCache) {
+			result = finderCache.getResult(_finderPathFetchByG_C_C, finderArgs);
+		}
+
+		if (result instanceof CPDisplayLayout) {
+			CPDisplayLayout cpDisplayLayout = (CPDisplayLayout)result;
+
+			if ((groupId != cpDisplayLayout.getGroupId()) ||
+				(classNameId != cpDisplayLayout.getClassNameId()) ||
+				(classPK != cpDisplayLayout.getClassPK())) {
+
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler sb = new StringBundler(5);
+
+			sb.append(_SQL_SELECT_CPDISPLAYLAYOUT_WHERE);
+
+			sb.append(_FINDER_COLUMN_G_C_C_GROUPID_2);
+
+			sb.append(_FINDER_COLUMN_G_C_C_CLASSNAMEID_2);
+
+			sb.append(_FINDER_COLUMN_G_C_C_CLASSPK_2);
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(groupId);
+
+				queryPos.add(classNameId);
+
+				queryPos.add(classPK);
+
+				List<CPDisplayLayout> list = query.list();
+
+				if (list.isEmpty()) {
+					if (useFinderCache) {
+						finderCache.putResult(
+							_finderPathFetchByG_C_C, finderArgs, list);
+					}
+				}
+				else {
+					CPDisplayLayout cpDisplayLayout = list.get(0);
+
+					result = cpDisplayLayout;
+
+					cacheResult(cpDisplayLayout);
+				}
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (CPDisplayLayout)result;
+		}
+	}
+
+	/**
+	 * Removes the cp display layout where groupId = &#63; and classNameId = &#63; and classPK = &#63; from the database.
+	 *
+	 * @param groupId the group ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @return the cp display layout that was removed
+	 */
+	@Override
+	public CPDisplayLayout removeByG_C_C(
+			long groupId, long classNameId, long classPK)
+		throws NoSuchCPDisplayLayoutException {
+
+		CPDisplayLayout cpDisplayLayout = findByG_C_C(
+			groupId, classNameId, classPK);
+
+		return remove(cpDisplayLayout);
+	}
+
+	/**
+	 * Returns the number of cp display layouts where groupId = &#63; and classNameId = &#63; and classPK = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @return the number of matching cp display layouts
+	 */
+	@Override
+	public int countByG_C_C(long groupId, long classNameId, long classPK) {
+		FinderPath finderPath = _finderPathCountByG_C_C;
+
+		Object[] finderArgs = new Object[] {groupId, classNameId, classPK};
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
+
+		if (count == null) {
+			StringBundler sb = new StringBundler(4);
+
+			sb.append(_SQL_COUNT_CPDISPLAYLAYOUT_WHERE);
+
+			sb.append(_FINDER_COLUMN_G_C_C_GROUPID_2);
+
+			sb.append(_FINDER_COLUMN_G_C_C_CLASSNAMEID_2);
+
+			sb.append(_FINDER_COLUMN_G_C_C_CLASSPK_2);
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(groupId);
+
+				queryPos.add(classNameId);
+
+				queryPos.add(classPK);
+
+				count = (Long)query.uniqueResult();
+
+				finderCache.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_G_C_C_GROUPID_2 =
+		"cpDisplayLayout.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_CLASSNAMEID_2 =
+		"cpDisplayLayout.classNameId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_C_C_CLASSPK_2 =
+		"cpDisplayLayout.classPK = ?";
+
 	public CPDisplayLayoutPersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
@@ -3332,9 +3887,10 @@ public class CPDisplayLayoutPersistenceImpl
 			cpDisplayLayout);
 
 		finderCache.putResult(
-			_finderPathFetchByC_C,
+			_finderPathFetchByG_C_C,
 			new Object[] {
-				cpDisplayLayout.getClassNameId(), cpDisplayLayout.getClassPK()
+				cpDisplayLayout.getGroupId(), cpDisplayLayout.getClassNameId(),
+				cpDisplayLayout.getClassPK()
 			},
 			cpDisplayLayout);
 	}
@@ -3377,9 +3933,7 @@ public class CPDisplayLayoutPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(CPDisplayLayoutImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(CPDisplayLayoutImpl.class);
 	}
 
 	/**
@@ -3404,9 +3958,7 @@ public class CPDisplayLayoutPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(CPDisplayLayoutImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(CPDisplayLayoutImpl.class, primaryKey);
@@ -3421,20 +3973,19 @@ public class CPDisplayLayoutPersistenceImpl
 			cpDisplayLayoutModelImpl.getGroupId()
 		};
 
+		finderCache.putResult(_finderPathCountByUUID_G, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathCountByUUID_G, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByUUID_G, args, cpDisplayLayoutModelImpl, false);
+			_finderPathFetchByUUID_G, args, cpDisplayLayoutModelImpl);
 
 		args = new Object[] {
+			cpDisplayLayoutModelImpl.getGroupId(),
 			cpDisplayLayoutModelImpl.getClassNameId(),
 			cpDisplayLayoutModelImpl.getClassPK()
 		};
 
+		finderCache.putResult(_finderPathCountByG_C_C, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathCountByC_C, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByC_C, args, cpDisplayLayoutModelImpl, false);
+			_finderPathFetchByG_C_C, args, cpDisplayLayoutModelImpl);
 	}
 
 	/**
@@ -3769,7 +4320,7 @@ public class CPDisplayLayoutPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CPDisplayLayout>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3839,7 +4390,7 @@ public class CPDisplayLayoutPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -3894,33 +4445,22 @@ public class CPDisplayLayoutPersistenceImpl
 	 * Initializes the cp display layout persistence.
 	 */
 	public void afterPropertiesSet() {
-		Bundle bundle = FrameworkUtil.getBundle(
-			CPDisplayLayoutPersistenceImpl.class);
-
-		_bundleContext = bundle.getBundleContext();
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class,
-			new CPDisplayLayoutModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", CPDisplayLayout.class.getName()));
-
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByUuid = _createFinderPath(
+		_finderPathWithPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
@@ -3928,27 +4468,27 @@ public class CPDisplayLayoutPersistenceImpl
 			},
 			new String[] {"uuid_"}, true);
 
-		_finderPathWithoutPaginationFindByUuid = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			true);
 
-		_finderPathCountByUuid = _createFinderPath(
+		_finderPathCountByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			false);
 
-		_finderPathFetchByUUID_G = _createFinderPath(
+		_finderPathFetchByUUID_G = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "groupId"}, true);
 
-		_finderPathCountByUUID_G = _createFinderPath(
+		_finderPathCountByUUID_G = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "groupId"}, false);
 
-		_finderPathWithPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -3957,17 +4497,17 @@ public class CPDisplayLayoutPersistenceImpl
 			},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathWithoutPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathCountByUuid_C = _createFinderPath(
+		_finderPathCountByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
 
-		_finderPathWithPaginationFindByGroupId = _createFinderPath(
+		_finderPathWithPaginationFindByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -3975,17 +4515,17 @@ public class CPDisplayLayoutPersistenceImpl
 			},
 			new String[] {"groupId"}, true);
 
-		_finderPathWithoutPaginationFindByGroupId = _createFinderPath(
+		_finderPathWithoutPaginationFindByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			true);
 
-		_finderPathCountByGroupId = _createFinderPath(
+		_finderPathCountByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			false);
 
-		_finderPathWithPaginationFindByG_C = _createFinderPath(
+		_finderPathWithPaginationFindByG_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -3994,17 +4534,17 @@ public class CPDisplayLayoutPersistenceImpl
 			},
 			new String[] {"groupId", "classNameId"}, true);
 
-		_finderPathWithoutPaginationFindByG_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"groupId", "classNameId"}, true);
 
-		_finderPathCountByG_C = _createFinderPath(
+		_finderPathCountByG_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"groupId", "classNameId"}, false);
 
-		_finderPathWithPaginationFindByG_L = _createFinderPath(
+		_finderPathWithPaginationFindByG_L = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_L",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -4013,25 +4553,48 @@ public class CPDisplayLayoutPersistenceImpl
 			},
 			new String[] {"groupId", "layoutUuid"}, true);
 
-		_finderPathWithoutPaginationFindByG_L = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_L = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_L",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "layoutUuid"}, true);
 
-		_finderPathCountByG_L = _createFinderPath(
+		_finderPathCountByG_L = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_L",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "layoutUuid"}, false);
 
-		_finderPathFetchByC_C = _createFinderPath(
-			FINDER_CLASS_NAME_ENTITY, "fetchByC_C",
+		_finderPathWithPaginationFindByC_C = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			},
+			new String[] {"classNameId", "classPK"}, true);
+
+		_finderPathWithoutPaginationFindByC_C = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"classNameId", "classPK"}, true);
 
-		_finderPathCountByC_C = _createFinderPath(
+		_finderPathCountByC_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"classNameId", "classPK"}, false);
+
+		_finderPathFetchByG_C_C = new FinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByG_C_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName()
+			},
+			new String[] {"groupId", "classNameId", "classPK"}, true);
+
+		_finderPathCountByG_C_C = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName()
+			},
+			new String[] {"groupId", "classNameId", "classPK"}, false);
 
 		_setCPDisplayLayoutUtilPersistence(this);
 	}
@@ -4040,14 +4603,6 @@ public class CPDisplayLayoutPersistenceImpl
 		_setCPDisplayLayoutUtilPersistence(null);
 
 		entityCache.removeCache(CPDisplayLayoutImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setCPDisplayLayoutUtilPersistence(
@@ -4065,8 +4620,6 @@ public class CPDisplayLayoutPersistenceImpl
 			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
-
-	private BundleContext _bundleContext;
 
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
@@ -4100,105 +4653,9 @@ public class CPDisplayLayoutPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"uuid"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
-	}
-
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class CPDisplayLayoutModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			CPDisplayLayoutModelImpl cpDisplayLayoutModelImpl =
-				(CPDisplayLayoutModelImpl)baseModel;
-
-			long columnBitmask = cpDisplayLayoutModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					cpDisplayLayoutModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						cpDisplayLayoutModelImpl.getColumnBitmask(columnName);
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					cpDisplayLayoutModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			CPDisplayLayoutModelImpl cpDisplayLayoutModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						cpDisplayLayoutModelImpl.getColumnOriginalValue(
-							columnName);
-				}
-				else {
-					arguments[i] = cpDisplayLayoutModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
 }

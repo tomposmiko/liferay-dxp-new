@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -275,48 +276,70 @@ public class AccountRoleModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<AccountRole, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, AccountRole>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<AccountRole, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<AccountRole, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AccountRole.class.getClassLoader(), AccountRole.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", AccountRole::getMvccVersion);
-		attributeGetterFunctions.put(
-			"accountRoleId", AccountRole::getAccountRoleId);
-		attributeGetterFunctions.put("companyId", AccountRole::getCompanyId);
-		attributeGetterFunctions.put(
-			"accountEntryId", AccountRole::getAccountEntryId);
-		attributeGetterFunctions.put("roleId", AccountRole::getRoleId);
+		try {
+			Constructor<AccountRole> constructor =
+				(Constructor<AccountRole>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<AccountRole, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<AccountRole, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<AccountRole, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AccountRole, Object>>();
 		Map<String, BiConsumer<AccountRole, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<AccountRole, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", AccountRole::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AccountRole, Long>)AccountRole::setMvccVersion);
+		attributeGetterFunctions.put(
+			"accountRoleId", AccountRole::getAccountRoleId);
 		attributeSetterBiConsumers.put(
 			"accountRoleId",
 			(BiConsumer<AccountRole, Long>)AccountRole::setAccountRoleId);
+		attributeGetterFunctions.put("companyId", AccountRole::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AccountRole, Long>)AccountRole::setCompanyId);
+		attributeGetterFunctions.put(
+			"accountEntryId", AccountRole::getAccountEntryId);
 		attributeSetterBiConsumers.put(
 			"accountEntryId",
 			(BiConsumer<AccountRole, Long>)AccountRole::setAccountEntryId);
+		attributeGetterFunctions.put("roleId", AccountRole::getRoleId);
 		attributeSetterBiConsumers.put(
 			"roleId", (BiConsumer<AccountRole, Long>)AccountRole::setRoleId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -493,6 +516,23 @@ public class AccountRoleModelImpl
 	}
 
 	@Override
+	public AccountRole cloneWithOriginalValues() {
+		AccountRoleImpl accountRoleImpl = new AccountRoleImpl();
+
+		accountRoleImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		accountRoleImpl.setAccountRoleId(
+			this.<Long>getColumnOriginalValue("accountRoleId"));
+		accountRoleImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		accountRoleImpl.setAccountEntryId(
+			this.<Long>getColumnOriginalValue("accountEntryId"));
+		accountRoleImpl.setRoleId(this.<Long>getColumnOriginalValue("roleId"));
+
+		return accountRoleImpl;
+	}
+
+	@Override
 	public int compareTo(AccountRole accountRole) {
 		long primaryKey = accountRole.getPrimaryKey();
 
@@ -660,9 +700,7 @@ public class AccountRoleModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AccountRole>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AccountRole.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

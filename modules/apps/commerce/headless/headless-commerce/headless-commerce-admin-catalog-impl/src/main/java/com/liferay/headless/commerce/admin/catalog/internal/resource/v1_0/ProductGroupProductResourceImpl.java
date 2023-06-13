@@ -61,11 +61,11 @@ public class ProductGroupProductResourceImpl
 
 		CommercePricingClass commercePricingClass =
 			_commercePricingClassService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (commercePricingClass == null) {
 			throw new NoSuchPricingClassException(
-				"Unable to find Product Group with externalReferenceCode: " +
+				"Unable to find product group with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -117,11 +117,11 @@ public class ProductGroupProductResourceImpl
 
 		CommercePricingClass commercePricingClass =
 			_commercePricingClassService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (commercePricingClass == null) {
 			throw new NoSuchPricingClassException(
-				"Unable to find Product Group with externalReferenceCode: " +
+				"Unable to find product group with external reference code " +
 					externalReferenceCode);
 		}
 

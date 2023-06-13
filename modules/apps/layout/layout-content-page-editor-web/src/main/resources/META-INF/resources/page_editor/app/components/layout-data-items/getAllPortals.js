@@ -24,7 +24,9 @@ import Layout from '../Layout';
 export default function getAllPortals(element) {
 	return Array.from(element.querySelectorAll('lfr-drop-zone')).map(
 		(dropZoneElement) => {
+			const dropZoneId = dropZoneElement.dataset.lfrDropZoneId || '';
 			const mainItemId = dropZoneElement.getAttribute('uuid') || '';
+			const priority = dropZoneElement.dataset.lfrPriority || Infinity;
 
 			const Component = () =>
 				mainItemId ? <Layout mainItemId={mainItemId} /> : null;
@@ -33,8 +35,10 @@ export default function getAllPortals(element) {
 
 			return {
 				Component,
+				dropZoneId,
 				element: dropZoneElement,
 				mainItemId,
+				priority,
 			};
 		}
 	);

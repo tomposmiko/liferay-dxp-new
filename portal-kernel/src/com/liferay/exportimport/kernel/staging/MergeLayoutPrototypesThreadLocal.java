@@ -44,10 +44,6 @@ public class MergeLayoutPrototypesThreadLocal {
 		return methodKeys.contains(new MethodKey(methodName, arguments));
 	}
 
-	public static boolean isSkipMerge() {
-		return _skipMerge.get();
-	}
-
 	public static void setInProgress(boolean inProgress) {
 		_inProgress.set(inProgress);
 	}
@@ -62,10 +58,6 @@ public class MergeLayoutPrototypesThreadLocal {
 		setInProgress(false);
 	}
 
-	public static void setSkipMerge(boolean skipMerge) {
-		_skipMerge.set(skipMerge);
-	}
-
 	private static final ThreadLocal<Boolean> _inProgress =
 		new CentralizedThreadLocal<>(
 			MergeLayoutPrototypesThreadLocal.class + "._inProgress",
@@ -74,10 +66,6 @@ public class MergeLayoutPrototypesThreadLocal {
 		new CentralizedThreadLocal<>(
 			MergeLayoutPrototypesThreadLocal.class + "._mergeComplete",
 			HashSet::new);
-	private static final ThreadLocal<Boolean> _skipMerge =
-		new CentralizedThreadLocal<>(
-			MergeLayoutPrototypesThreadLocal.class + "._skipMerge",
-			() -> Boolean.FALSE);
 
 	private static class MethodKey {
 

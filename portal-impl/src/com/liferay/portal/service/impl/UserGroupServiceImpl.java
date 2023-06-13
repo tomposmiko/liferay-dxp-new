@@ -153,7 +153,7 @@ public class UserGroupServiceImpl extends UserGroupServiceBaseImpl {
 	public List<UserGroup> getGtUserGroups(
 		long gtUserGroupId, long companyId, long parentUserGroupId, int size) {
 
-		return userGroupPersistence.filterFindByU_C_P(
+		return userGroupPersistence.filterFindByGtU_C_P(
 			gtUserGroupId, companyId, parentUserGroupId, 0, size,
 			new UserGroupIdComparator(true));
 	}
@@ -166,10 +166,12 @@ public class UserGroupServiceImpl extends UserGroupServiceBaseImpl {
 	 */
 	@Override
 	public UserGroup getUserGroup(long userGroupId) throws PortalException {
+		UserGroup userGroup = userGroupLocalService.getUserGroup(userGroupId);
+
 		UserGroupPermissionUtil.check(
 			getPermissionChecker(), userGroupId, ActionKeys.VIEW);
 
-		return userGroupLocalService.getUserGroup(userGroupId);
+		return userGroup;
 	}
 
 	/**

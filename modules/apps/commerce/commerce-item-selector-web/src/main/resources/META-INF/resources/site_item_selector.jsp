@@ -18,8 +18,6 @@
 
 <%
 SimpleSiteItemSelectorViewDisplayContext simpleSiteItemSelectorViewDisplayContext = (SimpleSiteItemSelectorViewDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
-
-String itemSelectedEventName = simpleSiteItemSelectorViewDisplayContext.getItemSelectedEventName();
 %>
 
 <liferay-frontend:management-bar
@@ -44,7 +42,7 @@ String itemSelectedEventName = simpleSiteItemSelectorViewDisplayContext.getItemS
 	</liferay-frontend:management-bar-buttons>
 </liferay-frontend:management-bar>
 
-<div class="container-fluid-1280" id="<portlet:namespace />siteSelectorWrapper">
+<div class="container-fluid container-fluid-max-xl" id="<portlet:namespace />siteSelectorWrapper">
 	<liferay-ui:search-container
 		id="sites"
 		searchContainer="<%= simpleSiteItemSelectorViewDisplayContext.getSearchContainer() %>"
@@ -55,32 +53,23 @@ String itemSelectedEventName = simpleSiteItemSelectorViewDisplayContext.getItemS
 			modelVar="group"
 		>
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="name"
 				value="<%= HtmlUtil.escape(group.getName(locale)) %>"
 			/>
 
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="channel"
 				value="<%= HtmlUtil.escape(simpleSiteItemSelectorViewDisplayContext.getChannelUsingSite(group.getGroupId())) %>"
 			/>
 
-			<%
-			row.setData(
-				HashMapBuilder.<String, Object>put(
-					"id", group.getGroupId()
-				).put(
-					"name", group.getName(locale)
-				).build());
-			%>
-
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 			>
 				<c:choose>
 					<c:when test="<%= simpleSiteItemSelectorViewDisplayContext.isSiteAvailable(group.getGroupId()) %>">
-						<aui:button cssClass="selector-button" value="choose" />
+						<aui:button cssClass="selector-button" data='<%= HashMapBuilder.<String, Object>put("id", group.getGroupId()).put("name", group.getName(locale)).build() %>' value="choose" />
 					</c:when>
 					<c:otherwise>
 						<liferay-ui:message key="that-site-is-already-associated-with-another-channel" />
@@ -94,28 +83,3 @@ String itemSelectedEventName = simpleSiteItemSelectorViewDisplayContext.getItemS
 		/>
 	</liferay-ui:search-container>
 </div>
-
-<aui:script use="aui-base">
-	A.one('#<portlet:namespace />sites').delegate(
-		'click',
-		function (event) {
-			var row = this.ancestor('tr');
-
-			var data = row.getDOM().dataset;
-
-			Liferay.Util.getOpener().Liferay.fire(
-				'<%= HtmlUtil.escapeJS(itemSelectedEventName) %>',
-				{
-					data: {id: data.id, name: data.name},
-				}
-			);
-
-			var popupWindow = Liferay.Util.getWindow();
-
-			if (popupWindow !== null) {
-				Liferay.Util.getWindow().hide();
-			}
-		},
-		'.selector-button'
-	);
-</aui:script>

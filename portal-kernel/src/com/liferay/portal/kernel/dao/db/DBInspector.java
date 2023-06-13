@@ -65,11 +65,11 @@ public class DBInspector {
 
 		DatabaseMetaData databaseMetaData = _connection.getMetaData();
 
-		try (ResultSet rs = databaseMetaData.getColumns(
+		try (ResultSet resultSet = databaseMetaData.getColumns(
 				getCatalog(), getSchema(), normalizeName(tableName),
 				normalizeName(columnName))) {
 
-			if (!rs.next()) {
+			if (!resultSet.next()) {
 				return false;
 			}
 
@@ -103,18 +103,18 @@ public class DBInspector {
 
 		DatabaseMetaData databaseMetaData = _connection.getMetaData();
 
-		try (ResultSet rs = databaseMetaData.getColumns(
+		try (ResultSet resultSet = databaseMetaData.getColumns(
 				getCatalog(), getSchema(),
 				normalizeName(tableName, databaseMetaData),
 				normalizeName(columnName, databaseMetaData))) {
 
-			if (!rs.next()) {
+			if (!resultSet.next()) {
 				return false;
 			}
 
 			int expectedColumnSize = _getColumnSize(columnType);
 
-			int actualColumnSize = rs.getInt("COLUMN_SIZE");
+			int actualColumnSize = resultSet.getInt("COLUMN_SIZE");
 
 			if ((expectedColumnSize != -1) &&
 				(expectedColumnSize != actualColumnSize)) {
@@ -124,7 +124,7 @@ public class DBInspector {
 
 			Integer expectedColumnDataType = _getColumnDataType(columnType);
 
-			int actualColumnDataType = rs.getInt("DATA_TYPE");
+			int actualColumnDataType = resultSet.getInt("DATA_TYPE");
 
 			if ((expectedColumnDataType == null) ||
 				(expectedColumnDataType != actualColumnDataType)) {
@@ -134,7 +134,7 @@ public class DBInspector {
 
 			boolean expectedColumnNullable = _isColumnNullable(columnType);
 
-			int actualColumnNullable = rs.getInt("NULLABLE");
+			int actualColumnNullable = resultSet.getInt("NULLABLE");
 
 			if ((expectedColumnNullable &&
 				 (actualColumnNullable != DatabaseMetaData.columnNullable)) ||
@@ -151,11 +151,11 @@ public class DBInspector {
 	public boolean hasIndex(String tableName, String indexName)
 		throws Exception {
 
-		DB db = DBManagerUtil.getDB();
 		DatabaseMetaData databaseMetaData = _connection.getMetaData();
 
-		try (ResultSet resultSet = db.getIndexResultSet(
-				_connection, normalizeName(tableName, databaseMetaData))) {
+		try (ResultSet resultSet = databaseMetaData.getIndexInfo(
+				_connection.getCatalog(), _connection.getSchema(),
+				normalizeName(tableName, databaseMetaData), false, false)) {
 
 			while (resultSet.next()) {
 				if (Objects.equals(
@@ -174,12 +174,12 @@ public class DBInspector {
 	}
 
 	public boolean hasRows(String tableName) {
-		try (PreparedStatement ps = _connection.prepareStatement(
+		try (PreparedStatement preparedStatement = _connection.prepareStatement(
 				"select count(*) from " + tableName);
-			ResultSet rs = ps.executeQuery()) {
+			ResultSet resultSet = preparedStatement.executeQuery()) {
 
-			while (rs.next()) {
-				int count = rs.getInt(1);
+			while (resultSet.next()) {
+				int count = resultSet.getInt(1);
 
 				if (count > 0) {
 					return true;
@@ -222,19 +222,21 @@ public class DBInspector {
 
 		DatabaseMetaData databaseMetaData = _connection.getMetaData();
 
-		try (ResultSet rs = databaseMetaData.getColumns(
+		try (ResultSet resultSet = databaseMetaData.getColumns(
 				getCatalog(), getSchema(),
 				normalizeName(tableName, databaseMetaData),
 				normalizeName(columnName, databaseMetaData))) {
 
-			if (!rs.next()) {
+			if (!resultSet.next()) {
 				throw new SQLException(
 					StringBundler.concat(
 						"Column ", tableName, StringPool.PERIOD, columnName,
 						" does not exist"));
 			}
 
-			if (rs.getInt("NULLABLE") == DatabaseMetaData.columnNullable) {
+			if (resultSet.getInt("NULLABLE") ==
+					DatabaseMetaData.columnNullable) {
+
 				return true;
 			}
 
@@ -300,10 +302,10 @@ public class DBInspector {
 	private boolean _hasTable(String tableName) throws Exception {
 		DatabaseMetaData metadata = _connection.getMetaData();
 
-		try (ResultSet rs = metadata.getTables(
+		try (ResultSet resultSet = metadata.getTables(
 				getCatalog(), getSchema(), tableName, null)) {
 
-			while (rs.next()) {
+			while (resultSet.next()) {
 				return true;
 			}
 		}

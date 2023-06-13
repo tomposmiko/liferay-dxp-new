@@ -15,12 +15,11 @@
 package com.liferay.dynamic.data.mapping.form.web.internal.configuration.persistence.listener;
 
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListenerException;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.util.PropsImpl;
 
-import java.util.Dictionary;
 import java.util.Locale;
 
 import org.junit.Before;
@@ -51,11 +50,11 @@ public class DDMFormWebConfigurationModelListenerTest extends PowerMockito {
 	public void testNegativeAutosaveIntervalShouldThrowException()
 		throws ConfigurationModelListenerException {
 
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-		properties.put("autosaveInterval", "-1");
-
-		_ddmFormWebConfigurationModelListener.onBeforeSave(null, properties);
+		_ddmFormWebConfigurationModelListener.onBeforeSave(
+			null,
+			HashMapDictionaryBuilder.<String, Object>put(
+				"autosaveInterval", "-1"
+			).build());
 	}
 
 	private void _setUpDDMFormWebConfigurationModelListener() {

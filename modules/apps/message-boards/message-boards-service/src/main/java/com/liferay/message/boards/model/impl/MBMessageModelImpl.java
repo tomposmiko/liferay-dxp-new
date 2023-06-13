@@ -43,6 +43,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -83,20 +84,21 @@ public class MBMessageModelImpl
 
 	public static final Object[][] TABLE_COLUMNS = {
 		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
-		{"uuid_", Types.VARCHAR}, {"messageId", Types.BIGINT},
-		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
-		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
-		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
-		{"classNameId", Types.BIGINT}, {"classPK", Types.BIGINT},
-		{"categoryId", Types.BIGINT}, {"threadId", Types.BIGINT},
-		{"rootMessageId", Types.BIGINT}, {"parentMessageId", Types.BIGINT},
-		{"treePath", Types.VARCHAR}, {"subject", Types.VARCHAR},
-		{"urlSubject", Types.VARCHAR}, {"body", Types.CLOB},
-		{"format", Types.VARCHAR}, {"anonymous", Types.BOOLEAN},
-		{"priority", Types.DOUBLE}, {"allowPingbacks", Types.BOOLEAN},
-		{"answer", Types.BOOLEAN}, {"lastPublishDate", Types.TIMESTAMP},
-		{"status", Types.INTEGER}, {"statusByUserId", Types.BIGINT},
-		{"statusByUserName", Types.VARCHAR}, {"statusDate", Types.TIMESTAMP}
+		{"uuid_", Types.VARCHAR}, {"externalReferenceCode", Types.VARCHAR},
+		{"messageId", Types.BIGINT}, {"groupId", Types.BIGINT},
+		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
+		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
+		{"modifiedDate", Types.TIMESTAMP}, {"classNameId", Types.BIGINT},
+		{"classPK", Types.BIGINT}, {"categoryId", Types.BIGINT},
+		{"threadId", Types.BIGINT}, {"rootMessageId", Types.BIGINT},
+		{"parentMessageId", Types.BIGINT}, {"treePath", Types.VARCHAR},
+		{"subject", Types.VARCHAR}, {"urlSubject", Types.VARCHAR},
+		{"body", Types.CLOB}, {"format", Types.VARCHAR},
+		{"anonymous", Types.BOOLEAN}, {"priority", Types.DOUBLE},
+		{"allowPingbacks", Types.BOOLEAN}, {"answer", Types.BOOLEAN},
+		{"lastPublishDate", Types.TIMESTAMP}, {"status", Types.INTEGER},
+		{"statusByUserId", Types.BIGINT}, {"statusByUserName", Types.VARCHAR},
+		{"statusDate", Types.TIMESTAMP}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -106,6 +108,7 @@ public class MBMessageModelImpl
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("externalReferenceCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("messageId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -136,7 +139,7 @@ public class MBMessageModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table MBMessage (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,uuid_ VARCHAR(75) null,messageId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,categoryId LONG,threadId LONG,rootMessageId LONG,parentMessageId LONG,treePath STRING null,subject VARCHAR(75) null,urlSubject VARCHAR(255) null,body TEXT null,format VARCHAR(75) null,anonymous BOOLEAN,priority DOUBLE,allowPingbacks BOOLEAN,answer BOOLEAN,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,primary key (messageId, ctCollectionId))";
+		"create table MBMessage (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,messageId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,categoryId LONG,threadId LONG,rootMessageId LONG,parentMessageId LONG,treePath STRING null,subject VARCHAR(75) null,urlSubject VARCHAR(255) null,body TEXT null,format VARCHAR(75) null,anonymous BOOLEAN,priority DOUBLE,allowPingbacks BOOLEAN,answer BOOLEAN,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,primary key (messageId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP = "drop table MBMessage";
 
@@ -186,57 +189,63 @@ public class MBMessageModelImpl
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long GROUPID_COLUMN_BITMASK = 32L;
+	public static final long EXTERNALREFERENCECODE_COLUMN_BITMASK = 32L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long PARENTMESSAGEID_COLUMN_BITMASK = 64L;
+	public static final long GROUPID_COLUMN_BITMASK = 64L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long STATUS_COLUMN_BITMASK = 128L;
+	public static final long PARENTMESSAGEID_COLUMN_BITMASK = 128L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long THREADID_COLUMN_BITMASK = 256L;
+	public static final long STATUS_COLUMN_BITMASK = 256L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long URLSUBJECT_COLUMN_BITMASK = 512L;
+	public static final long THREADID_COLUMN_BITMASK = 512L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long USERID_COLUMN_BITMASK = 1024L;
+	public static final long URLSUBJECT_COLUMN_BITMASK = 1024L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long UUID_COLUMN_BITMASK = 2048L;
+	public static final long USERID_COLUMN_BITMASK = 2048L;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long UUID_COLUMN_BITMASK = 4096L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *		#getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long CREATEDATE_COLUMN_BITMASK = 4096L;
+	public static final long CREATEDATE_COLUMN_BITMASK = 8192L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *		#getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long MESSAGEID_COLUMN_BITMASK = 8192L;
+	public static final long MESSAGEID_COLUMN_BITMASK = 16384L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -270,6 +279,7 @@ public class MBMessageModelImpl
 		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setCtCollectionId(soapModel.getCtCollectionId());
 		model.setUuid(soapModel.getUuid());
+		model.setExternalReferenceCode(soapModel.getExternalReferenceCode());
 		model.setMessageId(soapModel.getMessageId());
 		model.setGroupId(soapModel.getGroupId());
 		model.setCompanyId(soapModel.getCompanyId());
@@ -407,139 +417,166 @@ public class MBMessageModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<MBMessage, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, MBMessage>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<MBMessage, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<MBMessage, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			MBMessage.class.getClassLoader(), MBMessage.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", MBMessage::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", MBMessage::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", MBMessage::getUuid);
-		attributeGetterFunctions.put("messageId", MBMessage::getMessageId);
-		attributeGetterFunctions.put("groupId", MBMessage::getGroupId);
-		attributeGetterFunctions.put("companyId", MBMessage::getCompanyId);
-		attributeGetterFunctions.put("userId", MBMessage::getUserId);
-		attributeGetterFunctions.put("userName", MBMessage::getUserName);
-		attributeGetterFunctions.put("createDate", MBMessage::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", MBMessage::getModifiedDate);
-		attributeGetterFunctions.put("classNameId", MBMessage::getClassNameId);
-		attributeGetterFunctions.put("classPK", MBMessage::getClassPK);
-		attributeGetterFunctions.put("categoryId", MBMessage::getCategoryId);
-		attributeGetterFunctions.put("threadId", MBMessage::getThreadId);
-		attributeGetterFunctions.put(
-			"rootMessageId", MBMessage::getRootMessageId);
-		attributeGetterFunctions.put(
-			"parentMessageId", MBMessage::getParentMessageId);
-		attributeGetterFunctions.put("treePath", MBMessage::getTreePath);
-		attributeGetterFunctions.put("subject", MBMessage::getSubject);
-		attributeGetterFunctions.put("urlSubject", MBMessage::getUrlSubject);
-		attributeGetterFunctions.put("body", MBMessage::getBody);
-		attributeGetterFunctions.put("format", MBMessage::getFormat);
-		attributeGetterFunctions.put("anonymous", MBMessage::getAnonymous);
-		attributeGetterFunctions.put("priority", MBMessage::getPriority);
-		attributeGetterFunctions.put(
-			"allowPingbacks", MBMessage::getAllowPingbacks);
-		attributeGetterFunctions.put("answer", MBMessage::getAnswer);
-		attributeGetterFunctions.put(
-			"lastPublishDate", MBMessage::getLastPublishDate);
-		attributeGetterFunctions.put("status", MBMessage::getStatus);
-		attributeGetterFunctions.put(
-			"statusByUserId", MBMessage::getStatusByUserId);
-		attributeGetterFunctions.put(
-			"statusByUserName", MBMessage::getStatusByUserName);
-		attributeGetterFunctions.put("statusDate", MBMessage::getStatusDate);
+		try {
+			Constructor<MBMessage> constructor =
+				(Constructor<MBMessage>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<MBMessage, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<MBMessage, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<MBMessage, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<MBMessage, Object>>();
 		Map<String, BiConsumer<MBMessage, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<MBMessage, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", MBMessage::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<MBMessage, Long>)MBMessage::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", MBMessage::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<MBMessage, Long>)MBMessage::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", MBMessage::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<MBMessage, String>)MBMessage::setUuid);
+		attributeGetterFunctions.put(
+			"externalReferenceCode", MBMessage::getExternalReferenceCode);
+		attributeSetterBiConsumers.put(
+			"externalReferenceCode",
+			(BiConsumer<MBMessage, String>)MBMessage::setExternalReferenceCode);
+		attributeGetterFunctions.put("messageId", MBMessage::getMessageId);
 		attributeSetterBiConsumers.put(
 			"messageId", (BiConsumer<MBMessage, Long>)MBMessage::setMessageId);
+		attributeGetterFunctions.put("groupId", MBMessage::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<MBMessage, Long>)MBMessage::setGroupId);
+		attributeGetterFunctions.put("companyId", MBMessage::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<MBMessage, Long>)MBMessage::setCompanyId);
+		attributeGetterFunctions.put("userId", MBMessage::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<MBMessage, Long>)MBMessage::setUserId);
+		attributeGetterFunctions.put("userName", MBMessage::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<MBMessage, String>)MBMessage::setUserName);
+		attributeGetterFunctions.put("createDate", MBMessage::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<MBMessage, Date>)MBMessage::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", MBMessage::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<MBMessage, Date>)MBMessage::setModifiedDate);
+		attributeGetterFunctions.put("classNameId", MBMessage::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<MBMessage, Long>)MBMessage::setClassNameId);
+		attributeGetterFunctions.put("classPK", MBMessage::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK", (BiConsumer<MBMessage, Long>)MBMessage::setClassPK);
+		attributeGetterFunctions.put("categoryId", MBMessage::getCategoryId);
 		attributeSetterBiConsumers.put(
 			"categoryId",
 			(BiConsumer<MBMessage, Long>)MBMessage::setCategoryId);
+		attributeGetterFunctions.put("threadId", MBMessage::getThreadId);
 		attributeSetterBiConsumers.put(
 			"threadId", (BiConsumer<MBMessage, Long>)MBMessage::setThreadId);
+		attributeGetterFunctions.put(
+			"rootMessageId", MBMessage::getRootMessageId);
 		attributeSetterBiConsumers.put(
 			"rootMessageId",
 			(BiConsumer<MBMessage, Long>)MBMessage::setRootMessageId);
+		attributeGetterFunctions.put(
+			"parentMessageId", MBMessage::getParentMessageId);
 		attributeSetterBiConsumers.put(
 			"parentMessageId",
 			(BiConsumer<MBMessage, Long>)MBMessage::setParentMessageId);
+		attributeGetterFunctions.put("treePath", MBMessage::getTreePath);
 		attributeSetterBiConsumers.put(
 			"treePath", (BiConsumer<MBMessage, String>)MBMessage::setTreePath);
+		attributeGetterFunctions.put("subject", MBMessage::getSubject);
 		attributeSetterBiConsumers.put(
 			"subject", (BiConsumer<MBMessage, String>)MBMessage::setSubject);
+		attributeGetterFunctions.put("urlSubject", MBMessage::getUrlSubject);
 		attributeSetterBiConsumers.put(
 			"urlSubject",
 			(BiConsumer<MBMessage, String>)MBMessage::setUrlSubject);
+		attributeGetterFunctions.put("body", MBMessage::getBody);
 		attributeSetterBiConsumers.put(
 			"body", (BiConsumer<MBMessage, String>)MBMessage::setBody);
+		attributeGetterFunctions.put("format", MBMessage::getFormat);
 		attributeSetterBiConsumers.put(
 			"format", (BiConsumer<MBMessage, String>)MBMessage::setFormat);
+		attributeGetterFunctions.put("anonymous", MBMessage::getAnonymous);
 		attributeSetterBiConsumers.put(
 			"anonymous",
 			(BiConsumer<MBMessage, Boolean>)MBMessage::setAnonymous);
+		attributeGetterFunctions.put("priority", MBMessage::getPriority);
 		attributeSetterBiConsumers.put(
 			"priority", (BiConsumer<MBMessage, Double>)MBMessage::setPriority);
+		attributeGetterFunctions.put(
+			"allowPingbacks", MBMessage::getAllowPingbacks);
 		attributeSetterBiConsumers.put(
 			"allowPingbacks",
 			(BiConsumer<MBMessage, Boolean>)MBMessage::setAllowPingbacks);
+		attributeGetterFunctions.put("answer", MBMessage::getAnswer);
 		attributeSetterBiConsumers.put(
 			"answer", (BiConsumer<MBMessage, Boolean>)MBMessage::setAnswer);
+		attributeGetterFunctions.put(
+			"lastPublishDate", MBMessage::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<MBMessage, Date>)MBMessage::setLastPublishDate);
+		attributeGetterFunctions.put("status", MBMessage::getStatus);
 		attributeSetterBiConsumers.put(
 			"status", (BiConsumer<MBMessage, Integer>)MBMessage::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", MBMessage::getStatusByUserId);
 		attributeSetterBiConsumers.put(
 			"statusByUserId",
 			(BiConsumer<MBMessage, Long>)MBMessage::setStatusByUserId);
+		attributeGetterFunctions.put(
+			"statusByUserName", MBMessage::getStatusByUserName);
 		attributeSetterBiConsumers.put(
 			"statusByUserName",
 			(BiConsumer<MBMessage, String>)MBMessage::setStatusByUserName);
+		attributeGetterFunctions.put("statusDate", MBMessage::getStatusDate);
 		attributeSetterBiConsumers.put(
 			"statusDate",
 			(BiConsumer<MBMessage, Date>)MBMessage::setStatusDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -601,6 +638,35 @@ public class MBMessageModelImpl
 	@Deprecated
 	public String getOriginalUuid() {
 		return getColumnOriginalValue("uuid_");
+	}
+
+	@JSON
+	@Override
+	public String getExternalReferenceCode() {
+		if (_externalReferenceCode == null) {
+			return "";
+		}
+		else {
+			return _externalReferenceCode;
+		}
+	}
+
+	@Override
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_externalReferenceCode = externalReferenceCode;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
+	public String getOriginalExternalReferenceCode() {
+		return getColumnOriginalValue("externalReferenceCode");
 	}
 
 	@JSON
@@ -1516,6 +1582,7 @@ public class MBMessageModelImpl
 		mbMessageImpl.setMvccVersion(getMvccVersion());
 		mbMessageImpl.setCtCollectionId(getCtCollectionId());
 		mbMessageImpl.setUuid(getUuid());
+		mbMessageImpl.setExternalReferenceCode(getExternalReferenceCode());
 		mbMessageImpl.setMessageId(getMessageId());
 		mbMessageImpl.setGroupId(getGroupId());
 		mbMessageImpl.setCompanyId(getCompanyId());
@@ -1545,6 +1612,68 @@ public class MBMessageModelImpl
 		mbMessageImpl.setStatusDate(getStatusDate());
 
 		mbMessageImpl.resetOriginalValues();
+
+		return mbMessageImpl;
+	}
+
+	@Override
+	public MBMessage cloneWithOriginalValues() {
+		MBMessageImpl mbMessageImpl = new MBMessageImpl();
+
+		mbMessageImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		mbMessageImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		mbMessageImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		mbMessageImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
+		mbMessageImpl.setMessageId(
+			this.<Long>getColumnOriginalValue("messageId"));
+		mbMessageImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		mbMessageImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		mbMessageImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		mbMessageImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		mbMessageImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		mbMessageImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		mbMessageImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		mbMessageImpl.setClassPK(this.<Long>getColumnOriginalValue("classPK"));
+		mbMessageImpl.setCategoryId(
+			this.<Long>getColumnOriginalValue("categoryId"));
+		mbMessageImpl.setThreadId(
+			this.<Long>getColumnOriginalValue("threadId"));
+		mbMessageImpl.setRootMessageId(
+			this.<Long>getColumnOriginalValue("rootMessageId"));
+		mbMessageImpl.setParentMessageId(
+			this.<Long>getColumnOriginalValue("parentMessageId"));
+		mbMessageImpl.setTreePath(
+			this.<String>getColumnOriginalValue("treePath"));
+		mbMessageImpl.setSubject(
+			this.<String>getColumnOriginalValue("subject"));
+		mbMessageImpl.setUrlSubject(
+			this.<String>getColumnOriginalValue("urlSubject"));
+		mbMessageImpl.setBody(this.<String>getColumnOriginalValue("body"));
+		mbMessageImpl.setFormat(this.<String>getColumnOriginalValue("format"));
+		mbMessageImpl.setAnonymous(
+			this.<Boolean>getColumnOriginalValue("anonymous"));
+		mbMessageImpl.setPriority(
+			this.<Double>getColumnOriginalValue("priority"));
+		mbMessageImpl.setAllowPingbacks(
+			this.<Boolean>getColumnOriginalValue("allowPingbacks"));
+		mbMessageImpl.setAnswer(this.<Boolean>getColumnOriginalValue("answer"));
+		mbMessageImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+		mbMessageImpl.setStatus(this.<Integer>getColumnOriginalValue("status"));
+		mbMessageImpl.setStatusByUserId(
+			this.<Long>getColumnOriginalValue("statusByUserId"));
+		mbMessageImpl.setStatusByUserName(
+			this.<String>getColumnOriginalValue("statusByUserName"));
+		mbMessageImpl.setStatusDate(
+			this.<Date>getColumnOriginalValue("statusDate"));
 
 		return mbMessageImpl;
 	}
@@ -1644,6 +1773,17 @@ public class MBMessageModelImpl
 
 		if ((uuid != null) && (uuid.length() == 0)) {
 			mbMessageCacheModel.uuid = null;
+		}
+
+		mbMessageCacheModel.externalReferenceCode = getExternalReferenceCode();
+
+		String externalReferenceCode =
+			mbMessageCacheModel.externalReferenceCode;
+
+		if ((externalReferenceCode != null) &&
+			(externalReferenceCode.length() == 0)) {
+
+			mbMessageCacheModel.externalReferenceCode = null;
 		}
 
 		mbMessageCacheModel.messageId = getMessageId();
@@ -1856,15 +1996,14 @@ public class MBMessageModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, MBMessage>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					MBMessage.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
 	private long _mvccVersion;
 	private long _ctCollectionId;
 	private String _uuid;
+	private String _externalReferenceCode;
 	private long _messageId;
 	private long _groupId;
 	private long _companyId;
@@ -1926,6 +2065,8 @@ public class MBMessageModelImpl
 		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("ctCollectionId", _ctCollectionId);
 		_columnOriginalValues.put("uuid_", _uuid);
+		_columnOriginalValues.put(
+			"externalReferenceCode", _externalReferenceCode);
 		_columnOriginalValues.put("messageId", _messageId);
 		_columnOriginalValues.put("groupId", _groupId);
 		_columnOriginalValues.put("companyId", _companyId);
@@ -1982,59 +2123,61 @@ public class MBMessageModelImpl
 
 		columnBitmasks.put("uuid_", 4L);
 
-		columnBitmasks.put("messageId", 8L);
+		columnBitmasks.put("externalReferenceCode", 8L);
 
-		columnBitmasks.put("groupId", 16L);
+		columnBitmasks.put("messageId", 16L);
 
-		columnBitmasks.put("companyId", 32L);
+		columnBitmasks.put("groupId", 32L);
 
-		columnBitmasks.put("userId", 64L);
+		columnBitmasks.put("companyId", 64L);
 
-		columnBitmasks.put("userName", 128L);
+		columnBitmasks.put("userId", 128L);
 
-		columnBitmasks.put("createDate", 256L);
+		columnBitmasks.put("userName", 256L);
 
-		columnBitmasks.put("modifiedDate", 512L);
+		columnBitmasks.put("createDate", 512L);
 
-		columnBitmasks.put("classNameId", 1024L);
+		columnBitmasks.put("modifiedDate", 1024L);
 
-		columnBitmasks.put("classPK", 2048L);
+		columnBitmasks.put("classNameId", 2048L);
 
-		columnBitmasks.put("categoryId", 4096L);
+		columnBitmasks.put("classPK", 4096L);
 
-		columnBitmasks.put("threadId", 8192L);
+		columnBitmasks.put("categoryId", 8192L);
 
-		columnBitmasks.put("rootMessageId", 16384L);
+		columnBitmasks.put("threadId", 16384L);
 
-		columnBitmasks.put("parentMessageId", 32768L);
+		columnBitmasks.put("rootMessageId", 32768L);
 
-		columnBitmasks.put("treePath", 65536L);
+		columnBitmasks.put("parentMessageId", 65536L);
 
-		columnBitmasks.put("subject", 131072L);
+		columnBitmasks.put("treePath", 131072L);
 
-		columnBitmasks.put("urlSubject", 262144L);
+		columnBitmasks.put("subject", 262144L);
 
-		columnBitmasks.put("body", 524288L);
+		columnBitmasks.put("urlSubject", 524288L);
 
-		columnBitmasks.put("format", 1048576L);
+		columnBitmasks.put("body", 1048576L);
 
-		columnBitmasks.put("anonymous", 2097152L);
+		columnBitmasks.put("format", 2097152L);
 
-		columnBitmasks.put("priority", 4194304L);
+		columnBitmasks.put("anonymous", 4194304L);
 
-		columnBitmasks.put("allowPingbacks", 8388608L);
+		columnBitmasks.put("priority", 8388608L);
 
-		columnBitmasks.put("answer", 16777216L);
+		columnBitmasks.put("allowPingbacks", 16777216L);
 
-		columnBitmasks.put("lastPublishDate", 33554432L);
+		columnBitmasks.put("answer", 33554432L);
 
-		columnBitmasks.put("status", 67108864L);
+		columnBitmasks.put("lastPublishDate", 67108864L);
 
-		columnBitmasks.put("statusByUserId", 134217728L);
+		columnBitmasks.put("status", 134217728L);
 
-		columnBitmasks.put("statusByUserName", 268435456L);
+		columnBitmasks.put("statusByUserId", 268435456L);
 
-		columnBitmasks.put("statusDate", 536870912L);
+		columnBitmasks.put("statusByUserName", 536870912L);
+
+		columnBitmasks.put("statusDate", 1073741824L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

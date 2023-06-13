@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BrowserTracker;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -302,6 +300,7 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -320,6 +319,7 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 			(BrowserTracker)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<BrowserTracker> getBasePersistence() {
 		return browserTrackerPersistence;
 	}
@@ -523,9 +523,6 @@ public abstract class BrowserTrackerLocalServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		BrowserTrackerLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

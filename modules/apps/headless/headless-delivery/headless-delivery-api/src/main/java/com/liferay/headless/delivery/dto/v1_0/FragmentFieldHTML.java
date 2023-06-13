@@ -46,7 +46,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("FragmentFieldHTML")
+@GraphQLName(
+	description = "Represents a fragment field with HTML.",
+	value = "FragmentFieldHTML"
+)
 @JsonFilter("Liferay.Vulcan")
 @XmlRootElement(name = "FragmentFieldHTML")
 public class FragmentFieldHTML implements Serializable {
@@ -59,7 +62,9 @@ public class FragmentFieldHTML implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(FragmentFieldHTML.class, json);
 	}
 
-	@Schema
+	@Schema(
+		description = "The fragment field's HTML. Can be inline or mapped to an external value."
+	)
 	@Valid
 	public Object getHtml() {
 		return html;
@@ -82,7 +87,9 @@ public class FragmentFieldHTML implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The fragment field's HTML. Can be inline or mapped to an external value."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Object html;
 

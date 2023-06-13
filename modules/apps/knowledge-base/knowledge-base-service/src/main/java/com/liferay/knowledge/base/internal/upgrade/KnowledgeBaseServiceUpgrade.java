@@ -14,17 +14,20 @@
 
 package com.liferay.knowledge.base.internal.upgrade;
 
-import com.liferay.knowledge.base.internal.upgrade.v2_0_2.UpgradeKBArticle;
+import com.liferay.knowledge.base.internal.upgrade.v2_0_2.KBArticleUpgradeProcess;
 import com.liferay.knowledge.base.internal.upgrade.v3_0_0.util.KBArticleTable;
 import com.liferay.knowledge.base.internal.upgrade.v3_0_0.util.KBCommentTable;
 import com.liferay.knowledge.base.internal.upgrade.v3_0_0.util.KBFolderTable;
 import com.liferay.knowledge.base.internal.upgrade.v3_0_0.util.KBTemplateTable;
+import com.liferay.knowledge.base.internal.upgrade.v4_1_0.KBArticleExternalReferenceCodeUpgradeProcess;
+import com.liferay.knowledge.base.internal.upgrade.v4_1_0.KBFolderExternalReferenceCodeUpgradeProcess;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.settings.SettingsFactory;
-import com.liferay.portal.kernel.upgrade.BaseUpgradeSQLServerDatetime;
-import com.liferay.portal.kernel.upgrade.UpgradeMVCCVersion;
-import com.liferay.portal.kernel.upgrade.UpgradeViewCount;
+import com.liferay.portal.kernel.upgrade.BaseSQLServerDatetimeUpgradeProcess;
+import com.liferay.portal.kernel.upgrade.MVCCVersionUpgradeProcess;
+import com.liferay.portal.kernel.upgrade.ViewCountUpgradeProcess;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 import com.liferay.portlet.documentlibrary.store.StoreFactory;
 import com.liferay.view.count.service.ViewCountEntryLocalService;
@@ -43,74 +46,73 @@ public class KnowledgeBaseServiceUpgrade implements UpgradeStepRegistrator {
 		registry.register(
 			"0.0.1", "1.0.0",
 			new com.liferay.knowledge.base.internal.upgrade.v1_0_0.
-				UpgradeRatingsEntry(),
+				RatingsEntryUpgradeProcess(),
 			new com.liferay.knowledge.base.internal.upgrade.v1_0_0.
-				UpgradeRatingsStats());
+				RatingsStatsUpgradeProcess());
 
 		registry.register(
 			"1.0.0", "1.1.0",
 			new com.liferay.knowledge.base.internal.upgrade.v1_1_0.
-				UpgradeClassName(),
+				ClassNameUpgradeProcess(),
 			new com.liferay.knowledge.base.internal.upgrade.v1_1_0.
-				UpgradeExpandoTable(),
+				ExpandoTableUpgradeProcess(),
 			new com.liferay.knowledge.base.internal.upgrade.v1_1_0.
-				UpgradeKBArticle(),
+				KBArticleUpgradeProcess(),
 			new com.liferay.knowledge.base.internal.upgrade.v1_1_0.
-				UpgradeKBComment(),
+				KBCommentUpgradeProcess(),
 			new com.liferay.knowledge.base.internal.upgrade.v1_1_0.
-				UpgradeKBTemplate(),
+				KBTemplateUpgradeProcess(),
 			new com.liferay.knowledge.base.internal.upgrade.v1_1_0.
-				UpgradePortletPreferences(),
+				ResourceActionUpgradeProcess(),
 			new com.liferay.knowledge.base.internal.upgrade.v1_1_0.
-				UpgradeResourceAction(),
+				ResourcePermissionUpgradeProcess(),
 			new com.liferay.knowledge.base.internal.upgrade.v1_1_0.
-				UpgradeResourcePermission());
+				UpgradePortletPreferences());
 
 		registry.register(
 			"1.1.0", "1.2.0",
 			new com.liferay.knowledge.base.internal.upgrade.v1_2_0.
-				UpgradeKBArticle(),
+				KBArticleUpgradeProcess(),
 			new com.liferay.knowledge.base.internal.upgrade.v1_2_0.
-				UpgradeKBStructure(),
+				KBStructureUpgradeProcess(),
 			new com.liferay.knowledge.base.internal.upgrade.v1_2_0.
-				UpgradeKBTemplate());
+				KBTemplateUpgradeProcess());
 
 		registry.register(
 			"1.2.0", "1.3.0",
 			new com.liferay.knowledge.base.internal.upgrade.v1_3_0.
-				UpgradeKBAttachments(_storeFactory.getStore()),
+				KBAttachmentsUpgradeProcess(
+					_companyLocalService, _storeFactory.getStore()),
 			new com.liferay.knowledge.base.internal.upgrade.v1_3_0.
 				UpgradePortletPreferences());
 
 		registry.register(
 			"1.3.0", "1.3.1",
 			new com.liferay.knowledge.base.internal.upgrade.v1_3_1.
-				UpgradeKBArticle(),
-			new com.liferay.knowledge.base.internal.upgrade.v1_3_1.
-				UpgradeKBComment());
+				KBArticleUpgradeProcess());
 
 		registry.register(
 			"1.3.1", "1.3.2",
 			new com.liferay.knowledge.base.internal.upgrade.v1_3_2.
-				UpgradeKBArticle(),
+				KBArticleUpgradeProcess(),
 			new com.liferay.knowledge.base.internal.upgrade.v1_3_2.
-				UpgradeKBFolder());
+				KBFolderUpgradeProcess());
 
 		registry.register(
 			"1.3.2", "1.3.3",
 			new com.liferay.knowledge.base.internal.upgrade.v1_3_3.
-				UpgradeKBFolder());
+				KBFolderUpgradeProcess());
 
 		registry.register(
 			"1.3.3", "1.3.4",
 			new com.liferay.knowledge.base.internal.upgrade.v1_3_4.
-				UpgradeKBArticle(),
+				KBArticleUpgradeProcess(),
 			new com.liferay.knowledge.base.internal.upgrade.v1_3_4.
-				UpgradeKBComment(),
+				KBCommentUpgradeProcess(),
 			new com.liferay.knowledge.base.internal.upgrade.v1_3_4.
-				UpgradePortletPreferences(),
+				ResourceActionUpgradeProcess(),
 			new com.liferay.knowledge.base.internal.upgrade.v1_3_4.
-				UpgradeResourceAction());
+				UpgradePortletPreferences());
 
 		registry.register(
 			"1.3.4", "1.3.5",
@@ -122,7 +124,7 @@ public class KnowledgeBaseServiceUpgrade implements UpgradeStepRegistrator {
 			new com.liferay.knowledge.base.internal.upgrade.v2_0_0.
 				UpgradeClassNames(),
 			new com.liferay.knowledge.base.internal.upgrade.v2_0_0.
-				UpgradeKBComment(),
+				KBCommentUpgradeProcess(),
 			new com.liferay.knowledge.base.internal.upgrade.v2_0_0.
 				UpgradeRepository());
 
@@ -131,11 +133,11 @@ public class KnowledgeBaseServiceUpgrade implements UpgradeStepRegistrator {
 			new com.liferay.knowledge.base.internal.upgrade.v2_0_1.
 				UpgradePortletSettings(_settingsFactory));
 
-		registry.register("2.0.1", "2.0.2", new UpgradeKBArticle());
+		registry.register("2.0.1", "2.0.2", new KBArticleUpgradeProcess());
 
 		registry.register(
 			"2.0.2", "3.0.0",
-			new BaseUpgradeSQLServerDatetime(
+			new BaseSQLServerDatetimeUpgradeProcess(
 				new Class<?>[] {
 					KBArticleTable.class, KBCommentTable.class,
 					KBFolderTable.class, KBTemplateTable.class
@@ -143,7 +145,7 @@ public class KnowledgeBaseServiceUpgrade implements UpgradeStepRegistrator {
 
 		registry.register(
 			"3.0.0", "3.1.0",
-			new UpgradeMVCCVersion() {
+			new MVCCVersionUpgradeProcess() {
 
 				@Override
 				protected String[] getModuleTableNames() {
@@ -156,8 +158,13 @@ public class KnowledgeBaseServiceUpgrade implements UpgradeStepRegistrator {
 
 		registry.register(
 			"3.1.0", "4.0.0",
-			new UpgradeViewCount(
+			new ViewCountUpgradeProcess(
 				"KBArticle", KBArticle.class, "kbArticleId", "viewCount"));
+
+		registry.register(
+			"4.0.0", "4.1.0",
+			new KBArticleExternalReferenceCodeUpgradeProcess(),
+			new KBFolderExternalReferenceCodeUpgradeProcess());
 	}
 
 	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
@@ -169,6 +176,9 @@ public class KnowledgeBaseServiceUpgrade implements UpgradeStepRegistrator {
 	protected void setSettingsFactory(SettingsFactory settingsFactory) {
 		_settingsFactory = settingsFactory;
 	}
+
+	@Reference
+	private CompanyLocalService _companyLocalService;
 
 	private SettingsFactory _settingsFactory;
 

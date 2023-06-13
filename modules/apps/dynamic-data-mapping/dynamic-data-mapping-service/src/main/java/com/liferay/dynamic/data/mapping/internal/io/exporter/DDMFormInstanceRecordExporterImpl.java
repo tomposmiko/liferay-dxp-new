@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -127,10 +128,14 @@ public class DDMFormInstanceRecordExporterImpl
 					localizedValue.getString(locale));
 			});
 
-		ddmFormFieldsLabel.put(_STATUS, LanguageUtil.get(locale, _STATUS));
 		ddmFormFieldsLabel.put(
-			_MODIFIED_DATE, LanguageUtil.get(locale, "modified-date"));
-		ddmFormFieldsLabel.put(_AUTHOR, LanguageUtil.get(locale, _AUTHOR));
+			_KEY_AUTHOR, LanguageUtil.get(locale, _KEY_AUTHOR));
+		ddmFormFieldsLabel.put(
+			_KEY_LANGUAGE_ID, LanguageUtil.get(locale, "default-language"));
+		ddmFormFieldsLabel.put(
+			_KEY_MODIFIED_DATE, LanguageUtil.get(locale, "modified-date"));
+		ddmFormFieldsLabel.put(
+			_KEY_STATUS, LanguageUtil.get(locale, _KEY_STATUS));
 
 		return ddmFormFieldsLabel;
 	}
@@ -149,7 +154,7 @@ public class DDMFormInstanceRecordExporterImpl
 
 		Stream<DDMFormFieldValue> stream = ddmFormFieldValues.stream();
 
-		return HtmlUtil.unescape(
+		return HtmlUtil.extractText(
 			StringUtil.merge(
 				stream.map(
 					ddmForFieldValue -> ddmFormFieldValueRenderer.render(
@@ -201,17 +206,19 @@ public class DDMFormInstanceRecordExporterImpl
 				ddmFormInstanceRecord.getFormInstanceRecordVersion();
 
 			ddmFormFieldsValue.put(
-				_STATUS,
-				getStatusMessage(
-					ddmFormInstanceRecordVersion.getStatus(), locale));
+				_KEY_AUTHOR, ddmFormInstanceRecordVersion.getUserName());
 
 			ddmFormFieldsValue.put(
-				_MODIFIED_DATE,
+				_KEY_LANGUAGE_ID,
+				LocaleUtil.toLanguageId(ddmFormValues.getDefaultLocale()));
+			ddmFormFieldsValue.put(
+				_KEY_MODIFIED_DATE,
 				dateTimeFormat.format(
 					ddmFormInstanceRecordVersion.getStatusDate()));
-
 			ddmFormFieldsValue.put(
-				_AUTHOR, ddmFormInstanceRecordVersion.getUserName());
+				_KEY_STATUS,
+				getStatusMessage(
+					ddmFormInstanceRecordVersion.getStatus(), locale));
 
 			ddmFormFieldValues.add(ddmFormFieldsValue);
 		}
@@ -318,10 +325,12 @@ public class DDMFormInstanceRecordExporterImpl
 	protected DDMFormInstanceVersionLocalService
 		ddmFormInstanceVersionLocalService;
 
-	private static final String _AUTHOR = "author";
+	private static final String _KEY_AUTHOR = "author";
 
-	private static final String _MODIFIED_DATE = "modifiedDate";
+	private static final String _KEY_LANGUAGE_ID = "languageId";
 
-	private static final String _STATUS = "status";
+	private static final String _KEY_MODIFIED_DATE = "modifiedDate";
+
+	private static final String _KEY_STATUS = "status";
 
 }

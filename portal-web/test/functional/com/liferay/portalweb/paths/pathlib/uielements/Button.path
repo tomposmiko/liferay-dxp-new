@@ -72,7 +72,27 @@
 </tr>
 <tr>
 	<td>ANY</td>
-	<td>//*[contains(@class,'btn')][normalize-space(text())='${key_text}']</td>
+	<td>//*[not(self::div)][contains(@class,'btn')][normalize-space()='${key_text}'][not(contains(@class,'navbar'))]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANY_N</td>
+	<td>xpath=(//*[contains(@class,'btn')][normalize-space(text())='${key_text}'])[${key_indexNumber}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANY_SECONDARY</td>
+	<td>//*[not(self::div)][contains(@class,'btn-secondary')][normalize-space()='${key_text}'][not(contains(@class,'navbar'))]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANY_TITLE</td>
+	<td>//button[@title='${key_title}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANY_TITLE_DISABLED</td>
+	<td>//button[@title='${key_title}' and @disabled]</td>
 	<td></td>
 </tr>
 <tr>
@@ -86,13 +106,33 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ANY_WITH_LABEL</td>
+	<td>//label[normalize-space(text())='${key_fieldLabel}']/following-sibling::div//button[normalize-space()='${key_text}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANY_WITH_SPAN</td>
+	<td>//button/span[contains(.,'${key_text}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ANY_DISABLED</td>
-	<td>//*[contains(@class,'btn')][normalize-space(text())='${key_text}'][@disabled='']</td>
+	<td>//button[@disabled][contains(@class,'btn')][normalize-space()='${key_text}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TRASH_DISABLED</td>
+	<td>//button[*[name()='svg'][contains(@class,'lexicon-icon-trash')]][@disabled='']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ANY_ENABLED</td>
-	<td>//*[contains(@class,'btn')][normalize-space(text())='${key_text}'][not(@disabled='')]</td>
+	<td>//button[not(@disabled)][contains(@class,'btn')][normalize-space()='${key_text}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANY_LAST</td>
+	<td>xpath=(//*[contains(@class,'btn')][normalize-space(text())='${key_text}'])[last()]</td>
 	<td></td>
 </tr>
 <tr>
@@ -116,6 +156,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>BUTTON_ID</td>
+	<td>//*[contains(@class,'btn')][contains(@id,'${buttonId}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>BUTTON_LABEL</td>
+	<td>//div[./label[normalize-space(text())='${fieldLabel}']]//button[normalize-space()='${text}']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CANCEL</td>
 	<td>//a[contains(@class,'cancel') and contains(@class,'btn')] | //button[contains(.,'Cancel')] | //a[contains(@class,'btn') and contains(.,'Cancel')]</td>
 	<td></td>
@@ -123,11 +173,6 @@
 <tr>
 	<td>CANCEL_CHECKOUT</td>
 	<td>//a[contains(@class,'btn') and contains(.,'Cancel Checkout')] | //button[contains(.,'Cancel Checkout')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CANCEL_GIVEN_POSITION</td>
-	<td>//div[contains(@class,'lfr-form-content')]/../div/a[contains(@class,'cancel') and contains(@class,'btn')] | //button[contains(.,'Cancel')] | //a[contains(@class,'btn') and contains(.,'Cancel')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -197,11 +242,6 @@
 </tr>
 <tr>
 	<td>COLOR_PICKER</td>
-	<td>//label[normalize-space(text())='${key_fieldLabel}']/following-sibling::div//div[contains(@class,'color-picker')]//button[contains(@class,'clay-color-btn')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>COLOR_PICKER_1</td>
 	<td>//label[normalize-space(text())='${key_fieldLabel}']/following-sibling::div//div[contains(@class,'color-picker')]//button[contains(@class,'clay-color-btn')] | //div[contains(@class,'color-picker')][./label[normalize-space(text())='${key_fieldLabel}']]//button[contains(@class,'clay-color-btn')]</td>
 	<td></td>
 </tr>
@@ -247,7 +287,7 @@
 </tr>
 <tr>
 	<td>DELETE</td>
-	<td>//*[@data-qa-id='deleteButton'] | //div[contains(@class,'show')]//button[contains(.,'Delete')] | //button[contains(.,'delete')] | //button[contains(@class,'delete-logo')]</td>
+	<td>//*[@data-qa-id='deleteButton'] | //div[contains(@class,'show')]//button[contains(.,'Delete')] | //button[contains(.,'delete')] | //button[contains(.,'Delete')] | //button[contains(@class,'delete-logo')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -261,18 +301,28 @@
 	<td></td>
 </tr>
 <tr>
-	<td>DELETE_LAYOUT_LOGO</td>
-	<td>//button[contains(@class,'delete-logo')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>DELETE_ROW_N</td>
 	<td>xpath=(//button[contains(@class,'delete-row')])[${key_rowIndexNumber}]</td>
 	<td></td>
 </tr>
 <tr>
+	<td>DELETE_ROW_LAST</td>
+	<td>xpath=(//button[contains(@class,'delete-row')])[last()]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SECONDARY_BY_TITLE</td>
+	<td>//button[contains(@class,'btn-secondary') and contains (@title,'${key_value}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DEPOT_LANGUAGES_MANAGEMENT_PANEL_SAVE</td>
 	<td>//div[contains(@class,'modal-content')]//button[contains(.,'Save')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DISABLE_PROPAGATION</td>
+	<td>//a[contains(@class,'btn')][contains(.,'Disable Propagation')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -282,12 +332,17 @@
 </tr>
 <tr>
 	<td>DOWNLOAD</td>
-	<td>//a[2][contains(@class,'btn') and contains(.,'Download')] | //button[contains(.,'Download')]</td>
+	<td>//a[contains(@class,'btn-secondary') and contains(.,'Download')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DOWNLOAD_SIDEBAR</td>
 	<td>//div[contains(@class,'sidebar-section')]//a[contains(@class,'btn') and contains(.,'Download')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DUPLICATE</td>
+	<td>//button[contains(@class, 'ddm-form-field-repeatable-add-button p-0 btn btn-sm btn-primary')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -306,6 +361,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ENABLE_PROPAGATION</td>
+	<td>//a[contains(@class,'btn')][contains(.,'Ready for Propagation')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ENTER</td>
 	<td>//button[contains(.,'Enter')]</td>
 	<td></td>
@@ -313,11 +373,6 @@
 <tr>
 	<td>EXECUTE</td>
 	<td>//button[contains(.,'Execute')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>EXECUTE_ACTION</td>
-	<td>//li[contains(.,'${key_actionsDescription}')]//button[contains(.,'Execute')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -353,6 +408,11 @@
 <tr>
 	<td>FINISH_CONFIGURATION</td>
 	<td>//button[contains(.,'Finish Configuration')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>GENERAL_BUTTON_MODAL_FOOTER</td>
+	<td>//div[contains(@class, 'modal-footer')]//button[contains(@class,'btn-primary')][contains(text(),'${key_name}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -423,6 +483,11 @@
 <tr>
 	<td>LOCALIZATION_OPEN_GRAPH</td>
 	<td>//div[contains(@id,'${key_fieldName}')]//button[contains(@class,'localized')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LOCALIZATION_SUMMARY</td>
+	<td>//button[@id='_com_liferay_journal_web_portlet_JournalPortlet__com_liferay_journal_web_portlet_JournalPortlet_descriptionMapAsXMLMenu']</td>
 	<td></td>
 </tr>
 <tr>
@@ -502,12 +567,7 @@
 </tr>
 <tr>
 	<td>PLUS</td>
-	<td>//a[contains(@class,'btn')][contains(@href,'new') or contains(@href,'redirect') or contains(@href,'mvc') or contains(@href,'javascript')][.//*[name()='svg'][contains(@class,'icon-plus')]][not(contains(@class,'borderless'))] | //button[.//*[contains(@class,'icon-plus')]]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>PLUS_IE</td>
-	<td>//a[contains(@class,'nav-btn-monospaced')] | //button[contains(@class,'nav-btn-monospaced')]</td>
+	<td>//a[contains(@class,'btn')][contains(@href,'new') or contains(@href,'redirect') or contains(@href,'mvc') or contains(@href,'javascript')][.//*[name()='svg'][contains(@class,'icon-plus')]][not(contains(@class,'borderless'))] | //button[*[contains(@class,'icon-plus')]]</td>
 	<td></td>
 </tr>
 <tr>
@@ -527,7 +587,7 @@
 </tr>
 <tr>
 	<td>PROPAGATE</td>
-	<td>//button[contains(@title,'Propagate')]</td>
+	<td>//button[@*='Propagate']</td>
 	<td></td>
 </tr>
 <tr>
@@ -536,18 +596,23 @@
 	<td></td>
 </tr>
 <tr>
-	<td>PUBLISH_GIVEN_POSITION</td>
-	<td>//div[contains(@class,'lfr-form-content')]/../div/button[span[contains(.,'Publish')]]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>PUBLISH_LOCALIZED</td>
 	<td>//button[contains(@id,'publishButton')]</td>
 	<td></td>
 </tr>
 <tr>
+	<td>REMOVE_BUTTON</td>
+	<td>//button[contains(@class, 'ddm-form-field-repeatable-delete-button p-0 btn btn-sm btn-primary')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>REMOVE_IMAGE</td>
-	<td>//button[@id='sdjj___removeImage']</td>
+	<td>//button[*[name()='svg'][contains(@class,'lexicon-icon-trash')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>REMOVE_IMAGE_LAST</td>
+	<td>xpath=(//button[*[name()='svg'][contains(@class,'lexicon-icon-trash')]])[last()]</td>
 	<td></td>
 </tr>
 <tr>
@@ -592,7 +657,7 @@
 </tr>
 <tr>
 	<td>RESET_CHANGES</td>
-	<td>//button[contains(.,'Reset Changes')]</td>
+	<td>//a[contains(@class,'btn')][contains(.,'Reset Changes')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -603,6 +668,11 @@
 <tr>
 	<td>RESOLVE</td>
 	<td>//button/span[*[name()='svg'][contains(@class,'lexicon-icon-check-circle')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>RESTORE_DEFAULT</td>
+	<td>//button[@*='Restore Default']/*[contains(@class,'lexicon-icon-restore')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -651,6 +721,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CREATE_NEW</td>
+	<td>//button[contains(@class,'btn-sm btn-primary') and text()='Create New']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SEARCH</td>
 	<td>//*[@data-qa-id='searchButton'] | //button[contains(.,'Search')]</td>
 	<td></td>
@@ -658,6 +733,11 @@
 <tr>
 	<td>SEARCH_DISABLED</td>
 	<td>//button[contains(.,'Search')][@disabled='']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SEARCH_CLOSE</td>
+	<td>//button[contains(@class,'commerce-search__button ')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -681,13 +761,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SELECT_FIELD_LAST</td>
+	<td>xpath=(//*[contains(@class,'btn btn-secondary') and contains(text(),'Select')])[last()]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SELECT_FILE</td>
 	<td>//button[contains(.,'Select File')] | //label[contains(.,'Select File')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SELECT_FILE_SMALL_IMAGE</td>
-	<td>//div[contains(@class,'blogs-small-image-selector')]//a[contains(.,'Select File')]</td>
+	<td>//div[contains(@class,'blogs-small-image-selector')]//div[contains(@class,'browse-image-controls')]//button[contains(.,'Select File')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -701,28 +786,18 @@
 	<td></td>
 </tr>
 <tr>
-	<td>SELECT_OPEN_GRAPH_IMAGE</td>
-	<td>//button[contains(@name,'openGraphImageButton')][contains(.,'Select')]</td>
+	<td>TRANSLATIONS_DONE</td>
+	<td>//a[contains(@class,'btn-sm btn-primary') and text()='Done']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>TRANSLATIONS_LOCALIZATION</td>
-	<td>//div[contains(@class,'dropdown')]//button[contains(@class,'dropdown-toggle')]//span[*[name()='svg'][contains(@class,'lexicon-icon-${key_currentLocale}')]]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CLEAR_OPEN_GRAPH_IMAGE</td>
-	<td>//button[contains(@name,'openGraphClearImageButton')][contains(.,'Clear')]</td>
+	<td>//div[contains(@class,'dropdown')]//button[contains(@class,'dropdown-toggle')]//*[name()='svg'][contains(@class,'lexicon-icon-${key_currentLocale}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SEND_INVITATIONS</td>
 	<td>//button[contains(@id,'InviteMembersPortlet')]//span[contains(.,'Send Invitations')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>SEND_NEW_PASSWORD</td>
-	<td>//button[contains(.,'Send New Password')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -776,8 +851,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ARROW_SUBMIT_BTN</td>
+	<td>//button[@type='submit'][contains(@class,'btn-primary')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TWITCH_PLAY</td>
+	<td>//button[contains(@data-test-selector,'player-overlay-play-button') and contains(@aria-label,'Play')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>TRY_REDIRECTION</td>
-	<td>//button[@type='button' and @title='Check URL']</td>
+	<td>//button[@type='button' and @*='Check URL']</td>
 	<td></td>
 </tr>
 <tr>
@@ -792,7 +877,7 @@
 </tr>
 <tr>
 	<td>SUBMIT_FOR_PUBLICATION_DISABLED</td>
-	<td>//button[contains(@class,'disabled') and contains(.,'Submit for Publication')]</td>
+	<td>//div[contains(@class,'btn-group-item')]//button[@disabled and contains(.,'Submit for Publication')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -803,11 +888,6 @@
 <tr>
 	<td>TRANSFORM</td>
 	<td>//button[*[name()='svg'][contains(@class,'lexicon-icon-transform')]]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>TRASH</td>
-	<td>//button[*[name()='svg'][contains(@class,'lexicon-icon-trash')]]</td>
 	<td></td>
 </tr>
 <tr>
@@ -858,6 +938,16 @@
 <tr>
 	<td>WEB_CONTENT_CHOOSE</td>
 	<td>//tr[contains(.,'${key_webContentTitle}')]/td//button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>YOUTUBE_PLAY</td>
+	<td>//button[contains(@class,'ytp-large-play-button')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>BUTTON_PLUS_PRODUCT_VISIBILITY</td>
+	<td>//li[contains(@class,'nav-item')]//button[contains(@title,'${key_webContentTitle}')]</td>
 	<td></td>
 </tr>
 </tbody>

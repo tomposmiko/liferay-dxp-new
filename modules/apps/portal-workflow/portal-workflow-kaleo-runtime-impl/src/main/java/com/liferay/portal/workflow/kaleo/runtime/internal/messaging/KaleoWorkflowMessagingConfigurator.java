@@ -24,7 +24,7 @@ import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.proxy.ProxyMessageListener;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionManager;
 import com.liferay.portal.kernel.workflow.WorkflowEngineManager;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
@@ -58,8 +58,6 @@ public class KaleoWorkflowMessagingConfigurator {
 	protected void activate(BundleContext bundleContext) {
 		_bundleContext = bundleContext;
 
-		registerKaleoGraphWalkerDestination();
-
 		registerWorkflowDefinitionLinkDestination();
 
 		registerWorkflowMessageListeners();
@@ -83,53 +81,21 @@ public class KaleoWorkflowMessagingConfigurator {
 	}
 
 	protected void registerDestination(
-		DestinationConfiguration kaleoGraphWalkerDestinationConfiguration) {
+		DestinationConfiguration destinationConfiguration) {
 
 		Destination destination = _destinationFactory.createDestination(
-			kaleoGraphWalkerDestinationConfiguration);
+			destinationConfiguration);
 
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-		properties.put("destination.name", destination.getName());
+		Dictionary<String, Object> properties =
+			HashMapDictionaryBuilder.<String, Object>put(
+				"destination.name", destination.getName()
+			).build();
 
 		ServiceRegistration<Destination> serviceRegistration =
 			_bundleContext.registerService(
 				Destination.class, destination, properties);
 
 		_serviceRegistrations.put(destination.getName(), serviceRegistration);
-	}
-
-	protected void registerKaleoGraphWalkerDestination() {
-		DestinationConfiguration destinationConfiguration =
-			new DestinationConfiguration(
-				DestinationConfiguration.DESTINATION_TYPE_PARALLEL,
-				KaleoRuntimeDestinationNames.KALEO_GRAPH_WALKER);
-
-		destinationConfiguration.setMaximumQueueSize(_MAXIMUM_QUEUE_SIZE);
-
-		RejectedExecutionHandler rejectedExecutionHandler =
-			new ThreadPoolExecutor.CallerRunsPolicy() {
-
-				@Override
-				public void rejectedExecution(
-					Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
-
-					if (_log.isWarnEnabled()) {
-						_log.warn(
-							"The current thread will handle the request " +
-								"because the graph walker's task queue is at " +
-									"its maximum capacity");
-					}
-
-					super.rejectedExecution(runnable, threadPoolExecutor);
-				}
-
-			};
-
-		destinationConfiguration.setRejectedExecutionHandler(
-			rejectedExecutionHandler);
-
-		registerDestination(destinationConfiguration);
 	}
 
 	protected MessageListener registerProxyMessageListener(
@@ -156,15 +122,13 @@ public class KaleoWorkflowMessagingConfigurator {
 		schedulerEventMessageListenerWrapper.setMessageListener(
 			_timerMessageListener);
 
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-		properties.put(
-			"destination.name", KaleoRuntimeDestinationNames.WORKFLOW_TIMER);
-
 		_schedulerEventMessageListenerServiceRegistration =
 			_bundleContext.registerService(
 				MessageListener.class, schedulerEventMessageListenerWrapper,
-				properties);
+				HashMapDictionaryBuilder.<String, Object>put(
+					"destination.name",
+					KaleoRuntimeDestinationNames.WORKFLOW_TIMER
+				).build());
 	}
 
 	protected void registerWorkflowDefinitionLinkDestination() {

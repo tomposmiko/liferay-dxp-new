@@ -145,6 +145,9 @@ public class BeanPropertiesImpl implements BeanProperties {
 				beanValue = _converter.toBooleanValue(value, defaultValue);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 		}
 
@@ -190,6 +193,9 @@ public class BeanPropertiesImpl implements BeanProperties {
 				beanValue = _converter.toByteValue(value, defaultValue);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 		}
 
@@ -237,6 +243,9 @@ public class BeanPropertiesImpl implements BeanProperties {
 				beanValue = _converter.toDoubleValue(value, defaultValue);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 		}
 
@@ -282,6 +291,9 @@ public class BeanPropertiesImpl implements BeanProperties {
 				beanValue = _converter.toFloatValue(value, defaultValue);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 		}
 
@@ -327,6 +339,9 @@ public class BeanPropertiesImpl implements BeanProperties {
 				beanValue = _converter.toIntValue(value, defaultValue);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 		}
 
@@ -372,6 +387,9 @@ public class BeanPropertiesImpl implements BeanProperties {
 				beanValue = _converter.toLongValue(value, defaultValue);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 		}
 
@@ -419,6 +437,9 @@ public class BeanPropertiesImpl implements BeanProperties {
 				beanValue = BeanUtil.pojo.getProperty(bean, param);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 		}
 
@@ -472,6 +493,9 @@ public class BeanPropertiesImpl implements BeanProperties {
 				beanType = BeanUtil.pojo.getPropertyType(bean, param);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 		}
 
@@ -521,6 +545,9 @@ public class BeanPropertiesImpl implements BeanProperties {
 				beanValue = _converter.toShortValue(value, defaultValue);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 		}
 
@@ -568,6 +595,9 @@ public class BeanPropertiesImpl implements BeanProperties {
 				beanValue = _converter.toString(value, defaultValue);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 		}
 

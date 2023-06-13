@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -60,7 +61,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
-		"mvc.command.name=/content_layout/update_configuration_values"
+		"mvc.command.name=/layout_content_page_editor/update_configuration_values"
 	},
 	service = MVCActionCommand.class
 )
@@ -90,10 +91,6 @@ public class UpdateConfigurationValuesMVCActionCommand
 			JSONObject editableFragmentEntryProcessorJSONObject =
 				editableValuesJSONObject.getJSONObject(
 					fragmentEntryProcessorKey);
-
-			if (editableFragmentEntryProcessorJSONObject == null) {
-				continue;
-			}
 
 			JSONObject defaultEditableFragmentEntryProcessorJSONObject =
 				defaultEditableValuesJSONObject.getJSONObject(
@@ -138,7 +135,7 @@ public class UpdateConfigurationValuesMVCActionCommand
 
 		FragmentEntryLink fragmentEntryLink =
 			_fragmentEntryLinkService.updateFragmentEntryLink(
-				fragmentEntryLinkId, editableValues, true);
+				fragmentEntryLinkId, editableValues);
 
 		FragmentEntryProcessorContext fragmentEntryProcessorContext =
 			new DefaultFragmentEntryProcessorContext(
@@ -219,6 +216,9 @@ public class UpdateConfigurationValuesMVCActionCommand
 
 	@Reference
 	private ItemSelector _itemSelector;
+
+	@Reference
+	private LayoutLocalService _layoutLocalService;
 
 	@Reference
 	private Portal _portal;

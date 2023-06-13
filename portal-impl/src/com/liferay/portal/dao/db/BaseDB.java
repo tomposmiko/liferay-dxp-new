@@ -15,10 +15,12 @@
 package com.liferay.portal.dao.db;
 
 import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
+import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.dao.orm.common.SQLTransformer;
+import com.liferay.portal.db.partition.DBPartitionUtil;
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBInspector;
@@ -68,7 +70,8 @@ public abstract class BaseDB implements DB {
 
 	@Override
 	public void addIndexes(
-			Connection con, String indexesSQL, Set<String> validIndexNames)
+			Connection connection, String indexesSQL,
+			Set<String> validIndexNames)
 		throws IOException {
 
 		if (_log.isInfoEnabled()) {
@@ -100,7 +103,7 @@ public abstract class BaseDB implements DB {
 				}
 
 				try {
-					runSQL(con, sql);
+					runSQL(connection, sql);
 				}
 				catch (Exception exception) {
 					if (_log.isWarnEnabled()) {
@@ -166,8 +169,8 @@ public abstract class BaseDB implements DB {
 				String tableName = dbInspector.normalizeName(
 					tableResultSet.getString("TABLE_NAME"));
 
-				try (ResultSet indexResultSet = getIndexResultSet(
-						connection, tableName)) {
+				try (ResultSet indexResultSet = databaseMetaData.getIndexInfo(
+						catalog, schema, tableName, false, false)) {
 
 					while (indexResultSet.next()) {
 						String indexName = indexResultSet.getString(
@@ -199,19 +202,6 @@ public abstract class BaseDB implements DB {
 	}
 
 	@Override
-	public ResultSet getIndexResultSet(Connection connection, String tableName)
-		throws SQLException {
-
-		DatabaseMetaData databaseMetaData = connection.getMetaData();
-
-		DBInspector dbInspector = new DBInspector(connection);
-
-		return databaseMetaData.getIndexInfo(
-			dbInspector.getCatalog(), dbInspector.getSchema(), tableName, false,
-			false);
-	}
-
-	@Override
 	public int getMajorVersion() {
 		return _majorVersion;
 	}
@@ -219,19 +209,6 @@ public abstract class BaseDB implements DB {
 	@Override
 	public int getMinorVersion() {
 		return _minorVersion;
-	}
-
-	@Override
-	public ResultSet getPrimaryKeysResultSet(
-			Connection connection, String tableName)
-		throws SQLException {
-
-		DatabaseMetaData databaseMetaData = connection.getMetaData();
-
-		DBInspector dbInspector = new DBInspector(connection);
-
-		return databaseMetaData.getPrimaryKeys(
-			dbInspector.getCatalog(), dbInspector.getSchema(), tableName);
 	}
 
 	@Override
@@ -325,17 +302,24 @@ public abstract class BaseDB implements DB {
 	}
 
 	@Override
-	public void runSQL(Connection con, String sql)
-		throws IOException, SQLException {
+	public void process(UnsafeConsumer<Long, Exception> unsafeConsumer)
+		throws Exception {
 
-		runSQL(con, new String[] {sql});
+		DBPartitionUtil.forEachCompanyId(unsafeConsumer);
 	}
 
 	@Override
-	public void runSQL(Connection con, String[] sqls)
+	public void runSQL(Connection connection, String sql)
 		throws IOException, SQLException {
 
-		try (Statement s = con.createStatement()) {
+		runSQL(connection, new String[] {sql});
+	}
+
+	@Override
+	public void runSQL(Connection connection, String[] sqls)
+		throws IOException, SQLException {
+
+		try (Statement s = connection.createStatement()) {
 			for (String sql : sqls) {
 				sql = buildSQL(sql);
 
@@ -366,20 +350,14 @@ public abstract class BaseDB implements DB {
 				}
 				catch (SQLException sqlException) {
 					if (_log.isDebugEnabled()) {
-						StringBundler sb = new StringBundler(10);
-
-						sb.append("SQL: ");
-						sb.append(sql);
-						sb.append("\nSQL state: ");
-						sb.append(sqlException.getSQLState());
-						sb.append("\nVendor: ");
-						sb.append(getDBType());
-						sb.append("\nVendor error code: ");
-						sb.append(sqlException.getErrorCode());
-						sb.append("\nVendor error message: ");
-						sb.append(sqlException.getMessage());
-
-						_log.debug(sb.toString());
+						_log.debug(
+							StringBundler.concat(
+								"SQL: ", sql, "\nSQL state: ",
+								sqlException.getSQLState(), "\nVendor: ",
+								getDBType(), "\nVendor error code: ",
+								sqlException.getErrorCode(),
+								"\nVendor error message: ",
+								sqlException.getMessage()));
 					}
 
 					throw sqlException;
@@ -395,8 +373,8 @@ public abstract class BaseDB implements DB {
 
 	@Override
 	public void runSQL(String[] sqls) throws IOException, SQLException {
-		try (Connection con = DataAccess.getConnection()) {
-			runSQL(con, sqls);
+		try (Connection connection = DataAccess.getConnection()) {
+			runSQL(connection, sqls);
 		}
 	}
 
@@ -622,30 +600,41 @@ public abstract class BaseDB implements DB {
 
 	@Override
 	public void updateIndexes(
-			Connection con, String tablesSQL, String indexesSQL,
+			Connection connection, String tablesSQL, String indexesSQL,
 			boolean dropIndexes)
-		throws IOException, SQLException {
+		throws Exception {
 
-		List<Index> indexes = getIndexes(con);
+		process(
+			companyId -> {
+				if (Validator.isNotNull(companyId) && _log.isInfoEnabled()) {
+					_log.info(
+						"Updating database indexes for company " + companyId);
+				}
 
-		Set<String> validIndexNames = null;
+				List<Index> indexes = getIndexes(connection);
 
-		if (dropIndexes) {
-			validIndexNames = dropIndexes(con, tablesSQL, indexesSQL, indexes);
-		}
-		else {
-			validIndexNames = new HashSet<>();
+				Set<String> validIndexNames = null;
 
-			for (Index index : indexes) {
-				String indexName = StringUtil.toUpperCase(index.getIndexName());
+				if (dropIndexes) {
+					validIndexNames = dropIndexes(
+						connection, tablesSQL, indexesSQL, indexes);
+				}
+				else {
+					validIndexNames = new HashSet<>();
 
-				validIndexNames.add(indexName);
-			}
-		}
+					for (Index index : indexes) {
+						String indexName = StringUtil.toUpperCase(
+							index.getIndexName());
 
-		indexesSQL = _applyMaxStringIndexLengthLimitation(indexesSQL);
+						validIndexNames.add(indexName);
+					}
+				}
 
-		addIndexes(con, indexesSQL, validIndexNames);
+				addIndexes(
+					connection,
+					_applyMaxStringIndexLengthLimitation(indexesSQL),
+					validIndexNames);
+			});
 	}
 
 	protected BaseDB(DBType dbType, int majorVersion, int minorVersion) {
@@ -705,7 +694,7 @@ public abstract class BaseDB implements DB {
 	}
 
 	protected Set<String> dropIndexes(
-			Connection con, String tablesSQL, String indexesSQL,
+			Connection connection, String tablesSQL, String indexesSQL,
 			List<Index> indexes)
 		throws IOException, SQLException {
 
@@ -783,7 +772,7 @@ public abstract class BaseDB implements DB {
 				_log.info(sql);
 			}
 
-			runSQL(con, sql);
+			runSQL(connection, sql);
 		}
 
 		return validIndexNames;

@@ -21,10 +21,10 @@ SelectOrganizationsDisplayContext selectOrganizationsDisplayContext = new Select
 %>
 
 <clay:management-toolbar
-	displayContext="<%= new SelectOrganizationsManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, selectOrganizationsDisplayContext) %>"
+	managementToolbarDisplayContext="<%= new SelectOrganizationsManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, selectOrganizationsDisplayContext) %>"
 />
 
-<aui:form cssClass="container-fluid-1280" name="fm">
+<aui:form cssClass="container-fluid container-fluid-max-xl" name="fm">
 	<liferay-ui:search-container
 		id="organizations"
 		searchContainer="<%= selectOrganizationsDisplayContext.getOrganizationSearchContainer() %>"
@@ -51,26 +51,3 @@ SelectOrganizationsDisplayContext selectOrganizationsDisplayContext = new Select
 		/>
 	</liferay-ui:search-container>
 </aui:form>
-
-<aui:script use="liferay-search-container">
-	var searchContainer = Liferay.SearchContainer.get(
-		'<portlet:namespace />organizations'
-	);
-
-	searchContainer.on('rowToggled', function (event) {
-		var result = {};
-
-		var data = event.elements.allSelectedElements.getDOMNodes();
-
-		if (data.length) {
-			result = {
-				data: data,
-			};
-		}
-
-		Liferay.Util.getOpener().Liferay.fire(
-			'<%= HtmlUtil.escapeJS(selectOrganizationsDisplayContext.getEventName()) %>',
-			result
-		);
-	});
-</aui:script>

@@ -36,13 +36,12 @@ page import="com.liferay.portal.kernel.util.ListUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
 page import="com.liferay.style.book.exception.DuplicateStyleBookEntryKeyException" %><%@
 page import="com.liferay.style.book.exception.StyleBookEntryFileException" %><%@
-page import="com.liferay.style.book.web.internal.constants.StyleBookWebKeys" %><%@
 page import="com.liferay.style.book.web.internal.display.context.EditStyleBookEntryDisplayContext" %><%@
 page import="com.liferay.style.book.web.internal.display.context.ImportStyleBookDisplayContext" %><%@
 page import="com.liferay.style.book.web.internal.display.context.StyleBookDisplayContext" %><%@
 page import="com.liferay.style.book.web.internal.display.context.StyleBookManagementToolbarDisplayContext" %><%@
-page import="com.liferay.style.book.web.internal.portlet.zip.StyleBookEntryZipProcessor" %><%@
-page import="com.liferay.style.book.web.internal.servlet.taglib.clay.StyleBookVerticalCard" %>
+page import="com.liferay.style.book.web.internal.servlet.taglib.clay.StyleBookVerticalCard" %><%@
+page import="com.liferay.style.book.zip.processor.StyleBookEntryZipProcessorImportResultEntry" %>
 
 <%@ page import="java.util.List" %>
 

@@ -21,8 +21,8 @@ import com.liferay.petra.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.test.log.CaptureAppender;
-import com.liferay.portal.test.log.Log4JLoggerTestUtil;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -38,8 +38,6 @@ import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
-
-import org.apache.log4j.Level;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -457,8 +455,8 @@ public class ConfiguratorExtenderTest {
 
 		Class<?> clazz = _bundle.loadClass(name);
 
-		try (CaptureAppender captureAppender =
-				Log4JLoggerTestUtil.configureLog4JLogger(name, Level.ERROR)) {
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				name, LoggerTestUtil.ERROR)) {
 
 			ReflectionTestUtil.invoke(
 				clazz, "_process",

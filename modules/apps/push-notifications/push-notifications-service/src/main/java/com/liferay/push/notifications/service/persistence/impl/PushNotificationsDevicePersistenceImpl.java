@@ -16,7 +16,6 @@ package com.liferay.push.notifications.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -27,14 +26,13 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -55,17 +53,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -81,7 +75,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bruno Farache
  * @generated
  */
-@Component(service = PushNotificationsDevicePersistence.class)
+@Component(
+	service = {PushNotificationsDevicePersistence.class, BasePersistence.class}
+)
 public class PushNotificationsDevicePersistenceImpl
 	extends BasePersistenceImpl<PushNotificationsDevice>
 	implements PushNotificationsDevicePersistence {
@@ -172,8 +168,7 @@ public class PushNotificationsDevicePersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByToken, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByToken, finderArgs);
 		}
 
 		if (result instanceof PushNotificationsDevice) {
@@ -278,7 +273,7 @@ public class PushNotificationsDevicePersistenceImpl
 
 		Object[] finderArgs = new Object[] {token};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -439,7 +434,7 @@ public class PushNotificationsDevicePersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<PushNotificationsDevice>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (PushNotificationsDevice pushNotificationsDevice : list) {
@@ -896,7 +891,7 @@ public class PushNotificationsDevicePersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>PushNotificationsDeviceModelImpl</code>.
 	 * </p>
 	 *
-	 * @param userIds the user IDs
+	 * @param userId the user ID
 	 * @param platform the platform
 	 * @param start the lower bound of the range of push notifications devices
 	 * @param end the upper bound of the range of push notifications devices (not inclusive)
@@ -944,7 +939,7 @@ public class PushNotificationsDevicePersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<PushNotificationsDevice>)finderCache.getResult(
-				_finderPathWithPaginationFindByU_P, finderArgs, this);
+				_finderPathWithPaginationFindByU_P, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (PushNotificationsDevice pushNotificationsDevice : list) {
@@ -1070,7 +1065,7 @@ public class PushNotificationsDevicePersistenceImpl
 
 		Object[] finderArgs = new Object[] {userId, platform};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1145,7 +1140,7 @@ public class PushNotificationsDevicePersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByU_P, finderArgs, this);
+			_finderPathWithPaginationCountByU_P, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -1291,9 +1286,7 @@ public class PushNotificationsDevicePersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(PushNotificationsDeviceImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(PushNotificationsDeviceImpl.class);
 	}
 
 	/**
@@ -1323,9 +1316,7 @@ public class PushNotificationsDevicePersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(PushNotificationsDeviceImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(
@@ -1340,11 +1331,9 @@ public class PushNotificationsDevicePersistenceImpl
 			pushNotificationsDeviceModelImpl.getToken()
 		};
 
+		finderCache.putResult(_finderPathCountByToken, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathCountByToken, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByToken, args, pushNotificationsDeviceModelImpl,
-			false);
+			_finderPathFetchByToken, args, pushNotificationsDeviceModelImpl);
 	}
 
 	/**
@@ -1673,7 +1662,7 @@ public class PushNotificationsDevicePersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<PushNotificationsDevice>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1744,7 +1733,7 @@ public class PushNotificationsDevicePersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1795,41 +1784,33 @@ public class PushNotificationsDevicePersistenceImpl
 	 * Initializes the push notifications device persistence.
 	 */
 	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class,
-			new PushNotificationsDeviceModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", PushNotificationsDevice.class.getName()));
-
+	public void activate() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathFetchByToken = _createFinderPath(
+		_finderPathFetchByToken = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByToken",
 			new String[] {String.class.getName()}, new String[] {"token"},
 			true);
 
-		_finderPathCountByToken = _createFinderPath(
+		_finderPathCountByToken = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByToken",
 			new String[] {String.class.getName()}, new String[] {"token"},
 			false);
 
-		_finderPathWithPaginationFindByU_P = _createFinderPath(
+		_finderPathWithPaginationFindByU_P = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU_P",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -1838,17 +1819,17 @@ public class PushNotificationsDevicePersistenceImpl
 			},
 			new String[] {"userId", "platform"}, true);
 
-		_finderPathWithoutPaginationFindByU_P = _createFinderPath(
+		_finderPathWithoutPaginationFindByU_P = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU_P",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"userId", "platform"}, true);
 
-		_finderPathCountByU_P = _createFinderPath(
+		_finderPathCountByU_P = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_P",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"userId", "platform"}, false);
 
-		_finderPathWithPaginationCountByU_P = _createFinderPath(
+		_finderPathWithPaginationCountByU_P = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByU_P",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"userId", "platform"}, false);
@@ -1861,14 +1842,6 @@ public class PushNotificationsDevicePersistenceImpl
 		_setPushNotificationsDeviceUtilPersistence(null);
 
 		entityCache.removeCache(PushNotificationsDeviceImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setPushNotificationsDeviceUtilPersistence(
@@ -1913,8 +1886,6 @@ public class PushNotificationsDevicePersistenceImpl
 		super.setSessionFactory(sessionFactory);
 	}
 
-	private BundleContext _bundleContext;
-
 	@Reference
 	protected EntityCache entityCache;
 
@@ -1945,108 +1916,13 @@ public class PushNotificationsDevicePersistenceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		PushNotificationsDevicePersistenceImpl.class);
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class PushNotificationsDeviceModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			PushNotificationsDeviceModelImpl pushNotificationsDeviceModelImpl =
-				(PushNotificationsDeviceModelImpl)baseModel;
-
-			long columnBitmask =
-				pushNotificationsDeviceModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					pushNotificationsDeviceModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						pushNotificationsDeviceModelImpl.getColumnBitmask(
-							columnName);
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					pushNotificationsDeviceModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			PushNotificationsDeviceModelImpl pushNotificationsDeviceModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						pushNotificationsDeviceModelImpl.getColumnOriginalValue(
-							columnName);
-				}
-				else {
-					arguments[i] =
-						pushNotificationsDeviceModelImpl.getColumnValue(
-							columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-	}
+	@Reference
+	private PushNotificationsDeviceModelArgumentsResolver
+		_pushNotificationsDeviceModelArgumentsResolver;
 
 }

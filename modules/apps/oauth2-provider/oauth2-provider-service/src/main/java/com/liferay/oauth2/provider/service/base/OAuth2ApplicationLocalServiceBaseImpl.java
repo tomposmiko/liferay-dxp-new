@@ -32,8 +32,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -314,6 +312,7 @@ public abstract class OAuth2ApplicationLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -332,6 +331,7 @@ public abstract class OAuth2ApplicationLocalServiceBaseImpl
 			(OAuth2Application)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<OAuth2Application> getBasePersistence() {
 		return oAuth2ApplicationPersistence;
 	}
@@ -478,20 +478,5 @@ public abstract class OAuth2ApplicationLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.GroupLocalService
-		groupLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		OAuth2ApplicationLocalServiceBaseImpl.class);
 
 }

@@ -16,9 +16,11 @@ package com.liferay.fragment.entry.processor.editable.internal.parser;
 
 import com.liferay.fragment.entry.processor.editable.EditableFragmentEntryProcessor;
 import com.liferay.fragment.entry.processor.editable.parser.EditableElementParser;
+import com.liferay.fragment.entry.processor.helper.FragmentEntryProcessorHelper;
 import com.liferay.fragment.exception.FragmentEntryContentException;
 import com.liferay.info.localized.InfoLocalizedValue;
 import com.liferay.info.type.WebImage;
+import com.liferay.layout.responsive.ViewportSize;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONException;
@@ -31,12 +33,15 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
@@ -66,15 +71,37 @@ public class ImageEditableElementParser implements EditableElementParser {
 		String fieldName, Locale locale, Object fieldValue) {
 
 		String alt = StringPool.BLANK;
+		Object fileEntryId = 0;
 
 		if (fieldValue == null) {
 			alt = StringUtil.replace(
 				_TMPL_IMAGE_FIELD_ALT_TEMPLATE, "field_name", fieldName);
+			fileEntryId = StringUtil.replace(
+				_TMPL_IMAGE_FIELD_FILE_ENTRY_ID_TEMPLATE, "field_name",
+				fieldName);
 		}
 		else if (fieldValue instanceof JSONObject) {
 			JSONObject fieldValueJSONObject = (JSONObject)fieldValue;
 
 			alt = fieldValueJSONObject.getString("alt");
+
+			if (Validator.isNotNull(alt) && JSONUtil.isValid(alt)) {
+				JSONObject altJSONObject = fieldValueJSONObject.getJSONObject(
+					"alt");
+
+				alt = altJSONObject.getString(LocaleUtil.toLanguageId(locale));
+			}
+
+			if (fieldValueJSONObject.has("className") &&
+				fieldValueJSONObject.has("classPK")) {
+
+				fileEntryId = _fragmentEntryProcessorHelper.getFileEntryId(
+					fieldValueJSONObject.getString("className"),
+					fieldValueJSONObject.getLong("classPK"));
+			}
+			else if (fieldValueJSONObject.has("fileEntryId")) {
+				fileEntryId = fieldValueJSONObject.getLong("fileEntryId");
+			}
 		}
 		else if (fieldValue instanceof WebImage) {
 			WebImage webImage = (WebImage)fieldValue;
@@ -86,11 +113,18 @@ public class ImageEditableElementParser implements EditableElementParser {
 				InfoLocalizedValue<String> infoLocalizedValue =
 					altInfoLocalizedValueOptional.get();
 
-				alt = infoLocalizedValue.getValue();
+				alt = infoLocalizedValue.getValue(locale);
 			}
+
+			fileEntryId = _fragmentEntryProcessorHelper.getFileEntryId(
+				webImage);
 		}
 
-		return JSONUtil.put("alt", alt);
+		return JSONUtil.put(
+			"alt", alt
+		).put(
+			"fileEntryId", fileEntryId
+		);
 	}
 
 	@Override
@@ -106,14 +140,11 @@ public class ImageEditableElementParser implements EditableElementParser {
 		String src = replaceableElement.attr("src");
 
 		if (Validator.isNull(src.trim())) {
-			StringBundler sb = new StringBundler(4);
-
-			sb.append("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAJ");
-			sb.append("CAYAAAA7KqwyAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs");
-			sb.append("4c6QAAAARnQU1BAACxjwv8YQUAAAAkSURBVHgB7cxBEQAACAIwtH8P");
-			sb.append("zw52kxD8OBZgNXsPQUOUwCIgAz0DHTyygaAAAAAASUVORK5CYII=");
-
-			return sb.toString();
+			return StringBundler.concat(
+				"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAJ",
+				"CAYAAAA7KqwyAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs",
+				"4c6QAAAARnQU1BAACxjwv8YQUAAAAkSURBVHgB7cxBEQAACAIwtH8P",
+				"zw52kxD8OBZgNXsPQUOUwCIgAz0DHTyygaAAAAAASUVORK5CYII=");
 		}
 
 		return src;
@@ -163,7 +194,7 @@ public class ImageEditableElementParser implements EditableElementParser {
 			try {
 				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
 
-				fileEntryId = jsonObject.getLong("fileEntryId", 0);
+				fileEntryId = jsonObject.getLong("fileEntryId");
 				value = jsonObject.getString("url");
 			}
 			catch (JSONException jsonException) {
@@ -172,12 +203,23 @@ public class ImageEditableElementParser implements EditableElementParser {
 				value = StringPool.BLANK;
 			}
 		}
+		else {
+			fileEntryId = configJSONObject.getLong("fileEntryId");
+		}
 
 		value = value.trim();
 
 		if (fileEntryId > 0) {
 			replaceableElement.attr(
 				"data-fileentryid", String.valueOf(fileEntryId));
+
+			if ((configJSONObject != null) &&
+				configJSONObject.has("imageConfiguration")) {
+
+				_setImageConfiguration(
+					replaceableElement,
+					configJSONObject.getJSONObject("imageConfiguration"));
+			}
 		}
 
 		Matcher matcher = _pattern.matcher(replaceableElement.attr("src"));
@@ -192,6 +234,14 @@ public class ImageEditableElementParser implements EditableElementParser {
 
 		String alt = configJSONObject.getString("alt");
 
+		if (Validator.isNotNull(alt) && JSONUtil.isValid(alt)) {
+			JSONObject altJSONObject = configJSONObject.getJSONObject("alt");
+
+			Locale locale = LocaleThreadLocal.getThemeDisplayLocale();
+
+			alt = altJSONObject.getString(LocaleUtil.toLanguageId(locale));
+		}
+
 		if (Validator.isNotNull(alt)) {
 			replaceableElement.attr(
 				"alt", StringUtil.trim(_html.unescape(alt)));
@@ -204,6 +254,12 @@ public class ImageEditableElementParser implements EditableElementParser {
 		}
 
 		String imageTarget = configJSONObject.getString("imageTarget");
+
+		if (StringUtil.equalsIgnoreCase(imageTarget, "_parent") ||
+			StringUtil.equalsIgnoreCase(imageTarget, "_top")) {
+
+			imageTarget = "_self";
+		}
 
 		Element linkElement = new Element("a");
 
@@ -234,11 +290,36 @@ public class ImageEditableElementParser implements EditableElementParser {
 		}
 	}
 
+	private void _setImageConfiguration(
+		Element element, JSONObject imageConfigurationJSONObject) {
+
+		for (ViewportSize viewportSize : ViewportSize.values()) {
+			String imageConfiguration = imageConfigurationJSONObject.getString(
+				viewportSize.getViewportSizeId());
+
+			if (Validator.isNull(imageConfiguration) ||
+				Objects.equals(imageConfiguration, "auto")) {
+
+				continue;
+			}
+
+			element.attr(
+				"data-" + viewportSize.getViewportSizeId() + "-configuration",
+				imageConfiguration);
+		}
+	}
+
 	private static final String _TMPL_IMAGE_FIELD_ALT_TEMPLATE =
 		StringUtil.read(
 			EditableFragmentEntryProcessor.class,
 			"/META-INF/resources/fragment/entry/processor/editable" +
 				"/image_field_alt_template.tmpl");
+
+	private static final String _TMPL_IMAGE_FIELD_FILE_ENTRY_ID_TEMPLATE =
+		StringUtil.read(
+			EditableFragmentEntryProcessor.class,
+			"/META-INF/resources/fragment/entry/processor/editable" +
+				"/image_field_file_entry_id_template.tmpl");
 
 	private static final String _TMPL_IMAGE_FIELD_TEMPLATE = StringUtil.read(
 		EditableFragmentEntryProcessor.class,
@@ -250,6 +331,9 @@ public class ImageEditableElementParser implements EditableElementParser {
 
 	private static final Pattern _pattern = Pattern.compile(
 		"\\[resources:(.+?)\\]");
+
+	@Reference
+	private FragmentEntryProcessorHelper _fragmentEntryProcessorHelper;
 
 	@Reference
 	private Html _html;

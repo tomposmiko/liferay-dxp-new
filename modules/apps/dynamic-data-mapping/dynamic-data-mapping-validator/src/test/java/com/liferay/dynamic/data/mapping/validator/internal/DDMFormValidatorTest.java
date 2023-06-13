@@ -568,8 +568,7 @@ public class DDMFormValidatorTest {
 		Mockito.when(
 			ddmFormFieldTypeServicesTracker.getDDMFormFieldTypeNames()
 		).thenReturn(
-			SetUtil.fromArray(
-				new String[] {"html-çê的Ü", "html-text_*", "html-text_@"})
+			SetUtil.fromArray("date", "html-çê的Ü", "html-text_*", "html-text_@")
 		);
 
 		_ddmFormValidatorImpl.setDDMFormFieldTypeServicesTracker(

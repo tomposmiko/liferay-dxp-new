@@ -38,6 +38,7 @@ import com.liferay.ratings.kernel.model.RatingsEntrySoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -324,75 +325,97 @@ public class RatingsEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<RatingsEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, RatingsEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<RatingsEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<RatingsEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			RatingsEntry.class.getClassLoader(), RatingsEntry.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", RatingsEntry::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", RatingsEntry::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", RatingsEntry::getUuid);
-		attributeGetterFunctions.put("entryId", RatingsEntry::getEntryId);
-		attributeGetterFunctions.put("companyId", RatingsEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", RatingsEntry::getUserId);
-		attributeGetterFunctions.put("userName", RatingsEntry::getUserName);
-		attributeGetterFunctions.put("createDate", RatingsEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", RatingsEntry::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", RatingsEntry::getClassNameId);
-		attributeGetterFunctions.put("classPK", RatingsEntry::getClassPK);
-		attributeGetterFunctions.put("score", RatingsEntry::getScore);
+		try {
+			Constructor<RatingsEntry> constructor =
+				(Constructor<RatingsEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<RatingsEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<RatingsEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<RatingsEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<RatingsEntry, Object>>();
 		Map<String, BiConsumer<RatingsEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<RatingsEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", RatingsEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<RatingsEntry, Long>)RatingsEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", RatingsEntry::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<RatingsEntry, Long>)RatingsEntry::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", RatingsEntry::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<RatingsEntry, String>)RatingsEntry::setUuid);
+		attributeGetterFunctions.put("entryId", RatingsEntry::getEntryId);
 		attributeSetterBiConsumers.put(
 			"entryId",
 			(BiConsumer<RatingsEntry, Long>)RatingsEntry::setEntryId);
+		attributeGetterFunctions.put("companyId", RatingsEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<RatingsEntry, Long>)RatingsEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", RatingsEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<RatingsEntry, Long>)RatingsEntry::setUserId);
+		attributeGetterFunctions.put("userName", RatingsEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<RatingsEntry, String>)RatingsEntry::setUserName);
+		attributeGetterFunctions.put("createDate", RatingsEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<RatingsEntry, Date>)RatingsEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", RatingsEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<RatingsEntry, Date>)RatingsEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", RatingsEntry::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<RatingsEntry, Long>)RatingsEntry::setClassNameId);
+		attributeGetterFunctions.put("classPK", RatingsEntry::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<RatingsEntry, Long>)RatingsEntry::setClassPK);
+		attributeGetterFunctions.put("score", RatingsEntry::getScore);
 		attributeSetterBiConsumers.put(
 			"score", (BiConsumer<RatingsEntry, Double>)RatingsEntry::setScore);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -768,6 +791,35 @@ public class RatingsEntryModelImpl
 	}
 
 	@Override
+	public RatingsEntry cloneWithOriginalValues() {
+		RatingsEntryImpl ratingsEntryImpl = new RatingsEntryImpl();
+
+		ratingsEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		ratingsEntryImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		ratingsEntryImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		ratingsEntryImpl.setEntryId(
+			this.<Long>getColumnOriginalValue("entryId"));
+		ratingsEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		ratingsEntryImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		ratingsEntryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		ratingsEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		ratingsEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		ratingsEntryImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		ratingsEntryImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		ratingsEntryImpl.setScore(this.<Double>getColumnOriginalValue("score"));
+
+		return ratingsEntryImpl;
+	}
+
+	@Override
 	public int compareTo(RatingsEntry ratingsEntry) {
 		long primaryKey = ratingsEntry.getPrimaryKey();
 
@@ -977,9 +1029,7 @@ public class RatingsEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, RatingsEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					RatingsEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

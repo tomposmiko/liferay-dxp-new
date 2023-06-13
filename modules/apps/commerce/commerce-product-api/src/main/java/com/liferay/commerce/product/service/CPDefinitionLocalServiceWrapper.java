@@ -27,6 +27,10 @@ public class CPDefinitionLocalServiceWrapper
 	implements CPDefinitionLocalService,
 			   ServiceWrapper<CPDefinitionLocalService> {
 
+	public CPDefinitionLocalServiceWrapper() {
+		this(null);
+	}
+
 	public CPDefinitionLocalServiceWrapper(
 		CPDefinitionLocalService cpDefinitionLocalService) {
 
@@ -50,108 +54,6 @@ public class CPDefinitionLocalServiceWrapper
 		return _cpDefinitionLocalService.addCPDefinition(cpDefinition);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x)
-	 */
-	@Deprecated
-	@Override
-	public com.liferay.commerce.product.model.CPDefinition addCPDefinition(
-			long groupId, long userId,
-			java.util.Map<java.util.Locale, String> nameMap,
-			java.util.Map<java.util.Locale, String> shortDescriptionMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
-			java.util.Map<java.util.Locale, String> urlTitleMap,
-			java.util.Map<java.util.Locale, String> metaTitleMap,
-			java.util.Map<java.util.Locale, String> metaDescriptionMap,
-			java.util.Map<java.util.Locale, String> metaKeywordsMap,
-			String productTypeName, boolean ignoreSKUCombinations,
-			boolean shippable, boolean freeShipping, boolean shipSeparately,
-			double shippingExtraPrice, double width, double height,
-			double depth, double weight, long cpTaxCategoryId,
-			boolean taxExempt, boolean telcoOrElectronics,
-			String ddmStructureKey, boolean published, int displayDateMonth,
-			int displayDateDay, int displayDateYear, int displayDateHour,
-			int displayDateMinute, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire, String defaultSku, boolean subscriptionEnabled,
-			int subscriptionLength, String subscriptionType,
-			com.liferay.portal.kernel.util.UnicodeProperties
-				subscriptionTypeSettingsUnicodeProperties,
-			long maxSubscriptionCycles, boolean deliverySubscriptionEnabled,
-			int deliverySubscriptionLength, String deliverySubscriptionType,
-			com.liferay.portal.kernel.util.UnicodeProperties
-				deliverySubscriptionTypeSettingsUnicodeProperties,
-			long deliveryMaxSubscriptionCycles, String externalReferenceCode,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _cpDefinitionLocalService.addCPDefinition(
-			groupId, userId, nameMap, shortDescriptionMap, descriptionMap,
-			urlTitleMap, metaTitleMap, metaDescriptionMap, metaKeywordsMap,
-			productTypeName, ignoreSKUCombinations, shippable, freeShipping,
-			shipSeparately, shippingExtraPrice, width, height, depth, weight,
-			cpTaxCategoryId, taxExempt, telcoOrElectronics, ddmStructureKey,
-			published, displayDateMonth, displayDateDay, displayDateYear,
-			displayDateHour, displayDateMinute, expirationDateMonth,
-			expirationDateDay, expirationDateYear, expirationDateHour,
-			expirationDateMinute, neverExpire, defaultSku, subscriptionEnabled,
-			subscriptionLength, subscriptionType,
-			subscriptionTypeSettingsUnicodeProperties, maxSubscriptionCycles,
-			deliverySubscriptionEnabled, deliverySubscriptionLength,
-			deliverySubscriptionType,
-			deliverySubscriptionTypeSettingsUnicodeProperties,
-			deliveryMaxSubscriptionCycles, externalReferenceCode,
-			serviceContext);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x)
-	 */
-	@Deprecated
-	@Override
-	public com.liferay.commerce.product.model.CPDefinition addCPDefinition(
-			long groupId, long userId,
-			java.util.Map<java.util.Locale, String> nameMap,
-			java.util.Map<java.util.Locale, String> shortDescriptionMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
-			java.util.Map<java.util.Locale, String> urlTitleMap,
-			java.util.Map<java.util.Locale, String> metaTitleMap,
-			java.util.Map<java.util.Locale, String> metaDescriptionMap,
-			java.util.Map<java.util.Locale, String> metaKeywordsMap,
-			String productTypeName, boolean ignoreSKUCombinations,
-			boolean shippable, boolean freeShipping, boolean shipSeparately,
-			double shippingExtraPrice, double width, double height,
-			double depth, double weight, long cpTaxCategoryId,
-			boolean taxExempt, boolean telcoOrElectronics,
-			String ddmStructureKey, boolean published, int displayDateMonth,
-			int displayDateDay, int displayDateYear, int displayDateHour,
-			int displayDateMinute, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire, String defaultSku, boolean subscriptionEnabled,
-			int subscriptionLength, String subscriptionType,
-			com.liferay.portal.kernel.util.UnicodeProperties
-				subscriptionTypeSettingsUnicodeProperties,
-			long maxSubscriptionCycles, String externalReferenceCode,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _cpDefinitionLocalService.addCPDefinition(
-			groupId, userId, nameMap, shortDescriptionMap, descriptionMap,
-			urlTitleMap, metaTitleMap, metaDescriptionMap, metaKeywordsMap,
-			productTypeName, ignoreSKUCombinations, shippable, freeShipping,
-			shipSeparately, shippingExtraPrice, width, height, depth, weight,
-			cpTaxCategoryId, taxExempt, telcoOrElectronics, ddmStructureKey,
-			published, displayDateMonth, displayDateDay, displayDateYear,
-			displayDateHour, displayDateMinute, expirationDateMonth,
-			expirationDateDay, expirationDateYear, expirationDateHour,
-			expirationDateMinute, neverExpire, defaultSku, subscriptionEnabled,
-			subscriptionLength, subscriptionType,
-			subscriptionTypeSettingsUnicodeProperties, maxSubscriptionCycles,
-			externalReferenceCode, serviceContext);
-	}
-
 	@Override
 	public com.liferay.commerce.product.model.CPDefinition addCPDefinition(
 			String externalReferenceCode, long groupId, long userId,
@@ -180,7 +82,7 @@ public class CPDefinitionLocalServiceWrapper
 			int deliverySubscriptionLength, String deliverySubscriptionType,
 			com.liferay.portal.kernel.util.UnicodeProperties
 				deliverySubscriptionTypeSettingsUnicodeProperties,
-			long deliveryMaxSubscriptionCycles, int status,
+			long deliveryMaxSubscriptionCycles,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -199,7 +101,7 @@ public class CPDefinitionLocalServiceWrapper
 			maxSubscriptionCycles, deliverySubscriptionEnabled,
 			deliverySubscriptionLength, deliverySubscriptionType,
 			deliverySubscriptionTypeSettingsUnicodeProperties,
-			deliveryMaxSubscriptionCycles, status, serviceContext);
+			deliveryMaxSubscriptionCycles, serviceContext);
 	}
 
 	@Override
@@ -226,7 +128,7 @@ public class CPDefinitionLocalServiceWrapper
 			int subscriptionLength, String subscriptionType,
 			com.liferay.portal.kernel.util.UnicodeProperties
 				subscriptionTypeSettingsUnicodeProperties,
-			long maxSubscriptionCycles, int status,
+			long maxSubscriptionCycles,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -242,7 +144,7 @@ public class CPDefinitionLocalServiceWrapper
 			expirationDateYear, expirationDateHour, expirationDateMinute,
 			neverExpire, defaultSku, subscriptionEnabled, subscriptionLength,
 			subscriptionType, subscriptionTypeSettingsUnicodeProperties,
-			maxSubscriptionCycles, status, serviceContext);
+			maxSubscriptionCycles, serviceContext);
 	}
 
 	@Override
@@ -275,7 +177,7 @@ public class CPDefinitionLocalServiceWrapper
 				int deliverySubscriptionLength, String deliverySubscriptionType,
 				com.liferay.portal.kernel.util.UnicodeProperties
 					deliverySubscriptionTypeSettingsUnicodeProperties,
-				long deliveryMaxSubscriptionCycles, int status,
+				long deliveryMaxSubscriptionCycles,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -294,7 +196,7 @@ public class CPDefinitionLocalServiceWrapper
 			maxSubscriptionCycles, deliverySubscriptionEnabled,
 			deliverySubscriptionLength, deliverySubscriptionType,
 			deliverySubscriptionTypeSettingsUnicodeProperties,
-			deliveryMaxSubscriptionCycles, status, serviceContext);
+			deliveryMaxSubscriptionCycles, serviceContext);
 	}
 
 	@Override
@@ -323,7 +225,7 @@ public class CPDefinitionLocalServiceWrapper
 				String subscriptionType,
 				com.liferay.portal.kernel.util.UnicodeProperties
 					subscriptionTypeSettingsUnicodeProperties,
-				long maxSubscriptionCycles, int status,
+				long maxSubscriptionCycles,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -339,7 +241,7 @@ public class CPDefinitionLocalServiceWrapper
 			expirationDateYear, expirationDateHour, expirationDateMinute,
 			neverExpire, defaultSku, subscriptionEnabled, subscriptionLength,
 			subscriptionType, subscriptionTypeSettingsUnicodeProperties,
-			maxSubscriptionCycles, status, serviceContext);
+			maxSubscriptionCycles, serviceContext);
 	}
 
 	@Override
@@ -573,11 +475,11 @@ public class CPDefinitionLocalServiceWrapper
 	@Override
 	public com.liferay.commerce.product.model.CPDefinition
 		fetchCPDefinitionByCProductExternalReferenceCode(
-			long companyId, String externalReferenceCode) {
+			String externalReferenceCode, long companyId) {
 
 		return _cpDefinitionLocalService.
 			fetchCPDefinitionByCProductExternalReferenceCode(
-				companyId, externalReferenceCode);
+				externalReferenceCode, companyId);
 	}
 
 	@Override
@@ -853,10 +755,11 @@ public class CPDefinitionLocalServiceWrapper
 
 	@Override
 	public com.liferay.commerce.product.model.CPAttachmentFileEntry
-			getDefaultImage(long cpDefinitionId)
+			getDefaultImageCPAttachmentFileEntry(long cpDefinitionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _cpDefinitionLocalService.getDefaultImage(cpDefinitionId);
+		return _cpDefinitionLocalService.getDefaultImageCPAttachmentFileEntry(
+			cpDefinitionId);
 	}
 
 	@Override
@@ -887,8 +790,8 @@ public class CPDefinitionLocalServiceWrapper
 	}
 
 	@Override
-	public String getLayoutUuid(long cpDefinitionId) {
-		return _cpDefinitionLocalService.getLayoutUuid(cpDefinitionId);
+	public String getLayoutUuid(long groupId, long cpDefinitionId) {
+		return _cpDefinitionLocalService.getLayoutUuid(groupId, cpDefinitionId);
 	}
 
 	/**
@@ -994,6 +897,21 @@ public class CPDefinitionLocalServiceWrapper
 		return _cpDefinitionLocalService.searchCPDefinitions(
 			companyId, groupIds, keywords, filterFields, filterValues, start,
 			end, sort);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.search.BaseModelSearchResult
+		<com.liferay.commerce.product.model.CPDefinition>
+				searchCPDefinitionsByChannelGroupId(
+					long companyId, long[] groupIds,
+					long commerceChannelGroupId, String keywords, int status,
+					int start, int end,
+					com.liferay.portal.kernel.search.Sort sort)
+			throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _cpDefinitionLocalService.searchCPDefinitionsByChannelGroupId(
+			companyId, groupIds, commerceChannelGroupId, keywords, status,
+			start, end, sort);
 	}
 
 	@Override
@@ -1177,11 +1095,11 @@ public class CPDefinitionLocalServiceWrapper
 	@Override
 	public com.liferay.commerce.product.model.CPDefinition
 			updateExternalReferenceCode(
-				long cpDefinitionId, String externalReferenceCode)
+				String externalReferenceCode, long cpDefinitionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDefinitionLocalService.updateExternalReferenceCode(
-			cpDefinitionId, externalReferenceCode);
+			externalReferenceCode, cpDefinitionId);
 	}
 
 	@Override
@@ -1261,110 +1179,6 @@ public class CPDefinitionLocalServiceWrapper
 
 		return _cpDefinitionLocalService.updateTaxCategoryInfo(
 			cpDefinitionId, cpTaxCategoryId, taxExempt, telcoOrElectronics);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced with
-	 addOrUpdateCPDefinition
-	 */
-	@Deprecated
-	@Override
-	public com.liferay.commerce.product.model.CPDefinition upsertCPDefinition(
-			long groupId, long userId,
-			java.util.Map<java.util.Locale, String> nameMap,
-			java.util.Map<java.util.Locale, String> shortDescriptionMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
-			java.util.Map<java.util.Locale, String> urlTitleMap,
-			java.util.Map<java.util.Locale, String> metaTitleMap,
-			java.util.Map<java.util.Locale, String> metaDescriptionMap,
-			java.util.Map<java.util.Locale, String> metaKeywordsMap,
-			String productTypeName, boolean ignoreSKUCombinations,
-			boolean shippable, boolean freeShipping, boolean shipSeparately,
-			double shippingExtraPrice, double width, double height,
-			double depth, double weight, long cpTaxCategoryId,
-			boolean taxExempt, boolean telcoOrElectronics,
-			String ddmStructureKey, boolean published, int displayDateMonth,
-			int displayDateDay, int displayDateYear, int displayDateHour,
-			int displayDateMinute, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire, String defaultSku, boolean subscriptionEnabled,
-			int subscriptionLength, String subscriptionType,
-			com.liferay.portal.kernel.util.UnicodeProperties
-				subscriptionTypeSettingsUnicodeProperties,
-			long maxSubscriptionCycles, boolean deliverySubscriptionEnabled,
-			int deliverySubscriptionLength, String deliverySubscriptionType,
-			com.liferay.portal.kernel.util.UnicodeProperties
-				deliverySubscriptionTypeSettingsUnicodeProperties,
-			long deliveryMaxSubscriptionCycles, String externalReferenceCode,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _cpDefinitionLocalService.upsertCPDefinition(
-			groupId, userId, nameMap, shortDescriptionMap, descriptionMap,
-			urlTitleMap, metaTitleMap, metaDescriptionMap, metaKeywordsMap,
-			productTypeName, ignoreSKUCombinations, shippable, freeShipping,
-			shipSeparately, shippingExtraPrice, width, height, depth, weight,
-			cpTaxCategoryId, taxExempt, telcoOrElectronics, ddmStructureKey,
-			published, displayDateMonth, displayDateDay, displayDateYear,
-			displayDateHour, displayDateMinute, expirationDateMonth,
-			expirationDateDay, expirationDateYear, expirationDateHour,
-			expirationDateMinute, neverExpire, defaultSku, subscriptionEnabled,
-			subscriptionLength, subscriptionType,
-			subscriptionTypeSettingsUnicodeProperties, maxSubscriptionCycles,
-			deliverySubscriptionEnabled, deliverySubscriptionLength,
-			deliverySubscriptionType,
-			deliverySubscriptionTypeSettingsUnicodeProperties,
-			deliveryMaxSubscriptionCycles, externalReferenceCode,
-			serviceContext);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced with
-	 addOrUpdateCPDefinition
-	 */
-	@Deprecated
-	@Override
-	public com.liferay.commerce.product.model.CPDefinition upsertCPDefinition(
-			long groupId, long userId,
-			java.util.Map<java.util.Locale, String> nameMap,
-			java.util.Map<java.util.Locale, String> shortDescriptionMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
-			java.util.Map<java.util.Locale, String> urlTitleMap,
-			java.util.Map<java.util.Locale, String> metaTitleMap,
-			java.util.Map<java.util.Locale, String> metaDescriptionMap,
-			java.util.Map<java.util.Locale, String> metaKeywordsMap,
-			String productTypeName, boolean ignoreSKUCombinations,
-			boolean shippable, boolean freeShipping, boolean shipSeparately,
-			double shippingExtraPrice, double width, double height,
-			double depth, double weight, long cpTaxCategoryId,
-			boolean taxExempt, boolean telcoOrElectronics,
-			String ddmStructureKey, boolean published, int displayDateMonth,
-			int displayDateDay, int displayDateYear, int displayDateHour,
-			int displayDateMinute, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute,
-			boolean neverExpire, String defaultSku, boolean subscriptionEnabled,
-			int subscriptionLength, String subscriptionType,
-			com.liferay.portal.kernel.util.UnicodeProperties
-				subscriptionTypeSettingsUnicodeProperties,
-			long maxSubscriptionCycles, String externalReferenceCode,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _cpDefinitionLocalService.upsertCPDefinition(
-			groupId, userId, nameMap, shortDescriptionMap, descriptionMap,
-			urlTitleMap, metaTitleMap, metaDescriptionMap, metaKeywordsMap,
-			productTypeName, ignoreSKUCombinations, shippable, freeShipping,
-			shipSeparately, shippingExtraPrice, width, height, depth, weight,
-			cpTaxCategoryId, taxExempt, telcoOrElectronics, ddmStructureKey,
-			published, displayDateMonth, displayDateDay, displayDateYear,
-			displayDateHour, displayDateMinute, expirationDateMonth,
-			expirationDateDay, expirationDateYear, expirationDateHour,
-			expirationDateMinute, neverExpire, defaultSku, subscriptionEnabled,
-			subscriptionLength, subscriptionType,
-			subscriptionTypeSettingsUnicodeProperties, maxSubscriptionCycles,
-			externalReferenceCode, serviceContext);
 	}
 
 	@Override

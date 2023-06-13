@@ -35,7 +35,7 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.StagedModelPermissionLogic;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.kernel.workflow.permission.WorkflowPermission;
@@ -51,6 +51,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Preston Crary
@@ -60,9 +62,10 @@ public class DLFileEntryModelResourcePermissionRegistrar {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-		properties.put("model.class.name", DLFileEntry.class.getName());
+		Dictionary<String, Object> properties =
+			HashMapDictionaryBuilder.<String, Object>put(
+				"model.class.name", DLFileEntry.class.getName()
+			).build();
 
 		_serviceRegistration = bundleContext.registerService(
 			(Class<ModelResourcePermission<DLFileEntry>>)
@@ -172,7 +175,10 @@ public class DLFileEntryModelResourcePermissionRegistrar {
 	private ServiceRegistration<ModelResourcePermission<DLFileEntry>>
 		_serviceRegistration;
 
-	@Reference
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
 	private SharingModelResourcePermissionConfigurator
 		_sharingModelResourcePermissionConfigurator;
 

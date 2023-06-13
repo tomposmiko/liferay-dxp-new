@@ -16,7 +16,6 @@ package com.liferay.frontend.js.spa.web.internal.servlet.taglib.helper;
 
 import com.liferay.frontend.js.spa.web.internal.configuration.SPAConfiguration;
 import com.liferay.osgi.util.StringPlus;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -26,7 +25,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.service.PortletLocalService;
-import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseConstants;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -80,8 +78,8 @@ public class SPAHelper {
 		return _cacheExpirationTime;
 	}
 
-	public String getExcludedPaths() {
-		return _spaExcludedPathsJSONArray.toString();
+	public JSONArray getExcludedPathsJSONArray() {
+		return _spaExcludedPathsJSONArray;
 	}
 
 	public ResourceBundle getLanguageResourceBundle(
@@ -90,6 +88,11 @@ public class SPAHelper {
 		ResourceBundleLoader resourceBundleLoader =
 			ResourceBundleLoaderUtil.
 				getResourceBundleLoaderByServletContextName(servletContextName);
+
+		if (resourceBundleLoader == null) {
+			resourceBundleLoader =
+				ResourceBundleLoaderUtil.getPortalResourceBundleLoader();
+		}
 
 		return resourceBundleLoader.loadResourceBundle(locale);
 	}
@@ -102,10 +105,9 @@ public class SPAHelper {
 		return _navigationExceptionSelectorsString;
 	}
 
-	public String getPortletsBlacklist(ThemeDisplay themeDisplay) {
-		StringBundler sb = new StringBundler();
-
-		sb.append(StringPool.OPEN_CURLY_BRACE);
+	public JSONArray getPortletsBlacklistJSONArray(ThemeDisplay themeDisplay) {
+		JSONArray portletsBlacklistJSONArray =
+			JSONFactoryUtil.createJSONArray();
 
 		_portletLocalService.visitPortlets(
 			themeDisplay.getCompanyId(),
@@ -114,22 +116,11 @@ public class SPAHelper {
 					!portlet.isUndeployedPortlet() && portlet.isActive() &&
 					portlet.isReady()) {
 
-					sb.append(StringPool.QUOTE);
-					sb.append(portlet.getPortletId());
-					sb.append("\":true,");
+					portletsBlacklistJSONArray.put(portlet.getPortletId());
 				}
 			});
 
-		if (sb.index() == 1) {
-			sb.append(StringPool.CLOSE_CURLY_BRACE);
-		}
-		else {
-			sb.setIndex(sb.index() - 1);
-
-			sb.append("\":true}");
-		}
-
-		return sb.toString();
+		return portletsBlacklistJSONArray;
 	}
 
 	public int getRequestTimeout() {
@@ -140,12 +131,12 @@ public class SPAHelper {
 		return _spaConfiguration.userNotificationTimeout();
 	}
 
-	public String getValidStatusCodes() {
-		return _VALID_STATUS_CODES;
+	public JSONArray getValidStatusCodesJSONArray() {
+		return _VALID_STATUS_CODES_JSON_ARRAY;
 	}
 
 	public boolean isClearScreensCache(
-		HttpServletRequest httpServletRequest, HttpSession session) {
+		HttpServletRequest httpServletRequest, HttpSession httpSession) {
 
 		boolean singlePageApplicationClearCache = GetterUtil.getBoolean(
 			httpServletRequest.getAttribute(
@@ -162,7 +153,7 @@ public class SPAHelper {
 		}
 
 		String singlePageApplicationLastPortletId =
-			(String)session.getAttribute(
+			(String)httpSession.getAttribute(
 				WebKeys.SINGLE_PAGE_APPLICATION_LAST_PORTLET_ID);
 
 		if (Validator.isNotNull(singlePageApplicationLastPortletId) &&
@@ -176,23 +167,6 @@ public class SPAHelper {
 
 	public boolean isDebugEnabled() {
 		return _log.isDebugEnabled();
-	}
-
-	public boolean isDisabled(HttpServletRequest httpServletRequest) {
-		if (BrowserSnifferUtil.isIe(httpServletRequest)) {
-			if (_spaConfiguration.disableInInternetExplorer()) {
-				return true;
-			}
-
-			double majorVersion = BrowserSnifferUtil.getMajorVersion(
-				httpServletRequest);
-
-			if (majorVersion == 11.0) {
-				return _spaConfiguration.disableInInternetExplorer11();
-			}
-		}
-
-		return false;
 	}
 
 	@Activate
@@ -298,7 +272,7 @@ public class SPAHelper {
 	private static final String _SPA_NAVIGATION_EXCEPTION_SELECTOR_KEY =
 		"javascript.single.page.application.navigation.exception.selector";
 
-	private static final String _VALID_STATUS_CODES;
+	private static final JSONArray _VALID_STATUS_CODES_JSON_ARRAY;
 
 	private static final Log _log = LogFactoryUtil.getLog(SPAHelper.class);
 
@@ -316,10 +290,13 @@ public class SPAHelper {
 				jsonArray.put(field.getInt(null));
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 		}
 
-		_VALID_STATUS_CODES = jsonArray.toString();
+		_VALID_STATUS_CODES_JSON_ARRAY = jsonArray;
 
 		String portletNamespace = PortalUtil.getPortletNamespace(
 			PropsUtil.get(PropsKeys.AUTH_LOGIN_PORTLET_NAME));
@@ -327,15 +304,15 @@ public class SPAHelper {
 		_REDIRECT_PARAM_NAME = portletNamespace.concat("redirect");
 	}
 
-	private long _cacheExpirationTime;
+	private volatile long _cacheExpirationTime;
 	private ServiceTracker<Object, Object> _navigationExceptionSelectorTracker;
 
 	@Reference
 	private Portal _portal;
 
 	private PortletLocalService _portletLocalService;
-	private SPAConfiguration _spaConfiguration;
-	private JSONArray _spaExcludedPathsJSONArray;
+	private volatile SPAConfiguration _spaConfiguration;
+	private volatile JSONArray _spaExcludedPathsJSONArray;
 
 	private static final class NavigationExceptionSelectorTrackerCustomizer
 		implements ServiceTrackerCustomizer<Object, Object> {
@@ -347,46 +324,48 @@ public class SPAHelper {
 		}
 
 		@Override
-		public Object addingService(ServiceReference<Object> reference) {
+		public Object addingService(ServiceReference<Object> serviceReference) {
 			List<String> selectors = StringPlus.asList(
-				reference.getProperty(_SPA_NAVIGATION_EXCEPTION_SELECTOR_KEY));
+				serviceReference.getProperty(
+					_SPA_NAVIGATION_EXCEPTION_SELECTOR_KEY));
 
 			_navigationExceptionSelectors.addAll(selectors);
 
 			_navigationExceptionSelectorsString = ListUtil.toString(
 				_navigationExceptionSelectors, (String)null, StringPool.BLANK);
 
-			Object service = _bundleContext.getService(reference);
+			Object service = _bundleContext.getService(serviceReference);
 
-			_serviceReferences.add(reference);
+			_serviceReferences.add(serviceReference);
 
 			return service;
 		}
 
 		@Override
 		public void modifiedService(
-			ServiceReference<Object> reference, Object service) {
+			ServiceReference<Object> serviceReference, Object service) {
 
-			removedService(reference, service);
+			removedService(serviceReference, service);
 
-			addingService(reference);
+			addingService(serviceReference);
 		}
 
 		@Override
 		public void removedService(
-			ServiceReference<Object> reference, Object service) {
+			ServiceReference<Object> serviceReference, Object service) {
 
 			List<String> selectors = StringPlus.asList(
-				reference.getProperty(_SPA_NAVIGATION_EXCEPTION_SELECTOR_KEY));
+				serviceReference.getProperty(
+					_SPA_NAVIGATION_EXCEPTION_SELECTOR_KEY));
 
 			_navigationExceptionSelectors.removeAll(selectors);
 
 			_navigationExceptionSelectorsString = ListUtil.toString(
 				_navigationExceptionSelectors, (String)null, StringPool.BLANK);
 
-			_serviceReferences.remove(reference);
+			_serviceReferences.remove(serviceReference);
 
-			_bundleContext.ungetService(reference);
+			_bundleContext.ungetService(serviceReference);
 		}
 
 		private final BundleContext _bundleContext;

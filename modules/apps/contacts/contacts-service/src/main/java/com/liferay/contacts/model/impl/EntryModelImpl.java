@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -220,56 +221,77 @@ public class EntryModelImpl extends BaseModelImpl<Entry> implements EntryModel {
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Entry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Entry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Entry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Entry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Entry.class.getClassLoader(), Entry.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("entryId", Entry::getEntryId);
-		attributeGetterFunctions.put("groupId", Entry::getGroupId);
-		attributeGetterFunctions.put("companyId", Entry::getCompanyId);
-		attributeGetterFunctions.put("userId", Entry::getUserId);
-		attributeGetterFunctions.put("userName", Entry::getUserName);
-		attributeGetterFunctions.put("createDate", Entry::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", Entry::getModifiedDate);
-		attributeGetterFunctions.put("fullName", Entry::getFullName);
-		attributeGetterFunctions.put("emailAddress", Entry::getEmailAddress);
-		attributeGetterFunctions.put("comments", Entry::getComments);
+		try {
+			Constructor<Entry> constructor =
+				(Constructor<Entry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Entry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Entry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Entry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Entry, Object>>();
 		Map<String, BiConsumer<Entry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Entry, ?>>();
 
+		attributeGetterFunctions.put("entryId", Entry::getEntryId);
 		attributeSetterBiConsumers.put(
 			"entryId", (BiConsumer<Entry, Long>)Entry::setEntryId);
+		attributeGetterFunctions.put("groupId", Entry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<Entry, Long>)Entry::setGroupId);
+		attributeGetterFunctions.put("companyId", Entry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<Entry, Long>)Entry::setCompanyId);
+		attributeGetterFunctions.put("userId", Entry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<Entry, Long>)Entry::setUserId);
+		attributeGetterFunctions.put("userName", Entry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<Entry, String>)Entry::setUserName);
+		attributeGetterFunctions.put("createDate", Entry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<Entry, Date>)Entry::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", Entry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate", (BiConsumer<Entry, Date>)Entry::setModifiedDate);
+		attributeGetterFunctions.put("fullName", Entry::getFullName);
 		attributeSetterBiConsumers.put(
 			"fullName", (BiConsumer<Entry, String>)Entry::setFullName);
+		attributeGetterFunctions.put("emailAddress", Entry::getEmailAddress);
 		attributeSetterBiConsumers.put(
 			"emailAddress", (BiConsumer<Entry, String>)Entry::setEmailAddress);
+		attributeGetterFunctions.put("comments", Entry::getComments);
 		attributeSetterBiConsumers.put(
 			"comments", (BiConsumer<Entry, String>)Entry::setComments);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -547,6 +569,27 @@ public class EntryModelImpl extends BaseModelImpl<Entry> implements EntryModel {
 	}
 
 	@Override
+	public Entry cloneWithOriginalValues() {
+		EntryImpl entryImpl = new EntryImpl();
+
+		entryImpl.setEntryId(this.<Long>getColumnOriginalValue("entryId"));
+		entryImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		entryImpl.setCompanyId(this.<Long>getColumnOriginalValue("companyId"));
+		entryImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		entryImpl.setUserName(this.<String>getColumnOriginalValue("userName"));
+		entryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		entryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		entryImpl.setFullName(this.<String>getColumnOriginalValue("fullName"));
+		entryImpl.setEmailAddress(
+			this.<String>getColumnOriginalValue("emailAddress"));
+		entryImpl.setComments(this.<String>getColumnOriginalValue("comments"));
+
+		return entryImpl;
+	}
+
+	@Override
 	public int compareTo(Entry entry) {
 		int value = 0;
 
@@ -759,9 +802,7 @@ public class EntryModelImpl extends BaseModelImpl<Entry> implements EntryModel {
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Entry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Entry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

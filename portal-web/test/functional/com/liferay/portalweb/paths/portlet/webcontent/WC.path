@@ -60,12 +60,10 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ENTRY_CARDS-->
-
 <tr>
 	<td>ENTRY_CARDS_THUMBNAIL</td>
-	<td>//*[contains(@data-title,'${key_webContentTitle}')]//div[contains(@class,'card')]//a[contains(.,'${key_webContentTitle}')]</td>
+	<td>//li[contains(@data-title,'${key_webContentTitle}')]//div[contains(@class,'card')]//a[contains(.,'${key_webContentTitle}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -73,12 +71,10 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ENTRY_LIST-->
-
 <tr>
 	<td>ENTRY_LIST_THUMBNAIL</td>
-	<td>//*[contains(@data-title,'${key_webContentTitle}')]//*[@data-qa-id='rowItemContent']/div</td>
+	<td>//li[contains(@data-title,'${key_webContentTitle}')]//*[@data-qa-id='rowItemContent']/div</td>
 	<td></td>
 </tr>
 <tr>
@@ -88,22 +84,27 @@
 </tr>
 <tr>
 	<td>ENTRY_LIST_MENULIST_ICON</td>
-	<td>//*[contains(@data-title,'${key_webContentTitle}')]//*[contains(@class,'dropdown-toggle')]</td>
+	<td>//li[contains(@data-title,'${key_webContentTitle}')]//*[contains(@class,'dropdown-toggle')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ENTRY_LIST_CHECKBOX</td>
-	<td>//*[contains(@data-title,'${key_webContentTitle}')]//input</td>
+	<td>//li[contains(@data-title,'${key_webContentTitle}')]//input</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ENTRY_LIST_TITLE</td>
-	<td>//*[contains(@data-title,'${key_webContentTitle}')]//*[@data-qa-id='rowItemContent']//a</td>
+	<td>//li[contains(@data-title,'${key_webContentTitle}')]//*[@data-qa-id='rowItemContent']//a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ENTRY_LIST_TITLE_NAME</td>
+	<td>//li[contains(@data-title,'${key_webContentTitle}')]//*[@data-qa-id='rowItemContent']//a[contains(text(),'${key_webContentTitle}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ENTRY_LIST_TITLE_ON_LIVE</td>
-	<td>//*[contains(@data-title,'${key_webContentTitle}')]//*[@data-qa-id='rowItemContent']//p</td>
+	<td>//li[contains(@data-title,'${key_webContentTitle}')]//*[@data-qa-id='rowItemContent']//p</td>
 	<td></td>
 </tr>
 <tr>
@@ -113,12 +114,12 @@
 </tr>
 <tr>
 	<td>ENTRY_LIST_WORKFLOW_STATUS</td>
-	<td>//*[contains(@data-title,'${key_webContentTitle}')]//span[contains(@class,'label')]</td>
+	<td>//li[contains(@data-title,'${key_webContentTitle}')]//span[contains(@class,'label')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ENTRY_LIST_WORKFLOW_TRANSLATIONE_STATUS</td>
-	<td>//*[contains(@data-title,'${key_webContentTitle}')]//span[contains(@class,'label-info')]</td>
+	<td>//li[contains(@data-title,'${key_webContentTitle}')]//span[contains(@class,'label-info')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -126,9 +127,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ENTRY_TABLE-->
-
 <tr>
 	<td>ENTRY_TABLE_ID</td>
 	<td>//tr[contains(@data-title,'${key_webContentTitle}')]/td[2]</td>
@@ -154,9 +153,12 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--SIDEBAR -->
-
+<tr>
+	<td>PREVIEW_BUTTON</td>
+	<td>//fieldset[contains(@id,'${key_fieldsetName}')]//button[.//*[name()='svg'][contains(@class,'lexicon-icon-view')]]</td>
+	<td></td>
+</tr>
 <tr>
 	<td>SIDEBAR_BODY</td>
 	<td>//div[@class='sidebar-body']//div[contains(@id,'TabsSection')]</td>

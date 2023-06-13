@@ -17,8 +17,6 @@ package com.liferay.mobile.device.rules.service.base;
 import com.liferay.mobile.device.rules.model.MDRRule;
 import com.liferay.mobile.device.rules.service.MDRRuleService;
 import com.liferay.mobile.device.rules.service.MDRRuleServiceUtil;
-import com.liferay.mobile.device.rules.service.persistence.MDRRuleGroupFinder;
-import com.liferay.mobile.device.rules.service.persistence.MDRRuleGroupPersistence;
 import com.liferay.mobile.device.rules.service.persistence.MDRRulePersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -26,8 +24,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -145,21 +141,5 @@ public abstract class MDRRuleServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserService userService;
-
-	@Reference
-	protected MDRRuleGroupPersistence mdrRuleGroupPersistence;
-
-	@Reference
-	protected MDRRuleGroupFinder mdrRuleGroupFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MDRRuleServiceBaseImpl.class);
 
 }

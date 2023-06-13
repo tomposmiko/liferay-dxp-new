@@ -20,6 +20,7 @@ import com.liferay.item.selector.provider.GroupItemSelectorProvider;
 import com.liferay.item.selector.taglib.internal.servlet.item.selector.ItemSelectorUtil;
 import com.liferay.item.selector.taglib.internal.util.EntryURLUtil;
 import com.liferay.item.selector.taglib.internal.util.GroupItemSelectorTrackerUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.model.Group;
@@ -74,18 +75,19 @@ public class GroupSelectorDisplayContext {
 	}
 
 	public PortletURL getGroupItemSelectorURL(String groupType) {
-		PortletURL portletURL = _getItemSelectorURL();
-
-		portletURL.setParameter("groupType", groupType);
-		portletURL.setParameter(
-			"selectedTab",
-			ParamUtil.getString(_liferayPortletRequest, "selectedTab"));
-		portletURL.setParameter("showGroupSelector", Boolean.TRUE.toString());
-		portletURL.setParameter(
+		return PortletURLBuilder.create(
+			_getItemSelectorURL()
+		).setParameter(
+			"groupType", groupType
+		).setParameter(
 			"scopeGroupType",
-			ParamUtil.getString(_liferayPortletRequest, "scopeGroupType"));
-
-		return portletURL;
+			ParamUtil.getString(_liferayPortletRequest, "scopeGroupType")
+		).setParameter(
+			"selectedTab",
+			ParamUtil.getString(_liferayPortletRequest, "selectedTab")
+		).setParameter(
+			"showGroupSelector", true
+		).buildPortletURL();
 	}
 
 	public Set<String> getGroupTypes() {
@@ -183,15 +185,16 @@ public class GroupSelectorDisplayContext {
 	}
 
 	private PortletURL _getIteratorURL() {
-		PortletURL portletURL = _getItemSelectorURL();
-
-		portletURL.setParameter("groupType", _getGroupType());
-		portletURL.setParameter(
+		return PortletURLBuilder.create(
+			_getItemSelectorURL()
+		).setParameter(
+			"groupType", _getGroupType()
+		).setParameter(
 			"selectedTab",
-			ParamUtil.getString(_liferayPortletRequest, "selectedTab"));
-		portletURL.setParameter("showGroupSelector", Boolean.TRUE.toString());
-
-		return portletURL;
+			ParamUtil.getString(_liferayPortletRequest, "selectedTab")
+		).setParameter(
+			"showGroupSelector", true
+		).buildPortletURL();
 	}
 
 	private String _groupType;

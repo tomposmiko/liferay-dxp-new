@@ -14,7 +14,6 @@
 
 package com.liferay.portal.deploy.hot;
 
-import com.liferay.document.library.kernel.antivirus.AntivirusScanner;
 import com.liferay.document.library.kernel.util.DLProcessor;
 import com.liferay.document.library.kernel.util.DLProcessorRegistryUtil;
 import com.liferay.mail.kernel.util.Hook;
@@ -29,7 +28,6 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
-import com.liferay.portal.kernel.deploy.DeployManagerUtil;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployListener;
 import com.liferay.portal.kernel.deploy.hot.BaseHotDeployListener;
 import com.liferay.portal.kernel.deploy.hot.HotDeployEvent;
@@ -48,8 +46,8 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lock.LockListener;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.ModelListener;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.plugin.PluginPackage;
 import com.liferay.portal.kernel.portlet.ControlPanelEntry;
 import com.liferay.portal.kernel.resource.bundle.CacheResourceBundleLoader;
@@ -60,7 +58,6 @@ import com.liferay.portal.kernel.search.IndexerPostProcessor;
 import com.liferay.portal.kernel.security.auth.AuthFailure;
 import com.liferay.portal.kernel.security.auth.AuthToken;
 import com.liferay.portal.kernel.security.auth.Authenticator;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.EmailAddressGenerator;
 import com.liferay.portal.kernel.security.auth.EmailAddressValidator;
 import com.liferay.portal.kernel.security.auth.FullNameGenerator;
@@ -81,6 +78,7 @@ import com.liferay.portal.kernel.service.ReleaseLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceWrapper;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.servlet.DirectServletRegistryUtil;
+import com.liferay.portal.kernel.servlet.FileAvailabilityUtil;
 import com.liferay.portal.kernel.servlet.LiferayFilter;
 import com.liferay.portal.kernel.servlet.LiferayFilterTracker;
 import com.liferay.portal.kernel.servlet.TryFilter;
@@ -95,6 +93,7 @@ import com.liferay.portal.kernel.upgrade.util.UpgradeProcessUtil;
 import com.liferay.portal.kernel.url.ServletContextURLContainer;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
@@ -117,13 +116,8 @@ import com.liferay.portal.servlet.filters.cache.CacheUtil;
 import com.liferay.portal.servlet.taglib.ui.DeprecatedFormNavigatorEntry;
 import com.liferay.portal.spring.aop.AopInvocationHandler;
 import com.liferay.portal.util.JavaScriptBundleUtil;
-import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceRegistration;
-import com.liferay.taglib.FileAvailabilityUtil;
 
 import java.io.InputStream;
 
@@ -147,6 +141,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.Filter;
 import javax.servlet.ServletContext;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Brian Wing Shun Chan
@@ -288,10 +285,14 @@ public class HookHotDeployListener
 		Map<Object, ServiceRegistration<?>> serviceRegistrations =
 			getServiceRegistrations(servletContextName);
 
-		Registry registry = RegistryUtil.getRegistry();
+		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
 
-		ServiceRegistration<T> serviceRegistration = registry.registerService(
-			clazz, service, properties);
+		ServiceRegistration<T> serviceRegistration =
+			bundleContext.registerService(
+				clazz, service,
+				HashMapDictionaryBuilder.putAll(
+					properties
+				).build());
 
 		serviceRegistrations.put(serviceRegistrationKey, serviceRegistration);
 	}
@@ -448,8 +449,6 @@ public class HookHotDeployListener
 			HotDeployUtil.fireUndeployEvent(
 				new HotDeployEvent(servletContext, portletClassLoader));
 
-			DeployManagerUtil.undeploy(servletContextName);
-
 			return;
 		}
 
@@ -583,6 +582,10 @@ public class HookHotDeployListener
 			return (BasePersistence<?>)PortalBeanLocatorUtil.locate(beanName);
 		}
 		catch (BeanLocatorException beanLocatorException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(beanLocatorException, beanLocatorException);
+			}
+
 			return (BasePersistence<?>)PortletBeanLocatorUtil.locate(
 				servletContextName, beanName);
 		}
@@ -785,26 +788,12 @@ public class HookHotDeployListener
 		if (eventName.equals(APPLICATION_STARTUP_EVENTS)) {
 			Class<?> clazz = portletClassLoader.loadClass(eventClassName);
 
-			SimpleAction simpleAction = (SimpleAction)clazz.newInstance();
+			SimpleAction simpleAction = new InvokerSimpleAction(
+				(SimpleAction)clazz.newInstance(), portletClassLoader);
 
-			simpleAction = new InvokerSimpleAction(
-				simpleAction, portletClassLoader);
-
-			Long companyId = CompanyThreadLocal.getCompanyId();
-
-			try {
-				long[] companyIds = PortalInstances.getCompanyIds();
-
-				for (long curCompanyId : companyIds) {
-					CompanyThreadLocal.setCompanyId(curCompanyId);
-
-					simpleAction.run(
-						new String[] {String.valueOf(curCompanyId)});
-				}
-			}
-			finally {
-				CompanyThreadLocal.setCompanyId(companyId);
-			}
+			CompanyLocalServiceUtil.forEachCompanyId(
+				companyId -> simpleAction.run(
+					new String[] {String.valueOf(companyId)}));
 		}
 
 		if (_propsKeysEvents.contains(eventName)) {
@@ -1267,11 +1256,8 @@ public class HookHotDeployListener
 		if (GetterUtil.getBoolean(
 				SystemProperties.get("company-id-properties"))) {
 
-			List<Company> companies = CompanyLocalServiceUtil.getCompanies();
-
-			for (Company company : companies) {
-				PropsUtil.addProperties(company, portalProperties);
-			}
+			CompanyLocalServiceUtil.forEachCompany(
+				company -> PropsUtil.addProperties(company, portalProperties));
 		}
 		else {
 			PropsUtil.addProperties(portalProperties);
@@ -1378,19 +1364,6 @@ public class HookHotDeployListener
 					dlRepositoryClassName, externalRepositoryFactory,
 					resourceBundleLoader);
 			}
-		}
-
-		if (portalProperties.containsKey(PropsKeys.DL_STORE_ANTIVIRUS_IMPL)) {
-			String antivirusScannerClassName = portalProperties.getProperty(
-				PropsKeys.DL_STORE_ANTIVIRUS_IMPL);
-
-			AntivirusScanner antivirusScanner = (AntivirusScanner)newInstance(
-				portletClassLoader, AntivirusScanner.class,
-				antivirusScannerClassName);
-
-			registerService(
-				servletContextName, AntivirusScanner.class.getName(),
-				AntivirusScanner.class, antivirusScanner);
 		}
 
 		if (portalProperties.containsKey(PropsKeys.DL_STORE_IMPL)) {
@@ -1726,9 +1699,11 @@ public class HookHotDeployListener
 					servletContextName, serviceImplConstructor, serviceProxy);
 			}
 			catch (BeanLocatorException beanLocatorException) {
-				Registry registry = RegistryUtil.getRegistry();
+				if (_log.isDebugEnabled()) {
+					_log.debug(beanLocatorException, beanLocatorException);
+				}
 
-				registry.callService(
+				SystemBundleUtil.callService(
 					serviceTypeClass,
 					registryServiceProxy -> {
 						try {

@@ -641,6 +641,7 @@ public class KaleoTaskInstanceTokenLocalServiceUtil {
 				Long[] assigneeClassPKs, java.util.Date dueDateGT,
 				java.util.Date dueDateLT, Boolean completed,
 				Long kaleoDefinitionId, Long[] kaleoInstanceIds,
+				boolean searchByActiveWorkflowHandlers,
 				Boolean searchByUserRoles, boolean andOperator, int start,
 				int end,
 				OrderByComparator<KaleoTaskInstanceToken> orderByComparator,
@@ -650,8 +651,9 @@ public class KaleoTaskInstanceTokenLocalServiceUtil {
 		return getService().searchKaleoTaskInstanceTokens(
 			assetTitle, taskNames, assetTypes, assetPrimaryKeys,
 			assigneeClassName, assigneeClassPKs, dueDateGT, dueDateLT,
-			completed, kaleoDefinitionId, kaleoInstanceIds, searchByUserRoles,
-			andOperator, start, end, orderByComparator, serviceContext);
+			completed, kaleoDefinitionId, kaleoInstanceIds,
+			searchByActiveWorkflowHandlers, searchByUserRoles, andOperator,
+			start, end, orderByComparator, serviceContext);
 	}
 
 	public static KaleoTaskInstanceToken updateDueDate(

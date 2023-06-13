@@ -15,8 +15,8 @@
 package com.liferay.portal.background.task.internal.messaging;
 
 import com.liferay.portal.background.task.constants.BackgroundTaskContextMapConstants;
-import com.liferay.portal.background.task.model.BackgroundTask;
-import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -35,9 +35,9 @@ public class RemoveOnCompletionBackgroundTaskStatusMessageListener
 	extends BaseMessageListener {
 
 	public RemoveOnCompletionBackgroundTaskStatusMessageListener(
-		BackgroundTaskLocalService backgroundTaskLocalService) {
+		BackgroundTaskManager backgroundTaskManager) {
 
-		_backgroundTaskLocalService = backgroundTaskLocalService;
+		_backgroundTaskManager = backgroundTaskManager;
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class RemoveOnCompletionBackgroundTaskStatusMessageListener
 			BackgroundTaskConstants.BACKGROUND_TASK_ID);
 
 		BackgroundTask backgroundTask =
-			_backgroundTaskLocalService.fetchBackgroundTask(backgroundTaskId);
+			_backgroundTaskManager.fetchBackgroundTask(backgroundTaskId);
 
 		if (backgroundTask == null) {
 			return;
@@ -75,13 +75,13 @@ public class RemoveOnCompletionBackgroundTaskStatusMessageListener
 					"Deleting background task " + backgroundTask.toString());
 			}
 
-			_backgroundTaskLocalService.deleteBackgroundTask(backgroundTaskId);
+			_backgroundTaskManager.deleteBackgroundTask(backgroundTaskId);
 		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		RemoveOnCompletionBackgroundTaskStatusMessageListener.class);
 
-	private final BackgroundTaskLocalService _backgroundTaskLocalService;
+	private final BackgroundTaskManager _backgroundTaskManager;
 
 }

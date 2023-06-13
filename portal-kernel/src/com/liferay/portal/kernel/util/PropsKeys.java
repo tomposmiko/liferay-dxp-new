@@ -192,6 +192,10 @@ public interface PropsKeys {
 	public static final String AUTH_LOGIN_PORTLET_NAME =
 		"auth.login.portlet.name";
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x)
+	 */
+	@Deprecated
 	public static final String AUTH_LOGIN_PROMPT_ENABLED =
 		"auth.login.prompt.enabled";
 
@@ -255,34 +259,17 @@ public interface PropsKeys {
 	public static final String AUTO_DEPLOY_CUSTOM_PORTLET_XML =
 		"auto.deploy.custom.portlet.xml";
 
-	public static final String AUTO_DEPLOY_DEFAULT_DEST_DIR =
-		"auto.deploy.default.dest.dir";
-
 	public static final String AUTO_DEPLOY_DEPLOY_DIR =
 		"auto.deploy.deploy.dir";
-
-	public static final String AUTO_DEPLOY_DEST_DIR = "auto.deploy.dest.dir";
 
 	public static final String AUTO_DEPLOY_ENABLED = "auto.deploy.enabled";
 
 	public static final String AUTO_DEPLOY_INTERVAL = "auto.deploy.interval";
 
-	public static final String AUTO_DEPLOY_JBOSS_PREFIX =
-		"auto.deploy.jboss.prefix";
-
 	public static final String AUTO_DEPLOY_LISTENERS = "auto.deploy.listeners";
 
 	public static final String AUTO_DEPLOY_TOMCAT_CONF_DIR =
 		"auto.deploy.tomcat.conf.dir";
-
-	public static final String AUTO_DEPLOY_TOMCAT_DEST_DIR =
-		"auto.deploy.tomcat.dest.dir";
-
-	public static final String AUTO_DEPLOY_TOMCAT_LIB_DIR =
-		"auto.deploy.tomcat.lib.dir";
-
-	public static final String AUTO_DEPLOY_UNPACK_WAR =
-		"auto.deploy.unpack.war";
 
 	public static final String
 		AUTO_DEPLOY_WEBSPHERE_WSADMIN_APP_MANAGER_INSTALL_OPTIONS =
@@ -304,9 +291,6 @@ public interface PropsKeys {
 
 	public static final String AUTO_DEPLOY_WEBSPHERE_WSADMIN_PROPERTIES_FILE =
 		"auto.deploy.websphere.wsadmin.properties.file.name";
-
-	public static final String AUTO_DEPLOY_WILDFLY_PREFIX =
-		"auto.deploy.wildfly.prefix";
 
 	public static final String AUTO_LOGIN_HOOKS = "auto.login.hooks";
 
@@ -468,26 +452,6 @@ public interface PropsKeys {
 
 	public static final String CALENDAR_PUBLISH_TO_LIVE_BY_DEFAULT =
 		"calendar.publish.to.live.by.default";
-
-	public static final String CAS_AUTH_ENABLED = "cas.auth.enabled";
-
-	public static final String CAS_IMPORT_FROM_LDAP = "cas.import.from.ldap";
-
-	public static final String CAS_LOGIN_URL = "cas.login.url";
-
-	public static final String CAS_LOGOUT_ON_SESSION_EXPIRATION =
-		"cas.logout.on.session.expiration";
-
-	public static final String CAS_LOGOUT_URL = "cas.logout.url";
-
-	public static final String CAS_NO_SUCH_USER_REDIRECT_URL =
-		"cas.no.such.user.redirect.url";
-
-	public static final String CAS_SERVER_NAME = "cas.server.name";
-
-	public static final String CAS_SERVER_URL = "cas.server.url";
-
-	public static final String CAS_SERVICE_URL = "cas.service.url";
 
 	public static final String CDN_DYNAMIC_RESOURCES_ENABLED =
 		"cdn.dynamic.resources.enabled";
@@ -664,11 +628,21 @@ public interface PropsKeys {
 	public static final String CUSTOM_SQL_FUNCTION_ISNULL =
 		"custom.sql.function.isnull";
 
+	public static final String DATA_LIMIT_DL_STORAGE_MAX_SIZE =
+		"data.limit.dl.storage.max.size";
+
 	public static final String DATA_LIMIT_MAIL_MESSAGE_MAX_COUNT =
 		"data.limit.mail.message.max.count";
 
 	public static final String DATA_LIMIT_MAIL_MESSAGE_MAX_PERIOD =
 		"data.limit.mail.message.max.period";
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final String DATA_LIMIT_MAX_DL_STORAGE_SIZE =
+		"data.limit.max.dl.storage.size";
 
 	/**
 	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
@@ -927,6 +901,24 @@ public interface PropsKeys {
 	public static final String DL_EMAIL_FILE_ENTRY_ADDED_SUBJECT =
 		"dl.email.file.entry.added.subject";
 
+	public static final String DL_EMAIL_FILE_ENTRY_EXPIRED_BODY =
+		"dl.email.file.entry.expired.body";
+
+	public static final String DL_EMAIL_FILE_ENTRY_EXPIRED_ENABLED =
+		"dl.email.file.entry.expired.enabled";
+
+	public static final String DL_EMAIL_FILE_ENTRY_EXPIRED_SUBJECT =
+		"dl.email.file.entry.expired.subject";
+
+	public static final String DL_EMAIL_FILE_ENTRY_REVIEW_BODY =
+		"dl.email.file.entry.review.body";
+
+	public static final String DL_EMAIL_FILE_ENTRY_REVIEW_ENABLED =
+		"dl.email.file.entry.review.enabled";
+
+	public static final String DL_EMAIL_FILE_ENTRY_REVIEW_SUBJECT =
+		"dl.email.file.entry.review.subject";
+
 	public static final String DL_EMAIL_FILE_ENTRY_UPDATED_BODY =
 		"dl.email.file.entry.updated.body";
 
@@ -1097,10 +1089,6 @@ public interface PropsKeys {
 	public static final String DL_FILE_INDEXING_IGNORE_EXTENSIONS =
 		"dl.file.indexing.ignore.extensions";
 
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x)
-	 */
-	@Deprecated
 	public static final String DL_FILE_INDEXING_INTERVAL =
 		"dl.file.indexing.interval";
 
@@ -1138,13 +1126,6 @@ public interface PropsKeys {
 
 	public static final String DL_STORE_ANTIVIRUS_ENABLED =
 		"dl.store.antivirus.enabled";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String DL_STORE_ANTIVIRUS_IMPL =
-		"dl.store.antivirus.impl";
 
 	public static final String DL_STORE_FILE_IMPL_SAFE_FILE_NAME_2_AMPERSAND =
 		"dl.store.file.impl.safe.file.name.2.ampersand";
@@ -1212,6 +1193,9 @@ public interface PropsKeys {
 
 	public static final String EHCACHE_SOCKET_START_PORT =
 		"ehcache.socket.start.port";
+
+	public static final String ENTERPRISE_PRODUCT_NOTIFICATION_ENABLED =
+		"enterprise.product.notification.enabled";
 
 	public static final String ETAG_RESPONSE_SIZE_MAX =
 		"etag.response.size.max";
@@ -1312,13 +1296,6 @@ public interface PropsKeys {
 		"hot.deploy.dependency.management.enabled";
 
 	public static final String HOT_DEPLOY_LISTENERS = "hot.deploy.listeners";
-
-	public static final String HOT_UNDEPLOY_ENABLED = "hot.undeploy.enabled";
-
-	public static final String HOT_UNDEPLOY_INTERVAL = "hot.undeploy.interval";
-
-	public static final String HOT_UNDEPLOY_ON_REDEPLOY =
-		"hot.undeploy.on.redeploy";
 
 	public static final String HTTP_HEADER_VERSION_VERBOSITY =
 		"http.header.version.verbosity";
@@ -1495,9 +1472,6 @@ public interface PropsKeys {
 
 	public static final String INVOKER_FILTER_URI_MAX_LENGTH =
 		"invoker.filter.uri.max.length";
-
-	public static final String JAVADOC_MANAGER_ENABLED =
-		"javadoc.manager.enabled";
 
 	public static final String JAVASCRIPT_BAREBONE_ENABLED =
 		"javascript.barebone.enabled";
@@ -1774,13 +1748,6 @@ public interface PropsKeys {
 	public static final String LDAP_ATTRS_TRANSFORMER_IMPL =
 		"ldap.attrs.transformer.impl";
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String LDAP_IGNORE_USER_SEARCH_FILTER_FOR_AUTH =
-		"ldap.ignore.user.search.filter.for.auth";
-
 	public static final String LEARN_RESOURCES_CDN_ENABLED =
 		"learn.resources.cdn.enabled";
 
@@ -1792,6 +1759,10 @@ public interface PropsKeys {
 
 	public static final String LIFERAY_HOME = "liferay.home";
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String LIFERAY_LIB_GLOBAL_DIR =
 		"liferay.lib.global.dir";
 
@@ -1800,6 +1771,9 @@ public interface PropsKeys {
 
 	public static final String LIFERAY_LIB_PORTAL_DIR =
 		"liferay.lib.portal.dir";
+
+	public static final String LIFERAY_SHIELDED_CONTAINER_LIB_PORTAL_DIR =
+		"liferay.shielded.container.lib.portal.dir";
 
 	public static final String LIFERAY_WEB_PORTAL_DIR =
 		"liferay.web.portal.dir";
@@ -2221,25 +2195,6 @@ public interface PropsKeys {
 	public static final String NOTIFICATIONS_MAX_EVENTS =
 		"notifications.max.events";
 
-	public static final String NTLM_AUTH_ENABLED = "ntlm.auth.enabled";
-
-	public static final String NTLM_AUTH_NEGOTIATE_FLAGS =
-		"ntlm.auth.negotiate.flags";
-
-	public static final String NTLM_DOMAIN = "ntlm.auth.domain";
-
-	public static final String NTLM_DOMAIN_CONTROLLER =
-		"ntlm.auth.domain.controller";
-
-	public static final String NTLM_DOMAIN_CONTROLLER_NAME =
-		"ntlm.auth.domain.controller.name";
-
-	public static final String NTLM_SERVICE_ACCOUNT =
-		"ntlm.auth.service.account";
-
-	public static final String NTLM_SERVICE_PASSWORD =
-		"ntlm.auth.service.password";
-
 	public static final String OMNIADMIN_USERS = "omniadmin.users";
 
 	public static final String OPEN_ID_AUTH_ENABLED = "open.id.auth.enabled";
@@ -2489,20 +2444,6 @@ public interface PropsKeys {
 	public static final String PHONE_NUMBER_FORMAT_USA_REGEXP =
 		"phone.number.format.usa.regexp";
 
-	public static final String PLUGIN_NOTIFICATIONS_ENABLED =
-		"plugin.notifications.enabled";
-
-	public static final String PLUGIN_NOTIFICATIONS_PACKAGES_IGNORED =
-		"plugin.notifications.packages.ignored";
-
-	public static final String PLUGIN_REPOSITORIES_TRUSTED =
-		"plugin.repositories.trusted";
-
-	public static final String PLUGIN_REPOSITORIES_UNTRUSTED =
-		"plugin.repositories.untrusted";
-
-	public static final String PLUGIN_TYPES = "plugin.types";
-
 	public static final String POLLER_NOTIFICATIONS_TIMEOUT =
 		"poller.notifications.timeout";
 
@@ -2615,15 +2556,35 @@ public interface PropsKeys {
 	public static final String PORTAL_INSTANCE_PROTOCOL =
 		"portal.instance.protocol";
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no replacement
+	 */
+	@Deprecated
 	public static final String PORTAL_JAAS_AUTH_TYPE = "portal.jaas.auth.type";
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no replacement
+	 */
+	@Deprecated
 	public static final String PORTAL_JAAS_ENABLE = "portal.jaas.enable";
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no replacement
+	 */
+	@Deprecated
 	public static final String PORTAL_JAAS_IMPL = "portal.jaas.impl";
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no replacement
+	 */
+	@Deprecated
 	public static final String PORTAL_JAAS_PLAIN_PASSWORD =
 		"portal.jaas.plain.password";
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no replacement
+	 */
+	@Deprecated
 	public static final String PORTAL_JAAS_STRICT_PASSWORD =
 		"portal.jaas.strict.password";
 
@@ -2761,12 +2722,24 @@ public interface PropsKeys {
 	public static final String RECENT_GROUPS_MAX_ELEMENTS =
 		"recent.groups.max.elements";
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x)
+	 */
+	@Deprecated
 	public static final String REDIRECT_URL_DOMAINS_ALLOWED =
 		"redirect.url.domains.allowed";
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x)
+	 */
+	@Deprecated
 	public static final String REDIRECT_URL_IPS_ALLOWED =
 		"redirect.url.ips.allowed";
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x)
+	 */
+	@Deprecated
 	public static final String REDIRECT_URL_SECURITY_MODE =
 		"redirect.url.security.mode";
 
@@ -2939,6 +2912,10 @@ public interface PropsKeys {
 	public static final String SESSION_COOKIE_USE_FULL_HOSTNAME =
 		"session.cookie.use.full.hostname";
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String SESSION_DISABLED = "session.disabled";
 
 	public static final String SESSION_ENABLE_PERSISTENT_COOKIES =
@@ -3180,12 +3157,12 @@ public interface PropsKeys {
 			"sql.data.com.liferay.portal.kernel.model.Country.country.id";
 
 	public static final String
-		SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_ACCOUNT_ADDRESS =
-			"sql.data.com.liferay.portal.kernel.model.ListType.account.address";
+		SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_COMPANY_ADDRESS =
+			"sql.data.com.liferay.portal.kernel.model.ListType.company.address";
 
 	public static final String
-		SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_ACCOUNT_EMAIL_ADDRESS =
-			"sql.data.com.liferay.portal.kernel.model.ListType.account.email.address";
+		SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_COMPANY_EMAIL_ADDRESS =
+			"sql.data.com.liferay.portal.kernel.model.ListType.company.email.address";
 
 	public static final String
 		SQL_DATA_COM_LIFERAY_PORTAL_MODEL_LISTTYPE_CONTACT_EMAIL_ADDRESS =
@@ -3264,6 +3241,9 @@ public interface PropsKeys {
 	public static final String
 		TEMPLATE_ENGINE_FREEMARKER_TRANSACTION_READ_ONLY =
 			"template.engine.freemarker.transaction.read.only";
+
+	public static final String TEMPLATE_ENGINE_SERVICE_LOCATOR_RESTRICT =
+		"template.engine.service.locator.restrict";
 
 	public static final String TERMS_OF_USE_REQUIRED = "terms.of.use.required";
 
@@ -3353,6 +3333,9 @@ public interface PropsKeys {
 
 	public static final String UPGRADE_DATABASE_TRANSACTIONS_DISABLED =
 		"upgrade.database.transactions.disabled";
+
+	public static final String UPGRADE_REPORT_ENABLED =
+		"upgrade.report.enabled";
 
 	public static final String USER_GROUPS_NAME_ALLOW_NUMERIC =
 		"user.groups.name.allow.numeric";
@@ -3515,6 +3498,10 @@ public interface PropsKeys {
 	public static final String VERIFY_PATCH_LEVELS_DISABLED =
 		"verify.patch.levels.disabled";
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String VERIFY_PROCESS_CONCURRENCY_THRESHOLD =
 		"verify.process.concurrency.threshold";
 
@@ -3627,18 +3614,6 @@ public interface PropsKeys {
 
 	public static final String XML_VALIDATION_ENABLED =
 		"xml.validation.enabled";
-
-	public static final String XUGGLER_ENABLED = "xuggler.enabled";
-
-	public static final String XUGGLER_FFPRESET = "xuggler.ffpreset.";
-
-	public static final String XUGGLER_JAR_FILE = "xuggler.jar.file";
-
-	public static final String XUGGLER_JAR_NAME = "xuggler.jar.name";
-
-	public static final String XUGGLER_JAR_OPTIONS = "xuggler.jar.options";
-
-	public static final String XUGGLER_JAR_URL = "xuggler.jar.url";
 
 	public static final String YUI_COMPRESSOR_CSS_LINE_BREAK =
 		"yui.compressor.css.line.break";

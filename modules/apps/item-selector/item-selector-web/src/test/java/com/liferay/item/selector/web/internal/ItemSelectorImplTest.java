@@ -101,10 +101,6 @@ public class ItemSelectorImplTest extends PowerMockito {
 			new TestFileEntryItemSelectorReturnType(),
 			_testURLItemSelectorReturnType);
 
-		HttpUtil httpUtil = new HttpUtil();
-
-		httpUtil.setHttp(new HttpImpl());
-
 		PortalUtil portalUtil = new PortalUtil();
 
 		portalUtil.setPortal(new PortalImpl());

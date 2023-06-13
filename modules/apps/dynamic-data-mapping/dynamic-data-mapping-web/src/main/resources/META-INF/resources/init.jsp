@@ -72,6 +72,7 @@ page import="com.liferay.dynamic.data.mapping.web.internal.search.TemplateSearch
 page import="com.liferay.dynamic.data.mapping.web.internal.security.permission.resource.DDMStructurePermission" %><%@
 page import="com.liferay.dynamic.data.mapping.web.internal.security.permission.resource.DDMTemplatePermission" %><%@
 page import="com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem" %><%@
+page import="com.liferay.petra.portlet.url.builder.PortletURLBuilder" %><%@
 page import="com.liferay.petra.string.CharPool" %><%@
 page import="com.liferay.petra.string.StringBundler" %><%@
 page import="com.liferay.petra.string.StringPool" %><%@
@@ -105,6 +106,7 @@ page import="com.liferay.portal.kernel.template.TemplateHandler" %><%@
 page import="com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil" %><%@
 page import="com.liferay.portal.kernel.template.TemplateVariableDefinition" %><%@
 page import="com.liferay.portal.kernel.template.TemplateVariableGroup" %><%@
+page import="com.liferay.portal.kernel.util.HashMapBuilder" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.LocaleUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
@@ -169,8 +171,8 @@ if (ddmDisplayContext != null) {
 
 String storageTypeValue = StringPool.BLANK;
 
-if (scopeStorageType.equals("json")) {
-	storageTypeValue = StorageType.JSON.getValue();
+if (scopeStorageType.equals("default")) {
+	storageTypeValue = StorageType.DEFAULT.getValue();
 }
 
 String templateTypeValue = StringPool.BLANK;

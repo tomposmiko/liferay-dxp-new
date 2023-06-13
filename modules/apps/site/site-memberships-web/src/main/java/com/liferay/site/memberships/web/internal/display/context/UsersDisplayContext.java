@@ -14,6 +14,7 @@
 
 package com.liferay.site.memberships.web.internal.display.context;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -30,7 +31,6 @@ import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -159,54 +159,87 @@ public class UsersDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/view.jsp"
+		).setRedirect(
+			() -> {
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)_httpServletRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
 
-		PortletURL portletURL = _renderResponse.createRenderURL();
+				return themeDisplay.getURLCurrent();
+			}
+		).setKeywords(
+			() -> {
+				String keywords = getKeywords();
 
-		portletURL.setParameter("mvcPath", "/view.jsp");
-		portletURL.setParameter("tabs1", "users");
-		portletURL.setParameter("redirect", themeDisplay.getURLCurrent());
-		portletURL.setParameter("groupId", String.valueOf(getGroupId()));
+				if (Validator.isNotNull(keywords)) {
+					return keywords;
+				}
 
-		Role role = getRole();
+				return null;
+			}
+		).setNavigation(
+			() -> {
+				String navigation = getNavigation();
 
-		if (role != null) {
-			portletURL.setParameter("roleId", String.valueOf(role.getRoleId()));
-		}
+				if (Validator.isNotNull(navigation)) {
+					return navigation;
+				}
 
-		String displayStyle = getDisplayStyle();
+				return null;
+			}
+		).setTabs1(
+			"users"
+		).setParameter(
+			"displayStyle",
+			() -> {
+				String displayStyle = getDisplayStyle();
 
-		if (Validator.isNotNull(displayStyle)) {
-			portletURL.setParameter("displayStyle", displayStyle);
-		}
+				if (Validator.isNotNull(displayStyle)) {
+					return displayStyle;
+				}
 
-		String keywords = getKeywords();
+				return null;
+			}
+		).setParameter(
+			"groupId", getGroupId()
+		).setParameter(
+			"orderByCol",
+			() -> {
+				String orderByCol = getOrderByCol();
 
-		if (Validator.isNotNull(keywords)) {
-			portletURL.setParameter("keywords", keywords);
-		}
+				if (Validator.isNotNull(orderByCol)) {
+					return orderByCol;
+				}
 
-		String navigation = getNavigation();
+				return null;
+			}
+		).setParameter(
+			"orderByType",
+			() -> {
+				String orderByType = getOrderByType();
 
-		if (Validator.isNotNull(navigation)) {
-			portletURL.setParameter("navigation", navigation);
-		}
+				if (Validator.isNotNull(orderByType)) {
+					return orderByType;
+				}
 
-		String orderByCol = getOrderByCol();
+				return null;
+			}
+		).setParameter(
+			"roleId",
+			() -> {
+				Role role = getRole();
 
-		if (Validator.isNotNull(orderByCol)) {
-			portletURL.setParameter("orderByCol", orderByCol);
-		}
+				if (role != null) {
+					return role.getRoleId();
+				}
 
-		String orderByType = getOrderByType();
-
-		if (Validator.isNotNull(orderByType)) {
-			portletURL.setParameter("orderByType", orderByType);
-		}
-
-		return portletURL;
+				return null;
+			}
+		).buildPortletURL();
 	}
 
 	public Role getRole() {
@@ -238,8 +271,7 @@ public class UsersDisplayContext {
 
 		userSearch.setEmptyResultsMessage(
 			LanguageUtil.format(
-				ResourceBundleUtil.getBundle(
-					themeDisplay.getLocale(), getClass()),
+				themeDisplay.getLocale(),
 				"no-user-was-found-that-is-a-direct-member-of-this-x",
 				StringUtil.toLowerCase(
 					GroupUtil.getGroupTypeLabel(
@@ -258,17 +290,21 @@ public class UsersDisplayContext {
 				"inherit", Boolean.TRUE
 			).put(
 				"usersGroups", Long.valueOf(getGroupId())
-			).build();
-
-		Role role = getRole();
-
-		if (role != null) {
-			userParams.put(
+			).put(
 				"userGroupRole",
-				new Long[] {
-					Long.valueOf(getGroupId()), Long.valueOf(role.getRoleId())
-				});
-		}
+				() -> {
+					Role role = getRole();
+
+					if (role != null) {
+						return new Long[] {
+							Long.valueOf(getGroupId()),
+							Long.valueOf(role.getRoleId())
+						};
+					}
+
+					return null;
+				}
+			).build();
 
 		int usersCount = 0;
 		List<User> users = Collections.emptyList();

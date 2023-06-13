@@ -792,9 +792,7 @@ public class ThreadPoolExecutorTest {
 		executeLatch.await();
 
 		try {
-			MarkerBlockingJob markerBlockingJob = new MarkerBlockingJob();
-
-			threadPoolExecutor.execute(markerBlockingJob);
+			threadPoolExecutor.execute(new MarkerBlockingJob());
 
 			List<Runnable> rejectedList =
 				recordRejectedExecutionHandler.getRejectedList();

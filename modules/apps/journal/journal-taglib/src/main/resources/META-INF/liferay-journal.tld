@@ -25,10 +25,9 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
-			<name>dataAnalyticsTrackingEnabled</name>
+			<name>dataAnalyticsTrackEnabled</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
-			<type>boolean</type>
 		</attribute>
 		<attribute>
 			<name>ddmTemplateKey</name>

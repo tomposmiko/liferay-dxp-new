@@ -32,9 +32,11 @@ else {
 
 String usersListView = (String)request.getAttribute("view.jsp-usersListView");
 
-PortletURL portletURL = (PortletURL)request.getAttribute("view.jsp-portletURL");
-
-portletURL.setParameter("displayStyle", displayStyle);
+PortletURL portletURL = PortletURLBuilder.create(
+	(PortletURL)request.getAttribute("view.jsp-portletURL")
+).setParameter(
+	"displayStyle", displayStyle
+).buildPortletURL();
 
 String keywords = ParamUtil.getString(request, "keywords");
 
@@ -82,7 +84,7 @@ if (filterManageableOrganizations) {
 			viewTypeItems="<%= viewOrganizationsManagementToolbarDisplayContext.getViewTypeItems() %>"
 		/>
 
-		<aui:form action="<%= portletURL %>" cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "search();" %>'>
+		<aui:form action="<%= portletURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "search();" %>'>
 			<liferay-portlet:renderURLParams varImpl="portletURL" />
 			<aui:input name="<%= Constants.CMD %>" type="hidden" />
 			<aui:input name="toolbarItem" type="hidden" value="<%= toolbarItem %>" />

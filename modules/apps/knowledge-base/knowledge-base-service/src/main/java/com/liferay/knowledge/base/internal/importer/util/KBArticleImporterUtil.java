@@ -20,6 +20,7 @@ import com.liferay.knowledge.base.constants.KBConstants;
 import com.liferay.knowledge.base.constants.KBPortletKeys;
 import com.liferay.knowledge.base.exception.KBArticleImportException;
 import com.liferay.knowledge.base.model.KBArticle;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -64,7 +65,8 @@ public class KBArticleImporterUtil {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Unsupported image file suffix used in ZIP file " +
-						imageFileName);
+						imageFileName,
+					kbArticleImportException);
 			}
 		}
 
@@ -79,14 +81,10 @@ public class KBArticleImporterUtil {
 				fileEntriesMap);
 		}
 		catch (Exception exception) {
-			StringBuilder sb = new StringBuilder(4);
-
-			sb.append("Unable to import image file ");
-			sb.append(imageFileName);
-			sb.append(": ");
-			sb.append(exception.getLocalizedMessage());
-
-			throw new KBArticleImportException(sb.toString());
+			throw new KBArticleImportException(
+				StringBundler.concat(
+					"Unable to import image file ", imageFileName, ": ",
+					exception.getLocalizedMessage()));
 		}
 	}
 

@@ -17,10 +17,7 @@ package com.liferay.sharepoint.soap.repository.connector;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.FileImpl;
-import com.liferay.portal.util.HtmlImpl;
 import com.liferay.sharepoint.soap.repository.connector.internal.util.test.SharepointConnectionTestUtil;
 import com.liferay.sharepoint.soap.repository.connector.schema.query.Query;
 import com.liferay.sharepoint.soap.repository.connector.schema.query.QueryField;
@@ -45,7 +42,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -54,8 +50,7 @@ import org.junit.Test;
 public class SharepointConnectionTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@BeforeClass
@@ -92,14 +87,6 @@ public class SharepointConnectionTest {
 
 		_folderPath1 = StringPool.SLASH + _folderName1;
 		_folderPath2 = StringPool.SLASH + _folderName2;
-
-		FileUtil fileUtil = new FileUtil();
-
-		fileUtil.setFile(new FileImpl());
-
-		HtmlUtil htmlUtil = new HtmlUtil();
-
-		htmlUtil.setHtml(new HtmlImpl());
 
 		deleteSharepointObjects();
 	}

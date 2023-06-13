@@ -12,11 +12,9 @@
  * details.
  */
 
+import {render} from '@liferay/frontend-js-react-web';
 import {ClayAlert} from 'clay-alert';
-import {render} from 'frontend-js-react-web';
-import {PortletBase} from 'frontend-js-web';
-import dom from 'metal-dom';
-import {EventHandler} from 'metal-events';
+import {EventHandler, PortletBase, delegate} from 'frontend-js-web';
 import {Config} from 'metal-state';
 import ReactDOM from 'react-dom';
 
@@ -58,7 +56,7 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 	}
 
 	attachItemSelectorPreviewComponent() {
-		const itemsNodes = Array.from(this.all('.item-preview'));
+		const itemsNodes = Array.from(this.all('.item-preview-editable'));
 
 		const items = itemsNodes.map((node) => node.dataset);
 
@@ -66,9 +64,9 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 
 		if (items.length === clicableItems.length) {
 			clicableItems.forEach((clicableItem, index) => {
-				clicableItem.addEventListener('click', (e) => {
-					e.preventDefault();
-					e.stopPropagation();
+				clicableItem.addEventListener('click', (event) => {
+					event.preventDefault();
+					event.stopPropagation();
 
 					this.openItemSelectorPreview(items, index);
 				});
@@ -86,12 +84,11 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 		const data = {
 			container,
 			currentIndex: index,
-			editItemURL: this.editItemURL,
+			editImageURL: this.editImageURL,
 			handleSelectedItem: this._onItemSelected.bind(this),
 			headerTitle: this.closeCaption,
+			itemReturnType: this.uploadItemReturnType,
 			items,
-			uploadItemReturnType: this.uploadItemReturnType,
-			uploadItemURL: this.uploadItemURL,
 		};
 
 		render(ItemSelectorPreview, data, container);
@@ -119,7 +116,7 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 	 */
 	_bindEvents() {
 		this._eventHandler.add(
-			dom.delegate(this.rootNode, 'click', '.item-preview', (event) =>
+			delegate(this.rootNode, 'click', '.item-preview', (event) =>
 				this._onItemSelected(event.delegateTarget.dataset)
 			)
 		);
@@ -162,7 +159,7 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 
 					Liferay.componentReady('ItemSelectorPreview').then(() => {
 						Liferay.fire('updateCurrentItem', {
-							url: itemFileUrl,
+							...itemFile,
 							value: itemFileValue,
 						});
 					});
@@ -445,7 +442,6 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 		const item = {
 			base64: preview,
 			metadata: JSON.stringify(this._getUploadFileMetadata(file)),
-			mimeType: file.type,
 			returntype: this.uploadItemReturnType,
 			title: file.name,
 			value: preview,
@@ -471,11 +467,11 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 
 		if (
 			validExtensions === '*' ||
-			validExtensions.indexOf(fileExtension) != -1
+			validExtensions.indexOf(fileExtension) !== -1
 		) {
 			const maxFileSize = this.maxFileSize;
 
-			if (file.size <= maxFileSize) {
+			if (maxFileSize === 0 || file.size <= maxFileSize) {
 				this._previewFile(file);
 			}
 			else {
@@ -526,13 +522,13 @@ ItemSelectorRepositoryEntryBrowser.STATE = {
 	closeCaption: Config.string(),
 
 	/**
-	 * Url to edit the item.
+	 * Endpoint to send the image edited in the Image Editor
 	 *
 	 * @instance
 	 * @memberof ItemSelectorRepositoryEntryBrowser
 	 * @type {String}
 	 */
-	editItemURL: Config.string(),
+	editImageURL: Config.string(),
 
 	/**
 	 * Time to hide the alert messages.

@@ -45,6 +45,7 @@ public class CPAttachmentFileEntryWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("CPAttachmentFileEntryId", getCPAttachmentFileEntryId());
@@ -57,6 +58,8 @@ public class CPAttachmentFileEntryWrapper
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("classPK", getClassPK());
 		attributes.put("fileEntryId", getFileEntryId());
+		attributes.put("cdnEnabled", isCDNEnabled());
+		attributes.put("cdnURL", getCDNURL());
 		attributes.put("displayDate", getDisplayDate());
 		attributes.put("expirationDate", getExpirationDate());
 		attributes.put("title", getTitle());
@@ -74,6 +77,12 @@ public class CPAttachmentFileEntryWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -148,6 +157,18 @@ public class CPAttachmentFileEntryWrapper
 			setFileEntryId(fileEntryId);
 		}
 
+		Boolean cdnEnabled = (Boolean)attributes.get("cdnEnabled");
+
+		if (cdnEnabled != null) {
+			setCDNEnabled(cdnEnabled);
+		}
+
+		String cdnURL = (String)attributes.get("cdnURL");
+
+		if (cdnURL != null) {
+			setCDNURL(cdnURL);
+		}
+
 		Date displayDate = (Date)attributes.get("displayDate");
 
 		if (displayDate != null) {
@@ -216,8 +237,40 @@ public class CPAttachmentFileEntryWrapper
 	}
 
 	@Override
+	public CPAttachmentFileEntry cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
+	@Override
+	public com.liferay.portal.kernel.repository.model.FileEntry fetchFileEntry()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.fetchFileEntry();
+	}
+
+	@Override
 	public String[] getAvailableLanguageIds() {
 		return model.getAvailableLanguageIds();
+	}
+
+	/**
+	 * Returns the cdn enabled of this cp attachment file entry.
+	 *
+	 * @return the cdn enabled of this cp attachment file entry
+	 */
+	@Override
+	public boolean getCDNEnabled() {
+		return model.getCDNEnabled();
+	}
+
+	/**
+	 * Returns the cdn url of this cp attachment file entry.
+	 *
+	 * @return the cdn url of this cp attachment file entry
+	 */
+	@Override
+	public String getCDNURL() {
+		return model.getCDNURL();
 	}
 
 	/**
@@ -315,13 +368,6 @@ public class CPAttachmentFileEntryWrapper
 		return model.getExternalReferenceCode();
 	}
 
-	@Override
-	public com.liferay.portal.kernel.repository.model.FileEntry getFileEntry()
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return model.getFileEntry();
-	}
-
 	/**
 	 * Returns the file entry ID of this cp attachment file entry.
 	 *
@@ -370,6 +416,16 @@ public class CPAttachmentFileEntryWrapper
 	@Override
 	public Date getModifiedDate() {
 		return model.getModifiedDate();
+	}
+
+	/**
+	 * Returns the mvcc version of this cp attachment file entry.
+	 *
+	 * @return the mvcc version of this cp attachment file entry
+	 */
+	@Override
+	public long getMvccVersion() {
+		return model.getMvccVersion();
 	}
 
 	/**
@@ -579,6 +635,16 @@ public class CPAttachmentFileEntryWrapper
 	}
 
 	/**
+	 * Returns <code>true</code> if this cp attachment file entry is cdn enabled.
+	 *
+	 * @return <code>true</code> if this cp attachment file entry is cdn enabled; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isCDNEnabled() {
+		return model.isCDNEnabled();
+	}
+
+	/**
 	 * Returns <code>true</code> if this cp attachment file entry is denied.
 	 *
 	 * @return <code>true</code> if this cp attachment file entry is denied; <code>false</code> otherwise
@@ -666,6 +732,26 @@ public class CPAttachmentFileEntryWrapper
 		throws com.liferay.portal.kernel.exception.LocaleException {
 
 		model.prepareLocalizedFieldsForImport(defaultImportLocale);
+	}
+
+	/**
+	 * Sets whether this cp attachment file entry is cdn enabled.
+	 *
+	 * @param cdnEnabled the cdn enabled of this cp attachment file entry
+	 */
+	@Override
+	public void setCDNEnabled(boolean cdnEnabled) {
+		model.setCDNEnabled(cdnEnabled);
+	}
+
+	/**
+	 * Sets the cdn url of this cp attachment file entry.
+	 *
+	 * @param cdnURL the cdn url of this cp attachment file entry
+	 */
+	@Override
+	public void setCDNURL(String cdnURL) {
+		model.setCDNURL(cdnURL);
 	}
 
 	@Override
@@ -801,6 +887,16 @@ public class CPAttachmentFileEntryWrapper
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		model.setModifiedDate(modifiedDate);
+	}
+
+	/**
+	 * Sets the mvcc version of this cp attachment file entry.
+	 *
+	 * @param mvccVersion the mvcc version of this cp attachment file entry
+	 */
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		model.setMvccVersion(mvccVersion);
 	}
 
 	/**

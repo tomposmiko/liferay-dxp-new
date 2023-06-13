@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -179,19 +180,14 @@ public class PageColumnDefinitionSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "columnViewports")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					ColumnViewport[] columnViewportsArray =
-						new ColumnViewport[jsonParserFieldValues.length];
-
-					for (int i = 0; i < columnViewportsArray.length; i++) {
-						columnViewportsArray[i] = ColumnViewportSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
 					pageColumnDefinition.setColumnViewports(
-						columnViewportsArray);
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> ColumnViewportSerDes.toDTO((String)object)
+						).toArray(
+							size -> new ColumnViewport[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "size")) {

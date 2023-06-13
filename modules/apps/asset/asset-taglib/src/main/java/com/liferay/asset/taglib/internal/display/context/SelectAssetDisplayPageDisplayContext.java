@@ -36,11 +36,11 @@ import com.liferay.layout.item.selector.criterion.LayoutItemSelectorCriterion;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryServiceUtil;
-import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanParamUtil;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -49,7 +49,6 @@ import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -57,11 +56,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-
-import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -96,9 +91,9 @@ public class SelectAssetDisplayPageDisplayContext {
 		_groupId = GetterUtil.getLong(
 			_httpServletRequest.getAttribute(
 				"liferay-asset:select-asset-display-page:groupId"));
-		_new = GetterUtil.getBoolean(
+		_parentClassPK = GetterUtil.getLong(
 			_httpServletRequest.getAttribute(
-				"liferay-asset:select-asset-display-page:new"));
+				"liferay-asset:select-asset-display-page:parentClassPK"));
 		_showPortletLayouts = GetterUtil.getBoolean(
 			_httpServletRequest.getAttribute(
 				"liferay-asset:select-asset-display-page:showPortletLayouts"));
@@ -127,7 +122,7 @@ public class SelectAssetDisplayPageDisplayContext {
 		return _assetDisplayPageId;
 	}
 
-	public String getAssetDisplayPageItemSelectorURL() throws PortalException {
+	public String getAssetDisplayPageItemSelectorURL() {
 		ItemSelector itemSelector = ItemSelectorUtil.getItemSelector();
 
 		List<ItemSelectorCriterion> itemSelectorCriteria = new ArrayList<>();
@@ -149,23 +144,31 @@ public class SelectAssetDisplayPageDisplayContext {
 			layoutItemSelectorCriterion.setCheckDisplayPage(true);
 			layoutItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 				new UUIDItemSelectorReturnType());
+			layoutItemSelectorCriterion.setShowBreadcrumb(false);
 			layoutItemSelectorCriterion.setShowHiddenPages(true);
 
 			itemSelectorCriteria.add(layoutItemSelectorCriterion);
 		}
 
-		PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(
-			RequestBackedPortletURLFactoryUtil.create(_liferayPortletRequest),
-			_eventName,
-			itemSelectorCriteria.toArray(new ItemSelectorCriterion[0]));
-
-		itemSelectorURL.setParameter("layoutUuid", getLayoutUuid());
-
-		return itemSelectorURL.toString();
+		return PortletURLBuilder.create(
+			itemSelector.getItemSelectorURL(
+				RequestBackedPortletURLFactoryUtil.create(
+					_liferayPortletRequest),
+				_eventName,
+				itemSelectorCriteria.toArray(new ItemSelectorCriterion[0]))
+		).buildString();
 	}
 
 	public int getAssetDisplayPageType() {
 		if (_displayPageType != null) {
+			return _displayPageType;
+		}
+
+		if ((_classPK == 0) && (_parentClassPK > 0) &&
+			inheritableDisplayPageTemplate()) {
+
+			_displayPageType = AssetDisplayPageConstants.TYPE_INHERITED;
+
 			return _displayPageType;
 		}
 
@@ -182,10 +185,7 @@ public class SelectAssetDisplayPageDisplayContext {
 			_getAssetDisplayPageEntry();
 
 		if (assetDisplayPageEntry == null) {
-			if (!_new) {
-				_displayPageType = AssetDisplayPageConstants.TYPE_NONE;
-			}
-			else if (Validator.isNull(getLayoutUuid())) {
+			if (Validator.isNull(getLayoutUuid())) {
 				_displayPageType = AssetDisplayPageConstants.TYPE_DEFAULT;
 			}
 			else {
@@ -246,7 +246,7 @@ public class SelectAssetDisplayPageDisplayContext {
 		}
 
 		if (selLayout != null) {
-			return _getLayoutBreadcrumb(selLayout);
+			return selLayout.getBreadcrumb(themeDisplay.getLocale());
 		}
 
 		return null;
@@ -278,9 +278,44 @@ public class SelectAssetDisplayPageDisplayContext {
 				viewInContextURL, "p_l_mode", Constants.PREVIEW);
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 
 		return StringPool.BLANK;
+	}
+
+	public boolean inheritableDisplayPageTemplate() {
+		if (_inheritableDisplayPageTemplate != null) {
+			return _inheritableDisplayPageTemplate;
+		}
+
+		if (_parentClassPK <= 0) {
+			_inheritableDisplayPageTemplate = false;
+
+			return _inheritableDisplayPageTemplate;
+		}
+
+		LayoutDisplayPageProviderTracker layoutDisplayPageProviderTracker =
+			LayoutDisplayPageProviderTrackerUtil.
+				getLayoutDisplayPageProviderTracker();
+
+		LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
+			layoutDisplayPageProviderTracker.
+				getLayoutDisplayPageProviderByClassName(
+					PortalUtil.getClassName(_classNameId));
+
+		boolean inheritableDisplayPageTemplate = false;
+
+		if (layoutDisplayPageProvider != null) {
+			inheritableDisplayPageTemplate =
+				layoutDisplayPageProvider.inheritable();
+		}
+
+		_inheritableDisplayPageTemplate = inheritableDisplayPageTemplate;
+
+		return _inheritableDisplayPageTemplate;
 	}
 
 	public boolean isAssetDisplayPageTypeDefault() {
@@ -333,11 +368,8 @@ public class SelectAssetDisplayPageDisplayContext {
 				layoutDisplayPageProvider.getLayoutDisplayPageObjectProvider(
 					infoItemReference);
 
-			if (layoutDisplayPageObjectProvider == null) {
-				return false;
-			}
-
-			if (!AssetDisplayPageUtil.hasAssetDisplayPage(
+			if ((layoutDisplayPageObjectProvider == null) ||
+				!AssetDisplayPageUtil.hasAssetDisplayPage(
 					themeDisplay.getScopeGroupId(),
 					layoutDisplayPageObjectProvider.getClassNameId(),
 					layoutDisplayPageObjectProvider.getClassPK(),
@@ -347,18 +379,18 @@ public class SelectAssetDisplayPageDisplayContext {
 			}
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 
 		return true;
 	}
 
 	public boolean isURLViewInContext() throws Exception {
-		if (_classPK == 0) {
-			return false;
-		}
-
-		if (Validator.isNull(getLayoutUuid()) &&
-			Validator.isNull(getURLViewInContext())) {
+		if ((_classPK == 0) ||
+			(Validator.isNull(getLayoutUuid()) &&
+			 Validator.isNull(getURLViewInContext()))) {
 
 			return false;
 		}
@@ -413,41 +445,8 @@ public class SelectAssetDisplayPageDisplayContext {
 		return _defaultLayoutPageTemplateEntry;
 	}
 
-	private String _getLayoutBreadcrumb(Layout layout) throws Exception {
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		Locale locale = themeDisplay.getLocale();
-
-		List<Layout> ancestors = layout.getAncestors();
-
-		StringBundler sb = new StringBundler((4 * ancestors.size()) + 5);
-
-		if (layout.isPrivateLayout()) {
-			sb.append(LanguageUtil.get(_httpServletRequest, "private-pages"));
-		}
-		else {
-			sb.append(LanguageUtil.get(_httpServletRequest, "public-pages"));
-		}
-
-		sb.append(StringPool.SPACE);
-		sb.append(StringPool.GREATER_THAN);
-		sb.append(StringPool.SPACE);
-
-		Collections.reverse(ancestors);
-
-		for (Layout ancestor : ancestors) {
-			sb.append(HtmlUtil.escape(ancestor.getName(locale)));
-			sb.append(StringPool.SPACE);
-			sb.append(StringPool.GREATER_THAN);
-			sb.append(StringPool.SPACE);
-		}
-
-		sb.append(HtmlUtil.escape(layout.getName(locale)));
-
-		return sb.toString();
-	}
+	private static final Log _log = LogFactoryUtil.getLog(
+		SelectAssetDisplayPageDisplayContext.class);
 
 	private AssetDisplayPageEntry _assetDisplayPageEntry;
 	private Long _assetDisplayPageId;
@@ -459,9 +458,10 @@ public class SelectAssetDisplayPageDisplayContext {
 	private final String _eventName;
 	private final long _groupId;
 	private final HttpServletRequest _httpServletRequest;
+	private Boolean _inheritableDisplayPageTemplate;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
-	private final boolean _new;
+	private final Long _parentClassPK;
 	private final boolean _showPortletLayouts;
 	private final boolean _showViewInContextLink;
 

@@ -41,6 +41,7 @@ import com.liferay.portal.security.service.access.policy.model.SAPEntrySoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -310,68 +311,90 @@ public class SAPEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<SAPEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, SAPEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<SAPEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<SAPEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			SAPEntry.class.getClassLoader(), SAPEntry.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("uuid", SAPEntry::getUuid);
-		attributeGetterFunctions.put("sapEntryId", SAPEntry::getSapEntryId);
-		attributeGetterFunctions.put("companyId", SAPEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", SAPEntry::getUserId);
-		attributeGetterFunctions.put("userName", SAPEntry::getUserName);
-		attributeGetterFunctions.put("createDate", SAPEntry::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", SAPEntry::getModifiedDate);
-		attributeGetterFunctions.put(
-			"allowedServiceSignatures", SAPEntry::getAllowedServiceSignatures);
-		attributeGetterFunctions.put(
-			"defaultSAPEntry", SAPEntry::getDefaultSAPEntry);
-		attributeGetterFunctions.put("enabled", SAPEntry::getEnabled);
-		attributeGetterFunctions.put("name", SAPEntry::getName);
-		attributeGetterFunctions.put("title", SAPEntry::getTitle);
+		try {
+			Constructor<SAPEntry> constructor =
+				(Constructor<SAPEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<SAPEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<SAPEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<SAPEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<SAPEntry, Object>>();
 		Map<String, BiConsumer<SAPEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<SAPEntry, ?>>();
 
+		attributeGetterFunctions.put("uuid", SAPEntry::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<SAPEntry, String>)SAPEntry::setUuid);
+		attributeGetterFunctions.put("sapEntryId", SAPEntry::getSapEntryId);
 		attributeSetterBiConsumers.put(
 			"sapEntryId", (BiConsumer<SAPEntry, Long>)SAPEntry::setSapEntryId);
+		attributeGetterFunctions.put("companyId", SAPEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<SAPEntry, Long>)SAPEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", SAPEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<SAPEntry, Long>)SAPEntry::setUserId);
+		attributeGetterFunctions.put("userName", SAPEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<SAPEntry, String>)SAPEntry::setUserName);
+		attributeGetterFunctions.put("createDate", SAPEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<SAPEntry, Date>)SAPEntry::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", SAPEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<SAPEntry, Date>)SAPEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"allowedServiceSignatures", SAPEntry::getAllowedServiceSignatures);
 		attributeSetterBiConsumers.put(
 			"allowedServiceSignatures",
 			(BiConsumer<SAPEntry, String>)
 				SAPEntry::setAllowedServiceSignatures);
+		attributeGetterFunctions.put(
+			"defaultSAPEntry", SAPEntry::getDefaultSAPEntry);
 		attributeSetterBiConsumers.put(
 			"defaultSAPEntry",
 			(BiConsumer<SAPEntry, Boolean>)SAPEntry::setDefaultSAPEntry);
+		attributeGetterFunctions.put("enabled", SAPEntry::getEnabled);
 		attributeSetterBiConsumers.put(
 			"enabled", (BiConsumer<SAPEntry, Boolean>)SAPEntry::setEnabled);
+		attributeGetterFunctions.put("name", SAPEntry::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<SAPEntry, String>)SAPEntry::setName);
+		attributeGetterFunctions.put("title", SAPEntry::getTitle);
 		attributeSetterBiConsumers.put(
 			"title", (BiConsumer<SAPEntry, String>)SAPEntry::setTitle);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -889,6 +912,34 @@ public class SAPEntryModelImpl
 	}
 
 	@Override
+	public SAPEntry cloneWithOriginalValues() {
+		SAPEntryImpl sapEntryImpl = new SAPEntryImpl();
+
+		sapEntryImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		sapEntryImpl.setSapEntryId(
+			this.<Long>getColumnOriginalValue("sapEntryId"));
+		sapEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		sapEntryImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		sapEntryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		sapEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		sapEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		sapEntryImpl.setAllowedServiceSignatures(
+			this.<String>getColumnOriginalValue("allowedServiceSignatures"));
+		sapEntryImpl.setDefaultSAPEntry(
+			this.<Boolean>getColumnOriginalValue("defaultSAPEntry"));
+		sapEntryImpl.setEnabled(
+			this.<Boolean>getColumnOriginalValue("enabled"));
+		sapEntryImpl.setName(this.<String>getColumnOriginalValue("name"));
+		sapEntryImpl.setTitle(this.<String>getColumnOriginalValue("title"));
+
+		return sapEntryImpl;
+	}
+
+	@Override
 	public int compareTo(SAPEntry sapEntry) {
 		long primaryKey = sapEntry.getPrimaryKey();
 
@@ -1119,9 +1170,7 @@ public class SAPEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, SAPEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					SAPEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

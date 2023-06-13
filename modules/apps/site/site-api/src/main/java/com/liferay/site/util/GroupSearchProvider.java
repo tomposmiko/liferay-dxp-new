@@ -223,11 +223,9 @@ public class GroupSearchProvider {
 		PermissionChecker permissionChecker =
 			themeDisplay.getPermissionChecker();
 
-		if (permissionChecker.isCompanyAdmin()) {
-			return false;
-		}
+		if (permissionChecker.isCompanyAdmin() ||
+			GroupPermissionUtil.contains(permissionChecker, ActionKeys.VIEW)) {
 
-		if (GroupPermissionUtil.contains(permissionChecker, ActionKeys.VIEW)) {
 			return false;
 		}
 

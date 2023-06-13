@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.util.Locale;
+import java.util.stream.Stream;
 
 /**
  * @author Marcela Cunha
@@ -51,6 +52,21 @@ public class DDMFormFieldTypeUtil {
 
 		return GetterUtil.getString(
 			ddmFormFieldRenderingContext.getProperty(propertyName));
+	}
+
+	public static String[] getPropertyValues(
+		DDMFormField ddmFormField, Locale locale, String propertyName) {
+
+		return Stream.of(
+			(Object[])ddmFormField.getProperty(propertyName)
+		).map(
+			LocalizedValue.class::cast
+		).map(
+			localizedValue -> GetterUtil.getString(
+				localizedValue.getString(locale))
+		).toArray(
+			String[]::new
+		);
 	}
 
 	public static String getValue(String valueString) {

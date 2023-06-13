@@ -53,15 +53,15 @@ public class CommerceWishListItemUpgradeProcess extends UpgradeProcess {
 			CommerceWishListItemModelImpl.class,
 			CommerceWishListItemModelImpl.TABLE_NAME, "CProductId", "LONG");
 
-		try (PreparedStatement ps = connection.prepareStatement(
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"update CommerceWishListItem set CProductId = ?," +
 					"CPInstanceUuid = ? where CPInstanceId = ?");
 			Statement s = connection.createStatement();
-			ResultSet rs = s.executeQuery(
+			ResultSet resultSet = s.executeQuery(
 				"select distinct CPInstanceId from CommerceWishListItem")) {
 
-			while (rs.next()) {
-				long cpInstanceId = rs.getLong("CPInstanceId");
+			while (resultSet.next()) {
+				long cpInstanceId = resultSet.getLong("CPInstanceId");
 
 				CPInstance cpInstance = _cpInstanceLocalService.getCPInstance(
 					cpInstanceId);
@@ -70,12 +70,12 @@ public class CommerceWishListItemUpgradeProcess extends UpgradeProcess {
 					_cpDefinitionLocalService.getCPDefinition(
 						cpInstance.getCPDefinitionId());
 
-				ps.setLong(1, cpDefinition.getCProductId());
+				preparedStatement.setLong(1, cpDefinition.getCProductId());
 
-				ps.setString(2, cpInstance.getCPInstanceUuid());
-				ps.setLong(3, cpInstanceId);
+				preparedStatement.setString(2, cpInstance.getCPInstanceUuid());
+				preparedStatement.setLong(3, cpInstanceId);
 
-				ps.execute();
+				preparedStatement.execute();
 			}
 		}
 

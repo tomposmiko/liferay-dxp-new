@@ -41,23 +41,21 @@ public class SetPropertyFunctionTest extends PowerMockito {
 
 	@Test
 	public void testApply() {
-		SetPropertyFunction<Boolean> setPropertyFunction =
-			new SetMultipleFunction();
+		SetMultipleFunction setMultipleFunction = new SetMultipleFunction();
 
-		DefaultDDMExpressionObserver defaultDDMExpressionObserver =
-			new DefaultDDMExpressionObserver();
+		DefaultDDMExpressionObserver spyDefaultDDMExpressionObserver = spy(
+			new DefaultDDMExpressionObserver());
 
-		DefaultDDMExpressionObserver spy = spy(defaultDDMExpressionObserver);
+		setMultipleFunction.setDDMExpressionObserver(
+			spyDefaultDDMExpressionObserver);
 
-		setPropertyFunction.setDDMExpressionObserver(spy);
-
-		Boolean result = setPropertyFunction.apply("field", true);
+		Boolean result = setMultipleFunction.apply("field", true);
 
 		ArgumentCaptor<UpdateFieldPropertyRequest> argumentCaptor =
 			ArgumentCaptor.forClass(UpdateFieldPropertyRequest.class);
 
 		Mockito.verify(
-			spy, Mockito.times(1)
+			spyDefaultDDMExpressionObserver, Mockito.times(1)
 		).updateFieldProperty(
 			argumentCaptor.capture()
 		);
@@ -78,10 +76,9 @@ public class SetPropertyFunctionTest extends PowerMockito {
 
 	@Test
 	public void testNullObserver() {
-		SetPropertyFunction<Boolean> setPropertyFunction =
-			new SetEnabledFunction();
+		SetEnabledFunction setEnabledFunction = new SetEnabledFunction();
 
-		Assert.assertFalse(setPropertyFunction.apply("field", true));
+		Assert.assertFalse(setEnabledFunction.apply("field", true));
 	}
 
 }

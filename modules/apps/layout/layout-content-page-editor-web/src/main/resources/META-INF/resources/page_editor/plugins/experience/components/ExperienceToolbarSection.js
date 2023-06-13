@@ -16,7 +16,8 @@ import React, {useEffect, useMemo} from 'react';
 
 import togglePermissions from '../../../app/actions/togglePermission';
 import {config} from '../../../app/config/index';
-import {useDispatch, useSelector} from '../../../app/store/index';
+import {useDispatch, useSelector} from '../../../app/contexts/StoreContext';
+import selectSegmentsExperienceId from '../../../app/selectors/selectSegmentsExperienceId';
 import ExperienceSelector from './ExperienceSelector';
 
 // TODO: show how to colocate CSS with plugins (may use loaders)
@@ -26,10 +27,7 @@ export default function ExperienceToolbarSection({selectId}) {
 		(state) => state.availableSegmentsExperiences
 	);
 	const dispatch = useDispatch();
-
-	const segmentsExperienceId = useSelector(
-		(state) => state.segmentsExperienceId
-	);
+	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
 
 	const experiences = useMemo(
 		() =>
@@ -77,7 +75,7 @@ export default function ExperienceToolbarSection({selectId}) {
 	}, [dispatch, selectedExperience.hasLockedSegmentsExperiment]);
 
 	return (
-		<div className="mr-2 page-editor__toolbar-experience">
+		<div className="page-editor__toolbar-experience">
 			<label className="d-lg-block d-none mr-2" htmlFor={selectId}>
 				{Liferay.Language.get('experience')}
 			</label>

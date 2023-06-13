@@ -5,11 +5,9 @@ definition {
 			Click(locator1 = "Blogs#ADD_BLOGS_ENTRY");
 		}
 		else {
-			var key_text = "New Entry";
-
-			AssertClick(
-				locator1 = "Button#ANY",
-				value1 = "New Entry");
+			Click(
+				key_text = "New Entry",
+				locator1 = "Button#ANY");
 		}
 
 		AssertVisible(locator1 = "BlogsEntry#ENTRY_COVER_IMAGE_SELECT_FILE");
@@ -22,10 +20,10 @@ definition {
 	}
 
 	macro gotoBlogsEntryPermissionsCP {
-		Pause(locator = 1000);
+		Pause(locator = "1000");
 
 		LexiconCard.clickEllipsisItem(
-			card = ${entryTitle},
+			card = "${entryTitle}",
 			item = "Permissions");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
@@ -35,7 +33,7 @@ definition {
 		Portlet.mouseOverPortletTitle(portletTitleName = "Blogs");
 
 		Blogs.clickEllipsisItemPG(
-			entryTitle = ${entryTitle},
+			entryTitle = "${entryTitle}",
 			item = "Permissions");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
@@ -58,12 +56,12 @@ definition {
 	macro gotoEditCP {
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
-		var key_entryTitle = ${entryTitle};
+		var key_entryTitle = "${entryTitle}";
 
-		Blogs.viewEntryTitle(entryTitle = ${entryTitle});
+		Blogs.viewEntryTitle(entryTitle = "${entryTitle}");
 
 		Click(
-			key_listEntry = ${entryTitle},
+			key_listEntry = "${entryTitle}",
 			locator1 = "LexiconList#LIST_ENTRY_ELLIPSIS");
 
 		MenuItem.click(menuItem = "Edit");
@@ -76,11 +74,11 @@ definition {
 	}
 
 	macro gotoEditPG {
-		var key_entryTitle = ${entryTitle};
+		var key_entryTitle = "${entryTitle}";
 
 		AssertTextEquals(
 			locator1 = "BlogsEntry#TITLE",
-			value1 = ${entryTitle});
+			value1 = "${entryTitle}");
 
 		if (IsElementPresent(locator1 = "Button#EDIT_PENCIL")) {
 			Click(locator1 = "Button#EDIT_PENCIL");
@@ -89,85 +87,84 @@ definition {
 			Portlet.mouseOverPortletTitle(portletTitleName = "Blogs");
 
 			Blogs.clickEllipsisItemPG(
-				entryTitle = ${entryTitle},
+				entryTitle = "${entryTitle}",
 				item = "Edit");
 		}
 
-		if (isSet(coverImageName)) {
-			AssertElementPresent(locator1 = "BlogsEntry#ENTRY_COVER_IMAGE_CAPTION");
-		}
-		else {
-			AssertVisible(locator1 = "BlogsEntry#ENTRY_COVER_IMAGE_SELECT_FILE");
-		}
+		AssertVisible(
+			key_text = "Title",
+			locator1 = "TextArea#ANY");
 	}
 
 	macro gotoEntryCP {
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
-		var key_entryTitle = ${entryTitle};
+		var key_entryTitle = "${entryTitle}";
 
 		if (isSet(entryStatus)) {
 			AssertTextEquals(
 				locator1 = "Blogs#DESCRIPTIVE_VIEW_ENTRY_STATUS",
-				value1 = ${entryStatus});
+				value1 = "${entryStatus}");
 		}
 
-		LexiconList.clickListEntryTitle(listEntry = ${entryTitle});
+		LexiconList.clickListEntryTitle(listEntry = "${entryTitle}");
 	}
 
 	macro gotoEntryPG {
-		var key_entryContent = ${entryContent};
-		var key_entryTitle = ${entryTitle};
+		var key_entryContent = "${entryContent}";
+		var key_entryTitle = "${entryTitle}";
 
 		AssertTextEquals(
 			locator1 = "BlogsEntry#TITLE",
-			value1 = ${entryTitle});
+			value1 = "${entryTitle}");
 
 		AssertTextEquals(
 			locator1 = "BlogsEntry#CONTENT",
-			value1 = ${entryContent});
+			value1 = "${entryContent}");
 
 		AssertClick.assertTextClickAt(
 			locator1 = "BlogsEntry#TITLE_LINK",
-			value1 = ${entryTitle});
+			value1 = "${entryTitle}");
 	}
 
 	macro gotoEntryWithAbstractPG {
-		var key_entryAbstractDescription = ${entryAbstractDescription};
-		var key_entryTitle = ${entryTitle};
+		var key_entryAbstractDescription = "${entryAbstractDescription}";
+		var key_entryTitle = "${entryTitle}";
 
 		AssertTextEquals(
 			locator1 = "BlogsEntry#TITLE",
-			value1 = ${entryTitle});
+			value1 = "${entryTitle}");
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "BlogsEntry#CONTENT_ABSTRACT",
-			value1 = ${entryAbstractDescription});
+			value1 = "${entryAbstractDescription}");
 
 		AssertClick(
 			locator1 = "BlogsEntry#TITLE_LINK",
-			value1 = ${entryTitle});
+			value1 = "${entryTitle}");
 	}
 
 	macro gotoPG {
-		var key_entryTitle = ${entryTitle};
+		var key_entryTitle = "${entryTitle}";
 
 		if (isSet(blogEntryURL)) {
-			AssertLocation(value1 = ${blogEntryURL});
+			AssertLocation(value1 = "${blogEntryURL}");
 		}
 		else {
 			Click(
 				locator1 = "BlogsEntry#TITLE_LINK",
-				value1 = ${entryTitle});
+				value1 = "${entryTitle}");
 		}
 
 		AssertTextEquals(
 			locator1 = "BlogsEntry#TITLE",
-			value1 = ${entryTitle});
+			value1 = "${entryTitle}");
 	}
 
 	macro gotoSelectFile {
-		Pause(locator1 = 5000);
+		WaitForElementPresent(
+			locator1 = "BlogsEntry#ENTRY_COVER_IMAGE_SELECT_FILE",
+			value1 = "Select File");
 
 		AssertClick(
 			locator1 = "BlogsEntry#ENTRY_COVER_IMAGE_SELECT_FILE",
@@ -179,18 +176,18 @@ definition {
 
 		LexiconEntry.gotoEntryMenuItem(
 			menuItem = "Share",
-			rowEntry = ${entryTitle});
+			rowEntry = "${entryTitle}");
 	}
 
 	macro moveToRecycleBinCP {
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
-		var key_entryTitle = ${entryTitle};
+		var key_entryTitle = "${entryTitle}";
 
-		Blogs.viewEntryTitle(entryTitle = ${entryTitle});
+		Blogs.viewEntryTitle(entryTitle = "${entryTitle}");
 
 		Click(
-			key_listEntry = ${entryTitle},
+			key_listEntry = "${entryTitle}",
 			locator1 = "LexiconList#LIST_ENTRY_ELLIPSIS");
 
 		ClickNoError(
@@ -201,17 +198,76 @@ definition {
 	}
 
 	macro openBlogsAdmin {
-		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_blogs_web_portlet_BlogsAdminPortlet");
+		Navigator.openWithAppendToBaseURL(
+			baseURL = "${baseURL}",
+			urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_blogs_web_portlet_BlogsAdminPortlet");
 	}
 
-	macro openToAddEntry {
-		var baseURL = ${baseURL};
+	// You can use this navigation when you need to access the configuration quickly without checking the UI.
 
-		if (!(isSet(baseURL))) {
+	macro openToAddEntry {
+		var baseURL = "${baseURL}";
+
+		if (contains("${baseURL}", "{baseURL}")) {
 			var baseURL = PropsUtil.get("portal.url");
 		}
 
-		Open(locator1 = "${baseURL}/group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_blogs_web_portlet_BlogsAdminPortlet&_com_liferay_blogs_web_portlet_BlogsAdminPortlet_mvcRenderCommandName=%2Fblogs%2Fedit_entry");
+		// Entries accessed in site pages will be redirected back to the page after publishing. Those accessed in admin will stay in admin after publishing.
+
+		if (isSet(layoutName)) {
+			Open(locator1 = "${baseURL}/group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_blogs_web_portlet_BlogsAdminPortlet&_com_liferay_blogs_web_portlet_BlogsAdminPortlet_mvcRenderCommandName=%2Fblogs%2Fedit_entry&_com_liferay_blogs_web_portlet_BlogsAdminPortlet_redirect=http%3A%2F%2F${baseURL}%3A8080%2Fweb%2F${siteURLKey}%2F${layoutName}");
+		}
+		else {
+			Open(locator1 = "${baseURL}/group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_blogs_web_portlet_BlogsAdminPortlet&_com_liferay_blogs_web_portlet_BlogsAdminPortlet_mvcRenderCommandName=%2Fblogs%2Fedit_entry");
+		}
+	}
+
+	macro openToBlogEntry {
+		var baseURL = "${baseURL}";
+
+		if (contains("${baseURL}", "{baseURL}")) {
+			var baseURL = PropsUtil.get("portal.url");
+		}
+
+		Open(locator1 = "${baseURL}/web/${siteURLKey}/${layoutName}/-/blogs/${entryTitle}");
+	}
+
+	macro openToEditEntryInSite {
+		var entryId = JSONBlog.getBlogEntryId(
+			entryTitle = "${entryTitle}",
+			friendlyURL = "${friendlyURL}",
+			groupName = "${groupName}",
+			site = "${site}");
+
+		var baseURL = "${baseURL}";
+
+		if (contains("${baseURL}", "{baseURL}")) {
+			var baseURL = PropsUtil.get("portal.url");
+		}
+
+		Open(locator1 = "${baseURL}/group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_blogs_web_portlet_BlogsAdminPortlet&p_p_lifecycle=0&p_p_state=maximized&refererPlid=12&_com_liferay_blogs_web_portlet_BlogsAdminPortlet_mvcRenderCommandName=%2Fblogs%2Fedit_entry&_com_liferay_blogs_web_portlet_BlogsAdminPortlet_entryId=${entryId}");
+	}
+
+	macro openToNotPublishedTab {
+		Navigator.openWithAppendToBaseURL(urlAppend = "web/${siteURLKey}/${layoutName}?p_p_id=com_liferay_blogs_web_portlet_BlogsPortlet&_com_liferay_blogs_web_portlet_BlogsPortlet_mvcRenderCommandName=%2Fblogs%2Fview_not_published_entries");
+	}
+
+	macro openToStagingCP {
+		if (!(isSet(site))) {
+			var site = "true";
+		}
+
+		var stagingId = JSONGroupAPI._getGroupIdByName(
+			groupName = "${groupName}",
+			site = "${site}");
+
+		var baseURL = "${baseURL}";
+
+		if (contains("${baseURL}", "{baseURL}")) {
+			var baseURL = PropsUtil.get("portal.url");
+		}
+
+		Open(locator1 = "${baseURL}/group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_blogs_web_portlet_BlogsAdminPortlet&p_v_l_s_g_id=${stagingId}");
 	}
 
 }

@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -240,63 +241,85 @@ public class AssetLinkModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<AssetLink, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, AssetLink>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<AssetLink, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<AssetLink, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AssetLink.class.getClassLoader(), AssetLink.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", AssetLink::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", AssetLink::getCtCollectionId);
-		attributeGetterFunctions.put("linkId", AssetLink::getLinkId);
-		attributeGetterFunctions.put("companyId", AssetLink::getCompanyId);
-		attributeGetterFunctions.put("userId", AssetLink::getUserId);
-		attributeGetterFunctions.put("userName", AssetLink::getUserName);
-		attributeGetterFunctions.put("createDate", AssetLink::getCreateDate);
-		attributeGetterFunctions.put("entryId1", AssetLink::getEntryId1);
-		attributeGetterFunctions.put("entryId2", AssetLink::getEntryId2);
-		attributeGetterFunctions.put("type", AssetLink::getType);
-		attributeGetterFunctions.put("weight", AssetLink::getWeight);
+		try {
+			Constructor<AssetLink> constructor =
+				(Constructor<AssetLink>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<AssetLink, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<AssetLink, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<AssetLink, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AssetLink, Object>>();
 		Map<String, BiConsumer<AssetLink, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<AssetLink, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", AssetLink::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AssetLink, Long>)AssetLink::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", AssetLink::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<AssetLink, Long>)AssetLink::setCtCollectionId);
+		attributeGetterFunctions.put("linkId", AssetLink::getLinkId);
 		attributeSetterBiConsumers.put(
 			"linkId", (BiConsumer<AssetLink, Long>)AssetLink::setLinkId);
+		attributeGetterFunctions.put("companyId", AssetLink::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<AssetLink, Long>)AssetLink::setCompanyId);
+		attributeGetterFunctions.put("userId", AssetLink::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<AssetLink, Long>)AssetLink::setUserId);
+		attributeGetterFunctions.put("userName", AssetLink::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<AssetLink, String>)AssetLink::setUserName);
+		attributeGetterFunctions.put("createDate", AssetLink::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<AssetLink, Date>)AssetLink::setCreateDate);
+		attributeGetterFunctions.put("entryId1", AssetLink::getEntryId1);
 		attributeSetterBiConsumers.put(
 			"entryId1", (BiConsumer<AssetLink, Long>)AssetLink::setEntryId1);
+		attributeGetterFunctions.put("entryId2", AssetLink::getEntryId2);
 		attributeSetterBiConsumers.put(
 			"entryId2", (BiConsumer<AssetLink, Long>)AssetLink::setEntryId2);
+		attributeGetterFunctions.put("type", AssetLink::getType);
 		attributeSetterBiConsumers.put(
 			"type", (BiConsumer<AssetLink, Integer>)AssetLink::setType);
+		attributeGetterFunctions.put("weight", AssetLink::getWeight);
 		attributeSetterBiConsumers.put(
 			"weight", (BiConsumer<AssetLink, Integer>)AssetLink::setWeight);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -580,6 +603,32 @@ public class AssetLinkModelImpl
 	}
 
 	@Override
+	public AssetLink cloneWithOriginalValues() {
+		AssetLinkImpl assetLinkImpl = new AssetLinkImpl();
+
+		assetLinkImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		assetLinkImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		assetLinkImpl.setLinkId(this.<Long>getColumnOriginalValue("linkId"));
+		assetLinkImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		assetLinkImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		assetLinkImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		assetLinkImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		assetLinkImpl.setEntryId1(
+			this.<Long>getColumnOriginalValue("entryId1"));
+		assetLinkImpl.setEntryId2(
+			this.<Long>getColumnOriginalValue("entryId2"));
+		assetLinkImpl.setType(this.<Integer>getColumnOriginalValue("type_"));
+		assetLinkImpl.setWeight(this.<Integer>getColumnOriginalValue("weight"));
+
+		return assetLinkImpl;
+	}
+
+	@Override
 	public int compareTo(AssetLink assetLink) {
 		int value = 0;
 
@@ -777,9 +826,7 @@ public class AssetLinkModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AssetLink>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AssetLink.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

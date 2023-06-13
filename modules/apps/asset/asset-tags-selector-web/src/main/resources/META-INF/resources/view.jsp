@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <clay:management-toolbar
-	displayContext="<%= new AssetTagsSelectorManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, assetTagsSelectorDisplayContext) %>"
+	managementToolbarDisplayContext="<%= new AssetTagsSelectorManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, assetTagsSelectorDisplayContext) %>"
 />
 
 <clay:container-fluid>
@@ -50,44 +50,3 @@
 		/>
 	</liferay-ui:search-container>
 </clay:container-fluid>
-
-<aui:script use="liferay-search-container">
-	var searchContainer = Liferay.SearchContainer.get('<portlet:namespace />tags');
-
-	var searchContainerData = searchContainer.getData(true);
-
-	var selectedTagNames = <%= JSONFactoryUtil.serialize(assetTagsSelectorDisplayContext.getSelectedTagNames()) %>;
-
-	selectedTagNames = selectedTagNames.filter(function (tag) {
-		return searchContainerData.indexOf(tag) === -1;
-	});
-
-	searchContainer.on('rowToggled', function (event) {
-		var items = '';
-
-		var selectedItems = event.elements.allSelectedElements;
-
-		if (selectedItems.size() > 0) {
-			var selections = selectedTagNames.concat(selectedItems.attr('value'));
-
-			var uniqueSelections = [];
-
-			Array.prototype.forEach.call(selections, function (selection) {
-				if (!uniqueSelections.includes(selection)) {
-					uniqueSelections.push(selection);
-				}
-			});
-
-			items = uniqueSelections.join(',');
-		}
-
-		Liferay.Util.getOpener().Liferay.fire(
-			'<%= HtmlUtil.escapeJS(assetTagsSelectorDisplayContext.getEventName()) %>',
-			{
-				data: {
-					items: items,
-				},
-			}
-		);
-	});
-</aui:script>

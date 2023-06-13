@@ -32,11 +32,6 @@ AUI.add(
 
 		var SpreadSheet = A.Component.create({
 			ATTRS: {
-				addRecordURL: {
-					validator: Lang.isString,
-					value: STR_EMPTY,
-				},
-
 				portletNamespace: {
 					validator: Lang.isString,
 					value: STR_EMPTY,
@@ -71,7 +66,7 @@ AUI.add(
 			NAME: A.DataTable.Base.NAME,
 
 			TYPE_EDITOR: {
-				checkbox: A.CheckboxCellEditor,
+				'checkbox': A.CheckboxCellEditor,
 				'ddm-color':
 					FormBuilder.CUSTOM_CELL_EDITORS['color-cell-editor'],
 				'ddm-date': A.DateCellEditor,
@@ -84,28 +79,22 @@ AUI.add(
 				'ddm-link-to-page':
 					FormBuilder.CUSTOM_CELL_EDITORS['link-to-page-cell-editor'],
 				'ddm-number': A.TextCellEditor,
-				radio: A.RadioCellEditor,
-				select: A.DropDownCellEditor,
-				text: A.TextCellEditor,
-				textarea: A.TextAreaCellEditor,
+				'radio': A.RadioCellEditor,
+				'select': A.DropDownCellEditor,
+				'text': A.TextCellEditor,
+				'textarea': A.TextAreaCellEditor,
 			},
 
-			addRecord(
-				addRecordURL,
-				callback,
-				ddmFormValues,
-				displayIndex,
-				portletNamespace,
-				recordsetId
-			) {
+			addRecord(recordsetId, displayIndex, fieldsMap, callback) {
 				var instance = this;
 
 				callback = (callback && A.bind(callback, instance)) || EMPTY_FN;
 
-				A.io.request(addRecordURL, {
-					data: Liferay.Util.ns(portletNamespace, {
-						ddmFormValues: JSON.stringify(ddmFormValues),
+				Liferay.Service(
+					'/ddl.ddlrecord/add-record',
+					{
 						displayIndex,
+						fieldsMap: JSON.stringify(fieldsMap),
 						groupId: themeDisplay.getScopeGroupId(),
 						recordSetId: recordsetId,
 						serviceContext: JSON.stringify({
@@ -113,15 +102,9 @@ AUI.add(
 							userId: themeDisplay.getUserId(),
 							workflowAction: Liferay.Workflow.ACTION_PUBLISH,
 						}),
-					}),
-					dataType: 'JSON',
-					method: 'POST',
-					on: {
-						success() {
-							callback();
-						},
 					},
-				});
+					callback
+				);
 			},
 
 			buildDataTableColumns(columns, locale, structure, editable) {
@@ -181,8 +164,8 @@ AUI.add(
 							return checkedValue;
 						};
 
-						item.formatter = function (obj) {
-							var data = obj.data;
+						item.formatter = function (object) {
+							var data = object.data;
 
 							var value = data[name];
 
@@ -224,8 +207,8 @@ AUI.add(
 							});
 						};
 
-						item.formatter = function (obj) {
-							var data = obj.data;
+						item.formatter = function (object) {
+							var data = object.data;
 
 							var value = data[name];
 
@@ -253,8 +236,8 @@ AUI.add(
 							return numberValue;
 						};
 
-						item.formatter = function (obj) {
-							var data = obj.data;
+						item.formatter = function (object) {
+							var data = object.data;
 
 							var value = A.DataType.Number.parse(data[name]);
 
@@ -266,8 +249,8 @@ AUI.add(
 						};
 					}
 					else if (type === 'ddm-documentlibrary') {
-						item.formatter = function (obj) {
-							var data = obj.data;
+						item.formatter = function (object) {
+							var data = object.data;
 
 							var label = STR_EMPTY;
 							var value = data[name];
@@ -286,8 +269,8 @@ AUI.add(
 						};
 					}
 					else if (type === 'ddm-link-to-page') {
-						item.formatter = function (obj) {
-							var data = obj.data;
+						item.formatter = function (object) {
+							var data = object.data;
 
 							var label = STR_EMPTY;
 							var value = data[name];
@@ -333,8 +316,8 @@ AUI.add(
 							locale
 						);
 
-						item.formatter = function (obj) {
-							var data = obj.data;
+						item.formatter = function (object) {
+							var data = object.data;
 
 							var label = [];
 							var value = data[name];
@@ -355,8 +338,8 @@ AUI.add(
 					else if (type === 'textarea') {
 						item.allowHTML = true;
 
-						item.formatter = function (obj) {
-							var data = obj.data;
+						item.formatter = function (object) {
+							var data = object.data;
 
 							var value = data[name];
 
@@ -669,18 +652,16 @@ AUI.add(
 						}
 						else {
 							SpreadSheet.addRecord(
-								instance.get('addRecordURL'),
+								recordsetId,
+								recordIndex,
+								fieldsMap,
 								(json) => {
 									if (json.recordId > 0) {
 										record.set('recordId', json.recordId, {
 											silent: true,
 										});
 									}
-								},
-								fieldsMap,
-								recordIndex,
-								instance.get('portletNamespace'),
-								recordsetId
+								}
 							);
 						}
 					}
@@ -706,10 +687,11 @@ AUI.add(
 								A.bind(this._sort, this)
 							);
 
-							var facade = A.merge(options, {
+							var facade = {
+								...options,
 								models,
 								src: 'sort',
-							});
+							};
 
 							if (options.silent) {
 								this._defResetFn(facade);
@@ -783,6 +765,7 @@ AUI.add(
 
 				callback = (callback && A.bind(callback, instance)) || EMPTY_FN;
 
+				// eslint-disable-next-line @liferay/aui/no-io
 				A.io.request(updateRecordURL, {
 					data: Liferay.Util.ns(portletNamespace, {
 						ddmFormValues: JSON.stringify(ddmFormValues),

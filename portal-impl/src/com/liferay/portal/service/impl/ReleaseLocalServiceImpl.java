@@ -54,10 +54,10 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 			release = releasePersistence.create(releaseId);
 		}
 
-		Date now = new Date();
+		Date date = new Date();
 
-		release.setCreateDate(now);
-		release.setModifiedDate(now);
+		release.setCreateDate(date);
+		release.setModifiedDate(date);
 
 		release.setServletContextName(servletContextName);
 		release.setBuildNumber(buildNumber);
@@ -86,10 +86,10 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 			release = releasePersistence.create(releaseId);
 		}
 
-		Date now = new Date();
+		Date date = new Date();
 
-		release.setCreateDate(now);
-		release.setModifiedDate(now);
+		release.setCreateDate(date);
+		release.setModifiedDate(date);
 
 		release.setServletContextName(servletContextName);
 		release.setSchemaVersion(schemaVersion);
@@ -271,15 +271,12 @@ public class ReleaseLocalServiceImpl extends ReleaseLocalServiceBaseImpl {
 		}
 
 		if (!previousSchemaVersion.equals(currentSchemaVersion)) {
-			StringBundler sb = new StringBundler(5);
-
-			sb.append("Unable to update release because the previous schema ");
-			sb.append("version ");
-			sb.append(previousSchemaVersion);
-			sb.append(" does not match the expected schema version ");
-			sb.append(currentSchemaVersion);
-
-			throw new IllegalStateException(sb.toString());
+			throw new IllegalStateException(
+				StringBundler.concat(
+					"Unable to update release because the previous schema ",
+					"version ", previousSchemaVersion,
+					" does not match the expected schema version ",
+					currentSchemaVersion));
 		}
 
 		release.setSchemaVersion(schemaVersion);

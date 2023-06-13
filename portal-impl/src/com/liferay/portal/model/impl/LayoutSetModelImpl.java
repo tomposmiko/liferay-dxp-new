@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -319,89 +320,111 @@ public class LayoutSetModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<LayoutSet, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, LayoutSet>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<LayoutSet, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<LayoutSet, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			LayoutSet.class.getClassLoader(), LayoutSet.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", LayoutSet::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", LayoutSet::getCtCollectionId);
-		attributeGetterFunctions.put("layoutSetId", LayoutSet::getLayoutSetId);
-		attributeGetterFunctions.put("groupId", LayoutSet::getGroupId);
-		attributeGetterFunctions.put("companyId", LayoutSet::getCompanyId);
-		attributeGetterFunctions.put("createDate", LayoutSet::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", LayoutSet::getModifiedDate);
-		attributeGetterFunctions.put(
-			"privateLayout", LayoutSet::getPrivateLayout);
-		attributeGetterFunctions.put("logoId", LayoutSet::getLogoId);
-		attributeGetterFunctions.put("themeId", LayoutSet::getThemeId);
-		attributeGetterFunctions.put(
-			"colorSchemeId", LayoutSet::getColorSchemeId);
-		attributeGetterFunctions.put("css", LayoutSet::getCss);
-		attributeGetterFunctions.put("settings", LayoutSet::getSettings);
-		attributeGetterFunctions.put(
-			"layoutSetPrototypeUuid", LayoutSet::getLayoutSetPrototypeUuid);
-		attributeGetterFunctions.put(
-			"layoutSetPrototypeLinkEnabled",
-			LayoutSet::getLayoutSetPrototypeLinkEnabled);
+		try {
+			Constructor<LayoutSet> constructor =
+				(Constructor<LayoutSet>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<LayoutSet, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<LayoutSet, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<LayoutSet, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<LayoutSet, Object>>();
 		Map<String, BiConsumer<LayoutSet, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<LayoutSet, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", LayoutSet::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<LayoutSet, Long>)LayoutSet::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", LayoutSet::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<LayoutSet, Long>)LayoutSet::setCtCollectionId);
+		attributeGetterFunctions.put("layoutSetId", LayoutSet::getLayoutSetId);
 		attributeSetterBiConsumers.put(
 			"layoutSetId",
 			(BiConsumer<LayoutSet, Long>)LayoutSet::setLayoutSetId);
+		attributeGetterFunctions.put("groupId", LayoutSet::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<LayoutSet, Long>)LayoutSet::setGroupId);
+		attributeGetterFunctions.put("companyId", LayoutSet::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<LayoutSet, Long>)LayoutSet::setCompanyId);
+		attributeGetterFunctions.put("createDate", LayoutSet::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<LayoutSet, Date>)LayoutSet::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", LayoutSet::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<LayoutSet, Date>)LayoutSet::setModifiedDate);
+		attributeGetterFunctions.put(
+			"privateLayout", LayoutSet::getPrivateLayout);
 		attributeSetterBiConsumers.put(
 			"privateLayout",
 			(BiConsumer<LayoutSet, Boolean>)LayoutSet::setPrivateLayout);
+		attributeGetterFunctions.put("logoId", LayoutSet::getLogoId);
 		attributeSetterBiConsumers.put(
 			"logoId", (BiConsumer<LayoutSet, Long>)LayoutSet::setLogoId);
+		attributeGetterFunctions.put("themeId", LayoutSet::getThemeId);
 		attributeSetterBiConsumers.put(
 			"themeId", (BiConsumer<LayoutSet, String>)LayoutSet::setThemeId);
+		attributeGetterFunctions.put(
+			"colorSchemeId", LayoutSet::getColorSchemeId);
 		attributeSetterBiConsumers.put(
 			"colorSchemeId",
 			(BiConsumer<LayoutSet, String>)LayoutSet::setColorSchemeId);
+		attributeGetterFunctions.put("css", LayoutSet::getCss);
 		attributeSetterBiConsumers.put(
 			"css", (BiConsumer<LayoutSet, String>)LayoutSet::setCss);
+		attributeGetterFunctions.put("settings", LayoutSet::getSettings);
 		attributeSetterBiConsumers.put(
 			"settings", (BiConsumer<LayoutSet, String>)LayoutSet::setSettings);
+		attributeGetterFunctions.put(
+			"layoutSetPrototypeUuid", LayoutSet::getLayoutSetPrototypeUuid);
 		attributeSetterBiConsumers.put(
 			"layoutSetPrototypeUuid",
 			(BiConsumer<LayoutSet, String>)
 				LayoutSet::setLayoutSetPrototypeUuid);
+		attributeGetterFunctions.put(
+			"layoutSetPrototypeLinkEnabled",
+			LayoutSet::getLayoutSetPrototypeLinkEnabled);
 		attributeSetterBiConsumers.put(
 			"layoutSetPrototypeLinkEnabled",
 			(BiConsumer<LayoutSet, Boolean>)
 				LayoutSet::setLayoutSetPrototypeLinkEnabled);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -818,6 +841,42 @@ public class LayoutSetModelImpl
 	}
 
 	@Override
+	public LayoutSet cloneWithOriginalValues() {
+		LayoutSetImpl layoutSetImpl = new LayoutSetImpl();
+
+		layoutSetImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		layoutSetImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		layoutSetImpl.setLayoutSetId(
+			this.<Long>getColumnOriginalValue("layoutSetId"));
+		layoutSetImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		layoutSetImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		layoutSetImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		layoutSetImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		layoutSetImpl.setPrivateLayout(
+			this.<Boolean>getColumnOriginalValue("privateLayout"));
+		layoutSetImpl.setLogoId(this.<Long>getColumnOriginalValue("logoId"));
+		layoutSetImpl.setThemeId(
+			this.<String>getColumnOriginalValue("themeId"));
+		layoutSetImpl.setColorSchemeId(
+			this.<String>getColumnOriginalValue("colorSchemeId"));
+		layoutSetImpl.setCss(this.<String>getColumnOriginalValue("css"));
+		layoutSetImpl.setSettings(
+			this.<String>getColumnOriginalValue("settings_"));
+		layoutSetImpl.setLayoutSetPrototypeUuid(
+			this.<String>getColumnOriginalValue("layoutSetPrototypeUuid"));
+		layoutSetImpl.setLayoutSetPrototypeLinkEnabled(
+			this.<Boolean>getColumnOriginalValue(
+				"layoutSetPrototypeLinkEnabled"));
+
+		return layoutSetImpl;
+	}
+
+	@Override
 	public int compareTo(LayoutSet layoutSet) {
 		long primaryKey = layoutSet.getPrimaryKey();
 
@@ -1068,9 +1127,7 @@ public class LayoutSetModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, LayoutSet>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					LayoutSet.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

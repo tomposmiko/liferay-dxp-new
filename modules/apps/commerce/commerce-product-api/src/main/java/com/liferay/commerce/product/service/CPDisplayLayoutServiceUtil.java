@@ -36,33 +36,12 @@ public class CPDisplayLayoutServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.commerce.product.service.impl.CPDisplayLayoutServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x)
-	 */
-	@Deprecated
 	public static CPDisplayLayout addCPDisplayLayout(
-			Class<?> clazz, long classPK, String layoutUuid,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+			long groupId, Class<?> clazz, long classPK, String layoutUuid)
 		throws PortalException {
 
 		return getService().addCPDisplayLayout(
-			clazz, classPK, layoutUuid, serviceContext);
-	}
-
-	public static CPDisplayLayout addCPDisplayLayout(
-			long userId, long groupId, Class<?> clazz, long classPK,
-			String layoutUuid)
-		throws PortalException {
-
-		return getService().addCPDisplayLayout(
-			userId, groupId, clazz, classPK, layoutUuid);
-	}
-
-	public static void deleteCPDisplayLayout(Class<?> clazz, long classPK)
-		throws PortalException {
-
-		getService().deleteCPDisplayLayout(clazz, classPK);
+			groupId, clazz, classPK, layoutUuid);
 	}
 
 	public static void deleteCPDisplayLayout(long cpDisplayLayoutId)
@@ -97,11 +76,11 @@ public class CPDisplayLayoutServiceUtil {
 	}
 
 	public static CPDisplayLayout updateCPDisplayLayout(
-			long cpDisplayLayoutId, String layoutUuid)
+			long cpDisplayLayoutId, long classPK, String layoutUuid)
 		throws PortalException {
 
 		return getService().updateCPDisplayLayout(
-			cpDisplayLayoutId, layoutUuid);
+			cpDisplayLayoutId, classPK, layoutUuid);
 	}
 
 	public static CPDisplayLayoutService getService() {

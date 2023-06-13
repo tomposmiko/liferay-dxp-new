@@ -501,6 +501,10 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 			return doValidateSchemaVersion(schemaVersion);
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return false;
 		}
 	}
@@ -671,6 +675,10 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 			return document.formattedString();
 		}
 		catch (IOException ioException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(ioException, ioException);
+			}
+
 			return StringPool.BLANK;
 		}
 	}

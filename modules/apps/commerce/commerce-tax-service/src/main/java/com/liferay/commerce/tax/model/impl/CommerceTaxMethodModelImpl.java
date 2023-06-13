@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -82,18 +83,20 @@ public class CommerceTaxMethodModelImpl
 	public static final String TABLE_NAME = "CommerceTaxMethod";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"commerceTaxMethodId", Types.BIGINT}, {"groupId", Types.BIGINT},
-		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
-		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
-		{"modifiedDate", Types.TIMESTAMP}, {"name", Types.VARCHAR},
-		{"description", Types.VARCHAR}, {"engineKey", Types.VARCHAR},
-		{"percentage", Types.BOOLEAN}, {"active_", Types.BOOLEAN}
+		{"mvccVersion", Types.BIGINT}, {"commerceTaxMethodId", Types.BIGINT},
+		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
+		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
+		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
+		{"name", Types.VARCHAR}, {"description", Types.VARCHAR},
+		{"engineKey", Types.VARCHAR}, {"percentage", Types.BOOLEAN},
+		{"active_", Types.BOOLEAN}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("commerceTaxMethodId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -109,7 +112,7 @@ public class CommerceTaxMethodModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CommerceTaxMethod (commerceTaxMethodId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null,description STRING null,engineKey VARCHAR(75) null,percentage BOOLEAN,active_ BOOLEAN)";
+		"create table CommerceTaxMethod (mvccVersion LONG default 0 not null,commerceTaxMethodId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null,description STRING null,engineKey VARCHAR(75) null,percentage BOOLEAN,active_ BOOLEAN)";
 
 	public static final String TABLE_SQL_DROP = "drop table CommerceTaxMethod";
 
@@ -183,6 +186,7 @@ public class CommerceTaxMethodModelImpl
 
 		CommerceTaxMethod model = new CommerceTaxMethodImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setCommerceTaxMethodId(soapModel.getCommerceTaxMethodId());
 		model.setGroupId(soapModel.getGroupId());
 		model.setCompanyId(soapModel.getCompanyId());
@@ -313,96 +317,139 @@ public class CommerceTaxMethodModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CommerceTaxMethod>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceTaxMethod.class.getClassLoader(), CommerceTaxMethod.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<CommerceTaxMethod> constructor =
+				(Constructor<CommerceTaxMethod>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<CommerceTaxMethod, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CommerceTaxMethod, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceTaxMethod, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceTaxMethod, Object>>();
-
-		attributeGetterFunctions.put(
-			"commerceTaxMethodId", CommerceTaxMethod::getCommerceTaxMethodId);
-		attributeGetterFunctions.put("groupId", CommerceTaxMethod::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceTaxMethod::getCompanyId);
-		attributeGetterFunctions.put("userId", CommerceTaxMethod::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceTaxMethod::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceTaxMethod::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceTaxMethod::getModifiedDate);
-		attributeGetterFunctions.put("name", CommerceTaxMethod::getName);
-		attributeGetterFunctions.put(
-			"description", CommerceTaxMethod::getDescription);
-		attributeGetterFunctions.put(
-			"engineKey", CommerceTaxMethod::getEngineKey);
-		attributeGetterFunctions.put(
-			"percentage", CommerceTaxMethod::getPercentage);
-		attributeGetterFunctions.put("active", CommerceTaxMethod::getActive);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CommerceTaxMethod, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceTaxMethod, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<CommerceTaxMethod, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CommerceTaxMethod::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CommerceTaxMethod, Long>)
+				CommerceTaxMethod::setMvccVersion);
+		attributeGetterFunctions.put(
+			"commerceTaxMethodId", CommerceTaxMethod::getCommerceTaxMethodId);
 		attributeSetterBiConsumers.put(
 			"commerceTaxMethodId",
 			(BiConsumer<CommerceTaxMethod, Long>)
 				CommerceTaxMethod::setCommerceTaxMethodId);
+		attributeGetterFunctions.put("groupId", CommerceTaxMethod::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceTaxMethod, Long>)CommerceTaxMethod::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceTaxMethod::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceTaxMethod, Long>)
 				CommerceTaxMethod::setCompanyId);
+		attributeGetterFunctions.put("userId", CommerceTaxMethod::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceTaxMethod, Long>)CommerceTaxMethod::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceTaxMethod::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceTaxMethod, String>)
 				CommerceTaxMethod::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceTaxMethod::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceTaxMethod, Date>)
 				CommerceTaxMethod::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceTaxMethod::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceTaxMethod, Date>)
 				CommerceTaxMethod::setModifiedDate);
+		attributeGetterFunctions.put("name", CommerceTaxMethod::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommerceTaxMethod, String>)CommerceTaxMethod::setName);
+		attributeGetterFunctions.put(
+			"description", CommerceTaxMethod::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<CommerceTaxMethod, String>)
 				CommerceTaxMethod::setDescription);
+		attributeGetterFunctions.put(
+			"engineKey", CommerceTaxMethod::getEngineKey);
 		attributeSetterBiConsumers.put(
 			"engineKey",
 			(BiConsumer<CommerceTaxMethod, String>)
 				CommerceTaxMethod::setEngineKey);
+		attributeGetterFunctions.put(
+			"percentage", CommerceTaxMethod::getPercentage);
 		attributeSetterBiConsumers.put(
 			"percentage",
 			(BiConsumer<CommerceTaxMethod, Boolean>)
 				CommerceTaxMethod::setPercentage);
+		attributeGetterFunctions.put("active", CommerceTaxMethod::getActive);
 		attributeSetterBiConsumers.put(
 			"active",
 			(BiConsumer<CommerceTaxMethod, Boolean>)
 				CommerceTaxMethod::setActive);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@JSON
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@JSON
@@ -991,6 +1038,7 @@ public class CommerceTaxMethodModelImpl
 		CommerceTaxMethodImpl commerceTaxMethodImpl =
 			new CommerceTaxMethodImpl();
 
+		commerceTaxMethodImpl.setMvccVersion(getMvccVersion());
 		commerceTaxMethodImpl.setCommerceTaxMethodId(getCommerceTaxMethodId());
 		commerceTaxMethodImpl.setGroupId(getGroupId());
 		commerceTaxMethodImpl.setCompanyId(getCompanyId());
@@ -1005,6 +1053,41 @@ public class CommerceTaxMethodModelImpl
 		commerceTaxMethodImpl.setActive(isActive());
 
 		commerceTaxMethodImpl.resetOriginalValues();
+
+		return commerceTaxMethodImpl;
+	}
+
+	@Override
+	public CommerceTaxMethod cloneWithOriginalValues() {
+		CommerceTaxMethodImpl commerceTaxMethodImpl =
+			new CommerceTaxMethodImpl();
+
+		commerceTaxMethodImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		commerceTaxMethodImpl.setCommerceTaxMethodId(
+			this.<Long>getColumnOriginalValue("commerceTaxMethodId"));
+		commerceTaxMethodImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		commerceTaxMethodImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commerceTaxMethodImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commerceTaxMethodImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commerceTaxMethodImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commerceTaxMethodImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commerceTaxMethodImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		commerceTaxMethodImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		commerceTaxMethodImpl.setEngineKey(
+			this.<String>getColumnOriginalValue("engineKey"));
+		commerceTaxMethodImpl.setPercentage(
+			this.<Boolean>getColumnOriginalValue("percentage"));
+		commerceTaxMethodImpl.setActive(
+			this.<Boolean>getColumnOriginalValue("active_"));
 
 		return commerceTaxMethodImpl;
 	}
@@ -1083,6 +1166,8 @@ public class CommerceTaxMethodModelImpl
 	public CacheModel<CommerceTaxMethod> toCacheModel() {
 		CommerceTaxMethodCacheModel commerceTaxMethodCacheModel =
 			new CommerceTaxMethodCacheModel();
+
+		commerceTaxMethodCacheModel.mvccVersion = getMvccVersion();
 
 		commerceTaxMethodCacheModel.commerceTaxMethodId =
 			getCommerceTaxMethodId();
@@ -1234,12 +1319,11 @@ public class CommerceTaxMethodModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CommerceTaxMethod>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CommerceTaxMethod.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private long _commerceTaxMethodId;
 	private long _groupId;
 	private long _companyId;
@@ -1285,6 +1369,7 @@ public class CommerceTaxMethodModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("commerceTaxMethodId", _commerceTaxMethodId);
 		_columnOriginalValues.put("groupId", _groupId);
 		_columnOriginalValues.put("companyId", _companyId);
@@ -1320,29 +1405,31 @@ public class CommerceTaxMethodModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("commerceTaxMethodId", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("groupId", 2L);
+		columnBitmasks.put("commerceTaxMethodId", 2L);
 
-		columnBitmasks.put("companyId", 4L);
+		columnBitmasks.put("groupId", 4L);
 
-		columnBitmasks.put("userId", 8L);
+		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("userName", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("createDate", 32L);
+		columnBitmasks.put("userName", 32L);
 
-		columnBitmasks.put("modifiedDate", 64L);
+		columnBitmasks.put("createDate", 64L);
 
-		columnBitmasks.put("name", 128L);
+		columnBitmasks.put("modifiedDate", 128L);
 
-		columnBitmasks.put("description", 256L);
+		columnBitmasks.put("name", 256L);
 
-		columnBitmasks.put("engineKey", 512L);
+		columnBitmasks.put("description", 512L);
 
-		columnBitmasks.put("percentage", 1024L);
+		columnBitmasks.put("engineKey", 1024L);
 
-		columnBitmasks.put("active_", 2048L);
+		columnBitmasks.put("percentage", 2048L);
+
+		columnBitmasks.put("active_", 4096L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

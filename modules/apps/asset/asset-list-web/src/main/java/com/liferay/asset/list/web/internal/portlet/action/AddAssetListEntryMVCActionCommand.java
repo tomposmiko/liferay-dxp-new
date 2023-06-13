@@ -19,11 +19,11 @@ import com.liferay.asset.list.constants.AssetListPortletKeys;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryService;
 import com.liferay.asset.list.web.internal.handler.AssetListEntryExceptionRequestHandler;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
-import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
-import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -119,24 +118,23 @@ public class AddAssetListEntryMVCActionCommand extends BaseMVCActionCommand {
 		ActionRequest actionRequest, ActionResponse actionResponse,
 		AssetListEntry assetListEntry) {
 
-		LiferayPortletResponse liferayPortletResponse =
-			_portal.getLiferayPortletResponse(actionResponse);
+		return PortletURLBuilder.createRenderURL(
+			_portal.getLiferayPortletResponse(actionResponse)
+		).setMVCPath(
+			"/edit_asset_list_entry.jsp"
+		).setBackURL(
+			() -> {
+				String backURL = ParamUtil.getString(actionRequest, "backURL");
 
-		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+				if (backURL != null) {
+					return backURL;
+				}
 
-		portletURL.setParameter("mvcPath", "/edit_asset_list_entry.jsp");
-
-		String backURL = ParamUtil.getString(actionRequest, "backURL");
-
-		if (backURL != null) {
-			portletURL.setParameter("backURL", backURL);
-		}
-
-		portletURL.setParameter(
-			"assetListEntryId",
-			String.valueOf(assetListEntry.getAssetListEntryId()));
-
-		return portletURL.toString();
+				return null;
+			}
+		).setParameter(
+			"assetListEntryId", assetListEntry.getAssetListEntryId()
+		).buildString();
 	}
 
 	@Reference

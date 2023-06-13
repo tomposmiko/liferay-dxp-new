@@ -38,53 +38,57 @@ if (cpOptionValue != null) {
 
 <portlet:actionURL name="/cp_options/edit_cp_option_value" var="editProductOptionValueActionURL" />
 
-<aui:form action="<%= editProductOptionValueActionURL %>" cssClass="container-fluid-1280" method="post" name="optionValueFm">
-	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= (cpOptionValue == null) ? Constants.ADD : Constants.UPDATE %>" />
-	<aui:input name="cpOptionId" type="hidden" value="<%= cpOptionId %>" />
-	<aui:input name="cpOptionValueId" type="hidden" value="<%= cpOptionValueId %>" />
+<liferay-frontend:side-panel-content
+	title='<%= LanguageUtil.format(request, "edit-x", cpOptionValue.getName(), false) %>'
+>
+	<aui:form action="<%= editProductOptionValueActionURL %>" method="post" name="fm">
+		<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= (cpOptionValue == null) ? Constants.ADD : Constants.UPDATE %>" />
+		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
+		<aui:input name="cpOptionId" type="hidden" value="<%= cpOptionId %>" />
+		<aui:input name="cpOptionValueId" type="hidden" value="<%= cpOptionValueId %>" />
 
-	<div class="lfr-form-content">
-		<liferay-ui:error-marker
-			key="<%= WebKeys.ERROR_SECTION %>"
-			value="product-option-value-details"
-		/>
+		<liferay-ui:error exception="<%= CPOptionValueKeyException.class %>" message="price-type-cannot-be-changed-for-the-current-option-value-setup" />
 
-		<aui:model-context bean="<%= cpOptionValue %>" model="<%= CPOptionValue.class %>" />
+		<commerce-ui:panel
+			title='<%= LanguageUtil.get(request, "details") %>'
+		>
+			<liferay-ui:error-marker
+				key="<%= WebKeys.ERROR_SECTION %>"
+				value="product-option-value-details"
+			/>
 
-		<liferay-ui:error exception="<%= CPOptionValueKeyException.class %>" focusField="key" message="that-key-is-already-being-used" />
+			<aui:model-context bean="<%= cpOptionValue %>" model="<%= CPOptionValue.class %>" />
 
-		<aui:fieldset>
-			<aui:input id="optionValueName" name="name" wrapperCssClass="commerce-product-option-value-title" />
+			<liferay-ui:error exception="<%= CPOptionValueKeyException.class %>" focusField="key" message="that-key-is-already-being-used" />
 
-			<aui:input name="priority" />
-
-			<aui:input helpMessage="key-help" name="key" />
-		</aui:fieldset>
-
-		<c:if test="<%= CustomAttributesUtil.hasCustomAttributes(company.getCompanyId(), CPOptionValue.class.getName(), cpOptionValueId, null) %>">
 			<aui:fieldset>
-				<liferay-expando:custom-attribute-list
-					className="<%= CPOptionValue.class.getName() %>"
-					classPK="<%= (cpOptionValue != null) ? cpOptionValue.getCPOptionValueId() : 0 %>"
-					editable="<%= true %>"
-					label="<%= true %>"
-				/>
+				<aui:input helpMessage="key-help" id="key" name="key" />
+
+				<aui:input id="name" name="name" wrapperCssClass="commerce-product-option-value-title" />
+
+				<aui:input label="position" name="priority" />
 			</aui:fieldset>
-		</c:if>
 
-		<c:if test="<%= cpOptionValue == null %>">
-			<aui:script require="commerce-frontend-js/utilities/debounce as debounce, commerce-frontend-js/utilities/slugify as slugify">
-				var form = document.getElementById('<portlet:namespace />optionValueFm');
+			<c:if test="<%= CustomAttributesUtil.hasCustomAttributes(company.getCompanyId(), CPOptionValue.class.getName(), cpOptionValueId, null) %>">
+				<aui:fieldset>
+					<liferay-expando:custom-attribute-list
+						className="<%= CPOptionValue.class.getName() %>"
+						classPK="<%= (cpOptionValue != null) ? cpOptionValue.getCPOptionValueId() : 0 %>"
+						editable="<%= true %>"
+						label="<%= true %>"
+					/>
+				</aui:fieldset>
+			</c:if>
 
-				var keyInput = form.querySelector('#<portlet:namespace />key');
-				var nameInput = form.querySelector('#<portlet:namespace />optionValueName');
+			<liferay-frontend:component
+				module="js/edit_cp_option_and_value"
+			/>
+		</commerce-ui:panel>
 
-				var handleOnNameInput = function () {
-					keyInput.value = slugify.default(nameInput.value);
-				};
+		<aui:button-row>
+			<aui:button cssClass="btn-lg" type="submit" value="save" />
 
-				nameInput.addEventListener('input', debounce.default(handleOnNameInput, 200));
-			</aui:script>
-		</c:if>
-	</div>
-</aui:form>
+			<aui:button cssClass="btn-lg" type="cancel" />
+		</aui:button-row>
+	</aui:form>
+</liferay-frontend:side-panel-content>

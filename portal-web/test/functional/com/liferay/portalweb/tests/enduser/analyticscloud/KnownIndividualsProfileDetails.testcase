@@ -1,7 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property custom.properties = "jsonws.web.service.paths.excludes=";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -26,22 +25,17 @@ definition {
 
 		task ("Add a new user") {
 			JSONUser.addUser(
-				birthdayDay = 10,
-				birthdayMonth = 10,
-				birthdayYear = 2020,
+				birthdayDay = "10",
+				birthdayMonth = "10",
+				birthdayYear = "2020",
 				userEmailAddress = "user1@liferay.com",
 				userFirstName = "user1",
 				userLastName = "user1",
 				userScreenName = "user1");
-
-			JSONUser.setFirstPassword(
-				agreeToTermsAndAnswerReminderQuery = "true",
-				requireReset = "false",
-				userEmailAddress = "user1@liferay.com");
 		}
 
 		task ("Connect the DXP to AC") {
-			ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
 	}
 
@@ -50,7 +44,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -63,11 +57,11 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8938 | Test Summary: All attributes of the individual appear in a list"
-	@priority = 5
+	@priority = "5"
 	test AllIndividualAttributesAppearInList {
-		property portal.upstream = "quarantine";
-
-		// AC Refactor ticket: LRAC-9707
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
 		task ("Sign in as new user to view the site page") {
 			User.logoutAndLoginPG(
@@ -86,7 +80,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Go to the Individual > KnownIndividual > Details") {
@@ -101,7 +95,7 @@ definition {
 
 		task ("Assert attributes appear in list and assert some attribute values") {
 			for (var individualAttribute : list "birthDate,classPK,contactId,createDate,email,familyName,givenName,modifiedDate") {
-				ACIndividualsDashboard.assertIndividualAttribute(key_individualAttribute = ${individualAttribute});
+				ACIndividualsDashboard.assertIndividualAttribute(key_individualAttribute = "${individualAttribute}");
 			}
 
 			ACIndividualsDashboard.assertIndividualAttributeValue(
@@ -112,7 +106,7 @@ definition {
 
 			ACIndividualsDashboard.assertIndividualAttributeValue(
 				individualAttribute = "classPK",
-				individualAttributeValue = ${userId});
+				individualAttributeValue = "${userId}");
 
 			ACIndividualsDashboard.assertIndividualAttributeValue(
 				individualAttribute = "email",
@@ -129,8 +123,12 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8939 | Test Summary: Assert Individuals details search result displays correct number"
-	@priority = 3
+	@priority = "3"
 	test AssertIndividualsSearchDetailsResult {
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
 		task ("Sign in as new user to view the site page") {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "user1@liferay.com",
@@ -148,7 +146,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Go to the Individual > KnownIndividual > Details") {
@@ -165,21 +163,21 @@ definition {
 			ACUtils.searchBar(searchItem = "Name");
 
 			ACUtils.viewSearchResultsInfo(
-				count = 2,
+				count = "2",
 				searchTerm = '''"Name"''');
 
 			for (var individualAttribute : list "familyName,givenName") {
-				ACIndividualsDashboard.assertIndividualAttribute(key_individualAttribute = ${individualAttribute});
+				ACIndividualsDashboard.assertIndividualAttribute(key_individualAttribute = "${individualAttribute}");
 			}
 
 			for (var individualAttribute : list "birthDate,classPK,contactId,createDate,email,modifiedDate") {
-				ACIndividualsDashboard.assertNoIndividualAttribute(key_individualAttribute = ${individualAttribute});
+				ACIndividualsDashboard.assertNoIndividualAttribute(key_individualAttribute = "${individualAttribute}");
 			}
 
 			ACUtils.searchBar(searchItem = "Should not be here");
 
 			ACUtils.viewSearchResultsInfo(
-				count = 0,
+				count = "0",
 				searchTerm = '''"Should not be here"''');
 
 			AssertTextEquals(
@@ -190,9 +188,13 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8938 | Test Summary: Order an Individual's Details"
-	@priority = 3
+	@priority = "3"
 	test OrderIndividualDetails {
 		property portal.upstream = "quarantine";
+
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
 		task ("Sign in as new user to view the site page") {
 			User.logoutAndLoginPG(
@@ -211,7 +213,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Go to the Individual > KnownIndividual > Details") {

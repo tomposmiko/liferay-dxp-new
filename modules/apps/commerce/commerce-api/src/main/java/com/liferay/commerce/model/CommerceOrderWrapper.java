@@ -45,6 +45,7 @@ public class CommerceOrderWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("commerceOrderId", getCommerceOrderId());
@@ -56,6 +57,7 @@ public class CommerceOrderWrapper
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("commerceAccountId", getCommerceAccountId());
 		attributes.put("commerceCurrencyId", getCommerceCurrencyId());
+		attributes.put("commerceOrderTypeId", getCommerceOrderTypeId());
 		attributes.put("billingAddressId", getBillingAddressId());
 		attributes.put("shippingAddressId", getShippingAddressId());
 		attributes.put(
@@ -174,6 +176,12 @@ public class CommerceOrderWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -239,6 +247,12 @@ public class CommerceOrderWrapper
 
 		if (commerceCurrencyId != null) {
 			setCommerceCurrencyId(commerceCurrencyId);
+		}
+
+		Long commerceOrderTypeId = (Long)attributes.get("commerceOrderTypeId");
+
+		if (commerceOrderTypeId != null) {
+			setCommerceOrderTypeId(commerceOrderTypeId);
 		}
 
 		Long billingAddressId = (Long)attributes.get("billingAddressId");
@@ -655,6 +669,11 @@ public class CommerceOrderWrapper
 		}
 	}
 
+	@Override
+	public CommerceOrder cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
 	/**
 	 * Returns the advance status of this commerce order.
 	 *
@@ -750,6 +769,16 @@ public class CommerceOrderWrapper
 	@Override
 	public int getCommerceOrderItemsCount(long cpInstanceId) {
 		return model.getCommerceOrderItemsCount(cpInstanceId);
+	}
+
+	/**
+	 * Returns the commerce order type ID of this commerce order.
+	 *
+	 * @return the commerce order type ID of this commerce order
+	 */
+	@Override
+	public long getCommerceOrderTypeId() {
+		return model.getCommerceOrderTypeId();
 	}
 
 	/**
@@ -857,6 +886,16 @@ public class CommerceOrderWrapper
 	@Override
 	public Date getModifiedDate() {
 		return model.getModifiedDate();
+	}
+
+	/**
+	 * Returns the mvcc version of this commerce order.
+	 *
+	 * @return the mvcc version of this commerce order
+	 */
+	@Override
+	public long getMvccVersion() {
+		return model.getMvccVersion();
 	}
 
 	/**
@@ -1658,6 +1697,16 @@ public class CommerceOrderWrapper
 	}
 
 	/**
+	 * Sets the commerce order type ID of this commerce order.
+	 *
+	 * @param commerceOrderTypeId the commerce order type ID of this commerce order
+	 */
+	@Override
+	public void setCommerceOrderTypeId(long commerceOrderTypeId) {
+		model.setCommerceOrderTypeId(commerceOrderTypeId);
+	}
+
+	/**
 	 * Sets the commerce payment method key of this commerce order.
 	 *
 	 * @param commercePaymentMethodKey the commerce payment method key of this commerce order
@@ -1755,6 +1804,16 @@ public class CommerceOrderWrapper
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		model.setModifiedDate(modifiedDate);
+	}
+
+	/**
+	 * Sets the mvcc version of this commerce order.
+	 *
+	 * @param mvccVersion the mvcc version of this commerce order
+	 */
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		model.setMvccVersion(mvccVersion);
 	}
 
 	/**

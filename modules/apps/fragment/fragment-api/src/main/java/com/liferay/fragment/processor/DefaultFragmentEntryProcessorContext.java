@@ -51,6 +51,11 @@ public class DefaultFragmentEntryProcessorContext
 	}
 
 	@Override
+	public String getFragmentElementId() {
+		return _fragmentElementId;
+	}
+
+	@Override
 	public HttpServletRequest getHttpServletRequest() {
 		return _httpServletRequest;
 	}
@@ -95,17 +100,16 @@ public class DefaultFragmentEntryProcessorContext
 		return _segmentsEntryIds;
 	}
 
-	@Override
-	public long[] getSegmentsExperienceIds() {
-		return null;
-	}
-
 	public void setDisplayObject(Object object) {
 		_displayObject = object;
 	}
 
 	public void setFieldValues(Map<String, Object> fieldValues) {
 		_fieldValues = fieldValues;
+	}
+
+	public void setFragmentElementId(String fragmentElementId) {
+		_fragmentElementId = fragmentElementId;
 	}
 
 	public void setPreviewClassNameId(long previewClassNameId) {
@@ -128,11 +132,9 @@ public class DefaultFragmentEntryProcessorContext
 		_segmentsEntryIds = segmentsEntryIds;
 	}
 
-	public void setSegmentsExperienceIds(long[] segmentsExperienceIds) {
-	}
-
 	private Object _displayObject;
 	private Map<String, Object> _fieldValues;
+	private String _fragmentElementId;
 	private final HttpServletRequest _httpServletRequest;
 	private final HttpServletResponse _httpServletResponse;
 	private final Locale _locale;

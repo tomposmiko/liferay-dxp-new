@@ -46,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
-	configurationPid = "com.liferay.commerce.notification.internal.configuration.CommerceNotificationQueueEntryConfiguration",
+	configurationPid = "com.liferay.commerce.notification.internal.configuration.CommerceNotificationQueueConfiguration",
 	enabled = false, immediate = true,
 	service = CheckCommerceNotificationQueueEntryMessageListener.class
 )
@@ -101,11 +101,11 @@ public class CheckCommerceNotificationQueueEntryMessageListener
 		int deleteInterval =
 			_commerceNotificationQueueEntryConfiguration.deleteInterval();
 
-		Date now = new Date(
+		Date date = new Date(
 			System.currentTimeMillis() - (deleteInterval * Time.MINUTE));
 
 		_commerceNotificationQueueEntryLocalService.
-			deleteCommerceNotificationQueueEntries(now);
+			deleteCommerceNotificationQueueEntries(date);
 	}
 
 	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
@@ -116,7 +116,7 @@ public class CheckCommerceNotificationQueueEntryMessageListener
 	private static final Log _log = LogFactoryUtil.getLog(
 		CheckCommerceNotificationQueueEntryMessageListener.class);
 
-	private CommerceNotificationQueueEntryConfiguration
+	private volatile CommerceNotificationQueueEntryConfiguration
 		_commerceNotificationQueueEntryConfiguration;
 
 	@Reference

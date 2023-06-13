@@ -19,7 +19,6 @@ Export-Package:\
 	\
 	!aQute.lib.filter,\
 	\
-	!com.liferay.portal.aspectj,\
 	!com.liferay.portal.cache.thread.local,\
 	!com.liferay.portal.dao.jdbc.aop,\
 	!com.liferay.portal.fabric,\
@@ -55,7 +54,6 @@ Export-Package:\
 	!com.liferay.portal.tools.sourceformatter,\
 	!com.liferay.portal.tools.sql,\
 	!com.liferay.portal.velocity,\
-	!com.liferay.portal.xuggler,\
 	!com.liferay.portlet.documentlibrary.sharepoint,\
 	!com.liferay.portlet.layoutsadmin.lar,\
 	!com.liferay.portlet.sitesadmin.lar,\
@@ -79,6 +77,7 @@ Export-Package:\
 	!license.html,\
 	\
 	!org.apache.html.*,\
+	!org.apache.log4j.lf5.*,\
 	!org.apache.wml.*,\
 	\
 	!org.jcp.xml.*,\
@@ -113,22 +112,18 @@ Export-Package:\
 	\
 	com.sun.security.auth.module,\
 	\
-	com.thoughtworks.xstream.*;version='1.4.19',\
+	com.thoughtworks.xstream.*;version='1.4.17',\
 	\
-	io.netty.*;version='4.1',\
+	io.netty.*,\
 	\
 	java_cup.runtime.*;version='2.7.1',\
-	\
-	javassist.util.proxy;version='3.29.0.GA',\
-	\
-	javax.jms.*;version='1.1',\
 	\
 	javax.jws;version='1.1',\
 	javax.jws.soap;version='1.1',\
 	\
 	javax.mail.*;version='1.6.6',\
 	\
-	javax.persistence.*;version='2.1',\
+	javax.persistence.*;version='2.2.1',\
 	\
 	javax.portlet.*;version='2.0',\
 	\
@@ -227,10 +222,20 @@ Export-Package:\
 	org.apache.commons.logging;version="1.2",\
 	org.apache.commons.logging.impl;version="1.2",\
 	org.apache.commons.validator.routines;version='1.5.1',\
-	org.apache.log4j;version='1.2.19',\
-	org.apache.log4j.rolling;version='1.2.17',\
-	org.apache.log4j.spi;version='1.2.19',\
-	org.apache.log4j.xml;version='1.2.19',\
+	org.apache.log4j;version='2.17.0',\
+	org.apache.log4j.spi;version='2.17.0',\
+	org.apache.logging.log4j;version='2.17.0',\
+	org.apache.logging.log4j.core;version='2.17.0',\
+	org.apache.logging.log4j.core.appender;version='2.17.0',\
+	org.apache.logging.log4j.core.config;version='2.17.0',\
+	org.apache.logging.log4j.core.config.composite;version='2.17.0',\
+	org.apache.logging.log4j.core.config.xml;version='2.17.0',\
+	org.apache.logging.log4j.core.impl;version='2.17.0',\
+	org.apache.logging.log4j.core.layout;version='2.17.0',\
+	org.apache.logging.log4j.core.selector;version='2.17.0',\
+	org.apache.logging.log4j.core.util;version='2.17.0',\
+	org.apache.logging.log4j.message;version='2.17.0',\
+	org.apache.logging.log4j.spi;version='2.17.0',\
 	org.apache.naming.java,\
 	org.apache.regexp;version='2.7.1',\
 	org.apache.tika.*;version='1.26.0',\
@@ -245,8 +250,6 @@ Export-Package:\
 	org.apache.xml.utils.*;version='2.7.1',\
 	org.apache.xmlcommons;version='1.4.01',\
 	org.apache.xpath.*;version='2.7.1',\
-	\
-	org.aspectj.*,\
 	\
 	org.dom4j.*;version='2.1.3',\
 	\
@@ -312,18 +315,14 @@ Provide-Capability:\
 -includeresource:\
 	-@lib/com.liferay.portal.app.license.api.jar,\
 	@../../../lib/development/activation.jar,\
-	@../../../lib/development/jms.jar,\
 	@../../../lib/development/mail.jar,\
-	@../../../lib/development/persistence.jar,\
 	@../../../lib/development/servlet-api.jar,\
-	@../../../lib/global/portlet.jar,\
 	@../../../lib/portal/ant.jar,\
 	@../../../lib/portal/asm-analysis.jar,\
 	@../../../lib/portal/asm-commons.jar,\
 	@../../../lib/portal/asm-tree.jar,\
 	@../../../lib/portal/asm-util.jar,\
 	@../../../lib/portal/asm.jar,\
-	@../../../lib/portal/aspectj-rt.jar,\
 	@../../../lib/portal/ccpp.jar,\
 	@../../../lib/portal/commons-beanutils.jar,\
 	@../../../lib/portal/commons-chain.jar,\
@@ -334,9 +333,7 @@ Provide-Capability:\
 	@../../../lib/portal/commons-lang.jar,\
 	@../../../lib/portal/commons-logging.jar,\
 	@../../../lib/portal/dom4j.jar,\
-	@../../../lib/portal/hibernate-commons-annotations.jar,\
 	@../../../lib/portal/hibernate-core.jar,\
-	@../../../lib/portal/javassist.jar,\
 	@../../../lib/portal/jaxen.jar,\
 	@../../../lib/portal/jaxrpc.jar,\
 	@../../../lib/portal/jdom2.jar!/org/**,\
@@ -345,16 +342,13 @@ Provide-Capability:\
 	@../../../lib/portal/jodd-util.jar,\
 	@../../../lib/portal/json-java.jar,\
 	@../../../lib/portal/liferay-icu4j.jar,\
-	@../../../lib/portal/log4j-extras.jar,\
+	@../../../lib/portal/log4j-1.2-api.jar,\
+	@../../../lib/portal/log4j-api.jar,\
+	@../../../lib/portal/log4j-core.jar,\
 	@../../../lib/portal/netty-all.jar,\
-	@../../../lib/portal/netty-buffer.jar,\
-	@../../../lib/portal/netty-codec.jar,\
-	@../../../lib/portal/netty-common.jar,\
-	@../../../lib/portal/netty-handler.jar,\
-	@../../../lib/portal/netty-resolver.jar,\
-	@../../../lib/portal/netty-transport.jar,\
+	@../../../lib/portal/persistence.jar,\
+	@../../../lib/portal/portlet.jar,\
 	@../../../lib/portal/portletmvc4spring-framework.jar,\
-	@../../../lib/portal/reload4j.jar,\
 	@../../../lib/portal/rometools-utils.jar,\
 	@../../../lib/portal/rometools.jar,\
 	@../../../lib/portal/slf4j-api.jar,\
@@ -394,14 +388,12 @@ Provide-Capability:\
 	@lib/com.liferay.petra.mail.jar,\
 	@lib/com.liferay.petra.memory.jar,\
 	@lib/com.liferay.petra.nio.jar,\
+	@lib/com.liferay.petra.portlet.url.builder.jar,\
 	@lib/com.liferay.petra.process.jar,\
 	@lib/com.liferay.petra.reflect.jar,\
 	@lib/com.liferay.petra.sql.dsl.api.jar,\
 	@lib/com.liferay.petra.sql.dsl.spi.jar,\
 	@lib/com.liferay.petra.string.jar,\
 	@lib/com.liferay.petra.url.pattern.mapper.jar,\
-	@lib/com.liferay.petra.xml.jar,\
-	@lib/com.liferay.registry.api.jar
--removeheaders:\
-	Private-Package,\
-	Service-Component
+	@lib/com.liferay.petra.xml.jar
+-removeheaders: Private-Package

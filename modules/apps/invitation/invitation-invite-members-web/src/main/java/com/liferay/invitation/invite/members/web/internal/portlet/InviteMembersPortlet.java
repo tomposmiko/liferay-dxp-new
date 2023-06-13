@@ -98,9 +98,8 @@ public class InviteMembersPortlet extends MVCPortlet {
 			"count",
 			_getAvailableUsersCount(
 				themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),
-				keywords));
-
-		jsonObject.put(
+				keywords)
+		).put(
 			"options",
 			JSONUtil.put(
 				"end", end
@@ -108,7 +107,8 @@ public class InviteMembersPortlet extends MVCPortlet {
 				"keywords", keywords
 			).put(
 				"start", start
-			));
+			)
+		);
 
 		List<User> users = _getAvailableUsers(
 			themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),
@@ -190,6 +190,10 @@ public class InviteMembersPortlet extends MVCPortlet {
 			jsonObject.put("success", Boolean.TRUE);
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			jsonObject.put("success", Boolean.FALSE);
 		}
 

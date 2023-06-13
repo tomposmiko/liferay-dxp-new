@@ -14,21 +14,16 @@
 
 package com.liferay.portal.kernel.portlet.toolbar;
 
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.portlet.toolbar.contributor.locator.PortletToolbarContributorLocator;
 import com.liferay.portal.kernel.servlet.PortletServlet;
 import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.PortalImpl;
-import com.liferay.portal.util.PropsImpl;
 import com.liferay.portletmvc4spring.test.mock.web.portlet.MockPortletRequest;
-import com.liferay.registry.BasicRegistryImpl;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceRegistration;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,8 +33,10 @@ import javax.portlet.PortletResponse;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -49,8 +46,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 public class PortletToolbarTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@Test
@@ -59,20 +55,17 @@ public class PortletToolbarTest {
 
 		portalUtil.setPortal(new PortalImpl());
 
-		PropsUtil.setProps(new PropsImpl());
-
-		RegistryUtil.setRegistry(new BasicRegistryImpl());
-
-		Registry registry = RegistryUtil.getRegistry();
+		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
 
 		Menu testMenu = new Menu();
 
 		ServiceRegistration<PortletToolbarContributorLocator>
-			serviceRegistration = registry.registerService(
+			serviceRegistration = bundleContext.registerService(
 				PortletToolbarContributorLocator.class,
 				(portletId, portletRequest) -> Collections.singletonList(
 					(portletRequest1, portletResponse) ->
-						Collections.singletonList(testMenu)));
+						Collections.singletonList(testMenu)),
+				null);
 
 		PortletToolbar portletToolbar = new PortletToolbar();
 

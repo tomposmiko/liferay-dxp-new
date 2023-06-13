@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.product.exception.DuplicateCProductExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCProductException;
 import com.liferay.commerce.product.model.CProduct;
 import com.liferay.commerce.product.service.CProductLocalServiceUtil;
@@ -125,6 +124,8 @@ public class CProductPersistenceTest {
 
 		CProduct newCProduct = _persistence.create(pk);
 
+		newCProduct.setMvccVersion(RandomTestUtil.nextLong());
+
 		newCProduct.setUuid(RandomTestUtil.randomString());
 
 		newCProduct.setExternalReferenceCode(RandomTestUtil.randomString());
@@ -150,6 +151,8 @@ public class CProductPersistenceTest {
 		CProduct existingCProduct = _persistence.findByPrimaryKey(
 			newCProduct.getPrimaryKey());
 
+		Assert.assertEquals(
+			existingCProduct.getMvccVersion(), newCProduct.getMvccVersion());
 		Assert.assertEquals(existingCProduct.getUuid(), newCProduct.getUuid());
 		Assert.assertEquals(
 			existingCProduct.getExternalReferenceCode(),
@@ -176,26 +179,6 @@ public class CProductPersistenceTest {
 		Assert.assertEquals(
 			existingCProduct.getLatestVersion(),
 			newCProduct.getLatestVersion());
-	}
-
-	@Test(expected = DuplicateCProductExternalReferenceCodeException.class)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CProduct cProduct = addCProduct();
-
-		CProduct newCProduct = addCProduct();
-
-		newCProduct.setCompanyId(cProduct.getCompanyId());
-
-		newCProduct = _persistence.update(newCProduct);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCProduct);
-
-		newCProduct.setExternalReferenceCode(
-			cProduct.getExternalReferenceCode());
-
-		_persistence.update(newCProduct);
 	}
 
 	@Test
@@ -266,10 +249,11 @@ public class CProductPersistenceTest {
 
 	protected OrderByComparator<CProduct> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CProduct", "uuid", true, "externalReferenceCode", true,
-			"CProductId", true, "groupId", true, "companyId", true, "userId",
-			true, "userName", true, "createDate", true, "modifiedDate", true,
-			"publishedCPDefinitionId", true, "latestVersion", true);
+			"CProduct", "mvccVersion", true, "uuid", true,
+			"externalReferenceCode", true, "CProductId", true, "groupId", true,
+			"companyId", true, "userId", true, "userName", true, "createDate",
+			true, "modifiedDate", true, "publishedCPDefinitionId", true,
+			"latestVersion", true);
 	}
 
 	@Test
@@ -556,6 +540,8 @@ public class CProductPersistenceTest {
 		long pk = RandomTestUtil.nextLong();
 
 		CProduct cProduct = _persistence.create(pk);
+
+		cProduct.setMvccVersion(RandomTestUtil.nextLong());
 
 		cProduct.setUuid(RandomTestUtil.randomString());
 

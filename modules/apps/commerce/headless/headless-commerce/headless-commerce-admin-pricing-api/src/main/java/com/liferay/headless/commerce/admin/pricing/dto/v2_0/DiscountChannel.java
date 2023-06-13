@@ -120,7 +120,7 @@ public class DiscountChannel implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Channel channel;
 
-	@Schema(example = "PAB-34098-789-N")
+	@Schema
 	public String getChannelExternalReferenceCode() {
 		return channelExternalReferenceCode;
 	}
@@ -153,7 +153,7 @@ public class DiscountChannel implements Serializable {
 	protected String channelExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getChannelId() {
 		return channelId;
 	}
@@ -183,7 +183,7 @@ public class DiscountChannel implements Serializable {
 	protected Long channelId;
 
 	@DecimalMin("0")
-	@Schema(example = "30643")
+	@Schema
 	public Long getDiscountChannelId() {
 		return discountChannelId;
 	}
@@ -211,7 +211,7 @@ public class DiscountChannel implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long discountChannelId;
 
-	@Schema(example = "DAB-34098-789-N")
+	@Schema
 	public String getDiscountExternalReferenceCode() {
 		return discountExternalReferenceCode;
 	}
@@ -244,7 +244,7 @@ public class DiscountChannel implements Serializable {
 	protected String discountExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30324")
+	@Schema
 	public Long getDiscountId() {
 		return discountId;
 	}

@@ -85,8 +85,8 @@ public class CTCollectionServiceTest {
 	@Before
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
-
 		_role = RoleTestUtil.addRole(RoleConstants.TYPE_REGULAR);
+		_user = UserTestUtil.addGroupUser(_group, RoleConstants.SITE_MEMBER);
 
 		_resourcePermissionLocalService.addResourcePermission(
 			_role.getCompanyId(), CTConstants.RESOURCE_NAME,
@@ -94,9 +94,10 @@ public class CTCollectionServiceTest {
 			String.valueOf(_role.getCompanyId()), _role.getRoleId(),
 			CTActionKeys.ADD_PUBLICATION);
 
-		_user = UserTestUtil.addGroupUser(_group, RoleConstants.SITE_MEMBER);
-
 		_roleLocalService.addUserRole(_user.getUserId(), _role);
+		_roleLocalService.addUserRole(
+			_user.getUserId(),
+			_roleLocalService.getDefaultGroupRole(_group.getGroupId()));
 	}
 
 	@Test
@@ -191,7 +192,7 @@ public class CTCollectionServiceTest {
 		Assert.assertEquals(
 			0,
 			_ctCollectionService.getCTCollectionsCount(
-				_user.getCompanyId(), WorkflowConstants.STATUS_ANY, ""));
+				_user.getCompanyId(), null, ""));
 
 		_ctCollection = _ctCollectionService.addCTCollection(
 			_user.getCompanyId(), _user.getUserId(),
@@ -200,7 +201,7 @@ public class CTCollectionServiceTest {
 		Assert.assertEquals(
 			1,
 			_ctCollectionService.getCTCollectionsCount(
-				_user.getCompanyId(), WorkflowConstants.STATUS_ANY, ""));
+				_user.getCompanyId(), null, ""));
 
 		JournalFolder journalFolder = null;
 

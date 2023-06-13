@@ -17,10 +17,10 @@
 <%@ include file="/init.jsp" %>
 
 <clay:management-toolbar
-	displayContext="<%= new AssetBrowserManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, assetBrowserDisplayContext) %>"
+	managementToolbarDisplayContext="<%= new AssetBrowserManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, assetBrowserDisplayContext) %>"
 />
 
-<aui:form action="<%= assetBrowserDisplayContext.getPortletURL() %>" cssClass="container-fluid-1280" method="post" name="selectAssetFm">
+<aui:form action="<%= assetBrowserDisplayContext.getPortletURL() %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="selectAssetFm">
 	<c:if test="<%= assetBrowserDisplayContext.isShowBreadcrumb() %>">
 		<liferay-site-navigation:breadcrumb
 			breadcrumbEntries="<%= assetBrowserDisplayContext.getPortletBreadcrumbEntries() %>"
@@ -46,32 +46,35 @@
 			%>
 
 			<c:choose>
-				<c:when test="<%= assetRenderer != null %>">
+				<c:when test="<%= (assetRenderer != null) && (assetEntry.getEntryId() != assetBrowserDisplayContext.getRefererAssetEntryId()) %>">
 
 					<%
 					AssetRendererFactory<?> assetRendererFactory = assetRenderer.getAssetRendererFactory();
 
 					Group group = GroupLocalServiceUtil.getGroup(assetEntry.getGroupId());
 
-					String cssClass = StringPool.BLANK;
+					String cssClass = "selector-button";
 
-					Map<String, Object> data = new HashMap<String, Object>();
+					Map<String, Object> data = HashMapBuilder.<String, Object>put(
+						"assetclassname", assetEntry.getClassName()
+					).put(
+						"assetclassnameid", assetEntry.getClassNameId()
+					).put(
+						"assetclasspk", assetEntry.getClassPK()
+					).put(
+						"assettitle", assetRenderer.getTitle(locale)
+					).put(
+						"assettitlemap", JSONFactoryUtil.looseSerialize(LocalizationUtil.getLocalizationMap(assetEntry.getTitle()))
+					).put(
+						"assettype", assetRendererFactory.getTypeName(locale, assetBrowserDisplayContext.getSubtypeSelectionId())
+					).put(
+						"entityid", assetEntry.getEntryId()
+					).put(
+						"groupdescriptivename", group.getDescriptiveName(locale)
+					).build();
 
-					if (assetEntry.getEntryId() != assetBrowserDisplayContext.getRefererAssetEntryId()) {
-						data.put("assetclassname", assetEntry.getClassName());
-						data.put("assetclassnameid", assetEntry.getClassNameId());
-						data.put("assetclasspk", assetEntry.getClassPK());
-						data.put("assettitle", assetRenderer.getTitle(locale));
-						data.put("assettitlemap", JSONFactoryUtil.looseSerialize(LocalizationUtil.getLocalizationMap(assetEntry.getTitle())));
-						data.put("assettype", assetRendererFactory.getTypeName(locale, assetBrowserDisplayContext.getSubtypeSelectionId()));
-						data.put("entityid", assetEntry.getEntryId());
-						data.put("groupdescriptivename", group.getDescriptiveName(locale));
-
-						if (assetBrowserDisplayContext.isMultipleSelection()) {
-							row.setData(data);
-						}
-
-						cssClass = "selector-button";
+					if (assetBrowserDisplayContext.isMultipleSelection()) {
+						row.setData(data);
 					}
 					%>
 
@@ -97,7 +100,7 @@
 
 								<h5>
 									<c:choose>
-										<c:when test="<%= (assetEntry.getEntryId() != assetBrowserDisplayContext.getRefererAssetEntryId()) && !assetBrowserDisplayContext.isMultipleSelection() %>">
+										<c:when test="<%= !assetBrowserDisplayContext.isMultipleSelection() %>">
 											<aui:a cssClass="<%= cssClass %>" data="<%= data %>" href="javascript:;">
 												<%= HtmlUtil.escape(assetRenderer.getTitle(locale)) %>
 											</aui:a>
@@ -135,11 +138,6 @@
 							</liferay-ui:search-container-column-text>
 						</c:when>
 						<c:when test='<%= Objects.equals(assetBrowserDisplayContext.getDisplayStyle(), "icon") %>'>
-
-							<%
-							row.setCssClass("entry-card lfr-asset-item");
-							%>
-
 							<liferay-ui:search-container-column-text>
 								<clay:vertical-card
 									verticalCard="<%= new AssetEntryVerticalCard(assetEntry, renderRequest, assetBrowserDisplayContext) %>"
@@ -152,7 +150,7 @@
 								name="title"
 							>
 								<c:choose>
-									<c:when test="<%= (assetEntry.getEntryId() != assetBrowserDisplayContext.getRefererAssetEntryId()) && !assetBrowserDisplayContext.isMultipleSelection() %>">
+									<c:when test="<%= !assetBrowserDisplayContext.isMultipleSelection() %>">
 										<aui:a cssClass="<%= cssClass %>" data="<%= data %>" href="javascript:;">
 											<%= HtmlUtil.escape(assetRenderer.getTitle(locale)) %>
 										</aui:a>
@@ -210,7 +208,7 @@
 
 					<%
 					if (assetRenderer == null) {
-						_log.error("Unable to get asset renderer for asset entry with primary key " + assetEntry.getEntryId());
+						_log.error("Unable to get asset renderer for assetEntry with primary key " + assetEntry.getEntryId());
 					}
 
 					row.setSkip(true);
@@ -228,21 +226,15 @@
 </aui:form>
 
 <c:choose>
-	<c:when test="<%= assetBrowserDisplayContext.isLegacySingleSelection() %>">
-		<aui:script>
-			Liferay.Util.selectEntityHandler(
-				'#<portlet:namespace />selectAssetFm',
-				'<%= HtmlUtil.escapeJS(assetBrowserDisplayContext.getEventName()) %>'
-			);
-		</aui:script>
-	</c:when>
 	<c:when test="<%= !assetBrowserDisplayContext.isMultipleSelection() %>">
-		<aui:script require="metal-dom/src/all/dom as dom">
-			var delegateHandler = dom.delegate(
+		<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
+			var delegate = delegateModule.default;
+
+			var delegateHandler = delegate(
 				document.querySelector('#<portlet:namespace />selectAssetFm'),
 				'click',
 				'.selector-button',
-				function (event) {
+				(event) => {
 					event.preventDefault();
 
 					Liferay.Util.getOpener().Liferay.fire(
@@ -255,7 +247,7 @@
 			);
 
 			var onDestroyPortlet = function () {
-				delegateHandler.removeListener();
+				delegateHandler.dispose();
 
 				Liferay.detach('destroyPortlet', onDestroyPortlet);
 			};
@@ -266,5 +258,5 @@
 </c:choose>
 
 <%!
-private static Log _log = LogFactoryUtil.getLog("com_liferay_asset_browser_web.view_jsp");
+private static final Log _log = LogFactoryUtil.getLog("com_liferay_asset_browser_web.view_jsp");
 %>

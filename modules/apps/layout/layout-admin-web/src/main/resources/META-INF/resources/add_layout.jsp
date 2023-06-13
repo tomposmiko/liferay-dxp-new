@@ -22,9 +22,7 @@ long sourcePlid = ParamUtil.getLong(request, "sourcePlid");
 List<SiteNavigationMenu> autoSiteNavigationMenus = layoutsAdminDisplayContext.getAutoSiteNavigationMenus();
 %>
 
-<clay:container-fluid
-	cssClass="pb-9 pt-2"
->
+<clay:container-fluid>
 	<liferay-frontend:edit-form
 		action="<%= (sourcePlid <= 0) ? layoutsAdminDisplayContext.getAddLayoutURL() : layoutsAdminDisplayContext.getCopyLayoutURL(sourcePlid) %>"
 		method="post"
@@ -109,8 +107,8 @@ List<SiteNavigationMenu> autoSiteNavigationMenus = layoutsAdminDisplayContext.ge
 			/>
 
 			<clay:button
+				cssClass="btn-cancel"
 				displayType="secondary"
-				elementClasses="btn-cancel"
 				label="cancel"
 			/>
 		</liferay-frontend:edit-form-footer>
@@ -122,7 +120,7 @@ List<SiteNavigationMenu> autoSiteNavigationMenus = layoutsAdminDisplayContext.ge
 
 	var form = document.<portlet:namespace />fm;
 
-	form.addEventListener('submit', function (event) {
+	form.addEventListener('submit', (event) => {
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -144,7 +142,7 @@ List<SiteNavigationMenu> autoSiteNavigationMenus = layoutsAdminDisplayContext.ge
 
 		Array.prototype.slice
 			.call(form.querySelectorAll('input'))
-			.forEach(function (input) {
+			.forEach((input) => {
 				if (input.type == 'checkbox' && !input.checked) {
 					return;
 				}
@@ -158,10 +156,10 @@ List<SiteNavigationMenu> autoSiteNavigationMenus = layoutsAdminDisplayContext.ge
 			body: formData,
 			method: 'POST',
 		})
-			.then(function (response) {
+			.then((response) => {
 				return response.json();
 			})
-			.then(function (response) {
+			.then((response) => {
 				if (response.redirectURL) {
 					var redirectURL = new URL(
 						response.redirectURL,

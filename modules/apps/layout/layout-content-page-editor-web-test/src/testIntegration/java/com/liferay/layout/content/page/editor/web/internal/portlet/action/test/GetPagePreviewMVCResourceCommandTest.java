@@ -50,7 +50,6 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -152,8 +151,8 @@ public class GetPagePreviewMVCResourceCommandTest {
 				TestPropsValues.getUserId(), _group.getGroupId(), 0,
 				StringUtil.randomString(), StringUtil.randomString(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-				RandomTestUtil.randomString(), "{fieldSets: []}", 0,
-				FragmentConstants.TYPE_COMPONENT,
+				RandomTestUtil.randomString(), false, "{fieldSets: []}", null,
+				0, FragmentConstants.TYPE_COMPONENT,
 				WorkflowConstants.STATUS_APPROVED, _serviceContext);
 
 		_fragmentEntryLink = _fragmentEntryLinkService.addFragmentEntryLink(
@@ -168,9 +167,9 @@ public class GetPagePreviewMVCResourceCommandTest {
 				_group.getGroupId(), layout.getPlid());
 
 		_themeDisplay.setLayout(layout);
-		_themeDisplay.setLayoutSet(layout.getLayoutSet());
 		_themeDisplay.setLayoutTypePortlet(
 			(LayoutTypePortlet)layout.getLayoutType());
+		_themeDisplay.setLayoutSet(layout.getLayoutSet());
 		_themeDisplay.setLookAndFeel(
 			layout.getTheme(), layout.getColorScheme());
 		_themeDisplay.setPlid(layout.getPlid());
@@ -194,7 +193,10 @@ public class GetPagePreviewMVCResourceCommandTest {
 			(MockHttpServletRequest)
 				mockLiferayResourceRequest.getHttpServletRequest();
 
+		httpServletRequest.setAttribute(WebKeys.THEME_DISPLAY, _themeDisplay);
 		httpServletRequest.setMethod(HttpMethods.GET);
+
+		_serviceContext.setRequest(httpServletRequest);
 
 		MockLiferayResourceResponse mockLiferayResourceResponse =
 			new MockLiferayResourceResponse();
@@ -239,11 +241,10 @@ public class GetPagePreviewMVCResourceCommandTest {
 	private LayoutPageTemplateStructureLocalService
 		_layoutPageTemplateStructureLocalService;
 
-	@Inject(filter = "mvc.command.name=/content_layout/get_page_preview")
+	@Inject(
+		filter = "mvc.command.name=/layout_content_page_editor/get_page_preview"
+	)
 	private MVCResourceCommand _mvcResourceCommand;
-
-	@Inject
-	private Portal _portal;
 
 	@Inject
 	private PortletLocalService _portletLocalService;

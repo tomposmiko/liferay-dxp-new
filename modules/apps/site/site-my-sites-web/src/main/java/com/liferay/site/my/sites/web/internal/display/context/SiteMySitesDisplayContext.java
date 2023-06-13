@@ -17,6 +17,7 @@ package com.liferay.site.my.sites.web.internal.display.context;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
@@ -257,12 +258,13 @@ public class SiteMySitesDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
-
-		portletURL.setParameter("tabs1", getTabs1());
-		portletURL.setParameter("displayStyle", getDisplayStyle());
-
-		return portletURL;
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setTabs1(
+			getTabs1()
+		).setParameter(
+			"displayStyle", getDisplayStyle()
+		).buildPortletURL();
 	}
 
 	public String getTabs1() {

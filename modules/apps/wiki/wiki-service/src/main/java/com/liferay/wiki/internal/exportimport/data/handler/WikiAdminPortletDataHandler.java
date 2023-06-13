@@ -68,7 +68,7 @@ public class WikiAdminPortletDataHandler extends BasePortletDataHandler {
 
 	public static final String NAMESPACE = "wiki";
 
-	public static final String SCHEMA_VERSION = "1.0.0";
+	public static final String SCHEMA_VERSION = "4.0.0";
 
 	@Override
 	public String[] getClassNames() {
@@ -157,7 +157,7 @@ public class WikiAdminPortletDataHandler extends BasePortletDataHandler {
 
 	@Override
 	protected String doExportData(
-			final PortletDataContext portletDataContext, String portletId,
+			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
 		throws Exception {
 

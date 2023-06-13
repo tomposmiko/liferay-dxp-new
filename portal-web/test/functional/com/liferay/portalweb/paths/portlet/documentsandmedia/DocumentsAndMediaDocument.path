@@ -12,7 +12,12 @@
 <tbody>
 <tr>
 	<td>DOCUMENT_VIEW_VERSION_NUMBER</td>
-	<td>//section[contains(@id,'DLAdminPortlet')]//span[@class='workflow-version']/span[contains(@class,'workflow-value')]</td>
+	<td>//section[contains(@id,'DLAdminPortlet')]//span[contains(@class,'workflow-version')]/span[contains(@class,'workflow-value')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DOCUMENT_EXCEED_STORAGE_QUOTA_ERROR</td>
+	<td>//li[contains(@class,'upload-error')]//span[@class='error-message']</td>
 	<td></td>
 </tr>
 <tr>
@@ -20,17 +25,30 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CUSTOM_FIELD-->
-
+<tr>
+	<td>CUSTOM_FIELD_BUTTON</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'form')]//button[normalize-space()='${key_buttonName}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CUSTOM_FIELD_IMAGE_PREVIEW</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'image-picker-preview')]//img[contains(@src,'${key_image}')]</td>
+	<td></td>
+</tr>
 <tr>
 	<td>CUSTOM_FIELD_LOCALIZATION_DROPDOWN_TOGGLE</td>
-	<td>//div[contains(@class,'ddm-container')]//button[contains(@class,'dropdown-toggle')]//*[name()='svg'][contains(@class,'lexicon-icon-${key_currentLocale}')]</td>
+	<td>//div[@class='dropdown']//button[contains(@class,'dropdown-toggle')]//*[name()='svg'][contains(@class,'lexicon-icon-${key_currentLocale}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>CUSTOM_FIELD_NAME</td>
 	<td>//div[contains(@class,'ddm-field-group')]//span[contains(.,'${customFieldName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CUSTOM_FIELD_REQUIRED_ALERT</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']/following-sibling::span[contains(@class,'form-feedback-group')]//div[contains(@class,'form-feedback-item')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -43,17 +61,35 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DOCUMENT_INFO-->
-
 <tr>
 	<td>DOCUMENT_INFO_COLLABORATOR_TOOLTIP</td>
 	<td>//div[contains(@class,'lfr-portal-tooltip') and contains(@data-title,'${key_collaborator}')]</td>
 	<td></td>
 </tr>
 <tr>
+	<td>DOCUMENT_INFO_DOCUMENT_TYPE</td>
+	<td>//dt[contains(@class,'sidebar-dt') and contains (.,'Document Type')]/following-sibling::dd[contains(.,'${key_dmDocumentType}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DOCUMENT_INFO_EXTENSION</td>
+	<td>//dt[contains(@class,'sidebar-dt') and contains (.,'Extension')]/following-sibling::dd[contains(.,'${key_dmDocumentExtension}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DOCUMENT_INFO_FILE_NAME</td>
+	<td>//p[contains(@class,'component-subtitle')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DOCUMENT_INFO_LOCATION</td>
 	<td>//dd[contains(@class,'sidebar-dd')]//a[contains(.,'${key_dmFolderName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DOCUMENT_INFO_REVIEW_DATE</td>
+	<td>//dt[contains(@class,'sidebar-dt') and contains (.,'Review Date')]/following-sibling::dd[contains(.,'${key_reviewDateField}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -88,7 +124,7 @@
 </tr>
 <tr>
 	<td>DOCUMENT_INFO_RELATED_ASSETS_TITLE</td>
-	<td>//div[contains(@class,'sidebar-body')]//*[contains(@class,'list-group-item')]//a</td>
+	<td>//div[contains(@class,'sidebar-body')]//li[contains(@class,'list-group-item')]//a</td>
 	<td></td>
 </tr>
 <tr>
@@ -131,9 +167,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DOCUMENT_DETAILS-->
-
 <tr>
 	<td>DOCUMENT_DETAILS_DOWNLOAD</td>
 	<td>//div[@class='sidebar-section']//a[@title='File Size ${key_dmDocumentSize}']</td>
@@ -145,8 +179,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>DOCUMENT_DETAILS_EMPTY_STATE_PREVIEW</td>
+	<td>//div[contains(@class,'preview-file-error-container')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DOCUMENT_DETAILS_LATEST_VERSION_URL</td>
+	<td>//input[contains(@id,'urlInput') and contains(@value,'${key_latestVersionURL}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DOCUMENT_DETAILS_IMAGE_PREVIEW</td>
-	<td>//div[contains(@class,'preview-file-container')]/img</td>
+	<td>//div[contains(@class,'preview-file-container')]//img[contains(@src,'${key_dmDocumentFileName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -180,6 +224,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>DOCUMENT_DETAILS_WEBDAV_URL_LINK</td>
+	<td>//input[contains(@id,'webDavURLInput') and contains(@value,'${key_webDAVURL}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DOCUMENT_DETAILS_WORKFLOW</td>
 	<td>//div[contains(@class,'sidebar-header')]//span[contains(@class,'workflow-status')]</td>
 	<td></td>
@@ -189,9 +238,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DOCUMENT_EXTRACTED_METADATA-->
-
 <tr>
 	<td>DOCUMENT_EXTRACTED_METADATA_FIELD</td>
 	<td>//div[contains(@id,'documentLibraryMetadataPanel')]//label[contains(.,'${key_metadataLabel}')]/../../div[contains(.,'${key_metadataData}')]</td>
@@ -202,9 +249,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DOCUMENT_TOOLBAR-->
-
 <tr>
 	<td>DOCUMENT_TOOLBAR_DOWNLOAD</td>
 	<td>//ul[@class='tbar-nav']//li/a[@title='File Size ${key_dmDocumentSize}']</td>
@@ -220,9 +265,13 @@
 	<td></td>
 	<td></td>
 </tr>
-
+<!--DOCUMENT_VIEWPORT-->
+<tr>
+	<td>DOCUMENT_VIEWPORT_PREVIEW</td>
+	<td>//img[contains(@src,'${key_imageSourceURL}')]</td>
+	<td></td>
+</tr>
 <!--MARKETING-->
-
 <tr>
 	<td>MARKETING_SELECT</td>
 	<td>//div[@class='lfr-ddm-container']//div[contains(.,'${key_marketingSelect}')]</td>
@@ -253,9 +302,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DETAILS_PANEL-->
-
 <tr>
 	<td>DETAILS_URL</td>
 	<td>//div[label[contains(.,'Latest Version URL')]]</td>
@@ -266,22 +313,15 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--METADATA_PANEL-->
-
-<tr>
-	<td>METADATA_PANEL_BOOLEAN</td>
-	<td>//div[@class='lfr-ddm-container']/div[contains(.,'${key_booleanValue}')]</td>
-	<td></td>
-</tr>
 <tr>
 	<td>METADATA_PANEL_DATE</td>
-	<td>//div[@class='lfr-ddm-container']/div[contains(.,'${key_dateValue}')]</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'date-picker')]//input[@type='text']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>METADATA_PANEL_NUMBER</td>
-	<td>//div[@class='lfr-ddm-container']/div[contains(.,'${key_numberValue}')]</td>
+	<td>METADATA_PANEL_IMAGE</td>
+	<td>//div[contains(@class,'image-picker-preview')]/img[contains(@src,'${key_imageName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -295,8 +335,13 @@
 	<td></td>
 </tr>
 <tr>
-	<td>METADATA_PANEL_TEXT</td>
-	<td>//div[@class='lfr-ddm-container']/div[contains(.,'${key_textContent}')]</td>
+	<td>METADATA_PANEL_TEXT_INPUT</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::input</td>
+	<td></td>
+</tr>
+<tr>
+	<td>METADATA_PANEL_UPLOAD</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div//h4</td>
 	<td></td>
 </tr>
 <tr>
@@ -304,12 +349,42 @@
 	<td></td>
 	<td></td>
 </tr>
-
+<!--AUDIO_GENERATION-->
+<tr>
+	<td>AUDIO_PREVIEW</td>
+	<td>//audio[contains(@class,'preview-file-audio')]//source[contains(@src,'${key_audioName}')]</td>
+	<td></td>
+</tr>
 <!--VIDEO_GENERATION-->
-
+<tr>
+	<td>VIDEO_GENERATION_INFO</td>
+	<td>//div[contains(@class,'video-embed-placeholder-text') and contains(.,'${key_text}')]</td>
+	<td></td>
+</tr>
 <tr>
 	<td>VIDEO_GENERATION_THUMBNAIL_RESOLUTION</td>
 	<td>//head/title[contains(.,'${key_videoGenerationThumbnailResolution}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>VIDEO_PREVIEW</td>
+	<td>//video[contains(@poster,'${key_videoName}')]</td>
+	<td></td>
+</tr>
+<!--VIDEO_SHORTCUT-->
+<tr>
+	<td>VIDEO_SHORTCUT_PREVIEW</td>
+	<td>//iframe[contains(@src,'${key_videoShortcutPreview}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>VIDEO_SHORTCUT_THUMBNAIL_LIST</td>
+	<td>//li[@data-qa-id='row'][contains(.,'${key_list}')]//div[contains(@class,'bg-cover')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TWITCH_VIDEO_INACTIVE</td>
+	<td>//div[contains(@class,'video-player__inactive')]</td>
 	<td></td>
 </tr>
 </tbody>

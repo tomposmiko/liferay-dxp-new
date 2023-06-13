@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -73,7 +74,7 @@ public class StyleBookEntryLocalServiceImpl
 			String styleBookEntryKey, ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = userLocalService.getUser(userId);
+		User user = _userLocalService.getUser(userId);
 
 		long companyId = user.getCompanyId();
 
@@ -124,15 +125,11 @@ public class StyleBookEntryLocalServiceImpl
 
 		StyleBookEntry styleBookEntry = getStyleBookEntry(styleBookEntryId);
 
-		StringBundler sb = new StringBundler(5);
-
-		sb.append(styleBookEntry.getName());
-		sb.append(StringPool.SPACE);
-		sb.append(StringPool.OPEN_PARENTHESIS);
-		sb.append(LanguageUtil.get(LocaleUtil.getMostRelevantLocale(), "copy"));
-		sb.append(StringPool.CLOSE_PARENTHESIS);
-
-		String name = sb.toString();
+		String name = StringBundler.concat(
+			styleBookEntry.getName(), StringPool.SPACE,
+			StringPool.OPEN_PARENTHESIS,
+			LanguageUtil.get(LocaleUtil.getMostRelevantLocale(), "copy"),
+			StringPool.CLOSE_PARENTHESIS);
 
 		StyleBookEntry copyStyleBookEntry = addStyleBookEntry(
 			userId, groupId, styleBookEntry.getFrontendTokensValues(), name,
@@ -541,5 +538,8 @@ public class StyleBookEntryLocalServiceImpl
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

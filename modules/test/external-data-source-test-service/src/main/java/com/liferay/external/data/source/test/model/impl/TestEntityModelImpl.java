@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -205,32 +206,54 @@ public class TestEntityModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<TestEntity, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, TestEntity>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<TestEntity, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<TestEntity, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			TestEntity.class.getClassLoader(), TestEntity.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("id", TestEntity::getId);
-		attributeGetterFunctions.put("data", TestEntity::getData);
+		try {
+			Constructor<TestEntity> constructor =
+				(Constructor<TestEntity>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<TestEntity, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<TestEntity, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<TestEntity, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<TestEntity, Object>>();
 		Map<String, BiConsumer<TestEntity, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<TestEntity, ?>>();
 
+		attributeGetterFunctions.put("id", TestEntity::getId);
 		attributeSetterBiConsumers.put(
 			"id", (BiConsumer<TestEntity, Long>)TestEntity::setId);
+		attributeGetterFunctions.put("data", TestEntity::getData);
 		attributeSetterBiConsumers.put(
 			"data", (BiConsumer<TestEntity, String>)TestEntity::setData);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -328,6 +351,16 @@ public class TestEntityModelImpl
 		testEntityImpl.setData(getData());
 
 		testEntityImpl.resetOriginalValues();
+
+		return testEntityImpl;
+	}
+
+	@Override
+	public TestEntity cloneWithOriginalValues() {
+		TestEntityImpl testEntityImpl = new TestEntityImpl();
+
+		testEntityImpl.setId(this.<Long>getColumnOriginalValue("id_"));
+		testEntityImpl.setData(this.<String>getColumnOriginalValue("data_"));
 
 		return testEntityImpl;
 	}
@@ -499,9 +532,7 @@ public class TestEntityModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, TestEntity>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					TestEntity.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

@@ -35,6 +35,7 @@ public class AddressSoap implements Serializable {
 
 		soapModel.setMvccVersion(model.getMvccVersion());
 		soapModel.setUuid(model.getUuid());
+		soapModel.setExternalReferenceCode(model.getExternalReferenceCode());
 		soapModel.setAddressId(model.getAddressId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setUserId(model.getUserId());
@@ -43,16 +44,22 @@ public class AddressSoap implements Serializable {
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setClassNameId(model.getClassNameId());
 		soapModel.setClassPK(model.getClassPK());
+		soapModel.setCountryId(model.getCountryId());
+		soapModel.setRegionId(model.getRegionId());
+		soapModel.setTypeId(model.getTypeId());
+		soapModel.setCity(model.getCity());
+		soapModel.setDescription(model.getDescription());
+		soapModel.setLatitude(model.getLatitude());
+		soapModel.setLongitude(model.getLongitude());
+		soapModel.setMailing(model.isMailing());
+		soapModel.setName(model.getName());
+		soapModel.setPrimary(model.isPrimary());
 		soapModel.setStreet1(model.getStreet1());
 		soapModel.setStreet2(model.getStreet2());
 		soapModel.setStreet3(model.getStreet3());
-		soapModel.setCity(model.getCity());
+		soapModel.setValidationDate(model.getValidationDate());
+		soapModel.setValidationStatus(model.getValidationStatus());
 		soapModel.setZip(model.getZip());
-		soapModel.setRegionId(model.getRegionId());
-		soapModel.setCountryId(model.getCountryId());
-		soapModel.setTypeId(model.getTypeId());
-		soapModel.setMailing(model.isMailing());
-		soapModel.setPrimary(model.isPrimary());
 
 		return soapModel;
 	}
@@ -122,6 +129,14 @@ public class AddressSoap implements Serializable {
 		_uuid = uuid;
 	}
 
+	public String getExternalReferenceCode() {
+		return _externalReferenceCode;
+	}
+
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		_externalReferenceCode = externalReferenceCode;
+	}
+
 	public long getAddressId() {
 		return _addressId;
 	}
@@ -186,6 +201,94 @@ public class AddressSoap implements Serializable {
 		_classPK = classPK;
 	}
 
+	public long getCountryId() {
+		return _countryId;
+	}
+
+	public void setCountryId(long countryId) {
+		_countryId = countryId;
+	}
+
+	public long getRegionId() {
+		return _regionId;
+	}
+
+	public void setRegionId(long regionId) {
+		_regionId = regionId;
+	}
+
+	public long getTypeId() {
+		return _typeId;
+	}
+
+	public void setTypeId(long typeId) {
+		_typeId = typeId;
+	}
+
+	public String getCity() {
+		return _city;
+	}
+
+	public void setCity(String city) {
+		_city = city;
+	}
+
+	public String getDescription() {
+		return _description;
+	}
+
+	public void setDescription(String description) {
+		_description = description;
+	}
+
+	public double getLatitude() {
+		return _latitude;
+	}
+
+	public void setLatitude(double latitude) {
+		_latitude = latitude;
+	}
+
+	public double getLongitude() {
+		return _longitude;
+	}
+
+	public void setLongitude(double longitude) {
+		_longitude = longitude;
+	}
+
+	public boolean getMailing() {
+		return _mailing;
+	}
+
+	public boolean isMailing() {
+		return _mailing;
+	}
+
+	public void setMailing(boolean mailing) {
+		_mailing = mailing;
+	}
+
+	public String getName() {
+		return _name;
+	}
+
+	public void setName(String name) {
+		_name = name;
+	}
+
+	public boolean getPrimary() {
+		return _primary;
+	}
+
+	public boolean isPrimary() {
+		return _primary;
+	}
+
+	public void setPrimary(boolean primary) {
+		_primary = primary;
+	}
+
 	public String getStreet1() {
 		return _street1;
 	}
@@ -210,12 +313,20 @@ public class AddressSoap implements Serializable {
 		_street3 = street3;
 	}
 
-	public String getCity() {
-		return _city;
+	public Date getValidationDate() {
+		return _validationDate;
 	}
 
-	public void setCity(String city) {
-		_city = city;
+	public void setValidationDate(Date validationDate) {
+		_validationDate = validationDate;
+	}
+
+	public int getValidationStatus() {
+		return _validationStatus;
+	}
+
+	public void setValidationStatus(int validationStatus) {
+		_validationStatus = validationStatus;
 	}
 
 	public String getZip() {
@@ -226,56 +337,9 @@ public class AddressSoap implements Serializable {
 		_zip = zip;
 	}
 
-	public long getRegionId() {
-		return _regionId;
-	}
-
-	public void setRegionId(long regionId) {
-		_regionId = regionId;
-	}
-
-	public long getCountryId() {
-		return _countryId;
-	}
-
-	public void setCountryId(long countryId) {
-		_countryId = countryId;
-	}
-
-	public long getTypeId() {
-		return _typeId;
-	}
-
-	public void setTypeId(long typeId) {
-		_typeId = typeId;
-	}
-
-	public boolean getMailing() {
-		return _mailing;
-	}
-
-	public boolean isMailing() {
-		return _mailing;
-	}
-
-	public void setMailing(boolean mailing) {
-		_mailing = mailing;
-	}
-
-	public boolean getPrimary() {
-		return _primary;
-	}
-
-	public boolean isPrimary() {
-		return _primary;
-	}
-
-	public void setPrimary(boolean primary) {
-		_primary = primary;
-	}
-
 	private long _mvccVersion;
 	private String _uuid;
+	private String _externalReferenceCode;
 	private long _addressId;
 	private long _companyId;
 	private long _userId;
@@ -284,15 +348,21 @@ public class AddressSoap implements Serializable {
 	private Date _modifiedDate;
 	private long _classNameId;
 	private long _classPK;
+	private long _countryId;
+	private long _regionId;
+	private long _typeId;
+	private String _city;
+	private String _description;
+	private double _latitude;
+	private double _longitude;
+	private boolean _mailing;
+	private String _name;
+	private boolean _primary;
 	private String _street1;
 	private String _street2;
 	private String _street3;
-	private String _city;
+	private Date _validationDate;
+	private int _validationStatus;
 	private String _zip;
-	private long _regionId;
-	private long _countryId;
-	private long _typeId;
-	private boolean _mailing;
-	private boolean _primary;
 
 }

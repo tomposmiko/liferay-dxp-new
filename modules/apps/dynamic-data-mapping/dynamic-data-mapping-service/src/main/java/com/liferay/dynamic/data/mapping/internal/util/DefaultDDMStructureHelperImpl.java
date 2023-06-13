@@ -94,12 +94,9 @@ public class DefaultDDMStructureHelperImpl
 				_ddmStructureLocalService.fetchStructure(
 					groupId, classNameId, ddmStructureKey);
 
-			if (ddmStructure != null) {
-				continue;
-			}
-
-			if (name.equals(DLFileEntryTypeConstants.NAME_IG_IMAGE) &&
-				!UpgradeProcessUtil.isCreateIGImageDocumentType()) {
+			if ((ddmStructure != null) ||
+				(name.equals(DLFileEntryTypeConstants.NAME_IG_IMAGE) &&
+				 !UpgradeProcessUtil.isCreateIGImageDocumentType())) {
 
 				continue;
 			}
@@ -131,7 +128,7 @@ public class DefaultDDMStructureHelperImpl
 				userId, groupId,
 				DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID, classNameId,
 				ddmStructureKey, nameMap, descriptionMap, ddmForm,
-				ddmFormLayout, StorageType.JSON.toString(),
+				ddmFormLayout, StorageType.DEFAULT.toString(),
 				DDMStructureConstants.TYPE_DEFAULT, serviceContext);
 
 			Element templateElement = structureElement.element("template");

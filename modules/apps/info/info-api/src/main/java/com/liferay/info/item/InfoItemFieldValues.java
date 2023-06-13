@@ -72,13 +72,7 @@ public class InfoItemFieldValues {
 
 	public InfoFieldValue<Object> getInfoFieldValue(String infoFieldName) {
 		Collection<InfoFieldValue<Object>> infoFieldValues =
-			_builder._infoFieldValuesByIdMap.getOrDefault(
-				infoFieldName, Collections.emptyList());
-
-		if (infoFieldValues.isEmpty()) {
-			infoFieldValues = _builder._infoFieldValuesByNameMap.getOrDefault(
-				infoFieldName, Collections.emptyList());
-		}
+			_builder._infoFieldValuesMap.get(infoFieldName);
 
 		if (infoFieldValues != null) {
 			Iterator<InfoFieldValue<Object>> iterator =
@@ -99,15 +93,7 @@ public class InfoItemFieldValues {
 	public Collection<InfoFieldValue<Object>> getInfoFieldValues(
 		String infoFieldName) {
 
-		Collection<InfoFieldValue<Object>> infoFieldValues =
-			_builder._infoFieldValuesByIdMap.getOrDefault(
-				infoFieldName, Collections.emptyList());
-
-		if (!infoFieldValues.isEmpty()) {
-			return infoFieldValues;
-		}
-
-		return _builder._infoFieldValuesByNameMap.getOrDefault(
+		return _builder._infoFieldValuesMap.getOrDefault(
 			infoFieldName, Collections.emptyList());
 	}
 
@@ -134,7 +120,6 @@ public class InfoItemFieldValues {
 			InfoField infoField = infoFieldValue.getInfoField();
 
 			map.put(infoField.getName(), infoFieldValue.getValue(locale));
-			map.put(infoField.getUniqueId(), infoFieldValue.getValue(locale));
 		}
 
 		return map;
@@ -152,13 +137,8 @@ public class InfoItemFieldValues {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(3);
-
-		sb.append("{infoFieldValues: ");
-		sb.append(_builder._infoFieldValues);
-		sb.append("}");
-
-		return sb.toString();
+		return StringBundler.concat(
+			"{infoFieldValues: ", _builder._infoFieldValues, "}");
 	}
 
 	public static class Builder {
@@ -173,13 +153,8 @@ public class InfoItemFieldValues {
 			InfoField infoField = infoFieldValue.getInfoField();
 
 			Collection<InfoFieldValue<Object>> infoFieldValues =
-				_infoFieldValuesByNameMap.computeIfAbsent(
+				_infoFieldValuesMap.computeIfAbsent(
 					infoField.getName(), key -> new ArrayList<>());
-
-			infoFieldValues.add(infoFieldValue);
-
-			infoFieldValues = _infoFieldValuesByIdMap.computeIfAbsent(
-				infoField.getUniqueId(), key -> new ArrayList<>());
 
 			infoFieldValues.add(infoFieldValue);
 
@@ -188,10 +163,10 @@ public class InfoItemFieldValues {
 
 		public <T extends Throwable> Builder infoFieldValue(
 				UnsafeConsumer<UnsafeConsumer<InfoFieldValue<Object>, T>, T>
-					consumer)
+					unsafeConsumer)
 			throws T {
 
-			consumer.accept(this::infoFieldValue);
+			unsafeConsumer.accept(this::infoFieldValue);
 
 			return this;
 		}
@@ -228,9 +203,7 @@ public class InfoItemFieldValues {
 		private final Collection<InfoFieldValue<Object>> _infoFieldValues =
 			new LinkedHashSet<>();
 		private final Map<String, Collection<InfoFieldValue<Object>>>
-			_infoFieldValuesByIdMap = new HashMap<>();
-		private final Map<String, Collection<InfoFieldValue<Object>>>
-			_infoFieldValuesByNameMap = new HashMap<>();
+			_infoFieldValuesMap = new HashMap<>();
 		private InfoItemClassPKReference _infoItemClassPKReference;
 		private InfoItemReference _infoItemReference;
 

@@ -17,7 +17,6 @@ package com.liferay.frontend.js.svg4everybody.web.internal.servlet.taglib;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.servlet.BrowserSniffer;
 import com.liferay.portal.kernel.servlet.taglib.BaseDynamicInclude;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
 import com.liferay.portal.kernel.util.Portal;
@@ -65,25 +64,41 @@ public class SVG4EverybodyTopHeadDynamicInclude extends BaseDynamicInclude {
 			}
 		}
 
-		PrintWriter printWriter = httpServletResponse.getWriter();
+		boolean cdnHostEnabled = false;
 
-		AbsolutePortalURLBuilder absolutePortalURLBuilder =
-			_absolutePortalURLBuilderFactory.getAbsolutePortalURLBuilder(
-				httpServletRequest);
+		try {
+			String cdnHost = _portal.getCDNHost(httpServletRequest);
 
-		if (!cdnDynamicResourcesEnabled) {
-			absolutePortalURLBuilder.ignoreCDNHost();
+			cdnHostEnabled = !cdnHost.isEmpty();
+		}
+		catch (PortalException portalException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("Unable to get CDN host", portalException);
+			}
 		}
 
-		for (String jsFileName : _JS_FILE_NAMES) {
-			printWriter.print("<script data-senna-track=\"permanent\" src=\"");
+		if (cdnHostEnabled) {
+			PrintWriter printWriter = httpServletResponse.getWriter();
 
-			printWriter.print(
-				absolutePortalURLBuilder.forModule(
-					_bundleContext.getBundle(), jsFileName
-				).build());
+			AbsolutePortalURLBuilder absolutePortalURLBuilder =
+				_absolutePortalURLBuilderFactory.getAbsolutePortalURLBuilder(
+					httpServletRequest);
 
-			printWriter.println("\" type=\"text/javascript\"></script>");
+			if (!cdnDynamicResourcesEnabled) {
+				absolutePortalURLBuilder.ignoreCDNHost();
+			}
+
+			for (String jsFileName : _JS_FILE_NAMES) {
+				printWriter.print(
+					"<script data-senna-track=\"permanent\" src=\"");
+
+				printWriter.print(
+					absolutePortalURLBuilder.forModuleScript(
+						_bundleContext.getBundle(), jsFileName
+					).build());
+
+				printWriter.println("\" type=\"text/javascript\"></script>");
+			}
 		}
 	}
 
@@ -106,10 +121,7 @@ public class SVG4EverybodyTopHeadDynamicInclude extends BaseDynamicInclude {
 	@Reference
 	private AbsolutePortalURLBuilderFactory _absolutePortalURLBuilderFactory;
 
-	@Reference
-	private BrowserSniffer _browserSniffer;
-
-	private BundleContext _bundleContext;
+	private volatile BundleContext _bundleContext;
 
 	@Reference
 	private Portal _portal;

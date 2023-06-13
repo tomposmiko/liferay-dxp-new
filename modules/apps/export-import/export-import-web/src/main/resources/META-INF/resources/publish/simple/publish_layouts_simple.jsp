@@ -42,16 +42,6 @@ GroupDisplayContextHelper groupDisplayContextHelper = new GroupDisplayContextHel
 Map<String, Serializable> settingsMap = exportImportConfiguration.getSettingsMap();
 
 Map<String, String[]> parameterMap = (Map<String, String[]>)settingsMap.get("parameterMap");
-
-PortletURL advancedPublishURL = renderResponse.createRenderURL();
-
-advancedPublishURL.setParameter("mvcRenderCommandName", "publishLayouts");
-advancedPublishURL.setParameter(Constants.CMD, cmd);
-advancedPublishURL.setParameter("tabs1", privateLayout ? "private-pages" : "public-pages");
-advancedPublishURL.setParameter("groupId", String.valueOf(groupDisplayContextHelper.getGroupId()));
-advancedPublishURL.setParameter("layoutSetBranchId", MapUtil.getString(parameterMap, "layoutSetBranchId"));
-advancedPublishURL.setParameter("selPlid", String.valueOf(selPlid));
-advancedPublishURL.setParameter("privateLayout", String.valueOf(privateLayout));
 %>
 
 <clay:container-fluid
@@ -59,15 +49,33 @@ advancedPublishURL.setParameter("privateLayout", String.valueOf(privateLayout));
 >
 	<clay:link
 		displayType="link"
-		href="<%= advancedPublishURL.toString() %>"
-		label="switch-to-advanced-publication"
+		href='<%=
+			PortletURLBuilder.createRenderURL(
+				renderResponse
+			).setMVCRenderCommandName(
+				"/export_import/publish_layouts"
+			).setCMD(
+				cmd
+			).setTabs1(
+				privateLayout ? "private-pages" : "public-pages"
+			).setParameter(
+				"groupId", groupDisplayContextHelper.getGroupId()
+			).setParameter(
+				"layoutSetBranchId", MapUtil.getString(parameterMap, "layoutSetBranchId")
+			).setParameter(
+				"privateLayout", privateLayout
+			).setParameter(
+				"selPlid", selPlid
+			).buildString()
+		%>'
+		label="switch-to-advanced-publish-process"
 		small="<%= true %>"
 		type="button"
 	/>
 </clay:container-fluid>
 
-<portlet:actionURL name="editPublishConfiguration" var="confirmedActionURL">
-	<portlet:param name="mvcRenderCommandName" value="editPublishConfigurationSimple" />
+<portlet:actionURL name="/export_import/edit_publish_configuration" var="confirmedActionURL">
+	<portlet:param name="mvcRenderCommandName" value="/export_import/edit_publish_configuration_simple" />
 	<portlet:param name="exportImportConfigurationId" value="<%= String.valueOf(exportImportConfiguration.getExportImportConfigurationId()) %>" />
 	<portlet:param name="quickPublish" value="<%= Boolean.TRUE.toString() %>" />
 </portlet:actionURL>
@@ -88,17 +96,17 @@ advancedPublishURL.setParameter("privateLayout", String.valueOf(privateLayout));
 		<%
 		String taskExecutorClassName = localPublishing ? BackgroundTaskExecutorNames.LAYOUT_STAGING_BACKGROUND_TASK_EXECUTOR : BackgroundTaskExecutorNames.LAYOUT_REMOTE_STAGING_BACKGROUND_TASK_EXECUTOR;
 
-		int incompleteBackgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupDisplayContextHelper.getStagingGroupId(), taskExecutorClassName, false);
+		int incompleteBackgroundTaskCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupDisplayContextHelper.getStagingGroupId(), taskExecutorClassName, false);
 
 		if (localPublishing) {
-			incompleteBackgroundTasksCount += BackgroundTaskManagerUtil.getBackgroundTasksCount(groupDisplayContextHelper.getLiveGroupId(), taskExecutorClassName, false);
+			incompleteBackgroundTaskCount += BackgroundTaskManagerUtil.getBackgroundTasksCount(groupDisplayContextHelper.getLiveGroupId(), taskExecutorClassName, false);
 		}
 		%>
 
 		<clay:container-fluid>
-			<div class="<%= (incompleteBackgroundTasksCount == 0) ? "hide" : "in-progress" %>" id="<portlet:namespace />incompleteProcessMessage">
+			<div class="<%= (incompleteBackgroundTaskCount == 0) ? "hide" : "in-progress" %>" id="<portlet:namespace />incompleteProcessMessage">
 				<liferay-util:include page="/incomplete_processes_message.jsp" servletContext="<%= application %>">
-					<liferay-util:param name="incompleteBackgroundTasksCount" value="<%= String.valueOf(incompleteBackgroundTasksCount) %>" />
+					<liferay-util:param name="incompleteBackgroundTaskCount" value="<%= String.valueOf(incompleteBackgroundTaskCount) %>" />
 				</liferay-util:include>
 			</div>
 
@@ -108,7 +116,7 @@ advancedPublishURL.setParameter("privateLayout", String.valueOf(privateLayout));
 						<aui:input maxlength='<%= ModelHintsUtil.getMaxLength(ExportImportConfiguration.class.getName(), "name") %>' name="name" placeholder="process-name-placeholder" />
 					</aui:fieldset>
 
-					<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="changes-since-last-publication" markupView="lexicon">
+					<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="changes-since-last-publish-process" markupView="lexicon">
 						<li class="options portlet-list-simple">
 							<ul class="portlet-list">
 
@@ -240,7 +248,7 @@ advancedPublishURL.setParameter("privateLayout", String.valueOf(privateLayout));
 				</aui:fieldset-group>
 
 				<span class="publish-simple-help-text">
-					<liferay-ui:message key="simple-publication-help" />
+					<liferay-ui:message key="simple-publish-process-help" />
 				</span>
 			</ul>
 		</clay:container-fluid>

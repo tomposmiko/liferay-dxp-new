@@ -17,10 +17,11 @@ package com.liferay.portal.cache.io;
 import com.liferay.petra.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.petra.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.petra.lang.ClassLoaderPool;
-import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LogEntry;
+import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.io.ObjectInputStream;
@@ -30,7 +31,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -139,25 +139,24 @@ public class SerializableObjectWrapperTest {
 
 			});
 
-		try (CaptureHandler captureHandler =
-				JDKLoggerTestUtil.configureJDKLogger(
-					SerializableObjectWrapper.class.getName(), Level.ALL)) {
+		try (LogCapture logCapture = LoggerTestUtil.configureJDKLogger(
+				SerializableObjectWrapper.class.getName(), Level.ALL)) {
 
 			// Test unwrap
 
-			List<LogRecord> logRecords = captureHandler.getLogRecords();
+			List<LogEntry> logEntries = logCapture.getLogEntries();
 
 			Assert.assertNull(
 				SerializableObjectWrapper.unwrap(
 					_cloneBySerialization(_testSerializableObjectWrapper)));
 
-			Assert.assertEquals(logRecords.toString(), 1, logRecords.size());
+			Assert.assertEquals(logEntries.toString(), 1, logEntries.size());
 
-			LogRecord logRecord = logRecords.get(0);
+			LogEntry logEntry = logEntries.get(0);
 
 			Assert.assertEquals(
-				"Unable to deserialize object", logRecord.getMessage());
-			Assert.assertSame(classNotFoundException, logRecord.getThrown());
+				"Unable to deserialize object", logEntry.getMessage());
+			Assert.assertSame(classNotFoundException, logEntry.getThrowable());
 		}
 		finally {
 			currentThread.setContextClassLoader(contextClassLoader);

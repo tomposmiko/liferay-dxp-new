@@ -47,6 +47,12 @@ renderResponse.setTitle(LanguageUtil.get(request, "view-form"));
 		<aui:input name="formInstanceRecordId" type="hidden" value="<%= ddmFormInstanceRecordVersion.getFormInstanceRecordId() %>" />
 		<aui:input name="formInstanceId" type="hidden" value="<%= ddmFormInstanceRecordVersion.getFormInstanceId() %>" />
 
+		<%
+		DDMFormValues ddmFormValues = ddmFormInstanceRecordVersion.getDDMFormValues();
+		%>
+
+		<aui:input name="defaultLanguageId" type="hidden" value="<%= LocaleUtil.toLanguageId(ddmFormValues.getDefaultLocale()) %>" />
+
 		<div class="ddm-form-basic-info">
 			<h1 class="ddm-form-name"><%= ddmFormAdminDisplayContext.getFormName() %></h1>
 
@@ -59,6 +65,21 @@ renderResponse.setTitle(LanguageUtil.get(request, "view-form"));
 			</c:if>
 		</div>
 
-		<%= ddmFormAdminDisplayContext.getDDMFormHTML(renderRequest, false) %>
+		<%
+		String containerId = StringPool.BLANK;
+
+		Map<String, Object> ddmFormContext = ddmFormAdminDisplayContext.getDDMFormContext(renderRequest, false);
+
+		if (ddmFormContext.containsKey("containerId")) {
+			containerId = (String)ddmFormContext.get("containerId");
+		}
+		%>
+
+		<div id="<%= containerId %>">
+			<react:component
+				module="admin/js/FormView"
+				props="<%= ddmFormContext %>"
+			/>
+		</div>
 	</aui:form>
 </clay:container-fluid>

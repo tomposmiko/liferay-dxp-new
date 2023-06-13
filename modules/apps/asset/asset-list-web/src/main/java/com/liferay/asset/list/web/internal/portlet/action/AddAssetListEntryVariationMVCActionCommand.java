@@ -16,10 +16,8 @@ package com.liferay.asset.list.web.internal.portlet.action;
 
 import com.liferay.asset.list.constants.AssetListEntryTypeConstants;
 import com.liferay.asset.list.constants.AssetListPortletKeys;
-import com.liferay.asset.list.model.AssetListEntry;
-import com.liferay.asset.list.service.AssetListEntryLocalService;
 import com.liferay.asset.list.service.AssetListEntryService;
-import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -29,11 +27,9 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.segments.constants.SegmentsEntryConstants;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
-import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -63,7 +59,7 @@ public class AddAssetListEntryVariationMVCActionCommand
 		long segmentsEntryId = ParamUtil.getLong(
 			actionRequest, "segmentsEntryId");
 
-		UnicodeProperties unicodeProperties = new UnicodeProperties(true);
+		String typeSettings = null;
 
 		int type = ParamUtil.getInteger(actionRequest, "type");
 
@@ -71,25 +67,19 @@ public class AddAssetListEntryVariationMVCActionCommand
 			ThemeDisplay themeDisplay =
 				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
+			UnicodeProperties unicodeProperties = new UnicodeProperties(true);
+
 			unicodeProperties.setProperty(
 				"groupIds", String.valueOf(themeDisplay.getScopeGroupId()));
-		}
-		else if (type == AssetListEntryTypeConstants.TYPE_MANUAL) {
-			AssetListEntry assetListEntry =
-				_assetListEntryLocalService.fetchAssetListEntry(
-					assetListEntryId);
 
-			unicodeProperties.load(
-				assetListEntry.getTypeSettings(
-					SegmentsEntryConstants.ID_DEFAULT));
+			typeSettings = unicodeProperties.toString();
 		}
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
 
 		_assetListEntryService.updateAssetListEntry(
-			assetListEntryId, segmentsEntryId, unicodeProperties.toString(),
-			serviceContext);
+			assetListEntryId, segmentsEntryId, typeSettings, serviceContext);
 
 		sendRedirect(
 			actionRequest, actionResponse,
@@ -100,22 +90,16 @@ public class AddAssetListEntryVariationMVCActionCommand
 		ActionResponse actionResponse, long assetListEntryId,
 		long segmentsEntryId) {
 
-		LiferayPortletResponse liferayPortletResponse =
-			_portal.getLiferayPortletResponse(actionResponse);
-
-		PortletURL portletURL = liferayPortletResponse.createRenderURL();
-
-		portletURL.setParameter("mvcPath", "/edit_asset_list_entry.jsp");
-		portletURL.setParameter(
-			"assetListEntryId", String.valueOf(assetListEntryId));
-		portletURL.setParameter(
-			"segmentsEntryId", String.valueOf(segmentsEntryId));
-
-		return portletURL.toString();
+		return PortletURLBuilder.createRenderURL(
+			_portal.getLiferayPortletResponse(actionResponse)
+		).setMVCPath(
+			"/edit_asset_list_entry.jsp"
+		).setParameter(
+			"assetListEntryId", assetListEntryId
+		).setParameter(
+			"segmentsEntryId", segmentsEntryId
+		).buildString();
 	}
-
-	@Reference
-	private AssetListEntryLocalService _assetListEntryLocalService;
 
 	@Reference
 	private AssetListEntryService _assetListEntryService;

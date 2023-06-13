@@ -57,12 +57,17 @@ if (group.isOrganization()) {
 
 String className = ParamUtil.getString(request, "className", User.class.getName());
 
-PortletURL portletURL = renderResponse.createRenderURL();
-
-portletURL.setParameter("tabs1", tabs1);
-portletURL.setParameter("redirect", redirect);
-portletURL.setParameter("className", className);
-portletURL.setParameter("groupId", String.valueOf(group.getGroupId()));
+PortletURL portletURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setRedirect(
+	redirect
+).setTabs1(
+	tabs1
+).setParameter(
+	"className", className
+).setParameter(
+	"groupId", group.getGroupId()
+).buildPortletURL();
 
 if (role != null) {
 	portletURL.setParameter("roleId", String.valueOf(roleId));
@@ -166,9 +171,11 @@ String methodName = null;
 </liferay-util:buffer>
 
 <%
-PortletURL clearResultsURL = (PortletURL)request.getAttribute("edit_roles.jsp-portletURL");
-
-clearResultsURL.setParameter("keywords", StringPool.BLANK);
+PortletURL clearResultsURL = PortletURLBuilder.create(
+	(PortletURL)request.getAttribute("edit_roles.jsp-portletURL")
+).setKeywords(
+	StringPool.BLANK
+).buildPortletURL();
 
 SearchContainer<?> searchContainer = (SearchContainer<?>)request.getAttribute("liferay-ui:search:searchContainer");
 %>
@@ -176,7 +183,6 @@ SearchContainer<?> searchContainer = (SearchContainer<?>)request.getAttribute("l
 <clay:management-toolbar
 	clearResultsURL="<%= clearResultsURL.toString() %>"
 	itemsTotal="<%= searchContainer.getTotal() %>"
-	namespace="<%= liferayPortletResponse.getNamespace() %>"
 	searchActionURL="<%= portletURL.toString() %>"
 	selectable="<%= false %>"
 	showCreationMenu="<%= false %>"

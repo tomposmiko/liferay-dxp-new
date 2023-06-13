@@ -14,20 +14,18 @@
 
 package com.liferay.commerce.product.content.web.internal.display.context;
 
-import com.liferay.commerce.account.model.CommerceAccount;
-import com.liferay.commerce.constants.CommerceWebKeys;
-import com.liferay.commerce.context.CommerceContext;
 import com.liferay.commerce.product.catalog.CPCatalogEntry;
 import com.liferay.commerce.product.catalog.CPQuery;
 import com.liferay.commerce.product.content.render.list.CPContentListRendererRegistry;
 import com.liferay.commerce.product.content.render.list.entry.CPContentListEntryRendererRegistry;
-import com.liferay.commerce.product.content.web.internal.util.CPPublisherWebHelper;
+import com.liferay.commerce.product.content.web.internal.helper.CPPublisherWebHelper;
 import com.liferay.commerce.product.data.source.CPDataSource;
 import com.liferay.commerce.product.data.source.CPDataSourceRegistry;
 import com.liferay.commerce.product.data.source.CPDataSourceResult;
 import com.liferay.commerce.product.type.CPType;
 import com.liferay.commerce.product.type.CPTypeServicesTracker;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
@@ -92,7 +90,6 @@ public class CPPublisherDisplayContext extends BaseCPPublisherDisplayContext {
 
 		if (isSelectionStyleDynamic()) {
 			cpDataSourceResult = _getDynamicCPDataSourceResult(
-				cpContentRequestHelper.getRequest(),
 				_searchContainer.getStart(), _searchContainer.getEnd());
 		}
 		else if (isSelectionStyleDataSource()) {
@@ -134,15 +131,15 @@ public class CPPublisherDisplayContext extends BaseCPPublisherDisplayContext {
 		LiferayPortletResponse liferayPortletResponse =
 			cpContentRequestHelper.getLiferayPortletResponse();
 
-		PortletURL portletURL = liferayPortletResponse.createRenderURL();
-
 		String delta = ParamUtil.getString(
 			cpContentRequestHelper.getRequest(), "delta",
 			String.valueOf(getPaginationDelta()));
 
-		portletURL.setParameter("delta", delta);
-
-		return portletURL;
+		return PortletURLBuilder.createRenderURL(
+			liferayPortletResponse
+		).setParameter(
+			"delta", delta
+		).buildPortletURL();
 	}
 
 	public SearchContainer<CPCatalogEntry> getSearchContainer()
@@ -170,8 +167,7 @@ public class CPPublisherDisplayContext extends BaseCPPublisherDisplayContext {
 		return _searchContainer;
 	}
 
-	private CPDataSourceResult _getDynamicCPDataSourceResult(
-			HttpServletRequest httpServletRequest, int start, int end)
+	private CPDataSourceResult _getDynamicCPDataSourceResult(int start, int end)
 		throws Exception {
 
 		SearchContext searchContext = new SearchContext();
@@ -179,22 +175,6 @@ public class CPPublisherDisplayContext extends BaseCPPublisherDisplayContext {
 		searchContext.setAttributes(
 			HashMapBuilder.<String, Serializable>put(
 				Field.STATUS, WorkflowConstants.STATUS_APPROVED
-			).put(
-				"commerceAccountGroupIds",
-				() -> {
-					CommerceContext commerceContext =
-						(CommerceContext)httpServletRequest.getAttribute(
-							CommerceWebKeys.COMMERCE_CONTEXT);
-
-					CommerceAccount commerceAccount =
-						commerceContext.getCommerceAccount();
-
-					if (commerceAccount == null) {
-						return null;
-					}
-
-					return commerceContext.getCommerceAccountGroupIds();
-				}
 			).put(
 				"params", new LinkedHashMap<String, Object>()
 			).build());

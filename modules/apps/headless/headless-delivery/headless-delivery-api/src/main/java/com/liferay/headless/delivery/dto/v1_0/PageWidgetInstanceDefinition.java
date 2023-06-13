@@ -45,7 +45,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("PageWidgetInstanceDefinition")
+@GraphQLName(
+	description = "Represents a definition of a Page Widget instance.",
+	value = "PageWidgetInstanceDefinition"
+)
 @JsonFilter("Liferay.Vulcan")
 @XmlRootElement(name = "PageWidgetInstanceDefinition")
 public class PageWidgetInstanceDefinition implements Serializable {
@@ -60,7 +63,7 @@ public class PageWidgetInstanceDefinition implements Serializable {
 			PageWidgetInstanceDefinition.class, json);
 	}
 
-	@Schema
+	@Schema(description = "The fragment style of the page widget instance.")
 	@Valid
 	public FragmentStyle getFragmentStyle() {
 		return fragmentStyle;
@@ -85,11 +88,15 @@ public class PageWidgetInstanceDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The fragment style of the page widget instance."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected FragmentStyle fragmentStyle;
 
-	@Schema
+	@Schema(
+		description = "A list of fragment viewports of the page widget instance."
+	)
 	@Valid
 	public FragmentViewport[] getFragmentViewports() {
 		return fragmentViewports;
@@ -115,11 +122,13 @@ public class PageWidgetInstanceDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A list of fragment viewports of the page widget instance."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected FragmentViewport[] fragmentViewports;
 
-	@Schema
+	@Schema(description = "The widget instance of the page widget instance.")
 	@Valid
 	public WidgetInstance getWidgetInstance() {
 		return widgetInstance;
@@ -145,7 +154,9 @@ public class PageWidgetInstanceDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The widget instance of the page widget instance."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected WidgetInstance widgetInstance;
 

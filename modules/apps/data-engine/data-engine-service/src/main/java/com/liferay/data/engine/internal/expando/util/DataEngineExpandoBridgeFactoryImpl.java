@@ -18,8 +18,7 @@ import com.liferay.data.engine.internal.configuration.DataEngineConfiguration;
 import com.liferay.data.engine.internal.expando.model.DataEngineExpandoBridgeImpl;
 import com.liferay.data.engine.nativeobject.DataEngineNativeObject;
 import com.liferay.data.engine.nativeobject.tracker.DataEngineNativeObjectTracker;
-import com.liferay.data.engine.rest.resource.v2_0.DataDefinitionResource;
-import com.liferay.data.engine.rest.resource.v2_0.DataRecordResource;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactory;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -33,9 +32,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Jeyvison Nascimento
@@ -59,8 +55,8 @@ public class DataEngineExpandoBridgeFactoryImpl
 
 			try {
 				return new DataEngineExpandoBridgeImpl(
-					className, 0, companyId, _dataDefinitionResourceFactory,
-					_dataRecordResourceFactory, _groupLocalService);
+					className, 0, companyId, _ddmFormFieldTypeServicesTracker,
+					_groupLocalService);
 			}
 			catch (Exception exception) {
 				throw new RuntimeException(exception);
@@ -85,8 +81,7 @@ public class DataEngineExpandoBridgeFactoryImpl
 			try {
 				return new DataEngineExpandoBridgeImpl(
 					className, classPK, companyId,
-					_dataDefinitionResourceFactory, _dataRecordResourceFactory,
-					_groupLocalService);
+					_ddmFormFieldTypeServicesTracker, _groupLocalService);
 			}
 			catch (Exception exception) {
 				throw new RuntimeException(exception);
@@ -103,25 +98,13 @@ public class DataEngineExpandoBridgeFactoryImpl
 			DataEngineConfiguration.class, properties);
 	}
 
-	@Reference(
-		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY
-	)
-	private volatile DataDefinitionResource.Factory
-		_dataDefinitionResourceFactory;
-
 	private volatile DataEngineConfiguration _dataEngineConfiguration;
 
 	@Reference
 	private DataEngineNativeObjectTracker _dataEngineNativeObjectTracker;
 
-	@Reference(
-		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY
-	)
-	private volatile DataRecordResource.Factory _dataRecordResourceFactory;
+	@Reference
+	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
 
 	@Reference
 	private GroupLocalService _groupLocalService;

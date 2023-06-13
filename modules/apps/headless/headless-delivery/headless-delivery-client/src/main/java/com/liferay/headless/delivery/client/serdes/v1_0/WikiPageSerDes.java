@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -60,7 +61,7 @@ public class WikiPageSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (wikiPage.getActions() != null) {
 			if (sb.length() > 1) {
@@ -180,6 +181,20 @@ public class WikiPageSerDes {
 			sb.append("\"");
 
 			sb.append(_escape(wikiPage.getEncodingFormat()));
+
+			sb.append("\"");
+		}
+
+		if (wikiPage.getExternalReferenceCode() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"externalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(wikiPage.getExternalReferenceCode()));
 
 			sb.append("\"");
 		}
@@ -359,6 +374,16 @@ public class WikiPageSerDes {
 			sb.append("\"");
 		}
 
+		if (wikiPage.getWikiNodeId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"wikiNodeId\": ");
+
+			sb.append(wikiPage.getWikiNodeId());
+		}
+
 		sb.append("}");
 
 		return sb.toString();
@@ -378,7 +403,7 @@ public class WikiPageSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (wikiPage.getActions() == null) {
 			map.put("actions", null);
@@ -448,6 +473,15 @@ public class WikiPageSerDes {
 		else {
 			map.put(
 				"encodingFormat", String.valueOf(wikiPage.getEncodingFormat()));
+		}
+
+		if (wikiPage.getExternalReferenceCode() == null) {
+			map.put("externalReferenceCode", null);
+		}
+		else {
+			map.put(
+				"externalReferenceCode",
+				String.valueOf(wikiPage.getExternalReferenceCode()));
 		}
 
 		if (wikiPage.getHeadline() == null) {
@@ -546,6 +580,13 @@ public class WikiPageSerDes {
 			map.put("viewableBy", String.valueOf(wikiPage.getViewableBy()));
 		}
 
+		if (wikiPage.getWikiNodeId() == null) {
+			map.put("wikiNodeId", null);
+		}
+		else {
+			map.put("wikiNodeId", String.valueOf(wikiPage.getWikiNodeId()));
+		}
+
 		return map;
 	}
 
@@ -593,18 +634,14 @@ public class WikiPageSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "customFields")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					CustomField[] customFieldsArray =
-						new CustomField[jsonParserFieldValues.length];
-
-					for (int i = 0; i < customFieldsArray.length; i++) {
-						customFieldsArray[i] = CustomFieldSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					wikiPage.setCustomFields(customFieldsArray);
+					wikiPage.setCustomFields(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomFieldSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CustomField[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
@@ -627,6 +664,14 @@ public class WikiPageSerDes {
 			else if (Objects.equals(jsonParserFieldName, "encodingFormat")) {
 				if (jsonParserFieldValue != null) {
 					wikiPage.setEncodingFormat((String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "externalReferenceCode")) {
+
+				if (jsonParserFieldValue != null) {
+					wikiPage.setExternalReferenceCode(
+						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "headline")) {
@@ -667,18 +712,14 @@ public class WikiPageSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "relatedContents")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					RelatedContent[] relatedContentsArray =
-						new RelatedContent[jsonParserFieldValues.length];
-
-					for (int i = 0; i < relatedContentsArray.length; i++) {
-						relatedContentsArray[i] = RelatedContentSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					wikiPage.setRelatedContents(relatedContentsArray);
+					wikiPage.setRelatedContents(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> RelatedContentSerDes.toDTO((String)object)
+						).toArray(
+							size -> new RelatedContent[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "siteId")) {
@@ -696,22 +737,15 @@ public class WikiPageSerDes {
 						jsonParserFieldName, "taxonomyCategoryBriefs")) {
 
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					TaxonomyCategoryBrief[] taxonomyCategoryBriefsArray =
-						new TaxonomyCategoryBrief[jsonParserFieldValues.length];
-
-					for (int i = 0; i < taxonomyCategoryBriefsArray.length;
-						 i++) {
-
-						taxonomyCategoryBriefsArray[i] =
-							TaxonomyCategoryBriefSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
 					wikiPage.setTaxonomyCategoryBriefs(
-						taxonomyCategoryBriefsArray);
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> TaxonomyCategoryBriefSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new TaxonomyCategoryBrief[size]
+						));
 				}
 			}
 			else if (Objects.equals(
@@ -727,6 +761,12 @@ public class WikiPageSerDes {
 					wikiPage.setViewableBy(
 						WikiPage.ViewableBy.create(
 							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "wikiNodeId")) {
+				if (jsonParserFieldValue != null) {
+					wikiPage.setWikiNodeId(
+						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
 		}

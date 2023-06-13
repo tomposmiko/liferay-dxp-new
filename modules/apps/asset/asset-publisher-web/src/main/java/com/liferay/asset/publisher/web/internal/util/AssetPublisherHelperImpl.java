@@ -32,8 +32,9 @@ import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.publisher.util.AssetEntryResult;
 import com.liferay.asset.publisher.util.AssetPublisherHelper;
 import com.liferay.asset.publisher.web.internal.configuration.AssetPublisherWebConfiguration;
+import com.liferay.asset.publisher.web.internal.constants.AssetPublisherSelectionStyleConstants;
 import com.liferay.asset.util.AssetHelper;
-import com.liferay.petra.string.CharPool;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -323,7 +324,8 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 		throws Exception {
 
 		String selectionStyle = GetterUtil.getString(
-			portletPreferences.getValue("selectionStyle", null), "manual");
+			portletPreferences.getValue("selectionStyle", null),
+			AssetPublisherSelectionStyleConstants.TYPE_MANUAL);
 
 		long assetListEntryId = GetterUtil.getLong(
 			portletPreferences.getValue("assetListEntryId", null));
@@ -332,34 +334,14 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 			_assetListEntryService.fetchAssetListEntry(assetListEntryId);
 
 		if (selectionStyle.equals("asset-list") && (assetListEntry != null)) {
-			List<AssetEntry> viewableAssetEntries = new ArrayList<>();
-
 			long[] segmentsEntryIds = _getSegmentsEntryIds(portletRequest);
 
 			String acClientUserId = GetterUtil.getString(
 				portletRequest.getAttribute(
 					SegmentsWebKeys.SEGMENTS_ANONYMOUS_USER_ID));
 
-			List<AssetEntry> assetEntries =
-				_assetListAssetEntryProvider.getAssetEntries(
-					assetListEntry, segmentsEntryIds, acClientUserId);
-
-			for (AssetEntry assetEntry : assetEntries) {
-				AssetRendererFactory<?> assetRendererFactory =
-					AssetRendererFactoryRegistryUtil.
-						getAssetRendererFactoryByClassName(
-							assetEntry.getClassName());
-
-				AssetRenderer<?> assetRenderer =
-					assetRendererFactory.getAssetRenderer(
-						assetEntry.getClassPK());
-
-				if (assetRenderer.hasViewPermission(permissionChecker)) {
-					viewableAssetEntries.add(assetEntry);
-				}
-			}
-
-			return viewableAssetEntries;
+			return _assetListAssetEntryProvider.getAssetEntries(
+				assetListEntry, segmentsEntryIds, acClientUserId);
 		}
 
 		List<AssetEntry> assetEntries = getAssetEntries(
@@ -515,35 +497,6 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 	}
 
 	@Override
-	public String getAssetSocialURL(
-		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse, AssetEntry assetEntry) {
-
-		AssetRenderer<?> assetRenderer = assetEntry.getAssetRenderer();
-
-		PortletURL viewFullContentURL = getBaseAssetViewURL(
-			liferayPortletRequest, liferayPortletResponse, assetRenderer,
-			assetEntry);
-
-		try {
-			String viewURL = assetRenderer.getURLViewInContext(
-				liferayPortletRequest, liferayPortletResponse,
-				viewFullContentURL.toString());
-
-			if (Validator.isNotNull(viewURL)) {
-				return _normalizeURL(viewURL);
-			}
-		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
-			}
-		}
-
-		return _normalizeURL(viewFullContentURL.toString());
-	}
-
-	@Override
 	public String[] getAssetTagNames(PortletPreferences portletPreferences) {
 		List<String> allAssetTagNames = new ArrayList<>();
 
@@ -603,28 +556,35 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 		AssetRenderer<?> assetRenderer, AssetEntry assetEntry,
 		boolean viewInContext) {
 
-		PortletURL viewFullContentURL = getBaseAssetViewURL(
-			liferayPortletRequest, liferayPortletResponse, assetRenderer,
-			assetEntry);
+		PortletURL redirectURL = PortletURLBuilder.createRenderURL(
+			liferayPortletResponse
+		).setParameter(
+			"assetEntryId", assetEntry.getEntryId()
+		).setParameter(
+			"cur", ParamUtil.getInteger(liferayPortletRequest, "cur")
+		).setParameter(
+			"delta",
+			() -> {
+				int delta = ParamUtil.getInteger(
+					liferayPortletRequest, "delta");
 
-		PortletURL redirectURL = liferayPortletResponse.createRenderURL();
+				if (delta > 0) {
+					return delta;
+				}
 
-		int cur = ParamUtil.getInteger(liferayPortletRequest, "cur");
-		int delta = ParamUtil.getInteger(liferayPortletRequest, "delta");
-		boolean resetCur = ParamUtil.getBoolean(
-			liferayPortletRequest, "resetCur");
+				return null;
+			}
+		).setParameter(
+			"resetCur", ParamUtil.getBoolean(liferayPortletRequest, "resetCur")
+		).buildPortletURL();
 
-		redirectURL.setParameter("cur", String.valueOf(cur));
-
-		if (delta > 0) {
-			redirectURL.setParameter("delta", String.valueOf(delta));
-		}
-
-		redirectURL.setParameter("resetCur", String.valueOf(resetCur));
-		redirectURL.setParameter(
-			"assetEntryId", String.valueOf(assetEntry.getEntryId()));
-
-		viewFullContentURL.setParameter("redirect", redirectURL.toString());
+		PortletURL viewFullContentURL = PortletURLBuilder.create(
+			getBaseAssetViewURL(
+				liferayPortletRequest, liferayPortletResponse, assetRenderer,
+				assetEntry)
+		).setRedirect(
+			redirectURL
+		).buildPortletURL();
 
 		String viewURL = null;
 
@@ -639,17 +599,15 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 				if (Validator.isNotNull(viewURL) &&
 					!Objects.equals(viewURL, noSuchEntryRedirect)) {
 
-					String redirect = ParamUtil.getString(
-						liferayPortletRequest, "redirect");
-
-					if (Validator.isNull(redirect)) {
-						redirect = _portal.getCurrentURL(liferayPortletRequest);
-					}
-
-					viewURL = _http.setParameter(viewURL, "redirect", redirect);
+					viewURL = _http.setParameter(
+						viewURL, "redirect",
+						_portal.getCurrentURL(liferayPortletRequest));
 				}
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 		}
 
@@ -666,16 +624,21 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 		LiferayPortletResponse liferayPortletResponse,
 		AssetRenderer<?> assetRenderer, AssetEntry assetEntry) {
 
-		PortletURL baseAssetViewURL = liferayPortletResponse.createRenderURL();
+		PortletURL baseAssetViewURL = PortletURLBuilder.createRenderURL(
+			liferayPortletResponse
+		).setMVCPath(
+			"/view_content.jsp"
+		).setParameter(
+			"assetEntryId", assetEntry.getEntryId()
+		).setParameter(
+			"type",
+			() -> {
+				AssetRendererFactory<?> assetRendererFactory =
+					assetRenderer.getAssetRendererFactory();
 
-		baseAssetViewURL.setParameter("mvcPath", "/view_content.jsp");
-		baseAssetViewURL.setParameter(
-			"assetEntryId", String.valueOf(assetEntry.getEntryId()));
-
-		AssetRendererFactory<?> assetRendererFactory =
-			assetRenderer.getAssetRendererFactory();
-
-		baseAssetViewURL.setParameter("type", assetRendererFactory.getType());
+				return assetRendererFactory.getType();
+			}
+		).buildPortletURL();
 
 		String urlTitle = assetRenderer.getUrlTitle(
 			liferayPortletRequest.getLocale());
@@ -692,13 +655,10 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 
 			urlTitle = urlTitle.replaceAll(StringPool.SLASH, StringPool.DASH);
 
-			StringBundler sb = new StringBundler(3);
-
-			sb.append(StringPool.DASH);
-			sb.append(StringPool.DASH);
-			sb.append(StringPool.PLUS);
-
-			urlTitle = urlTitle.replaceAll(sb.toString(), StringPool.DASH);
+			urlTitle = urlTitle.replaceAll(
+				StringBundler.concat(
+					StringPool.DASH, StringPool.DASH, StringPool.PLUS),
+				StringPool.DASH);
 
 			baseAssetViewURL.setParameter("urlTitle", urlTitle);
 		}
@@ -714,9 +674,13 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 			portletPreferences.getValue(
 				"anyAssetType", Boolean.TRUE.toString()));
 		String selectionStyle = portletPreferences.getValue(
-			"selectionStyle", "dynamic");
+			"selectionStyle",
+			AssetPublisherSelectionStyleConstants.TYPE_DYNAMIC);
 
-		if (anyAssetType || selectionStyle.equals("manual")) {
+		if (anyAssetType ||
+			selectionStyle.equals(
+				AssetPublisherSelectionStyleConstants.TYPE_MANUAL)) {
+
 			return availableClassNameIds;
 		}
 
@@ -819,8 +783,9 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 
 			return parentGroupId;
 		}
-
-		throw new IllegalArgumentException("Invalid scope ID " + scopeId);
+		else {
+			throw new IllegalArgumentException("Invalid scope ID " + scopeId);
+		}
 	}
 
 	@Override
@@ -841,6 +806,9 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 				groupIds.add(groupId);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 		}
 
@@ -1230,16 +1198,6 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 		return assetTagNames;
 	}
 
-	private String _normalizeURL(String url) {
-		int index = url.indexOf(CharPool.QUESTION);
-
-		if (index != -1) {
-			url = url.substring(0, index);
-		}
-
-		return url;
-	}
-
 	private void _removeAndStoreSelection(
 			List<String> assetEntryUuids, PortletPreferences portletPreferences)
 		throws Exception {
@@ -1437,7 +1395,8 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 	@Reference
 	private AssetListEntryService _assetListEntryService;
 
-	private AssetPublisherWebConfiguration _assetPublisherWebConfiguration;
+	private volatile AssetPublisherWebConfiguration
+		_assetPublisherWebConfiguration;
 
 	@Reference
 	private AssetTagLocalService _assetTagLocalService;

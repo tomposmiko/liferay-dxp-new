@@ -33,10 +33,6 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 	@Override
 	public void onAfterRemove(Layout layout) {
-		if (layout == null) {
-			return;
-		}
-
 		_friendlyURLEntryLocalService.deleteFriendlyURLEntry(
 			layout.getGroupId(),
 			_layoutFriendlyURLEntryHelper.getClassNameId(

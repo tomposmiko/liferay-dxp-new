@@ -261,7 +261,13 @@ public class CommerceInventoryWarehouseLocalServiceUtil {
 			commerceInventoryWarehouseId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce inventory warehouse with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse's external reference code
+	 * @return the matching commerce inventory warehouse, or <code>null</code> if a matching commerce inventory warehouse could not be found
+	 */
 	public static CommerceInventoryWarehouse
 		fetchCommerceInventoryWarehouseByExternalReferenceCode(
 			long companyId, String externalReferenceCode) {
@@ -271,6 +277,9 @@ public class CommerceInventoryWarehouseLocalServiceUtil {
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceInventoryWarehouseByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static CommerceInventoryWarehouse
 		fetchCommerceInventoryWarehouseByReferenceCode(
@@ -278,6 +287,14 @@ public class CommerceInventoryWarehouseLocalServiceUtil {
 
 		return getService().fetchCommerceInventoryWarehouseByReferenceCode(
 			companyId, externalReferenceCode);
+	}
+
+	public static CommerceInventoryWarehouse
+		fetchCommerceInventoryWarehouseByReferenceCode(
+			String externalReferenceCode, long companyId) {
+
+		return getService().fetchCommerceInventoryWarehouseByReferenceCode(
+			externalReferenceCode, companyId);
 	}
 
 	public static CommerceInventoryWarehouse
@@ -311,7 +328,14 @@ public class CommerceInventoryWarehouseLocalServiceUtil {
 			commerceInventoryWarehouseId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce inventory warehouse with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse's external reference code
+	 * @return the matching commerce inventory warehouse
+	 * @throws PortalException if a matching commerce inventory warehouse could not be found
+	 */
 	public static CommerceInventoryWarehouse
 			getCommerceInventoryWarehouseByExternalReferenceCode(
 				long companyId, String externalReferenceCode)
@@ -440,14 +464,13 @@ public class CommerceInventoryWarehouseLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
-	public static List<CommerceInventoryWarehouse>
-			searchCommerceInventoryWarehouses(
-				long companyId, Boolean active, String commerceCountryCode,
-				String keywords, int start, int end,
-				com.liferay.portal.kernel.search.Sort sort)
+	public static List<CommerceInventoryWarehouse> search(
+			long companyId, Boolean active, String commerceCountryCode,
+			String keywords, int start, int end,
+			com.liferay.portal.kernel.search.Sort sort)
 		throws PortalException {
 
-		return getService().searchCommerceInventoryWarehouses(
+		return getService().search(
 			companyId, active, commerceCountryCode, keywords, start, end, sort);
 	}
 

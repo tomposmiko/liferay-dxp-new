@@ -17,8 +17,6 @@ package com.liferay.dynamic.data.lists.service.base;
 import com.liferay.dynamic.data.lists.model.DDLRecordVersion;
 import com.liferay.dynamic.data.lists.service.DDLRecordVersionService;
 import com.liferay.dynamic.data.lists.service.DDLRecordVersionServiceUtil;
-import com.liferay.dynamic.data.lists.service.persistence.DDLRecordFinder;
-import com.liferay.dynamic.data.lists.service.persistence.DDLRecordPersistence;
 import com.liferay.dynamic.data.lists.service.persistence.DDLRecordVersionPersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -26,8 +24,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -149,14 +145,5 @@ public abstract class DDLRecordVersionServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected DDLRecordPersistence ddlRecordPersistence;
-
-	@Reference
-	protected DDLRecordFinder ddlRecordFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDLRecordVersionServiceBaseImpl.class);
 
 }

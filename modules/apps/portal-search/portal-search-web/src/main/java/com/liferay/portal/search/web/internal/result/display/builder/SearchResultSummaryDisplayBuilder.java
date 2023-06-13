@@ -20,6 +20,8 @@ import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.util.AssetRendererFactoryLookup;
+import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -42,6 +44,7 @@ import com.liferay.portal.kernel.util.FastDateFormatConstants;
 import com.liferay.portal.kernel.util.FastDateFormatFactory;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.legacy.document.DocumentBuilderFactory;
@@ -107,9 +110,6 @@ public class SearchResultSummaryDisplayBuilder {
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(exception, exception);
-			}
-			else if (_log.isWarnEnabled()) {
-				_log.warn(exception.toString());
 			}
 
 			return buildTemporarilyUnavailable();
@@ -212,6 +212,14 @@ public class SearchResultSummaryDisplayBuilder {
 		return this;
 	}
 
+	public SearchResultSummaryDisplayBuilder setObjectDefinitionLocalService(
+		ObjectDefinitionLocalService objectDefinitionLocalService) {
+
+		_objectDefinitionLocalService = objectDefinitionLocalService;
+
+		return this;
+	}
+
 	public SearchResultSummaryDisplayBuilder setPortletURLFactory(
 		PortletURLFactory portletURLFactory) {
 
@@ -309,15 +317,10 @@ public class SearchResultSummaryDisplayBuilder {
 		Group group = _groupLocalService.fetchGroup(assetRenderer.getGroupId());
 
 		if ((group != null) && group.isStagingGroup()) {
-			StringBundler sb = new StringBundler(5);
-
-			sb.append(title);
-			sb.append(StringPool.SPACE);
-			sb.append(StringPool.OPEN_PARENTHESIS);
-			sb.append(_language.get(_httpServletRequest, "staged"));
-			sb.append(StringPool.CLOSE_PARENTHESIS);
-
-			title = sb.toString();
+			title = StringBundler.concat(
+				title, StringPool.SPACE, StringPool.OPEN_PARENTHESIS,
+				_language.get(_httpServletRequest, "staged"),
+				StringPool.CLOSE_PARENTHESIS);
 		}
 
 		return title;
@@ -690,6 +693,17 @@ public class SearchResultSummaryDisplayBuilder {
 		String modelResource = _resourceActions.getModelResource(
 			_themeDisplay.getLocale(), className);
 
+		if (className.startsWith(ObjectDefinition.class.getName() + "#")) {
+			String[] parts = StringUtil.split(className, "#");
+
+			ObjectDefinition objectDefinition =
+				_objectDefinitionLocalService.fetchObjectDefinition(
+					Long.valueOf(parts[1]));
+
+			modelResource = objectDefinition.getLabel(
+				_themeDisplay.getLocale());
+		}
+
 		if (!Validator.isBlank(modelResource)) {
 			searchResultSummaryDisplayContext.setModelResource(modelResource);
 			searchResultSummaryDisplayContext.setModelResourceVisible(true);
@@ -958,11 +972,9 @@ public class SearchResultSummaryDisplayBuilder {
 			return false;
 		}
 
-		if (ArrayUtil.isNotEmpty(assetEntry.getCategoryIds())) {
-			return true;
-		}
+		if (ArrayUtil.isNotEmpty(assetEntry.getCategoryIds()) ||
+			ArrayUtil.isNotEmpty(assetEntry.getTagNames())) {
 
-		if (ArrayUtil.isNotEmpty(assetEntry.getTagNames())) {
 			return true;
 		}
 
@@ -972,11 +984,9 @@ public class SearchResultSummaryDisplayBuilder {
 	protected boolean hasAssetRendererURLDownload(
 		AssetRenderer<?> assetRenderer) {
 
-		if (assetRenderer == null) {
-			return false;
-		}
+		if ((assetRenderer == null) ||
+			Validator.isNull(assetRenderer.getURLDownload(_themeDisplay))) {
 
-		if (Validator.isNull(assetRenderer.getURLDownload(_themeDisplay))) {
 			return false;
 		}
 
@@ -1025,6 +1035,7 @@ public class SearchResultSummaryDisplayBuilder {
 	private Language _language;
 	private com.liferay.portal.kernel.search.Document _legacyDocument;
 	private Locale _locale;
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private PortletURLFactory _portletURLFactory;
 	private RenderRequest _renderRequest;
 	private RenderResponse _renderResponse;

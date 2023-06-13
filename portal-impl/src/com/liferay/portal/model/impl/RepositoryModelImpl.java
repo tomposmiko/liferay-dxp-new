@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -326,90 +327,112 @@ public class RepositoryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Repository, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Repository>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Repository, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Repository, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Repository.class.getClassLoader(), Repository.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", Repository::getMvccVersion);
-		attributeGetterFunctions.put("uuid", Repository::getUuid);
-		attributeGetterFunctions.put(
-			"repositoryId", Repository::getRepositoryId);
-		attributeGetterFunctions.put("groupId", Repository::getGroupId);
-		attributeGetterFunctions.put("companyId", Repository::getCompanyId);
-		attributeGetterFunctions.put("userId", Repository::getUserId);
-		attributeGetterFunctions.put("userName", Repository::getUserName);
-		attributeGetterFunctions.put("createDate", Repository::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", Repository::getModifiedDate);
-		attributeGetterFunctions.put("classNameId", Repository::getClassNameId);
-		attributeGetterFunctions.put("name", Repository::getName);
-		attributeGetterFunctions.put("description", Repository::getDescription);
-		attributeGetterFunctions.put("portletId", Repository::getPortletId);
-		attributeGetterFunctions.put(
-			"typeSettings", Repository::getTypeSettings);
-		attributeGetterFunctions.put("dlFolderId", Repository::getDlFolderId);
-		attributeGetterFunctions.put(
-			"lastPublishDate", Repository::getLastPublishDate);
+		try {
+			Constructor<Repository> constructor =
+				(Constructor<Repository>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Repository, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Repository, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Repository, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Repository, Object>>();
 		Map<String, BiConsumer<Repository, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Repository, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", Repository::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<Repository, Long>)Repository::setMvccVersion);
+		attributeGetterFunctions.put("uuid", Repository::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<Repository, String>)Repository::setUuid);
+		attributeGetterFunctions.put(
+			"repositoryId", Repository::getRepositoryId);
 		attributeSetterBiConsumers.put(
 			"repositoryId",
 			(BiConsumer<Repository, Long>)Repository::setRepositoryId);
+		attributeGetterFunctions.put("groupId", Repository::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<Repository, Long>)Repository::setGroupId);
+		attributeGetterFunctions.put("companyId", Repository::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<Repository, Long>)Repository::setCompanyId);
+		attributeGetterFunctions.put("userId", Repository::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<Repository, Long>)Repository::setUserId);
+		attributeGetterFunctions.put("userName", Repository::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<Repository, String>)Repository::setUserName);
+		attributeGetterFunctions.put("createDate", Repository::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<Repository, Date>)Repository::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", Repository::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<Repository, Date>)Repository::setModifiedDate);
+		attributeGetterFunctions.put("classNameId", Repository::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<Repository, Long>)Repository::setClassNameId);
+		attributeGetterFunctions.put("name", Repository::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<Repository, String>)Repository::setName);
+		attributeGetterFunctions.put("description", Repository::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<Repository, String>)Repository::setDescription);
+		attributeGetterFunctions.put("portletId", Repository::getPortletId);
 		attributeSetterBiConsumers.put(
 			"portletId",
 			(BiConsumer<Repository, String>)Repository::setPortletId);
+		attributeGetterFunctions.put(
+			"typeSettings", Repository::getTypeSettings);
 		attributeSetterBiConsumers.put(
 			"typeSettings",
 			(BiConsumer<Repository, String>)Repository::setTypeSettings);
+		attributeGetterFunctions.put("dlFolderId", Repository::getDlFolderId);
 		attributeSetterBiConsumers.put(
 			"dlFolderId",
 			(BiConsumer<Repository, Long>)Repository::setDlFolderId);
+		attributeGetterFunctions.put(
+			"lastPublishDate", Repository::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<Repository, Date>)Repository::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -858,6 +881,42 @@ public class RepositoryModelImpl
 	}
 
 	@Override
+	public Repository cloneWithOriginalValues() {
+		RepositoryImpl repositoryImpl = new RepositoryImpl();
+
+		repositoryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		repositoryImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		repositoryImpl.setRepositoryId(
+			this.<Long>getColumnOriginalValue("repositoryId"));
+		repositoryImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		repositoryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		repositoryImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		repositoryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		repositoryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		repositoryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		repositoryImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		repositoryImpl.setName(this.<String>getColumnOriginalValue("name"));
+		repositoryImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		repositoryImpl.setPortletId(
+			this.<String>getColumnOriginalValue("portletId"));
+		repositoryImpl.setTypeSettings(
+			this.<String>getColumnOriginalValue("typeSettings"));
+		repositoryImpl.setDlFolderId(
+			this.<Long>getColumnOriginalValue("dlFolderId"));
+		repositoryImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+
+		return repositoryImpl;
+	}
+
+	@Override
 	public int compareTo(Repository repository) {
 		long primaryKey = repository.getPrimaryKey();
 
@@ -1105,9 +1164,7 @@ public class RepositoryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Repository>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Repository.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

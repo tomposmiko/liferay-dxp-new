@@ -45,7 +45,6 @@ public class SXPElementWrapper
 
 		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
-		attributes.put("externalReferenceCode", getExternalReferenceCode());
 		attributes.put("sxpElementId", getSXPElementId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
@@ -56,10 +55,8 @@ public class SXPElementWrapper
 		attributes.put("elementDefinitionJSON", getElementDefinitionJSON());
 		attributes.put("hidden", isHidden());
 		attributes.put("readOnly", isReadOnly());
-		attributes.put("schemaVersion", getSchemaVersion());
 		attributes.put("title", getTitle());
 		attributes.put("type", getType());
-		attributes.put("version", getVersion());
 		attributes.put("status", getStatus());
 
 		return attributes;
@@ -77,13 +74,6 @@ public class SXPElementWrapper
 
 		if (uuid != null) {
 			setUuid(uuid);
-		}
-
-		String externalReferenceCode = (String)attributes.get(
-			"externalReferenceCode");
-
-		if (externalReferenceCode != null) {
-			setExternalReferenceCode(externalReferenceCode);
 		}
 
 		Long sxpElementId = (Long)attributes.get("sxpElementId");
@@ -147,12 +137,6 @@ public class SXPElementWrapper
 			setReadOnly(readOnly);
 		}
 
-		String schemaVersion = (String)attributes.get("schemaVersion");
-
-		if (schemaVersion != null) {
-			setSchemaVersion(schemaVersion);
-		}
-
 		String title = (String)attributes.get("title");
 
 		if (title != null) {
@@ -165,17 +149,16 @@ public class SXPElementWrapper
 			setType(type);
 		}
 
-		String version = (String)attributes.get("version");
-
-		if (version != null) {
-			setVersion(version);
-		}
-
 		Integer status = (Integer)attributes.get("status");
 
 		if (status != null) {
 			setStatus(status);
 		}
+	}
+
+	@Override
+	public SXPElement cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
 	}
 
 	@Override
@@ -295,16 +278,6 @@ public class SXPElementWrapper
 	}
 
 	/**
-	 * Returns the external reference code of this sxp element.
-	 *
-	 * @return the external reference code of this sxp element
-	 */
-	@Override
-	public String getExternalReferenceCode() {
-		return model.getExternalReferenceCode();
-	}
-
-	/**
 	 * Returns the hidden of this sxp element.
 	 *
 	 * @return the hidden of this sxp element
@@ -352,16 +325,6 @@ public class SXPElementWrapper
 	@Override
 	public boolean getReadOnly() {
 		return model.getReadOnly();
-	}
-
-	/**
-	 * Returns the schema version of this sxp element.
-	 *
-	 * @return the schema version of this sxp element
-	 */
-	@Override
-	public String getSchemaVersion() {
-		return model.getSchemaVersion();
 	}
 
 	/**
@@ -511,16 +474,6 @@ public class SXPElementWrapper
 	}
 
 	/**
-	 * Returns the version of this sxp element.
-	 *
-	 * @return the version of this sxp element
-	 */
-	@Override
-	public String getVersion() {
-		return model.getVersion();
-	}
-
-	/**
 	 * Returns <code>true</code> if this sxp element is hidden.
 	 *
 	 * @return <code>true</code> if this sxp element is hidden; <code>false</code> otherwise
@@ -658,16 +611,6 @@ public class SXPElementWrapper
 	}
 
 	/**
-	 * Sets the external reference code of this sxp element.
-	 *
-	 * @param externalReferenceCode the external reference code of this sxp element
-	 */
-	@Override
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		model.setExternalReferenceCode(externalReferenceCode);
-	}
-
-	/**
 	 * Sets whether this sxp element is hidden.
 	 *
 	 * @param hidden the hidden of this sxp element
@@ -715,16 +658,6 @@ public class SXPElementWrapper
 	@Override
 	public void setReadOnly(boolean readOnly) {
 		model.setReadOnly(readOnly);
-	}
-
-	/**
-	 * Sets the schema version of this sxp element.
-	 *
-	 * @param schemaVersion the schema version of this sxp element
-	 */
-	@Override
-	public void setSchemaVersion(String schemaVersion) {
-		model.setSchemaVersion(schemaVersion);
 	}
 
 	/**
@@ -859,16 +792,6 @@ public class SXPElementWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
-	}
-
-	/**
-	 * Sets the version of this sxp element.
-	 *
-	 * @param version the version of this sxp element
-	 */
-	@Override
-	public void setVersion(String version) {
-		model.setVersion(version);
 	}
 
 	@Override

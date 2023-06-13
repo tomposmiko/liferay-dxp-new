@@ -234,7 +234,7 @@ AUI.add(
 				var newNode = {
 					alwaysShowHitArea: hasChildren,
 					cssClasses: {
-						pages: A.merge(TREE_CSS_CLASSES, cssIcons),
+						pages: {...TREE_CSS_CLASSES, ...cssIcons},
 					},
 					draggable: node.sortable,
 					expanded,
@@ -256,7 +256,7 @@ AUI.add(
 					);
 				}
 
-				if (instance.get('selPlid') == node.plid) {
+				if (instance.get('selPlid') === node.plid) {
 					instance._pendingSelectedNodeId = id;
 				}
 
@@ -268,7 +268,7 @@ AUI.add(
 				if (node.layoutRevisionId) {
 					if (!node.layoutRevisionHead) {
 						title = Liferay.Language.get(
-							'there-is-not-a-version-of-this-page-marked-as-ready-for-publication'
+							'there-is-not-a-version-of-this-page-marked-as-ready-for-publish-process'
 						);
 					}
 					else if (node.layoutBranchName) {
@@ -279,7 +279,7 @@ AUI.add(
 						name += Lang.sub(' [{layoutBranchName}]', node);
 
 						title = Liferay.Language.get(
-							'this-is-the-page-variation-that-is-marked-as-ready-for-publication'
+							'this-is-the-page-variation-that-is-marked-as-ready-for-publish-process'
 						);
 					}
 
@@ -309,17 +309,15 @@ AUI.add(
 			_formatNodeLabel(node, cssClass, name, title) {
 				var instance = this;
 
-				var data = A.merge(
-					{
-						cssClass,
-						label: name,
-						plid: node.plid,
-						title,
-						url: node.regularURL,
-						uuid: node.uuid,
-					},
-					node
-				);
+				var data = {
+					cssClass,
+					label: name,
+					plid: node.plid,
+					title,
+					url: node.regularURL,
+					uuid: node.uuid,
+					...node,
+				};
 
 				var label = instance._createNodeLink(
 					data,
@@ -333,13 +331,11 @@ AUI.add(
 				var instance = this;
 
 				var rootLabel = instance._createNodeLink(
-					A.merge(
-						{
-							label: Liferay.Util.escapeHTML(rootConfig.label),
-							plid: rootConfig.defaultParentLayoutId,
-						},
-						rootConfig
-					),
+					{
+						label: Liferay.Util.escapeHTML(rootConfig.label),
+						plid: rootConfig.defaultParentLayoutId,
+						...rootConfig,
+					},
 					rootConfig.linkTemplate
 				);
 
@@ -411,7 +407,7 @@ AUI.add(
 
 									this.syncUI();
 								}
-								catch (e) {}
+								catch (error) {}
 
 								this.fire('ioSuccess');
 							},
@@ -541,7 +537,7 @@ AUI.add(
 					linkTemplate: NODE_LINK_TPL,
 				};
 
-				return A.merge(defaultRootConfig, val);
+				return {...defaultRootConfig, ...val};
 			},
 
 			_updateLayout(data) {

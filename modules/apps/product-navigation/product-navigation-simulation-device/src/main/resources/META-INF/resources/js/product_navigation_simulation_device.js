@@ -15,10 +15,11 @@
 AUI.add(
 	'liferay-product-navigation-simulation-device',
 	(A) => {
+		// eslint-disable-next-line @liferay/aui/no-object
 		var AObject = A.Object;
 		var Lang = A.Lang;
 
-		var BODY = A.getBody();
+		var BODY = document.body;
 
 		var CSS_SELECTED = 'selected';
 
@@ -73,8 +74,6 @@ AUI.add(
 			'<div class="lfr-device-size-status">' +
 			'<span class="lfr-device-size-status-content"></span>' +
 			'</div>';
-
-		var TPL_SIMULATION_DEVICE = '<div class="lfr-simulation-device" />';
 
 		var WIN = A.config.win;
 
@@ -179,7 +178,8 @@ AUI.add(
 							dialogWidth = widthNode.val();
 						}
 						else {
-							dialogWidth = instance._simulationDeviceNode.width();
+							dialogWidth =
+								instance._simulationDeviceNode.offsetWidth;
 
 							dialogAutoWidth = true;
 						}
@@ -192,7 +192,8 @@ AUI.add(
 							dialogHeight = heightNode.val();
 						}
 						else {
-							dialogHeight = instance._simulationDeviceNode.height();
+							dialogHeight =
+								instance._simulationDeviceNode.offsetHeight;
 
 							dialogAutoHeight = true;
 						}
@@ -374,12 +375,15 @@ AUI.add(
 						Liferay.Util.openWindow(
 							{
 								cache: false,
-								dialog: A.merge(DIALOG_DEFAULTS, dialogConfig),
+								dialog: {
+									...DIALOG_DEFAULTS,
+									...dialogConfig,
+								},
 								dialogIframe: DIALOG_IFRAME_DEFAULTS,
 								id: instance._dialogId,
 								iframeId: 'simulationDeviceIframe',
 								title: Liferay.Language.get(
-									'simulation-peview'
+									'simulation-preview'
 								),
 								uri: createIframeURL(),
 							},
@@ -498,11 +502,14 @@ AUI.add(
 
 					instance._dialogId = A.guid();
 
-					instance._simulationDeviceNode = A.Node.create(
-						Lang.sub(TPL_SIMULATION_DEVICE)
+					instance._simulationDeviceNode = document.createElement(
+						'div'
 					);
 
-					BODY.append(instance._simulationDeviceNode);
+					instance._simulationDeviceNode.className =
+						'lfr-simulation-device';
+
+					BODY.appendChild(instance._simulationDeviceNode);
 
 					var devices = instance.get('devices');
 
@@ -534,7 +541,7 @@ AUI.add(
 
 					instance._simulationDeviceNode.remove();
 
-					BODY.append(instance._simulationDeviceNode);
+					BODY.appendChild(instance._simulationDeviceNode);
 
 					var dialog = Liferay.Util.getWindow(instance._dialogId);
 

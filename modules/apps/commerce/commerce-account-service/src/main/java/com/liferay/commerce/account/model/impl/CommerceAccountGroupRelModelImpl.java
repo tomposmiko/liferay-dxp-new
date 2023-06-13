@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -307,87 +308,109 @@ public class CommerceAccountGroupRelModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CommerceAccountGroupRel>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceAccountGroupRel.class.getClassLoader(),
+			CommerceAccountGroupRel.class, ModelWrapper.class);
+
+		try {
+			Constructor<CommerceAccountGroupRel> constructor =
+				(Constructor<CommerceAccountGroupRel>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<CommerceAccountGroupRel, Object>>
 		_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommerceAccountGroupRel, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceAccountGroupRel, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceAccountGroupRel, Object>>();
-
-		attributeGetterFunctions.put(
-			"commerceAccountGroupRelId",
-			CommerceAccountGroupRel::getCommerceAccountGroupRelId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceAccountGroupRel::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceAccountGroupRel::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceAccountGroupRel::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceAccountGroupRel::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceAccountGroupRel::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", CommerceAccountGroupRel::getClassNameId);
-		attributeGetterFunctions.put(
-			"classPK", CommerceAccountGroupRel::getClassPK);
-		attributeGetterFunctions.put(
-			"commerceAccountGroupId",
-			CommerceAccountGroupRel::getCommerceAccountGroupId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CommerceAccountGroupRel, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceAccountGroupRel, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceAccountGroupRel, ?>>();
 
+		attributeGetterFunctions.put(
+			"commerceAccountGroupRelId",
+			CommerceAccountGroupRel::getCommerceAccountGroupRelId);
 		attributeSetterBiConsumers.put(
 			"commerceAccountGroupRelId",
 			(BiConsumer<CommerceAccountGroupRel, Long>)
 				CommerceAccountGroupRel::setCommerceAccountGroupRelId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceAccountGroupRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceAccountGroupRel, Long>)
 				CommerceAccountGroupRel::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceAccountGroupRel::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceAccountGroupRel, Long>)
 				CommerceAccountGroupRel::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceAccountGroupRel::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceAccountGroupRel, String>)
 				CommerceAccountGroupRel::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceAccountGroupRel::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceAccountGroupRel, Date>)
 				CommerceAccountGroupRel::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceAccountGroupRel::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceAccountGroupRel, Date>)
 				CommerceAccountGroupRel::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", CommerceAccountGroupRel::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<CommerceAccountGroupRel, Long>)
 				CommerceAccountGroupRel::setClassNameId);
+		attributeGetterFunctions.put(
+			"classPK", CommerceAccountGroupRel::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<CommerceAccountGroupRel, Long>)
 				CommerceAccountGroupRel::setClassPK);
+		attributeGetterFunctions.put(
+			"commerceAccountGroupId",
+			CommerceAccountGroupRel::getCommerceAccountGroupId);
 		attributeSetterBiConsumers.put(
 			"commerceAccountGroupId",
 			(BiConsumer<CommerceAccountGroupRel, Long>)
 				CommerceAccountGroupRel::setCommerceAccountGroupId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -679,6 +702,33 @@ public class CommerceAccountGroupRelModelImpl
 	}
 
 	@Override
+	public CommerceAccountGroupRel cloneWithOriginalValues() {
+		CommerceAccountGroupRelImpl commerceAccountGroupRelImpl =
+			new CommerceAccountGroupRelImpl();
+
+		commerceAccountGroupRelImpl.setCommerceAccountGroupRelId(
+			this.<Long>getColumnOriginalValue("commerceAccountGroupRelId"));
+		commerceAccountGroupRelImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commerceAccountGroupRelImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commerceAccountGroupRelImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commerceAccountGroupRelImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commerceAccountGroupRelImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commerceAccountGroupRelImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		commerceAccountGroupRelImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		commerceAccountGroupRelImpl.setCommerceAccountGroupId(
+			this.<Long>getColumnOriginalValue("commerceAccountGroupId"));
+
+		return commerceAccountGroupRelImpl;
+	}
+
+	@Override
 	public int compareTo(CommerceAccountGroupRel commerceAccountGroupRel) {
 		int value = 0;
 
@@ -885,8 +935,7 @@ public class CommerceAccountGroupRelModelImpl
 		private static final Function
 			<InvocationHandler, CommerceAccountGroupRel>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						CommerceAccountGroupRel.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 

@@ -94,8 +94,14 @@ public interface CPOptionValueLocalService
 
 	@Indexable(type = IndexableType.REINDEX)
 	public CPOptionValue addCPOptionValue(
-			long cpOptionId, Map<Locale, String> nameMap, double priority,
-			String key, String externalReferenceCode,
+			String externalReferenceCode, long cpOptionId,
+			Map<Locale, String> nameMap, double priority, String key,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	public CPOptionValue addOrUpdateCPOptionValue(
+			String externalReferenceCode, long cpOptionId,
+			Map<Locale, String> nameMap, double priority, String key,
 			ServiceContext serviceContext)
 		throws PortalException;
 
@@ -228,16 +234,25 @@ public interface CPOptionValueLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPOptionValue fetchByExternalReferenceCode(
-		long companyId, String externalReferenceCode);
+		String externalReferenceCode, long companyId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPOptionValue fetchCPOptionValue(long CPOptionValueId);
 
-	@Deprecated
+	/**
+	 * Returns the cp option value with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option value's external reference code
+	 * @return the matching cp option value, or <code>null</code> if a matching cp option value could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPOptionValue fetchCPOptionValueByExternalReferenceCode(
 		long companyId, String externalReferenceCode);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPOptionValueByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPOptionValue fetchCPOptionValueByReferenceCode(
@@ -272,7 +287,14 @@ public interface CPOptionValueLocalService
 	public CPOptionValue getCPOptionValue(long cpOptionId, String key)
 		throws PortalException;
 
-	@Deprecated
+	/**
+	 * Returns the cp option value with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option value's external reference code
+	 * @return the matching cp option value
+	 * @throws PortalException if a matching cp option value could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CPOptionValue getCPOptionValueByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -350,10 +372,35 @@ public interface CPOptionValueLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Hits search(SearchContext searchContext);
 
+	/**
+	 * @param companyId
+	 * @param groupId
+	 * @param cpOptionId
+	 * @param keywords
+	 * @param start
+	 * @param end
+	 * @param sort
+	 * @return
+	 * @throws PortalException
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #searchCPOptionValues(long, long, String, int, int, Sort[])}
+	 */
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BaseModelSearchResult<CPOptionValue> searchCPOptionValues(
 			long companyId, long groupId, long cpOptionId, String keywords,
 			int start, int end, Sort sort)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public BaseModelSearchResult<CPOptionValue> searchCPOptionValues(
+			long companyId, long cpOptionId, String keywords, int start,
+			int end, Sort[] sorts)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int searchCPOptionValuesCount(
+			long companyId, long cpOptionId, String keywords)
 		throws PortalException;
 
 	/**
@@ -373,12 +420,6 @@ public interface CPOptionValueLocalService
 	public CPOptionValue updateCPOptionValue(
 			long cpOptionValueId, Map<Locale, String> nameMap, double priority,
 			String key, ServiceContext serviceContext)
-		throws PortalException;
-
-	public CPOptionValue upsertCPOptionValue(
-			long cpOptionId, Map<Locale, String> nameMap, double priority,
-			String key, String externalReferenceCode,
-			ServiceContext serviceContext)
 		throws PortalException;
 
 }

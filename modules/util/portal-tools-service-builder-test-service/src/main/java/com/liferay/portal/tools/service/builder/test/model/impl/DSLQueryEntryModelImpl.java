@@ -30,6 +30,7 @@ import com.liferay.portal.tools.service.builder.test.model.DSLQueryEntryModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -209,34 +210,56 @@ public class DSLQueryEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<DSLQueryEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, DSLQueryEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<DSLQueryEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<DSLQueryEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DSLQueryEntry.class.getClassLoader(), DSLQueryEntry.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"dslQueryEntryId", DSLQueryEntry::getDslQueryEntryId);
-		attributeGetterFunctions.put("name", DSLQueryEntry::getName);
+		try {
+			Constructor<DSLQueryEntry> constructor =
+				(Constructor<DSLQueryEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<DSLQueryEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<DSLQueryEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<DSLQueryEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DSLQueryEntry, Object>>();
 		Map<String, BiConsumer<DSLQueryEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<DSLQueryEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"dslQueryEntryId", DSLQueryEntry::getDslQueryEntryId);
 		attributeSetterBiConsumers.put(
 			"dslQueryEntryId",
 			(BiConsumer<DSLQueryEntry, Long>)DSLQueryEntry::setDslQueryEntryId);
+		attributeGetterFunctions.put("name", DSLQueryEntry::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<DSLQueryEntry, String>)DSLQueryEntry::setName);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -334,6 +357,17 @@ public class DSLQueryEntryModelImpl
 		dslQueryEntryImpl.setName(getName());
 
 		dslQueryEntryImpl.resetOriginalValues();
+
+		return dslQueryEntryImpl;
+	}
+
+	@Override
+	public DSLQueryEntry cloneWithOriginalValues() {
+		DSLQueryEntryImpl dslQueryEntryImpl = new DSLQueryEntryImpl();
+
+		dslQueryEntryImpl.setDslQueryEntryId(
+			this.<Long>getColumnOriginalValue("dslQueryEntryId"));
+		dslQueryEntryImpl.setName(this.<String>getColumnOriginalValue("name"));
 
 		return dslQueryEntryImpl;
 	}
@@ -506,9 +540,7 @@ public class DSLQueryEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DSLQueryEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DSLQueryEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

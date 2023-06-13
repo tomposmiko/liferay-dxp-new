@@ -58,7 +58,7 @@ else {
 	<portlet:param name="mvcPath" value="/admin/definition/edit_definition.jsp" />
 </portlet:actionURL>
 
-<aui:form action="<%= actionURL %>" cssClass="container-fluid-1280" enctype="multipart/form-data" method="post" name="fm">
+<aui:form action="<%= actionURL %>" cssClass="container-fluid container-fluid-max-xl" enctype="multipart/form-data" method="post" name="fm">
 	<liferay-ui:error exception="<%= DefinitionFileException.InvalidDefinitionFile.class %>" message="please-enter-a-valid-file" />
 	<liferay-ui:error exception="<%= DefinitionNameException.class %>" message="please-enter-a-valid-name" />
 
@@ -88,9 +88,7 @@ else {
 				<aui:option label="<%= ReportDataSourceType.PORTAL.getValue() %>" selected="<%= sourceId == 0 %>" value="<%= 0 %>" />
 
 				<%
-				List<Source> sources = SourceServiceUtil.getSources(themeDisplay.getSiteGroupId(), null, null, false, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
-
-				for (Source source : sources) {
+				for (Source source : SourceServiceUtil.getSources(themeDisplay.getSiteGroupId(), null, null, false, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 				%>
 
 					<aui:option label="<%= HtmlUtil.escape(source.getName(locale)) %>" selected="<%= sourceId == source.getSourceId() %>" value="<%= source.getSourceId() %>" />
@@ -207,8 +205,8 @@ else {
 	</aui:button-row>
 </aui:form>
 
-<aui:script>
-	AUI().ready(function (A) {
+<script type="text/javascript">
+	AUI().ready((A) => {
 		Liferay.Report.initialize({
 			namespace: '<portlet:namespace />',
 			parameters:
@@ -242,4 +240,4 @@ else {
 			);
 		}
 	}
-</aui:script>
+</script>

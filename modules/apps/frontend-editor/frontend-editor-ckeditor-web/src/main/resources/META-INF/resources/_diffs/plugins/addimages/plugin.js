@@ -154,7 +154,7 @@
 		 * @param {CKEDITOR.editor} editor The current editor instance
 		 * @protected
 		 */
-		_onImageUploaded(image, editor, randomId) {
+		_onImageUploaded(image, editor) {
 			const instance = this;
 
 			const fragment = CKEDITOR.htmlParser.fragment.fromHtml(
@@ -163,11 +163,9 @@
 
 			const filter = new CKEDITOR.htmlParser.filter({
 				elements: {
+					// eslint-disable-next-line @liferay/no-abbreviations
 					img(element) {
-						if (
-							instance._tempImage[randomId] &&
-							image.src === instance._tempImage[randomId].src
-						) {
+						if (image.src === instance._tempImage.src) {
 							element.attributes.src = image.src;
 						}
 					},
@@ -240,7 +238,7 @@
 								);
 
 								editor.fire('imageAdd', {
-									el: element,
+									element,
 									file,
 								});
 							})
@@ -291,14 +289,14 @@
 			reader.addEventListener('loadend', () => {
 				const bin = reader.result;
 
-				const el = CKEDITOR.dom.element.createFromHtml(
+				const element = CKEDITOR.dom.element.createFromHtml(
 					'<img src="' + bin + '">'
 				);
 
-				editor.insertElement(el);
+				editor.insertElement(element);
 
 				const imageData = {
-					el,
+					element,
 					file,
 				};
 
@@ -362,7 +360,7 @@
 				);
 			});
 
-			AUI().use('aui-progressbar', 'uploader', (A) => {
+			AUI().use('aui-progressbar,uploader', (A) => {
 				const ATTR_DATA_RANDOM_ID = 'data-random-id';
 				const CSS_UPLOADING_IMAGE = 'uploading-image';
 
@@ -371,8 +369,8 @@
 
 				const TPL_PROGRESS_BAR = '<div class="progressbar"></div>';
 
-				const _onUploadError = (randomId) => {
-					var image = this._tempImage[randomId];
+				const _onUploadError = () => {
+					var image = this._tempImage;
 
 					if (image) {
 						image.parentElement.remove();
@@ -398,8 +396,7 @@
 					const data = JSON.parse(event.data);
 
 					if (data.success) {
-						const randomId = data.file.randomId;
-						const image = this._tempImage[randomId];
+						const image = this._tempImage;
 
 						if (image) {
 							image.removeAttribute(ATTR_DATA_RANDOM_ID);
@@ -423,6 +420,7 @@
 
 							editor.fire('imageUploaded', {
 								editor,
+								// eslint-disable-next-line @liferay/no-abbreviations
 								el: image,
 								fileEntryId: data.file.fileEntryId,
 								uploadImageReturnType: '',
@@ -445,14 +443,12 @@
 							});
 
 							if (!imageFound) {
-								this._onImageUploaded(image, editor, randomId);
+								this._onImageUploaded(image, editor);
 							}
 						}
 					}
 					else {
-						_onUploadError(
-							event.target._ATTR_E_FACADE.newVal.randomId
-						);
+						_onUploadError();
 					}
 				};
 
@@ -499,11 +495,7 @@
 
 					image.classList.add(CSS_UPLOADING_IMAGE);
 
-					if (this._tempImage == undefined) {
-						this._tempImage = {};
-					}
-
-					this._tempImage[randomId] = image;
+					this._tempImage = image;
 
 					let uploader = eventData.uploader;
 

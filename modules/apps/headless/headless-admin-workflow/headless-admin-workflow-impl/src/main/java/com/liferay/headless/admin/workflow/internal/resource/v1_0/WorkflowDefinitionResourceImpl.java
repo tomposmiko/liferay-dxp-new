@@ -14,12 +14,32 @@
 
 package com.liferay.headless.admin.workflow.internal.resource.v1_0;
 
+import com.liferay.headless.admin.workflow.dto.v1_0.Node;
+import com.liferay.headless.admin.workflow.dto.v1_0.Transition;
 import com.liferay.headless.admin.workflow.dto.v1_0.WorkflowDefinition;
+import com.liferay.headless.admin.workflow.internal.dto.v1_0.util.NodeUtil;
+import com.liferay.headless.admin.workflow.internal.dto.v1_0.util.TransitionUtil;
+import com.liferay.headless.admin.workflow.internal.odata.entity.v1_0.WorkflowDefinitionEntityModel;
 import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowDefinitionResource;
+import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionManager;
+import com.liferay.portal.kernel.workflow.comparator.WorkflowComparatorFactory;
+import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
+
+import java.util.Locale;
+import java.util.Map;
+
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -33,7 +53,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 	scope = ServiceScope.PROTOTYPE, service = WorkflowDefinitionResource.class
 )
 public class WorkflowDefinitionResourceImpl
-	extends BaseWorkflowDefinitionResourceImpl {
+	extends BaseWorkflowDefinitionResourceImpl implements EntityModelResource {
 
 	@Override
 	public void deleteWorkflowDefinitionUndeploy(String name, String version)
@@ -45,29 +65,43 @@ public class WorkflowDefinitionResourceImpl
 	}
 
 	@Override
-	public WorkflowDefinition getWorkflowDefinitionByName(String name)
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
 		throws Exception {
 
+		return _entityModel;
+	}
+
+	@Override
+	public WorkflowDefinition getWorkflowDefinitionByName(
+			String name, Integer version)
+		throws Exception {
+
+		if (version == null) {
+			return _toWorkflowDefinition(
+				_workflowDefinitionManager.getLatestWorkflowDefinition(
+					contextCompany.getCompanyId(), name));
+		}
+
 		return _toWorkflowDefinition(
-			_workflowDefinitionManager.getLatestWorkflowDefinition(
-				contextCompany.getCompanyId(), name));
+			_workflowDefinitionManager.getWorkflowDefinition(
+				contextCompany.getCompanyId(), name, version));
 	}
 
 	@Override
 	public Page<WorkflowDefinition> getWorkflowDefinitionsPage(
-			Pagination pagination)
+			Boolean active, Pagination pagination, Sort[] sorts)
 		throws Exception {
 
 		return Page.of(
 			transform(
 				_workflowDefinitionManager.getLatestWorkflowDefinitions(
-					contextCompany.getCompanyId(),
+					active, contextCompany.getCompanyId(),
 					pagination.getStartPosition(), pagination.getEndPosition(),
-					null),
+					_toOrderByComparator((Sort)ArrayUtil.getValue(sorts, 0))),
 				this::_toWorkflowDefinition),
 			pagination,
 			_workflowDefinitionManager.getLatestWorkflowDefinitionsCount(
-				contextCompany.getCompanyId()));
+				active, contextCompany.getCompanyId()));
 	}
 
 	@Override
@@ -109,22 +143,70 @@ public class WorkflowDefinitionResourceImpl
 				GetterUtil.getInteger(version), active));
 	}
 
+	private OrderByComparator
+		<com.liferay.portal.kernel.workflow.WorkflowDefinition>
+			_toOrderByComparator(Sort sort) {
+
+		if (sort == null) {
+			return _workflowComparatorFactory.
+				getDefinitionModifiedDateComparator(false);
+		}
+
+		if (StringUtil.equals(sort.getFieldName(), "name")) {
+			return _workflowComparatorFactory.getDefinitionNameComparator(
+				!sort.isReverse());
+		}
+
+		return _workflowComparatorFactory.getDefinitionModifiedDateComparator(
+			!sort.isReverse());
+	}
+
 	private WorkflowDefinition _toWorkflowDefinition(
 		com.liferay.portal.kernel.workflow.WorkflowDefinition
 			workflowDefinition) {
+
+		Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
+			workflowDefinition.getTitle());
 
 		return new WorkflowDefinition() {
 			{
 				active = workflowDefinition.isActive();
 				content = workflowDefinition.getContent();
+				dateCreated = workflowDefinition.getCreateDate();
 				dateModified = workflowDefinition.getModifiedDate();
 				description = workflowDefinition.getDescription();
 				name = workflowDefinition.getName();
-				title = workflowDefinition.getTitle();
+				nodes = transformToArray(
+					workflowDefinition.getWorkflowNodes(),
+					workflowNode -> NodeUtil.toNode(
+						contextAcceptLanguage.getPreferredLocale(),
+						workflowNode),
+					Node.class);
+				title = titleMap.get(
+					contextAcceptLanguage.getPreferredLocale());
+				title_i18n = LocalizedMapUtil.getI18nMap(
+					contextAcceptLanguage.isAcceptAllLanguages(),
+					LocalizationUtil.getLocalizationMap(
+						workflowDefinition.getTitle()));
+				transitions = transformToArray(
+					workflowDefinition.getWorkflowTransitions(),
+					workflowTransition -> TransitionUtil.toTransition(
+						contextAcceptLanguage.getPreferredLocale(),
+						workflowTransition),
+					Transition.class);
 				version = String.valueOf(workflowDefinition.getVersion());
 			}
 		};
 	}
+
+	private static final EntityModel _entityModel =
+		new WorkflowDefinitionEntityModel();
+
+	@Reference
+	private Language _language;
+
+	@Reference
+	private WorkflowComparatorFactory _workflowComparatorFactory;
 
 	@Reference(target = "(proxy.bean=false)")
 	private WorkflowDefinitionManager _workflowDefinitionManager;

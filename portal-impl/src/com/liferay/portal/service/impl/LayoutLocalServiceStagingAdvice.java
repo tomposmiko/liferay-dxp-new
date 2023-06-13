@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutStagingHandler;
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.SystemEventConstants;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.BaseLocalService;
@@ -164,22 +163,24 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 		parentLayoutId = layoutLocalServiceHelper.getParentLayoutId(
 			groupId, privateLayout, parentLayoutId);
 
-		Layout layout = LayoutUtil.findByG_P_L(
-			groupId, privateLayout, layoutId);
-
 		String name = nameMap.get(LocaleUtil.getSiteDefault());
 
 		Map<Locale, String> layoutFriendlyURLMap =
 			layoutLocalServiceHelper.getFriendlyURLMap(
 				groupId, privateLayout, layoutId, name, friendlyURLMap);
 
+		String friendlyURL = layoutFriendlyURLMap.get(
+			LocaleUtil.getSiteDefault());
+
 		layoutLocalServiceHelper.validate(
-			groupId, privateLayout, layoutId, parentLayoutId,
-			layout.getClassNameId(), layout.getClassPK(), name, type,
-			layoutFriendlyURLMap, serviceContext);
+			groupId, privateLayout, layoutId, parentLayoutId, name, type,
+			hidden, layoutFriendlyURLMap, serviceContext);
 
 		layoutLocalServiceHelper.validateParentLayoutId(
 			groupId, privateLayout, layoutId, parentLayoutId);
+
+		Layout layout = LayoutUtil.findByG_P_L(
+			groupId, privateLayout, layoutId);
 
 		if (LayoutStagingUtil.isBranchingLayout(layout)) {
 			layout = getProxiedLayout(layout);
@@ -217,8 +218,7 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 		layoutRevision.setRobotsMap(robotsMap);
 		layout.setType(type);
 		layout.setHidden(hidden);
-		layout.setFriendlyURL(
-			layoutFriendlyURLMap.get(LocaleUtil.getSiteDefault()));
+		layout.setFriendlyURL(friendlyURL);
 
 		if (!hasIconImage) {
 			layout.setIconImageId(0);
@@ -539,11 +539,9 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 		LayoutStagingHandler layoutStagingHandler =
 			LayoutStagingUtil.getLayoutStagingHandler(layout);
 
-		if (layoutStagingHandler != null) {
-			return layout;
-		}
+		if ((layoutStagingHandler != null) ||
+			!LayoutStagingUtil.isBranchingLayout(layout)) {
 
-		if (!LayoutStagingUtil.isBranchingLayout(layout)) {
 			return layout;
 		}
 
@@ -574,17 +572,18 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 				userId = GetterUtil.getLong(PrincipalThreadLocal.getName());
 
 				if (userId > 0) {
-					User user = UserLocalServiceUtil.getUser(userId);
-
 					LayoutSet layoutSet = firstLayout.getLayoutSet();
 
 					layoutSetBranchId = StagingUtil.getRecentLayoutSetBranchId(
-						user, layoutSet.getLayoutSetId());
+						UserLocalServiceUtil.getUser(userId),
+						layoutSet.getLayoutSetId());
 				}
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug("No layout set branch found for user " + userId);
+					_log.debug(
+						"No layout set branch found for user " + userId,
+						exception);
 				}
 			}
 		}
@@ -800,6 +799,11 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 					throw invocationTargetException.getTargetException();
 				}
 				catch (NoSuchMethodException noSuchMethodException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							noSuchMethodException, noSuchMethodException);
+					}
+
 					returnValue = _invoke(method, arguments);
 				}
 			}

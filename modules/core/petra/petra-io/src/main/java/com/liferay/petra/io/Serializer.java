@@ -230,8 +230,9 @@ public class Serializer {
 
 			return;
 		}
-
-		writeByte(SerializationConstants.TC_OBJECT);
+		else {
+			writeByte(SerializationConstants.TC_OBJECT);
+		}
 
 		try {
 			ObjectOutputStream objectOutputStream =

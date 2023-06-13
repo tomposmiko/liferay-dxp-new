@@ -21,7 +21,7 @@ SegmentsSimulationDisplayContext segmentsSimulationDisplayContext = new Segments
 %>
 
 <clay:container-fluid
-	cssClass="segments-simulation"
+	cssClass="p-0 segments-simulation"
 	id='<%= liferayPortletResponse.getNamespace() + "segmentsSimulationContainer" %>'
 >
 	<c:choose>
@@ -38,11 +38,11 @@ SegmentsSimulationDisplayContext segmentsSimulationDisplayContext = new Segments
 					for (SegmentsEntry segmentsEntry : segmentsSimulationDisplayContext.getSegmentsEntries()) {
 					%>
 
-						<li class="bg-transparent list-group-item list-group-item-flex">
+						<li class="bg-transparent list-group-item list-group-item-flex pb-3 pt-0 px-0">
 							<span>
 								<div class="custom-checkbox">
-									<label class="position-relative text-light">
-										<input class="custom-control-input simulated-segment" name="<%= segmentsSimulationDisplayContext.getPortletNamespace() %>segmentsEntryId" type="checkbox" value="<%= String.valueOf(segmentsEntry.getSegmentsEntryId()) %>" />
+									<label class="position-relative">
+										<input class="custom-control-input simulated-segment" name="<%= segmentsSimulationDisplayContext.getPortletNamespace() + "segmentsEntryId" %>" type="checkbox" value="<%= String.valueOf(segmentsEntry.getSegmentsEntryId()) %>" />
 
 										<span class="custom-control-label">
 											<span class="custom-control-label-text">

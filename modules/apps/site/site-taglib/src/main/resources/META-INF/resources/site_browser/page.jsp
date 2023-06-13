@@ -17,15 +17,14 @@
 <%@ include file="/site_browser/init.jsp" %>
 
 <%
-String eventName = GetterUtil.getString(request.getAttribute("liferay-site:site-browser:eventName"));
 long[] selectedGroupIds = GetterUtil.getLongValues(request.getAttribute("liferay-site:site-browser:selectedGroupIds"));
 %>
 
 <clay:management-toolbar
-	displayContext="<%= new SiteBrowserManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, siteBrowserDisplayContext) %>"
+	managementToolbarDisplayContext="<%= new SiteBrowserManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, siteBrowserDisplayContext) %>"
 />
 
-<aui:form action="<%= siteBrowserDisplayContext.getPortletURL() %>" cssClass="container-fluid-1280" method="post" name="selectGroupFm">
+<aui:form action="<%= siteBrowserDisplayContext.getPortletURL() %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="selectGroupFm">
 	<liferay-ui:search-container
 		searchContainer="<%= siteBrowserDisplayContext.getSearchContainer() %>"
 	>
@@ -84,11 +83,6 @@ long[] selectedGroupIds = GetterUtil.getLongValues(request.getAttribute("liferay
 					</liferay-ui:search-container-column-text>
 				</c:when>
 				<c:when test='<%= Objects.equals(siteBrowserDisplayContext.getDisplayStyle(), "icon") %>'>
-
-					<%
-					row.setCssClass("entry-card lfr-asset-item " + row.getCssClass());
-					%>
-
 					<liferay-ui:search-container-column-text>
 						<clay:vertical-card
 							verticalCard="<%= new SiteVerticalCard(group, renderRequest, selectedGroupIds) %>"
@@ -128,10 +122,3 @@ long[] selectedGroupIds = GetterUtil.getLongValues(request.getAttribute("liferay
 		/>
 	</liferay-ui:search-container>
 </aui:form>
-
-<aui:script use="aui-base">
-	Liferay.Util.selectEntityHandler(
-		'#<portlet:namespace />selectGroupFm',
-		'<%= HtmlUtil.escapeJS(eventName) %>'
-	);
-</aui:script>

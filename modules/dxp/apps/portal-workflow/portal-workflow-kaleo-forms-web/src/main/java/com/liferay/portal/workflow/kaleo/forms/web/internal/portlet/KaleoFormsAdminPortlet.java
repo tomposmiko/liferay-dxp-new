@@ -29,6 +29,9 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.WorkflowInstanceLink;
 import com.liferay.portal.kernel.portlet.PortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
@@ -38,6 +41,8 @@ import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -64,7 +69,8 @@ import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionVersionLocalServ
 
 import java.io.IOException;
 
-import java.util.Enumeration;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -80,6 +86,7 @@ import javax.portlet.ResourceResponse;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -92,7 +99,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.workflow.kaleo.forms.web.internal.configuration.KaleoFormsWebConfiguration",
-	immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=kaleo-forms-admin-portlet",
 		"com.liferay.portlet.display-category=category.hidden",
@@ -118,6 +125,21 @@ import org.osgi.service.component.annotations.Reference;
 	service = Portlet.class
 )
 public class KaleoFormsAdminPortlet extends MVCPortlet {
+
+	public KaleoFormsAdminPortlet() {
+		_parameterNames = ListUtil.fromArray(
+			"backURL", "ddmStructureId", "ddmStructureName", "ddmTemplateId",
+			"historyKey", "kaleoProcessId", "kaleoTaskFormPairsData", "mvcPath",
+			"redirect", "translatedLanguagesDescription",
+			"translatedLanguagesName", "workflowDefinition");
+
+		for (Locale availableLocale : LanguageUtil.getAvailableLocales()) {
+			_parameterNames.add(
+				"description" + LocaleUtil.toLanguageId(availableLocale));
+			_parameterNames.add(
+				"name" + LocaleUtil.toLanguageId(availableLocale));
+		}
+	}
 
 	/**
 	 * Deletes the <code>KaleoDraftDefinition</code> (in the
@@ -292,6 +314,10 @@ public class KaleoFormsAdminPortlet extends MVCPortlet {
 			return rootElement.elementTextTrim("name");
 		}
 		catch (DocumentException documentException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(documentException, documentException);
+			}
+
 			return defaultName;
 		}
 	}
@@ -370,26 +396,22 @@ public class KaleoFormsAdminPortlet extends MVCPortlet {
 	 *
 	 * @param  resourceRequest the resource request
 	 * @param  resourceResponse the resource response
-	 * @throws Exception if an exception occurred
 	 */
 	protected void saveInPortletSession(
-			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
-		throws Exception {
+		ResourceRequest resourceRequest, ResourceResponse resourceResponse) {
 
-		Enumeration<String> enumeration = resourceRequest.getParameterNames();
+		Map<String, String[]> parameterMap = resourceRequest.getParameterMap();
 
-		while (enumeration.hasMoreElements()) {
-			String name = enumeration.nextElement();
+		PortletSession portletSession = resourceRequest.getPortletSession();
 
-			if (Objects.equals(name, "doAsUserId")) {
+		for (String parameterName : _parameterNames) {
+			if (!parameterMap.containsKey(parameterName)) {
 				continue;
 			}
 
-			PortletSession portletSession = resourceRequest.getPortletSession();
-
-			String value = ParamUtil.getString(resourceRequest, name);
-
-			portletSession.setAttribute(name, value);
+			portletSession.setAttribute(
+				parameterName,
+				ParamUtil.getString(resourceRequest, parameterName));
 		}
 	}
 
@@ -512,6 +534,9 @@ public class KaleoFormsAdminPortlet extends MVCPortlet {
 	@Reference
 	protected StorageEngine storageEngine;
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		KaleoFormsAdminPortlet.class);
+
 	@Reference
 	private DDLExporterFactory _ddlExporterFactory;
 
@@ -532,6 +557,8 @@ public class KaleoFormsAdminPortlet extends MVCPortlet {
 
 	@Reference
 	private KaleoProcessService _kaleoProcessService;
+
+	private final List<String> _parameterNames;
 
 	@Reference
 	private WorkflowInstanceLinkLocalService _workflowInstanceLinkLocalService;

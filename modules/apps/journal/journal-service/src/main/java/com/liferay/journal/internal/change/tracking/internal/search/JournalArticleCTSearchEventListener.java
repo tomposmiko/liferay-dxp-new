@@ -19,7 +19,7 @@ import com.liferay.change.tracking.spi.listener.CTEventListener;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleTable;
 import com.liferay.journal.service.JournalArticleLocalService;
-import com.liferay.petra.lang.SafeClosable;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.search.Indexer;
@@ -44,9 +44,10 @@ public class JournalArticleCTSearchEventListener implements CTEventListener {
 			() -> {
 				List<JournalArticle> journalArticles = null;
 
-				try (SafeClosable safeClosable =
-						CTCollectionThreadLocal.setCTCollectionId(
-							ctCollectionId)) {
+				try (SafeCloseable safeCloseable =
+						CTCollectionThreadLocal.
+							setCTCollectionIdWithSafeCloseable(
+								ctCollectionId)) {
 
 					journalArticles = _journalArticleLocalService.dslQuery(
 						DSLQueryFactoryUtil.select(

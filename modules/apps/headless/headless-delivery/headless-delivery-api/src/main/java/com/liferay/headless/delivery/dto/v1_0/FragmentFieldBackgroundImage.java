@@ -45,7 +45,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("FragmentFieldBackgroundImage")
+@GraphQLName(
+	description = "Represents a fragment field with a background image.",
+	value = "FragmentFieldBackgroundImage"
+)
 @JsonFilter("Liferay.Vulcan")
 @XmlRootElement(name = "FragmentFieldBackgroundImage")
 public class FragmentFieldBackgroundImage implements Serializable {
@@ -60,7 +63,7 @@ public class FragmentFieldBackgroundImage implements Serializable {
 			FragmentFieldBackgroundImage.class, json);
 	}
 
-	@Schema
+	@Schema(description = "The fragment field's background image.")
 	@Valid
 	public FragmentImage getBackgroundFragmentImage() {
 		return backgroundFragmentImage;
@@ -89,7 +92,7 @@ public class FragmentFieldBackgroundImage implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The fragment field's background image.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected FragmentImage backgroundFragmentImage;
 

@@ -59,7 +59,7 @@ const TranslationManager = ({
 		onClose: () => setVisibleModal(false),
 	});
 
-	const localeToBeRemoved = React.useRef(null);
+	const localeToBeRemovedRef = React.useRef(null);
 
 	const removeLocale = (locale) => {
 		if (defaultLocale === locale.id) {
@@ -83,18 +83,18 @@ const TranslationManager = ({
 				<DeleteLocaleModal
 					observer={observer}
 					onCancel={() => {
-						localeToBeRemoved.current = null;
+						localeToBeRemovedRef.current = null;
 						onClose();
 					}}
 					onConfirm={() => {
-						removeLocale(localeToBeRemoved.current);
+						removeLocale(localeToBeRemovedRef.current);
 						onClose();
 					}}
 				/>
 			)}
 
 			<div className="autofit-row">
-				<div className="autofit-col">
+				<div className="autofit-col autofit-col-expand">
 					<LocalesContainer
 						className={cssClass}
 						id={id}
@@ -114,24 +114,27 @@ const TranslationManager = ({
 								setEditingLocale(locale.id);
 							}}
 							onLocaleRemoved={(locale) => {
-								localeToBeRemoved.current = locale;
+								localeToBeRemovedRef.current = locale;
 								setVisibleModal(true);
 							}}
 						/>
+
+						<div className="autofit-col">
+							<LocaleSelector
+								locales={locales}
+								onItemClick={(locale) => {
+									setAvailableLocales(
+										new Map(availableLocales).set(
+											locale.id,
+											locale
+										)
+									);
+
+									setEditingLocale(locale.id);
+								}}
+							/>
+						</div>
 					</LocalesContainer>
-				</div>
-
-				<div className="autofit-col">
-					<LocaleSelector
-						locales={locales}
-						onItemClick={(locale) => {
-							setAvailableLocales(
-								new Map(availableLocales).set(locale.id, locale)
-							);
-
-							setEditingLocale(locale.id);
-						}}
-					/>
 				</div>
 			</div>
 		</>

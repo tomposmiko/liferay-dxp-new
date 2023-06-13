@@ -27,14 +27,12 @@ String displayStyle = blogEntriesDisplayContext.getDisplayStyle();
 SearchContainer<BlogsEntry> entriesSearchContainer = blogEntriesDisplayContext.getSearchContainer();
 
 PortletURL portletURL = entriesSearchContainer.getIteratorURL();
-
-BlogEntriesManagementToolbarDisplayContext blogEntriesManagementToolbarDisplayContext = new BlogEntriesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, entriesSearchContainer, trashHelper, displayStyle);
 %>
 
 <clay:management-toolbar
-	displayContext="<%= blogEntriesManagementToolbarDisplayContext %>"
+	managementToolbarDisplayContext="<%= new BlogEntriesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, entriesSearchContainer, trashHelper, displayStyle) %>"
+	propsTransformer="blogs_admin/js/BlogEntriesManagementToolbarPropsTransformer"
 	searchContainerId="blogEntries"
-	supportsBulkActions="<%= true %>"
 />
 
 <portlet:actionURL name="/blogs/edit_entry" var="restoreTrashEntriesURL">
@@ -45,9 +43,7 @@ BlogEntriesManagementToolbarDisplayContext blogEntriesManagementToolbarDisplayCo
 	portletURL="<%= restoreTrashEntriesURL %>"
 />
 
-<clay:container-fluid
-	cssClass="main-content-body"
->
+<clay:container-fluid>
 	<aui:form action="<%= portletURL %>" method="get" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" />
 		<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
@@ -94,12 +90,6 @@ BlogEntriesManagementToolbarDisplayContext blogEntriesManagementToolbarDisplayCo
 		</liferay-ui:search-container>
 	</aui:form>
 </clay:container-fluid>
-
-<liferay-frontend:component
-	componentId="<%= blogEntriesManagementToolbarDisplayContext.getDefaultEventHandler() %>"
-	context="<%= blogEntriesManagementToolbarDisplayContext.getComponentContext() %>"
-	module="blogs_admin/js/ManagementToolbarDefaultEventHandler.es"
-/>
 
 <liferay-frontend:component
 	componentId="<%= BlogsWebConstants.BLOGS_ELEMENTS_DEFAULT_EVENT_HANDLER %>"

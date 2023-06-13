@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -333,6 +331,7 @@ public abstract class LVEntryLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -349,6 +348,7 @@ public abstract class LVEntryLocalServiceBaseImpl
 		return lvEntryLocalService.deleteLVEntry((LVEntry)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<LVEntry> getBasePersistence() {
 		return lvEntryPersistence;
 	}
@@ -396,7 +396,7 @@ public abstract class LVEntryLocalServiceBaseImpl
 	 * <strong>Important:</strong> Inspect LVEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
 	 * </p>
 	 *
-	 * @param draftLVEntry the lv entry
+	 * @param lvEntry the lv entry
 	 * @return the lv entry that was updated
 	 */
 	@Indexable(type = IndexableType.REINDEX)
@@ -1323,9 +1323,6 @@ public abstract class LVEntryLocalServiceBaseImpl
 	@BeanReference(type = LVEntryLocalizationVersionPersistence.class)
 	protected LVEntryLocalizationVersionPersistence
 		lvEntryLocalizationVersionPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		LVEntryLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

@@ -132,11 +132,7 @@ else {
 				>
 					<aui:input name="fileEntryTypeId" type="hidden" value="<%= (fileEntryTypeId > 0) ? fileEntryTypeId : 0 %>" />
 
-					<%
-					String defaultLanguageId = LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault());
-					%>
-
-					<aui:input name="defaultLanguageId" type="hidden" value="<%= defaultLanguageId %>" />
+					<aui:input name="defaultLanguageId" type="hidden" value="<%= LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()) %>" />
 
 					<div class="document-type-selector" id="<portlet:namespace />documentTypeSelector">
 						<liferay-ui:icon-menu
@@ -151,6 +147,8 @@ else {
 							%>
 
 								<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/document_library/upload_multiple_file_entries" var="viewFileEntryTypeURL">
+									<portlet:param name="redirect" value="<%= redirect %>" />
+									<portlet:param name="portletResource" value='<%= ParamUtil.getString(request, "portletResource") %>' />
 									<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
 									<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
 									<portlet:param name="fileEntryTypeId" value="<%= String.valueOf(curFileEntryType.getFileEntryTypeId()) %>" />
@@ -175,9 +173,7 @@ else {
 
 						<%
 						try {
-							List<DDMStructure> ddmStructures = fileEntryType.getDDMStructures();
-
-							for (DDMStructure ddmStructure : ddmStructures) {
+							for (DDMStructure ddmStructure : fileEntryType.getDDMStructures()) {
 								DDMFormValues ddmFormValues = null;
 
 								try {
@@ -193,19 +189,14 @@ else {
 								}
 						%>
 
-								<aui:input name="ddmFormFieldNamespace" type="hidden" value="<%= String.valueOf(ddmStructure.getPrimaryKey()) %>" />
-
-								<div class="document-type-fields">
-									<liferay-ddm:html
-										classNameId="<%= PortalUtil.getClassNameId(com.liferay.dynamic.data.mapping.model.DDMStructure.class) %>"
-										classPK="<%= ddmStructure.getPrimaryKey() %>"
-										ddmFormValues="<%= ddmFormValues %>"
-										defaultEditLocale="<%= LocaleUtil.fromLanguageId(defaultLanguageId) %>"
-										fieldsNamespace="<%= String.valueOf(ddmStructure.getPrimaryKey()) %>"
-										groupId="<%= groupId %>"
-										localizable="<%= true %>"
-										requestedLocale="<%= locale %>"
-										synchronousFormSubmission="<%= false %>"
+								<div class="document-type-fields" data-ddm-fieldset>
+									<liferay-data-engine:data-layout-renderer
+										containerId='<%= liferayPortletResponse.getNamespace() + "dataEngineLayoutRenderer" + ddmStructure.getStructureId() %>'
+										dataDefinitionId="<%= ddmStructure.getStructureId() %>"
+										dataRecordValues="<%= DataRecordValuesUtil.getDataRecordValues(ddmFormValues, ddmStructure) %>"
+										namespace="<%= liferayPortletResponse.getNamespace() + ddmStructure.getStructureId() + StringPool.UNDERLINE %>"
+										persisted="<%= fileEntry != null %>"
+										submittable="<%= false %>"
 									/>
 								</div>
 
@@ -218,20 +209,22 @@ else {
 
 					</c:if>
 
-					<aui:script position="inline" require="metal-dom/src/all/dom as dom">
+					<aui:script position="inline" require="frontend-js-web/liferay/delegate/delegate.es as delegateModule,frontend-js-web/liferay/util/run_scripts_in_element.es as runScriptsInElement">
 						var documentTypeMenuList = document.querySelector(
 							'#<portlet:namespace />documentTypeSelector .lfr-menu-list'
 						);
 
 						if (documentTypeMenuList) {
-							dom.delegate(documentTypeMenuList, 'click', 'li a', function (event) {
+							var delegate = delegateModule.default;
+
+							delegate(documentTypeMenuList, 'click', 'li a', (event) => {
 								event.preventDefault();
 
 								Liferay.Util.fetch(event.delegateTarget.getAttribute('href'))
-									.then(function (response) {
+									.then((response) => {
 										return response.text();
 									})
-									.then(function (response) {
+									.then((response) => {
 										var commonFileMetadataContainer = document.getElementById(
 											'<portlet:namespace />commonFileMetadataContainer'
 										);
@@ -239,9 +232,7 @@ else {
 										if (commonFileMetadataContainer) {
 											commonFileMetadataContainer.innerHTML = response;
 
-											dom.globalEval.runScriptsInElement(
-												commonFileMetadataContainer
-											);
+											runScriptsInElement.default(commonFileMetadataContainer);
 										}
 
 										var fileNodes = document.querySelectorAll(
@@ -250,7 +241,7 @@ else {
 
 										var selectedFileNodes = Array.prototype.filter.call(
 											fileNodes,
-											function (fileNode) {
+											(fileNode) => {
 												return fileNode.checked;
 											}
 										);
@@ -314,7 +305,7 @@ else {
 			id="dlFileEntryDisplayPagePanel"
 			markupView="lexicon"
 			persistState="<%= true %>"
-			title="display-page-template"
+			title="display-page"
 		>
 			<aui:fieldset>
 				<liferay-asset:select-asset-display-page
@@ -342,6 +333,7 @@ else {
 						className="<%= DLFileEntry.class.getName() %>"
 						classPK="<%= assetClassPK %>"
 						classTypePK="<%= fileEntryTypeId %>"
+						visibilityTypes="<%= AssetVocabularyConstants.VISIBILITY_TYPES %>"
 					/>
 
 					<liferay-asset:asset-tags-selector
@@ -351,6 +343,28 @@ else {
 				</aui:fieldset>
 			</liferay-ui:panel>
 		</c:if>
+
+		<liferay-ui:panel
+			cssClass="expiration-date-panel"
+			defaultState="closed"
+			extended="<%= false %>"
+			id="dlFileEntryExpirationDatePanel"
+			markupView="lexicon"
+			persistState="<%= true %>"
+			title="expiration-date"
+		>
+			<aui:fieldset>
+				<liferay-ui:error exception="<%= FileEntryExpirationDateException.class %>" message="please-enter-a-valid-expiration-date" />
+				<liferay-ui:error exception="<%= FileEntryReviewDateException.class %>" message="please-enter-a-valid-review-date" />
+
+				<p class="text-secondary">
+					<liferay-ui:message key="including-an-expiration-date-will-allow-your-documents-or-media-to-expire-automatically-and-become-unpublished" />
+				</p>
+
+				<aui:input dateTogglerCheckboxLabel="never-expire" disabled="<%= dlEditFileEntryDisplayContext.isNeverExpire() %>" name="expirationDate" wrapperCssClass="expiration-date" />
+				<aui:input dateTogglerCheckboxLabel="never-review" disabled="<%= dlEditFileEntryDisplayContext.isNeverReview() %>" name="reviewDate" wrapperCssClass="review-date" />
+			</aui:fieldset>
+		</liferay-ui:panel>
 
 		<liferay-ui:panel
 			cssClass="mb-3"

@@ -20,13 +20,18 @@
 String className = ParamUtil.getString(request, "className");
 long classPK = ParamUtil.getLong(request, "classPK");
 String displayStyle = ParamUtil.getString(request, "displayStyle", "list");
+
 String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectRuleGroup");
 
-PortletURL portletURL = renderResponse.createRenderURL();
-
-portletURL.setParameter("mvcPath", "/select_rule_group.jsp");
-portletURL.setParameter("groupId", String.valueOf(groupId));
-portletURL.setParameter("eventName", eventName);
+PortletURL portletURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCPath(
+	"/select_rule_group.jsp"
+).setParameter(
+	"eventName", eventName
+).setParameter(
+	"groupId", groupId
+).buildPortletURL();
 
 RuleGroupSearch ruleGroupSearch = new RuleGroupSearch(liferayPortletRequest, portletURL);
 
@@ -78,7 +83,7 @@ ruleGroupSearch.setResults(mdrRuleGroups);
 	</liferay-frontend:management-bar>
 </c:if>
 
-<aui:form action="<%= portletURL %>" cssClass="container-fluid-1280" method="post" name="selectRuleGroupFm">
+<aui:form action="<%= portletURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="selectRuleGroupFm">
 	<liferay-ui:search-container
 		searchContainer="<%= ruleGroupSearch %>"
 	>
@@ -127,11 +132,6 @@ ruleGroupSearch.setResults(mdrRuleGroups);
 					</liferay-ui:search-container-column-text>
 				</c:when>
 				<c:when test='<%= displayStyle.equals("icon") %>'>
-
-					<%
-					row.setCssClass("entry-card lfr-asset-item");
-					%>
-
 					<liferay-ui:search-container-column-text>
 						<liferay-frontend:icon-vertical-card
 							cssClass='<%= (ruleGroupInstance == null) ? "selector-button" : StringPool.BLANK %>'
@@ -144,7 +144,7 @@ ruleGroupSearch.setResults(mdrRuleGroups);
 				</c:when>
 				<c:when test='<%= displayStyle.equals("list") %>'>
 					<liferay-ui:search-container-column-text
-						cssClass="table-cell-content"
+						cssClass="table-cell-expand"
 						name="name"
 					>
 						<c:choose>
@@ -160,7 +160,7 @@ ruleGroupSearch.setResults(mdrRuleGroups);
 					</liferay-ui:search-container-column-text>
 
 					<liferay-ui:search-container-column-text
-						cssClass="table-cell-content"
+						cssClass="table-cell-expand"
 						name="description"
 						value="<%= ruleGroup.getDescription(locale) %>"
 					/>

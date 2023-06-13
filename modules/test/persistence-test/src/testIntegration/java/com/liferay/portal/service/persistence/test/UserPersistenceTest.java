@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
-import com.liferay.portal.kernel.exception.DuplicateUserExternalReferenceCodeException;
 import com.liferay.portal.kernel.exception.NoSuchUserException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
@@ -306,25 +305,6 @@ public class UserPersistenceTest {
 		Assert.assertEquals(existingUser.getStatus(), newUser.getStatus());
 	}
 
-	@Test(expected = DuplicateUserExternalReferenceCodeException.class)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		User user = addUser();
-
-		User newUser = addUser();
-
-		newUser.setCompanyId(user.getCompanyId());
-
-		newUser = _persistence.update(newUser);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newUser);
-
-		newUser.setExternalReferenceCode(user.getExternalReferenceCode());
-
-		_persistence.update(newUser);
-	}
-
 	@Test
 	public void testCountByUuid() throws Exception {
 		_persistence.countByUuid("");
@@ -374,11 +354,11 @@ public class UserPersistenceTest {
 	}
 
 	@Test
-	public void testCountByU_C() throws Exception {
-		_persistence.countByU_C(
+	public void testCountByGtU_C() throws Exception {
+		_persistence.countByGtU_C(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
 
-		_persistence.countByU_C(0L, 0L);
+		_persistence.countByGtU_C(0L, 0L);
 	}
 
 	@Test

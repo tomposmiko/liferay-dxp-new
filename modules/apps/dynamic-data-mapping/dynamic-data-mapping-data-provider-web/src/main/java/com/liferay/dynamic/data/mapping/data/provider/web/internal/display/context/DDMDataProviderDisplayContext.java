@@ -20,7 +20,7 @@ import com.liferay.dynamic.data.mapping.data.provider.DDMDataProvider;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderTracker;
 import com.liferay.dynamic.data.mapping.data.provider.display.DDMDataProviderDisplay;
 import com.liferay.dynamic.data.mapping.data.provider.web.internal.display.DDMDataProviderDisplayTracker;
-import com.liferay.dynamic.data.mapping.data.provider.web.internal.display.context.util.DDMDataProviderRequestHelper;
+import com.liferay.dynamic.data.mapping.data.provider.web.internal.display.context.helper.DDMDataProviderRequestHelper;
 import com.liferay.dynamic.data.mapping.data.provider.web.internal.search.DDMDataProviderSearch;
 import com.liferay.dynamic.data.mapping.data.provider.web.internal.security.permission.resource.DDMDataProviderInstancePermission;
 import com.liferay.dynamic.data.mapping.data.provider.web.internal.security.permission.resource.DDMFormPermission;
@@ -50,6 +50,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.frontend.taglib.servlet.taglib.util.EmptyResultMessageKeys;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanParamUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -62,12 +63,12 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -145,12 +146,11 @@ public class DDMDataProviderDisplayContext {
 	}
 
 	public String getClearResultsURL() throws PortletException {
-		PortletURL clearResultsURL = PortletURLUtil.clone(
-			getPortletURL(), _renderResponse);
-
-		clearResultsURL.setParameter("keywords", StringPool.BLANK);
-
-		return clearResultsURL.toString();
+		return PortletURLBuilder.create(
+			PortletURLUtil.clone(getPortletURL(), _renderResponse)
+		).setKeywords(
+			StringPool.BLANK
+		).buildString();
 	}
 
 	public CreationMenu getCreationMenu() {
@@ -355,77 +355,104 @@ public class DDMDataProviderDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		return ParamUtil.getString(
-			_renderRequest, "orderByCol", "modified-date");
+		if (Validator.isNotNull(_orderByCol)) {
+			return _orderByCol;
+		}
+
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			_renderRequest, DDMPortletKeys.DYNAMIC_DATA_MAPPING_DATA_PROVIDER,
+			"modified-date");
+
+		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		return ParamUtil.getString(_renderRequest, "orderByType", "asc");
+		if (Validator.isNotNull(_orderByType)) {
+			return _orderByType;
+		}
+
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_renderRequest, DDMPortletKeys.DYNAMIC_DATA_MAPPING_DATA_PROVIDER,
+			"asc");
+
+		return _orderByType;
 	}
 
 	public PortletURL getPortletURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/view.jsp"
+		).setKeywords(
+			() -> {
+				String keywords = getKeywords();
 
-		portletURL.setParameter("mvcPath", "/view.jsp");
-		portletURL.setParameter(
-			"groupId",
-			String.valueOf(_ddmDataProviderRequestHelper.getScopeGroupId()));
+				if (Validator.isNotNull(keywords)) {
+					return keywords;
+				}
 
-		String delta = ParamUtil.getString(_renderRequest, "delta");
+				return null;
+			}
+		).setParameter(
+			"delta",
+			() -> {
+				String delta = ParamUtil.getString(_renderRequest, "delta");
 
-		if (Validator.isNotNull(delta)) {
-			portletURL.setParameter("delta", delta);
-		}
+				if (Validator.isNotNull(delta)) {
+					return delta;
+				}
 
-		String displayStyle = getDisplayStyle();
+				return null;
+			}
+		).setParameter(
+			"displayStyle",
+			() -> {
+				String displayStyle = getDisplayStyle();
 
-		if (Validator.isNotNull(displayStyle)) {
-			portletURL.setParameter("displayStyle", displayStyle);
-		}
+				if (Validator.isNotNull(displayStyle)) {
+					return displayStyle;
+				}
 
-		String keywords = getKeywords();
+				return null;
+			}
+		).setParameter(
+			"groupId", _ddmDataProviderRequestHelper.getScopeGroupId()
+		).setParameter(
+			"orderByCol",
+			() -> {
+				String orderByCol = getOrderByCol();
 
-		if (Validator.isNotNull(keywords)) {
-			portletURL.setParameter("keywords", keywords);
-		}
+				if (Validator.isNotNull(orderByCol)) {
+					return orderByCol;
+				}
 
-		String orderByCol = getOrderByCol();
+				return null;
+			}
+		).setParameter(
+			"orderByType",
+			() -> {
+				String orderByType = getOrderByType();
 
-		if (Validator.isNotNull(orderByCol)) {
-			portletURL.setParameter("orderByCol", orderByCol);
-		}
+				if (Validator.isNotNull(orderByType)) {
+					return orderByType;
+				}
 
-		String orderByType = getOrderByType();
-
-		if (Validator.isNotNull(orderByType)) {
-			portletURL.setParameter("orderByType", orderByType);
-		}
-
-		portletURL.setParameter("refererPortletName", getRefererPortletName());
-
-		return portletURL;
+				return null;
+			}
+		).setParameter(
+			"refererPortletName", getRefererPortletName()
+		).buildPortletURL();
 	}
 
 	public SearchContainer<?> getSearch() {
-		String displayStyle = getDisplayStyle();
-
-		PortletURL portletURL = getPortletURL();
-
-		portletURL.setParameter("displayStyle", displayStyle);
+		PortletURL portletURL = PortletURLBuilder.create(
+			getPortletURL()
+		).setParameter(
+			"displayStyle", getDisplayStyle()
+		).buildPortletURL();
 
 		DDMDataProviderSearch ddmDataProviderSearch = new DDMDataProviderSearch(
 			_renderRequest, portletURL);
-
-		String orderByCol = getOrderByCol();
-		String orderByType = getOrderByType();
-
-		OrderByComparator<DDMDataProviderInstance> orderByComparator =
-			DDMDataProviderPortletUtil.getDDMDataProviderOrderByComparator(
-				orderByCol, orderByType);
-
-		ddmDataProviderSearch.setOrderByCol(orderByCol);
-		ddmDataProviderSearch.setOrderByComparator(orderByComparator);
-		ddmDataProviderSearch.setOrderByType(orderByType);
 
 		if (ddmDataProviderSearch.isSearch()) {
 			ddmDataProviderSearch.setEmptyResultsMessage(
@@ -435,6 +462,12 @@ public class DDMDataProviderDisplayContext {
 			ddmDataProviderSearch.setEmptyResultsMessage(
 				"there-are-no-data-providers");
 		}
+
+		ddmDataProviderSearch.setOrderByCol(getOrderByCol());
+		ddmDataProviderSearch.setOrderByComparator(
+			DDMDataProviderPortletUtil.getDDMDataProviderOrderByComparator(
+				getOrderByCol(), getOrderByType()));
+		ddmDataProviderSearch.setOrderByType(getOrderByType());
 
 		setDDMDataProviderInstanceSearchResults(ddmDataProviderSearch);
 		setDDMDataProviderInstanceSearchTotal(ddmDataProviderSearch);
@@ -447,15 +480,21 @@ public class DDMDataProviderDisplayContext {
 	}
 
 	public String getSortingURL() throws Exception {
-		PortletURL sortingURL = PortletURLUtil.clone(
-			getPortletURL(), _renderResponse);
+		return PortletURLBuilder.create(
+			PortletURLUtil.clone(getPortletURL(), _renderResponse)
+		).setParameter(
+			"orderByType",
+			() -> {
+				String orderByType = ParamUtil.getString(
+					_renderRequest, "orderByType");
 
-		String orderByType = ParamUtil.getString(_renderRequest, "orderByType");
+				if (orderByType.equals("asc")) {
+					return "desc";
+				}
 
-		sortingURL.setParameter(
-			"orderByType", orderByType.equals("asc") ? "desc" : "asc");
-
-		return sortingURL.toString();
+				return "asc";
+			}
+		).buildString();
 	}
 
 	public String getTitle() {
@@ -769,6 +808,8 @@ public class DDMDataProviderDisplayContext {
 	private final DDMFormRenderer _ddmFormRenderer;
 	private final DDMFormValuesDeserializer _ddmFormValuesDeserializer;
 	private String _displayStyle;
+	private String _orderByCol;
+	private String _orderByType;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 	private final UserLocalService _userLocalService;

@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
@@ -74,6 +73,49 @@ public class Mutation {
 			this::_populateResourceContext,
 			channelResource -> channelResource.postChannelBatch(
 				callbackURL, object));
+	}
+
+	@GraphQLField
+	public boolean deleteChannelByExternalReferenceCode(
+			@GraphQLName("externalReferenceCode") String externalReferenceCode)
+		throws Exception {
+
+		_applyVoidComponentServiceObjects(
+			_channelResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			channelResource ->
+				channelResource.deleteChannelByExternalReferenceCode(
+					externalReferenceCode));
+
+		return true;
+	}
+
+	@GraphQLField
+	public Channel patchChannelByExternalReferenceCode(
+			@GraphQLName("externalReferenceCode") String externalReferenceCode,
+			@GraphQLName("channel") Channel channel)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_channelResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			channelResource ->
+				channelResource.patchChannelByExternalReferenceCode(
+					externalReferenceCode, channel));
+	}
+
+	@GraphQLField
+	public Channel updateChannelByExternalReferenceCode(
+			@GraphQLName("externalReferenceCode") String externalReferenceCode,
+			@GraphQLName("channel") Channel channel)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_channelResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			channelResource ->
+				channelResource.putChannelByExternalReferenceCode(
+					externalReferenceCode, channel));
 	}
 
 	@GraphQLField
@@ -188,9 +230,6 @@ public class Mutation {
 		channelResource.setContextUser(_user);
 		channelResource.setGroupLocalService(_groupLocalService);
 		channelResource.setRoleLocalService(_roleLocalService);
-
-		channelResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private static ComponentServiceObjects<ChannelResource>
@@ -205,7 +244,5 @@ public class Mutation {
 	private BiFunction<Object, String, Sort[]> _sortsBiFunction;
 	private UriInfo _uriInfo;
 	private com.liferay.portal.kernel.model.User _user;
-	private VulcanBatchEngineImportTaskResource
-		_vulcanBatchEngineImportTaskResource;
 
 }

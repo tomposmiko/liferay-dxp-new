@@ -39,14 +39,14 @@ public class CommerceCatalogServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.commerce.product.service.impl.CommerceCatalogServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static CommerceCatalog addCommerceCatalog(
-			String name, String commerceCurrencyCode,
-			String catalogDefaultLanguageId, String externalReferenceCode,
+			String externalReferenceCode, String name,
+			String commerceCurrencyCode, String catalogDefaultLanguageId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addCommerceCatalog(
-			name, commerceCurrencyCode, catalogDefaultLanguageId,
-			externalReferenceCode, serviceContext);
+			externalReferenceCode, name, commerceCurrencyCode,
+			catalogDefaultLanguageId, serviceContext);
 	}
 
 	public static CommerceCatalog deleteCommerceCatalog(long commerceCatalogId)
@@ -56,11 +56,11 @@ public class CommerceCatalogServiceUtil {
 	}
 
 	public static CommerceCatalog fetchByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
+			String externalReferenceCode, long companyId)
 		throws PortalException {
 
 		return getService().fetchByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	public static CommerceCatalog fetchCommerceCatalog(long commerceCatalogId)
@@ -96,13 +96,12 @@ public class CommerceCatalogServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static List<CommerceCatalog> searchCommerceCatalogs(
+	public static List<CommerceCatalog> search(
 			long companyId, String keywords, int start, int end,
 			com.liferay.portal.kernel.search.Sort sort)
 		throws PortalException {
 
-		return getService().searchCommerceCatalogs(
-			companyId, keywords, start, end, sort);
+		return getService().search(companyId, keywords, start, end, sort);
 	}
 
 	public static int searchCommerceCatalogsCount(
@@ -123,11 +122,11 @@ public class CommerceCatalogServiceUtil {
 	}
 
 	public static CommerceCatalog updateCommerceCatalogExternalReferenceCode(
-			long commerceCatalogId, String externalReferenceCode)
+			String externalReferenceCode, long commerceCatalogId)
 		throws PortalException {
 
 		return getService().updateCommerceCatalogExternalReferenceCode(
-			commerceCatalogId, externalReferenceCode);
+			externalReferenceCode, commerceCatalogId);
 	}
 
 	public static CommerceCatalogService getService() {

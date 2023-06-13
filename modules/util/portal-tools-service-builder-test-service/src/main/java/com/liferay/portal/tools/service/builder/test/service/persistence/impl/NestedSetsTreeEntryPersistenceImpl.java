@@ -15,7 +15,6 @@
 package com.liferay.portal.tools.service.builder.test.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -27,12 +26,10 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.service.persistence.impl.NestedSetsTreeManager;
 import com.liferay.portal.kernel.service.persistence.impl.PersistenceNestedSetsTreeManager;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -51,17 +48,10 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * The persistence implementation for the nested sets tree entry service.
@@ -158,9 +148,7 @@ public class NestedSetsTreeEntryPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(NestedSetsTreeEntryImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(NestedSetsTreeEntryImpl.class);
 	}
 
 	/**
@@ -186,9 +174,7 @@ public class NestedSetsTreeEntryPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(NestedSetsTreeEntryImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(NestedSetsTreeEntryImpl.class, primaryKey);
@@ -541,7 +527,7 @@ public class NestedSetsTreeEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<NestedSetsTreeEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -611,7 +597,7 @@ public class NestedSetsTreeEntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -667,7 +653,7 @@ public class NestedSetsTreeEntryPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountAncestors, finderArgs, this);
+			_finderPathWithPaginationCountAncestors, finderArgs);
 
 		if (count == null) {
 			try {
@@ -694,7 +680,7 @@ public class NestedSetsTreeEntryPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountDescendants, finderArgs, this);
+			_finderPathWithPaginationCountDescendants, finderArgs);
 
 		if (count == null) {
 			try {
@@ -725,7 +711,7 @@ public class NestedSetsTreeEntryPersistenceImpl
 
 		List<NestedSetsTreeEntry> list =
 			(List<NestedSetsTreeEntry>)finderCache.getResult(
-				_finderPathWithPaginationGetAncestors, finderArgs, this);
+				_finderPathWithPaginationGetAncestors, finderArgs);
 
 		if ((list != null) && !list.isEmpty()) {
 			for (NestedSetsTreeEntry tempNestedSetsTreeEntry : list) {
@@ -772,7 +758,7 @@ public class NestedSetsTreeEntryPersistenceImpl
 
 		List<NestedSetsTreeEntry> list =
 			(List<NestedSetsTreeEntry>)finderCache.getResult(
-				_finderPathWithPaginationGetDescendants, finderArgs, this);
+				_finderPathWithPaginationGetDescendants, finderArgs);
 
 		if ((list != null) && !list.isEmpty()) {
 			for (NestedSetsTreeEntry tempNestedSetsTreeEntry : list) {
@@ -926,33 +912,22 @@ public class NestedSetsTreeEntryPersistenceImpl
 	 * Initializes the nested sets tree entry persistence.
 	 */
 	public void afterPropertiesSet() {
-		Bundle bundle = FrameworkUtil.getBundle(
-			NestedSetsTreeEntryPersistenceImpl.class);
-
-		_bundleContext = bundle.getBundleContext();
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class,
-			new NestedSetsTreeEntryModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", NestedSetsTreeEntry.class.getName()));
-
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationCountAncestors = _createFinderPath(
+		_finderPathWithPaginationCountAncestors = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countAncestors",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
@@ -963,7 +938,7 @@ public class NestedSetsTreeEntryPersistenceImpl
 			},
 			false);
 
-		_finderPathWithPaginationCountDescendants = _createFinderPath(
+		_finderPathWithPaginationCountDescendants = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countDescendants",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
@@ -974,7 +949,7 @@ public class NestedSetsTreeEntryPersistenceImpl
 			},
 			false);
 
-		_finderPathWithPaginationGetAncestors = _createFinderPath(
+		_finderPathWithPaginationGetAncestors = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "getAncestors",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
@@ -985,7 +960,7 @@ public class NestedSetsTreeEntryPersistenceImpl
 			},
 			true);
 
-		_finderPathWithPaginationGetDescendants = _createFinderPath(
+		_finderPathWithPaginationGetDescendants = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "getDescendants",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
@@ -1003,14 +978,6 @@ public class NestedSetsTreeEntryPersistenceImpl
 		_setNestedSetsTreeEntryUtilPersistence(null);
 
 		entityCache.removeCache(NestedSetsTreeEntryImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setNestedSetsTreeEntryUtilPersistence(
@@ -1028,8 +995,6 @@ public class NestedSetsTreeEntryPersistenceImpl
 			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
-
-	private BundleContext _bundleContext;
 
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
@@ -1058,107 +1023,9 @@ public class NestedSetsTreeEntryPersistenceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		NestedSetsTreeEntryPersistenceImpl.class);
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
-	}
-
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class NestedSetsTreeEntryModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			NestedSetsTreeEntryModelImpl nestedSetsTreeEntryModelImpl =
-				(NestedSetsTreeEntryModelImpl)baseModel;
-
-			long columnBitmask =
-				nestedSetsTreeEntryModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					nestedSetsTreeEntryModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						nestedSetsTreeEntryModelImpl.getColumnBitmask(
-							columnName);
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					nestedSetsTreeEntryModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			NestedSetsTreeEntryModelImpl nestedSetsTreeEntryModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						nestedSetsTreeEntryModelImpl.getColumnOriginalValue(
-							columnName);
-				}
-				else {
-					arguments[i] = nestedSetsTreeEntryModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
 }

@@ -94,6 +94,10 @@ public class LocalizationImpl implements Localization {
 
 	@Override
 	public String[] getAvailableLanguageIds(Document document) {
+		if (document == null) {
+			return new String[0];
+		}
+
 		String attributeValue = _getRootAttributeValue(
 			document, _AVAILABLE_LOCALES, StringPool.BLANK);
 
@@ -140,19 +144,12 @@ public class LocalizationImpl implements Localization {
 		}
 
 		if (_log.isWarnEnabled()) {
-			StringBundler sb = new StringBundler(9);
-
-			sb.append("Language ");
-			sb.append(LocaleUtil.toLanguageId(contentDefaultLocale));
-			sb.append(" is missing for ");
-			sb.append(className);
-			sb.append(" with primary key ");
-			sb.append(primaryKey);
-			sb.append(". Setting default language to ");
-			sb.append(LocaleUtil.toLanguageId(defaultLocale));
-			sb.append(".");
-
-			_log.warn(sb.toString());
+			_log.warn(
+				StringBundler.concat(
+					"Language ", LocaleUtil.toLanguageId(contentDefaultLocale),
+					" is missing for ", className, " with primary key ",
+					primaryKey, ". Setting default language to ",
+					LocaleUtil.toLanguageId(defaultLocale), "."));
 		}
 
 		return defaultLocale;
@@ -222,11 +219,8 @@ public class LocalizationImpl implements Localization {
 		String defaultValue) {
 
 		if (!Validator.isXml(xml)) {
-			if (useDefault) {
-				return xml;
-			}
-
-			if (requestedLanguageId.equals(
+			if (useDefault ||
+				requestedLanguageId.equals(
 					LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()))) {
 
 				return xml;
@@ -364,6 +358,9 @@ public class LocalizationImpl implements Localization {
 					xmlStreamReader.close();
 				}
 				catch (Exception exception) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(exception, exception);
+					}
 				}
 			}
 		}
@@ -832,14 +829,6 @@ public class LocalizationImpl implements Localization {
 	public String getXml(
 		Map<String, String> map, String defaultLanguageId, String key) {
 
-		return getXml(map, defaultLanguageId, key, false);
-	}
-
-	@Override
-	public String getXml(
-		Map<String, String> map, String defaultLanguageId, String key,
-		boolean cdata) {
-
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
 		XMLStreamWriter xmlStreamWriter = null;
@@ -884,15 +873,8 @@ public class LocalizationImpl implements Localization {
 				xmlStreamWriter.writeStartElement(key);
 
 				xmlStreamWriter.writeAttribute(_LANGUAGE_ID, languageId);
-
-				if (cdata) {
-					xmlStreamWriter.writeCData(
-						XMLUtil.stripInvalidChars(entry.getValue()));
-				}
-				else {
-					xmlStreamWriter.writeCharacters(
-						XMLUtil.stripInvalidChars(entry.getValue()));
-				}
+				xmlStreamWriter.writeCharacters(
+					XMLUtil.stripInvalidChars(entry.getValue()));
 
 				xmlStreamWriter.writeEndElement();
 			}
@@ -1017,9 +999,6 @@ public class LocalizationImpl implements Localization {
 			if ((availableLocales != null) &&
 				availableLocales.contains(requestedLanguageId)) {
 
-				availableLocales = StringUtil.removeFromList(
-					availableLocales, requestedLanguageId);
-
 				UnsyncStringWriter unsyncStringWriter =
 					new UnsyncStringWriter();
 
@@ -1033,8 +1012,12 @@ public class LocalizationImpl implements Localization {
 				xmlStreamWriter.writeStartElement(_ROOT);
 
 				if (localized) {
+					availableLocales = StringUtil.removeFromList(
+						availableLocales, requestedLanguageId);
+
 					xmlStreamWriter.writeAttribute(
 						_AVAILABLE_LOCALES, availableLocales);
+
 					xmlStreamWriter.writeAttribute(
 						_DEFAULT_LOCALE, defaultLanguageId);
 				}
@@ -1068,6 +1051,9 @@ public class LocalizationImpl implements Localization {
 					xmlStreamReader.close();
 				}
 				catch (Exception exception) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(exception, exception);
+					}
 				}
 			}
 
@@ -1076,6 +1062,9 @@ public class LocalizationImpl implements Localization {
 					xmlStreamWriter.close();
 				}
 				catch (Exception exception) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(exception, exception);
+					}
 				}
 			}
 		}
@@ -1122,15 +1111,6 @@ public class LocalizationImpl implements Localization {
 		Map<Locale, String> localizationMap, String xml, String key,
 		String defaultLanguageId) {
 
-		return updateLocalization(
-			localizationMap, xml, key, defaultLanguageId, false);
-	}
-
-	@Override
-	public String updateLocalization(
-		Map<Locale, String> localizationMap, String xml, String key,
-		String defaultLanguageId, boolean cdata) {
-
 		Set<Locale> availableLocales = LanguageUtil.getAvailableLocales();
 
 		if (Validator.isBlank(xml)) {
@@ -1151,7 +1131,7 @@ public class LocalizationImpl implements Localization {
 				return StringPool.BLANK;
 			}
 
-			return getXml(map, defaultLanguageId, key, cdata);
+			return getXml(map, defaultLanguageId, key);
 		}
 
 		for (Locale locale : availableLocales) {
@@ -1320,6 +1300,9 @@ public class LocalizationImpl implements Localization {
 					xmlStreamReader.close();
 				}
 				catch (Exception exception) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(exception, exception);
+					}
 				}
 			}
 
@@ -1328,6 +1311,9 @@ public class LocalizationImpl implements Localization {
 					xmlStreamWriter.close();
 				}
 				catch (Exception exception) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(exception, exception);
+					}
 				}
 			}
 		}
@@ -1341,6 +1327,9 @@ public class LocalizationImpl implements Localization {
 				xmlStreamWriter.close();
 			}
 			catch (XMLStreamException xmlStreamException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(xmlStreamException, xmlStreamException);
+				}
 			}
 		}
 	}
@@ -1424,6 +1413,9 @@ public class LocalizationImpl implements Localization {
 					value.getBytes(StringPool.ISO_8859_1), StringPool.UTF8);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 		}
 
@@ -1491,6 +1483,9 @@ public class LocalizationImpl implements Localization {
 					xmlStreamReader.close();
 				}
 				catch (Exception exception) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(exception, exception);
+					}
 				}
 			}
 		}

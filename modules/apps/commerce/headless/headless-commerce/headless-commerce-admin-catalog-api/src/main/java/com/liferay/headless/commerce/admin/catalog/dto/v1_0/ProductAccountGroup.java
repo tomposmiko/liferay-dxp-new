@@ -62,7 +62,7 @@ public class ProductAccountGroup implements Serializable {
 	}
 
 	@DecimalMin("0")
-	@Schema(example = "31130")
+	@Schema
 	public Long getAccountGroupId() {
 		return accountGroupId;
 	}
@@ -90,7 +90,7 @@ public class ProductAccountGroup implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long accountGroupId;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -119,7 +119,7 @@ public class ProductAccountGroup implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "31130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -146,7 +146,7 @@ public class ProductAccountGroup implements Serializable {
 	@NotNull
 	protected Long id;
 
-	@Schema(example = "Alessio Antonio Rendina")
+	@Schema
 	public String getName() {
 		return name;
 	}

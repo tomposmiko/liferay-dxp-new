@@ -160,20 +160,20 @@ public class DDLRecordSetStagedModelRepository
 
 	@Override
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		final PortletDataContext portletDataContext) {
+		PortletDataContext portletDataContext) {
 
 		return getExportActionableDynamicQuery(
 			portletDataContext, DDLRecordSetConstants.SCOPE_DYNAMIC_DATA_LISTS);
 	}
 
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		final PortletDataContext portletDataContext, final int scope) {
+		PortletDataContext portletDataContext, int scope) {
 
 		ExportActionableDynamicQuery exportActionableDynamicQuery =
 			_ddlRecordSetLocalService.getExportActionableDynamicQuery(
 				portletDataContext);
 
-		final ActionableDynamicQuery.AddCriteriaMethod addCriteriaMethod =
+		ActionableDynamicQuery.AddCriteriaMethod addCriteriaMethod =
 			exportActionableDynamicQuery.getAddCriteriaMethod();
 
 		exportActionableDynamicQuery.setAddCriteriaMethod(

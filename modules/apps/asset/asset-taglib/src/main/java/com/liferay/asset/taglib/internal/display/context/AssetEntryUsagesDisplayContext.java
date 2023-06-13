@@ -38,6 +38,7 @@ import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeCon
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -137,18 +138,13 @@ public class AssetEntryUsagesDisplayContext {
 				return StringPool.BLANK;
 			}
 
-			if (!_isDraft(layout)) {
+			if (!layout.isDraftLayout()) {
 				return layout.getName(_themeDisplay.getLocale());
 			}
 
-			StringBundler sb = new StringBundler(4);
-
-			sb.append(layout.getName(_themeDisplay.getLocale()));
-			sb.append(" (");
-			sb.append(LanguageUtil.get(_themeDisplay.getLocale(), "draft"));
-			sb.append(")");
-
-			return sb.toString();
+			return StringBundler.concat(
+				layout.getName(_themeDisplay.getLocale()), " (",
+				LanguageUtil.get(_themeDisplay.getLocale(), "draft"), ")");
 		}
 
 		long plid = assetEntryUsage.getPlid();
@@ -156,7 +152,7 @@ public class AssetEntryUsagesDisplayContext {
 		Layout layout = LayoutLocalServiceUtil.fetchLayout(
 			assetEntryUsage.getPlid());
 
-		if ((layout.getClassNameId() > 0) && (layout.getClassPK() > 0)) {
+		if (layout.isDraftLayout()) {
 			plid = layout.getClassPK();
 		}
 
@@ -168,18 +164,13 @@ public class AssetEntryUsagesDisplayContext {
 			return StringPool.BLANK;
 		}
 
-		if (!_isDraft(layout)) {
+		if (!layout.isDraftLayout()) {
 			return layoutPageTemplateEntry.getName();
 		}
 
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(layoutPageTemplateEntry.getName());
-		sb.append(" (");
-		sb.append(LanguageUtil.get(_themeDisplay.getLocale(), "draft"));
-		sb.append(")");
-
-		return sb.toString();
+		return StringBundler.concat(
+			layoutPageTemplateEntry.getName(), " (",
+			LanguageUtil.get(_themeDisplay.getLocale(), "draft"), ")");
 	}
 
 	public String getAssetEntryUsageTypeLabel(AssetEntryUsage assetEntryUsage) {
@@ -303,18 +294,15 @@ public class AssetEntryUsagesDisplayContext {
 				String.valueOf(AssetRendererFactory.TYPE_LATEST));
 		}
 		else {
-			PortletURL portletURL = PortletURLFactoryUtil.create(
-				_renderRequest, assetEntryUsage.getContainerKey(),
-				assetEntryUsage.getPlid(), PortletRequest.RENDER_PHASE);
-
-			portletURL.setParameter(
-				"previewAssetEntryId",
-				String.valueOf(assetEntryUsage.getAssetEntryId()));
-			portletURL.setParameter(
-				"previewAssetEntryType",
-				String.valueOf(AssetRendererFactory.TYPE_LATEST));
-
-			layoutURL = portletURL.toString();
+			layoutURL = PortletURLBuilder.create(
+				PortletURLFactoryUtil.create(
+					_renderRequest, assetEntryUsage.getContainerKey(),
+					assetEntryUsage.getPlid(), PortletRequest.RENDER_PHASE)
+			).setParameter(
+				"previewAssetEntryId", assetEntryUsage.getAssetEntryId()
+			).setParameter(
+				"previewAssetEntryType", AssetRendererFactory.TYPE_LATEST
+			).buildString();
 		}
 
 		String portletURLString = HttpUtil.addParameter(
@@ -422,14 +410,10 @@ public class AssetEntryUsagesDisplayContext {
 			return true;
 		}
 
-		if (assetEntryUsage.getType() ==
-				AssetEntryUsageConstants.TYPE_DISPLAY_PAGE_TEMPLATE) {
-
-			return false;
-		}
-
-		if (assetEntryUsage.getType() !=
-				AssetEntryUsageConstants.TYPE_PAGE_TEMPLATE) {
+		if ((assetEntryUsage.getType() ==
+				AssetEntryUsageConstants.TYPE_DISPLAY_PAGE_TEMPLATE) ||
+			(assetEntryUsage.getType() !=
+				AssetEntryUsageConstants.TYPE_PAGE_TEMPLATE)) {
 
 			return false;
 		}
@@ -438,7 +422,7 @@ public class AssetEntryUsagesDisplayContext {
 
 		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
 
-		if ((layout.getClassNameId() > 0) && (layout.getClassPK() > 0)) {
+		if (layout.isDraftLayout()) {
 			plid = layout.getClassPK();
 		}
 
@@ -446,12 +430,9 @@ public class AssetEntryUsagesDisplayContext {
 			LayoutPageTemplateEntryLocalServiceUtil.
 				fetchLayoutPageTemplateEntryByPlid(plid);
 
-		if (layoutPageTemplateEntry == null) {
-			return false;
-		}
-
-		if (layoutPageTemplateEntry.getType() ==
-				LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE) {
+		if ((layoutPageTemplateEntry == null) ||
+			(layoutPageTemplateEntry.getType() ==
+				LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE)) {
 
 			return false;
 		}
@@ -552,16 +533,6 @@ public class AssetEntryUsagesDisplayContext {
 		}
 
 		return 0;
-	}
-
-	private boolean _isDraft(Layout layout) {
-		if (layout.getClassNameId() != PortalUtil.getClassNameId(
-				Layout.class.getName())) {
-
-			return false;
-		}
-
-		return true;
 	}
 
 	private final AssetEntry _assetEntry;

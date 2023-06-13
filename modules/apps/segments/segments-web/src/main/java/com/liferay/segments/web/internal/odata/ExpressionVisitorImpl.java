@@ -19,16 +19,13 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.CollectionEntityField;
-import com.liferay.portal.odata.entity.ComplexEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.expression.BinaryExpression;
 import com.liferay.portal.odata.filter.expression.CollectionPropertyExpression;
-import com.liferay.portal.odata.filter.expression.ComplexPropertyExpression;
 import com.liferay.portal.odata.filter.expression.Expression;
 import com.liferay.portal.odata.filter.expression.ExpressionVisitException;
 import com.liferay.portal.odata.filter.expression.ExpressionVisitor;
@@ -39,7 +36,6 @@ import com.liferay.portal.odata.filter.expression.LiteralExpression;
 import com.liferay.portal.odata.filter.expression.MemberExpression;
 import com.liferay.portal.odata.filter.expression.MethodExpression;
 import com.liferay.portal.odata.filter.expression.PrimitivePropertyExpression;
-import com.liferay.portal.odata.filter.expression.PropertyExpression;
 import com.liferay.portal.odata.filter.expression.UnaryExpression;
 
 import java.util.Collections;
@@ -77,7 +73,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 				 Objects.equals(BinaryExpression.Operation.NE, operation)) {
 
 			return _getOperationJSONObject(
-				String.valueOf(operation), left, right);
+				String.valueOf(operation), (EntityField)left, right);
 		}
 
 		throw new UnsupportedOperationException(
@@ -118,28 +114,6 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 					}
 
 				}));
-	}
-
-	public Object visitComplexPropertyExpression(
-		ComplexPropertyExpression complexPropertyExpression) {
-
-		Map<String, EntityField> entityFieldsMap =
-			_entityModel.getEntityFieldsMap();
-
-		ComplexEntityField complexEntityField =
-			(ComplexEntityField)entityFieldsMap.get(
-				complexPropertyExpression.getName());
-
-		Map<String, EntityField> complexEntityFieldFieldsMap =
-			complexEntityField.getEntityFieldsMap();
-
-		PropertyExpression propertyExpression =
-			complexPropertyExpression.getPropertyExpression();
-
-		EntityField entityField = complexEntityFieldFieldsMap.get(
-			propertyExpression.getName());
-
-		return complexEntityField.getName() + "/" + entityField.getName();
 	}
 
 	@Override
@@ -184,7 +158,7 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 
 		if (operation == ListExpression.Operation.IN) {
 			return _getOperationJSONObject(
-				String.valueOf(operation), left, right);
+				String.valueOf(operation), (EntityField)left, right);
 		}
 
 		throw new UnsupportedOperationException(
@@ -221,7 +195,8 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 			}
 
 			return _getOperationJSONObject(
-				String.valueOf(type), expressions.get(0), expressions.get(1));
+				String.valueOf(type), (EntityField)expressions.get(0),
+				expressions.get(1));
 		}
 
 		throw new UnsupportedOperationException(
@@ -266,30 +241,25 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 
 		String conjunctionName = leftJSONObject.getString("conjunctionName");
 
-		_groupCount++;
+		if (Validator.isNotNull(conjunctionName) &&
+			Objects.equals(conjunctionName, operation.toString())) {
 
-		if (Validator.isNotNull(conjunctionName)) {
-			String operationString = operation.toString();
-
-			if (Objects.equals(
-					conjunctionName.toLowerCase(LocaleUtil.ROOT),
-					operationString.toLowerCase(LocaleUtil.ROOT))) {
-
-				return JSONUtil.put(
-					"conjunctionName",
-					StringUtil.lowerCase(String.valueOf(operation))
+			return JSONUtil.put(
+				"conjunctionName",
+				StringUtil.lowerCase(String.valueOf(operation))
+			).put(
+				"groupId", leftJSONObject.getString("groupId")
+			).put(
+				"items",
+				leftJSONObject.getJSONArray(
+					"items"
 				).put(
-					"groupId", "group_" + _groupCount
-				).put(
-					"items",
-					leftJSONObject.getJSONArray(
-						"items"
-					).put(
-						rightJSONObject
-					)
-				);
-			}
+					rightJSONObject
+				)
+			);
 		}
+
+		_groupCount++;
 
 		return JSONUtil.put(
 			"conjunctionName", StringUtil.lowerCase(String.valueOf(operation))
@@ -301,7 +271,8 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 	}
 
 	private JSONObject _getOperationJSONObject(
-		String operatorName, Object object, List<Object> fieldValues) {
+		String operatorName, EntityField entityField,
+		List<Object> fieldValues) {
 
 		Stream<Object> stream = fieldValues.stream();
 
@@ -316,32 +287,22 @@ public class ExpressionVisitorImpl implements ExpressionVisitor<Object> {
 		return JSONUtil.put(
 			"operatorName", StringUtil.lowerCase(operatorName)
 		).put(
-			"propertyName", _getPropertyName(object)
+			"propertyName", entityField.getName()
 		).put(
 			"value", jsonArray
 		);
 	}
 
 	private JSONObject _getOperationJSONObject(
-		String operatorName, Object object, Object fieldValue) {
+		String operatorName, EntityField entityField, Object fieldValue) {
 
 		return JSONUtil.put(
 			"operatorName", StringUtil.lowerCase(operatorName)
 		).put(
-			"propertyName", _getPropertyName(object)
+			"propertyName", entityField.getName()
 		).put(
 			"value", fieldValue
 		);
-	}
-
-	private String _getPropertyName(Object object) {
-		if (object instanceof EntityField) {
-			EntityField entityField = (EntityField)object;
-
-			return entityField.getName();
-		}
-
-		return String.valueOf(object);
 	}
 
 	private final EntityModel _entityModel;

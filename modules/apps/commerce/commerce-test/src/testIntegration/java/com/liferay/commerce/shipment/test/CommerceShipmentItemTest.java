@@ -34,15 +34,13 @@ import com.liferay.commerce.service.CommerceShipmentItemLocalServiceUtil;
 import com.liferay.commerce.service.CommerceShipmentLocalServiceUtil;
 import com.liferay.commerce.shipment.test.util.CommerceShipmentTestUtil;
 import com.liferay.commerce.test.util.CommerceTestUtil;
-import com.liferay.commerce.test.util.TestCommerceContext;
+import com.liferay.commerce.test.util.context.TestCommerceContext;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
-import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
@@ -76,12 +74,9 @@ public class CommerceShipmentItemTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_company = CompanyTestUtil.addCompany();
+		_group = GroupTestUtil.addGroup();
 
-		_user = UserTestUtil.addUser(_company);
-
-		_group = GroupTestUtil.addGroup(
-			_company.getCompanyId(), _user.getUserId(), 0);
+		_user = UserTestUtil.addUser();
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
@@ -90,9 +85,9 @@ public class CommerceShipmentItemTest {
 			_group.getCompanyId());
 
 		_commerceChannel = CommerceChannelLocalServiceUtil.addCommerceChannel(
-			_group.getGroupId(), "Test Channel",
+			null, _group.getGroupId(), "Test Channel",
 			CommerceChannelConstants.CHANNEL_TYPE_SITE, null,
-			_commerceCurrency.getCode(), null, serviceContext);
+			_commerceCurrency.getCode(), serviceContext);
 
 		_commerceOrder = CommerceTestUtil.addB2CCommerceOrder(
 			_user.getUserId(), _commerceChannel.getGroupId(),
@@ -333,6 +328,8 @@ public class CommerceShipmentItemTest {
 		CommerceShipmentLocalServiceUtil.addCommerceShipment(_commerceShipment);
 	}
 
+	private static User _user;
+
 	@DeleteAfterTestRun
 	private CommerceChannel _commerceChannel;
 
@@ -356,12 +353,6 @@ public class CommerceShipmentItemTest {
 	@Inject
 	private CommerceShipmentItemLocalService _commerceShipmentItemLocalService;
 
-	@DeleteAfterTestRun
-	private Company _company;
-
 	private Group _group;
-
-	@DeleteAfterTestRun
-	private User _user;
 
 }

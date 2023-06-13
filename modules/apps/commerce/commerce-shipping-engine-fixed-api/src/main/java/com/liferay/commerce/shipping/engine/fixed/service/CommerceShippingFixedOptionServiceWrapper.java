@@ -27,6 +27,10 @@ public class CommerceShippingFixedOptionServiceWrapper
 	implements CommerceShippingFixedOptionService,
 			   ServiceWrapper<CommerceShippingFixedOptionService> {
 
+	public CommerceShippingFixedOptionServiceWrapper() {
+		this(null);
+	}
+
 	public CommerceShippingFixedOptionServiceWrapper(
 		CommerceShippingFixedOptionService commerceShippingFixedOptionService) {
 
@@ -38,7 +42,7 @@ public class CommerceShippingFixedOptionServiceWrapper
 	public
 		com.liferay.commerce.shipping.engine.fixed.model.
 			CommerceShippingFixedOption addCommerceShippingFixedOption(
-					long userId, long groupId, long commerceShippingMethodId,
+					long groupId, long commerceShippingMethodId,
 					java.util.Map<java.util.Locale, String> nameMap,
 					java.util.Map<java.util.Locale, String> descriptionMap,
 					java.math.BigDecimal amount, double priority)
@@ -46,8 +50,8 @@ public class CommerceShippingFixedOptionServiceWrapper
 
 		return _commerceShippingFixedOptionService.
 			addCommerceShippingFixedOption(
-				userId, groupId, commerceShippingMethodId, nameMap,
-				descriptionMap, amount, priority);
+				groupId, commerceShippingMethodId, nameMap, descriptionMap,
+				amount, priority);
 	}
 
 	/**

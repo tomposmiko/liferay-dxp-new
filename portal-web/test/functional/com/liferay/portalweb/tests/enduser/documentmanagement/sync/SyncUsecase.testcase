@@ -21,18 +21,18 @@ definition {
 			panel = "Control Panel",
 			portlet = "Sync Connector Admin");
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages",
-			site = ${siteName});
+			site = "${siteName}");
 
-		SitePages.addPublicPage(
+		PagesAdmin.addPublicPage(
 			pageName = "Sync Page",
 			sitePageType = "Widget Page");
 
-		SitePages.configurePage(
+		PagesAdmin.configurePage(
 			columnName = "1 Column",
 			pageName = "Sync Page",
 			privacy = "Public Pages",
@@ -52,7 +52,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -62,11 +62,12 @@ definition {
 
 			DMDocumentType.tearDownCP();
 
-			Page.tearDownCP();
+			PagesAdmin.tearDownCP();
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
+	@refactorneeded
 	test AddDocument {
 		property portal.acceptance = "false";
 		property testray.component.names = "Training";

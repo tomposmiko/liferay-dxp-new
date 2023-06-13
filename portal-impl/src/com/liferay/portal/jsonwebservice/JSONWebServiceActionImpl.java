@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceActionMapping;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceNaming;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CamelCaseUtil;
@@ -31,11 +32,6 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MethodParameter;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.util.PropsUtil;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceReference;
-import com.liferay.registry.ServiceTracker;
-import com.liferay.registry.util.StringPlus;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,6 +67,9 @@ import jodd.typeconverter.TypeConverterManager;
 
 import jodd.util.ClassUtil;
 import jodd.util.StringUtil;
+
+import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * @author Igor Spasic
@@ -116,6 +115,22 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 		return new JSONRPCResponse(jsonRPCRequest, result, exception1);
 	}
 
+	private static ServiceTracker<Object, Object> _getServiceTracker() {
+		ServiceTracker<Object, Object> serviceTracker = new ServiceTracker<>(
+			SystemBundleUtil.getBundleContext(),
+			SystemBundleUtil.createFilter(
+				StringBundler.concat(
+					"(",
+					PropsKeys.
+						JSONWS_WEB_SERVICE_PARAMETER_TYPE_WHITELIST_CLASS_NAMES,
+					"=*)")),
+			null);
+
+		serviceTracker.open();
+
+		return serviceTracker;
+	}
+
 	private void _checkTypeIsAssignable(
 		int argumentPos, Class<?> targetClass, Class<?> parameterType) {
 
@@ -139,18 +154,11 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 					" for method argument ", argumentPos));
 		}
 
-		if (parameterType.isPrimitive()) {
-			return;
-		}
-
-		if (parameterTypeName.equals(
+		if (parameterType.isPrimitive() ||
+			parameterTypeName.equals(
 				_jsonWebServiceNaming.convertModelClassToImplClassName(
-					targetClass))) {
-
-			return;
-		}
-
-		if (ArrayUtil.contains(
+					targetClass)) ||
+			ArrayUtil.contains(
 				_JSONWS_WEB_SERVICE_PARAMETER_TYPE_WHITELIST_CLASS_NAMES,
 				parameterTypeName)) {
 
@@ -168,8 +176,9 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 			for (ServiceReference<Object> serviceReference :
 					serviceReferences) {
 
-				List<String> whitelistedClassNames = StringPlus.asList(
-					serviceReference.getProperty(key));
+				List<String> whitelistedClassNames =
+					com.liferay.portal.kernel.util.StringUtil.asList(
+						serviceReference.getProperty(key));
 
 				if (whitelistedClassNames.contains(parameterTypeName)) {
 					return;
@@ -226,6 +235,12 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 							targetType = classLoader.loadClass(modelClassName);
 						}
 						catch (ClassNotFoundException classNotFoundException) {
+							if (_log.isDebugEnabled()) {
+								_log.debug(
+									classNotFoundException,
+									classNotFoundException);
+							}
+
 							Class<?> actionClass =
 								_jsonWebServiceActionConfig.getActionClass();
 
@@ -359,46 +374,47 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 
 			return _generifyMap(map, genericParameterTypes);
 		}
+		else {
+			Object parameterValue = null;
 
-		Object parameterValue = null;
-
-		try {
-			parameterValue = _convertType(value, parameterType);
-		}
-		catch (Exception exception1) {
-			if (value instanceof Map) {
-				try {
-					parameterValue = _createDefaultParameterValue(
-						null, parameterType);
-				}
-				catch (Exception exception2) {
-					ClassCastException classCastException =
-						new ClassCastException(exception1.getMessage());
-
-					classCastException.addSuppressed(exception2);
-
-					throw classCastException;
-				}
-
-				BeanCopy beanCopy = new BeanCopy(value, parameterValue);
-
-				beanCopy.copy();
+			try {
+				parameterValue = _convertType(value, parameterType);
 			}
-			else {
-				String valueString = value.toString();
+			catch (Exception exception1) {
+				if (value instanceof Map) {
+					try {
+						parameterValue = _createDefaultParameterValue(
+							null, parameterType);
+					}
+					catch (Exception exception2) {
+						ClassCastException classCastException =
+							new ClassCastException(exception1.getMessage());
 
-				valueString = valueString.trim();
+						classCastException.addSuppressed(exception2);
 
-				if (!valueString.startsWith(StringPool.OPEN_CURLY_BRACE)) {
-					throw new ClassCastException(exception1.getMessage());
+						throw classCastException;
+					}
+
+					BeanCopy beanCopy = new BeanCopy(value, parameterValue);
+
+					beanCopy.copy();
 				}
+				else {
+					String valueString = value.toString();
 
-				parameterValue = JSONFactoryUtil.looseDeserialize(
-					valueString, parameterType);
+					valueString = valueString.trim();
+
+					if (!valueString.startsWith(StringPool.OPEN_CURLY_BRACE)) {
+						throw new ClassCastException(exception1.getMessage());
+					}
+
+					parameterValue = JSONFactoryUtil.looseDeserialize(
+						valueString, parameterType);
+				}
 			}
-		}
 
-		return parameterValue;
+			return parameterValue;
+		}
 	}
 
 	private Object _createDefaultParameterValue(
@@ -422,11 +438,7 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 	}
 
 	private List<?> _generifyList(List<?> list, Class<?>[] types) {
-		if (types == null) {
-			return list;
-		}
-
-		if (types.length != 1) {
+		if ((types == null) || (types.length != 1)) {
 			return list;
 		}
 
@@ -444,11 +456,7 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 	}
 
 	private Map<?, ?> _generifyMap(Map<?, ?> map, Class<?>[] types) {
-		if (types == null) {
-			return map;
-		}
-
-		if (types.length != 2) {
+		if ((types == null) || (types.length != 2)) {
 			return map;
 		}
 
@@ -502,8 +510,6 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 	}
 
 	private Object _invokeActionMethod() throws Exception {
-		Object actionObject = _jsonWebServiceActionConfig.getActionObject();
-
 		Method actionMethod = _jsonWebServiceActionConfig.getActionMethod();
 
 		Object[] parameters = _prepareParameters(
@@ -515,7 +521,8 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 			_log.warn("Invoking deprecated method " + actionMethod.getName());
 		}
 
-		return actionMethod.invoke(actionObject, parameters);
+		return actionMethod.invoke(
+			_jsonWebServiceActionConfig.getActionObject(), parameters);
 	}
 
 	private Object[] _prepareParameters(Class<?> actionClass) throws Exception {
@@ -595,7 +602,8 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 	private static final Log _log = LogFactoryUtil.getLog(
 		JSONWebServiceActionImpl.class);
 
-	private static final ServiceTracker<Object, Object> _serviceTracker;
+	private static final ServiceTracker<Object, Object> _serviceTracker =
+		_getServiceTracker();
 
 	private final JSONWebServiceActionConfig _jsonWebServiceActionConfig;
 	private final JSONWebServiceActionParameters
@@ -675,8 +683,7 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 		// java.time.format.DateTimeFormatterBuilder#appendPattern(String).
 
 		private static final DateTimeFormatter _dateTimeFormatter =
-			new DateTimeFormatterBuilder(
-			).parseCaseInsensitive(
+			new DateTimeFormatterBuilder().parseCaseInsensitive(
 			).appendPattern(
 				"yyyy-[MM][M]-[dd][d]"
 			).optionalStart(
@@ -712,18 +719,6 @@ public class JSONWebServiceActionImpl implements JSONWebServiceAction {
 	}
 
 	static {
-		Registry registry = RegistryUtil.getRegistry();
-
-		_serviceTracker = registry.trackServices(
-			registry.getFilter(
-				StringBundler.concat(
-					"(",
-					PropsKeys.
-						JSONWS_WEB_SERVICE_PARAMETER_TYPE_WHITELIST_CLASS_NAMES,
-					"=*)")));
-
-		_serviceTracker.open();
-
 		TypeConverterManager typeConverterManager = TypeConverterManager.get();
 
 		typeConverterManager.register(Date.class, new DateTypeConverter());

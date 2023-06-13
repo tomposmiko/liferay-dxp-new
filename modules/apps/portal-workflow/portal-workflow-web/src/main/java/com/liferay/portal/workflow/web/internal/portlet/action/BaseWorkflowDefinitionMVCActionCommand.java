@@ -74,7 +74,7 @@ public abstract class BaseWorkflowDefinitionMVCActionCommand
 			Throwable rootThrowable = getRootThrowable(workflowException);
 
 			if (_log.isWarnEnabled()) {
-				_log.warn(rootThrowable, rootThrowable);
+				_log.warn(workflowException, workflowException);
 			}
 
 			hideDefaultErrorMessage(actionRequest);
@@ -96,27 +96,6 @@ public abstract class BaseWorkflowDefinitionMVCActionCommand
 		}
 	}
 
-	protected void addDefaultTitle(
-		ActionRequest actionRequest, Map<Locale, String> titleMap) {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		String title = titleMap.get(themeDisplay.getLocale());
-
-		if (titleMap.isEmpty() || Validator.isNull(title)) {
-			title = ParamUtil.getString(
-				actionRequest, "defaultDuplicationTitle");
-
-			if (Validator.isNull(title)) {
-				title = LanguageUtil.get(
-					getResourceBundle(actionRequest), "untitled-workflow");
-			}
-
-			titleMap.put(themeDisplay.getLocale(), title);
-		}
-	}
-
 	@Override
 	protected void addSuccessMessage(
 		ActionRequest actionRequest, ActionResponse actionResponse) {
@@ -134,20 +113,18 @@ public abstract class BaseWorkflowDefinitionMVCActionCommand
 			themeDisplay.getLocale(), getClass());
 	}
 
-	protected Throwable getRootThrowable(Throwable throwable) {
-		if ((throwable.getCause() == null) ||
-			(!(throwable.getCause() instanceof IllegalArgumentException) &&
-			 !(throwable.getCause() instanceof NoSuchRoleException) &&
-			 !(throwable.getCause() instanceof
-				 PrincipalException.MustBeCompanyAdmin) &&
-			 !(throwable.getCause() instanceof
-				 PrincipalException.MustBeOmniadmin) &&
-			 !(throwable.getCause() instanceof WorkflowException))) {
+	protected Throwable getRootThrowable(WorkflowException workflowException) {
+		if (workflowException.getCause() instanceof IllegalArgumentException ||
+			workflowException.getCause() instanceof NoSuchRoleException ||
+			workflowException.getCause() instanceof
+				PrincipalException.MustBeCompanyAdmin ||
+			workflowException.getCause() instanceof
+				PrincipalException.MustBeOmniadmin) {
 
-			return throwable;
+			return workflowException.getCause();
 		}
 
-		return getRootThrowable(throwable.getCause());
+		return workflowException;
 	}
 
 	protected String getSuccessMessage(ActionRequest actionRequest) {
@@ -159,10 +136,8 @@ public abstract class BaseWorkflowDefinitionMVCActionCommand
 		ActionRequest actionRequest, Map<Locale, String> titleMap) {
 
 		if (titleMap == null) {
-			return null;
+			return StringPool.BLANK;
 		}
-
-		addDefaultTitle(actionRequest, titleMap);
 
 		String value = StringPool.BLANK;
 

@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.headless.admin.user.client.dto.v1_0.Organization;
+import com.liferay.headless.admin.user.client.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.client.http.HttpInvoker;
 import com.liferay.headless.admin.user.client.pagination.Page;
 import com.liferay.headless.admin.user.client.pagination.Pagination;
@@ -52,9 +53,8 @@ import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -63,16 +63,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -222,20 +224,11 @@ public abstract class BaseOrganizationResourceTestCase {
 
 		assertContains(organization1, (List<Organization>)page.getItems());
 		assertContains(organization2, (List<Organization>)page.getItems());
-		assertValid(page, testGetOrganizationsPage_getExpectedActions());
+		assertValid(page);
 
 		organizationResource.deleteOrganization(organization1.getId());
 
 		organizationResource.deleteOrganization(organization2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetOrganizationsPage_getExpectedActions()
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -257,35 +250,6 @@ public abstract class BaseOrganizationResourceTestCase {
 			Page<Organization> page = organizationResource.getOrganizationsPage(
 				null, null,
 				getFilterString(entityField, "between", organization1),
-				Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(organization1),
-				(List<Organization>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetOrganizationsPageWithFilterDoubleEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DOUBLE);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		Organization organization1 = testGetOrganizationsPage_addOrganization(
-			randomOrganization());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		Organization organization2 = testGetOrganizationsPage_addOrganization(
-			randomOrganization());
-
-		for (EntityField entityField : entityFields) {
-			Page<Organization> page = organizationResource.getOrganizationsPage(
-				null, null, getFilterString(entityField, "eq", organization1),
 				Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -373,21 +337,9 @@ public abstract class BaseOrganizationResourceTestCase {
 		testGetOrganizationsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, organization1, organization2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					organization1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetOrganizationsPageWithSortDouble() throws Exception {
-		testGetOrganizationsPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, organization1, organization2) -> {
-				BeanTestUtil.setProperty(
-					organization1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					organization2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -396,10 +348,8 @@ public abstract class BaseOrganizationResourceTestCase {
 		testGetOrganizationsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, organization1, organization2) -> {
-				BeanTestUtil.setProperty(
-					organization1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
-					organization2, entityField.getName(), 1);
+				BeanUtils.setProperty(organization1, entityField.getName(), 0);
+				BeanUtils.setProperty(organization2, entityField.getName(), 1);
 			});
 	}
 
@@ -412,27 +362,27 @@ public abstract class BaseOrganizationResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						organization1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						organization2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						organization1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						organization2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -440,12 +390,12 @@ public abstract class BaseOrganizationResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						organization1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						organization2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -526,10 +476,8 @@ public abstract class BaseOrganizationResourceTestCase {
 
 		long totalCount = organizationsJSONObject.getLong("totalCount");
 
-		Organization organization1 =
-			testGraphQLGetOrganizationsPage_addOrganization();
-		Organization organization2 =
-			testGraphQLGetOrganizationsPage_addOrganization();
+		Organization organization1 = testGraphQLOrganization_addOrganization();
+		Organization organization2 = testGraphQLOrganization_addOrganization();
 
 		organizationsJSONObject = JSONUtil.getValueAsJSONObject(
 			invokeGraphQLQuery(graphQLField), "JSONObject/data",
@@ -548,12 +496,6 @@ public abstract class BaseOrganizationResourceTestCase {
 			Arrays.asList(
 				OrganizationSerDes.toDTOs(
 					organizationsJSONObject.getString("items"))));
-	}
-
-	protected Organization testGraphQLGetOrganizationsPage_addOrganization()
-		throws Exception {
-
-		return testGraphQLOrganization_addOrganization();
 	}
 
 	@Test
@@ -603,8 +545,7 @@ public abstract class BaseOrganizationResourceTestCase {
 
 	@Test
 	public void testGraphQLDeleteOrganization() throws Exception {
-		Organization organization =
-			testGraphQLDeleteOrganization_addOrganization();
+		Organization organization = testGraphQLOrganization_addOrganization();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -619,6 +560,7 @@ public abstract class BaseOrganizationResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteOrganization"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -634,12 +576,6 @@ public abstract class BaseOrganizationResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected Organization testGraphQLDeleteOrganization_addOrganization()
-		throws Exception {
-
-		return testGraphQLOrganization_addOrganization();
 	}
 
 	@Test
@@ -662,8 +598,7 @@ public abstract class BaseOrganizationResourceTestCase {
 
 	@Test
 	public void testGraphQLGetOrganization() throws Exception {
-		Organization organization =
-			testGraphQLGetOrganization_addOrganization();
+		Organization organization = testGraphQLOrganization_addOrganization();
 
 		Assert.assertTrue(
 			equals(
@@ -705,12 +640,6 @@ public abstract class BaseOrganizationResourceTestCase {
 				"Object/code"));
 	}
 
-	protected Organization testGraphQLGetOrganization_addOrganization()
-		throws Exception {
-
-		return testGraphQLOrganization_addOrganization();
-	}
-
 	@Test
 	public void testPatchOrganization() throws Exception {
 		Organization postOrganization = testPatchOrganization_addOrganization();
@@ -723,8 +652,8 @@ public abstract class BaseOrganizationResourceTestCase {
 
 		Organization expectedPatchOrganization = postOrganization.clone();
 
-		BeanTestUtil.copyProperties(
-			randomPatchOrganization, expectedPatchOrganization);
+		_beanUtilsBean.copyProperties(
+			expectedPatchOrganization, randomPatchOrganization);
 
 		Organization getOrganization = organizationResource.getOrganization(
 			patchOrganization.getId());
@@ -767,6 +696,376 @@ public abstract class BaseOrganizationResourceTestCase {
 	}
 
 	@Test
+	public void testGetOrganizationChildOrganizationsPage() throws Exception {
+		String organizationId =
+			testGetOrganizationChildOrganizationsPage_getOrganizationId();
+		String irrelevantOrganizationId =
+			testGetOrganizationChildOrganizationsPage_getIrrelevantOrganizationId();
+
+		Page<Organization> page =
+			organizationResource.getOrganizationChildOrganizationsPage(
+				organizationId, null, null, null, Pagination.of(1, 10), null);
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		if (irrelevantOrganizationId != null) {
+			Organization irrelevantOrganization =
+				testGetOrganizationChildOrganizationsPage_addOrganization(
+					irrelevantOrganizationId, randomIrrelevantOrganization());
+
+			page = organizationResource.getOrganizationChildOrganizationsPage(
+				irrelevantOrganizationId, null, null, null, Pagination.of(1, 2),
+				null);
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantOrganization),
+				(List<Organization>)page.getItems());
+			assertValid(page);
+		}
+
+		Organization organization1 =
+			testGetOrganizationChildOrganizationsPage_addOrganization(
+				organizationId, randomOrganization());
+
+		Organization organization2 =
+			testGetOrganizationChildOrganizationsPage_addOrganization(
+				organizationId, randomOrganization());
+
+		page = organizationResource.getOrganizationChildOrganizationsPage(
+			organizationId, null, null, null, Pagination.of(1, 10), null);
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(organization1, organization2),
+			(List<Organization>)page.getItems());
+		assertValid(page);
+
+		organizationResource.deleteOrganization(organization1.getId());
+
+		organizationResource.deleteOrganization(organization2.getId());
+	}
+
+	@Test
+	public void testGetOrganizationChildOrganizationsPageWithFilterDateTimeEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.DATE_TIME);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String organizationId =
+			testGetOrganizationChildOrganizationsPage_getOrganizationId();
+
+		Organization organization1 = randomOrganization();
+
+		organization1 =
+			testGetOrganizationChildOrganizationsPage_addOrganization(
+				organizationId, organization1);
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> page =
+				organizationResource.getOrganizationChildOrganizationsPage(
+					organizationId, null, null,
+					getFilterString(entityField, "between", organization1),
+					Pagination.of(1, 2), null);
+
+			assertEquals(
+				Collections.singletonList(organization1),
+				(List<Organization>)page.getItems());
+		}
+	}
+
+	@Test
+	public void testGetOrganizationChildOrganizationsPageWithFilterStringEquals()
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(
+			EntityField.Type.STRING);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String organizationId =
+			testGetOrganizationChildOrganizationsPage_getOrganizationId();
+
+		Organization organization1 =
+			testGetOrganizationChildOrganizationsPage_addOrganization(
+				organizationId, randomOrganization());
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		Organization organization2 =
+			testGetOrganizationChildOrganizationsPage_addOrganization(
+				organizationId, randomOrganization());
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> page =
+				organizationResource.getOrganizationChildOrganizationsPage(
+					organizationId, null, null,
+					getFilterString(entityField, "eq", organization1),
+					Pagination.of(1, 2), null);
+
+			assertEquals(
+				Collections.singletonList(organization1),
+				(List<Organization>)page.getItems());
+		}
+	}
+
+	@Test
+	public void testGetOrganizationChildOrganizationsPageWithPagination()
+		throws Exception {
+
+		String organizationId =
+			testGetOrganizationChildOrganizationsPage_getOrganizationId();
+
+		Organization organization1 =
+			testGetOrganizationChildOrganizationsPage_addOrganization(
+				organizationId, randomOrganization());
+
+		Organization organization2 =
+			testGetOrganizationChildOrganizationsPage_addOrganization(
+				organizationId, randomOrganization());
+
+		Organization organization3 =
+			testGetOrganizationChildOrganizationsPage_addOrganization(
+				organizationId, randomOrganization());
+
+		Page<Organization> page1 =
+			organizationResource.getOrganizationChildOrganizationsPage(
+				organizationId, null, null, null, Pagination.of(1, 2), null);
+
+		List<Organization> organizations1 =
+			(List<Organization>)page1.getItems();
+
+		Assert.assertEquals(
+			organizations1.toString(), 2, organizations1.size());
+
+		Page<Organization> page2 =
+			organizationResource.getOrganizationChildOrganizationsPage(
+				organizationId, null, null, null, Pagination.of(2, 2), null);
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<Organization> organizations2 =
+			(List<Organization>)page2.getItems();
+
+		Assert.assertEquals(
+			organizations2.toString(), 1, organizations2.size());
+
+		Page<Organization> page3 =
+			organizationResource.getOrganizationChildOrganizationsPage(
+				organizationId, null, null, null, Pagination.of(1, 3), null);
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(organization1, organization2, organization3),
+			(List<Organization>)page3.getItems());
+	}
+
+	@Test
+	public void testGetOrganizationChildOrganizationsPageWithSortDateTime()
+		throws Exception {
+
+		testGetOrganizationChildOrganizationsPageWithSort(
+			EntityField.Type.DATE_TIME,
+			(entityField, organization1, organization2) -> {
+				BeanUtils.setProperty(
+					organization1, entityField.getName(),
+					DateUtils.addMinutes(new Date(), -2));
+			});
+	}
+
+	@Test
+	public void testGetOrganizationChildOrganizationsPageWithSortInteger()
+		throws Exception {
+
+		testGetOrganizationChildOrganizationsPageWithSort(
+			EntityField.Type.INTEGER,
+			(entityField, organization1, organization2) -> {
+				BeanUtils.setProperty(organization1, entityField.getName(), 0);
+				BeanUtils.setProperty(organization2, entityField.getName(), 1);
+			});
+	}
+
+	@Test
+	public void testGetOrganizationChildOrganizationsPageWithSortString()
+		throws Exception {
+
+		testGetOrganizationChildOrganizationsPageWithSort(
+			EntityField.Type.STRING,
+			(entityField, organization1, organization2) -> {
+				Class<?> clazz = organization1.getClass();
+
+				String entityFieldName = entityField.getName();
+
+				java.lang.reflect.Method method = clazz.getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.isAssignableFrom(Map.class)) {
+					BeanUtils.setProperty(
+						organization1, entityFieldName,
+						Collections.singletonMap("Aaa", "Aaa"));
+					BeanUtils.setProperty(
+						organization2, entityFieldName,
+						Collections.singletonMap("Bbb", "Bbb"));
+				}
+				else if (entityFieldName.contains("email")) {
+					BeanUtils.setProperty(
+						organization1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()) +
+									"@liferay.com");
+					BeanUtils.setProperty(
+						organization2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()) +
+									"@liferay.com");
+				}
+				else {
+					BeanUtils.setProperty(
+						organization1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanUtils.setProperty(
+						organization2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+			});
+	}
+
+	protected void testGetOrganizationChildOrganizationsPageWithSort(
+			EntityField.Type type,
+			UnsafeTriConsumer
+				<EntityField, Organization, Organization, Exception>
+					unsafeTriConsumer)
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(type);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		String organizationId =
+			testGetOrganizationChildOrganizationsPage_getOrganizationId();
+
+		Organization organization1 = randomOrganization();
+		Organization organization2 = randomOrganization();
+
+		for (EntityField entityField : entityFields) {
+			unsafeTriConsumer.accept(entityField, organization1, organization2);
+		}
+
+		organization1 =
+			testGetOrganizationChildOrganizationsPage_addOrganization(
+				organizationId, organization1);
+
+		organization2 =
+			testGetOrganizationChildOrganizationsPage_addOrganization(
+				organizationId, organization2);
+
+		for (EntityField entityField : entityFields) {
+			Page<Organization> ascPage =
+				organizationResource.getOrganizationChildOrganizationsPage(
+					organizationId, null, null, null, Pagination.of(1, 2),
+					entityField.getName() + ":asc");
+
+			assertEquals(
+				Arrays.asList(organization1, organization2),
+				(List<Organization>)ascPage.getItems());
+
+			Page<Organization> descPage =
+				organizationResource.getOrganizationChildOrganizationsPage(
+					organizationId, null, null, null, Pagination.of(1, 2),
+					entityField.getName() + ":desc");
+
+			assertEquals(
+				Arrays.asList(organization2, organization1),
+				(List<Organization>)descPage.getItems());
+		}
+	}
+
+	protected Organization
+			testGetOrganizationChildOrganizationsPage_addOrganization(
+				String organizationId, Organization organization)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected String
+			testGetOrganizationChildOrganizationsPage_getOrganizationId()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected String
+			testGetOrganizationChildOrganizationsPage_getIrrelevantOrganizationId()
+		throws Exception {
+
+		return null;
+	}
+
+	@Test
+	public void testDeleteUserAccountsByEmailAddress() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		Organization organization =
+			testDeleteUserAccountsByEmailAddress_addOrganization();
+
+		assertHttpResponseStatusCode(
+			204,
+			organizationResource.deleteUserAccountsByEmailAddressHttpResponse(
+				organization.getId(), null));
+	}
+
+	protected Organization
+			testDeleteUserAccountsByEmailAddress_addOrganization()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testPostUserAccountsByEmailAddress() throws Exception {
+		Assert.assertTrue(false);
+	}
+
+	@Test
+	public void testDeleteUserAccountByEmailAddress() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		Organization organization =
+			testDeleteUserAccountByEmailAddress_addOrganization();
+
+		assertHttpResponseStatusCode(
+			204,
+			organizationResource.deleteUserAccountByEmailAddressHttpResponse(
+				organization.getId(), null));
+	}
+
+	protected Organization testDeleteUserAccountByEmailAddress_addOrganization()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
 	public void testGetOrganizationOrganizationsPage() throws Exception {
 		String parentOrganizationId =
 			testGetOrganizationOrganizationsPage_getParentOrganizationId();
@@ -795,10 +1094,7 @@ public abstract class BaseOrganizationResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantOrganization),
 				(List<Organization>)page.getItems());
-			assertValid(
-				page,
-				testGetOrganizationOrganizationsPage_getExpectedActions(
-					irrelevantParentOrganizationId));
+			assertValid(page);
 		}
 
 		Organization organization1 =
@@ -817,24 +1113,11 @@ public abstract class BaseOrganizationResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(organization1, organization2),
 			(List<Organization>)page.getItems());
-		assertValid(
-			page,
-			testGetOrganizationOrganizationsPage_getExpectedActions(
-				parentOrganizationId));
+		assertValid(page);
 
 		organizationResource.deleteOrganization(organization1.getId());
 
 		organizationResource.deleteOrganization(organization2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetOrganizationOrganizationsPage_getExpectedActions(
-				String parentOrganizationId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -861,42 +1144,6 @@ public abstract class BaseOrganizationResourceTestCase {
 				organizationResource.getOrganizationOrganizationsPage(
 					parentOrganizationId, null, null,
 					getFilterString(entityField, "between", organization1),
-					Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(organization1),
-				(List<Organization>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetOrganizationOrganizationsPageWithFilterDoubleEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DOUBLE);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		String parentOrganizationId =
-			testGetOrganizationOrganizationsPage_getParentOrganizationId();
-
-		Organization organization1 =
-			testGetOrganizationOrganizationsPage_addOrganization(
-				parentOrganizationId, randomOrganization());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		Organization organization2 =
-			testGetOrganizationOrganizationsPage_addOrganization(
-				parentOrganizationId, randomOrganization());
-
-		for (EntityField entityField : entityFields) {
-			Page<Organization> page =
-				organizationResource.getOrganizationOrganizationsPage(
-					parentOrganizationId, null, null,
-					getFilterString(entityField, "eq", organization1),
 					Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -1001,23 +1248,9 @@ public abstract class BaseOrganizationResourceTestCase {
 		testGetOrganizationOrganizationsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, organization1, organization2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					organization1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetOrganizationOrganizationsPageWithSortDouble()
-		throws Exception {
-
-		testGetOrganizationOrganizationsPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, organization1, organization2) -> {
-				BeanTestUtil.setProperty(
-					organization1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					organization2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -1028,10 +1261,8 @@ public abstract class BaseOrganizationResourceTestCase {
 		testGetOrganizationOrganizationsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, organization1, organization2) -> {
-				BeanTestUtil.setProperty(
-					organization1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
-					organization2, entityField.getName(), 1);
+				BeanUtils.setProperty(organization1, entityField.getName(), 0);
+				BeanUtils.setProperty(organization2, entityField.getName(), 1);
 			});
 	}
 
@@ -1046,27 +1277,27 @@ public abstract class BaseOrganizationResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						organization1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						organization2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						organization1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						organization2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1074,12 +1305,12 @@ public abstract class BaseOrganizationResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						organization1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						organization2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1164,6 +1395,11 @@ public abstract class BaseOrganizationResourceTestCase {
 	@Rule
 	public SearchTestRule searchTestRule = new SearchTestRule();
 
+	@Test
+	public void testPostUserAccountByEmailAddress() throws Exception {
+		Assert.assertTrue(true);
+	}
+
 	protected Organization testGraphQLOrganization_addOrganization()
 		throws Exception {
 
@@ -1217,6 +1453,14 @@ public abstract class BaseOrganizationResourceTestCase {
 		}
 	}
 
+	protected void assertEquals(
+		UserAccount userAccount1, UserAccount userAccount2) {
+
+		Assert.assertTrue(
+			userAccount1 + " does not equal " + userAccount2,
+			equals(userAccount1, userAccount2));
+	}
+
 	protected void assertEqualsIgnoringOrder(
 		List<Organization> organizations1, List<Organization> organizations2) {
 
@@ -1259,6 +1503,16 @@ public abstract class BaseOrganizationResourceTestCase {
 
 			if (Objects.equals("actions", additionalAssertFieldName)) {
 				if (organization.getActions() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"childOrganizations", additionalAssertFieldName)) {
+
+				if (organization.getChildOrganizations() == null) {
 					valid = false;
 				}
 
@@ -1313,10 +1567,36 @@ public abstract class BaseOrganizationResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("numberOfAccounts", additionalAssertFieldName)) {
+				if (organization.getNumberOfAccounts() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals(
 					"numberOfOrganizations", additionalAssertFieldName)) {
 
 				if (organization.getNumberOfOrganizations() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("numberOfUsers", additionalAssertFieldName)) {
+				if (organization.getNumberOfUsers() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"organizationAccounts", additionalAssertFieldName)) {
+
+				if (organization.getOrganizationAccounts() == null) {
 					valid = false;
 				}
 
@@ -1352,6 +1632,14 @@ public abstract class BaseOrganizationResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("userAccounts", additionalAssertFieldName)) {
+				if (organization.getUserAccounts() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			throw new IllegalArgumentException(
 				"Invalid additional assert field name " +
 					additionalAssertFieldName);
@@ -1361,13 +1649,6 @@ public abstract class BaseOrganizationResourceTestCase {
 	}
 
 	protected void assertValid(Page<Organization> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<Organization> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<Organization> organizations = page.getItems();
@@ -1382,23 +1663,230 @@ public abstract class BaseOrganizationResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
+	}
 
-		Map<String, Map<String, String>> actions = page.getActions();
+	protected void assertValid(UserAccount userAccount) {
+		boolean valid = true;
 
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
+		if (userAccount.getDateCreated() == null) {
+			valid = false;
 		}
+
+		if (userAccount.getDateModified() == null) {
+			valid = false;
+		}
+
+		if (userAccount.getId() == null) {
+			valid = false;
+		}
+
+		for (String additionalAssertFieldName :
+				getAdditionalUserAccountAssertFieldNames()) {
+
+			if (Objects.equals("accountBriefs", additionalAssertFieldName)) {
+				if (userAccount.getAccountBriefs() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (userAccount.getActions() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("additionalName", additionalAssertFieldName)) {
+				if (userAccount.getAdditionalName() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("alternateName", additionalAssertFieldName)) {
+				if (userAccount.getAlternateName() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("birthDate", additionalAssertFieldName)) {
+				if (userAccount.getBirthDate() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("customFields", additionalAssertFieldName)) {
+				if (userAccount.getCustomFields() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("dashboardURL", additionalAssertFieldName)) {
+				if (userAccount.getDashboardURL() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("emailAddress", additionalAssertFieldName)) {
+				if (userAccount.getEmailAddress() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (userAccount.getExternalReferenceCode() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("familyName", additionalAssertFieldName)) {
+				if (userAccount.getFamilyName() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("givenName", additionalAssertFieldName)) {
+				if (userAccount.getGivenName() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("honorificPrefix", additionalAssertFieldName)) {
+				if (userAccount.getHonorificPrefix() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("honorificSuffix", additionalAssertFieldName)) {
+				if (userAccount.getHonorificSuffix() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("image", additionalAssertFieldName)) {
+				if (userAccount.getImage() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("jobTitle", additionalAssertFieldName)) {
+				if (userAccount.getJobTitle() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("keywords", additionalAssertFieldName)) {
+				if (userAccount.getKeywords() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("lastLoginDate", additionalAssertFieldName)) {
+				if (userAccount.getLastLoginDate() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("name", additionalAssertFieldName)) {
+				if (userAccount.getName() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"organizationBriefs", additionalAssertFieldName)) {
+
+				if (userAccount.getOrganizationBriefs() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("profileURL", additionalAssertFieldName)) {
+				if (userAccount.getProfileURL() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("roleBriefs", additionalAssertFieldName)) {
+				if (userAccount.getRoleBriefs() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("siteBriefs", additionalAssertFieldName)) {
+				if (userAccount.getSiteBriefs() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"userAccountContactInformation",
+					additionalAssertFieldName)) {
+
+				if (userAccount.getUserAccountContactInformation() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			throw new IllegalArgumentException(
+				"Invalid additional assert field name " +
+					additionalAssertFieldName);
+		}
+
+		Assert.assertTrue(valid);
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
+		return new String[0];
+	}
+
+	protected String[] getAdditionalUserAccountAssertFieldNames() {
 		return new String[0];
 	}
 
@@ -1470,6 +1958,19 @@ public abstract class BaseOrganizationResourceTestCase {
 				if (!equals(
 						(Map)organization1.getActions(),
 						(Map)organization2.getActions())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"childOrganizations", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						organization1.getChildOrganizations(),
+						organization2.getChildOrganizations())) {
 
 					return false;
 				}
@@ -1573,12 +2074,47 @@ public abstract class BaseOrganizationResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("numberOfAccounts", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						organization1.getNumberOfAccounts(),
+						organization2.getNumberOfAccounts())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals(
 					"numberOfOrganizations", additionalAssertFieldName)) {
 
 				if (!Objects.deepEquals(
 						organization1.getNumberOfOrganizations(),
 						organization2.getNumberOfOrganizations())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("numberOfUsers", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						organization1.getNumberOfUsers(),
+						organization2.getNumberOfUsers())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"organizationAccounts", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						organization1.getOrganizationAccounts(),
+						organization2.getOrganizationAccounts())) {
 
 					return false;
 				}
@@ -1624,6 +2160,17 @@ public abstract class BaseOrganizationResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("userAccounts", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						organization1.getUserAccounts(),
+						organization2.getUserAccounts())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			throw new IllegalArgumentException(
 				"Invalid additional assert field name " +
 					additionalAssertFieldName);
@@ -1658,19 +2205,324 @@ public abstract class BaseOrganizationResourceTestCase {
 		return false;
 	}
 
+	protected boolean equals(
+		UserAccount userAccount1, UserAccount userAccount2) {
+
+		if (userAccount1 == userAccount2) {
+			return true;
+		}
+
+		for (String additionalAssertFieldName :
+				getAdditionalUserAccountAssertFieldNames()) {
+
+			if (Objects.equals("accountBriefs", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getAccountBriefs(),
+						userAccount2.getAccountBriefs())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getActions(), userAccount2.getActions())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("additionalName", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getAdditionalName(),
+						userAccount2.getAdditionalName())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("alternateName", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getAlternateName(),
+						userAccount2.getAlternateName())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("birthDate", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getBirthDate(),
+						userAccount2.getBirthDate())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("customFields", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getCustomFields(),
+						userAccount2.getCustomFields())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("dashboardURL", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getDashboardURL(),
+						userAccount2.getDashboardURL())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("dateCreated", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getDateCreated(),
+						userAccount2.getDateCreated())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("dateModified", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getDateModified(),
+						userAccount2.getDateModified())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("emailAddress", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getEmailAddress(),
+						userAccount2.getEmailAddress())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						userAccount1.getExternalReferenceCode(),
+						userAccount2.getExternalReferenceCode())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("familyName", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getFamilyName(),
+						userAccount2.getFamilyName())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("givenName", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getGivenName(),
+						userAccount2.getGivenName())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("honorificPrefix", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getHonorificPrefix(),
+						userAccount2.getHonorificPrefix())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("honorificSuffix", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getHonorificSuffix(),
+						userAccount2.getHonorificSuffix())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("id", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getId(), userAccount2.getId())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("image", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getImage(), userAccount2.getImage())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("jobTitle", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getJobTitle(),
+						userAccount2.getJobTitle())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("keywords", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getKeywords(),
+						userAccount2.getKeywords())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("lastLoginDate", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getLastLoginDate(),
+						userAccount2.getLastLoginDate())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("name", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getName(), userAccount2.getName())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"organizationBriefs", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						userAccount1.getOrganizationBriefs(),
+						userAccount2.getOrganizationBriefs())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("profileURL", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getProfileURL(),
+						userAccount2.getProfileURL())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("roleBriefs", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getRoleBriefs(),
+						userAccount2.getRoleBriefs())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("siteBriefs", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						userAccount1.getSiteBriefs(),
+						userAccount2.getSiteBriefs())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"userAccountContactInformation",
+					additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						userAccount1.getUserAccountContactInformation(),
+						userAccount2.getUserAccountContactInformation())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			throw new IllegalArgumentException(
+				"Invalid additional assert field name " +
+					additionalAssertFieldName);
+		}
+
+		return true;
+	}
+
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1687,10 +2539,6 @@ public abstract class BaseOrganizationResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1700,18 +2548,18 @@ public abstract class BaseOrganizationResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1728,6 +2576,11 @@ public abstract class BaseOrganizationResourceTestCase {
 		sb.append(" ");
 
 		if (entityFieldName.equals("actions")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("childOrganizations")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
 		}
@@ -1845,10 +2698,24 @@ public abstract class BaseOrganizationResourceTestCase {
 			return sb.toString();
 		}
 
-		if (entityFieldName.equals("numberOfOrganizations")) {
-			sb.append(String.valueOf(organization.getNumberOfOrganizations()));
+		if (entityFieldName.equals("numberOfAccounts")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
 
-			return sb.toString();
+		if (entityFieldName.equals("numberOfOrganizations")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("numberOfUsers")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("organizationAccounts")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("organizationContactInformation")) {
@@ -1862,6 +2729,11 @@ public abstract class BaseOrganizationResourceTestCase {
 		}
 
 		if (entityFieldName.equals("services")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("userAccounts")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
 		}
@@ -1916,7 +2788,9 @@ public abstract class BaseOrganizationResourceTestCase {
 				id = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				image = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				numberOfAccounts = RandomTestUtil.randomInt();
 				numberOfOrganizations = RandomTestUtil.randomInt();
+				numberOfUsers = RandomTestUtil.randomInt();
 			}
 		};
 	}
@@ -1931,119 +2805,35 @@ public abstract class BaseOrganizationResourceTestCase {
 		return randomOrganization();
 	}
 
+	protected UserAccount randomUserAccount() throws Exception {
+		return new UserAccount() {
+			{
+				additionalName = RandomTestUtil.randomString();
+				alternateName = RandomTestUtil.randomString();
+				birthDate = RandomTestUtil.nextDate();
+				dashboardURL = RandomTestUtil.randomString();
+				dateCreated = RandomTestUtil.nextDate();
+				dateModified = RandomTestUtil.nextDate();
+				emailAddress = RandomTestUtil.randomString();
+				externalReferenceCode = RandomTestUtil.randomString();
+				familyName = RandomTestUtil.randomString();
+				givenName = RandomTestUtil.randomString();
+				honorificPrefix = RandomTestUtil.randomString();
+				honorificSuffix = RandomTestUtil.randomString();
+				id = RandomTestUtil.randomLong();
+				image = RandomTestUtil.randomString();
+				jobTitle = RandomTestUtil.randomString();
+				lastLoginDate = RandomTestUtil.nextDate();
+				name = RandomTestUtil.randomString();
+				profileURL = RandomTestUtil.randomString();
+			}
+		};
+	}
+
 	protected OrganizationResource organizationResource;
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
-
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
 
 	protected class GraphQLField {
 
@@ -2119,6 +2909,18 @@ public abstract class BaseOrganizationResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseOrganizationResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

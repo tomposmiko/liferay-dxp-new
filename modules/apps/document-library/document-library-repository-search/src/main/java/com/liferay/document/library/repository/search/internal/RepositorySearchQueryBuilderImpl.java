@@ -16,6 +16,8 @@ package com.liferay.document.library.repository.search.internal;
 
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.search.RepositorySearchQueryBuilder;
 import com.liferay.portal.kernel.repository.search.RepositorySearchQueryTermBuilder;
 import com.liferay.portal.kernel.search.BooleanClause;
@@ -93,11 +95,9 @@ public class RepositorySearchQueryBuilderImpl
 
 		long[] folderIds = searchContext.getFolderIds();
 
-		if (ArrayUtil.isEmpty(folderIds)) {
-			return;
-		}
+		if (ArrayUtil.isEmpty(folderIds) ||
+			(folderIds[0] == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID)) {
 
-		if (folderIds[0] == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 			return;
 		}
 
@@ -108,6 +108,10 @@ public class RepositorySearchQueryBuilderImpl
 				_dlAppService.getFolder(folderId);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
+
 				continue;
 			}
 
@@ -264,6 +268,9 @@ public class RepositorySearchQueryBuilderImpl
 
 		_repositorySearchQueryTermBuilder = repositorySearchQueryTermBuilder;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		RepositorySearchQueryBuilderImpl.class);
 
 	private DLAppService _dlAppService;
 	private RepositorySearchQueryTermBuilder _repositorySearchQueryTermBuilder;

@@ -18,6 +18,7 @@ import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.MVCCModel;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -35,7 +36,7 @@ import java.util.Date;
  * @generated
  */
 public class CommerceOrderCacheModel
-	implements CacheModel<CommerceOrder>, Externalizable {
+	implements CacheModel<CommerceOrder>, Externalizable, MVCCModel {
 
 	@Override
 	public boolean equals(Object object) {
@@ -50,7 +51,9 @@ public class CommerceOrderCacheModel
 		CommerceOrderCacheModel commerceOrderCacheModel =
 			(CommerceOrderCacheModel)object;
 
-		if (commerceOrderId == commerceOrderCacheModel.commerceOrderId) {
+		if ((commerceOrderId == commerceOrderCacheModel.commerceOrderId) &&
+			(mvccVersion == commerceOrderCacheModel.mvccVersion)) {
+
 			return true;
 		}
 
@@ -59,14 +62,28 @@ public class CommerceOrderCacheModel
 
 	@Override
 	public int hashCode() {
-		return HashUtil.hash(0, commerceOrderId);
+		int hashCode = HashUtil.hash(0, commerceOrderId);
+
+		return HashUtil.hash(hashCode, mvccVersion);
+	}
+
+	@Override
+	public long getMvccVersion() {
+		return mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		this.mvccVersion = mvccVersion;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(137);
+		StringBundler sb = new StringBundler(141);
 
-		sb.append("{uuid=");
+		sb.append("{mvccVersion=");
+		sb.append(mvccVersion);
+		sb.append(", uuid=");
 		sb.append(uuid);
 		sb.append(", externalReferenceCode=");
 		sb.append(externalReferenceCode);
@@ -88,6 +105,8 @@ public class CommerceOrderCacheModel
 		sb.append(commerceAccountId);
 		sb.append(", commerceCurrencyId=");
 		sb.append(commerceCurrencyId);
+		sb.append(", commerceOrderTypeId=");
+		sb.append(commerceOrderTypeId);
 		sb.append(", billingAddressId=");
 		sb.append(billingAddressId);
 		sb.append(", shippingAddressId=");
@@ -211,6 +230,8 @@ public class CommerceOrderCacheModel
 	public CommerceOrder toEntityModel() {
 		CommerceOrderImpl commerceOrderImpl = new CommerceOrderImpl();
 
+		commerceOrderImpl.setMvccVersion(mvccVersion);
+
 		if (uuid == null) {
 			commerceOrderImpl.setUuid("");
 		}
@@ -253,6 +274,7 @@ public class CommerceOrderCacheModel
 
 		commerceOrderImpl.setCommerceAccountId(commerceAccountId);
 		commerceOrderImpl.setCommerceCurrencyId(commerceCurrencyId);
+		commerceOrderImpl.setCommerceOrderTypeId(commerceOrderTypeId);
 		commerceOrderImpl.setBillingAddressId(billingAddressId);
 		commerceOrderImpl.setShippingAddressId(shippingAddressId);
 
@@ -427,6 +449,7 @@ public class CommerceOrderCacheModel
 	public void readExternal(ObjectInput objectInput)
 		throws ClassNotFoundException, IOException {
 
+		mvccVersion = objectInput.readLong();
 		uuid = objectInput.readUTF();
 		externalReferenceCode = objectInput.readUTF();
 
@@ -444,6 +467,8 @@ public class CommerceOrderCacheModel
 		commerceAccountId = objectInput.readLong();
 
 		commerceCurrencyId = objectInput.readLong();
+
+		commerceOrderTypeId = objectInput.readLong();
 
 		billingAddressId = objectInput.readLong();
 
@@ -525,6 +550,8 @@ public class CommerceOrderCacheModel
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+		objectOutput.writeLong(mvccVersion);
+
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -560,6 +587,8 @@ public class CommerceOrderCacheModel
 		objectOutput.writeLong(commerceAccountId);
 
 		objectOutput.writeLong(commerceCurrencyId);
+
+		objectOutput.writeLong(commerceOrderTypeId);
 
 		objectOutput.writeLong(billingAddressId);
 
@@ -678,6 +707,7 @@ public class CommerceOrderCacheModel
 		objectOutput.writeLong(statusDate);
 	}
 
+	public long mvccVersion;
 	public String uuid;
 	public String externalReferenceCode;
 	public long commerceOrderId;
@@ -689,6 +719,7 @@ public class CommerceOrderCacheModel
 	public long modifiedDate;
 	public long commerceAccountId;
 	public long commerceCurrencyId;
+	public long commerceOrderTypeId;
 	public long billingAddressId;
 	public long shippingAddressId;
 	public String commercePaymentMethodKey;

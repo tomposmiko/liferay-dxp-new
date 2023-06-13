@@ -63,7 +63,7 @@ public class AvailabilityEstimate implements Serializable {
 	}
 
 	@DecimalMin("0")
-	@Schema(example = "23130")
+	@Schema
 	public Long getGroupId() {
 		return groupId;
 	}
@@ -92,7 +92,7 @@ public class AvailabilityEstimate implements Serializable {
 	protected Long groupId;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -119,7 +119,7 @@ public class AvailabilityEstimate implements Serializable {
 	protected Long id;
 
 	@DecimalMin("0")
-	@Schema(example = "1.1")
+	@Schema
 	public Double getPriority() {
 		return priority;
 	}
@@ -147,7 +147,7 @@ public class AvailabilityEstimate implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Double priority;
 
-	@Schema(example = "{en_US=Croatia, hr_HR=Hrvatska, hu_HU=Horvatorszag}")
+	@Schema
 	@Valid
 	public Map<String, String> getTitle() {
 		return title;

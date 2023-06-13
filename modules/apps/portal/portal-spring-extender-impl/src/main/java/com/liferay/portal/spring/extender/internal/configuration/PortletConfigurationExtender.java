@@ -103,19 +103,18 @@ public class PortletConfigurationExtender
 
 		public void start() {
 			try {
-				String[] sources = StringUtil.split(
-					_portletConfiguration.get(
-						PropsKeys.RESOURCE_ACTIONS_CONFIGS));
+				_resourceActions.populateModelResources(
+					_classLoader,
+					StringUtil.split(
+						_portletConfiguration.get(
+							PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
 
-				_resourceActions.populateModelResources(_classLoader, sources);
-
-				String bundleSymbolicName = _bundle.getSymbolicName();
-
-				if (!PropsValues.RESOURCE_ACTIONS_STRICT_MODE_ENABLED ||
-					bundleSymbolicName.contains("commerce")) {
-
+				if (!PropsValues.RESOURCE_ACTIONS_STRICT_MODE_ENABLED) {
 					_resourceActions.populatePortletResources(
-						_classLoader, sources);
+						_classLoader,
+						StringUtil.split(
+							_portletConfiguration.get(
+								PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
 				}
 			}
 			catch (Exception exception) {

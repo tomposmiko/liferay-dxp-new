@@ -207,7 +207,7 @@ public class Product implements Serializable {
 	protected Map<String, ?> expando;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -430,6 +430,38 @@ public class Product implements Serializable {
 	protected String name;
 
 	@Schema
+	@Valid
+	public ProductConfiguration getProductConfiguration() {
+		return productConfiguration;
+	}
+
+	public void setProductConfiguration(
+		ProductConfiguration productConfiguration) {
+
+		this.productConfiguration = productConfiguration;
+	}
+
+	@JsonIgnore
+	public void setProductConfiguration(
+		UnsafeSupplier<ProductConfiguration, Exception>
+			productConfigurationUnsafeSupplier) {
+
+		try {
+			productConfiguration = productConfigurationUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected ProductConfiguration productConfiguration;
+
+	@Schema
 	public Long getProductId() {
 		return productId;
 	}
@@ -519,7 +551,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ProductSpecification[] productSpecifications;
 
-	@Schema(example = "simple")
+	@Schema
 	public String getProductType() {
 		return productType;
 	}
@@ -658,7 +690,7 @@ public class Product implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String slug;
 
-	@Schema(example = "[tag1, tag2, tag3]")
+	@Schema
 	public String[] getTags() {
 		return tags;
 	}
@@ -713,6 +745,35 @@ public class Product implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String urlImage;
+
+	@Schema
+	@Valid
+	public Map<String, String> getUrls() {
+		return urls;
+	}
+
+	public void setUrls(Map<String, String> urls) {
+		this.urls = urls;
+	}
+
+	@JsonIgnore
+	public void setUrls(
+		UnsafeSupplier<Map<String, String>, Exception> urlsUnsafeSupplier) {
+
+		try {
+			urls = urlsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Map<String, String> urls;
 
 	@Override
 	public boolean equals(Object object) {
@@ -932,6 +993,16 @@ public class Product implements Serializable {
 			sb.append("\"");
 		}
 
+		if (productConfiguration != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"productConfiguration\": ");
+
+			sb.append(String.valueOf(productConfiguration));
+		}
+
 		if (productId != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -1100,6 +1171,16 @@ public class Product implements Serializable {
 			sb.append(_escape(urlImage));
 
 			sb.append("\"");
+		}
+
+		if (urls != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"urls\": ");
+
+			sb.append(_toJSON(urls));
 		}
 
 		sb.append("}");

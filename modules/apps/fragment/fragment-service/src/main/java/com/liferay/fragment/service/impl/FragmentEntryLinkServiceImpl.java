@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.security.permission.BaseModelPermissionCheckerU
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
-import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Map;
 import java.util.Objects;
@@ -47,28 +46,6 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class FragmentEntryLinkServiceImpl
 	extends FragmentEntryLinkServiceBaseImpl {
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #addFragmentEntryLink(long, long, long, long, long, String,
-	 *             String, String, String, String, String, int, String,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public FragmentEntryLink addFragmentEntryLink(
-			long groupId, long originalFragmentEntryLinkId,
-			long fragmentEntryId, long segmentsExperienceId, long classNameId,
-			long classPK, String css, String html, String js,
-			String configuration, String editableValues, String namespace,
-			int position, String rendererKey, ServiceContext serviceContext)
-		throws PortalException {
-
-		return addFragmentEntryLink(
-			groupId, originalFragmentEntryLinkId, fragmentEntryId,
-			segmentsExperienceId, classPK, css, html, js, configuration,
-			editableValues, namespace, position, rendererKey, serviceContext);
-	}
 
 	@Override
 	public FragmentEntryLink addFragmentEntryLink(
@@ -126,23 +103,6 @@ public class FragmentEntryLinkServiceImpl
 			fragmentEntryLinkId, editableValues, updateClassedModel);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #updateFragmentEntryLinks(long, long, long[], String,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public void updateFragmentEntryLinks(
-			long groupId, long classNameId, long classPK,
-			long[] fragmentEntryIds, String editableValues,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		updateFragmentEntryLinks(
-			groupId, classPK, fragmentEntryIds, editableValues, serviceContext);
-	}
-
 	@Override
 	public void updateFragmentEntryLinks(
 			long groupId, long plid, long[] fragmentEntryIds,
@@ -187,9 +147,7 @@ public class FragmentEntryLinkServiceImpl
 
 		Layout layout = _layoutLocalService.fetchLayout(plid);
 
-		if (Validator.isNotNull(layout.getClassNameId()) &&
-			(layout.getClassPK() > 0)) {
-
+		if (layout.isDraftLayout()) {
 			layoutPageTemplateEntryPlid = layout.getClassPK();
 		}
 

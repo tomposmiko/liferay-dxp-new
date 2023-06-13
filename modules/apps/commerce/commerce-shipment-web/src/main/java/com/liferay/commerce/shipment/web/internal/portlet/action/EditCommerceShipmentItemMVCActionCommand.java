@@ -22,6 +22,7 @@ import com.liferay.commerce.model.CommerceShipment;
 import com.liferay.commerce.model.CommerceShipmentItem;
 import com.liferay.commerce.service.CommerceOrderItemService;
 import com.liferay.commerce.service.CommerceShipmentItemService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -123,38 +124,49 @@ public class EditCommerceShipmentItemMVCActionCommand
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		PortletURL portletURL = PortletProviderUtil.getPortletURL(
-			actionRequest, themeDisplay.getScopeGroup(),
-			CommerceShipment.class.getName(), PortletProvider.Action.EDIT);
+		PortletURL portletURL = PortletURLBuilder.create(
+			PortletProviderUtil.getPortletURL(
+				actionRequest, themeDisplay.getScopeGroup(),
+				CommerceShipment.class.getName(), PortletProvider.Action.EDIT)
+		).setMVCRenderCommandName(
+			"/commerce_shipment/edit_commerce_shipment_item"
+		).setParameter(
+			"commerceOrderItemId",
+			() -> {
+				long commerceOrderItemId = ParamUtil.getLong(
+					actionRequest, "commerceOrderItemId");
 
-		portletURL.setParameter(
-			"mvcRenderCommandName",
-			"/commerce_shipment/edit_commerce_shipment_item");
+				if (commerceOrderItemId > 0) {
+					return commerceOrderItemId;
+				}
 
-		long commerceShipmentId = ParamUtil.getLong(
-			actionRequest, "commerceShipmentId");
+				return null;
+			}
+		).setParameter(
+			"commerceShipmentId",
+			() -> {
+				long commerceShipmentId = ParamUtil.getLong(
+					actionRequest, "commerceShipmentId");
 
-		if (commerceShipmentId > 0) {
-			portletURL.setParameter(
-				"commerceShipmentId", String.valueOf(commerceShipmentId));
-		}
+				if (commerceShipmentId > 0) {
+					return commerceShipmentId;
+				}
 
-		long commerceShipmentItemId = ParamUtil.getLong(
-			actionRequest, "commerceShipmentItemId");
+				return null;
+			}
+		).setParameter(
+			"commerceShipmentItemId",
+			() -> {
+				long commerceShipmentItemId = ParamUtil.getLong(
+					actionRequest, "commerceShipmentItemId");
 
-		if (commerceShipmentItemId > 0) {
-			portletURL.setParameter(
-				"commerceShipmentItemId",
-				String.valueOf(commerceShipmentItemId));
-		}
+				if (commerceShipmentItemId > 0) {
+					return commerceShipmentItemId;
+				}
 
-		long commerceOrderItemId = ParamUtil.getLong(
-			actionRequest, "commerceOrderItemId");
-
-		if (commerceOrderItemId > 0) {
-			portletURL.setParameter(
-				"commerceOrderItemId", String.valueOf(commerceOrderItemId));
-		}
+				return null;
+			}
+		).buildPortletURL();
 
 		try {
 			portletURL.setWindowState(LiferayWindowState.POP_UP);
@@ -228,6 +240,13 @@ public class EditCommerceShipmentItemMVCActionCommand
 					_commerceShipmentItemService.updateCommerceShipmentItem(
 						commerceShipmentItem.getCommerceShipmentItemId(),
 						commerceInventoryWarehouseId, quantity);
+
+				if (quantity == 0) {
+					commerceShipmentItem =
+						_commerceShipmentItemService.updateCommerceShipmentItem(
+							commerceShipmentItem.getCommerceShipmentItemId(), 0,
+							quantity);
+				}
 			}
 		}
 

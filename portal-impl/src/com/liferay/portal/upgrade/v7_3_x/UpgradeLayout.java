@@ -76,12 +76,6 @@ public class UpgradeLayout extends UpgradeProcess {
 		}
 
 		runSQL("DROP_TABLE_IF_EXISTS(LayoutVersion)");
-
-		runSQL("update Layout set classNameId = 0 where classNameId is null");
-
-		if (!hasColumnType(LayoutTable.TABLE_NAME, "title", "TEXT null")) {
-			alter(LayoutTable.class, new AlterColumnType("title", "TEXT null"));
-		}
 	}
 
 }

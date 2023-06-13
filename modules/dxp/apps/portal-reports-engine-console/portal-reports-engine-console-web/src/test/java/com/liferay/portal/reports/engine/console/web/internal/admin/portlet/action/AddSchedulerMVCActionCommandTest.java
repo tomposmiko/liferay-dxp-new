@@ -15,15 +15,11 @@
 package com.liferay.portal.reports.engine.console.web.internal.admin.portlet.action;
 
 import com.liferay.portal.kernel.cal.Recurrence;
-import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.CalendarFactoryImpl;
 import com.liferay.portal.util.FastDateFormatFactoryImpl;
-import com.liferay.portal.util.PropsImpl;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -32,9 +28,7 @@ import javax.portlet.ActionRequest;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Matchers;
@@ -46,18 +40,11 @@ import org.mockito.Mockito;
 public class AddSchedulerMVCActionCommandTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-		PropsUtil.setProps(new PropsImpl());
-	}
 
 	@Before
 	public void setUp() {
-		seUpCalendarFactoryUtil();
 		setUpFastDateFormatFactoryUtil();
 	}
 
@@ -202,12 +189,6 @@ public class AddSchedulerMVCActionCommandTest {
 
 		fastDateFormatFactoryUtil.setFastDateFormatFactory(
 			new FastDateFormatFactoryImpl());
-	}
-
-	protected void seUpCalendarFactoryUtil() {
-		CalendarFactoryUtil calendarFactoryUtil = new CalendarFactoryUtil();
-
-		calendarFactoryUtil.setCalendarFactory(new CalendarFactoryImpl());
 	}
 
 	protected void whenActionRequestGetParameter(

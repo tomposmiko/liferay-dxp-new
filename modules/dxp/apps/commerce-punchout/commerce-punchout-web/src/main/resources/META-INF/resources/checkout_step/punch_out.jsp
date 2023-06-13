@@ -18,6 +18,7 @@
 
 <%
 String redirectURL = (String)request.getAttribute(PunchOutConstants.PUNCH_OUT_REDIRECT_URL_ATTRIBUTE_NAME);
+String signOutURL = themeDisplay.getURLSignOut();
 %>
 
 <div>
@@ -29,5 +30,5 @@ String redirectURL = (String)request.getAttribute(PunchOutConstants.PUNCH_OUT_RE
 </div>
 
 <script>
-	window.location.href = '<%= HtmlUtil.escapeJS(themeDisplay.getURLSignOut()) %>';
+	window.location.href = '<%= HtmlUtil.escapeJS(signOutURL) %>';
 </script>

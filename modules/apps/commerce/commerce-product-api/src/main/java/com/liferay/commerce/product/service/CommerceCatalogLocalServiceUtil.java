@@ -62,26 +62,26 @@ public class CommerceCatalogLocalServiceUtil {
 	}
 
 	public static CommerceCatalog addCommerceCatalog(
-			String name, String commerceCurrencyCode,
-			String catalogDefaultLanguageId, boolean system,
-			String externalReferenceCode,
+			String externalReferenceCode, String name,
+			String commerceCurrencyCode, String catalogDefaultLanguageId,
+			boolean system,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addCommerceCatalog(
-			name, commerceCurrencyCode, catalogDefaultLanguageId, system,
-			externalReferenceCode, serviceContext);
+			externalReferenceCode, name, commerceCurrencyCode,
+			catalogDefaultLanguageId, system, serviceContext);
 	}
 
 	public static CommerceCatalog addCommerceCatalog(
-			String name, String commerceCurrencyCode,
-			String catalogDefaultLanguageId, String externalReferenceCode,
+			String externalReferenceCode, String name,
+			String commerceCurrencyCode, String catalogDefaultLanguageId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addCommerceCatalog(
-			name, commerceCurrencyCode, catalogDefaultLanguageId,
-			externalReferenceCode, serviceContext);
+			externalReferenceCode, name, commerceCurrencyCode,
+			catalogDefaultLanguageId, serviceContext);
 	}
 
 	public static CommerceCatalog addDefaultCommerceCatalog(long companyId)
@@ -249,17 +249,23 @@ public class CommerceCatalogLocalServiceUtil {
 	}
 
 	public static CommerceCatalog fetchByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
+		String externalReferenceCode, long companyId) {
 
 		return getService().fetchByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	public static CommerceCatalog fetchCommerceCatalog(long commerceCatalogId) {
 		return getService().fetchCommerceCatalog(commerceCatalogId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce catalog with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce catalog's external reference code
+	 * @return the matching commerce catalog, or <code>null</code> if a matching commerce catalog could not be found
+	 */
 	public static CommerceCatalog fetchCommerceCatalogByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
 
@@ -271,6 +277,9 @@ public class CommerceCatalogLocalServiceUtil {
 		return getService().fetchCommerceCatalogByGroupId(groupId);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceCatalogByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static CommerceCatalog fetchCommerceCatalogByReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -305,7 +314,14 @@ public class CommerceCatalogLocalServiceUtil {
 		return getService().getCommerceCatalog(commerceCatalogId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce catalog with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce catalog's external reference code
+	 * @return the matching commerce catalog
+	 * @throws PortalException if a matching commerce catalog could not be found
+	 */
 	public static CommerceCatalog getCommerceCatalogByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
 		throws PortalException {
@@ -378,19 +394,18 @@ public class CommerceCatalogLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
-	public static List<CommerceCatalog> searchCommerceCatalogs(long companyId)
+	public static List<CommerceCatalog> search(long companyId)
 		throws PortalException {
 
-		return getService().searchCommerceCatalogs(companyId);
+		return getService().search(companyId);
 	}
 
-	public static List<CommerceCatalog> searchCommerceCatalogs(
+	public static List<CommerceCatalog> search(
 			long companyId, String keywords, int start, int end,
 			com.liferay.portal.kernel.search.Sort sort)
 		throws PortalException {
 
-		return getService().searchCommerceCatalogs(
-			companyId, keywords, start, end, sort);
+		return getService().search(companyId, keywords, start, end, sort);
 	}
 
 	public static int searchCommerceCatalogsCount(
@@ -427,11 +442,11 @@ public class CommerceCatalogLocalServiceUtil {
 	}
 
 	public static CommerceCatalog updateCommerceCatalogExternalReferenceCode(
-			long commerceCatalogId, String externalReferenceCode)
+			String externalReferenceCode, long commerceCatalogId)
 		throws PortalException {
 
 		return getService().updateCommerceCatalogExternalReferenceCode(
-			commerceCatalogId, externalReferenceCode);
+			externalReferenceCode, commerceCatalogId);
 	}
 
 	public static CommerceCatalogLocalService getService() {

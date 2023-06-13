@@ -384,19 +384,47 @@ public class CommerceShipmentServiceSoap {
 		}
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #updateAddress(long, String, String, String, String, String, String,
+	 String, long, long, String, ServiceContext)}
+	 */
+	@Deprecated
 	public static com.liferay.commerce.model.CommerceShipmentSoap updateAddress(
 			long commerceShipmentId, String name, String description,
 			String street1, String street2, String street3, String city,
-			String zip, long commerceRegionId, long commerceCountryId,
-			String phoneNumber)
+			String zip, long regionId, long countryId, String phoneNumber)
 		throws RemoteException {
 
 		try {
 			com.liferay.commerce.model.CommerceShipment returnValue =
 				CommerceShipmentServiceUtil.updateAddress(
 					commerceShipmentId, name, description, street1, street2,
-					street3, city, zip, commerceRegionId, commerceCountryId,
-					phoneNumber);
+					street3, city, zip, regionId, countryId, phoneNumber);
+
+			return com.liferay.commerce.model.CommerceShipmentSoap.toSoapModel(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.commerce.model.CommerceShipmentSoap updateAddress(
+			long commerceShipmentId, String name, String description,
+			String street1, String street2, String street3, String city,
+			String zip, long regionId, long countryId, String phoneNumber,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			com.liferay.commerce.model.CommerceShipment returnValue =
+				CommerceShipmentServiceUtil.updateAddress(
+					commerceShipmentId, name, description, street1, street2,
+					street3, city, zip, regionId, countryId, phoneNumber,
+					serviceContext);
 
 			return com.liferay.commerce.model.CommerceShipmentSoap.toSoapModel(
 				returnValue);
@@ -461,9 +489,9 @@ public class CommerceShipmentServiceSoap {
 			updateCommerceShipment(
 				long commerceShipmentId, String name, String description,
 				String street1, String street2, String street3, String city,
-				String zip, long commerceRegionId, long commerceCountryId,
-				String phoneNumber, String carrier, String trackingNumber,
-				int status, int shippingDateMonth, int shippingDateDay,
+				String zip, long regionId, long countryId, String phoneNumber,
+				String carrier, String trackingNumber, int status,
+				int shippingDateMonth, int shippingDateDay,
 				int shippingDateYear, int shippingDateHour,
 				int shippingDateMinute, int expectedDateMonth,
 				int expectedDateDay, int expectedDateYear, int expectedDateHour,
@@ -474,12 +502,11 @@ public class CommerceShipmentServiceSoap {
 			com.liferay.commerce.model.CommerceShipment returnValue =
 				CommerceShipmentServiceUtil.updateCommerceShipment(
 					commerceShipmentId, name, description, street1, street2,
-					street3, city, zip, commerceRegionId, commerceCountryId,
-					phoneNumber, carrier, trackingNumber, status,
-					shippingDateMonth, shippingDateDay, shippingDateYear,
-					shippingDateHour, shippingDateMinute, expectedDateMonth,
-					expectedDateDay, expectedDateYear, expectedDateHour,
-					expectedDateMinute);
+					street3, city, zip, regionId, countryId, phoneNumber,
+					carrier, trackingNumber, status, shippingDateMonth,
+					shippingDateDay, shippingDateYear, shippingDateHour,
+					shippingDateMinute, expectedDateMonth, expectedDateDay,
+					expectedDateYear, expectedDateHour, expectedDateMinute);
 
 			return com.liferay.commerce.model.CommerceShipmentSoap.toSoapModel(
 				returnValue);

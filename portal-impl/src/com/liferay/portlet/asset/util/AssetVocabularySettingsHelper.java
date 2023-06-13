@@ -126,12 +126,13 @@ public class AssetVocabularySettingsHelper {
 
 			if (classNameIdAndClassTypePK.equals(
 					AssetCategoryConstants.
-						ALL_CLASS_NAME_IDS_AND_CLASS_TYPE_PKS) &&
-				required) {
+						ALL_CLASS_NAME_IDS_AND_CLASS_TYPE_PKS)) {
 
-				requiredClassNameIds.clear();
+				if (required) {
+					requiredClassNameIds.clear();
 
-				requiredClassNameIds.add(classNameIdAndClassTypePK);
+					requiredClassNameIds.add(classNameIdAndClassTypePK);
+				}
 
 				selectedClassNameIds.clear();
 
@@ -145,17 +146,6 @@ public class AssetVocabularySettingsHelper {
 			}
 
 			selectedClassNameIds.add(classNameIdAndClassTypePK);
-		}
-
-		if (selectedClassNameIds.contains(
-				AssetCategoryConstants.ALL_CLASS_NAME_IDS_AND_CLASS_TYPE_PKS)) {
-
-			selectedClassNameIds.clear();
-
-			selectedClassNameIds.add(
-				AssetCategoryConstants.ALL_CLASS_NAME_IDS_AND_CLASS_TYPE_PKS);
-
-			selectedClassNameIds.addAll(requiredClassNameIds);
 		}
 
 		_unicodeProperties.setProperty(
@@ -262,6 +252,15 @@ public class AssetVocabularySettingsHelper {
 				AssetCategoryConstants.ALL_CLASS_NAME_IDS_AND_CLASS_TYPE_PKS)) {
 
 			return true;
+		}
+
+		if (classTypePK == AssetCategoryConstants.ALL_CLASS_TYPE_PK) {
+			String prefix = classNameId + StringPool.COLON;
+
+			return ArrayUtil.exists(
+				classNameIdsAndClassTypePKs,
+				classNameIdsAndClassTypePK ->
+					classNameIdsAndClassTypePK.startsWith(prefix));
 		}
 
 		String classNameIdAndClassTypePK = getClassNameIdAndClassTypePK(

@@ -21,10 +21,10 @@ JournalSelectDDMTemplateDisplayContext journalSelectDDMTemplateDisplayContext = 
 %>
 
 <clay:management-toolbar
-	displayContext="<%= new JournalSelectDDMTemplateManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, journalSelectDDMTemplateDisplayContext) %>"
+	managementToolbarDisplayContext="<%= new JournalSelectDDMTemplateManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, journalSelectDDMTemplateDisplayContext) %>"
 />
 
-<aui:form cssClass="container-fluid-1280" method="post" name="selectDDMTemplateFm">
+<aui:form cssClass="container-fluid container-fluid-max-xl" method="post" name="selectDDMTemplateFm">
 	<liferay-ui:search-container
 		searchContainer="<%= journalSelectDDMTemplateDisplayContext.getTemplateSearch() %>"
 	>
@@ -35,11 +35,6 @@ JournalSelectDDMTemplateDisplayContext journalSelectDDMTemplateDisplayContext = 
 		>
 			<c:choose>
 				<c:when test='<%= Objects.equals(journalSelectDDMTemplateDisplayContext.getDisplayStyle(), "icon") %>'>
-
-					<%
-					row.setCssClass("entry-card lfr-asset-item " + row.getCssClass());
-					%>
-
 					<liferay-ui:search-container-column-text>
 						<clay:vertical-card
 							verticalCard="<%= new JournalSelectDDMTemplateVerticalCard(ddmTemplate, renderRequest, journalSelectDDMTemplateDisplayContext) %>"
@@ -48,7 +43,7 @@ JournalSelectDDMTemplateDisplayContext journalSelectDDMTemplateDisplayContext = 
 				</c:when>
 				<c:otherwise>
 					<liferay-ui:search-container-column-text
-						cssClass="table-cell-content"
+						cssClass="table-cell-expand"
 						name="name"
 					>
 						<c:choose>
@@ -80,7 +75,7 @@ JournalSelectDDMTemplateDisplayContext journalSelectDDMTemplateDisplayContext = 
 					</liferay-ui:search-container-column-text>
 
 					<liferay-ui:search-container-column-text
-						cssClass="table-cell-content"
+						cssClass="table-cell-expand"
 						name="description"
 						value="<%= HtmlUtil.escape(ddmTemplate.getDescription(locale)) %>"
 					/>
@@ -99,12 +94,3 @@ JournalSelectDDMTemplateDisplayContext journalSelectDDMTemplateDisplayContext = 
 		/>
 	</liferay-ui:search-container>
 </aui:form>
-
-<aui:script>
-	document.addEventListener('DOMContentLoaded', function () {
-		Liferay.Util.selectEntityHandler(
-			'#<portlet:namespace />selectDDMTemplateFm',
-			'<%= HtmlUtil.escapeJS(journalSelectDDMTemplateDisplayContext.getEventName()) %>'
-		);
-	});
-</aui:script>

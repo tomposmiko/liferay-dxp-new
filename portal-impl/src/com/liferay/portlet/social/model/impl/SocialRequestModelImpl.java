@@ -37,6 +37,7 @@ import com.liferay.social.kernel.model.SocialRequestSoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -349,90 +350,112 @@ public class SocialRequestModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<SocialRequest, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, SocialRequest>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<SocialRequest, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<SocialRequest, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			SocialRequest.class.getClassLoader(), SocialRequest.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", SocialRequest::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", SocialRequest::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", SocialRequest::getUuid);
-		attributeGetterFunctions.put("requestId", SocialRequest::getRequestId);
-		attributeGetterFunctions.put("groupId", SocialRequest::getGroupId);
-		attributeGetterFunctions.put("companyId", SocialRequest::getCompanyId);
-		attributeGetterFunctions.put("userId", SocialRequest::getUserId);
-		attributeGetterFunctions.put(
-			"createDate", SocialRequest::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", SocialRequest::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", SocialRequest::getClassNameId);
-		attributeGetterFunctions.put("classPK", SocialRequest::getClassPK);
-		attributeGetterFunctions.put("type", SocialRequest::getType);
-		attributeGetterFunctions.put("extraData", SocialRequest::getExtraData);
-		attributeGetterFunctions.put(
-			"receiverUserId", SocialRequest::getReceiverUserId);
-		attributeGetterFunctions.put("status", SocialRequest::getStatus);
+		try {
+			Constructor<SocialRequest> constructor =
+				(Constructor<SocialRequest>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<SocialRequest, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<SocialRequest, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<SocialRequest, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<SocialRequest, Object>>();
 		Map<String, BiConsumer<SocialRequest, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<SocialRequest, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", SocialRequest::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<SocialRequest, Long>)SocialRequest::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", SocialRequest::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<SocialRequest, Long>)SocialRequest::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", SocialRequest::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<SocialRequest, String>)SocialRequest::setUuid);
+		attributeGetterFunctions.put("requestId", SocialRequest::getRequestId);
 		attributeSetterBiConsumers.put(
 			"requestId",
 			(BiConsumer<SocialRequest, Long>)SocialRequest::setRequestId);
+		attributeGetterFunctions.put("groupId", SocialRequest::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<SocialRequest, Long>)SocialRequest::setGroupId);
+		attributeGetterFunctions.put("companyId", SocialRequest::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<SocialRequest, Long>)SocialRequest::setCompanyId);
+		attributeGetterFunctions.put("userId", SocialRequest::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<SocialRequest, Long>)SocialRequest::setUserId);
+		attributeGetterFunctions.put(
+			"createDate", SocialRequest::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<SocialRequest, Long>)SocialRequest::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", SocialRequest::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<SocialRequest, Long>)SocialRequest::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", SocialRequest::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<SocialRequest, Long>)SocialRequest::setClassNameId);
+		attributeGetterFunctions.put("classPK", SocialRequest::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<SocialRequest, Long>)SocialRequest::setClassPK);
+		attributeGetterFunctions.put("type", SocialRequest::getType);
 		attributeSetterBiConsumers.put(
 			"type", (BiConsumer<SocialRequest, Integer>)SocialRequest::setType);
+		attributeGetterFunctions.put("extraData", SocialRequest::getExtraData);
 		attributeSetterBiConsumers.put(
 			"extraData",
 			(BiConsumer<SocialRequest, String>)SocialRequest::setExtraData);
+		attributeGetterFunctions.put(
+			"receiverUserId", SocialRequest::getReceiverUserId);
 		attributeSetterBiConsumers.put(
 			"receiverUserId",
 			(BiConsumer<SocialRequest, Long>)SocialRequest::setReceiverUserId);
+		attributeGetterFunctions.put("status", SocialRequest::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<SocialRequest, Integer>)SocialRequest::setStatus);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -888,6 +911,43 @@ public class SocialRequestModelImpl
 	}
 
 	@Override
+	public SocialRequest cloneWithOriginalValues() {
+		SocialRequestImpl socialRequestImpl = new SocialRequestImpl();
+
+		socialRequestImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		socialRequestImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		socialRequestImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		socialRequestImpl.setRequestId(
+			this.<Long>getColumnOriginalValue("requestId"));
+		socialRequestImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		socialRequestImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		socialRequestImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		socialRequestImpl.setCreateDate(
+			this.<Long>getColumnOriginalValue("createDate"));
+		socialRequestImpl.setModifiedDate(
+			this.<Long>getColumnOriginalValue("modifiedDate"));
+		socialRequestImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		socialRequestImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		socialRequestImpl.setType(
+			this.<Integer>getColumnOriginalValue("type_"));
+		socialRequestImpl.setExtraData(
+			this.<String>getColumnOriginalValue("extraData"));
+		socialRequestImpl.setReceiverUserId(
+			this.<Long>getColumnOriginalValue("receiverUserId"));
+		socialRequestImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
+
+		return socialRequestImpl;
+	}
+
+	@Override
 	public int compareTo(SocialRequest socialRequest) {
 		int value = 0;
 
@@ -1095,9 +1155,7 @@ public class SocialRequestModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, SocialRequest>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					SocialRequest.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

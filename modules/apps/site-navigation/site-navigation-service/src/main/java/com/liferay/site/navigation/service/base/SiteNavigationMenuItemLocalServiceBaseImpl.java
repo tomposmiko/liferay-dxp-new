@@ -35,8 +35,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -53,7 +51,6 @@ import com.liferay.site.navigation.model.SiteNavigationMenuItem;
 import com.liferay.site.navigation.service.SiteNavigationMenuItemLocalService;
 import com.liferay.site.navigation.service.SiteNavigationMenuItemLocalServiceUtil;
 import com.liferay.site.navigation.service.persistence.SiteNavigationMenuItemPersistence;
-import com.liferay.site.navigation.service.persistence.SiteNavigationMenuPersistence;
 
 import java.io.Serializable;
 
@@ -423,6 +420,7 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -441,6 +439,7 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 			(SiteNavigationMenuItem)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<SiteNavigationMenuItem> getBasePersistence() {
 		return siteNavigationMenuItemPersistence;
 	}
@@ -660,15 +659,5 @@ public abstract class SiteNavigationMenuItemLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@Reference
-	protected SiteNavigationMenuPersistence siteNavigationMenuPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SiteNavigationMenuItemLocalServiceBaseImpl.class);
 
 }

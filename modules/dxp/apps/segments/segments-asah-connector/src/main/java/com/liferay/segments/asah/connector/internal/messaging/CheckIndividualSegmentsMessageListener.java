@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
@@ -39,7 +40,8 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.segments.asah.connector.internal.configuration.SegmentsAsahConfiguration",
-	immediate = true, service = CheckIndividualSegmentsMessageListener.class
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	service = CheckIndividualSegmentsMessageListener.class
 )
 public class CheckIndividualSegmentsMessageListener
 	extends BaseMessageListener {

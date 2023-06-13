@@ -25,7 +25,6 @@ import {DragSource as dragSource, DropTarget as dropTarget} from 'react-dnd';
 import ThemeContext from '../../ThemeContext.es';
 import {PROPERTY_TYPES} from '../../utils/constants.es';
 import {DragTypes} from '../../utils/drag-types.es';
-import {unescapeSingleQuotes} from '../../utils/odata.es';
 import {
 	createNewGroup,
 	dateToInternationalHuman,
@@ -170,6 +169,7 @@ class CriteriaRow extends Component {
 		onDelete: PropTypes.func.isRequired,
 		onMove: PropTypes.func.isRequired,
 		propertyKey: PropTypes.string.isRequired,
+		renderEmptyValuesErrors: PropTypes.bool,
 		supportedOperators: PropTypes.array,
 		supportedProperties: PropTypes.array,
 		supportedPropertyTypes: PropTypes.object,
@@ -178,6 +178,7 @@ class CriteriaRow extends Component {
 	static defaultProps = {
 		criterion: {},
 		editing: true,
+		renderEmptyValuesErrors: false,
 		supportedOperators: [],
 		supportedProperties: [],
 		supportedPropertyTypes: {},
@@ -254,9 +255,10 @@ class CriteriaRow extends Component {
 		return (
 			<span>
 				<b className="mr-1 text-dark">{propertyLabel}</b>
+
 				<span className="mr-1 operator">{operatorLabel}</span>
 
-				<b>{unescapeSingleQuotes(parsedValue)}</b>
+				<b>{parsedValue}</b>
 			</span>
 		);
 	};
@@ -334,7 +336,12 @@ class CriteriaRow extends Component {
 		}
 	};
 
-	_renderValueInput = (selectedProperty, value, disabled) => {
+	_renderValueInput = (
+		disabled,
+		renderEmptyValuesErrors,
+		selectedProperty,
+		value
+	) => {
 		const inputComponentsMap = {
 			[PROPERTY_TYPES.BOOLEAN]: BooleanInput,
 			[PROPERTY_TYPES.COLLECTION]: CollectionInput,
@@ -356,6 +363,7 @@ class CriteriaRow extends Component {
 				displayValue={this.props.criterion.displayValue || ''}
 				onChange={this._handleTypedInputChange}
 				options={selectedProperty.options}
+				renderEmptyValueErrors={renderEmptyValuesErrors}
 				selectEntity={selectedProperty.selectEntity}
 				value={value}
 			/>
@@ -433,6 +441,7 @@ class CriteriaRow extends Component {
 	}) {
 		const {
 			connectDragSource,
+			renderEmptyValuesErrors,
 			supportedOperators,
 			supportedPropertyTypes,
 		} = this.props;
@@ -472,7 +481,12 @@ class CriteriaRow extends Component {
 					value={selectedOperator && selectedOperator.name}
 				/>
 
-				{this._renderValueInput(selectedProperty, value, disabledInput)}
+				{this._renderValueInput(
+					disabledInput,
+					renderEmptyValuesErrors,
+					selectedProperty,
+					value
+				)}
 
 				{error ? (
 					<ClayButton
@@ -516,6 +530,7 @@ class CriteriaRow extends Component {
 			dragging,
 			editing,
 			hover,
+			renderEmptyValuesErrors,
 			supportedOperators,
 			supportedProperties,
 		} = this.props;
@@ -583,6 +598,7 @@ class CriteriaRow extends Component {
 								this._renderEditContainer({
 									error,
 									propertyLabel,
+									renderEmptyValuesErrors,
 									selectedOperator,
 									selectedProperty,
 									value,
@@ -607,6 +623,16 @@ class CriteriaRow extends Component {
 						unknownEntityError: unknownEntity,
 					})}
 				{warning && this._renderWarningMessages()}
+				{!value && renderEmptyValuesErrors && (
+					<ClayAlert
+						className="pr-6 text-right"
+						displayType="danger"
+						title={Liferay.Language.get(
+							'a-value-needs-to-be-added-or-selected-in-the-blank-field'
+						)}
+						variant="feedback"
+					/>
+				)}
 			</>
 		);
 	}

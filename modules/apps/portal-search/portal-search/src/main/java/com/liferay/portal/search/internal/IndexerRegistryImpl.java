@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerPostProcessor;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.dummy.DummyIndexer;
-import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.search.configuration.IndexerRegistryConfiguration;
@@ -217,15 +216,12 @@ public class IndexerRegistryImpl implements IndexerRegistry {
 					indexerPostProcessors.add(indexerPostProcessor);
 
 					if (_log.isDebugEnabled()) {
-						StringBundler sb = new StringBundler(5);
-
-						sb.append("Registration of indexer post processor ");
-						sb.append("for ");
-						sb.append(indexerClassName);
-						sb.append(" will be completed once the indexer ");
-						sb.append("becomes available");
-
-						_log.debug(sb.toString());
+						_log.debug(
+							StringBundler.concat(
+								"Registration of indexer post processor for ",
+								indexerClassName,
+								" will be completed once the indexer becomes ",
+								"available"));
 					}
 				}
 			}
@@ -272,8 +268,8 @@ public class IndexerRegistryImpl implements IndexerRegistry {
 
 			BufferedIndexerInvocationHandler bufferedIndexerInvocationHandler =
 				new BufferedIndexerInvocationHandler(
-					indexer, _indexStatusManager, _indexerRegistryConfiguration,
-					_persistedModelLocalServiceRegistry);
+					indexer, _indexStatusManager,
+					_indexerRegistryConfiguration);
 
 			if (_indexerRequestBufferOverflowHandler == null) {
 				bufferedIndexerInvocationHandler.
@@ -390,10 +386,6 @@ public class IndexerRegistryImpl implements IndexerRegistry {
 
 	@Reference
 	private IndexStatusManager _indexStatusManager;
-
-	@Reference
-	private PersistedModelLocalServiceRegistry
-		_persistedModelLocalServiceRegistry;
 
 	private final Map<String, Indexer<? extends Object>> _proxiedIndexers =
 		new ConcurrentHashMap<>();

@@ -43,16 +43,16 @@ String sampleURL = virtualCPTypeHelper.getSampleURL(cpDefinitionId, cpInstanceId
 		<div class="row">
 			<div class="col-lg-6 col-md-7">
 				<div class="row">
-					<div class="col-lg-2 col-md-3 col-xs-2">
+					<div class="col-2 col-lg-2 col-md-3">
 						<div id="<portlet:namespace />thumbs-container">
 
 							<%
 							for (CPMedia imageCPMedia : cpContentHelper.getImages(cpDefinitionId, themeDisplay)) {
-								String url = imageCPMedia.getUrl();
+								String url = imageCPMedia.getURL();
 							%>
 
 								<div class="card thumb" data-url="<%= HtmlUtil.escapeAttribute(url) %>">
-									<img class="center-block img-responsive" src="<%= HtmlUtil.escapeAttribute(url) %>" />
+									<img class="center-block img-fluid" src="<%= HtmlUtil.escapeAttribute(url) %>" />
 								</div>
 
 							<%
@@ -62,9 +62,14 @@ String sampleURL = virtualCPTypeHelper.getSampleURL(cpDefinitionId, cpInstanceId
 						</div>
 					</div>
 
-					<div class="col-lg-10 col-md-9 col-xs-10 full-image">
-						<c:if test="<%= Validator.isNotNull(cpCatalogEntry.getDefaultImageFileUrl()) %>">
-							<img class="center-block img-responsive" id="<portlet:namespace />full-image" src="<%= HtmlUtil.escapeAttribute(cpCatalogEntry.getDefaultImageFileUrl()) %>" />
+					<div class="col-10 col-lg-10 col-md-9 full-image">
+
+						<%
+						String defaultImageFileURL = cpContentHelper.getDefaultImageFileURL(CommerceUtil.getCommerceAccountId((CommerceContext)request.getAttribute(CommerceWebKeys.COMMERCE_CONTEXT)), cpCatalogEntry.getCPDefinitionId());
+						%>
+
+						<c:if test="<%= Validator.isNotNull(defaultImageFileURL) %>">
+							<img class="center-block img-fluid" id="<portlet:namespace />full-image" src="<%= HtmlUtil.escapeAttribute(defaultImageFileURL) %>" />
 						</c:if>
 					</div>
 				</div>
@@ -77,7 +82,7 @@ String sampleURL = virtualCPTypeHelper.getSampleURL(cpDefinitionId, cpInstanceId
 					<c:when test="<%= cpSku != null %>">
 						<h4 class="sku"><%= HtmlUtil.escape(cpSku.getSku()) %></h4>
 
-						<div class="price"><liferay-commerce:price CPDefinitionId="<%= cpDefinitionId %>" CPInstanceId="<%= cpSku.getCPInstanceId() %>" /></div>
+						<div class="price-container w-50"><commerce-ui:price CPCatalogEntry="<%= cpCatalogEntry %>" namespace="<%= liferayPortletResponse.getNamespace() %>" /></div>
 
 						<div class="subscription-info"><commerce-ui:product-subscription-info CPInstanceId="<%= cpSku.getCPInstanceId() %>" /></div>
 
@@ -90,7 +95,7 @@ String sampleURL = virtualCPTypeHelper.getSampleURL(cpDefinitionId, cpInstanceId
 					<c:otherwise>
 						<h4 class="sku" data-text-cp-instance-sku=""></h4>
 
-						<div class="price" data-text-cp-instance-price=""></div>
+						<div class="price-container w-50" data-text-cp-instance-price=""></div>
 
 						<div class="subscription-info" data-text-cp-instance-subscription-info="" data-text-cp-instance-subscription-info-show></div>
 
@@ -129,8 +134,8 @@ String sampleURL = virtualCPTypeHelper.getSampleURL(cpDefinitionId, cpInstanceId
 
 				<div class="row">
 					<div class="col-md-12">
-						<liferay-commerce:compare-product
-							CPDefinitionId="<%= cpDefinitionId %>"
+						<commerce-ui:compare-checkbox
+							CPCatalogEntry="<%= cpCatalogEntry %>"
 						/>
 					</div>
 				</div>
@@ -145,7 +150,7 @@ String sampleURL = virtualCPTypeHelper.getSampleURL(cpDefinitionId, cpInstanceId
 	</div>
 
 	<%
-	List<CPMedia> attachmentCPMedias = cpContentHelper.getCPAttachmentFileEntries(cpDefinitionId, themeDisplay);
+	List<CPMedia> cpAttachmentFileEntries = cpContentHelper.getCPAttachmentFileEntries(cpDefinitionId, themeDisplay);
 	List<CPDefinitionSpecificationOptionValue> cpDefinitionSpecificationOptionValues = cpContentHelper.getCPDefinitionSpecificationOptionValues(cpDefinitionId);
 	List<CPOptionCategory> cpOptionCategories = cpContentHelper.getCPOptionCategories(company.getCompanyId());
 	%>
@@ -168,7 +173,7 @@ String sampleURL = virtualCPTypeHelper.getSampleURL(cpDefinitionId, cpInstanceId
 						</li>
 					</c:if>
 
-					<c:if test="<%= !attachmentCPMedias.isEmpty() %>">
+					<c:if test="<%= !cpAttachmentFileEntries.isEmpty() %>">
 						<li class="nav-item" role="presentation">
 							<a aria-controls="<portlet:namespace />attachments" aria-expanded="false" class="nav-link" data-toggle="tab" href="#<portlet:namespace />attachments" role="tab">
 								<%= LanguageUtil.get(resourceBundle, "attachments") %>
@@ -242,13 +247,13 @@ String sampleURL = virtualCPTypeHelper.getSampleURL(cpDefinitionId, cpInstanceId
 						</div>
 					</c:if>
 
-					<c:if test="<%= !attachmentCPMedias.isEmpty() %>">
+					<c:if test="<%= !cpAttachmentFileEntries.isEmpty() %>">
 						<div class="tab-pane" id="<portlet:namespace />attachments">
 							<div class="table-responsive">
 								<table class="table table-bordered table-striped">
 
 									<%
-									for (CPMedia attachmentCPMedia : attachmentCPMedias) {
+									for (CPMedia attachmentCPMedia : cpAttachmentFileEntries) {
 									%>
 
 										<tr>
@@ -256,7 +261,7 @@ String sampleURL = virtualCPTypeHelper.getSampleURL(cpDefinitionId, cpInstanceId
 												<span><%= HtmlUtil.escape(attachmentCPMedia.getTitle()) %></span>
 
 												<span>
-													<aui:icon cssClass="icon-monospaced" image="download" markupView="lexicon" target="_blank" url="<%= attachmentCPMedia.getDownloadUrl() %>" />
+													<aui:icon cssClass="icon-monospaced" image="download" markupView="lexicon" target="_blank" url="<%= attachmentCPMedia.getDownloadURL() %>" />
 												</span>
 											</td>
 										</tr>
@@ -276,11 +281,11 @@ String sampleURL = virtualCPTypeHelper.getSampleURL(cpDefinitionId, cpInstanceId
 </div>
 
 <aui:script>
-	window.document.addEventListener('DOMContentLoaded', function () {
+	window.document.addEventListener('DOMContentLoaded', () => {
 		var thumbElements = window.document.querySelectorAll('.thumb');
 
-		Array.from(thumbElements).forEach(function (thumbElement) {
-			thumbElement.addEventListener('click', function (event) {
+		Array.from(thumbElements).forEach((thumbElement) => {
+			thumbElement.addEventListener('click', (event) => {
 				window.document
 					.querySelector('#<portlet:namespace />full-image')
 					.setAttribute(

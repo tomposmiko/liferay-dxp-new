@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -331,67 +332,88 @@ public class TeamModelImpl extends BaseModelImpl<Team> implements TeamModel {
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Team, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Team>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Team, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Team, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Team.class.getClassLoader(), Team.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", Team::getMvccVersion);
-		attributeGetterFunctions.put("ctCollectionId", Team::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", Team::getUuid);
-		attributeGetterFunctions.put("teamId", Team::getTeamId);
-		attributeGetterFunctions.put("companyId", Team::getCompanyId);
-		attributeGetterFunctions.put("userId", Team::getUserId);
-		attributeGetterFunctions.put("userName", Team::getUserName);
-		attributeGetterFunctions.put("createDate", Team::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", Team::getModifiedDate);
-		attributeGetterFunctions.put("groupId", Team::getGroupId);
-		attributeGetterFunctions.put("name", Team::getName);
-		attributeGetterFunctions.put("description", Team::getDescription);
-		attributeGetterFunctions.put(
-			"lastPublishDate", Team::getLastPublishDate);
+		try {
+			Constructor<Team> constructor =
+				(Constructor<Team>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Team, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Team, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Team, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Team, Object>>();
 		Map<String, BiConsumer<Team, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Team, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", Team::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion", (BiConsumer<Team, Long>)Team::setMvccVersion);
+		attributeGetterFunctions.put("ctCollectionId", Team::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId", (BiConsumer<Team, Long>)Team::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", Team::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<Team, String>)Team::setUuid);
+		attributeGetterFunctions.put("teamId", Team::getTeamId);
 		attributeSetterBiConsumers.put(
 			"teamId", (BiConsumer<Team, Long>)Team::setTeamId);
+		attributeGetterFunctions.put("companyId", Team::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<Team, Long>)Team::setCompanyId);
+		attributeGetterFunctions.put("userId", Team::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<Team, Long>)Team::setUserId);
+		attributeGetterFunctions.put("userName", Team::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<Team, String>)Team::setUserName);
+		attributeGetterFunctions.put("createDate", Team::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<Team, Date>)Team::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", Team::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate", (BiConsumer<Team, Date>)Team::setModifiedDate);
+		attributeGetterFunctions.put("groupId", Team::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<Team, Long>)Team::setGroupId);
+		attributeGetterFunctions.put("name", Team::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<Team, String>)Team::setName);
+		attributeGetterFunctions.put("description", Team::getDescription);
 		attributeSetterBiConsumers.put(
 			"description", (BiConsumer<Team, String>)Team::setDescription);
+		attributeGetterFunctions.put(
+			"lastPublishDate", Team::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<Team, Date>)Team::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -752,6 +774,32 @@ public class TeamModelImpl extends BaseModelImpl<Team> implements TeamModel {
 	}
 
 	@Override
+	public Team cloneWithOriginalValues() {
+		TeamImpl teamImpl = new TeamImpl();
+
+		teamImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		teamImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		teamImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		teamImpl.setTeamId(this.<Long>getColumnOriginalValue("teamId"));
+		teamImpl.setCompanyId(this.<Long>getColumnOriginalValue("companyId"));
+		teamImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		teamImpl.setUserName(this.<String>getColumnOriginalValue("userName"));
+		teamImpl.setCreateDate(this.<Date>getColumnOriginalValue("createDate"));
+		teamImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		teamImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		teamImpl.setName(this.<String>getColumnOriginalValue("name"));
+		teamImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		teamImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+
+		return teamImpl;
+	}
+
+	@Override
 	public int compareTo(Team team) {
 		int value = 0;
 
@@ -977,9 +1025,7 @@ public class TeamModelImpl extends BaseModelImpl<Team> implements TeamModel {
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Team>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Team.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

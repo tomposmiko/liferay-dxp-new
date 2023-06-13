@@ -26,7 +26,6 @@ import java.io.ByteArrayInputStream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mock;
@@ -39,8 +38,7 @@ import org.mockito.MockitoAnnotations;
 public class GCloudVisionUtilTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@Before

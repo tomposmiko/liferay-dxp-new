@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.json.JSONSerializer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
@@ -109,9 +110,10 @@ public class DDMFormContextProviderServlet extends HttpServlet {
 			DDMFormTemplateContextProcessor ddmFormTemplateContextProcessor =
 				createDDMFormTemplateContextProcessor(httpServletRequest);
 
+			ddmFormRenderingContext.setDDMFormInstanceId(
+				ddmFormTemplateContextProcessor.getDDMFormInstanceId());
 			ddmFormRenderingContext.setDDMFormValues(
 				ddmFormTemplateContextProcessor.getDDMFormValues());
-
 			ddmFormRenderingContext.setGroupId(
 				ddmFormTemplateContextProcessor.getGroupId());
 
@@ -124,7 +126,8 @@ public class DDMFormContextProviderServlet extends HttpServlet {
 						ddmFormTemplateContextProcessor.getDDMFormLayout(),
 						ddmFormRenderingContext,
 						_ddmStructureLayoutLocalService,
-						_ddmStructureLocalService, _jsonFactory);
+						_ddmStructureLocalService, _groupLocalService,
+						_jsonFactory);
 
 			ddmFormPagesTemplateContextFactory.setDDMFormEvaluator(
 				_ddmFormEvaluator);
@@ -227,6 +230,9 @@ public class DDMFormContextProviderServlet extends HttpServlet {
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
+
+	@Reference
+	private GroupLocalService _groupLocalService;
 
 	@Reference
 	private JSONFactory _jsonFactory;

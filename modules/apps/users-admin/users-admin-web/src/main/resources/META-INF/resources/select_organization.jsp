@@ -18,7 +18,6 @@
 
 <%
 String p_u_i_d = ParamUtil.getString(request, "p_u_i_d");
-String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectOrganization");
 
 long selOrganizationId = ParamUtil.getLong(request, "organizationId");
 User selUser = PortalUtil.getSelectedUser(request);
@@ -50,7 +49,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "organizations"));
 	sortingURL="<%= selectOrganizationManagementToolbarDisplayContext.getSortingURL() %>"
 />
 
-<aui:form action="<%= portletURL %>" cssClass="container-fluid-1280" method="post" name="selectOrganizationFm">
+<aui:form action="<%= portletURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="selectOrganizationFm">
 	<liferay-ui:search-container
 		searchContainer="<%= searchContainer %>"
 		var="organizationSearchContainer"
@@ -62,14 +61,14 @@ renderResponse.setTitle(LanguageUtil.get(request, "organizations"));
 			modelVar="organization"
 		>
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="name"
 				orderable="<%= true %>"
 				property="name"
 			/>
 
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="parent-organization"
 				value="<%= HtmlUtil.escape(organization.getParentOrganizationName()) %>"
 			/>
@@ -99,14 +98,6 @@ renderResponse.setTitle(LanguageUtil.get(request, "organizations"));
 				<c:if test="<%= Validator.isNull(p_u_i_d) || OrganizationMembershipPolicyUtil.isMembershipAllowed((selUser != null) ? selUser.getUserId() : 0, organization.getOrganizationId()) %>">
 
 					<%
-					Map<String, Object> data = HashMapBuilder.<String, Object>put(
-						"entityid", organization.getOrganizationId()
-					).put(
-						"entityname", organization.getName()
-					).put(
-						"type", LanguageUtil.get(request, organization.getType())
-					).build();
-
 					boolean disabled = false;
 
 					if (selUser != null) {
@@ -124,7 +115,20 @@ renderResponse.setTitle(LanguageUtil.get(request, "organizations"));
 					}
 					%>
 
-					<aui:button cssClass="selector-button" data="<%= data %>" disabled="<%= disabled %>" value="choose" />
+					<aui:button
+						cssClass="selector-button"
+						data='<%=
+							HashMapBuilder.<String, Object>put(
+								"entityid", organization.getOrganizationId()
+							).put(
+								"entityname", organization.getName()
+							).put(
+								"type", LanguageUtil.get(request, organization.getType())
+							).build()
+						%>'
+						disabled="<%= disabled %>"
+						value="choose"
+					/>
 				</c:if>
 			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>
@@ -134,11 +138,3 @@ renderResponse.setTitle(LanguageUtil.get(request, "organizations"));
 		/>
 	</liferay-ui:search-container>
 </aui:form>
-
-<aui:script use="aui-base">
-	Liferay.Util.selectEntityHandler(
-		'#<portlet:namespace />selectOrganizationFm',
-		'<%= HtmlUtil.escapeJS(eventName) %>',
-		<%= selUser != null %>
-	);
-</aui:script>

@@ -395,7 +395,7 @@ public class ExportLayoutPageTemplateEntriesMVCResourceCommandTest {
 			_read(expectedFileName));
 
 		Assert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString());
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString());
 	}
 
 	private void _validateContent(
@@ -408,15 +408,16 @@ public class ExportLayoutPageTemplateEntriesMVCResourceCommandTest {
 		boolean equals = false;
 
 		for (String expectedPageTemplateName : expectedPageTemplateNames) {
-			String expectedJSON1 = String.valueOf(
-				JSONFactoryUtil.createJSONObject(
-					StringUtil.replace(
-						_read(expectedFileName), "${", "}",
-						HashMapBuilder.put(
-							"PAGE_TEMPLATE_NAME", expectedPageTemplateName
-						).build())));
+			JSONObject expectedJSONObject = JSONFactoryUtil.createJSONObject(
+				StringUtil.replace(
+					_read(expectedFileName), "${", "}",
+					HashMapBuilder.put(
+						"PAGE_TEMPLATE_NAME", expectedPageTemplateName
+					).build()));
 
-			equals = expectedJSON1.equals(jsonObject.toString());
+			String expectedJSON1 = expectedJSONObject.toJSONString();
+
+			equals = expectedJSON1.equals(jsonObject.toJSONString());
 
 			if (equals) {
 				break;
@@ -472,7 +473,7 @@ public class ExportLayoutPageTemplateEntriesMVCResourceCommandTest {
 		_layoutPageTemplateStructureLocalService;
 
 	@Inject(
-		filter = "mvc.command.name=/layout_page_template/export_layout_page_template_entry"
+		filter = "mvc.command.name=/layout_page_template_admin/export_layout_page_template_entries"
 	)
 	private MVCResourceCommand _mvcResourceCommand;
 

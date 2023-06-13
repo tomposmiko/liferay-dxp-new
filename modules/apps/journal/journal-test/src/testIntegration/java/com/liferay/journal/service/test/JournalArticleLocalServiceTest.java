@@ -16,7 +16,6 @@ package com.liferay.journal.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.display.page.constants.AssetDisplayPageConstants;
-import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
 import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
@@ -27,16 +26,19 @@ import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLinkLocalService;
+import com.liferay.dynamic.data.mapping.storage.Field;
+import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
-import com.liferay.journal.constants.JournalArticleConstants;
 import com.liferay.journal.constants.JournalFolderConstants;
+import com.liferay.journal.exception.DuplicateArticleExternalReferenceCodeException;
 import com.liferay.journal.exception.DuplicateArticleIdException;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleDisplay;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.test.util.JournalTestUtil;
+import com.liferay.journal.util.JournalConverter;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
@@ -192,47 +194,6 @@ public class JournalArticleLocalServiceTest {
 	}
 
 	@Test
-	public void testDefaultAssetDisplayPageSetForNewJournalArticles()
-		throws Exception {
-
-		DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
-			_group.getGroupId(), JournalArticle.class.getName());
-
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
-
-		LayoutPageTemplateEntry layoutPageTemplateEntry =
-			_layoutPageTemplateEntryLocalService.addLayoutPageTemplateEntry(
-				_group.getCreatorUserId(), _group.getGroupId(), 0,
-				_portal.getClassNameId(JournalArticle.class.getName()),
-				ddmStructure.getStructureId(), RandomTestUtil.randomString(),
-				LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE, 0, true,
-				0, 0, 0, 0, serviceContext);
-
-		JournalArticle journalArticle = JournalTestUtil.addArticle(
-			_group.getGroupId(),
-			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			JournalArticleConstants.CLASS_NAME_ID_DEFAULT, StringPool.BLANK,
-			true, RandomTestUtil.randomLocaleStringMap(),
-			RandomTestUtil.randomLocaleStringMap(),
-			RandomTestUtil.randomLocaleStringMap(), ddmStructure, null,
-			LocaleUtil.getSiteDefault(), null, null, true, true,
-			serviceContext);
-
-		AssetDisplayPageEntry assetDisplayPageEntry =
-			_assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
-				_group.getGroupId(),
-				_portal.getClassNameId(JournalArticle.class.getName()),
-				journalArticle.getResourcePrimKey());
-
-		Assert.assertNotNull(assetDisplayPageEntry);
-
-		Assert.assertEquals(
-			layoutPageTemplateEntry.getLayoutPageTemplateEntryId(),
-			assetDisplayPageEntry.getLayoutPageTemplateEntryId());
-	}
-
-	@Test
 	public void testDeleteDDMStructurePredefinedValues() throws Exception {
 		Tuple tuple = _createJournalArticleWithPredefinedValues("Test Article");
 
@@ -295,11 +256,11 @@ public class JournalArticleLocalServiceTest {
 	@Test(expected = DuplicateArticleIdException.class)
 	public void testDuplicatedArticleId() throws Exception {
 		JournalArticle article = JournalTestUtil.addArticle(
-			_group.getGroupId(),
-			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+			RandomTestUtil.randomString(), _group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, null, true);
 
 		JournalTestUtil.addArticle(
-			_group.getGroupId(),
+			RandomTestUtil.randomString(), _group.getGroupId(),
 			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			article.getArticleId(), false);
 	}
@@ -312,6 +273,18 @@ public class JournalArticleLocalServiceTest {
 
 		JournalTestUtil.addArticle(
 			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			article.getArticleId(), true);
+	}
+
+	@Test(expected = DuplicateArticleExternalReferenceCodeException.class)
+	public void testDuplicatedExternalReferenceCode() throws Exception {
+		JournalArticle article = JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		JournalTestUtil.addArticle(
+			article.getExternalReferenceCode(), _group.getGroupId(),
 			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			article.getArticleId(), true);
 	}
@@ -474,39 +447,27 @@ public class JournalArticleLocalServiceTest {
 		Assert.assertEquals(
 			actualDDMStructure.getStructureId(), ddmStructure.getStructureId());
 
-		DDMFormField actualDDMFormField = actualDDMStructure.getDDMFormField(
-			"name");
+		Fields fields = _journalConverter.getDDMFields(
+			ddmStructure, journalArticle.getContent());
 
-		Assert.assertNotNull(actualDDMFormField);
+		Field field = fields.get("name");
 
-		LocalizedValue actualDDMFormFieldPredefinedValue =
-			actualDDMFormField.getPredefinedValue();
-
-		Assert.assertEquals(
-			"Valor Predefinido",
-			actualDDMFormFieldPredefinedValue.getString(LocaleUtil.BRAZIL));
-		Assert.assertEquals(
-			"Valeur Prédéfinie",
-			actualDDMFormFieldPredefinedValue.getString(LocaleUtil.FRENCH));
-		Assert.assertEquals(
-			"Valor Predefinido",
-			actualDDMFormFieldPredefinedValue.getString(LocaleUtil.SPAIN));
-		Assert.assertEquals(
-			"Predefined Value",
-			actualDDMFormFieldPredefinedValue.getString(LocaleUtil.US));
-
-		Locale unavailableLocale = LocaleUtil.ITALY;
+		Assert.assertNotNull(field);
 
 		Assert.assertEquals(
-			"Predefined Value",
-			actualDDMFormFieldPredefinedValue.getString(unavailableLocale));
+			"Valor Predefinido", field.getValue(LocaleUtil.BRAZIL));
+		Assert.assertEquals(
+			"Valeur Prédéfinie", field.getValue(LocaleUtil.FRENCH));
+		Assert.assertEquals(
+			"Valore Predefinito", field.getValue(LocaleUtil.ITALY));
+		Assert.assertEquals("Predefined Value", field.getValue(LocaleUtil.US));
 	}
 
 	private Tuple _createJournalArticleWithPredefinedValues(String title)
 		throws Exception {
 
 		Set<Locale> availableLocales = DDMFormTestUtil.createAvailableLocales(
-			LocaleUtil.BRAZIL, LocaleUtil.FRENCH, LocaleUtil.SPAIN,
+			LocaleUtil.BRAZIL, LocaleUtil.FRENCH, LocaleUtil.ITALY,
 			LocaleUtil.US);
 
 		DDMForm ddmForm = DDMFormTestUtil.createDDMForm(
@@ -519,7 +480,7 @@ public class JournalArticleLocalServiceTest {
 
 		label.addString(LocaleUtil.BRAZIL, "rótulo");
 		label.addString(LocaleUtil.FRENCH, "étiquette");
-		label.addString(LocaleUtil.SPAIN, "etiqueta");
+		label.addString(LocaleUtil.ITALY, "etichetta");
 		label.addString(LocaleUtil.US, "label");
 
 		ddmFormField.setLabel(label);
@@ -532,7 +493,7 @@ public class JournalArticleLocalServiceTest {
 		DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
 			_group.getGroupId(), ddmStructure.getStructureId(),
 			PortalUtil.getClassNameId(JournalArticle.class),
-			TemplateConstants.LANG_TYPE_VM,
+			TemplateConstants.LANG_TYPE_FTL,
 			JournalTestUtil.getSampleTemplateXSL(), LocaleUtil.US);
 
 		String content = DDMStructureTestUtil.getSampleStructuredContent(
@@ -541,7 +502,7 @@ public class JournalArticleLocalServiceTest {
 			).put(
 				LocaleUtil.FRENCH, "Valeur Prédéfinie"
 			).put(
-				LocaleUtil.SPAIN, "Valor Predefinido"
+				LocaleUtil.ITALY, "Valore Predefinito"
 			).put(
 				LocaleUtil.US, "Predefined Value"
 			).build(),
@@ -589,6 +550,9 @@ public class JournalArticleLocalServiceTest {
 
 	@Inject
 	private JournalArticleLocalService _journalArticleLocalService;
+
+	@Inject
+	private JournalConverter _journalConverter;
 
 	@Inject
 	private LayoutPageTemplateEntryLocalService

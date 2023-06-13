@@ -25,19 +25,28 @@ String orderByCol = ParamUtil.getString(request, "orderByCol");
 String orderByType = ParamUtil.getString(request, "orderByType");
 String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 
-PortletURL portletURL = liferayPortletResponse.createRenderURL();
-
-portletURL.setParameter("mvcRenderCommandName", "exportLayoutsView");
-portletURL.setParameter("groupId", String.valueOf(groupId));
-portletURL.setParameter("privateLayout", String.valueOf(privateLayout));
-portletURL.setParameter("displayStyle", displayStyle);
-portletURL.setParameter("navigation", navigation);
-portletURL.setParameter("orderByCol", orderByCol);
-portletURL.setParameter("orderByType", orderByType);
-portletURL.setParameter("searchContainerId", searchContainerId);
+PortletURL portletURL = PortletURLBuilder.createRenderURL(
+	liferayPortletResponse
+).setMVCRenderCommandName(
+	"/export_import/view_export_layouts"
+).setNavigation(
+	navigation
+).setParameter(
+	"displayStyle", displayStyle
+).setParameter(
+	"groupId", groupId
+).setParameter(
+	"orderByCol", orderByCol
+).setParameter(
+	"orderByType", orderByType
+).setParameter(
+	"privateLayout", privateLayout
+).setParameter(
+	"searchContainerId", searchContainerId
+).buildPortletURL();
 %>
 
-<portlet:actionURL name="deleteBackgroundTasks" var="deleteBackgroundTasksURL">
+<portlet:actionURL name="/export_import/delete_layout_export_background_tasks" var="deleteBackgroundTasksURL">
 	<portlet:param name="redirect" value="<%= currentURL.toString() %>" />
 </portlet:actionURL>
 
@@ -130,9 +139,7 @@ portletURL.setParameter("searchContainerId", searchContainerId);
 							</span>
 
 							<%
-							List<FileEntry> attachmentsFileEntries = backgroundTask.getAttachmentsFileEntries();
-
-							for (FileEntry fileEntry : attachmentsFileEntries) {
+							for (FileEntry fileEntry : backgroundTask.getAttachmentsFileEntries()) {
 							%>
 
 								<liferay-ui:icon
@@ -172,7 +179,7 @@ portletURL.setParameter("searchContainerId", searchContainerId);
 								}
 								%>
 
-								<div class="active progress progress-xs">
+								<div class="active progress">
 									<div class="progress-bar" style="width: <%= percentage %>%;">
 										<c:if test="<%= allProgressBarCountersTotal > 0 %>">
 											<%= percentage + StringPool.PERCENT %>
@@ -233,7 +240,7 @@ portletURL.setParameter("searchContainerId", searchContainerId);
 						cssClass="table-cell-expand table-cell-minw-200 table-title"
 						name="title"
 					>
-						<span id="<portlet:namespace />backgroundTaskName<%= String.valueOf(backgroundTask.getBackgroundTaskId()) %>">
+						<span id="<%= liferayPortletResponse.getNamespace() + "backgroundTaskName" + String.valueOf(backgroundTask.getBackgroundTaskId()) %>">
 							<liferay-ui:message key="<%= HtmlUtil.escape(backgroundTaskName) %>" />
 						</span>
 					</liferay-ui:search-container-column-text>
@@ -268,9 +275,7 @@ portletURL.setParameter("searchContainerId", searchContainerId);
 					>
 
 						<%
-						List<FileEntry> attachmentsFileEntries = backgroundTask.getAttachmentsFileEntries();
-
-						for (FileEntry fileEntry : attachmentsFileEntries) {
+						for (FileEntry fileEntry : backgroundTask.getAttachmentsFileEntries()) {
 							StringBundler sb = new StringBundler(4);
 
 							sb.append(fileEntry.getTitle());
@@ -305,8 +310,8 @@ portletURL.setParameter("searchContainerId", searchContainerId);
 						markupView="lexicon"
 						showWhenSingleIcon="<%= true %>"
 					>
-						<portlet:actionURL name="editExportConfiguration" var="relaunchURL">
-							<portlet:param name="mvcRenderCommandName" value="exportLayoutsView" />
+						<portlet:actionURL name="/export_import/edit_export_configuration" var="relaunchURL">
+							<portlet:param name="mvcRenderCommandName" value="/export_import/view_export_layouts" />
 							<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RELAUNCH %>" />
 							<portlet:param name="redirect" value="<%= portletURL.toString() %>" />
 							<portlet:param name="backgroundTaskId" value="<%= String.valueOf(backgroundTask.getBackgroundTaskId()) %>" />
@@ -319,7 +324,7 @@ portletURL.setParameter("searchContainerId", searchContainerId);
 							url="<%= relaunchURL %>"
 						/>
 
-						<portlet:actionURL name="deleteBackgroundTasks" var="deleteBackgroundTaskURL">
+						<portlet:actionURL name="/export_import/delete_layout_export_background_tasks" var="deleteBackgroundTaskURL">
 							<portlet:param name="redirect" value="<%= portletURL.toString() %>" />
 							<portlet:param name="deleteBackgroundTaskIds" value="<%= String.valueOf(backgroundTask.getBackgroundTaskId()) %>" />
 						</portlet:actionURL>
@@ -347,36 +352,16 @@ portletURL.setParameter("searchContainerId", searchContainerId);
 </aui:form>
 
 <%
-int incompleteBackgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupId, BackgroundTaskExecutorNames.LAYOUT_EXPORT_BACKGROUND_TASK_EXECUTOR, false);
+int incompleteBackgroundTaskCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupId, BackgroundTaskExecutorNames.LAYOUT_EXPORT_BACKGROUND_TASK_EXECUTOR, false);
 %>
 
 <div class="hide incomplete-process-message">
 	<liferay-util:include page="/incomplete_processes_message.jsp" servletContext="<%= application %>">
-		<liferay-util:param name="incompleteBackgroundTasksCount" value="<%= String.valueOf(incompleteBackgroundTasksCount) %>" />
+		<liferay-util:param name="incompleteBackgroundTaskCount" value="<%= String.valueOf(incompleteBackgroundTaskCount) %>" />
 	</liferay-util:include>
 </div>
 
 <script>
-	function <portlet:namespace />deleteEntries() {
-		if (
-			confirm(
-				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-selected-entries") %>'
-			)
-		) {
-			var form = document.<portlet:namespace />fm;
-
-			Liferay.Util.postForm(form, {
-				data: {
-					<%= Constants.CMD %>: '<%= Constants.DELETE %>',
-					deleteBackgroundTaskIds: Liferay.Util.listCheckedExcept(
-						form,
-						'<portlet:namespace />allRowIds'
-					),
-				},
-			});
-		}
-	}
-
 	function <portlet:namespace />viewBackgroundTaskDetails(backgroundTaskId) {
 		var title = '';
 

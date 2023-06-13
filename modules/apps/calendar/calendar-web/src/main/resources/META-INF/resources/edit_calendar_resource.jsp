@@ -40,7 +40,7 @@ if (calendarResource != null) {
 
 <liferay-portlet:actionURL name="updateCalendarResource" var="updateCalendarResourceURL" />
 
-<aui:form action="<%= updateCalendarResourceURL %>" cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "updateCalendarResource();" %>'>
+<aui:form action="<%= updateCalendarResourceURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "updateCalendarResource();" %>'>
 	<aui:input name="mvcPath" type="hidden" value="/edit_calendar_resource.jsp" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="calendarResourceId" type="hidden" value="<%= String.valueOf(calendarResourceId) %>" />
@@ -59,12 +59,14 @@ if (calendarResource != null) {
 		<aui:input name="name" />
 
 		<liferay-ui:panel-container
+			cssClass="panel-group-flush panel-group-sm"
 			extended="<%= true %>"
 			id="calendarResourceDetailsPanelContainer"
 			persistState="<%= true %>"
 		>
 			<liferay-ui:panel
 				collapsible="<%= true %>"
+				cssClass="panel-unstyled"
 				defaultState="closed"
 				extended="<%= false %>"
 				id="calendarResourceDetailsPanel"
@@ -106,6 +108,7 @@ if (calendarResource != null) {
 
 			<liferay-ui:panel
 				collapsible="<%= true %>"
+				cssClass="panel-unstyled"
 				defaultState="closed"
 				extended="<%= false %>"
 				id="calendarResourceCategorizationPanel"
@@ -128,6 +131,7 @@ if (calendarResource != null) {
 			<c:if test="<%= calendarResource == null %>">
 				<liferay-ui:panel
 					collapsible="<%= true %>"
+					cssClass="panel-unstyled"
 					defaultState="closed"
 					extended="<%= false %>"
 					id="calendarResourcePermissionsPanel"

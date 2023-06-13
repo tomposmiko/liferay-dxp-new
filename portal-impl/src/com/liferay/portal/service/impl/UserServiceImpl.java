@@ -15,7 +15,8 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.announcements.kernel.model.AnnouncementsDelivery;
-import com.liferay.portal.kernel.change.tracking.CTAware;
+import com.liferay.announcements.kernel.service.AnnouncementsDeliveryService;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.RequiredUserException;
@@ -50,7 +51,12 @@ import com.liferay.portal.kernel.security.membershippolicy.SiteMembershipPolicyU
 import com.liferay.portal.kernel.security.membershippolicy.UserGroupMembershipPolicyUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.OrganizationLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserGroupLocalService;
+import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.service.permission.OrganizationPermissionUtil;
 import com.liferay.portal.kernel.service.permission.PasswordPolicyPermissionUtil;
@@ -60,6 +66,12 @@ import com.liferay.portal.kernel.service.permission.TeamPermissionUtil;
 import com.liferay.portal.kernel.service.permission.UserGroupPermissionUtil;
 import com.liferay.portal.kernel.service.permission.UserGroupRolePermissionUtil;
 import com.liferay.portal.kernel.service.permission.UserPermissionUtil;
+import com.liferay.portal.kernel.service.persistence.CompanyPersistence;
+import com.liferay.portal.kernel.service.persistence.GroupPersistence;
+import com.liferay.portal.kernel.service.persistence.OrganizationPersistence;
+import com.liferay.portal.kernel.service.persistence.RolePersistence;
+import com.liferay.portal.kernel.service.persistence.UserGroupPersistence;
+import com.liferay.portal.kernel.service.persistence.UserGroupRolePersistence;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -124,7 +136,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 				User user = getUser();
 
 				if (user.getUserId() == userIds[0]) {
-					Group group = groupPersistence.findByPrimaryKey(groupId);
+					Group group = _groupPersistence.findByPrimaryKey(groupId);
 
 					if (user.getCompanyId() == group.getCompanyId()) {
 						int type = group.getType();
@@ -178,6 +190,91 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 
 		OrganizationMembershipPolicyUtil.propagateMembership(
 			userIds, new long[] {organizationId}, null);
+	}
+
+	@Override
+	public User addOrUpdateUser(
+			String externalReferenceCode, long creatorUserId, long companyId,
+			boolean autoPassword, String password1, String password2,
+			boolean autoScreenName, String screenName, String emailAddress,
+			Locale locale, String firstName, String middleName, String lastName,
+			long prefixId, long suffixId, boolean male, int birthdayMonth,
+			int birthdayDay, int birthdayYear, String jobTitle,
+			List<Address> addresses, List<EmailAddress> emailAddresses,
+			List<Phone> phones, List<Website> websites, boolean sendEmail,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		boolean workflowEnabled = WorkflowThreadLocal.isEnabled();
+
+		try {
+			WorkflowThreadLocal.setEnabled(false);
+
+			User user = userLocalService.fetchUserByExternalReferenceCode(
+				companyId, externalReferenceCode);
+
+			if (user == null) {
+				checkAddUserPermission(
+					creatorUserId, companyId, emailAddress, new long[0],
+					new long[0], new long[0], new long[0], serviceContext);
+			}
+			else {
+				UserPermissionUtil.check(
+					getPermissionChecker(), user.getUserId(), null,
+					ActionKeys.UPDATE);
+
+				validateUpdatePermission(
+					user, screenName, emailAddress, firstName, middleName,
+					lastName, prefixId, suffixId, birthdayMonth, birthdayDay,
+					birthdayYear, male, jobTitle);
+
+				long curUserId = getUserId();
+
+				if (curUserId == user.getUserId()) {
+					emailAddress = StringUtil.toLowerCase(
+						StringUtil.trim(emailAddress));
+
+					if (!StringUtil.equalsIgnoreCase(
+							emailAddress, user.getEmailAddress())) {
+
+						validateEmailAddress(user, emailAddress);
+					}
+				}
+			}
+
+			user = userLocalService.addOrUpdateUser(
+				externalReferenceCode, creatorUserId, companyId, autoPassword,
+				password1, password2, autoScreenName, screenName, emailAddress,
+				locale, firstName, middleName, lastName, prefixId, suffixId,
+				male, birthdayMonth, birthdayDay, birthdayYear, jobTitle,
+				sendEmail, serviceContext);
+
+			if (addresses != null) {
+				UsersAdminUtil.updateAddresses(
+					Contact.class.getName(), user.getContactId(), addresses);
+			}
+
+			if (emailAddresses != null) {
+				UsersAdminUtil.updateEmailAddresses(
+					Contact.class.getName(), user.getContactId(),
+					emailAddresses);
+			}
+
+			if (phones != null) {
+				UsersAdminUtil.updatePhones(
+					Contact.class.getName(), user.getContactId(), phones);
+			}
+
+			if (websites != null) {
+				UsersAdminUtil.updateWebsites(
+					Contact.class.getName(), user.getContactId(), websites);
+			}
+
+			return user;
+		}
+		finally {
+			WorkflowThreadLocal.setEnabled(workflowEnabled);
+		}
 	}
 
 	/**
@@ -1194,7 +1291,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 				permissionChecker, User.class.getName(), 0, ActionKeys.VIEW);
 		}
 
-		return userPersistence.findByU_C(
+		return userPersistence.findByGtU_C(
 			gtUserId, companyId, 0, size, new UserIdComparator(true));
 	}
 
@@ -1203,7 +1300,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			long gtUserId, long organizationId, int size)
 		throws PortalException {
 
-		Organization organization = organizationPersistence.findByPrimaryKey(
+		Organization organization = _organizationPersistence.findByPrimaryKey(
 			organizationId);
 
 		PermissionChecker permissionChecker = getPermissionChecker();
@@ -1226,7 +1323,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			long gtUserId, long userGroupId, int size)
 		throws PortalException {
 
-		UserGroup userGroup = userGroupPersistence.findByPrimaryKey(
+		UserGroup userGroup = _userGroupPersistence.findByPrimaryKey(
 			userGroupId);
 
 		PermissionChecker permissionChecker = getPermissionChecker();
@@ -1405,6 +1502,27 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	}
 
 	/**
+	 * Returns the user with the external reference code.
+	 *
+	 * @param  companyId the primary key of the user's company
+	 * @param  externalReferenceCode the user's external reference code
+	 * @return the user with the external reference code
+	 */
+	@Override
+	public User getUserByExternalReferenceCode(
+			long companyId, String externalReferenceCode)
+		throws PortalException {
+
+		User user = userLocalService.getUserByExternalReferenceCode(
+			companyId, externalReferenceCode);
+
+		UserPermissionUtil.check(
+			getPermissionChecker(), user.getUserId(), ActionKeys.VIEW);
+
+		return user;
+	}
+
+	/**
 	 * Returns the user with the primary key.
 	 *
 	 * @param  userId the primary key of the user
@@ -1446,7 +1564,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 		UserGroupPermissionUtil.check(
 			getPermissionChecker(), userGroupId, ActionKeys.VIEW_MEMBERS);
 
-		return userGroupPersistence.getUsers(userGroupId);
+		return _userGroupPersistence.getUsers(userGroupId);
 	}
 
 	@Override
@@ -1562,7 +1680,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 		if (!UserPermissionUtil.contains(
 				getPermissionChecker(), userId, ActionKeys.VIEW)) {
 
-			Role role = roleLocalService.getRole(companyId, name);
+			Role role = _roleLocalService.getRole(companyId, name);
 
 			RolePermissionUtil.check(
 				getPermissionChecker(), role.getRoleId(),
@@ -1668,7 +1786,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			getPermissionChecker(), roleId, ActionKeys.ASSIGN_MEMBERS);
 
 		Set<Long> unsetUserIds = SetUtil.fromArray(
-			rolePersistence.getUserPrimaryKeys(roleId));
+			_rolePersistence.getUserPrimaryKeys(roleId));
 
 		unsetUserIds.removeAll(SetUtil.fromArray(userIds));
 
@@ -1710,7 +1828,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			getPermissionChecker(), userGroupId, ActionKeys.ASSIGN_MEMBERS);
 
 		Set<Long> unsetUserIds = SetUtil.fromArray(
-			userGroupPersistence.getUserPrimaryKeys(userGroupId));
+			_userGroupPersistence.getUserPrimaryKeys(userGroupId));
 
 		unsetUserIds.removeAll(SetUtil.fromArray(userIds));
 
@@ -1792,7 +1910,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 				User user = getUser();
 
 				if (user.getUserId() == userIds[0]) {
-					Group group = groupPersistence.findByPrimaryKey(groupId);
+					Group group = _groupPersistence.findByPrimaryKey(groupId);
 
 					if (user.getCompanyId() == group.getCompanyId()) {
 						int type = group.getType();
@@ -1950,7 +2068,6 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	 * @param  agreedToTermsOfUse whether the user has agree to the terms of use
 	 * @return the user
 	 */
-	@CTAware(onProduction = true)
 	@Override
 	public User updateAgreedToTermsOfUse(
 			long userId, boolean agreedToTermsOfUse)
@@ -2210,7 +2327,6 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	 *         password the next time they log in
 	 * @return the user
 	 */
-	@CTAware(onProduction = true)
 	@Override
 	public User updatePassword(
 			long userId, String password1, String password2,
@@ -2249,7 +2365,6 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 	 * @param  answer the user's new password reset answer
 	 * @return the user
 	 */
-	@CTAware(onProduction = true)
 	@Override
 	public User updateReminderQuery(long userId, String question, String answer)
 		throws PortalException {
@@ -2516,7 +2631,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 		List<UserGroupRole> oldSiteUserGroupRoles = new ArrayList<>();
 
 		List<UserGroupRole> oldUserGroupRoles =
-			userGroupRolePersistence.findByUserId(userId);
+			_userGroupRolePersistence.findByUserId(userId);
 
 		for (UserGroupRole oldUserGroupRole : oldUserGroupRoles) {
 			Role role = oldUserGroupRole.getRole();
@@ -2884,7 +2999,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 		List<UserGroupRole> oldSiteUserGroupRoles = new ArrayList<>();
 
 		List<UserGroupRole> oldUserGroupRoles =
-			userGroupRolePersistence.findByUserId(userId);
+			_userGroupRolePersistence.findByUserId(userId);
 
 		for (UserGroupRole oldUserGroupRole : oldUserGroupRoles) {
 			Role role = oldUserGroupRole.getRole();
@@ -3191,7 +3306,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			long[] userGroupIds, ServiceContext serviceContext)
 		throws PortalException {
 
-		Company company = companyPersistence.findByPrimaryKey(companyId);
+		Company company = _companyPersistence.findByPrimaryKey(companyId);
 
 		if (groupIds != null) {
 			checkGroups(0, groupIds);
@@ -3264,7 +3379,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 
 			User user = userPersistence.findByPrimaryKey(userId);
 
-			List<Group> oldGroups = groupLocalService.getUserGroups(userId);
+			List<Group> oldGroups = _groupLocalService.getUserGroups(userId);
 
 			oldGroupIds = new long[oldGroups.size()];
 
@@ -3297,7 +3412,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 				continue;
 			}
 
-			Group group = groupPersistence.findByPrimaryKey(groupId);
+			Group group = _groupPersistence.findByPrimaryKey(groupId);
 
 			GroupPermissionUtil.check(
 				permissionChecker, group, ActionKeys.ASSIGN_MEMBERS);
@@ -3344,7 +3459,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			// he has the permission to add a new organization
 
 			List<Organization> oldOrganizations =
-				organizationLocalService.getUserOrganizations(userId);
+				_organizationLocalService.getUserOrganizations(userId);
 
 			oldOrganizationIds = new long[oldOrganizations.size()];
 
@@ -3381,7 +3496,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			}
 
 			Organization organization =
-				organizationPersistence.findByPrimaryKey(organizationId);
+				_organizationPersistence.findByPrimaryKey(organizationId);
 
 			OrganizationPermissionUtil.check(
 				permissionChecker, organization, ActionKeys.ASSIGN_MEMBERS);
@@ -3403,7 +3518,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			// not have the rights to remove and check that he has the
 			// permission to add a new role
 
-			List<Role> oldRoles = roleLocalService.getUserRoles(userId);
+			List<Role> oldRoles = _roleLocalService.getUserRoles(userId);
 
 			oldRoleIds = new long[oldRoles.size()];
 
@@ -3458,7 +3573,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			// rights to remove or that have a mandatory membership
 
 			List<UserGroup> oldUserGroups =
-				userGroupLocalService.getUserUserGroups(userId);
+				_userGroupLocalService.getUserUserGroups(userId);
 
 			oldUserGroupIds = new long[oldUserGroups.size()];
 
@@ -3509,7 +3624,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			// Add back any user group roles that the administrator does not
 			// have the rights to remove or that have a mandatory membership
 
-			oldUserGroupRoles = userGroupRoleLocalService.getUserGroupRoles(
+			oldUserGroupRoles = _userGroupRoleLocalService.getUserGroupRoles(
 				userId);
 
 			for (UserGroupRole oldUserGroupRole : oldUserGroupRoles) {
@@ -3522,7 +3637,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 
 				if (role.getType() == RoleConstants.TYPE_ORGANIZATION) {
 					Organization organization =
-						organizationPersistence.findByPrimaryKey(
+						_organizationPersistence.findByPrimaryKey(
 							group.getOrganizationId());
 
 					if (!UserGroupRolePermissionUtil.contains(
@@ -3602,7 +3717,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 		for (AnnouncementsDelivery announcementsDelivery :
 				announcementsDeliveries) {
 
-			announcementsDeliveryService.updateDelivery(
+			_announcementsDeliveryService.updateDelivery(
 				userId, announcementsDelivery.getType(),
 				announcementsDelivery.isEmail(), announcementsDelivery.isSms());
 		}
@@ -3612,7 +3727,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 		throws PortalException {
 
 		if (!user.hasCompanyMx() && user.hasCompanyMx(emailAddress)) {
-			Company company = companyPersistence.findByPrimaryKey(
+			Company company = _companyPersistence.findByPrimaryKey(
 				user.getCompanyId());
 
 			if (company.isStrangers() && !company.isStrangersWithMx()) {
@@ -3637,7 +3752,7 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 			boolean allowed = false;
 
 			List<Organization> organizations =
-				organizationLocalService.getUserOrganizations(userId);
+				_organizationLocalService.getUserOrganizations(userId);
 
 			for (Organization organization : organizations) {
 				if (OrganizationPermissionUtil.contains(
@@ -3735,5 +3850,41 @@ public class UserServiceImpl extends UserServiceBaseImpl {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		UserServiceImpl.class);
+
+	@BeanReference(type = AnnouncementsDeliveryService.class)
+	private AnnouncementsDeliveryService _announcementsDeliveryService;
+
+	@BeanReference(type = CompanyPersistence.class)
+	private CompanyPersistence _companyPersistence;
+
+	@BeanReference(type = GroupLocalService.class)
+	private GroupLocalService _groupLocalService;
+
+	@BeanReference(type = GroupPersistence.class)
+	private GroupPersistence _groupPersistence;
+
+	@BeanReference(type = OrganizationLocalService.class)
+	private OrganizationLocalService _organizationLocalService;
+
+	@BeanReference(type = OrganizationPersistence.class)
+	private OrganizationPersistence _organizationPersistence;
+
+	@BeanReference(type = RoleLocalService.class)
+	private RoleLocalService _roleLocalService;
+
+	@BeanReference(type = RolePersistence.class)
+	private RolePersistence _rolePersistence;
+
+	@BeanReference(type = UserGroupLocalService.class)
+	private UserGroupLocalService _userGroupLocalService;
+
+	@BeanReference(type = UserGroupPersistence.class)
+	private UserGroupPersistence _userGroupPersistence;
+
+	@BeanReference(type = UserGroupRoleLocalService.class)
+	private UserGroupRoleLocalService _userGroupRoleLocalService;
+
+	@BeanReference(type = UserGroupRolePersistence.class)
+	private UserGroupRolePersistence _userGroupRolePersistence;
 
 }

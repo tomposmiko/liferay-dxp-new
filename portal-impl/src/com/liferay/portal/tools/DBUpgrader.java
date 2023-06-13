@@ -15,7 +15,7 @@
 package com.liferay.portal.tools;
 
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
-import com.liferay.petra.lang.SafeClosable;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.dao.orm.common.SQLTransformer;
 import com.liferay.portal.events.StartupHelperUtil;
@@ -31,12 +31,14 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
 import com.liferay.portal.kernel.model.ReleaseConstants;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
+import com.liferay.portal.kernel.module.util.ServiceLatch;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.version.Version;
-import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
+import com.liferay.portal.module.framework.ModuleFrameworkUtil;
 import com.liferay.portal.transaction.TransactionsUtil;
 import com.liferay.portal.upgrade.PortalUpgradeProcess;
 import com.liferay.portal.util.InitUtil;
@@ -46,8 +48,6 @@ import com.liferay.portal.verify.VerifyException;
 import com.liferay.portal.verify.VerifyGroup;
 import com.liferay.portal.verify.VerifyProperties;
 import com.liferay.portal.verify.VerifyResourcePermissions;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.sql.Connection;
@@ -56,6 +56,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.logging.log4j.core.Appender;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 import org.springframework.context.ApplicationContext;
 
@@ -70,16 +74,13 @@ public class DBUpgrader {
 			return;
 		}
 
-		StringBundler sb = new StringBundler(6);
-
-		sb.append("The database contains changes from a previous upgrade ");
-		sb.append("attempt that failed. Please restore the old database and ");
-		sb.append("file system and retry the upgrade. A patch may be ");
-		sb.append("required if the upgrade failed due to a bug or an ");
-		sb.append("unforeseen data permutation that resulted from a corrupt ");
-		sb.append("database.");
-
-		throw new IllegalStateException(sb.toString());
+		throw new IllegalStateException(
+			StringBundler.concat(
+				"The database contains changes from a previous upgrade ",
+				"attempt that failed. Please restore the old database and ",
+				"file system and retry the upgrade. A patch may be required ",
+				"if the upgrade failed due to a bug or an unforeseen data ",
+				"permutation that resulted from a corrupt database."));
 	}
 
 	public static void checkRequiredBuildNumber(int requiredBuildNumber)
@@ -88,16 +89,12 @@ public class DBUpgrader {
 		int buildNumber = _getReleaseColumnValue("buildNumber");
 
 		if (buildNumber > ReleaseInfo.getParentBuildNumber()) {
-			StringBundler sb = new StringBundler(6);
-
-			sb.append("Attempting to deploy an older Liferay Portal version. ");
-			sb.append("Current build number is ");
-			sb.append(buildNumber);
-			sb.append(" and attempting to deploy number ");
-			sb.append(ReleaseInfo.getParentBuildNumber());
-			sb.append(".");
-
-			throw new IllegalStateException(sb.toString());
+			throw new IllegalStateException(
+				StringBundler.concat(
+					"Attempting to deploy an older Liferay Portal version. ",
+					"Current build number is ", buildNumber,
+					" and attempting to deploy number ",
+					ReleaseInfo.getParentBuildNumber(), "."));
 		}
 		else if (buildNumber < requiredBuildNumber) {
 			String msg =
@@ -122,23 +119,34 @@ public class DBUpgrader {
 
 			StartupHelperUtil.printPatchLevel();
 
-			upgrade();
+			try (SafeCloseable safeCloseable =
+					ProxyModeThreadLocal.setWithSafeCloseable(false)) {
+
+				if (PropsValues.UPGRADE_REPORT_ENABLED) {
+					_startUpgradeReportLogAppender();
+				}
+
+				upgrade();
+			}
 
 			_registerModuleServiceLifecycle("portlets.initialized");
 
 			System.out.println(
 				"\nCompleted Liferay core upgrade process in " +
 					(stopWatch.getTime() / Time.SECOND) + " seconds");
-
-			System.out.println(
-				"Running modules upgrades. Connect to Gogo shell to check " +
-					"the status.");
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			exception.printStackTrace();
 
 			System.exit(1);
 		}
+		finally {
+			if (PropsValues.UPGRADE_REPORT_ENABLED) {
+				_stopUpgradeReportLogAppender();
+			}
+		}
+
+		System.out.println("Exiting DBUpgrader#main(String[]).");
 	}
 
 	public static void upgrade() throws Exception {
@@ -150,16 +158,14 @@ public class DBUpgrader {
 
 		StartupHelperUtil.setUpgrading(true);
 
-		try (SafeClosable safeClosable =
-				ProxyModeThreadLocal.setWithSafeClosable(false)) {
+		_upgradePortal();
 
-			_upgradePortal();
+		DLFileEntryTypeLocalServiceUtil.getBasicDocumentDLFileEntryType();
 
+		_upgradeModules(applicationContext);
+
+		if (applicationContext == null) {
 			DependencyManagerSyncUtil.sync();
-
-			DLFileEntryTypeLocalServiceUtil.getBasicDocumentDLFileEntryType();
-
-			_upgradeModules(applicationContext);
 		}
 	}
 
@@ -212,16 +218,16 @@ public class DBUpgrader {
 	private static int _getReleaseColumnValue(String columnName)
 		throws Exception {
 
-		try (Connection con = DataAccess.getConnection();
-			PreparedStatement ps = con.prepareStatement(
+		try (Connection connection = DataAccess.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(
 				"select " + columnName +
 					" from Release_ where releaseId = ?")) {
 
-			ps.setLong(1, ReleaseConstants.DEFAULT_ID);
+			preparedStatement.setLong(1, ReleaseConstants.DEFAULT_ID);
 
-			try (ResultSet rs = ps.executeQuery()) {
-				if (rs.next()) {
-					return rs.getInt(columnName);
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				if (resultSet.next()) {
+					return resultSet.getInt(columnName);
 				}
 			}
 
@@ -234,19 +240,48 @@ public class DBUpgrader {
 	private static void _registerModuleServiceLifecycle(
 		String moduleServiceLifecycle) {
 
-		Registry registry = RegistryUtil.getRegistry();
+		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
 
-		registry.registerService(
+		bundleContext.registerService(
 			ModuleServiceLifecycle.class,
 			new ModuleServiceLifecycle() {
 			},
-			HashMapBuilder.<String, Object>put(
+			HashMapDictionaryBuilder.<String, Object>put(
 				"module.service.lifecycle", moduleServiceLifecycle
 			).put(
 				"service.vendor", ReleaseInfo.getVendor()
 			).put(
 				"service.version", ReleaseInfo.getVersion()
 			).build());
+	}
+
+	private static void _startUpgradeReportLogAppender() {
+		ServiceLatch serviceLatch = SystemBundleUtil.newServiceLatch();
+
+		serviceLatch.<Appender>waitFor(
+			StringBundler.concat(
+				"(&(appender.name=UpgradeReportLogAppender)(objectClass=",
+				Appender.class.getName(), "))"),
+			appender -> {
+				_appender = appender;
+
+				_appender.start();
+			});
+		serviceLatch.openOn(
+			() -> {
+			});
+	}
+
+	private static void _stopUpgradeReportLogAppender() {
+		if (_appender != null) {
+			_appender.stop();
+		}
+
+		if (_appenderServiceReference != null) {
+			BundleContext bundleContext = SystemBundleUtil.getBundleContext();
+
+			bundleContext.ungetService(_appenderServiceReference);
+		}
 	}
 
 	private static void _updateCompanyKey() throws Exception {
@@ -257,33 +292,33 @@ public class DBUpgrader {
 
 	private static void _updateReleaseBuildInfo() throws Exception {
 		try (Connection connection = DataAccess.getConnection();
-			PreparedStatement ps = connection.prepareStatement(
+			PreparedStatement preparedStatement = connection.prepareStatement(
 				"update Release_ set buildNumber = ?, buildDate = ? where " +
 					"releaseId = ?")) {
 
-			ps.setInt(1, ReleaseInfo.getParentBuildNumber());
+			preparedStatement.setInt(1, ReleaseInfo.getParentBuildNumber());
 
 			java.util.Date buildDate = ReleaseInfo.getBuildDate();
 
-			ps.setDate(2, new Date(buildDate.getTime()));
+			preparedStatement.setDate(2, new Date(buildDate.getTime()));
 
-			ps.setLong(3, ReleaseConstants.DEFAULT_ID);
+			preparedStatement.setLong(3, ReleaseConstants.DEFAULT_ID);
 
-			ps.executeUpdate();
+			preparedStatement.executeUpdate();
 		}
 	}
 
 	private static void _updateReleaseState(int state) throws Exception {
-		try (Connection con = DataAccess.getConnection();
-			PreparedStatement ps = con.prepareStatement(
+		try (Connection connection = DataAccess.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(
 				"update Release_ set modifiedDate = ?, state_ = ? where " +
 					"releaseId = ?")) {
 
-			ps.setDate(1, new Date(System.currentTimeMillis()));
-			ps.setInt(2, state);
-			ps.setLong(3, ReleaseConstants.DEFAULT_ID);
+			preparedStatement.setDate(1, new Date(System.currentTimeMillis()));
+			preparedStatement.setInt(2, state);
+			preparedStatement.setLong(3, ReleaseConstants.DEFAULT_ID);
 
-			ps.executeUpdate();
+			preparedStatement.executeUpdate();
 		}
 	}
 
@@ -294,7 +329,7 @@ public class DBUpgrader {
 			InitUtil.registerContext();
 		}
 		else {
-			ModuleFrameworkUtilAdapter.registerContext(applicationContext);
+			ModuleFrameworkUtil.registerContext(applicationContext);
 		}
 
 		_registerModuleServiceLifecycle("portal.initialized");
@@ -376,5 +411,9 @@ public class DBUpgrader {
 	private static final Version _VERSION_7010 = new Version(0, 0, 6);
 
 	private static final Log _log = LogFactoryUtil.getLog(DBUpgrader.class);
+
+	private static volatile Appender _appender;
+	private static volatile ServiceReference<Appender>
+		_appenderServiceReference;
 
 }

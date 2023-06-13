@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -227,65 +228,86 @@ public class ReleaseModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Release, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Release>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Release, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Release, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Release.class.getClassLoader(), Release.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", Release::getMvccVersion);
-		attributeGetterFunctions.put("releaseId", Release::getReleaseId);
-		attributeGetterFunctions.put("createDate", Release::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", Release::getModifiedDate);
-		attributeGetterFunctions.put(
-			"servletContextName", Release::getServletContextName);
-		attributeGetterFunctions.put(
-			"schemaVersion", Release::getSchemaVersion);
-		attributeGetterFunctions.put("buildNumber", Release::getBuildNumber);
-		attributeGetterFunctions.put("buildDate", Release::getBuildDate);
-		attributeGetterFunctions.put("verified", Release::getVerified);
-		attributeGetterFunctions.put("state", Release::getState);
-		attributeGetterFunctions.put("testString", Release::getTestString);
+		try {
+			Constructor<Release> constructor =
+				(Constructor<Release>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Release, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Release, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Release, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Release, Object>>();
 		Map<String, BiConsumer<Release, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Release, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", Release::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion", (BiConsumer<Release, Long>)Release::setMvccVersion);
+		attributeGetterFunctions.put("releaseId", Release::getReleaseId);
 		attributeSetterBiConsumers.put(
 			"releaseId", (BiConsumer<Release, Long>)Release::setReleaseId);
+		attributeGetterFunctions.put("createDate", Release::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<Release, Date>)Release::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", Release::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<Release, Date>)Release::setModifiedDate);
+		attributeGetterFunctions.put(
+			"servletContextName", Release::getServletContextName);
 		attributeSetterBiConsumers.put(
 			"servletContextName",
 			(BiConsumer<Release, String>)Release::setServletContextName);
+		attributeGetterFunctions.put(
+			"schemaVersion", Release::getSchemaVersion);
 		attributeSetterBiConsumers.put(
 			"schemaVersion",
 			(BiConsumer<Release, String>)Release::setSchemaVersion);
+		attributeGetterFunctions.put("buildNumber", Release::getBuildNumber);
 		attributeSetterBiConsumers.put(
 			"buildNumber",
 			(BiConsumer<Release, Integer>)Release::setBuildNumber);
+		attributeGetterFunctions.put("buildDate", Release::getBuildDate);
 		attributeSetterBiConsumers.put(
 			"buildDate", (BiConsumer<Release, Date>)Release::setBuildDate);
+		attributeGetterFunctions.put("verified", Release::getVerified);
 		attributeSetterBiConsumers.put(
 			"verified", (BiConsumer<Release, Boolean>)Release::setVerified);
+		attributeGetterFunctions.put("state", Release::getState);
 		attributeSetterBiConsumers.put(
 			"state", (BiConsumer<Release, Integer>)Release::setState);
+		attributeGetterFunctions.put("testString", Release::getTestString);
 		attributeSetterBiConsumers.put(
 			"testString", (BiConsumer<Release, String>)Release::setTestString);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -553,6 +575,35 @@ public class ReleaseModelImpl
 	}
 
 	@Override
+	public Release cloneWithOriginalValues() {
+		ReleaseImpl releaseImpl = new ReleaseImpl();
+
+		releaseImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		releaseImpl.setReleaseId(
+			this.<Long>getColumnOriginalValue("releaseId"));
+		releaseImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		releaseImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		releaseImpl.setServletContextName(
+			this.<String>getColumnOriginalValue("servletContextName"));
+		releaseImpl.setSchemaVersion(
+			this.<String>getColumnOriginalValue("schemaVersion"));
+		releaseImpl.setBuildNumber(
+			this.<Integer>getColumnOriginalValue("buildNumber"));
+		releaseImpl.setBuildDate(
+			this.<Date>getColumnOriginalValue("buildDate"));
+		releaseImpl.setVerified(
+			this.<Boolean>getColumnOriginalValue("verified"));
+		releaseImpl.setState(this.<Integer>getColumnOriginalValue("state_"));
+		releaseImpl.setTestString(
+			this.<String>getColumnOriginalValue("testString"));
+
+		return releaseImpl;
+	}
+
+	@Override
 	public int compareTo(Release release) {
 		long primaryKey = release.getPrimaryKey();
 
@@ -774,9 +825,7 @@ public class ReleaseModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Release>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Release.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

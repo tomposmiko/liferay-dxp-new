@@ -532,13 +532,13 @@ public abstract class BaseCommerceOrderPriceCalculation
 	}
 
 	private boolean _greaterThanZero(BigDecimal value) {
-		if ((value == null) ||
-			CommerceBigDecimalUtil.lte(value, BigDecimal.ZERO)) {
+		if ((value != null) ||
+			CommerceBigDecimalUtil.gt(value, BigDecimal.ZERO)) {
 
-			return false;
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	private void _updateDiscounts(

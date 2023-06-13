@@ -20,6 +20,8 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -28,7 +30,9 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.trash.TrashHelper;
 import com.liferay.wiki.model.WikiNode;
@@ -94,6 +98,28 @@ public class WikiNodesManagementToolbarDisplayContext {
 		).build();
 	}
 
+	public Map<String, Object> getAdditionalProps() {
+		return HashMapBuilder.<String, Object>put(
+			"deleteNodesCmd",
+			() -> {
+				if (_isTrashEnabled()) {
+					return Constants.MOVE_TO_TRASH;
+				}
+
+				return Constants.DELETE;
+			}
+		).put(
+			"deleteNodesURL",
+			() -> PortletURLBuilder.createActionURL(
+				_liferayPortletResponse
+			).setActionName(
+				"/wiki/edit_node"
+			).buildString()
+		).put(
+			"trashEnabled", _isTrashEnabled()
+		).build();
+	}
+
 	public List<String> getAvailableActions(WikiNode wikiNode)
 		throws PortalException {
 
@@ -119,16 +145,14 @@ public class WikiNodesManagementToolbarDisplayContext {
 
 		return CreationMenuBuilder.addDropdownItem(
 			dropdownItem -> {
-				PortletURL viewNodesURL =
-					_liferayPortletResponse.createRenderURL();
-
-				viewNodesURL.setParameter(
-					"mvcRenderCommandName", "/wiki_admin/view");
-
 				dropdownItem.setHref(
 					_liferayPortletResponse.createRenderURL(),
 					"mvcRenderCommandName", "/wiki/edit_node", "redirect",
-					viewNodesURL.toString());
+					PortletURLBuilder.createRenderURL(
+						_liferayPortletResponse
+					).setMVCRenderCommandName(
+						"/wiki_admin/view"
+					).buildString());
 
 				dropdownItem.setLabel(
 					LanguageUtil.get(_httpServletRequest, "add-wiki"));
@@ -151,15 +175,14 @@ public class WikiNodesManagementToolbarDisplayContext {
 	}
 
 	public PortletURL getSortingURL() throws PortletException {
-		PortletURL sortingURL = _getPortletURL();
-
-		sortingURL.setParameter("orderByCol", _getOrderByCol());
-
-		sortingURL.setParameter(
+		return PortletURLBuilder.create(
+			_getPortletURL()
+		).setParameter(
+			"orderByCol", _getOrderByCol()
+		).setParameter(
 			"orderByType",
-			Objects.equals(_getOrderByType(), "asc") ? "desc" : "asc");
-
-		return sortingURL;
+			Objects.equals(_getOrderByType(), "asc") ? "desc" : "asc"
+		).buildPortletURL();
 	}
 
 	public int getTotalItems() {
@@ -226,12 +249,21 @@ public class WikiNodesManagementToolbarDisplayContext {
 	}
 
 	private PortletURL _getPortletURL() throws PortletException {
-		PortletURL portletURL = PortletURLUtil.clone(
-			_currentURLObj, _liferayPortletResponse);
+		return PortletURLBuilder.create(
+			PortletURLUtil.clone(_currentURLObj, _liferayPortletResponse)
+		).setMVCRenderCommandName(
+			"/wiki_admin/view"
+		).buildPortletURL();
+	}
 
-		portletURL.setParameter("mvcRenderCommandName", "/wiki_admin/view");
-
-		return portletURL;
+	private boolean _isTrashEnabled() {
+		try {
+			return _trashHelper.isTrashEnabled(
+				PortalUtil.getScopeGroupId(_httpServletRequest));
+		}
+		catch (PortalException portalException) {
+			return ReflectionUtil.throwException(portalException);
+		}
 	}
 
 	private final PortletURL _currentURLObj;

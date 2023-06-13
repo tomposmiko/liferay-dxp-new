@@ -99,7 +99,7 @@ if (feed != null) {
 	feedURL.setCacheability(ResourceURL.FULL);
 	feedURL.setParameter("groupId", String.valueOf(groupId));
 	feedURL.setParameter("feedId", String.valueOf(feedId));
-	feedURL.setResourceID("rss");
+	feedURL.setResourceID("/journal/rss");
 }
 
 portletDisplay.setShowBackIcon(true);
@@ -191,7 +191,7 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 			<liferay-frontend:fieldset
 				collapsed="<%= true %>"
 				collapsible="<%= true %>"
-				label="web-content-contraints"
+				label="web-content-constraints"
 			>
 				<div class="form-group">
 					<aui:input name="ddmStructureKey" required="<%= true %>" type="hidden" value="<%= ddmStructureKey %>" />
@@ -211,10 +211,10 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 						<aui:select label="template" name="ddmTemplateKey" showEmptyOption="<%= true %>">
 
 							<%
-							for (DDMTemplate ddmTemplate : ddmTemplates) {
+							for (DDMTemplate ddTemplate : ddmTemplates) {
 							%>
 
-								<aui:option label="<%= HtmlUtil.escape(ddmTemplate.getName(locale)) %>" selected="<%= Objects.equals(ddmTemplateKey, ddmTemplate.getTemplateKey()) %>" value="<%= ddmTemplate.getTemplateKey() %>" />
+								<aui:option label="<%= HtmlUtil.escape(ddTemplate.getName(locale)) %>" selected="<%= Objects.equals(ddmTemplateKey, ddTemplate.getTemplateKey()) %>" value="<%= ddTemplate.getTemplateKey() %>" />
 
 							<%
 							}
@@ -429,7 +429,7 @@ renderResponse.setTitle((feed == null) ? LanguageUtil.get(request, "new-feed") :
 	);
 
 	if (contentFieldSelector) {
-		contentFieldSelector.addEventListener('change', function () {
+		contentFieldSelector.addEventListener('change', () => {
 			var contentFieldValue = '';
 			var ddmRendererTemplateKeyValue = '';
 

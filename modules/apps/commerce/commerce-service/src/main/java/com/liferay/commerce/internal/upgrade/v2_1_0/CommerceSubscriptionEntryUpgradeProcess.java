@@ -25,11 +25,13 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Ethan Bustad
@@ -58,16 +60,16 @@ public class CommerceSubscriptionEntryUpgradeProcess
 
 		_addIndexes(CommerceSubscriptionEntryModelImpl.TABLE_NAME);
 
-		try (PreparedStatement ps = connection.prepareStatement(
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"update CommerceSubscriptionEntry set CProductId = ?," +
 					"CPInstanceUUID = ? where CPInstanceId = ?");
 			Statement s = connection.createStatement();
-			ResultSet rs = s.executeQuery(
+			ResultSet resultSet = s.executeQuery(
 				"select distinct CPInstanceId from " +
 					"CommerceSubscriptionEntry")) {
 
-			while (rs.next()) {
-				long cpInstanceId = rs.getLong("CPInstanceId");
+			while (resultSet.next()) {
+				long cpInstanceId = resultSet.getLong("CPInstanceId");
 
 				CPInstance cpInstance = _cpInstanceLocalService.getCPInstance(
 					cpInstanceId);
@@ -76,13 +78,13 @@ public class CommerceSubscriptionEntryUpgradeProcess
 					_cpDefinitionLocalService.getCPDefinition(
 						cpInstance.getCPDefinitionId());
 
-				ps.setLong(1, cpDefinition.getCProductId());
+				preparedStatement.setLong(1, cpDefinition.getCProductId());
 
-				ps.setString(2, cpInstance.getCPInstanceUuid());
+				preparedStatement.setString(2, cpInstance.getCPInstanceUuid());
 
-				ps.setLong(3, cpInstanceId);
+				preparedStatement.setLong(3, cpInstanceId);
 
-				ps.execute();
+				preparedStatement.execute();
 			}
 		}
 
@@ -106,7 +108,7 @@ public class CommerceSubscriptionEntryUpgradeProcess
 						indexMetadata.getIndexName(), tableName));
 			}
 
-			if (!hasIndex(tableName, indexMetadata.getIndexName())) {
+			if (!_tableHasIndex(tableName, indexMetadata.getIndexName())) {
 				runSQL(indexMetadata.getCreateSQL(null));
 			}
 			else if (_log.isInfoEnabled()) {
@@ -116,6 +118,26 @@ public class CommerceSubscriptionEntryUpgradeProcess
 						indexMetadata.getIndexName(), tableName));
 			}
 		}
+	}
+
+	private boolean _tableHasIndex(String tableName, String indexName)
+		throws Exception {
+
+		DatabaseMetaData metadata = connection.getMetaData();
+
+		try (ResultSet resultSet = metadata.getIndexInfo(
+				null, null, tableName, false, false)) {
+
+			while (resultSet.next()) {
+				String curIndexName = resultSet.getString("index_name");
+
+				if (Objects.equals(indexName, curIndexName)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

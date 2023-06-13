@@ -88,9 +88,9 @@ public class UpdateLanguageAction implements Action {
 					contact.getSkypeSn(), contact.getTwitterSn());
 			}
 
-			HttpSession session = httpServletRequest.getSession();
+			HttpSession httpSession = httpServletRequest.getSession();
 
-			session.setAttribute(WebKeys.LOCALE, locale);
+			httpSession.setAttribute(WebKeys.LOCALE, locale);
 
 			LanguageUtil.updateCookie(
 				httpServletRequest, httpServletResponse, locale);
@@ -207,14 +207,7 @@ public class UpdateLanguageAction implements Action {
 			}
 		}
 
-		if (!Validator.isBlank(themeDisplay.getPathMain()) &&
-			layoutURL.startsWith(themeDisplay.getPathMain())) {
-
-			redirect = layoutURL;
-		}
-		else if (isFriendlyURLResolver(layoutURL) ||
-				 layout.isTypeControlPanel()) {
-
+		if (isFriendlyURLResolver(layoutURL) || layout.isTypeControlPanel()) {
 			redirect = layoutURL + friendlyURLSeparatorPart;
 		}
 		else if (layoutURL.equals(StringPool.SLASH) ||
@@ -288,11 +281,8 @@ public class UpdateLanguageAction implements Action {
 		Locale layoutURLLocale = LocaleUtil.fromLanguageId(
 			layoutURLLanguageId, true, false);
 
-		if (layoutURLLocale != null) {
-			return true;
-		}
-
-		if (PortalUtil.isGroupFriendlyURL(
+		if ((layoutURLLocale != null) ||
+			PortalUtil.isGroupFriendlyURL(
 				layoutURL, group.getFriendlyURL(),
 				layout.getFriendlyURL(locale))) {
 

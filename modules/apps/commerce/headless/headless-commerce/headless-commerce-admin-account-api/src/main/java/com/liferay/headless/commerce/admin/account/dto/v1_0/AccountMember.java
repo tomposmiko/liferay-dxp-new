@@ -62,7 +62,7 @@ public class AccountMember implements Serializable {
 	}
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getAccountId() {
 		return accountId;
 	}
@@ -90,9 +90,7 @@ public class AccountMember implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long accountId;
 
-	@Schema(
-		example = "[{description={en_US=Account Administrator Description US, hr_HR=Account Administrator Description HR, hu_HU=Account Administrator Description HU}}, {description={en_US=Order Manager Description US, hr_HR=Order Manager Description HR, hu_HU=Order Manager Description HU}}]"
-	)
+	@Schema
 	@Valid
 	public AccountRole[] getAccountRoles() {
 		return accountRoles;
@@ -121,7 +119,7 @@ public class AccountMember implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected AccountRole[] accountRoles;
 
-	@Schema(example = "joe.1@commerce.com")
+	@Schema
 	public String getEmail() {
 		return email;
 	}
@@ -150,7 +148,7 @@ public class AccountMember implements Serializable {
 	@NotEmpty
 	protected String email;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -178,7 +176,7 @@ public class AccountMember implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String externalReferenceCode;
 
-	@Schema(example = "User Name")
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -204,7 +202,7 @@ public class AccountMember implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
-	@Schema(example = "UAB-34098-789-N")
+	@Schema
 	public String getUserExternalReferenceCode() {
 		return userExternalReferenceCode;
 	}
@@ -235,7 +233,7 @@ public class AccountMember implements Serializable {
 	protected String userExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30002")
+	@Schema
 	public Long getUserId() {
 		return userId;
 	}

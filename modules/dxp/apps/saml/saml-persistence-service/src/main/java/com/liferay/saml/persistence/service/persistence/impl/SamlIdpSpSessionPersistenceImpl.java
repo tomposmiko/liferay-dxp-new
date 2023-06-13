@@ -16,7 +16,6 @@ package com.liferay.saml.persistence.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -27,18 +26,16 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.saml.persistence.exception.NoSuchIdpSpSessionException;
 import com.liferay.saml.persistence.model.SamlIdpSpSession;
 import com.liferay.saml.persistence.model.SamlIdpSpSessionTable;
@@ -55,19 +52,13 @@ import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
 
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -83,7 +74,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Mika Koivisto
  * @generated
  */
-@Component(service = SamlIdpSpSessionPersistence.class)
+@Component(service = {SamlIdpSpSessionPersistence.class, BasePersistence.class})
 public class SamlIdpSpSessionPersistenceImpl
 	extends BasePersistenceImpl<SamlIdpSpSession>
 	implements SamlIdpSpSessionPersistence {
@@ -105,8 +96,8 @@ public class SamlIdpSpSessionPersistenceImpl
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
-	private FinderPath _finderPathWithPaginationFindByCreateDate;
-	private FinderPath _finderPathWithPaginationCountByCreateDate;
+	private FinderPath _finderPathWithPaginationFindByLtCreateDate;
+	private FinderPath _finderPathWithPaginationCountByLtCreateDate;
 
 	/**
 	 * Returns all the saml idp sp sessions where createDate &lt; &#63;.
@@ -115,8 +106,8 @@ public class SamlIdpSpSessionPersistenceImpl
 	 * @return the matching saml idp sp sessions
 	 */
 	@Override
-	public List<SamlIdpSpSession> findByCreateDate(Date createDate) {
-		return findByCreateDate(
+	public List<SamlIdpSpSession> findByLtCreateDate(Date createDate) {
+		return findByLtCreateDate(
 			createDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
@@ -133,10 +124,10 @@ public class SamlIdpSpSessionPersistenceImpl
 	 * @return the range of matching saml idp sp sessions
 	 */
 	@Override
-	public List<SamlIdpSpSession> findByCreateDate(
+	public List<SamlIdpSpSession> findByLtCreateDate(
 		Date createDate, int start, int end) {
 
-		return findByCreateDate(createDate, start, end, null);
+		return findByLtCreateDate(createDate, start, end, null);
 	}
 
 	/**
@@ -153,11 +144,11 @@ public class SamlIdpSpSessionPersistenceImpl
 	 * @return the ordered range of matching saml idp sp sessions
 	 */
 	@Override
-	public List<SamlIdpSpSession> findByCreateDate(
+	public List<SamlIdpSpSession> findByLtCreateDate(
 		Date createDate, int start, int end,
 		OrderByComparator<SamlIdpSpSession> orderByComparator) {
 
-		return findByCreateDate(
+		return findByLtCreateDate(
 			createDate, start, end, orderByComparator, true);
 	}
 
@@ -176,7 +167,7 @@ public class SamlIdpSpSessionPersistenceImpl
 	 * @return the ordered range of matching saml idp sp sessions
 	 */
 	@Override
-	public List<SamlIdpSpSession> findByCreateDate(
+	public List<SamlIdpSpSession> findByLtCreateDate(
 		Date createDate, int start, int end,
 		OrderByComparator<SamlIdpSpSession> orderByComparator,
 		boolean useFinderCache) {
@@ -184,7 +175,7 @@ public class SamlIdpSpSessionPersistenceImpl
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
-		finderPath = _finderPathWithPaginationFindByCreateDate;
+		finderPath = _finderPathWithPaginationFindByLtCreateDate;
 		finderArgs = new Object[] {
 			_getTime(createDate), start, end, orderByComparator
 		};
@@ -193,7 +184,7 @@ public class SamlIdpSpSessionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<SamlIdpSpSession>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SamlIdpSpSession samlIdpSpSession : list) {
@@ -224,12 +215,12 @@ public class SamlIdpSpSessionPersistenceImpl
 			boolean bindCreateDate = false;
 
 			if (createDate == null) {
-				sb.append(_FINDER_COLUMN_CREATEDATE_CREATEDATE_1);
+				sb.append(_FINDER_COLUMN_LTCREATEDATE_CREATEDATE_1);
 			}
 			else {
 				bindCreateDate = true;
 
-				sb.append(_FINDER_COLUMN_CREATEDATE_CREATEDATE_2);
+				sb.append(_FINDER_COLUMN_LTCREATEDATE_CREATEDATE_2);
 			}
 
 			if (orderByComparator != null) {
@@ -284,12 +275,12 @@ public class SamlIdpSpSessionPersistenceImpl
 	 * @throws NoSuchIdpSpSessionException if a matching saml idp sp session could not be found
 	 */
 	@Override
-	public SamlIdpSpSession findByCreateDate_First(
+	public SamlIdpSpSession findByLtCreateDate_First(
 			Date createDate,
 			OrderByComparator<SamlIdpSpSession> orderByComparator)
 		throws NoSuchIdpSpSessionException {
 
-		SamlIdpSpSession samlIdpSpSession = fetchByCreateDate_First(
+		SamlIdpSpSession samlIdpSpSession = fetchByLtCreateDate_First(
 			createDate, orderByComparator);
 
 		if (samlIdpSpSession != null) {
@@ -316,11 +307,11 @@ public class SamlIdpSpSessionPersistenceImpl
 	 * @return the first matching saml idp sp session, or <code>null</code> if a matching saml idp sp session could not be found
 	 */
 	@Override
-	public SamlIdpSpSession fetchByCreateDate_First(
+	public SamlIdpSpSession fetchByLtCreateDate_First(
 		Date createDate,
 		OrderByComparator<SamlIdpSpSession> orderByComparator) {
 
-		List<SamlIdpSpSession> list = findByCreateDate(
+		List<SamlIdpSpSession> list = findByLtCreateDate(
 			createDate, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -339,12 +330,12 @@ public class SamlIdpSpSessionPersistenceImpl
 	 * @throws NoSuchIdpSpSessionException if a matching saml idp sp session could not be found
 	 */
 	@Override
-	public SamlIdpSpSession findByCreateDate_Last(
+	public SamlIdpSpSession findByLtCreateDate_Last(
 			Date createDate,
 			OrderByComparator<SamlIdpSpSession> orderByComparator)
 		throws NoSuchIdpSpSessionException {
 
-		SamlIdpSpSession samlIdpSpSession = fetchByCreateDate_Last(
+		SamlIdpSpSession samlIdpSpSession = fetchByLtCreateDate_Last(
 			createDate, orderByComparator);
 
 		if (samlIdpSpSession != null) {
@@ -371,17 +362,17 @@ public class SamlIdpSpSessionPersistenceImpl
 	 * @return the last matching saml idp sp session, or <code>null</code> if a matching saml idp sp session could not be found
 	 */
 	@Override
-	public SamlIdpSpSession fetchByCreateDate_Last(
+	public SamlIdpSpSession fetchByLtCreateDate_Last(
 		Date createDate,
 		OrderByComparator<SamlIdpSpSession> orderByComparator) {
 
-		int count = countByCreateDate(createDate);
+		int count = countByLtCreateDate(createDate);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<SamlIdpSpSession> list = findByCreateDate(
+		List<SamlIdpSpSession> list = findByLtCreateDate(
 			createDate, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -401,7 +392,7 @@ public class SamlIdpSpSessionPersistenceImpl
 	 * @throws NoSuchIdpSpSessionException if a saml idp sp session with the primary key could not be found
 	 */
 	@Override
-	public SamlIdpSpSession[] findByCreateDate_PrevAndNext(
+	public SamlIdpSpSession[] findByLtCreateDate_PrevAndNext(
 			long samlIdpSpSessionId, Date createDate,
 			OrderByComparator<SamlIdpSpSession> orderByComparator)
 		throws NoSuchIdpSpSessionException {
@@ -416,12 +407,12 @@ public class SamlIdpSpSessionPersistenceImpl
 
 			SamlIdpSpSession[] array = new SamlIdpSpSessionImpl[3];
 
-			array[0] = getByCreateDate_PrevAndNext(
+			array[0] = getByLtCreateDate_PrevAndNext(
 				session, samlIdpSpSession, createDate, orderByComparator, true);
 
 			array[1] = samlIdpSpSession;
 
-			array[2] = getByCreateDate_PrevAndNext(
+			array[2] = getByLtCreateDate_PrevAndNext(
 				session, samlIdpSpSession, createDate, orderByComparator,
 				false);
 
@@ -435,7 +426,7 @@ public class SamlIdpSpSessionPersistenceImpl
 		}
 	}
 
-	protected SamlIdpSpSession getByCreateDate_PrevAndNext(
+	protected SamlIdpSpSession getByLtCreateDate_PrevAndNext(
 		Session session, SamlIdpSpSession samlIdpSpSession, Date createDate,
 		OrderByComparator<SamlIdpSpSession> orderByComparator,
 		boolean previous) {
@@ -456,12 +447,12 @@ public class SamlIdpSpSessionPersistenceImpl
 		boolean bindCreateDate = false;
 
 		if (createDate == null) {
-			sb.append(_FINDER_COLUMN_CREATEDATE_CREATEDATE_1);
+			sb.append(_FINDER_COLUMN_LTCREATEDATE_CREATEDATE_1);
 		}
 		else {
 			bindCreateDate = true;
 
-			sb.append(_FINDER_COLUMN_CREATEDATE_CREATEDATE_2);
+			sb.append(_FINDER_COLUMN_LTCREATEDATE_CREATEDATE_2);
 		}
 
 		if (orderByComparator != null) {
@@ -562,9 +553,9 @@ public class SamlIdpSpSessionPersistenceImpl
 	 * @param createDate the create date
 	 */
 	@Override
-	public void removeByCreateDate(Date createDate) {
+	public void removeByLtCreateDate(Date createDate) {
 		for (SamlIdpSpSession samlIdpSpSession :
-				findByCreateDate(
+				findByLtCreateDate(
 					createDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 
 			remove(samlIdpSpSession);
@@ -578,12 +569,12 @@ public class SamlIdpSpSessionPersistenceImpl
 	 * @return the number of matching saml idp sp sessions
 	 */
 	@Override
-	public int countByCreateDate(Date createDate) {
-		FinderPath finderPath = _finderPathWithPaginationCountByCreateDate;
+	public int countByLtCreateDate(Date createDate) {
+		FinderPath finderPath = _finderPathWithPaginationCountByLtCreateDate;
 
 		Object[] finderArgs = new Object[] {_getTime(createDate)};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -593,12 +584,12 @@ public class SamlIdpSpSessionPersistenceImpl
 			boolean bindCreateDate = false;
 
 			if (createDate == null) {
-				sb.append(_FINDER_COLUMN_CREATEDATE_CREATEDATE_1);
+				sb.append(_FINDER_COLUMN_LTCREATEDATE_CREATEDATE_1);
 			}
 			else {
 				bindCreateDate = true;
 
-				sb.append(_FINDER_COLUMN_CREATEDATE_CREATEDATE_2);
+				sb.append(_FINDER_COLUMN_LTCREATEDATE_CREATEDATE_2);
 			}
 
 			String sql = sb.toString();
@@ -631,10 +622,10 @@ public class SamlIdpSpSessionPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_CREATEDATE_CREATEDATE_1 =
+	private static final String _FINDER_COLUMN_LTCREATEDATE_CREATEDATE_1 =
 		"samlIdpSpSession.createDate IS NULL";
 
-	private static final String _FINDER_COLUMN_CREATEDATE_CREATEDATE_2 =
+	private static final String _FINDER_COLUMN_LTCREATEDATE_CREATEDATE_2 =
 		"samlIdpSpSession.createDate < ?";
 
 	private FinderPath _finderPathWithPaginationFindBySamlIdpSsoSessionId;
@@ -739,7 +730,7 @@ public class SamlIdpSpSessionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<SamlIdpSpSession>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SamlIdpSpSession samlIdpSpSession : list) {
@@ -1110,7 +1101,7 @@ public class SamlIdpSpSessionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {samlIdpSsoSessionId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1151,285 +1142,6 @@ public class SamlIdpSpSessionPersistenceImpl
 		_FINDER_COLUMN_SAMLIDPSSOSESSIONID_SAMLIDPSSOSESSIONID_2 =
 			"samlIdpSpSession.samlIdpSsoSessionId = ?";
 
-	private FinderPath _finderPathFetchBySISSI_SSEI;
-	private FinderPath _finderPathCountBySISSI_SSEI;
-
-	/**
-	 * Returns the saml idp sp session where samlIdpSsoSessionId = &#63; and samlSpEntityId = &#63; or throws a <code>NoSuchIdpSpSessionException</code> if it could not be found.
-	 *
-	 * @param samlIdpSsoSessionId the saml idp sso session ID
-	 * @param samlSpEntityId the saml sp entity ID
-	 * @return the matching saml idp sp session
-	 * @throws NoSuchIdpSpSessionException if a matching saml idp sp session could not be found
-	 */
-	@Override
-	public SamlIdpSpSession findBySISSI_SSEI(
-			long samlIdpSsoSessionId, String samlSpEntityId)
-		throws NoSuchIdpSpSessionException {
-
-		SamlIdpSpSession samlIdpSpSession = fetchBySISSI_SSEI(
-			samlIdpSsoSessionId, samlSpEntityId);
-
-		if (samlIdpSpSession == null) {
-			StringBundler sb = new StringBundler(6);
-
-			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-			sb.append("samlIdpSsoSessionId=");
-			sb.append(samlIdpSsoSessionId);
-
-			sb.append(", samlSpEntityId=");
-			sb.append(samlSpEntityId);
-
-			sb.append("}");
-
-			if (_log.isDebugEnabled()) {
-				_log.debug(sb.toString());
-			}
-
-			throw new NoSuchIdpSpSessionException(sb.toString());
-		}
-
-		return samlIdpSpSession;
-	}
-
-	/**
-	 * Returns the saml idp sp session where samlIdpSsoSessionId = &#63; and samlSpEntityId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param samlIdpSsoSessionId the saml idp sso session ID
-	 * @param samlSpEntityId the saml sp entity ID
-	 * @return the matching saml idp sp session, or <code>null</code> if a matching saml idp sp session could not be found
-	 */
-	@Override
-	public SamlIdpSpSession fetchBySISSI_SSEI(
-		long samlIdpSsoSessionId, String samlSpEntityId) {
-
-		return fetchBySISSI_SSEI(samlIdpSsoSessionId, samlSpEntityId, true);
-	}
-
-	/**
-	 * Returns the saml idp sp session where samlIdpSsoSessionId = &#63; and samlSpEntityId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param samlIdpSsoSessionId the saml idp sso session ID
-	 * @param samlSpEntityId the saml sp entity ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching saml idp sp session, or <code>null</code> if a matching saml idp sp session could not be found
-	 */
-	@Override
-	public SamlIdpSpSession fetchBySISSI_SSEI(
-		long samlIdpSsoSessionId, String samlSpEntityId,
-		boolean useFinderCache) {
-
-		samlSpEntityId = Objects.toString(samlSpEntityId, "");
-
-		Object[] finderArgs = null;
-
-		if (useFinderCache) {
-			finderArgs = new Object[] {samlIdpSsoSessionId, samlSpEntityId};
-		}
-
-		Object result = null;
-
-		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchBySISSI_SSEI, finderArgs, this);
-		}
-
-		if (result instanceof SamlIdpSpSession) {
-			SamlIdpSpSession samlIdpSpSession = (SamlIdpSpSession)result;
-
-			if ((samlIdpSsoSessionId !=
-					samlIdpSpSession.getSamlIdpSsoSessionId()) ||
-				!Objects.equals(
-					samlSpEntityId, samlIdpSpSession.getSamlSpEntityId())) {
-
-				result = null;
-			}
-		}
-
-		if (result == null) {
-			StringBundler sb = new StringBundler(4);
-
-			sb.append(_SQL_SELECT_SAMLIDPSPSESSION_WHERE);
-
-			sb.append(_FINDER_COLUMN_SISSI_SSEI_SAMLIDPSSOSESSIONID_2);
-
-			boolean bindSamlSpEntityId = false;
-
-			if (samlSpEntityId.isEmpty()) {
-				sb.append(_FINDER_COLUMN_SISSI_SSEI_SAMLSPENTITYID_3);
-			}
-			else {
-				bindSamlSpEntityId = true;
-
-				sb.append(_FINDER_COLUMN_SISSI_SSEI_SAMLSPENTITYID_2);
-			}
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				queryPos.add(samlIdpSsoSessionId);
-
-				if (bindSamlSpEntityId) {
-					queryPos.add(samlSpEntityId);
-				}
-
-				List<SamlIdpSpSession> list = query.list();
-
-				if (list.isEmpty()) {
-					if (useFinderCache) {
-						finderCache.putResult(
-							_finderPathFetchBySISSI_SSEI, finderArgs, list);
-					}
-				}
-				else {
-					if (list.size() > 1) {
-						Collections.sort(list, Collections.reverseOrder());
-
-						if (_log.isWarnEnabled()) {
-							if (!useFinderCache) {
-								finderArgs = new Object[] {
-									samlIdpSsoSessionId, samlSpEntityId
-								};
-							}
-
-							_log.warn(
-								"SamlIdpSpSessionPersistenceImpl.fetchBySISSI_SSEI(long, String, boolean) with parameters (" +
-									StringUtil.merge(finderArgs) +
-										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
-						}
-					}
-
-					SamlIdpSpSession samlIdpSpSession = list.get(0);
-
-					result = samlIdpSpSession;
-
-					cacheResult(samlIdpSpSession);
-				}
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		if (result instanceof List<?>) {
-			return null;
-		}
-		else {
-			return (SamlIdpSpSession)result;
-		}
-	}
-
-	/**
-	 * Removes the saml idp sp session where samlIdpSsoSessionId = &#63; and samlSpEntityId = &#63; from the database.
-	 *
-	 * @param samlIdpSsoSessionId the saml idp sso session ID
-	 * @param samlSpEntityId the saml sp entity ID
-	 * @return the saml idp sp session that was removed
-	 */
-	@Override
-	public SamlIdpSpSession removeBySISSI_SSEI(
-			long samlIdpSsoSessionId, String samlSpEntityId)
-		throws NoSuchIdpSpSessionException {
-
-		SamlIdpSpSession samlIdpSpSession = findBySISSI_SSEI(
-			samlIdpSsoSessionId, samlSpEntityId);
-
-		return remove(samlIdpSpSession);
-	}
-
-	/**
-	 * Returns the number of saml idp sp sessions where samlIdpSsoSessionId = &#63; and samlSpEntityId = &#63;.
-	 *
-	 * @param samlIdpSsoSessionId the saml idp sso session ID
-	 * @param samlSpEntityId the saml sp entity ID
-	 * @return the number of matching saml idp sp sessions
-	 */
-	@Override
-	public int countBySISSI_SSEI(
-		long samlIdpSsoSessionId, String samlSpEntityId) {
-
-		samlSpEntityId = Objects.toString(samlSpEntityId, "");
-
-		FinderPath finderPath = _finderPathCountBySISSI_SSEI;
-
-		Object[] finderArgs = new Object[] {
-			samlIdpSsoSessionId, samlSpEntityId
-		};
-
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
-
-		if (count == null) {
-			StringBundler sb = new StringBundler(3);
-
-			sb.append(_SQL_COUNT_SAMLIDPSPSESSION_WHERE);
-
-			sb.append(_FINDER_COLUMN_SISSI_SSEI_SAMLIDPSSOSESSIONID_2);
-
-			boolean bindSamlSpEntityId = false;
-
-			if (samlSpEntityId.isEmpty()) {
-				sb.append(_FINDER_COLUMN_SISSI_SSEI_SAMLSPENTITYID_3);
-			}
-			else {
-				bindSamlSpEntityId = true;
-
-				sb.append(_FINDER_COLUMN_SISSI_SSEI_SAMLSPENTITYID_2);
-			}
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				queryPos.add(samlIdpSsoSessionId);
-
-				if (bindSamlSpEntityId) {
-					queryPos.add(samlSpEntityId);
-				}
-
-				count = (Long)query.uniqueResult();
-
-				finderCache.putResult(finderPath, finderArgs, count);
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return count.intValue();
-	}
-
-	private static final String
-		_FINDER_COLUMN_SISSI_SSEI_SAMLIDPSSOSESSIONID_2 =
-			"samlIdpSpSession.samlIdpSsoSessionId = ? AND ";
-
-	private static final String _FINDER_COLUMN_SISSI_SSEI_SAMLSPENTITYID_2 =
-		"samlIdpSpSession.samlSpEntityId = ?";
-
-	private static final String _FINDER_COLUMN_SISSI_SSEI_SAMLSPENTITYID_3 =
-		"(samlIdpSpSession.samlSpEntityId IS NULL OR samlIdpSpSession.samlSpEntityId = '')";
-
 	public SamlIdpSpSessionPersistenceImpl() {
 		setModelClass(SamlIdpSpSession.class);
 
@@ -1448,14 +1160,6 @@ public class SamlIdpSpSessionPersistenceImpl
 	public void cacheResult(SamlIdpSpSession samlIdpSpSession) {
 		entityCache.putResult(
 			SamlIdpSpSessionImpl.class, samlIdpSpSession.getPrimaryKey(),
-			samlIdpSpSession);
-
-		finderCache.putResult(
-			_finderPathFetchBySISSI_SSEI,
-			new Object[] {
-				samlIdpSpSession.getSamlIdpSsoSessionId(),
-				samlIdpSpSession.getSamlSpEntityId()
-			},
 			samlIdpSpSession);
 	}
 
@@ -1497,9 +1201,7 @@ public class SamlIdpSpSessionPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(SamlIdpSpSessionImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(SamlIdpSpSessionImpl.class);
 	}
 
 	/**
@@ -1524,28 +1226,11 @@ public class SamlIdpSpSessionPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(SamlIdpSpSessionImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(SamlIdpSpSessionImpl.class, primaryKey);
 		}
-	}
-
-	protected void cacheUniqueFindersCache(
-		SamlIdpSpSessionModelImpl samlIdpSpSessionModelImpl) {
-
-		Object[] args = new Object[] {
-			samlIdpSpSessionModelImpl.getSamlIdpSsoSessionId(),
-			samlIdpSpSessionModelImpl.getSamlSpEntityId()
-		};
-
-		finderCache.putResult(
-			_finderPathCountBySISSI_SSEI, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchBySISSI_SSEI, args, samlIdpSpSessionModelImpl,
-			false);
 	}
 
 	/**
@@ -1724,8 +1409,6 @@ public class SamlIdpSpSessionPersistenceImpl
 		entityCache.putResult(
 			SamlIdpSpSessionImpl.class, samlIdpSpSessionModelImpl, false, true);
 
-		cacheUniqueFindersCache(samlIdpSpSessionModelImpl);
-
 		if (isNew) {
 			samlIdpSpSession.setNew(false);
 		}
@@ -1870,7 +1553,7 @@ public class SamlIdpSpSessionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<SamlIdpSpSession>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1940,7 +1623,7 @@ public class SamlIdpSpSessionPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1990,44 +1673,36 @@ public class SamlIdpSpSessionPersistenceImpl
 	 * Initializes the saml idp sp session persistence.
 	 */
 	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class,
-			new SamlIdpSpSessionModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", SamlIdpSpSession.class.getName()));
-
+	public void activate() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByCreateDate = _createFinderPath(
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCreateDate",
+		_finderPathWithPaginationFindByLtCreateDate = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByLtCreateDate",
 			new String[] {
 				Date.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), OrderByComparator.class.getName()
 			},
 			new String[] {"createDate"}, true);
 
-		_finderPathWithPaginationCountByCreateDate = _createFinderPath(
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByCreateDate",
+		_finderPathWithPaginationCountByLtCreateDate = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByLtCreateDate",
 			new String[] {Date.class.getName()}, new String[] {"createDate"},
 			false);
 
-		_finderPathWithPaginationFindBySamlIdpSsoSessionId = _createFinderPath(
+		_finderPathWithPaginationFindBySamlIdpSsoSessionId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findBySamlIdpSsoSessionId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -2035,27 +1710,15 @@ public class SamlIdpSpSessionPersistenceImpl
 			},
 			new String[] {"samlIdpSsoSessionId"}, true);
 
-		_finderPathWithoutPaginationFindBySamlIdpSsoSessionId =
-			_createFinderPath(
-				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-				"findBySamlIdpSsoSessionId",
-				new String[] {Long.class.getName()},
-				new String[] {"samlIdpSsoSessionId"}, true);
+		_finderPathWithoutPaginationFindBySamlIdpSsoSessionId = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"findBySamlIdpSsoSessionId", new String[] {Long.class.getName()},
+			new String[] {"samlIdpSsoSessionId"}, true);
 
-		_finderPathCountBySamlIdpSsoSessionId = _createFinderPath(
+		_finderPathCountBySamlIdpSsoSessionId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
 			"countBySamlIdpSsoSessionId", new String[] {Long.class.getName()},
 			new String[] {"samlIdpSsoSessionId"}, false);
-
-		_finderPathFetchBySISSI_SSEI = _createFinderPath(
-			FINDER_CLASS_NAME_ENTITY, "fetchBySISSI_SSEI",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"samlIdpSsoSessionId", "samlSpEntityId"}, true);
-
-		_finderPathCountBySISSI_SSEI = _createFinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countBySISSI_SSEI",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"samlIdpSsoSessionId", "samlSpEntityId"}, false);
 
 		_setSamlIdpSpSessionUtilPersistence(this);
 	}
@@ -2065,14 +1728,6 @@ public class SamlIdpSpSessionPersistenceImpl
 		_setSamlIdpSpSessionUtilPersistence(null);
 
 		entityCache.removeCache(SamlIdpSpSessionImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setSamlIdpSpSessionUtilPersistence(
@@ -2117,8 +1772,6 @@ public class SamlIdpSpSessionPersistenceImpl
 		super.setSessionFactory(sessionFactory);
 	}
 
-	private BundleContext _bundleContext;
-
 	@Reference
 	protected EntityCache entityCache;
 
@@ -2156,105 +1809,13 @@ public class SamlIdpSpSessionPersistenceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		SamlIdpSpSessionPersistenceImpl.class);
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class SamlIdpSpSessionModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			SamlIdpSpSessionModelImpl samlIdpSpSessionModelImpl =
-				(SamlIdpSpSessionModelImpl)baseModel;
-
-			long columnBitmask = samlIdpSpSessionModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					samlIdpSpSessionModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						samlIdpSpSessionModelImpl.getColumnBitmask(columnName);
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					samlIdpSpSessionModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			SamlIdpSpSessionModelImpl samlIdpSpSessionModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						samlIdpSpSessionModelImpl.getColumnOriginalValue(
-							columnName);
-				}
-				else {
-					arguments[i] = samlIdpSpSessionModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-	}
+	@Reference
+	private SamlIdpSpSessionModelArgumentsResolver
+		_samlIdpSpSessionModelArgumentsResolver;
 
 }

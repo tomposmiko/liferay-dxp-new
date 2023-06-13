@@ -25,7 +25,7 @@ boolean privateLayout = ParamUtil.getBoolean(request, "privateLayout");
 %>
 
 <liferay-portlet:renderURL varImpl="portletURL">
-	<portlet:param name="mvcRenderCommandName" value="publishLayouts" />
+	<portlet:param name="mvcRenderCommandName" value="/export_import/publish_layouts" />
 	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.PUBLISH %>" />
 	<portlet:param name="publishConfigurationButtons" value="saved" />
 	<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
@@ -49,10 +49,6 @@ int exportImportConfigurationsCount = ExportImportConfigurationLocalServiceUtil.
 
 exportImportConfigurationSearchContainer.setResults(exportImportConfigurations);
 exportImportConfigurationSearchContainer.setTotal(exportImportConfigurationsCount);
-
-PortletURL clearResultsURL = PortletURLUtil.clone(currentURLObj, renderResponse);
-
-clearResultsURL.setParameter("keywords", StringPool.BLANK);
 %>
 
 <div class="export-dialog-tree">
@@ -62,12 +58,18 @@ clearResultsURL.setParameter("keywords", StringPool.BLANK);
 		</div>
 
 		<liferay-portlet:renderURL varImpl="searchURL">
-			<portlet:param name="mvcRenderCommandName" value="publishLayouts" />
+			<portlet:param name="mvcRenderCommandName" value="/export_import/publish_layouts" />
 			<portlet:param name="publishConfigurationButtons" value="saved" />
 		</liferay-portlet:renderURL>
 
 		<clay:management-toolbar
-			clearResultsURL="<%= clearResultsURL.toString() %>"
+			clearResultsURL="<%=
+				PortletURLBuilder.create(
+					PortletURLUtil.clone(currentURLObj, renderResponse)
+				).setKeywords(
+					StringPool.BLANK
+				).buildString()
+			%>"
 			itemsTotal="<%= exportImportConfigurationsCount %>"
 			searchActionURL="<%= searchURL.toString() %>"
 			selectable="<%= false %>"
@@ -95,7 +97,7 @@ clearResultsURL.setParameter("keywords", StringPool.BLANK);
 					</liferay-ui:search-container-column-text>
 
 					<liferay-portlet:renderURL varImpl="rowURL">
-						<portlet:param name="mvcRenderCommandName" value="publishLayouts" />
+						<portlet:param name="mvcRenderCommandName" value="/export_import/publish_layouts" />
 						<portlet:param name="<%= Constants.CMD %>" value="<%= localPublishing ? Constants.PUBLISH_TO_LIVE : Constants.PUBLISH_TO_REMOTE %>" />
 						<portlet:param name="redirect" value="<%= currentURL %>" />
 						<portlet:param name="exportImportConfigurationId" value="<%= String.valueOf(exportImportConfiguration.getExportImportConfigurationId()) %>" />

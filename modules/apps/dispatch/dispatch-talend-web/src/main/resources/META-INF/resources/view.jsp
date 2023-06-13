@@ -23,13 +23,17 @@ String fileEntryName = (String)request.getAttribute(DispatchWebKeys.FILE_ENTRY_N
 
 <liferay-portlet:actionURL name="/dispatch_talend/edit_dispatch_talend_job_archive" portletName="<%= DispatchPortletKeys.DISPATCH %>" var="editDispatchTalendJobArchiveActionURL" />
 
-<div class="closed container-fluid-1280" id="<portlet:namespace />editDispatchTriggerId">
-	<div class="container main-content-body sheet">
-		<aui:form action="<%= editDispatchTalendJobArchiveActionURL %>" cssClass="container-fluid-1280" enctype="multipart/form-data" method="post" name="fm">
+<div class="closed container-fluid container-fluid-max-xl container-form-lg" id="<portlet:namespace />editDispatchTriggerId">
+	<div class="sheet">
+		<aui:form action="<%= editDispatchTalendJobArchiveActionURL %>" enctype="multipart/form-data" method="post" name="fm">
 			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 			<aui:input name="dispatchTriggerId" type="hidden" value="<%= String.valueOf(dispatchTrigger.getDispatchTriggerId()) %>" />
 
 			<aui:model-context bean="<%= dispatchTrigger %>" model="<%= DispatchTrigger.class %>" />
+
+			<liferay-ui:error exception="<%= TalendArchiveException.class %>">
+				<liferay-ui:message key="the-file-must-be-a-valid-talend-job-archive" />
+			</liferay-ui:error>
 
 			<p class="<%= Objects.equals(fileEntryName, StringPool.BLANK) ? "hide" : StringPool.BLANK %> text-default" id="<portlet:namespace />fileEntryName">
 				<span id="<portlet:namespace />fileEntryRemove">
@@ -46,24 +50,22 @@ String fileEntryName = (String)request.getAttribute(DispatchWebKeys.FILE_ENTRY_N
 
 			<c:if test="<%= (dispatchTrigger == null) || !dispatchTrigger.isSystem() %>">
 				<div class="<%= Objects.equals(fileEntryName, StringPool.BLANK) ? StringPool.BLANK : "hide" %>" id="<portlet:namespace />fileEntry">
-					<aui:input name="jobArchive" required="<%= true %>" type="file" />
+					<aui:input label="upload-your-talend-job-file" name="jobArchive" required="<%= true %>" type="file" />
 				</div>
 			</c:if>
 
-			<aui:button-row>
-				<aui:button cssClass="btn-lg" type="submit" value="save" />
+			<div class="sheet-footer">
+				<aui:button type="submit" value="save" />
 
-				<aui:button cssClass="btn-lg" href="<%= currentURL %>" type="cancel" />
-			</aui:button-row>
+				<aui:button href="<%= currentURL %>" type="cancel" />
+			<div>
 		</aui:form>
 	</div>
 </div>
 
 <aui:script>
-	AUI().ready(function (A) {
-		A.one('#<portlet:namespace />fileEntryRemove').on('click', function (
-			event
-		) {
+	AUI().ready((A) => {
+		A.one('#<portlet:namespace />fileEntryRemove').on('click', (event) => {
 			event.preventDefault();
 
 			A.one('#<portlet:namespace />fileEntry').removeClass('hide');

@@ -30,6 +30,7 @@ import com.liferay.portal.tools.service.builder.test.model.NestedSetsTreeEntryMo
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -217,63 +218,85 @@ public class NestedSetsTreeEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, NestedSetsTreeEntry>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			NestedSetsTreeEntry.class.getClassLoader(),
+			NestedSetsTreeEntry.class, ModelWrapper.class);
+
+		try {
+			Constructor<NestedSetsTreeEntry> constructor =
+				(Constructor<NestedSetsTreeEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<NestedSetsTreeEntry, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<NestedSetsTreeEntry, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<NestedSetsTreeEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<NestedSetsTreeEntry, Object>>();
-
-		attributeGetterFunctions.put(
-			"nestedSetsTreeEntryId",
-			NestedSetsTreeEntry::getNestedSetsTreeEntryId);
-		attributeGetterFunctions.put(
-			"groupId", NestedSetsTreeEntry::getGroupId);
-		attributeGetterFunctions.put(
-			"parentNestedSetsTreeEntryId",
-			NestedSetsTreeEntry::getParentNestedSetsTreeEntryId);
-		attributeGetterFunctions.put(
-			"leftNestedSetsTreeEntryId",
-			NestedSetsTreeEntry::getLeftNestedSetsTreeEntryId);
-		attributeGetterFunctions.put(
-			"rightNestedSetsTreeEntryId",
-			NestedSetsTreeEntry::getRightNestedSetsTreeEntryId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<NestedSetsTreeEntry, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<NestedSetsTreeEntry, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<NestedSetsTreeEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"nestedSetsTreeEntryId",
+			NestedSetsTreeEntry::getNestedSetsTreeEntryId);
 		attributeSetterBiConsumers.put(
 			"nestedSetsTreeEntryId",
 			(BiConsumer<NestedSetsTreeEntry, Long>)
 				NestedSetsTreeEntry::setNestedSetsTreeEntryId);
+		attributeGetterFunctions.put(
+			"groupId", NestedSetsTreeEntry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<NestedSetsTreeEntry, Long>)
 				NestedSetsTreeEntry::setGroupId);
+		attributeGetterFunctions.put(
+			"parentNestedSetsTreeEntryId",
+			NestedSetsTreeEntry::getParentNestedSetsTreeEntryId);
 		attributeSetterBiConsumers.put(
 			"parentNestedSetsTreeEntryId",
 			(BiConsumer<NestedSetsTreeEntry, Long>)
 				NestedSetsTreeEntry::setParentNestedSetsTreeEntryId);
+		attributeGetterFunctions.put(
+			"leftNestedSetsTreeEntryId",
+			NestedSetsTreeEntry::getLeftNestedSetsTreeEntryId);
 		attributeSetterBiConsumers.put(
 			"leftNestedSetsTreeEntryId",
 			(BiConsumer<NestedSetsTreeEntry, Long>)
 				NestedSetsTreeEntry::setLeftNestedSetsTreeEntryId);
+		attributeGetterFunctions.put(
+			"rightNestedSetsTreeEntryId",
+			NestedSetsTreeEntry::getRightNestedSetsTreeEntryId);
 		attributeSetterBiConsumers.put(
 			"rightNestedSetsTreeEntryId",
 			(BiConsumer<NestedSetsTreeEntry, Long>)
 				NestedSetsTreeEntry::setRightNestedSetsTreeEntryId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -453,6 +476,25 @@ public class NestedSetsTreeEntryModelImpl
 	}
 
 	@Override
+	public NestedSetsTreeEntry cloneWithOriginalValues() {
+		NestedSetsTreeEntryImpl nestedSetsTreeEntryImpl =
+			new NestedSetsTreeEntryImpl();
+
+		nestedSetsTreeEntryImpl.setNestedSetsTreeEntryId(
+			this.<Long>getColumnOriginalValue("nestedSetsTreeEntryId"));
+		nestedSetsTreeEntryImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		nestedSetsTreeEntryImpl.setParentNestedSetsTreeEntryId(
+			this.<Long>getColumnOriginalValue("parentNestedSetsTreeEntryId"));
+		nestedSetsTreeEntryImpl.setLeftNestedSetsTreeEntryId(
+			this.<Long>getColumnOriginalValue("leftNestedSetsTreeEntryId"));
+		nestedSetsTreeEntryImpl.setRightNestedSetsTreeEntryId(
+			this.<Long>getColumnOriginalValue("rightNestedSetsTreeEntryId"));
+
+		return nestedSetsTreeEntryImpl;
+	}
+
+	@Override
 	public int compareTo(NestedSetsTreeEntry nestedSetsTreeEntry) {
 		long primaryKey = nestedSetsTreeEntry.getPrimaryKey();
 
@@ -625,9 +667,7 @@ public class NestedSetsTreeEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, NestedSetsTreeEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					NestedSetsTreeEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

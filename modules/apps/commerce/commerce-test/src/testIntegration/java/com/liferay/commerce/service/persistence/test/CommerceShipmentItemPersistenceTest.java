@@ -127,6 +127,8 @@ public class CommerceShipmentItemPersistenceTest {
 
 		CommerceShipmentItem newCommerceShipmentItem = _persistence.create(pk);
 
+		newCommerceShipmentItem.setMvccVersion(RandomTestUtil.nextLong());
+
 		newCommerceShipmentItem.setGroupId(RandomTestUtil.nextLong());
 
 		newCommerceShipmentItem.setCompanyId(RandomTestUtil.nextLong());
@@ -157,6 +159,9 @@ public class CommerceShipmentItemPersistenceTest {
 			_persistence.findByPrimaryKey(
 				newCommerceShipmentItem.getPrimaryKey());
 
+		Assert.assertEquals(
+			existingCommerceShipmentItem.getMvccVersion(),
+			newCommerceShipmentItem.getMvccVersion());
 		Assert.assertEquals(
 			existingCommerceShipmentItem.getCommerceShipmentItemId(),
 			newCommerceShipmentItem.getCommerceShipmentItemId());
@@ -202,10 +207,10 @@ public class CommerceShipmentItemPersistenceTest {
 	}
 
 	@Test
-	public void testCountByCommerceShipment() throws Exception {
-		_persistence.countByCommerceShipment(RandomTestUtil.nextLong());
+	public void testCountByCommerceShipmentId() throws Exception {
+		_persistence.countByCommerceShipmentId(RandomTestUtil.nextLong());
 
-		_persistence.countByCommerceShipment(0L);
+		_persistence.countByCommerceShipmentId(0L);
 	}
 
 	@Test
@@ -260,11 +265,12 @@ public class CommerceShipmentItemPersistenceTest {
 
 	protected OrderByComparator<CommerceShipmentItem> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CommerceShipmentItem", "commerceShipmentItemId", true, "groupId",
-			true, "companyId", true, "userId", true, "userName", true,
-			"createDate", true, "modifiedDate", true, "commerceShipmentId",
-			true, "commerceOrderItemId", true, "commerceInventoryWarehouseId",
-			true, "quantity", true);
+			"CommerceShipmentItem", "mvccVersion", true,
+			"commerceShipmentItemId", true, "groupId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "commerceShipmentId", true,
+			"commerceOrderItemId", true, "commerceInventoryWarehouseId", true,
+			"quantity", true);
 	}
 
 	@Test
@@ -580,6 +586,8 @@ public class CommerceShipmentItemPersistenceTest {
 		long pk = RandomTestUtil.nextLong();
 
 		CommerceShipmentItem commerceShipmentItem = _persistence.create(pk);
+
+		commerceShipmentItem.setMvccVersion(RandomTestUtil.nextLong());
 
 		commerceShipmentItem.setGroupId(RandomTestUtil.nextLong());
 

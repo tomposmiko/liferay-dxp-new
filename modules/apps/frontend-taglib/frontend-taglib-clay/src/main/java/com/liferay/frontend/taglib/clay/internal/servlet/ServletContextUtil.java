@@ -36,7 +36,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = {})
 public class ServletContextUtil {
 
-	public static final String getClayDataSetDisplaySettingsNamespace(
+	public static String getClayDataSetDisplaySettingsNamespace(
 		HttpServletRequest httpServletRequest, String id) {
 
 		StringBundler sb = new StringBundler(7);
@@ -63,23 +63,21 @@ public class ServletContextUtil {
 		return sb.toString();
 	}
 
-	public static final ClayDataSetDisplayViewSerializer
+	public static ClayDataSetDisplayViewSerializer
 		getClayDataSetDisplayViewSerializer() {
 
 		return _clayDataSetDisplayViewSerializer;
 	}
 
-	public static final ClayDataSetFilterSerializer
-		getClayDataSetFilterSerializer() {
-
+	public static ClayDataSetFilterSerializer getClayDataSetFilterSerializer() {
 		return _clayDataSetFilterSerializer;
 	}
 
-	public static final String getContextPath() {
+	public static String getContextPath() {
 		return _servletContext.getContextPath();
 	}
 
-	public static final ServletContext getServletContext() {
+	public static ServletContext getServletContext() {
 		return _servletContext;
 	}
 

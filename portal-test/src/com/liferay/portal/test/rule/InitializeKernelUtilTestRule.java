@@ -20,7 +20,13 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AbstractTestRule;
+import com.liferay.portal.kernel.util.CalendarFactory;
+import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.Html;
+import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -81,8 +87,11 @@ public class InitializeKernelUtilTestRule
 			_setUpPropsUtil(_processProperties(portalProps.properties()));
 		}
 
+		_setUpCalendarFactoryUtil();
 		_setUpFileUtil();
 		_setUpJSONFactoryUtil();
+		_setUpHtmlUtil();
+		_setUpHttpUtil();
 
 		return null;
 	}
@@ -123,6 +132,24 @@ public class InitializeKernelUtilTestRule
 		return propertyMap;
 	}
 
+	private void _setUpCalendarFactoryUtil()
+		throws ReflectiveOperationException {
+
+		Thread thread = Thread.currentThread();
+
+		ClassLoader classLoader = thread.getContextClassLoader();
+
+		CalendarFactoryUtil calendarFactoryUtil = new CalendarFactoryUtil();
+
+		Class<?> clazz = classLoader.loadClass(
+			"com.liferay.portal.util.CalendarFactoryImpl");
+
+		Constructor<?> constructor = clazz.getDeclaredConstructor();
+
+		calendarFactoryUtil.setCalendarFactory(
+			(CalendarFactory)constructor.newInstance());
+	}
+
 	private void _setUpFileUtil() throws ClassNotFoundException {
 		Thread thread = Thread.currentThread();
 
@@ -134,6 +161,36 @@ public class InitializeKernelUtilTestRule
 			ReflectionTestUtil.getFieldValue(
 				classLoader.loadClass("com.liferay.portal.util.FileImpl"),
 				"_fileImpl"));
+	}
+
+	private void _setUpHtmlUtil() throws ReflectiveOperationException {
+		Thread thread = Thread.currentThread();
+
+		ClassLoader classLoader = thread.getContextClassLoader();
+
+		HtmlUtil htmlUtil = new HtmlUtil();
+
+		Class<?> clazz = classLoader.loadClass(
+			"com.liferay.portal.util.HtmlImpl");
+
+		Constructor<?> constructor = clazz.getDeclaredConstructor();
+
+		htmlUtil.setHtml((Html)constructor.newInstance());
+	}
+
+	private void _setUpHttpUtil() throws ReflectiveOperationException {
+		Thread thread = Thread.currentThread();
+
+		ClassLoader classLoader = thread.getContextClassLoader();
+
+		HttpUtil httpUtil = new HttpUtil();
+
+		Class<?> clazz = classLoader.loadClass(
+			"com.liferay.portal.util.HttpImpl");
+
+		Constructor<?> constructor = clazz.getDeclaredConstructor();
+
+		httpUtil.setHttp((Http)constructor.newInstance());
 	}
 
 	private void _setUpJSONFactoryUtil() throws ReflectiveOperationException {

@@ -357,10 +357,6 @@ public class SearchDisplayContext {
 	public String getSearchScopeParameterString() {
 		SearchScope searchScope = getSearchScope();
 
-		if (searchScope == null) {
-			searchScope = SearchScopePreference.THIS_SITE.getSearchScope();
-		}
-
 		return searchScope.getParameterString();
 	}
 
@@ -604,7 +600,15 @@ public class SearchDisplayContext {
 		SearchScopePreference searchScopePreference =
 			getSearchScopePreference();
 
-		return searchScopePreference.getSearchScope();
+		SearchScope searchScope = searchScopePreference.getSearchScope();
+
+		if (searchScope == null) {
+			throw new IllegalArgumentException(
+				"Scope parameter is empty and no default is set in " +
+					"preferences");
+		}
+
+		return searchScope;
 	}
 
 	protected SearchScopePreference getSearchScopePreference() {

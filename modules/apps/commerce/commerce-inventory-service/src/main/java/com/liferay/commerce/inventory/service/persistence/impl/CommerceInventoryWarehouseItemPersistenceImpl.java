@@ -14,7 +14,6 @@
 
 package com.liferay.commerce.inventory.service.persistence.impl;
 
-import com.liferay.commerce.inventory.exception.DuplicateCommerceInventoryWarehouseItemExternalReferenceCodeException;
 import com.liferay.commerce.inventory.exception.NoSuchInventoryWarehouseItemException;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItemTable;
@@ -23,7 +22,6 @@ import com.liferay.commerce.inventory.model.impl.CommerceInventoryWarehouseItemM
 import com.liferay.commerce.inventory.service.persistence.CommerceInventoryWarehouseItemPersistence;
 import com.liferay.commerce.inventory.service.persistence.CommerceInventoryWarehouseItemUtil;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -33,20 +31,17 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
@@ -57,17 +52,10 @@ import java.lang.reflect.InvocationHandler;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * The persistence implementation for the commerce inventory warehouse item service.
@@ -200,7 +188,7 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceInventoryWarehouseItem>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceInventoryWarehouseItem
@@ -575,7 +563,7 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -726,7 +714,7 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceInventoryWarehouseItem>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceInventoryWarehouseItem
@@ -1127,7 +1115,7 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 
 		Object[] finderArgs = new Object[] {commerceInventoryWarehouseId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1276,7 +1264,7 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceInventoryWarehouseItem>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceInventoryWarehouseItem
@@ -1700,7 +1688,7 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, sku};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1840,8 +1828,7 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_S, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_S, finderArgs);
 		}
 
 		if (result instanceof CommerceInventoryWarehouseItem) {
@@ -1958,7 +1945,7 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 
 		Object[] finderArgs = new Object[] {commerceInventoryWarehouseId, sku};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2099,8 +2086,7 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_ERC, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_ERC, finderArgs);
 		}
 
 		if (result instanceof CommerceInventoryWarehouseItem) {
@@ -2235,7 +2221,7 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, externalReferenceCode};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2386,9 +2372,7 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(CommerceInventoryWarehouseItemImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(CommerceInventoryWarehouseItemImpl.class);
 	}
 
 	/**
@@ -2422,9 +2406,7 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(CommerceInventoryWarehouseItemImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(
@@ -2442,22 +2424,20 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 			commerceInventoryWarehouseItemModelImpl.getSku()
 		};
 
-		finderCache.putResult(
-			_finderPathCountByC_S, args, Long.valueOf(1), false);
+		finderCache.putResult(_finderPathCountByC_S, args, Long.valueOf(1));
 		finderCache.putResult(
 			_finderPathFetchByC_S, args,
-			commerceInventoryWarehouseItemModelImpl, false);
+			commerceInventoryWarehouseItemModelImpl);
 
 		args = new Object[] {
 			commerceInventoryWarehouseItemModelImpl.getCompanyId(),
 			commerceInventoryWarehouseItemModelImpl.getExternalReferenceCode()
 		};
 
-		finderCache.putResult(
-			_finderPathCountByC_ERC, args, Long.valueOf(1), false);
+		finderCache.putResult(_finderPathCountByC_ERC, args, Long.valueOf(1));
 		finderCache.putResult(
 			_finderPathFetchByC_ERC, args,
-			commerceInventoryWarehouseItemModelImpl, false);
+			commerceInventoryWarehouseItemModelImpl);
 	}
 
 	/**
@@ -2605,45 +2585,6 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 			commerceInventoryWarehouseItemModelImpl =
 				(CommerceInventoryWarehouseItemModelImpl)
 					commerceInventoryWarehouseItem;
-
-		if (Validator.isNull(
-				commerceInventoryWarehouseItem.getExternalReferenceCode())) {
-
-			commerceInventoryWarehouseItem.setExternalReferenceCode(
-				String.valueOf(commerceInventoryWarehouseItem.getPrimaryKey()));
-		}
-		else {
-			CommerceInventoryWarehouseItem ercCommerceInventoryWarehouseItem =
-				fetchByC_ERC(
-					commerceInventoryWarehouseItem.getCompanyId(),
-					commerceInventoryWarehouseItem.getExternalReferenceCode());
-
-			if (isNew) {
-				if (ercCommerceInventoryWarehouseItem != null) {
-					throw new DuplicateCommerceInventoryWarehouseItemExternalReferenceCodeException(
-						"Duplicate commerce inventory warehouse item with external reference code " +
-							commerceInventoryWarehouseItem.
-								getExternalReferenceCode() + " and company " +
-									commerceInventoryWarehouseItem.
-										getCompanyId());
-				}
-			}
-			else {
-				if ((ercCommerceInventoryWarehouseItem != null) &&
-					(commerceInventoryWarehouseItem.
-						getCommerceInventoryWarehouseItemId() !=
-							ercCommerceInventoryWarehouseItem.
-								getCommerceInventoryWarehouseItemId())) {
-
-					throw new DuplicateCommerceInventoryWarehouseItemExternalReferenceCodeException(
-						"Duplicate commerce inventory warehouse item with external reference code " +
-							commerceInventoryWarehouseItem.
-								getExternalReferenceCode() + " and company " +
-									commerceInventoryWarehouseItem.
-										getCompanyId());
-				}
-			}
-		}
 
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
@@ -2847,7 +2788,7 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceInventoryWarehouseItem>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2920,7 +2861,7 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -2976,34 +2917,22 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 	 * Initializes the commerce inventory warehouse item persistence.
 	 */
 	public void afterPropertiesSet() {
-		Bundle bundle = FrameworkUtil.getBundle(
-			CommerceInventoryWarehouseItemPersistenceImpl.class);
-
-		_bundleContext = bundle.getBundleContext();
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class,
-			new CommerceInventoryWarehouseItemModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name",
-				CommerceInventoryWarehouseItem.class.getName()));
-
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByCompanyId = _createFinderPath(
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -3011,18 +2940,18 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 			},
 			new String[] {"companyId"}, true);
 
-		_finderPathWithoutPaginationFindByCompanyId = _createFinderPath(
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			true);
 
-		_finderPathCountByCompanyId = _createFinderPath(
+		_finderPathCountByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
 
 		_finderPathWithPaginationFindByCommerceInventoryWarehouseId =
-			_createFinderPath(
+			new FinderPath(
 				FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
 				"findByCommerceInventoryWarehouseId",
 				new String[] {
@@ -3032,19 +2961,19 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 				new String[] {"commerceInventoryWarehouseId"}, true);
 
 		_finderPathWithoutPaginationFindByCommerceInventoryWarehouseId =
-			_createFinderPath(
+			new FinderPath(
 				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
 				"findByCommerceInventoryWarehouseId",
 				new String[] {Long.class.getName()},
 				new String[] {"commerceInventoryWarehouseId"}, true);
 
-		_finderPathCountByCommerceInventoryWarehouseId = _createFinderPath(
+		_finderPathCountByCommerceInventoryWarehouseId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
 			"countByCommerceInventoryWarehouseId",
 			new String[] {Long.class.getName()},
 			new String[] {"commerceInventoryWarehouseId"}, false);
 
-		_finderPathWithPaginationFindByCompanyId_Sku = _createFinderPath(
+		_finderPathWithPaginationFindByCompanyId_Sku = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId_Sku",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -3053,32 +2982,32 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 			},
 			new String[] {"companyId", "sku"}, true);
 
-		_finderPathWithoutPaginationFindByCompanyId_Sku = _createFinderPath(
+		_finderPathWithoutPaginationFindByCompanyId_Sku = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId_Sku",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "sku"}, true);
 
-		_finderPathCountByCompanyId_Sku = _createFinderPath(
+		_finderPathCountByCompanyId_Sku = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId_Sku",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "sku"}, false);
 
-		_finderPathFetchByC_S = _createFinderPath(
+		_finderPathFetchByC_S = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_S",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"commerceInventoryWarehouseId", "sku"}, true);
 
-		_finderPathCountByC_S = _createFinderPath(
+		_finderPathCountByC_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_S",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"commerceInventoryWarehouseId", "sku"}, false);
 
-		_finderPathFetchByC_ERC = _createFinderPath(
+		_finderPathFetchByC_ERC = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_ERC",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, true);
 
-		_finderPathCountByC_ERC = _createFinderPath(
+		_finderPathCountByC_ERC = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_ERC",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "externalReferenceCode"}, false);
@@ -3091,14 +3020,6 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 
 		entityCache.removeCache(
 			CommerceInventoryWarehouseItemImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setCommerceInventoryWarehouseItemUtilPersistence(
@@ -3118,8 +3039,6 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
-
-	private BundleContext _bundleContext;
 
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
@@ -3156,112 +3075,9 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"commerceInventoryWarehouseItemId"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
-	}
-
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class CommerceInventoryWarehouseItemModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			CommerceInventoryWarehouseItemModelImpl
-				commerceInventoryWarehouseItemModelImpl =
-					(CommerceInventoryWarehouseItemModelImpl)baseModel;
-
-			long columnBitmask =
-				commerceInventoryWarehouseItemModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					commerceInventoryWarehouseItemModelImpl, columnNames,
-					original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						commerceInventoryWarehouseItemModelImpl.
-							getColumnBitmask(columnName);
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					commerceInventoryWarehouseItemModelImpl, columnNames,
-					original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			CommerceInventoryWarehouseItemModelImpl
-				commerceInventoryWarehouseItemModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						commerceInventoryWarehouseItemModelImpl.
-							getColumnOriginalValue(columnName);
-				}
-				else {
-					arguments[i] =
-						commerceInventoryWarehouseItemModelImpl.getColumnValue(
-							columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
 }

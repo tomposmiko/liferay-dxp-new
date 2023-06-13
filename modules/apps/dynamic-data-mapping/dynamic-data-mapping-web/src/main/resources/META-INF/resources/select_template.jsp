@@ -21,7 +21,6 @@ long templateId = ParamUtil.getLong(request, "templateId");
 
 long classNameId = ParamUtil.getLong(request, "classNameId");
 long classPK = ParamUtil.getLong(request, "classPK");
-String eventName = ParamUtil.getString(request, "eventName", "selectTemplate");
 
 DDMStructure structure = null;
 
@@ -40,9 +39,9 @@ if ((classPK > 0) && (structureClassNameId == classNameId)) {
 	disabled="<%= ddmDisplayContext.isDisabledManagementBar(DDMWebKeys.DYNAMIC_DATA_MAPPING_TEMPLATE) %>"
 	filterDropdownItems="<%= ddmDisplayContext.getFilterItemsDropdownItems() %>"
 	itemsTotal="<%= ddmDisplayContext.getTotalItems(DDMWebKeys.DYNAMIC_DATA_MAPPING_TEMPLATE) %>"
-	namespace="<%= liferayPortletResponse.getNamespace() %>"
 	searchActionURL="<%= ddmDisplayContext.getSelectTemplateSearchActionURL() %>"
 	searchFormName="searchForm"
+	searchInputAutoFocus="<%= true %>"
 	selectable="<%= false %>"
 	sortingOrder="<%= ddmDisplayContext.getOrderByType() %>"
 	sortingURL="<%= ddmDisplayContext.getSortingURL() %>"
@@ -64,7 +63,7 @@ if ((classPK > 0) && (structureClassNameId == classNameId)) {
 				/>
 
 				<liferay-ui:search-container-column-text
-					cssClass="table-cell-content"
+					cssClass="table-cell-expand"
 					name="name"
 				>
 					<c:choose>
@@ -96,7 +95,7 @@ if ((classPK > 0) && (structureClassNameId == classNameId)) {
 				</liferay-ui:search-container-column-text>
 
 				<liferay-ui:search-container-column-jsp
-					cssClass="table-cell-content"
+					cssClass="table-cell-expand"
 					name="description"
 					path="/template_description.jsp"
 				/>
@@ -113,16 +112,3 @@ if ((classPK > 0) && (structureClassNameId == classNameId)) {
 		</liferay-ui:search-container>
 	</clay:container-fluid>
 </aui:form>
-
-<aui:script>
-	Liferay.Util.focusFormField(
-		document.<portlet:namespace />searchForm.<portlet:namespace />keywords
-	);
-</aui:script>
-
-<aui:script>
-	Liferay.Util.selectEntityHandler(
-		'#<portlet:namespace />selectTemplateFm',
-		'<%= HtmlUtil.escapeJS(eventName) %>'
-	);
-</aui:script>

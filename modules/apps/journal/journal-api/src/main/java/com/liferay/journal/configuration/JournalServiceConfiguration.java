@@ -51,18 +51,6 @@ public interface JournalServiceConfiguration {
 	)
 	public String errorTemplateFTL();
 
-	@Meta.AD(
-		deflt = "${resource:com/liferay/journal/dependencies/error.vm}",
-		name = "error-template-vm", required = false
-	)
-	public String errorTemplateVM();
-
-	@Meta.AD(
-		deflt = "${resource:com/liferay/journal/dependencies/error.xsl}",
-		name = "error-template-xsl", required = false
-	)
-	public String errorTemplateXSL();
-
 	@Meta.AD(deflt = "15", name = "check-interval", required = false)
 	public int checkInterval();
 
@@ -132,14 +120,6 @@ public interface JournalServiceConfiguration {
 	public boolean syncContentSearchOnStartup();
 
 	@Meta.AD(
-		deflt = "true",
-		description = "journal-article-export-import-processor-cache-enabled-help",
-		name = "journal-article-export-import-processor-cache-enabled",
-		required = false
-	)
-	public boolean journalArticleExportImportProcessorCacheEnabled();
-
-	@Meta.AD(
 		deflt = "@page_break@",
 		description = "journal-article-token-page-break",
 		name = "journal-article-page-break-token", required = false
@@ -160,8 +140,9 @@ public interface JournalServiceConfiguration {
 
 	@Meta.AD(
 		deflt = "false",
-		description = "single-asset-publish-includes-version-history-help",
-		name = "single-asset-publish-includes-version-history", required = false
+		description = "single-asset-publish-process-includes-version-history-help",
+		name = "single-asset-publish-process-includes-version-history",
+		required = false
 	)
 	public boolean singleAssetPublishIncludeVersionHistory();
 

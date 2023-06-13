@@ -69,6 +69,7 @@ public class OrganizationModelDocumentContributor
 				"nameTreePath", _buildNameTreePath(organization));
 			document.addKeyword(
 				"parentOrganizationId", organization.getParentOrganizationId());
+			document.remove(Field.USER_NAME);
 
 			_populateAddresses(
 				document, organization.getAddresses(),
@@ -182,6 +183,9 @@ public class OrganizationModelDocumentContributor
 		document.addText("city", cities.toArray(new String[0]));
 		document.addText("country", countries.toArray(new String[0]));
 		document.addText("region", regions.toArray(new String[0]));
+		document.addKeyword(
+			Field.getSortableFieldName("region"),
+			regions.toArray(new String[0]));
 		document.addText("street", streets.toArray(new String[0]));
 		document.addText("zip", zips.toArray(new String[0]));
 	}

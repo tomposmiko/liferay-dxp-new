@@ -39,6 +39,7 @@ import com.liferay.translation.model.TranslationEntrySoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -78,15 +79,16 @@ public class TranslationEntryModelImpl
 	public static final String TABLE_NAME = "TranslationEntry";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
-		{"translationEntryId", Types.BIGINT}, {"groupId", Types.BIGINT},
-		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
-		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
-		{"modifiedDate", Types.TIMESTAMP}, {"classNameId", Types.BIGINT},
-		{"classPK", Types.BIGINT}, {"content", Types.CLOB},
-		{"contentType", Types.VARCHAR}, {"languageId", Types.VARCHAR},
-		{"status", Types.INTEGER}, {"statusByUserId", Types.BIGINT},
-		{"statusByUserName", Types.VARCHAR}, {"statusDate", Types.TIMESTAMP}
+		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
+		{"uuid_", Types.VARCHAR}, {"translationEntryId", Types.BIGINT},
+		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
+		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
+		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
+		{"classNameId", Types.BIGINT}, {"classPK", Types.BIGINT},
+		{"content", Types.CLOB}, {"contentType", Types.VARCHAR},
+		{"languageId", Types.VARCHAR}, {"status", Types.INTEGER},
+		{"statusByUserId", Types.BIGINT}, {"statusByUserName", Types.VARCHAR},
+		{"statusDate", Types.TIMESTAMP}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -94,6 +96,7 @@ public class TranslationEntryModelImpl
 
 	static {
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("translationEntryId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
@@ -114,7 +117,7 @@ public class TranslationEntryModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table TranslationEntry (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,translationEntryId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,content TEXT null,contentType VARCHAR(75) null,languageId VARCHAR(75) null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
+		"create table TranslationEntry (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,uuid_ VARCHAR(75) null,translationEntryId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,content TEXT null,contentType VARCHAR(75) null,languageId VARCHAR(75) null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,primary key (translationEntryId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP = "drop table TranslationEntry";
 
@@ -203,6 +206,7 @@ public class TranslationEntryModelImpl
 		TranslationEntry model = new TranslationEntryImpl();
 
 		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
 		model.setUuid(soapModel.getUuid());
 		model.setTranslationEntryId(soapModel.getTranslationEntryId());
 		model.setGroupId(soapModel.getGroupId());
@@ -334,122 +338,150 @@ public class TranslationEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, TranslationEntry>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			TranslationEntry.class.getClassLoader(), TranslationEntry.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<TranslationEntry> constructor =
+				(Constructor<TranslationEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<TranslationEntry, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<TranslationEntry, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<TranslationEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<TranslationEntry, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", TranslationEntry::getMvccVersion);
-		attributeGetterFunctions.put("uuid", TranslationEntry::getUuid);
-		attributeGetterFunctions.put(
-			"translationEntryId", TranslationEntry::getTranslationEntryId);
-		attributeGetterFunctions.put("groupId", TranslationEntry::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", TranslationEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", TranslationEntry::getUserId);
-		attributeGetterFunctions.put("userName", TranslationEntry::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", TranslationEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", TranslationEntry::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", TranslationEntry::getClassNameId);
-		attributeGetterFunctions.put("classPK", TranslationEntry::getClassPK);
-		attributeGetterFunctions.put("content", TranslationEntry::getContent);
-		attributeGetterFunctions.put(
-			"contentType", TranslationEntry::getContentType);
-		attributeGetterFunctions.put(
-			"languageId", TranslationEntry::getLanguageId);
-		attributeGetterFunctions.put("status", TranslationEntry::getStatus);
-		attributeGetterFunctions.put(
-			"statusByUserId", TranslationEntry::getStatusByUserId);
-		attributeGetterFunctions.put(
-			"statusByUserName", TranslationEntry::getStatusByUserName);
-		attributeGetterFunctions.put(
-			"statusDate", TranslationEntry::getStatusDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<TranslationEntry, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<TranslationEntry, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<TranslationEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", TranslationEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<TranslationEntry, Long>)
 				TranslationEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", TranslationEntry::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<TranslationEntry, Long>)
+				TranslationEntry::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", TranslationEntry::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<TranslationEntry, String>)TranslationEntry::setUuid);
+		attributeGetterFunctions.put(
+			"translationEntryId", TranslationEntry::getTranslationEntryId);
 		attributeSetterBiConsumers.put(
 			"translationEntryId",
 			(BiConsumer<TranslationEntry, Long>)
 				TranslationEntry::setTranslationEntryId);
+		attributeGetterFunctions.put("groupId", TranslationEntry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<TranslationEntry, Long>)TranslationEntry::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", TranslationEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<TranslationEntry, Long>)TranslationEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", TranslationEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<TranslationEntry, Long>)TranslationEntry::setUserId);
+		attributeGetterFunctions.put("userName", TranslationEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<TranslationEntry, String>)
 				TranslationEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", TranslationEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<TranslationEntry, Date>)
 				TranslationEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", TranslationEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<TranslationEntry, Date>)
 				TranslationEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", TranslationEntry::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<TranslationEntry, Long>)
 				TranslationEntry::setClassNameId);
+		attributeGetterFunctions.put("classPK", TranslationEntry::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<TranslationEntry, Long>)TranslationEntry::setClassPK);
+		attributeGetterFunctions.put("content", TranslationEntry::getContent);
 		attributeSetterBiConsumers.put(
 			"content",
 			(BiConsumer<TranslationEntry, String>)TranslationEntry::setContent);
+		attributeGetterFunctions.put(
+			"contentType", TranslationEntry::getContentType);
 		attributeSetterBiConsumers.put(
 			"contentType",
 			(BiConsumer<TranslationEntry, String>)
 				TranslationEntry::setContentType);
+		attributeGetterFunctions.put(
+			"languageId", TranslationEntry::getLanguageId);
 		attributeSetterBiConsumers.put(
 			"languageId",
 			(BiConsumer<TranslationEntry, String>)
 				TranslationEntry::setLanguageId);
+		attributeGetterFunctions.put("status", TranslationEntry::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<TranslationEntry, Integer>)TranslationEntry::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", TranslationEntry::getStatusByUserId);
 		attributeSetterBiConsumers.put(
 			"statusByUserId",
 			(BiConsumer<TranslationEntry, Long>)
 				TranslationEntry::setStatusByUserId);
+		attributeGetterFunctions.put(
+			"statusByUserName", TranslationEntry::getStatusByUserName);
 		attributeSetterBiConsumers.put(
 			"statusByUserName",
 			(BiConsumer<TranslationEntry, String>)
 				TranslationEntry::setStatusByUserName);
+		attributeGetterFunctions.put(
+			"statusDate", TranslationEntry::getStatusDate);
 		attributeSetterBiConsumers.put(
 			"statusDate",
 			(BiConsumer<TranslationEntry, Date>)
 				TranslationEntry::setStatusDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -467,6 +499,21 @@ public class TranslationEntryModelImpl
 		}
 
 		_mvccVersion = mvccVersion;
+	}
+
+	@JSON
+	@Override
+	public long getCtCollectionId() {
+		return _ctCollectionId;
+	}
+
+	@Override
+	public void setCtCollectionId(long ctCollectionId) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_ctCollectionId = ctCollectionId;
 	}
 
 	@JSON
@@ -1012,6 +1059,7 @@ public class TranslationEntryModelImpl
 		TranslationEntryImpl translationEntryImpl = new TranslationEntryImpl();
 
 		translationEntryImpl.setMvccVersion(getMvccVersion());
+		translationEntryImpl.setCtCollectionId(getCtCollectionId());
 		translationEntryImpl.setUuid(getUuid());
 		translationEntryImpl.setTranslationEntryId(getTranslationEntryId());
 		translationEntryImpl.setGroupId(getGroupId());
@@ -1031,6 +1079,52 @@ public class TranslationEntryModelImpl
 		translationEntryImpl.setStatusDate(getStatusDate());
 
 		translationEntryImpl.resetOriginalValues();
+
+		return translationEntryImpl;
+	}
+
+	@Override
+	public TranslationEntry cloneWithOriginalValues() {
+		TranslationEntryImpl translationEntryImpl = new TranslationEntryImpl();
+
+		translationEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		translationEntryImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		translationEntryImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		translationEntryImpl.setTranslationEntryId(
+			this.<Long>getColumnOriginalValue("translationEntryId"));
+		translationEntryImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		translationEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		translationEntryImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		translationEntryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		translationEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		translationEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		translationEntryImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		translationEntryImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		translationEntryImpl.setContent(
+			this.<String>getColumnOriginalValue("content"));
+		translationEntryImpl.setContentType(
+			this.<String>getColumnOriginalValue("contentType"));
+		translationEntryImpl.setLanguageId(
+			this.<String>getColumnOriginalValue("languageId"));
+		translationEntryImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
+		translationEntryImpl.setStatusByUserId(
+			this.<Long>getColumnOriginalValue("statusByUserId"));
+		translationEntryImpl.setStatusByUserName(
+			this.<String>getColumnOriginalValue("statusByUserName"));
+		translationEntryImpl.setStatusDate(
+			this.<Date>getColumnOriginalValue("statusDate"));
 
 		return translationEntryImpl;
 	}
@@ -1110,6 +1204,8 @@ public class TranslationEntryModelImpl
 			new TranslationEntryCacheModel();
 
 		translationEntryCacheModel.mvccVersion = getMvccVersion();
+
+		translationEntryCacheModel.ctCollectionId = getCtCollectionId();
 
 		translationEntryCacheModel.uuid = getUuid();
 
@@ -1289,13 +1385,12 @@ public class TranslationEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, TranslationEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					TranslationEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
 	private long _mvccVersion;
+	private long _ctCollectionId;
 	private String _uuid;
 	private long _translationEntryId;
 	private long _groupId;
@@ -1345,6 +1440,7 @@ public class TranslationEntryModelImpl
 		_columnOriginalValues = new HashMap<String, Object>();
 
 		_columnOriginalValues.put("mvccVersion", _mvccVersion);
+		_columnOriginalValues.put("ctCollectionId", _ctCollectionId);
 		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put("translationEntryId", _translationEntryId);
 		_columnOriginalValues.put("groupId", _groupId);
@@ -1387,39 +1483,41 @@ public class TranslationEntryModelImpl
 
 		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("uuid_", 2L);
+		columnBitmasks.put("ctCollectionId", 2L);
 
-		columnBitmasks.put("translationEntryId", 4L);
+		columnBitmasks.put("uuid_", 4L);
 
-		columnBitmasks.put("groupId", 8L);
+		columnBitmasks.put("translationEntryId", 8L);
 
-		columnBitmasks.put("companyId", 16L);
+		columnBitmasks.put("groupId", 16L);
 
-		columnBitmasks.put("userId", 32L);
+		columnBitmasks.put("companyId", 32L);
 
-		columnBitmasks.put("userName", 64L);
+		columnBitmasks.put("userId", 64L);
 
-		columnBitmasks.put("createDate", 128L);
+		columnBitmasks.put("userName", 128L);
 
-		columnBitmasks.put("modifiedDate", 256L);
+		columnBitmasks.put("createDate", 256L);
 
-		columnBitmasks.put("classNameId", 512L);
+		columnBitmasks.put("modifiedDate", 512L);
 
-		columnBitmasks.put("classPK", 1024L);
+		columnBitmasks.put("classNameId", 1024L);
 
-		columnBitmasks.put("content", 2048L);
+		columnBitmasks.put("classPK", 2048L);
 
-		columnBitmasks.put("contentType", 4096L);
+		columnBitmasks.put("content", 4096L);
 
-		columnBitmasks.put("languageId", 8192L);
+		columnBitmasks.put("contentType", 8192L);
 
-		columnBitmasks.put("status", 16384L);
+		columnBitmasks.put("languageId", 16384L);
 
-		columnBitmasks.put("statusByUserId", 32768L);
+		columnBitmasks.put("status", 32768L);
 
-		columnBitmasks.put("statusByUserName", 65536L);
+		columnBitmasks.put("statusByUserId", 65536L);
 
-		columnBitmasks.put("statusDate", 131072L);
+		columnBitmasks.put("statusByUserName", 131072L);
+
+		columnBitmasks.put("statusDate", 262144L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

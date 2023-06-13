@@ -17,7 +17,6 @@ package com.liferay.dispatch.web.internal.portlet.action;
 import com.liferay.dispatch.constants.DispatchConstants;
 import com.liferay.dispatch.constants.DispatchPortletKeys;
 import com.liferay.dispatch.executor.DispatchTaskClusterMode;
-import com.liferay.dispatch.executor.DispatchTaskStatus;
 import com.liferay.dispatch.model.DispatchTrigger;
 import com.liferay.dispatch.service.DispatchTriggerService;
 import com.liferay.dispatch.web.internal.security.permisison.resource.DispatchTriggerPermission;
@@ -41,6 +40,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -147,23 +147,13 @@ public class EditDispatchTriggerMVCActionCommand extends BaseMVCActionCommand {
 			_log.error(exception, exception);
 
 			jsonObject.put(
-				"cssClass", DispatchTaskStatus.FAILED.getCssClass()
-			).put(
 				"error", exception.getMessage()
-			).put(
-				"status", DispatchTaskStatus.FAILED.getLabel()
 			).put(
 				"success", false
 			);
 		}
 
-		jsonObject.put(
-			"cssClass", DispatchTaskStatus.IN_PROGRESS.getCssClass()
-		).put(
-			"status", DispatchTaskStatus.IN_PROGRESS.getLabel()
-		).put(
-			"success", true
-		);
+		jsonObject.put("success", true);
 
 		return jsonObject;
 	}
@@ -229,14 +219,13 @@ public class EditDispatchTriggerMVCActionCommand extends BaseMVCActionCommand {
 			actionRequest, "dispatchTriggerId");
 
 		String name = ParamUtil.getString(actionRequest, "name");
-		String dispatchTaskExecutorType = ParamUtil.getString(
-			actionRequest, "dispatchTaskExecutorType");
 
 		UnicodeProperties dispatchTaskSettingsUnicodeProperties =
-			new UnicodeProperties(true);
-
-		dispatchTaskSettingsUnicodeProperties.fastLoad(
-			ParamUtil.getString(actionRequest, "dispatchTaskSettings"));
+			UnicodePropertiesBuilder.create(
+				true
+			).fastLoad(
+				ParamUtil.getString(actionRequest, "dispatchTaskSettings")
+			).build();
 
 		DispatchTrigger dispatchTrigger = null;
 
@@ -245,6 +234,9 @@ public class EditDispatchTriggerMVCActionCommand extends BaseMVCActionCommand {
 				dispatchTriggerId, dispatchTaskSettingsUnicodeProperties, name);
 		}
 		else {
+			String dispatchTaskExecutorType = ParamUtil.getString(
+				actionRequest, "dispatchTaskExecutorType");
+
 			dispatchTrigger = _dispatchTriggerService.addDispatchTrigger(
 				_portal.getUserId(actionRequest), dispatchTaskExecutorType,
 				dispatchTaskSettingsUnicodeProperties, name);

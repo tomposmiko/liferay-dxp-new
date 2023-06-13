@@ -42,6 +42,7 @@ public class CommerceShipmentWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("commerceShipmentId", getCommerceShipmentId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
@@ -65,6 +66,12 @@ public class CommerceShipmentWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long commerceShipmentId = (Long)attributes.get("commerceShipmentId");
 
 		if (commerceShipmentId != null) {
@@ -162,6 +169,11 @@ public class CommerceShipmentWrapper
 		if (status != null) {
 			setStatus(status);
 		}
+	}
+
+	@Override
+	public CommerceShipment cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
 	}
 
 	@Override
@@ -294,6 +306,16 @@ public class CommerceShipmentWrapper
 	@Override
 	public Date getModifiedDate() {
 		return model.getModifiedDate();
+	}
+
+	/**
+	 * Returns the mvcc version of this commerce shipment.
+	 *
+	 * @return the mvcc version of this commerce shipment
+	 */
+	@Override
+	public long getMvccVersion() {
+		return model.getMvccVersion();
 	}
 
 	/**
@@ -479,6 +501,16 @@ public class CommerceShipmentWrapper
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		model.setModifiedDate(modifiedDate);
+	}
+
+	/**
+	 * Sets the mvcc version of this commerce shipment.
+	 *
+	 * @param mvccVersion the mvcc version of this commerce shipment
+	 */
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		model.setMvccVersion(mvccVersion);
 	}
 
 	/**

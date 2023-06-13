@@ -716,12 +716,12 @@ public class CommercePriceListCommerceAccountGroupRelUtil {
 	 * @return the matching commerce price list commerce account group rel
 	 * @throws NoSuchPriceListCommerceAccountGroupRelException if a matching commerce price list commerce account group rel could not be found
 	 */
-	public static CommercePriceListCommerceAccountGroupRel findByC_C(
+	public static CommercePriceListCommerceAccountGroupRel findByCAGI_CPI(
 			long commercePriceListId, long commerceAccountGroupId)
 		throws com.liferay.commerce.price.list.exception.
 			NoSuchPriceListCommerceAccountGroupRelException {
 
-		return getPersistence().findByC_C(
+		return getPersistence().findByCAGI_CPI(
 			commercePriceListId, commerceAccountGroupId);
 	}
 
@@ -732,10 +732,10 @@ public class CommercePriceListCommerceAccountGroupRelUtil {
 	 * @param commerceAccountGroupId the commerce account group ID
 	 * @return the matching commerce price list commerce account group rel, or <code>null</code> if a matching commerce price list commerce account group rel could not be found
 	 */
-	public static CommercePriceListCommerceAccountGroupRel fetchByC_C(
+	public static CommercePriceListCommerceAccountGroupRel fetchByCAGI_CPI(
 		long commercePriceListId, long commerceAccountGroupId) {
 
-		return getPersistence().fetchByC_C(
+		return getPersistence().fetchByCAGI_CPI(
 			commercePriceListId, commerceAccountGroupId);
 	}
 
@@ -747,11 +747,11 @@ public class CommercePriceListCommerceAccountGroupRelUtil {
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching commerce price list commerce account group rel, or <code>null</code> if a matching commerce price list commerce account group rel could not be found
 	 */
-	public static CommercePriceListCommerceAccountGroupRel fetchByC_C(
+	public static CommercePriceListCommerceAccountGroupRel fetchByCAGI_CPI(
 		long commercePriceListId, long commerceAccountGroupId,
 		boolean useFinderCache) {
 
-		return getPersistence().fetchByC_C(
+		return getPersistence().fetchByCAGI_CPI(
 			commercePriceListId, commerceAccountGroupId, useFinderCache);
 	}
 
@@ -762,12 +762,12 @@ public class CommercePriceListCommerceAccountGroupRelUtil {
 	 * @param commerceAccountGroupId the commerce account group ID
 	 * @return the commerce price list commerce account group rel that was removed
 	 */
-	public static CommercePriceListCommerceAccountGroupRel removeByC_C(
+	public static CommercePriceListCommerceAccountGroupRel removeByCAGI_CPI(
 			long commercePriceListId, long commerceAccountGroupId)
 		throws com.liferay.commerce.price.list.exception.
 			NoSuchPriceListCommerceAccountGroupRelException {
 
-		return getPersistence().removeByC_C(
+		return getPersistence().removeByCAGI_CPI(
 			commercePriceListId, commerceAccountGroupId);
 	}
 
@@ -778,10 +778,10 @@ public class CommercePriceListCommerceAccountGroupRelUtil {
 	 * @param commerceAccountGroupId the commerce account group ID
 	 * @return the number of matching commerce price list commerce account group rels
 	 */
-	public static int countByC_C(
+	public static int countByCAGI_CPI(
 		long commercePriceListId, long commerceAccountGroupId) {
 
-		return getPersistence().countByC_C(
+		return getPersistence().countByCAGI_CPI(
 			commercePriceListId, commerceAccountGroupId);
 	}
 

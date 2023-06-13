@@ -109,12 +109,53 @@ public class SiteNavigationMenuItemServiceSoap {
 		}
 	}
 
+	public static com.liferay.site.navigation.model.SiteNavigationMenuItemSoap
+			deleteSiteNavigationMenuItem(
+				long siteNavigationMenuItemId, boolean deleteChildren)
+		throws RemoteException {
+
+		try {
+			com.liferay.site.navigation.model.SiteNavigationMenuItem
+				returnValue =
+					SiteNavigationMenuItemServiceUtil.
+						deleteSiteNavigationMenuItem(
+							siteNavigationMenuItemId, deleteChildren);
+
+			return com.liferay.site.navigation.model.SiteNavigationMenuItemSoap.
+				toSoapModel(returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
 	public static void deleteSiteNavigationMenuItems(long siteNavigationMenuId)
 		throws RemoteException {
 
 		try {
 			SiteNavigationMenuItemServiceUtil.deleteSiteNavigationMenuItems(
 				siteNavigationMenuId);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static Long[] getParentSiteNavigationMenuItemIds(
+			long siteNavigationMenuId, String typeSettingsKeyword)
+		throws RemoteException {
+
+		try {
+			java.util.List<Long> returnValue =
+				SiteNavigationMenuItemServiceUtil.
+					getParentSiteNavigationMenuItemIds(
+						siteNavigationMenuId, typeSettingsKeyword);
+
+			return returnValue.toArray(new Long[returnValue.size()]);
 		}
 		catch (Exception exception) {
 			_log.error(exception, exception);

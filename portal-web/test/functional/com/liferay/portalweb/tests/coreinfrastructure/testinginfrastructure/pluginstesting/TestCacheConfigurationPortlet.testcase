@@ -11,17 +11,17 @@ definition {
 	}
 
 	tearDown {
-		Page.tearDownCP();
+		PagesAdmin.tearDownCP();
 	}
 
 	@ignore = "true"
-	@priority = 4
+	@priority = "4"
 	test ViewCacheConfiguration {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Test Cache Configuration Page");
+		PagesAdmin.addPublicPage(pageName = "Test Cache Configuration Page");
 
 		Navigator.gotoPage(pageName = "Test Cache Configuration Page");
 

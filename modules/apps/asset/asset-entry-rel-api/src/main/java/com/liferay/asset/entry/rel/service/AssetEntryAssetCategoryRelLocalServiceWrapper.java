@@ -30,6 +30,10 @@ public class AssetEntryAssetCategoryRelLocalServiceWrapper
 	implements AssetEntryAssetCategoryRelLocalService,
 			   ServiceWrapper<AssetEntryAssetCategoryRelLocalService> {
 
+	public AssetEntryAssetCategoryRelLocalServiceWrapper() {
+		this(null);
+	}
+
 	public AssetEntryAssetCategoryRelLocalServiceWrapper(
 		AssetEntryAssetCategoryRelLocalService
 			assetEntryAssetCategoryRelLocalService) {
@@ -418,6 +422,15 @@ public class AssetEntryAssetCategoryRelLocalServiceWrapper
 	public int getAssetEntryAssetCategoryRelsCount(long assetEntryId) {
 		return _assetEntryAssetCategoryRelLocalService.
 			getAssetEntryAssetCategoryRelsCount(assetEntryId);
+	}
+
+	@Override
+	public int getAssetEntryAssetCategoryRelsCountByAssetCategoryId(
+		long assetCategoryId) {
+
+		return _assetEntryAssetCategoryRelLocalService.
+			getAssetEntryAssetCategoryRelsCountByAssetCategoryId(
+				assetCategoryId);
 	}
 
 	@Override

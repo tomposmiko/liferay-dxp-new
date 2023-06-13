@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -275,44 +276,65 @@ public class PortletModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Portlet, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Portlet>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Portlet, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Portlet, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Portlet.class.getClassLoader(), Portlet.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", Portlet::getMvccVersion);
-		attributeGetterFunctions.put("id", Portlet::getId);
-		attributeGetterFunctions.put("companyId", Portlet::getCompanyId);
-		attributeGetterFunctions.put("portletId", Portlet::getPortletId);
-		attributeGetterFunctions.put("roles", Portlet::getRoles);
-		attributeGetterFunctions.put("active", Portlet::getActive);
+		try {
+			Constructor<Portlet> constructor =
+				(Constructor<Portlet>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Portlet, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Portlet, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Portlet, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Portlet, Object>>();
 		Map<String, BiConsumer<Portlet, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Portlet, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", Portlet::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion", (BiConsumer<Portlet, Long>)Portlet::setMvccVersion);
+		attributeGetterFunctions.put("id", Portlet::getId);
 		attributeSetterBiConsumers.put(
 			"id", (BiConsumer<Portlet, Long>)Portlet::setId);
+		attributeGetterFunctions.put("companyId", Portlet::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<Portlet, Long>)Portlet::setCompanyId);
+		attributeGetterFunctions.put("portletId", Portlet::getPortletId);
 		attributeSetterBiConsumers.put(
 			"portletId", (BiConsumer<Portlet, String>)Portlet::setPortletId);
+		attributeGetterFunctions.put("roles", Portlet::getRoles);
 		attributeSetterBiConsumers.put(
 			"roles", (BiConsumer<Portlet, String>)Portlet::setRoles);
+		attributeGetterFunctions.put("active", Portlet::getActive);
 		attributeSetterBiConsumers.put(
 			"active", (BiConsumer<Portlet, Boolean>)Portlet::setActive);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -511,6 +533,23 @@ public class PortletModelImpl
 	}
 
 	@Override
+	public Portlet cloneWithOriginalValues() {
+		PortletImpl portletImpl = new PortletImpl();
+
+		portletImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		portletImpl.setId(this.<Long>getColumnOriginalValue("id_"));
+		portletImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		portletImpl.setPortletId(
+			this.<String>getColumnOriginalValue("portletId"));
+		portletImpl.setRoles(this.<String>getColumnOriginalValue("roles"));
+		portletImpl.setActive(this.<Boolean>getColumnOriginalValue("active_"));
+
+		return portletImpl;
+	}
+
+	@Override
 	public int compareTo(Portlet portlet) {
 		long primaryKey = portlet.getPrimaryKey();
 
@@ -691,9 +730,7 @@ public class PortletModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Portlet>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Portlet.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

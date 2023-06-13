@@ -56,8 +56,11 @@ renderResponse.setTitle(GetterUtil.get(title, LanguageUtil.get(request, "view-fo
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 		<aui:input name="formInstanceRecordId" type="hidden" value="<%= ddmFormDisplayContext.getFormInstanceRecordId() %>" />
 		<aui:input name="formInstanceId" type="hidden" value="<%= ddmFormDisplayContext.getFormInstanceId() %>" />
+		<aui:input name="defaultLanguageId" type="hidden" value='<%= ParamUtil.getString(request, "defaultLanguageId") %>' />
 
-		<div class="ddm-form-basic-info">
+		<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/dynamic_data_mapping_form/validate_csrf_token" var="validateCSRFTokenURL" />
+
+		<div id=<%= ddmFormDisplayContext.getContainerId() %>>
 
 			<%
 			String languageId = ddmFormDisplayContext.getDefaultLanguageId();
@@ -65,17 +68,20 @@ renderResponse.setTitle(GetterUtil.get(title, LanguageUtil.get(request, "view-fo
 			Locale displayLocale = LocaleUtil.fromLanguageId(languageId);
 			%>
 
-			<h1 class="ddm-form-name"><%= HtmlUtil.escape(formInstance.getName(displayLocale)) %></h1>
-
-			<%
-			String description = HtmlUtil.escape(formInstance.getDescription(displayLocale));
-			%>
-
-			<c:if test="<%= Validator.isNotNull(description) %>">
-				<h5 class="ddm-form-description"><%= description %></h5>
-			</c:if>
+			<react:component
+				module="admin/js/FormView"
+				props='<%=
+					HashMapBuilder.<String, Object>put(
+						"description", HtmlUtil.escape(formInstance.getDescription(displayLocale))
+					).put(
+						"title", HtmlUtil.escape(formInstance.getName(displayLocale))
+					).put(
+						"validateCSRFTokenURL", validateCSRFTokenURL.toString()
+					).putAll(
+						ddmFormDisplayContext.getDDMFormContext()
+					).build()
+				%>'
+			/>
 		</div>
-
-		<%= ddmFormDisplayContext.getDDMFormHTML() %>
 	</aui:form>
 </clay:container-fluid>

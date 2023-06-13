@@ -45,6 +45,7 @@ import javax.servlet.ServletContext;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -53,7 +54,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.workflow.configuration.WorkflowDefinitionConfiguration",
-	immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = {
 		"portal.workflow.tabs.name=" + WorkflowWebKeys.WORKFLOW_TAB_DEFINITION,
 		"service.ranking:Integer=100"
@@ -126,9 +127,7 @@ public class KaleoDesignerWorkflowPortletTab extends BaseWorkflowPortletTab {
 		if (_kaleoDesignerDisplayContext == null) {
 			_kaleoDesignerDisplayContext = new KaleoDesignerDisplayContext(
 				renderRequest, _kaleoDefinitionVersionLocalService,
-				ResourceBundleLoaderUtil.
-					getResourceBundleLoaderByBundleSymbolicName(
-						"com.liferay.portal.workflow.kaleo.designer.web"),
+				ResourceBundleLoaderUtil.getPortalResourceBundleLoader(),
 				_userLocalService);
 		}
 
@@ -195,7 +194,7 @@ public class KaleoDesignerWorkflowPortletTab extends BaseWorkflowPortletTab {
 	private static final Log _log = LogFactoryUtil.getLog(
 		KaleoDesignerWorkflowPortletTab.class);
 
-	private boolean _companyAdministratorCanPublish;
+	private volatile boolean _companyAdministratorCanPublish;
 	private KaleoDefinitionVersionLocalService
 		_kaleoDefinitionVersionLocalService;
 	private KaleoDesignerDisplayContext _kaleoDesignerDisplayContext;

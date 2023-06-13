@@ -23,16 +23,21 @@ import com.liferay.change.tracking.internal.reference.TableReferenceInfo;
 import com.liferay.change.tracking.internal.resolver.ConstraintResolverContextImpl;
 import com.liferay.change.tracking.internal.resolver.ConstraintResolverKey;
 import com.liferay.change.tracking.model.CTEntry;
+import com.liferay.change.tracking.model.CTEntryTable;
 import com.liferay.change.tracking.service.CTEntryLocalService;
 import com.liferay.change.tracking.spi.display.CTDisplayRenderer;
 import com.liferay.change.tracking.spi.resolver.ConstraintResolver;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.petra.sql.dsl.Column;
+import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.Table;
+import com.liferay.petra.sql.dsl.ast.ASTNode;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
+import com.liferay.petra.sql.dsl.query.JoinStep;
 import com.liferay.petra.sql.dsl.query.WhereStep;
 import com.liferay.petra.sql.dsl.spi.ast.DefaultASTNodeListener;
+import com.liferay.petra.sql.dsl.spi.query.Join;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.dao.orm.common.SQLTransformer;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
@@ -58,9 +63,11 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -133,6 +140,9 @@ public class CTConflictChecker<T extends CTModel<T>> {
 		List<ConflictInfo> conflictInfos = new ArrayList<>();
 
 		_checkAdditions(
+			connection, ctPersistence, conflictInfos, primaryKeyName);
+
+		_checkDeletions(
 			connection, ctPersistence, conflictInfos, primaryKeyName);
 
 		if (_modificationCTEntries != null) {
@@ -285,29 +295,60 @@ public class CTConflictChecker<T extends CTModel<T>> {
 		}
 	}
 
+	private void _checkDeletions(
+		Connection connection, CTPersistence<T> ctPersistence,
+		List<ConflictInfo> conflictInfos, String primaryKeyName) {
+
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				StringBundler.concat(
+					"select publication.", primaryKeyName, " from ",
+					ctPersistence.getTableName(),
+					" publication inner join CTEntry on CTEntry.modelClassPK ",
+					"= publication.", primaryKeyName,
+					" where CTEntry.ctCollectionId = ", _sourceCTCollectionId,
+					" and CTEntry.modelClassNameId = ", _modelClassNameId,
+					" and CTEntry.changeType = ",
+					CTConstants.CT_CHANGE_TYPE_DELETION,
+					" and publication.ctCollectionId = ", _targetCTCollectionId,
+					" and CTEntry.modelMvccVersion != ",
+					"publication.mvccVersion"));
+			ResultSet resultSet = preparedStatement.executeQuery()) {
+
+			while (resultSet.next()) {
+				conflictInfos.add(
+					new ModificationDeletionConflictInfo(resultSet.getLong(1)));
+			}
+		}
+		catch (SQLException sqlException) {
+			throw new ORMException(sqlException);
+		}
+	}
+
 	private void _checkMissingRequirements(
 			Connection connection, CTPersistence<T> ctPersistence,
 			List<ConflictInfo> conflictInfos)
 		throws PortalException {
 
-		Set<Long> primaryKeys = new HashSet<>();
+		if (!_ctEntryLocalService.hasCTEntries(
+				_sourceCTCollectionId, _modelClassNameId)) {
 
-		for (CTEntry ctEntry :
-				_ctEntryLocalService.getCTEntries(
-					_sourceCTCollectionId, _modelClassNameId)) {
-
-			if (ctEntry.getChangeType() ==
-					CTConstants.CT_CHANGE_TYPE_ADDITION) {
-
-				primaryKeys.add(ctEntry.getModelClassPK());
-			}
-		}
-
-		if (primaryKeys.isEmpty()) {
 			return;
 		}
 
-		Long[] primaryKeysArray = primaryKeys.toArray(new Long[0]);
+		DSLQuery ctEntryDSLQuery = DSLQueryFactoryUtil.select(
+			CTEntryTable.INSTANCE.modelClassPK
+		).from(
+			CTEntryTable.INSTANCE
+		).where(
+			CTEntryTable.INSTANCE.ctCollectionId.eq(
+				_sourceCTCollectionId
+			).and(
+				CTEntryTable.INSTANCE.modelClassNameId.eq(_modelClassNameId)
+			).and(
+				CTEntryTable.INSTANCE.changeType.eq(
+					CTConstants.CT_CHANGE_TYPE_ADDITION)
+			)
+		);
 
 		Map<Long, TableReferenceInfo<?>> combinedTableReferenceInfos =
 			_tableReferenceDefinitionManager.getCombinedTableReferenceInfos();
@@ -334,52 +375,8 @@ public class CTConflictChecker<T extends CTModel<T>> {
 					continue;
 				}
 
-				Column<?, Long> childPKColumn =
-					tableJoinHolder.getChildPKColumn();
-
-				Table<?> childTable = childPKColumn.getTable();
-
-				Column<?, Long> ctCollectionIdColumn = childTable.getColumn(
-					"ctCollectionId", Long.class);
-
-				Predicate missingRequirementWherePredicate =
-					tableJoinHolder.getMissingRequirementWherePredicate();
-
-				missingRequirementWherePredicate =
-					missingRequirementWherePredicate.and(
-						childPKColumn.in(
-							primaryKeysArray
-						).and(
-							ctCollectionIdColumn.eq(_sourceCTCollectionId)
-						));
-
-				Column<?, Long> parentPKColumn =
-					tableJoinHolder.getParentPKColumn();
-
-				Table<?> parentTable = parentPKColumn.getTable();
-
-				ctCollectionIdColumn = parentTable.getColumn(
-					"ctCollectionId", Long.class);
-
-				if ((ctCollectionIdColumn != null) &&
-					ctCollectionIdColumn.isPrimaryKey()) {
-
-					missingRequirementWherePredicate =
-						missingRequirementWherePredicate.and(
-							ctCollectionIdColumn.neq(
-								_sourceCTCollectionId
-							).or(
-								ctCollectionIdColumn.neq(_targetCTCollectionId)
-							).or(
-								parentPKColumn.isNull()
-							).withParentheses());
-				}
-
-				WhereStep whereStep =
-					tableJoinHolder.getMissingRequirementWhereStep();
-
-				DSLQuery nextDSLQuery = whereStep.where(
-					missingRequirementWherePredicate);
+				DSLQuery nextDSLQuery = _getMissingRequirementsDSLQuery(
+					ctEntryDSLQuery, tableJoinHolder);
 
 				if (dslQuery == null) {
 					dslQuery = nextDSLQuery;
@@ -535,6 +532,69 @@ public class CTConflictChecker<T extends CTModel<T>> {
 		catch (SQLException sqlException) {
 			throw new ORMException(sqlException);
 		}
+	}
+
+	private DSLQuery _getMissingRequirementsDSLQuery(
+		DSLQuery ctEntryDSLQuery, TableJoinHolder tableJoinHolder) {
+
+		WhereStep whereStep = tableJoinHolder.getMissingRequirementWhereStep();
+
+		Deque<Join> joins = new LinkedList<>();
+
+		ASTNode astNode = whereStep;
+
+		while (astNode instanceof Join) {
+			Join join = (Join)astNode;
+
+			joins.push(join);
+
+			astNode = join.getChild();
+		}
+
+		Join join = null;
+
+		JoinStep joinStep = (JoinStep)astNode;
+
+		while ((join = joins.poll()) != null) {
+			Predicate predicate = join.getOnPredicate();
+
+			Table<?> table = join.getTable();
+
+			predicate = predicate.and(
+				() -> {
+					Column<?, Long> ctCollectionIdColumn = table.getColumn(
+						"ctCollectionId", Long.class);
+
+					if (ctCollectionIdColumn != null) {
+						return ctCollectionIdColumn.in(
+							new Long[] {
+								_sourceCTCollectionId, _targetCTCollectionId
+							});
+					}
+
+					return null;
+				});
+
+			joinStep = joinStep.leftJoinOn(table, predicate);
+		}
+
+		Column<?, Long> childPKColumn = tableJoinHolder.getChildPKColumn();
+
+		Table<?> childTable = childPKColumn.getTable();
+
+		Column<?, Long> ctCollectionIdColumn = childTable.getColumn(
+			"ctCollectionId", Long.class);
+
+		Predicate missingRequirementWherePredicate =
+			tableJoinHolder.getMissingRequirementWherePredicate();
+
+		return joinStep.where(
+			missingRequirementWherePredicate.and(
+				childPKColumn.in(
+					ctEntryDSLQuery
+				).and(
+					ctCollectionIdColumn.eq(_sourceCTCollectionId)
+				)));
 	}
 
 	private List<Long> _getModifiedPrimaryKeys(

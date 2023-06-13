@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.math.BigDecimal;
@@ -80,7 +81,8 @@ public class CommerceDiscountModelImpl
 	public static final String TABLE_NAME = "CommerceDiscount";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"uuid_", Types.VARCHAR}, {"externalReferenceCode", Types.VARCHAR},
+		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
+		{"externalReferenceCode", Types.VARCHAR},
 		{"commerceDiscountId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
@@ -104,6 +106,7 @@ public class CommerceDiscountModelImpl
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("externalReferenceCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("commerceDiscountId", Types.BIGINT);
@@ -139,7 +142,7 @@ public class CommerceDiscountModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CommerceDiscount (uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,commerceDiscountId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title VARCHAR(75) null,target VARCHAR(75) null,useCouponCode BOOLEAN,couponCode VARCHAR(75) null,usePercentage BOOLEAN,maximumDiscountAmount DECIMAL(30, 16) null,levelType VARCHAR(75) null,level1 DECIMAL(30, 16) null,level2 DECIMAL(30, 16) null,level3 DECIMAL(30, 16) null,level4 DECIMAL(30, 16) null,limitationType VARCHAR(75) null,limitationTimes INTEGER,limitationTimesPerAccount INTEGER,numberOfUse INTEGER,rulesConjunction BOOLEAN,active_ BOOLEAN,displayDate DATE null,expirationDate DATE null,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
+		"create table CommerceDiscount (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,commerceDiscountId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title VARCHAR(75) null,target VARCHAR(75) null,useCouponCode BOOLEAN,couponCode VARCHAR(75) null,usePercentage BOOLEAN,maximumDiscountAmount DECIMAL(30, 16) null,levelType VARCHAR(75) null,level1 DECIMAL(30, 16) null,level2 DECIMAL(30, 16) null,level3 DECIMAL(30, 16) null,level4 DECIMAL(30, 16) null,limitationType VARCHAR(75) null,limitationTimes INTEGER,limitationTimesPerAccount INTEGER,numberOfUse INTEGER,rulesConjunction BOOLEAN,active_ BOOLEAN,displayDate DATE null,expirationDate DATE null,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
 
 	public static final String TABLE_SQL_DROP = "drop table CommerceDiscount";
 
@@ -243,6 +246,7 @@ public class CommerceDiscountModelImpl
 
 		CommerceDiscount model = new CommerceDiscountImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setUuid(soapModel.getUuid());
 		model.setExternalReferenceCode(soapModel.getExternalReferenceCode());
 		model.setCommerceDiscountId(soapModel.getCommerceDiscountId());
@@ -394,205 +398,248 @@ public class CommerceDiscountModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CommerceDiscount>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceDiscount.class.getClassLoader(), CommerceDiscount.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<CommerceDiscount> constructor =
+				(Constructor<CommerceDiscount>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<CommerceDiscount, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CommerceDiscount, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceDiscount, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<CommerceDiscount, Object>>();
-
-		attributeGetterFunctions.put("uuid", CommerceDiscount::getUuid);
-		attributeGetterFunctions.put(
-			"externalReferenceCode",
-			CommerceDiscount::getExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"commerceDiscountId", CommerceDiscount::getCommerceDiscountId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceDiscount::getCompanyId);
-		attributeGetterFunctions.put("userId", CommerceDiscount::getUserId);
-		attributeGetterFunctions.put("userName", CommerceDiscount::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceDiscount::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceDiscount::getModifiedDate);
-		attributeGetterFunctions.put("title", CommerceDiscount::getTitle);
-		attributeGetterFunctions.put("target", CommerceDiscount::getTarget);
-		attributeGetterFunctions.put(
-			"useCouponCode", CommerceDiscount::getUseCouponCode);
-		attributeGetterFunctions.put(
-			"couponCode", CommerceDiscount::getCouponCode);
-		attributeGetterFunctions.put(
-			"usePercentage", CommerceDiscount::getUsePercentage);
-		attributeGetterFunctions.put(
-			"maximumDiscountAmount",
-			CommerceDiscount::getMaximumDiscountAmount);
-		attributeGetterFunctions.put("level", CommerceDiscount::getLevel);
-		attributeGetterFunctions.put("level1", CommerceDiscount::getLevel1);
-		attributeGetterFunctions.put("level2", CommerceDiscount::getLevel2);
-		attributeGetterFunctions.put("level3", CommerceDiscount::getLevel3);
-		attributeGetterFunctions.put("level4", CommerceDiscount::getLevel4);
-		attributeGetterFunctions.put(
-			"limitationType", CommerceDiscount::getLimitationType);
-		attributeGetterFunctions.put(
-			"limitationTimes", CommerceDiscount::getLimitationTimes);
-		attributeGetterFunctions.put(
-			"limitationTimesPerAccount",
-			CommerceDiscount::getLimitationTimesPerAccount);
-		attributeGetterFunctions.put(
-			"numberOfUse", CommerceDiscount::getNumberOfUse);
-		attributeGetterFunctions.put(
-			"rulesConjunction", CommerceDiscount::getRulesConjunction);
-		attributeGetterFunctions.put("active", CommerceDiscount::getActive);
-		attributeGetterFunctions.put(
-			"displayDate", CommerceDiscount::getDisplayDate);
-		attributeGetterFunctions.put(
-			"expirationDate", CommerceDiscount::getExpirationDate);
-		attributeGetterFunctions.put(
-			"lastPublishDate", CommerceDiscount::getLastPublishDate);
-		attributeGetterFunctions.put("status", CommerceDiscount::getStatus);
-		attributeGetterFunctions.put(
-			"statusByUserId", CommerceDiscount::getStatusByUserId);
-		attributeGetterFunctions.put(
-			"statusByUserName", CommerceDiscount::getStatusByUserName);
-		attributeGetterFunctions.put(
-			"statusDate", CommerceDiscount::getStatusDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CommerceDiscount, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceDiscount, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<CommerceDiscount, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CommerceDiscount::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CommerceDiscount, Long>)
+				CommerceDiscount::setMvccVersion);
+		attributeGetterFunctions.put("uuid", CommerceDiscount::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CommerceDiscount, String>)CommerceDiscount::setUuid);
+		attributeGetterFunctions.put(
+			"externalReferenceCode",
+			CommerceDiscount::getExternalReferenceCode);
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<CommerceDiscount, String>)
 				CommerceDiscount::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"commerceDiscountId", CommerceDiscount::getCommerceDiscountId);
 		attributeSetterBiConsumers.put(
 			"commerceDiscountId",
 			(BiConsumer<CommerceDiscount, Long>)
 				CommerceDiscount::setCommerceDiscountId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceDiscount::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceDiscount, Long>)CommerceDiscount::setCompanyId);
+		attributeGetterFunctions.put("userId", CommerceDiscount::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceDiscount, Long>)CommerceDiscount::setUserId);
+		attributeGetterFunctions.put("userName", CommerceDiscount::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceDiscount, String>)
 				CommerceDiscount::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceDiscount::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceDiscount, Date>)
 				CommerceDiscount::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceDiscount::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceDiscount, Date>)
 				CommerceDiscount::setModifiedDate);
+		attributeGetterFunctions.put("title", CommerceDiscount::getTitle);
 		attributeSetterBiConsumers.put(
 			"title",
 			(BiConsumer<CommerceDiscount, String>)CommerceDiscount::setTitle);
+		attributeGetterFunctions.put("target", CommerceDiscount::getTarget);
 		attributeSetterBiConsumers.put(
 			"target",
 			(BiConsumer<CommerceDiscount, String>)CommerceDiscount::setTarget);
+		attributeGetterFunctions.put(
+			"useCouponCode", CommerceDiscount::getUseCouponCode);
 		attributeSetterBiConsumers.put(
 			"useCouponCode",
 			(BiConsumer<CommerceDiscount, Boolean>)
 				CommerceDiscount::setUseCouponCode);
+		attributeGetterFunctions.put(
+			"couponCode", CommerceDiscount::getCouponCode);
 		attributeSetterBiConsumers.put(
 			"couponCode",
 			(BiConsumer<CommerceDiscount, String>)
 				CommerceDiscount::setCouponCode);
+		attributeGetterFunctions.put(
+			"usePercentage", CommerceDiscount::getUsePercentage);
 		attributeSetterBiConsumers.put(
 			"usePercentage",
 			(BiConsumer<CommerceDiscount, Boolean>)
 				CommerceDiscount::setUsePercentage);
+		attributeGetterFunctions.put(
+			"maximumDiscountAmount",
+			CommerceDiscount::getMaximumDiscountAmount);
 		attributeSetterBiConsumers.put(
 			"maximumDiscountAmount",
 			(BiConsumer<CommerceDiscount, BigDecimal>)
 				CommerceDiscount::setMaximumDiscountAmount);
+		attributeGetterFunctions.put("level", CommerceDiscount::getLevel);
 		attributeSetterBiConsumers.put(
 			"level",
 			(BiConsumer<CommerceDiscount, String>)CommerceDiscount::setLevel);
+		attributeGetterFunctions.put("level1", CommerceDiscount::getLevel1);
 		attributeSetterBiConsumers.put(
 			"level1",
 			(BiConsumer<CommerceDiscount, BigDecimal>)
 				CommerceDiscount::setLevel1);
+		attributeGetterFunctions.put("level2", CommerceDiscount::getLevel2);
 		attributeSetterBiConsumers.put(
 			"level2",
 			(BiConsumer<CommerceDiscount, BigDecimal>)
 				CommerceDiscount::setLevel2);
+		attributeGetterFunctions.put("level3", CommerceDiscount::getLevel3);
 		attributeSetterBiConsumers.put(
 			"level3",
 			(BiConsumer<CommerceDiscount, BigDecimal>)
 				CommerceDiscount::setLevel3);
+		attributeGetterFunctions.put("level4", CommerceDiscount::getLevel4);
 		attributeSetterBiConsumers.put(
 			"level4",
 			(BiConsumer<CommerceDiscount, BigDecimal>)
 				CommerceDiscount::setLevel4);
+		attributeGetterFunctions.put(
+			"limitationType", CommerceDiscount::getLimitationType);
 		attributeSetterBiConsumers.put(
 			"limitationType",
 			(BiConsumer<CommerceDiscount, String>)
 				CommerceDiscount::setLimitationType);
+		attributeGetterFunctions.put(
+			"limitationTimes", CommerceDiscount::getLimitationTimes);
 		attributeSetterBiConsumers.put(
 			"limitationTimes",
 			(BiConsumer<CommerceDiscount, Integer>)
 				CommerceDiscount::setLimitationTimes);
+		attributeGetterFunctions.put(
+			"limitationTimesPerAccount",
+			CommerceDiscount::getLimitationTimesPerAccount);
 		attributeSetterBiConsumers.put(
 			"limitationTimesPerAccount",
 			(BiConsumer<CommerceDiscount, Integer>)
 				CommerceDiscount::setLimitationTimesPerAccount);
+		attributeGetterFunctions.put(
+			"numberOfUse", CommerceDiscount::getNumberOfUse);
 		attributeSetterBiConsumers.put(
 			"numberOfUse",
 			(BiConsumer<CommerceDiscount, Integer>)
 				CommerceDiscount::setNumberOfUse);
+		attributeGetterFunctions.put(
+			"rulesConjunction", CommerceDiscount::getRulesConjunction);
 		attributeSetterBiConsumers.put(
 			"rulesConjunction",
 			(BiConsumer<CommerceDiscount, Boolean>)
 				CommerceDiscount::setRulesConjunction);
+		attributeGetterFunctions.put("active", CommerceDiscount::getActive);
 		attributeSetterBiConsumers.put(
 			"active",
 			(BiConsumer<CommerceDiscount, Boolean>)CommerceDiscount::setActive);
+		attributeGetterFunctions.put(
+			"displayDate", CommerceDiscount::getDisplayDate);
 		attributeSetterBiConsumers.put(
 			"displayDate",
 			(BiConsumer<CommerceDiscount, Date>)
 				CommerceDiscount::setDisplayDate);
+		attributeGetterFunctions.put(
+			"expirationDate", CommerceDiscount::getExpirationDate);
 		attributeSetterBiConsumers.put(
 			"expirationDate",
 			(BiConsumer<CommerceDiscount, Date>)
 				CommerceDiscount::setExpirationDate);
+		attributeGetterFunctions.put(
+			"lastPublishDate", CommerceDiscount::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<CommerceDiscount, Date>)
 				CommerceDiscount::setLastPublishDate);
+		attributeGetterFunctions.put("status", CommerceDiscount::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<CommerceDiscount, Integer>)CommerceDiscount::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", CommerceDiscount::getStatusByUserId);
 		attributeSetterBiConsumers.put(
 			"statusByUserId",
 			(BiConsumer<CommerceDiscount, Long>)
 				CommerceDiscount::setStatusByUserId);
+		attributeGetterFunctions.put(
+			"statusByUserName", CommerceDiscount::getStatusByUserName);
 		attributeSetterBiConsumers.put(
 			"statusByUserName",
 			(BiConsumer<CommerceDiscount, String>)
 				CommerceDiscount::setStatusByUserName);
+		attributeGetterFunctions.put(
+			"statusDate", CommerceDiscount::getStatusDate);
 		attributeSetterBiConsumers.put(
 			"statusDate",
 			(BiConsumer<CommerceDiscount, Date>)
 				CommerceDiscount::setStatusDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@JSON
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@JSON
@@ -1399,6 +1446,7 @@ public class CommerceDiscountModelImpl
 	public Object clone() {
 		CommerceDiscountImpl commerceDiscountImpl = new CommerceDiscountImpl();
 
+		commerceDiscountImpl.setMvccVersion(getMvccVersion());
 		commerceDiscountImpl.setUuid(getUuid());
 		commerceDiscountImpl.setExternalReferenceCode(
 			getExternalReferenceCode());
@@ -1436,6 +1484,80 @@ public class CommerceDiscountModelImpl
 		commerceDiscountImpl.setStatusDate(getStatusDate());
 
 		commerceDiscountImpl.resetOriginalValues();
+
+		return commerceDiscountImpl;
+	}
+
+	@Override
+	public CommerceDiscount cloneWithOriginalValues() {
+		CommerceDiscountImpl commerceDiscountImpl = new CommerceDiscountImpl();
+
+		commerceDiscountImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		commerceDiscountImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		commerceDiscountImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
+		commerceDiscountImpl.setCommerceDiscountId(
+			this.<Long>getColumnOriginalValue("commerceDiscountId"));
+		commerceDiscountImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commerceDiscountImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commerceDiscountImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commerceDiscountImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commerceDiscountImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commerceDiscountImpl.setTitle(
+			this.<String>getColumnOriginalValue("title"));
+		commerceDiscountImpl.setTarget(
+			this.<String>getColumnOriginalValue("target"));
+		commerceDiscountImpl.setUseCouponCode(
+			this.<Boolean>getColumnOriginalValue("useCouponCode"));
+		commerceDiscountImpl.setCouponCode(
+			this.<String>getColumnOriginalValue("couponCode"));
+		commerceDiscountImpl.setUsePercentage(
+			this.<Boolean>getColumnOriginalValue("usePercentage"));
+		commerceDiscountImpl.setMaximumDiscountAmount(
+			this.<BigDecimal>getColumnOriginalValue("maximumDiscountAmount"));
+		commerceDiscountImpl.setLevel(
+			this.<String>getColumnOriginalValue("levelType"));
+		commerceDiscountImpl.setLevel1(
+			this.<BigDecimal>getColumnOriginalValue("level1"));
+		commerceDiscountImpl.setLevel2(
+			this.<BigDecimal>getColumnOriginalValue("level2"));
+		commerceDiscountImpl.setLevel3(
+			this.<BigDecimal>getColumnOriginalValue("level3"));
+		commerceDiscountImpl.setLevel4(
+			this.<BigDecimal>getColumnOriginalValue("level4"));
+		commerceDiscountImpl.setLimitationType(
+			this.<String>getColumnOriginalValue("limitationType"));
+		commerceDiscountImpl.setLimitationTimes(
+			this.<Integer>getColumnOriginalValue("limitationTimes"));
+		commerceDiscountImpl.setLimitationTimesPerAccount(
+			this.<Integer>getColumnOriginalValue("limitationTimesPerAccount"));
+		commerceDiscountImpl.setNumberOfUse(
+			this.<Integer>getColumnOriginalValue("numberOfUse"));
+		commerceDiscountImpl.setRulesConjunction(
+			this.<Boolean>getColumnOriginalValue("rulesConjunction"));
+		commerceDiscountImpl.setActive(
+			this.<Boolean>getColumnOriginalValue("active_"));
+		commerceDiscountImpl.setDisplayDate(
+			this.<Date>getColumnOriginalValue("displayDate"));
+		commerceDiscountImpl.setExpirationDate(
+			this.<Date>getColumnOriginalValue("expirationDate"));
+		commerceDiscountImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+		commerceDiscountImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
+		commerceDiscountImpl.setStatusByUserId(
+			this.<Long>getColumnOriginalValue("statusByUserId"));
+		commerceDiscountImpl.setStatusByUserName(
+			this.<String>getColumnOriginalValue("statusByUserName"));
+		commerceDiscountImpl.setStatusDate(
+			this.<Date>getColumnOriginalValue("statusDate"));
 
 		return commerceDiscountImpl;
 	}
@@ -1514,6 +1636,8 @@ public class CommerceDiscountModelImpl
 	public CacheModel<CommerceDiscount> toCacheModel() {
 		CommerceDiscountCacheModel commerceDiscountCacheModel =
 			new CommerceDiscountCacheModel();
+
+		commerceDiscountCacheModel.mvccVersion = getMvccVersion();
 
 		commerceDiscountCacheModel.uuid = getUuid();
 
@@ -1770,12 +1894,11 @@ public class CommerceDiscountModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CommerceDiscount>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CommerceDiscount.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private String _uuid;
 	private String _externalReferenceCode;
 	private long _commerceDiscountId;
@@ -1839,6 +1962,7 @@ public class CommerceDiscountModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put(
 			"externalReferenceCode", _externalReferenceCode);
@@ -1899,69 +2023,71 @@ public class CommerceDiscountModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("uuid_", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("externalReferenceCode", 2L);
+		columnBitmasks.put("uuid_", 2L);
 
-		columnBitmasks.put("commerceDiscountId", 4L);
+		columnBitmasks.put("externalReferenceCode", 4L);
 
-		columnBitmasks.put("companyId", 8L);
+		columnBitmasks.put("commerceDiscountId", 8L);
 
-		columnBitmasks.put("userId", 16L);
+		columnBitmasks.put("companyId", 16L);
 
-		columnBitmasks.put("userName", 32L);
+		columnBitmasks.put("userId", 32L);
 
-		columnBitmasks.put("createDate", 64L);
+		columnBitmasks.put("userName", 64L);
 
-		columnBitmasks.put("modifiedDate", 128L);
+		columnBitmasks.put("createDate", 128L);
 
-		columnBitmasks.put("title", 256L);
+		columnBitmasks.put("modifiedDate", 256L);
 
-		columnBitmasks.put("target", 512L);
+		columnBitmasks.put("title", 512L);
 
-		columnBitmasks.put("useCouponCode", 1024L);
+		columnBitmasks.put("target", 1024L);
 
-		columnBitmasks.put("couponCode", 2048L);
+		columnBitmasks.put("useCouponCode", 2048L);
 
-		columnBitmasks.put("usePercentage", 4096L);
+		columnBitmasks.put("couponCode", 4096L);
 
-		columnBitmasks.put("maximumDiscountAmount", 8192L);
+		columnBitmasks.put("usePercentage", 8192L);
 
-		columnBitmasks.put("levelType", 16384L);
+		columnBitmasks.put("maximumDiscountAmount", 16384L);
 
-		columnBitmasks.put("level1", 32768L);
+		columnBitmasks.put("levelType", 32768L);
 
-		columnBitmasks.put("level2", 65536L);
+		columnBitmasks.put("level1", 65536L);
 
-		columnBitmasks.put("level3", 131072L);
+		columnBitmasks.put("level2", 131072L);
 
-		columnBitmasks.put("level4", 262144L);
+		columnBitmasks.put("level3", 262144L);
 
-		columnBitmasks.put("limitationType", 524288L);
+		columnBitmasks.put("level4", 524288L);
 
-		columnBitmasks.put("limitationTimes", 1048576L);
+		columnBitmasks.put("limitationType", 1048576L);
 
-		columnBitmasks.put("limitationTimesPerAccount", 2097152L);
+		columnBitmasks.put("limitationTimes", 2097152L);
 
-		columnBitmasks.put("numberOfUse", 4194304L);
+		columnBitmasks.put("limitationTimesPerAccount", 4194304L);
 
-		columnBitmasks.put("rulesConjunction", 8388608L);
+		columnBitmasks.put("numberOfUse", 8388608L);
 
-		columnBitmasks.put("active_", 16777216L);
+		columnBitmasks.put("rulesConjunction", 16777216L);
 
-		columnBitmasks.put("displayDate", 33554432L);
+		columnBitmasks.put("active_", 33554432L);
 
-		columnBitmasks.put("expirationDate", 67108864L);
+		columnBitmasks.put("displayDate", 67108864L);
 
-		columnBitmasks.put("lastPublishDate", 134217728L);
+		columnBitmasks.put("expirationDate", 134217728L);
 
-		columnBitmasks.put("status", 268435456L);
+		columnBitmasks.put("lastPublishDate", 268435456L);
 
-		columnBitmasks.put("statusByUserId", 536870912L);
+		columnBitmasks.put("status", 536870912L);
 
-		columnBitmasks.put("statusByUserName", 1073741824L);
+		columnBitmasks.put("statusByUserId", 1073741824L);
 
-		columnBitmasks.put("statusDate", 2147483648L);
+		columnBitmasks.put("statusByUserName", 2147483648L);
+
+		columnBitmasks.put("statusDate", 4294967296L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

@@ -48,27 +48,25 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -182,6 +180,8 @@ public abstract class BaseAttachmentResourceTestCase {
 		Attachment attachment = randomAttachment();
 
 		attachment.setAttachment(regex);
+		attachment.setCdnURL(regex);
+		attachment.setContentType(regex);
 		attachment.setExternalReferenceCode(regex);
 		attachment.setSrc(regex);
 
@@ -192,6 +192,8 @@ public abstract class BaseAttachmentResourceTestCase {
 		attachment = AttachmentSerDes.toDTO(json);
 
 		Assert.assertEquals(regex, attachment.getAttachment());
+		Assert.assertEquals(regex, attachment.getCdnURL());
+		Assert.assertEquals(regex, attachment.getContentType());
 		Assert.assertEquals(regex, attachment.getExternalReferenceCode());
 		Assert.assertEquals(regex, attachment.getSrc());
 	}
@@ -227,10 +229,7 @@ public abstract class BaseAttachmentResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantAttachment),
 				(List<Attachment>)page.getItems());
-			assertValid(
-				page,
-				testGetProductByExternalReferenceCodeAttachmentsPage_getExpectedActions(
-					irrelevantExternalReferenceCode));
+			assertValid(page);
 		}
 
 		Attachment attachment1 =
@@ -250,20 +249,7 @@ public abstract class BaseAttachmentResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(attachment1, attachment2),
 			(List<Attachment>)page.getItems());
-		assertValid(
-			page,
-			testGetProductByExternalReferenceCodeAttachmentsPage_getExpectedActions(
-				externalReferenceCode));
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetProductByExternalReferenceCodeAttachmentsPage_getExpectedActions(
-				String externalReferenceCode)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
+		assertValid(page);
 	}
 
 	@Test
@@ -435,10 +421,7 @@ public abstract class BaseAttachmentResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantAttachment),
 				(List<Attachment>)page.getItems());
-			assertValid(
-				page,
-				testGetProductByExternalReferenceCodeImagesPage_getExpectedActions(
-					irrelevantExternalReferenceCode));
+			assertValid(page);
 		}
 
 		Attachment attachment1 =
@@ -457,20 +440,7 @@ public abstract class BaseAttachmentResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(attachment1, attachment2),
 			(List<Attachment>)page.getItems());
-		assertValid(
-			page,
-			testGetProductByExternalReferenceCodeImagesPage_getExpectedActions(
-				externalReferenceCode));
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetProductByExternalReferenceCodeImagesPage_getExpectedActions(
-				String externalReferenceCode)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
+		assertValid(page);
 	}
 
 	@Test
@@ -633,10 +603,7 @@ public abstract class BaseAttachmentResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantAttachment),
 				(List<Attachment>)page.getItems());
-			assertValid(
-				page,
-				testGetProductIdAttachmentsPage_getExpectedActions(
-					irrelevantId));
+			assertValid(page);
 		}
 
 		Attachment attachment1 = testGetProductIdAttachmentsPage_addAttachment(
@@ -653,17 +620,7 @@ public abstract class BaseAttachmentResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(attachment1, attachment2),
 			(List<Attachment>)page.getItems());
-		assertValid(
-			page, testGetProductIdAttachmentsPage_getExpectedActions(id));
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetProductIdAttachmentsPage_getExpectedActions(Long id)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
+		assertValid(page);
 	}
 
 	@Test
@@ -804,9 +761,7 @@ public abstract class BaseAttachmentResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantAttachment),
 				(List<Attachment>)page.getItems());
-			assertValid(
-				page,
-				testGetProductIdImagesPage_getExpectedActions(irrelevantId));
+			assertValid(page);
 		}
 
 		Attachment attachment1 = testGetProductIdImagesPage_addAttachment(
@@ -823,16 +778,7 @@ public abstract class BaseAttachmentResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(attachment1, attachment2),
 			(List<Attachment>)page.getItems());
-		assertValid(page, testGetProductIdImagesPage_getExpectedActions(id));
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetProductIdImagesPage_getExpectedActions(Long id)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
+		assertValid(page);
 	}
 
 	@Test
@@ -1040,6 +986,30 @@ public abstract class BaseAttachmentResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("cdnEnabled", additionalAssertFieldName)) {
+				if (attachment.getCdnEnabled() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("cdnURL", additionalAssertFieldName)) {
+				if (attachment.getCdnURL() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("contentType", additionalAssertFieldName)) {
+				if (attachment.getContentType() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("customFields", additionalAssertFieldName)) {
 				if (attachment.getCustomFields() == null) {
 					valid = false;
@@ -1131,13 +1101,6 @@ public abstract class BaseAttachmentResourceTestCase {
 	}
 
 	protected void assertValid(Page<Attachment> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<Attachment> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<Attachment> attachments = page.getItems();
@@ -1152,20 +1115,6 @@ public abstract class BaseAttachmentResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1238,6 +1187,38 @@ public abstract class BaseAttachmentResourceTestCase {
 				if (!Objects.deepEquals(
 						attachment1.getAttachment(),
 						attachment2.getAttachment())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("cdnEnabled", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						attachment1.getCdnEnabled(),
+						attachment2.getCdnEnabled())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("cdnURL", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						attachment1.getCdnURL(), attachment2.getCdnURL())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("contentType", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						attachment1.getContentType(),
+						attachment2.getContentType())) {
 
 					return false;
 				}
@@ -1401,16 +1382,14 @@ public abstract class BaseAttachmentResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1427,10 +1406,6 @@ public abstract class BaseAttachmentResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1440,18 +1415,18 @@ public abstract class BaseAttachmentResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1470,6 +1445,27 @@ public abstract class BaseAttachmentResourceTestCase {
 		if (entityFieldName.equals("attachment")) {
 			sb.append("'");
 			sb.append(String.valueOf(attachment.getAttachment()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("cdnEnabled")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("cdnURL")) {
+			sb.append("'");
+			sb.append(String.valueOf(attachment.getCdnURL()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("contentType")) {
+			sb.append("'");
+			sb.append(String.valueOf(attachment.getContentType()));
 			sb.append("'");
 
 			return sb.toString();
@@ -1568,9 +1564,8 @@ public abstract class BaseAttachmentResourceTestCase {
 		}
 
 		if (entityFieldName.equals("priority")) {
-			sb.append(String.valueOf(attachment.getPriority()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("src")) {
@@ -1587,9 +1582,8 @@ public abstract class BaseAttachmentResourceTestCase {
 		}
 
 		if (entityFieldName.equals("type")) {
-			sb.append(String.valueOf(attachment.getType()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		throw new IllegalArgumentException(
@@ -1638,6 +1632,10 @@ public abstract class BaseAttachmentResourceTestCase {
 			{
 				attachment = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
+				cdnEnabled = RandomTestUtil.randomBoolean();
+				cdnURL = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				contentType = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 				displayDate = RandomTestUtil.nextDate();
 				expirationDate = RandomTestUtil.nextDate();
 				externalReferenceCode = StringUtil.toLowerCase(
@@ -1665,115 +1663,6 @@ public abstract class BaseAttachmentResourceTestCase {
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
-
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
 
 	protected class GraphQLField {
 
@@ -1849,6 +1738,18 @@ public abstract class BaseAttachmentResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseAttachmentResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

@@ -57,25 +57,22 @@ public class MySQLDB extends BaseDB {
 	}
 
 	@Override
-	public List<Index> getIndexes(Connection con) throws SQLException {
+	public List<Index> getIndexes(Connection connection) throws SQLException {
 		List<Index> indexes = new ArrayList<>();
 
-		StringBundler sb = new StringBundler(4);
+		String sql = StringBundler.concat(
+			"select distinct(index_name), table_name, non_unique from ",
+			"information_schema.statistics where index_schema = database() ",
+			"and (index_name like 'LIFERAY_%' or index_name like 'IX_%')");
 
-		sb.append("select distinct(index_name), table_name, non_unique from ");
-		sb.append("information_schema.statistics where index_schema = ");
-		sb.append("database() and (index_name like 'LIFERAY_%' or index_name ");
-		sb.append("like 'IX_%')");
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				sql);
+			ResultSet resultSet = preparedStatement.executeQuery()) {
 
-		String sql = sb.toString();
-
-		try (PreparedStatement ps = con.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery()) {
-
-			while (rs.next()) {
-				String indexName = rs.getString("index_name");
-				String tableName = rs.getString("table_name");
-				boolean unique = !rs.getBoolean("non_unique");
+			while (resultSet.next()) {
+				String indexName = resultSet.getString("index_name");
+				String tableName = resultSet.getString("table_name");
+				boolean unique = !resultSet.getBoolean("non_unique");
 
 				indexes.add(new Index(indexName, tableName, unique));
 			}
@@ -91,28 +88,14 @@ public class MySQLDB extends BaseDB {
 
 	@Override
 	public String getPopulateSQL(String databaseName, String sqlContent) {
-		StringBundler sb = new StringBundler(4);
-
-		sb.append("use ");
-		sb.append(databaseName);
-		sb.append(";\n\n");
-		sb.append(sqlContent);
-
-		return sb.toString();
+		return StringBundler.concat("use ", databaseName, ";\n\n", sqlContent);
 	}
 
 	@Override
 	public String getRecreateSQL(String databaseName) {
-		StringBundler sb = new StringBundler(6);
-
-		sb.append("drop database if exists ");
-		sb.append(databaseName);
-		sb.append(";\n");
-		sb.append("create database ");
-		sb.append(databaseName);
-		sb.append(" character set utf8;\n");
-
-		return sb.toString();
+		return StringBundler.concat(
+			"drop database if exists ", databaseName, ";\n", "create database ",
+			databaseName, " character set utf8;\n");
 	}
 
 	@Override

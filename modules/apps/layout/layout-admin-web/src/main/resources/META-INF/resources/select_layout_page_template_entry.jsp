@@ -51,9 +51,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 						<ul class="nav nav-stacked">
 
 							<%
-							List<LayoutPageTemplateCollection> layoutPageTemplateCollections = LayoutPageTemplateCollectionServiceUtil.getLayoutPageTemplateCollections(scopeGroupId);
-
-							for (LayoutPageTemplateCollection layoutPageTemplateCollection : layoutPageTemplateCollections) {
+							for (LayoutPageTemplateCollection layoutPageTemplateCollection : LayoutPageTemplateCollectionServiceUtil.getLayoutPageTemplateCollections(scopeGroupId)) {
 								int layoutPageTemplateEntriesCount = LayoutPageTemplateEntryServiceUtil.getLayoutPageTemplateEntriesCount(themeDisplay.getScopeGroupId(), layoutPageTemplateCollection.getLayoutPageTemplateCollectionId(), WorkflowConstants.STATUS_APPROVED);
 							%>
 
@@ -137,11 +135,6 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 								keyProperty="layoutPageTemplateEntryId"
 								modelVar="layoutPageTemplateEntry"
 							>
-
-								<%
-								row.setCssClass("entry-card lfr-asset-item " + row.getCssClass());
-								%>
-
 								<liferay-ui:search-container-column-text>
 									<clay:vertical-card
 										verticalCard="<%= new SelectLayoutPageTemplateEntryVerticalCard(layoutPageTemplateEntry, renderRequest, renderResponse) %>"
@@ -167,16 +160,18 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 	</clay:row>
 </clay:container-fluid>
 
-<aui:script require="metal-dom/src/all/dom as dom">
+<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
+	var delegate = delegateModule.default;
+
 	var layoutPageTemplateEntries = document.getElementById(
 		'<portlet:namespace />layoutPageTemplateEntries'
 	);
 
-	var addLayoutActionOptionQueryClickHandler = dom.delegate(
+	var addLayoutActionOptionQueryClickHandler = delegate(
 		layoutPageTemplateEntries,
 		'click',
 		'.add-layout-action-option',
-		function (event) {
+		(event) => {
 			Liferay.Util.openModal({
 				height: '60vh',
 				id: '<portlet:namespace />addLayoutDialog',
@@ -187,8 +182,21 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 		}
 	);
 
+	var addLayoutActionOptionQueryKeyDownHandler = delegate(
+		layoutPageTemplateEntries,
+		'keydown',
+		'.add-layout-action-option',
+		(event) => {
+			if (event.code === 'Space' || event.code === 'Enter') {
+				event.preventDefault();
+				event.delegateTarget.click();
+			}
+		}
+	);
+
 	function handleDestroyPortlet() {
-		addLayoutActionOptionQueryClickHandler.removeListener();
+		addLayoutActionOptionQueryClickHandler.dispose();
+		addLayoutActionOptionQueryKeyDownHandler.dispose();
 
 		Liferay.detach('destroyPortlet', handleDestroyPortlet);
 	}

@@ -39,21 +39,21 @@ public class CPDefinitionOptionRelUpgradeProcess
 		String updateCPDefinitionOptionRelSQL =
 			"update CPDefinitionOptionRel set key_ = ? WHERE CPOptionId = ?";
 
-		try (PreparedStatement ps =
+		try (PreparedStatement preparedStatement =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
 					connection, updateCPDefinitionOptionRelSQL);
 			Statement s = connection.createStatement(
 				ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-			ResultSet rs = s.executeQuery(selectCPOptionSQL)) {
+			ResultSet resultSet = s.executeQuery(selectCPOptionSQL)) {
 
-			while (rs.next()) {
-				ps.setString(1, rs.getString("key_"));
-				ps.setLong(2, rs.getLong("CPOptionId"));
+			while (resultSet.next()) {
+				preparedStatement.setString(1, resultSet.getString("key_"));
+				preparedStatement.setLong(2, resultSet.getLong("CPOptionId"));
 
-				ps.addBatch();
+				preparedStatement.addBatch();
 			}
 
-			ps.executeBatch();
+			preparedStatement.executeBatch();
 		}
 	}
 

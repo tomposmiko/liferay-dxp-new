@@ -1037,8 +1037,10 @@ public class SharingEntryUtil {
 	 * @param expirationDate the expiration date
 	 * @return the matching sharing entries
 	 */
-	public static List<SharingEntry> findByExpirationDate(Date expirationDate) {
-		return getPersistence().findByExpirationDate(expirationDate);
+	public static List<SharingEntry> findByLtExpirationDate(
+		Date expirationDate) {
+
+		return getPersistence().findByLtExpirationDate(expirationDate);
 	}
 
 	/**
@@ -1053,10 +1055,10 @@ public class SharingEntryUtil {
 	 * @param end the upper bound of the range of sharing entries (not inclusive)
 	 * @return the range of matching sharing entries
 	 */
-	public static List<SharingEntry> findByExpirationDate(
+	public static List<SharingEntry> findByLtExpirationDate(
 		Date expirationDate, int start, int end) {
 
-		return getPersistence().findByExpirationDate(
+		return getPersistence().findByLtExpirationDate(
 			expirationDate, start, end);
 	}
 
@@ -1073,11 +1075,11 @@ public class SharingEntryUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching sharing entries
 	 */
-	public static List<SharingEntry> findByExpirationDate(
+	public static List<SharingEntry> findByLtExpirationDate(
 		Date expirationDate, int start, int end,
 		OrderByComparator<SharingEntry> orderByComparator) {
 
-		return getPersistence().findByExpirationDate(
+		return getPersistence().findByLtExpirationDate(
 			expirationDate, start, end, orderByComparator);
 	}
 
@@ -1095,12 +1097,12 @@ public class SharingEntryUtil {
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching sharing entries
 	 */
-	public static List<SharingEntry> findByExpirationDate(
+	public static List<SharingEntry> findByLtExpirationDate(
 		Date expirationDate, int start, int end,
 		OrderByComparator<SharingEntry> orderByComparator,
 		boolean useFinderCache) {
 
-		return getPersistence().findByExpirationDate(
+		return getPersistence().findByLtExpirationDate(
 			expirationDate, start, end, orderByComparator, useFinderCache);
 	}
 
@@ -1112,12 +1114,12 @@ public class SharingEntryUtil {
 	 * @return the first matching sharing entry
 	 * @throws NoSuchEntryException if a matching sharing entry could not be found
 	 */
-	public static SharingEntry findByExpirationDate_First(
+	public static SharingEntry findByLtExpirationDate_First(
 			Date expirationDate,
 			OrderByComparator<SharingEntry> orderByComparator)
 		throws com.liferay.sharing.exception.NoSuchEntryException {
 
-		return getPersistence().findByExpirationDate_First(
+		return getPersistence().findByLtExpirationDate_First(
 			expirationDate, orderByComparator);
 	}
 
@@ -1128,11 +1130,11 @@ public class SharingEntryUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching sharing entry, or <code>null</code> if a matching sharing entry could not be found
 	 */
-	public static SharingEntry fetchByExpirationDate_First(
+	public static SharingEntry fetchByLtExpirationDate_First(
 		Date expirationDate,
 		OrderByComparator<SharingEntry> orderByComparator) {
 
-		return getPersistence().fetchByExpirationDate_First(
+		return getPersistence().fetchByLtExpirationDate_First(
 			expirationDate, orderByComparator);
 	}
 
@@ -1144,12 +1146,12 @@ public class SharingEntryUtil {
 	 * @return the last matching sharing entry
 	 * @throws NoSuchEntryException if a matching sharing entry could not be found
 	 */
-	public static SharingEntry findByExpirationDate_Last(
+	public static SharingEntry findByLtExpirationDate_Last(
 			Date expirationDate,
 			OrderByComparator<SharingEntry> orderByComparator)
 		throws com.liferay.sharing.exception.NoSuchEntryException {
 
-		return getPersistence().findByExpirationDate_Last(
+		return getPersistence().findByLtExpirationDate_Last(
 			expirationDate, orderByComparator);
 	}
 
@@ -1160,11 +1162,11 @@ public class SharingEntryUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching sharing entry, or <code>null</code> if a matching sharing entry could not be found
 	 */
-	public static SharingEntry fetchByExpirationDate_Last(
+	public static SharingEntry fetchByLtExpirationDate_Last(
 		Date expirationDate,
 		OrderByComparator<SharingEntry> orderByComparator) {
 
-		return getPersistence().fetchByExpirationDate_Last(
+		return getPersistence().fetchByLtExpirationDate_Last(
 			expirationDate, orderByComparator);
 	}
 
@@ -1177,12 +1179,12 @@ public class SharingEntryUtil {
 	 * @return the previous, current, and next sharing entry
 	 * @throws NoSuchEntryException if a sharing entry with the primary key could not be found
 	 */
-	public static SharingEntry[] findByExpirationDate_PrevAndNext(
+	public static SharingEntry[] findByLtExpirationDate_PrevAndNext(
 			long sharingEntryId, Date expirationDate,
 			OrderByComparator<SharingEntry> orderByComparator)
 		throws com.liferay.sharing.exception.NoSuchEntryException {
 
-		return getPersistence().findByExpirationDate_PrevAndNext(
+		return getPersistence().findByLtExpirationDate_PrevAndNext(
 			sharingEntryId, expirationDate, orderByComparator);
 	}
 
@@ -1191,8 +1193,8 @@ public class SharingEntryUtil {
 	 *
 	 * @param expirationDate the expiration date
 	 */
-	public static void removeByExpirationDate(Date expirationDate) {
-		getPersistence().removeByExpirationDate(expirationDate);
+	public static void removeByLtExpirationDate(Date expirationDate) {
+		getPersistence().removeByLtExpirationDate(expirationDate);
 	}
 
 	/**
@@ -1201,8 +1203,8 @@ public class SharingEntryUtil {
 	 * @param expirationDate the expiration date
 	 * @return the number of matching sharing entries
 	 */
-	public static int countByExpirationDate(Date expirationDate) {
-		return getPersistence().countByExpirationDate(expirationDate);
+	public static int countByLtExpirationDate(Date expirationDate) {
+		return getPersistence().countByLtExpirationDate(expirationDate);
 	}
 
 	/**

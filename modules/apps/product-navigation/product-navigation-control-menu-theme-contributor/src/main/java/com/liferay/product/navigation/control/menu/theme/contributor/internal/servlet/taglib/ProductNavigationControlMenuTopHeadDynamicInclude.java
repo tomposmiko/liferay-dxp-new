@@ -57,7 +57,7 @@ public class ProductNavigationControlMenuTopHeadDynamicInclude
 
 		PrintWriter printWriter = httpServletResponse.getWriter();
 
-		StringBundler sb = new StringBundler(6);
+		StringBundler sb = new StringBundler(3);
 
 		sb.append("<link data-senna-track=\"permanent\" href=\"");
 
@@ -66,19 +66,11 @@ public class ProductNavigationControlMenuTopHeadDynamicInclude
 				httpServletRequest);
 
 		sb.append(
-			absolutePortalURLBuilder.forModule(
-				_bundle,
-				"/product_navigation_control_menu.css?languageId=" +
-					themeDisplay.getLanguageId()
+			absolutePortalURLBuilder.forModuleStylesheet(
+				_bundle, "/product_navigation_control_menu.css"
 			).build());
 
 		sb.append("\" rel=\"stylesheet\" type = \"text/css\" />\n");
-		sb.append("<script data-senna-track=\"permanent\" src=\"");
-		sb.append(
-			absolutePortalURLBuilder.forModule(
-				_bundle, "/product_navigation_control_menu.js"
-			).build());
-		sb.append("\" type=\"text/javascript\"></script>");
 
 		printWriter.println(sb.toString());
 	}
@@ -98,6 +90,6 @@ public class ProductNavigationControlMenuTopHeadDynamicInclude
 	@Reference
 	private AbsolutePortalURLBuilderFactory _absolutePortalURLBuilderFactory;
 
-	private Bundle _bundle;
+	private volatile Bundle _bundle;
 
 }

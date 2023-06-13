@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -222,50 +223,72 @@ public class BrowserTrackerModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<BrowserTracker, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, BrowserTracker>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<BrowserTracker, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<BrowserTracker, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			BrowserTracker.class.getClassLoader(), BrowserTracker.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", BrowserTracker::getMvccVersion);
-		attributeGetterFunctions.put(
-			"browserTrackerId", BrowserTracker::getBrowserTrackerId);
-		attributeGetterFunctions.put("companyId", BrowserTracker::getCompanyId);
-		attributeGetterFunctions.put("userId", BrowserTracker::getUserId);
-		attributeGetterFunctions.put(
-			"browserKey", BrowserTracker::getBrowserKey);
+		try {
+			Constructor<BrowserTracker> constructor =
+				(Constructor<BrowserTracker>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<BrowserTracker, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<BrowserTracker, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<BrowserTracker, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<BrowserTracker, Object>>();
 		Map<String, BiConsumer<BrowserTracker, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<BrowserTracker, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", BrowserTracker::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<BrowserTracker, Long>)BrowserTracker::setMvccVersion);
+		attributeGetterFunctions.put(
+			"browserTrackerId", BrowserTracker::getBrowserTrackerId);
 		attributeSetterBiConsumers.put(
 			"browserTrackerId",
 			(BiConsumer<BrowserTracker, Long>)
 				BrowserTracker::setBrowserTrackerId);
+		attributeGetterFunctions.put("companyId", BrowserTracker::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<BrowserTracker, Long>)BrowserTracker::setCompanyId);
+		attributeGetterFunctions.put("userId", BrowserTracker::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<BrowserTracker, Long>)BrowserTracker::setUserId);
+		attributeGetterFunctions.put(
+			"browserKey", BrowserTracker::getBrowserKey);
 		attributeSetterBiConsumers.put(
 			"browserKey",
 			(BiConsumer<BrowserTracker, Long>)BrowserTracker::setBrowserKey);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -428,6 +451,24 @@ public class BrowserTrackerModelImpl
 		browserTrackerImpl.setBrowserKey(getBrowserKey());
 
 		browserTrackerImpl.resetOriginalValues();
+
+		return browserTrackerImpl;
+	}
+
+	@Override
+	public BrowserTracker cloneWithOriginalValues() {
+		BrowserTrackerImpl browserTrackerImpl = new BrowserTrackerImpl();
+
+		browserTrackerImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		browserTrackerImpl.setBrowserTrackerId(
+			this.<Long>getColumnOriginalValue("browserTrackerId"));
+		browserTrackerImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		browserTrackerImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		browserTrackerImpl.setBrowserKey(
+			this.<Long>getColumnOriginalValue("browserKey"));
 
 		return browserTrackerImpl;
 	}
@@ -600,9 +641,7 @@ public class BrowserTrackerModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, BrowserTracker>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					BrowserTracker.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

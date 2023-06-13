@@ -24,9 +24,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -57,6 +55,10 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface BlogPostingResource {
 
+	public static Builder builder() {
+		return FactoryHolder.factory.create();
+	}
+
 	public void deleteBlogPosting(Long blogPostingId) throws Exception;
 
 	public Response deleteBlogPostingBatch(String callbackURL, Object object)
@@ -85,6 +87,20 @@ public interface BlogPostingResource {
 	public Rating putBlogPostingMyRating(Long blogPostingId, Rating rating)
 		throws Exception;
 
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getBlogPostingPermissionsPage(Long blogPostingId, String roleNames)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			putBlogPostingPermissionsPage(
+				Long blogPostingId,
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
+		throws Exception;
+
+	public String getBlogPostingRenderedContentByDisplayPageDisplayPageKey(
+			Long blogPostingId, String displayPageKey)
+		throws Exception;
+
 	public Page<BlogPosting> getSiteBlogPostingsPage(
 			Long siteId, String search,
 			com.liferay.portal.vulcan.aggregation.Aggregation aggregation,
@@ -96,6 +112,28 @@ public interface BlogPostingResource {
 
 	public Response postSiteBlogPostingBatch(
 			Long siteId, String callbackURL, Object object)
+		throws Exception;
+
+	public void deleteSiteBlogPostingByExternalReferenceCode(
+			Long siteId, String externalReferenceCode)
+		throws Exception;
+
+	public BlogPosting getSiteBlogPostingByExternalReferenceCode(
+			Long siteId, String externalReferenceCode)
+		throws Exception;
+
+	public BlogPosting putSiteBlogPostingByExternalReferenceCode(
+			Long siteId, String externalReferenceCode, BlogPosting blogPosting)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getSiteBlogPostingPermissionsPage(Long siteId, String roleNames)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			putSiteBlogPostingPermissionsPage(
+				Long siteId,
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
 
 	public void putSiteBlogPostingSubscribe(Long siteId) throws Exception;
@@ -139,12 +177,6 @@ public interface BlogPostingResource {
 
 	public void setRoleLocalService(RoleLocalService roleLocalService);
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider);
-
-	public void setVulcanBatchEngineImportTaskResource(
-		VulcanBatchEngineImportTaskResource
-			vulcanBatchEngineImportTaskResource);
-
 	public default Filter toFilter(String filterString) {
 		return toFilter(
 			filterString, Collections.<String, List<String>>emptyMap());
@@ -156,8 +188,10 @@ public interface BlogPostingResource {
 		return null;
 	}
 
-	public default Sort[] toSorts(String sortsString) {
-		return new Sort[0];
+	public static class FactoryHolder {
+
+		public static volatile Factory factory;
+
 	}
 
 	@ProviderType

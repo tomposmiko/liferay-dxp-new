@@ -15,9 +15,13 @@
 package com.liferay.document.library.web.internal.portlet.action;
 
 import com.liferay.document.library.constants.DLPortletKeys;
+import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.document.library.web.internal.display.context.IGConfigurationDisplayContext;
+import com.liferay.item.selector.ItemSelector;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
+import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
+import com.liferay.portal.kernel.service.RepositoryLocalService;
 import com.liferay.trash.TrashHelper;
-import com.liferay.trash.util.TrashWebKeys;
 
 import javax.portlet.PortletConfig;
 
@@ -36,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
 	service = ConfigurationAction.class
 )
 public class IGDisplayConfigurationAction
-	extends ValidateRootFolderConfigurationAction {
+	extends BaseValidateRootFolderConfigurationAction {
 
 	@Override
 	public String getJspPath(HttpServletRequest httpServletRequest) {
@@ -50,7 +54,11 @@ public class IGDisplayConfigurationAction
 		throws Exception {
 
 		httpServletRequest.setAttribute(
-			TrashWebKeys.TRASH_HELPER, _trashHelper);
+			IGConfigurationDisplayContext.class.getName(),
+			new IGConfigurationDisplayContext(
+				_dlAppLocalService, _itemSelector, httpServletRequest,
+				_portletPreferencesLocalService, _repositoryLocalService,
+				_trashHelper));
 
 		super.include(portletConfig, httpServletRequest, httpServletResponse);
 	}
@@ -63,6 +71,18 @@ public class IGDisplayConfigurationAction
 	public void setServletContext(ServletContext servletContext) {
 		super.setServletContext(servletContext);
 	}
+
+	@Reference
+	private DLAppLocalService _dlAppLocalService;
+
+	@Reference
+	private ItemSelector _itemSelector;
+
+	@Reference
+	private PortletPreferencesLocalService _portletPreferencesLocalService;
+
+	@Reference
+	private RepositoryLocalService _repositoryLocalService;
 
 	@Reference
 	private TrashHelper _trashHelper;

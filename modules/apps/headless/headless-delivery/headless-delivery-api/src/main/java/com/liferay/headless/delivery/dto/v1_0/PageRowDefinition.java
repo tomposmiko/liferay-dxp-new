@@ -45,7 +45,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("PageRowDefinition")
+@GraphQLName(
+	description = "Represents a definition of a Page row.",
+	value = "PageRowDefinition"
+)
 @JsonFilter("Liferay.Vulcan")
 @XmlRootElement(name = "PageRowDefinition")
 public class PageRowDefinition implements Serializable {
@@ -58,7 +61,7 @@ public class PageRowDefinition implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(PageRowDefinition.class, json);
 	}
 
-	@Schema
+	@Schema(description = "The fragment style of a Page row.")
 	@Valid
 	public FragmentStyle getFragmentStyle() {
 		return fragmentStyle;
@@ -83,11 +86,11 @@ public class PageRowDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The fragment style of a Page row.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected FragmentStyle fragmentStyle;
 
-	@Schema
+	@Schema(description = "A list of fragment viewports of a Page row.")
 	@Valid
 	public FragmentViewport[] getFragmentViewports() {
 		return fragmentViewports;
@@ -113,11 +116,13 @@ public class PageRowDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A list of fragment viewports of a Page row.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected FragmentViewport[] fragmentViewports;
 
-	@Schema
+	@Schema(
+		description = "A flag that indicates whether the page row has gutters."
+	)
 	public Boolean getGutters() {
 		return gutters;
 	}
@@ -141,43 +146,13 @@ public class PageRowDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether the page row has gutters."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean gutters;
 
-	@Schema(
-		description = "A flag that indicates whether the page row is indexed or not."
-	)
-	public Boolean getIndexed() {
-		return indexed;
-	}
-
-	public void setIndexed(Boolean indexed) {
-		this.indexed = indexed;
-	}
-
-	@JsonIgnore
-	public void setIndexed(
-		UnsafeSupplier<Boolean, Exception> indexedUnsafeSupplier) {
-
-		try {
-			indexed = indexedUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(
-		description = "A flag that indicates whether the page row is indexed or not."
-	)
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Boolean indexed;
-
-	@Schema
+	@Schema(description = "The page row's modules per row.")
 	public Integer getModulesPerRow() {
 		return modulesPerRow;
 	}
@@ -201,11 +176,11 @@ public class PageRowDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The page row's modules per row.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer modulesPerRow;
 
-	@Schema
+	@Schema(description = "The page row's number of columns.")
 	public Integer getNumberOfColumns() {
 		return numberOfColumns;
 	}
@@ -229,11 +204,13 @@ public class PageRowDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The page row's number of columns.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer numberOfColumns;
 
-	@Schema
+	@Schema(
+		description = "A flag that indicates whether the page row has reverse order."
+	)
 	public Boolean getReverseOrder() {
 		return reverseOrder;
 	}
@@ -257,7 +234,9 @@ public class PageRowDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether the page row has reverse order."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean reverseOrder;
 
@@ -297,7 +276,7 @@ public class PageRowDefinition implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected RowViewportConfig rowViewportConfig;
 
-	@Schema
+	@Schema(description = "A list of viewports of the page row.")
 	@Valid
 	public RowViewport[] getRowViewports() {
 		return rowViewports;
@@ -322,11 +301,11 @@ public class PageRowDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A list of viewports of the page row.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected RowViewport[] rowViewports;
 
-	@Schema
+	@Schema(description = "The vertical aligment property of the page row.")
 	public String getVerticalAlignment() {
 		return verticalAlignment;
 	}
@@ -350,7 +329,9 @@ public class PageRowDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The vertical aligment property of the page row."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String verticalAlignment;
 
@@ -419,16 +400,6 @@ public class PageRowDefinition implements Serializable {
 			sb.append("\"gutters\": ");
 
 			sb.append(gutters);
-		}
-
-		if (indexed != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"indexed\": ");
-
-			sb.append(indexed);
 		}
 
 		if (modulesPerRow != null) {

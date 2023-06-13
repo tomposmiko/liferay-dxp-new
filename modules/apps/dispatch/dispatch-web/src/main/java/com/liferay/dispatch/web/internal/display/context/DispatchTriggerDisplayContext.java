@@ -14,28 +14,22 @@
 
 package com.liferay.dispatch.web.internal.display.context;
 
-import com.liferay.dispatch.executor.DispatchTaskExecutor;
 import com.liferay.dispatch.executor.DispatchTaskExecutorRegistry;
+import com.liferay.dispatch.metadata.DispatchTriggerMetadata;
+import com.liferay.dispatch.metadata.DispatchTriggerMetadataProvider;
 import com.liferay.dispatch.model.DispatchTrigger;
 import com.liferay.dispatch.service.DispatchTriggerLocalService;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.text.Format;
-
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.portlet.PortletURL;
@@ -50,32 +44,24 @@ public class DispatchTriggerDisplayContext extends BaseDisplayContext {
 	public DispatchTriggerDisplayContext(
 		DispatchTaskExecutorRegistry dispatchTaskExecutorRegistry,
 		DispatchTriggerLocalService dispatchTriggerLocalService,
+		DispatchTriggerMetadataProvider dispatchTriggerMetadataProvider,
 		RenderRequest renderRequest) {
 
 		super(renderRequest);
 
 		_dispatchTaskExecutorRegistry = dispatchTaskExecutorRegistry;
 		_dispatchTriggerLocalService = dispatchTriggerLocalService;
-
-		_dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(
-			dispatchRequestHelper.getLocale());
+		_dispatchTriggerMetadataProvider = dispatchTriggerMetadataProvider;
 	}
 
 	public String getDispatchTaskExecutorName(
 		String dispatchTaskExecutorType, Locale locale) {
 
-		DispatchTaskExecutor dispatchTaskExecutor =
-			_dispatchTaskExecutorRegistry.fetchDispatchTaskExecutor(
-				dispatchTaskExecutorType);
-
-		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-			locale, dispatchTaskExecutor.getClass());
-
 		String name =
 			_dispatchTaskExecutorRegistry.fetchDispatchTaskExecutorName(
 				dispatchTaskExecutorType);
 
-		return LanguageUtil.get(resourceBundle, name);
+		return LanguageUtil.get(locale, name);
 	}
 
 	public Set<String> getDispatchTaskExecutorTypes() {
@@ -86,17 +72,11 @@ public class DispatchTriggerDisplayContext extends BaseDisplayContext {
 		return dispatchRequestHelper.getDispatchTrigger();
 	}
 
-	public String getNextFireDateString(long dispatchTriggerId)
-		throws PortalException {
+	public DispatchTriggerMetadata getDispatchTriggerMetadata(
+		long dispatchTriggerId) {
 
-		Date nextRunDate = _dispatchTriggerLocalService.getNextFireDate(
+		return _dispatchTriggerMetadataProvider.getDispatchTriggerMetadata(
 			dispatchTriggerId);
-
-		if (nextRunDate != null) {
-			return _dateFormatDateTime.format(nextRunDate);
-		}
-
-		return StringPool.BLANK;
 	}
 
 	public String getOrderByCol() {
@@ -176,9 +156,10 @@ public class DispatchTriggerDisplayContext extends BaseDisplayContext {
 		return _searchContainer;
 	}
 
-	private final Format _dateFormatDateTime;
 	private final DispatchTaskExecutorRegistry _dispatchTaskExecutorRegistry;
 	private final DispatchTriggerLocalService _dispatchTriggerLocalService;
+	private final DispatchTriggerMetadataProvider
+		_dispatchTriggerMetadataProvider;
 	private RowChecker _rowChecker;
 	private SearchContainer<DispatchTrigger> _searchContainer;
 

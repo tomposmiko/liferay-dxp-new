@@ -34,6 +34,7 @@ import com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthAppSoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -292,77 +293,99 @@ public class WeDeployAuthAppModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, WeDeployAuthApp>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			WeDeployAuthApp.class.getClassLoader(), WeDeployAuthApp.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<WeDeployAuthApp> constructor =
+				(Constructor<WeDeployAuthApp>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<WeDeployAuthApp, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<WeDeployAuthApp, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<WeDeployAuthApp, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<WeDeployAuthApp, Object>>();
-
-		attributeGetterFunctions.put(
-			"weDeployAuthAppId", WeDeployAuthApp::getWeDeployAuthAppId);
-		attributeGetterFunctions.put(
-			"companyId", WeDeployAuthApp::getCompanyId);
-		attributeGetterFunctions.put("userId", WeDeployAuthApp::getUserId);
-		attributeGetterFunctions.put("userName", WeDeployAuthApp::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", WeDeployAuthApp::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", WeDeployAuthApp::getModifiedDate);
-		attributeGetterFunctions.put("name", WeDeployAuthApp::getName);
-		attributeGetterFunctions.put(
-			"redirectURI", WeDeployAuthApp::getRedirectURI);
-		attributeGetterFunctions.put("clientId", WeDeployAuthApp::getClientId);
-		attributeGetterFunctions.put(
-			"clientSecret", WeDeployAuthApp::getClientSecret);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<WeDeployAuthApp, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<WeDeployAuthApp, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<WeDeployAuthApp, ?>>();
 
+		attributeGetterFunctions.put(
+			"weDeployAuthAppId", WeDeployAuthApp::getWeDeployAuthAppId);
 		attributeSetterBiConsumers.put(
 			"weDeployAuthAppId",
 			(BiConsumer<WeDeployAuthApp, Long>)
 				WeDeployAuthApp::setWeDeployAuthAppId);
+		attributeGetterFunctions.put(
+			"companyId", WeDeployAuthApp::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<WeDeployAuthApp, Long>)WeDeployAuthApp::setCompanyId);
+		attributeGetterFunctions.put("userId", WeDeployAuthApp::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<WeDeployAuthApp, Long>)WeDeployAuthApp::setUserId);
+		attributeGetterFunctions.put("userName", WeDeployAuthApp::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<WeDeployAuthApp, String>)WeDeployAuthApp::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", WeDeployAuthApp::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<WeDeployAuthApp, Date>)WeDeployAuthApp::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", WeDeployAuthApp::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<WeDeployAuthApp, Date>)
 				WeDeployAuthApp::setModifiedDate);
+		attributeGetterFunctions.put("name", WeDeployAuthApp::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<WeDeployAuthApp, String>)WeDeployAuthApp::setName);
+		attributeGetterFunctions.put(
+			"redirectURI", WeDeployAuthApp::getRedirectURI);
 		attributeSetterBiConsumers.put(
 			"redirectURI",
 			(BiConsumer<WeDeployAuthApp, String>)
 				WeDeployAuthApp::setRedirectURI);
+		attributeGetterFunctions.put("clientId", WeDeployAuthApp::getClientId);
 		attributeSetterBiConsumers.put(
 			"clientId",
 			(BiConsumer<WeDeployAuthApp, String>)WeDeployAuthApp::setClientId);
+		attributeGetterFunctions.put(
+			"clientSecret", WeDeployAuthApp::getClientSecret);
 		attributeSetterBiConsumers.put(
 			"clientSecret",
 			(BiConsumer<WeDeployAuthApp, String>)
 				WeDeployAuthApp::setClientSecret);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -664,6 +687,34 @@ public class WeDeployAuthAppModelImpl
 	}
 
 	@Override
+	public WeDeployAuthApp cloneWithOriginalValues() {
+		WeDeployAuthAppImpl weDeployAuthAppImpl = new WeDeployAuthAppImpl();
+
+		weDeployAuthAppImpl.setWeDeployAuthAppId(
+			this.<Long>getColumnOriginalValue("weDeployAuthAppId"));
+		weDeployAuthAppImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		weDeployAuthAppImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		weDeployAuthAppImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		weDeployAuthAppImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		weDeployAuthAppImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		weDeployAuthAppImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		weDeployAuthAppImpl.setRedirectURI(
+			this.<String>getColumnOriginalValue("redirectURI"));
+		weDeployAuthAppImpl.setClientId(
+			this.<String>getColumnOriginalValue("clientId"));
+		weDeployAuthAppImpl.setClientSecret(
+			this.<String>getColumnOriginalValue("clientSecret"));
+
+		return weDeployAuthAppImpl;
+	}
+
+	@Override
 	public int compareTo(WeDeployAuthApp weDeployAuthApp) {
 		long primaryKey = weDeployAuthApp.getPrimaryKey();
 
@@ -887,9 +938,7 @@ public class WeDeployAuthAppModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, WeDeployAuthApp>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					WeDeployAuthApp.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

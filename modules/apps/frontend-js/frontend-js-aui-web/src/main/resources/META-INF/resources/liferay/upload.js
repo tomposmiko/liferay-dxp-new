@@ -154,15 +154,12 @@ AUI.add(
 			'<strong class="lead">{[ this.strings.warningTitle ]}</strong>{[ this.strings.pendingFileText ]}',
 			'</div>',
 
-			'<div class="float-container hide manage-upload-target" id="{$ns}manageUploadTarget">',
+			'<div class="clearfix hide manage-upload-target" id="{$ns}manageUploadTarget">',
 			'<tpl if="multipleFiles">',
-			'<span class="field field-choice select-files">',
-			'<span class="field-content">',
-			'<span class="field-element">',
-			'<input class="select-all-files" id="{$ns}allRowIds" name="{$ns}allRowIds" type="checkbox" />',
-			'</span>',
-			'</span>',
-			'</span>',
+			'<div class="form-check select-files">',
+			'<input class="form-check-input select-all-files" id="{$ns}allRowIds" name="{$ns}allRowIds" type="checkbox" />',
+			'<label class="form-check-label" for="{$ns}allRowIds"> {[ this.strings.selectAllText ]}</label>',
+			'</div>',
 			'</tpl>',
 
 			'<a class="cancel-uploads hide lfr-button" href="javascript:;">{[ this.cancelUploadsText ]}</a>',
@@ -175,10 +172,6 @@ AUI.add(
 		];
 
 		var UPLOADER_TYPE = A.Uploader.TYPE || 'none';
-
-		var URL_SWF_UPLOADER =
-			themeDisplay.getPathContext() +
-			'/aui/uploader/assets/flashuploader.swf';
 
 		/**
 		 * OPTIONS
@@ -295,6 +288,7 @@ AUI.add(
 						pendingFileText: Liferay.Language.get(
 							'these-files-have-been-previously-uploaded-but-not-actually-saved.-please-save-or-delete-them-before-they-are-removed'
 						),
+						selectAllText: Liferay.Language.get('select-all'),
 						selectFileText: Liferay.Language.get('select-file'),
 						selectFilesText: Liferay.Language.get('select-files'),
 						unexpectedErrorOnDeleteText: Liferay.Language.get(
@@ -434,7 +428,7 @@ AUI.add(
 									tempRandomSuffix
 								);
 
-								if (posTempRandomSuffix != -1) {
+								if (posTempRandomSuffix !== -1) {
 									tempTitle = title.substr(
 										0,
 										posTempRandomSuffix
@@ -595,6 +589,7 @@ AUI.add(
 						queue &&
 						(queue.queuedFiles.length > 0 ||
 							queue.numberOfUploads > 0 ||
+							// eslint-disable-next-line @liferay/aui/no-object
 							!A.Object.isEmpty(queue.currentFiles)) &&
 						queue._currentState === UploaderQueue.UPLOADING
 					);
@@ -839,7 +834,7 @@ AUI.add(
 					try {
 						data = JSON.parse(data);
 					}
-					catch (e) {}
+					catch (error) {}
 
 					if (
 						data.status &&
@@ -1163,10 +1158,6 @@ AUI.add(
 						},
 						selectFilesButton: instance._selectFilesButton,
 						simLimit: instance.get('simultaneousUploads'),
-						swfURL: Liferay.Util.addParams(
-							timestampParam,
-							URL_SWF_UPLOADER
-						),
 						uploadURL: Liferay.Util.addParams(
 							timestampParam,
 							instance.get('uploadFile')
@@ -1468,9 +1459,8 @@ AUI.add(
 
 					if (
 						useFallback ||
-						UPLOADER_TYPE == 'none' ||
-						(UPLOADER_TYPE == 'flash' &&
-							!A.SWFDetect.isFlashVersionAtLeast(10, 1))
+						UPLOADER_TYPE === 'none' ||
+						UPLOADER_TYPE === 'flash'
 					) {
 						if (fallback) {
 							fallback.show();

@@ -20,6 +20,7 @@ import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
+import com.liferay.commerce.account.constants.CommerceAccountConstants;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CProduct;
@@ -43,10 +44,7 @@ import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
@@ -57,7 +55,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	enabled = false,
-	property = "model.class.name=com.liferay.commerce.product.model.CPDefinition",
+	property = "dto.class.name=com.liferay.commerce.product.model.CPDefinition",
 	service = {DTOConverter.class, ProductDTOConverter.class}
 )
 public class ProductDTOConverter
@@ -139,11 +137,12 @@ public class ProductDTOConverter
 				skuFormatted = _getSku(
 					cpDefinition, dtoConverterContext.getLocale());
 				tags = _getTags(cpDefinition);
-				thumbnail = cpDefinition.getDefaultImageThumbnailSrc();
-				urls = _getUrlTitleMap(
+				thumbnail = cpDefinition.getDefaultImageThumbnailSrc(
+					CommerceAccountConstants.ACCOUNT_ID_ADMIN);
+				urls = LanguageUtils.getLanguageIdMap(
 					_cpDefinitionService.getUrlTitleMap(
 						cpDefinition.getCPDefinitionId()));
-				workflowStatusInfo = _getWorkflowStatusInfo(
+				workflowStatusInfo = _toStatus(
 					cpDefinition.getStatus(), productStatusLabel,
 					productStatusLabelI18n);
 			}
@@ -193,36 +192,6 @@ public class ProductDTOConverter
 		);
 	}
 
-	private Map<String, String> _getUrlTitleMap(
-		Map<Locale, String> urlTitleMap) {
-
-		Set<Map.Entry<Locale, String>> entries = urlTitleMap.entrySet();
-
-		Stream<Map.Entry<Locale, String>> stream = entries.stream();
-
-		return stream.collect(
-			Collectors.toMap(
-				entry -> {
-					Locale locale = entry.getKey();
-
-					return locale.toString();
-				},
-				Map.Entry::getValue));
-	}
-
-	private Status _getWorkflowStatusInfo(
-		int statusCode, String productStatusLabel,
-		String productStatusLabelI18n) {
-
-		return new Status() {
-			{
-				code = statusCode;
-				label = productStatusLabel;
-				label_i18n = productStatusLabelI18n;
-			}
-		};
-	}
-
 	private Category _toCategory(AssetCategory assetCategory) {
 		return new Category() {
 			{
@@ -243,6 +212,19 @@ public class ProductDTOConverter
 
 						return assetVocabulary.getName();
 					});
+			}
+		};
+	}
+
+	private Status _toStatus(
+		int statusCode, String productStatusLabel,
+		String productStatusLabelI18n) {
+
+		return new Status() {
+			{
+				code = statusCode;
+				label = productStatusLabel;
+				label_i18n = productStatusLabelI18n;
 			}
 		};
 	}

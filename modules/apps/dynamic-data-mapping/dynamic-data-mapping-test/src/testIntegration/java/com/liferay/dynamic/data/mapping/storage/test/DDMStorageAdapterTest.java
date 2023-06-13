@@ -29,15 +29,14 @@ import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterGetResponse;
 import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterSaveRequest;
 import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterSaveResponse;
 import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterTracker;
+import com.liferay.dynamic.data.mapping.storage.StorageType;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceRegistration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +51,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceRegistration;
+
 /**
  * @author Carolina Barbosa
  */
@@ -65,7 +69,6 @@ public class DDMStorageAdapterTest {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		_setUpDDMStorageAdapterTracker();
 		_setUpDDMTestStorageAdapter();
 	}
 
@@ -112,26 +115,18 @@ public class DDMStorageAdapterTest {
 
 		_deleteDDMFormValues(testDDMStorageAdapter, primaryKey);
 
-		ddmFormValues = _getDDMFormValues(testDDMStorageAdapter, primaryKey);
-
-		Assert.assertNull(ddmFormValues);
-	}
-
-	private static void _setUpDDMStorageAdapterTracker() {
-		Registry registry = RegistryUtil.getRegistry();
-
-		_ddmStorageAdapterTracker = registry.getService(
-			registry.getServiceReference(DDMStorageAdapterTracker.class));
+		Assert.assertNull(_getDDMFormValues(testDDMStorageAdapter, primaryKey));
 	}
 
 	private static void _setUpDDMTestStorageAdapter() {
-		Registry registry = RegistryUtil.getRegistry();
+		Bundle bundle = FrameworkUtil.getBundle(DDMStorageAdapterTest.class);
 
-		_serviceRegistration = registry.registerService(
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		_serviceRegistration = bundleContext.registerService(
 			DDMStorageAdapter.class, new DDMTestStorageAdapter(),
-			HashMapBuilder.<String, Object>put(
-				"ddm.storage.adapter.type", _STORAGE_TYPE_TEST
-			).build());
+			MapUtil.singletonDictionary(
+				"ddm.storage.adapter.type", _STORAGE_TYPE_TEST));
 	}
 
 	private boolean _containsValue(DDMFormValues ddmFormValues, String value) {
@@ -175,22 +170,21 @@ public class DDMStorageAdapterTest {
 			DDMStorageAdapter ddmStorageAdapter, long primaryKey)
 		throws Exception {
 
-		DDMStorageAdapterDeleteRequest.Builder
-			ddmStorageAdapterDeleteRequestBuilder =
-				DDMStorageAdapterDeleteRequest.Builder.newBuilder(primaryKey);
-
-		ddmStorageAdapter.delete(ddmStorageAdapterDeleteRequestBuilder.build());
+		ddmStorageAdapter.delete(
+			DDMStorageAdapterDeleteRequest.Builder.newBuilder(
+				primaryKey
+			).build());
 	}
 
 	private DDMFormValues _getDDMFormValues(
 			DDMStorageAdapter ddmStorageAdapter, long primaryKey)
 		throws Exception {
 
-		DDMStorageAdapterGetRequest.Builder ddmStorageAdapterGetRequestBuilder =
-			DDMStorageAdapterGetRequest.Builder.newBuilder(primaryKey, null);
-
 		DDMStorageAdapterGetResponse ddmStorageAdapterGetResponse =
-			ddmStorageAdapter.get(ddmStorageAdapterGetRequestBuilder.build());
+			ddmStorageAdapter.get(
+				DDMStorageAdapterGetRequest.Builder.newBuilder(
+					primaryKey, null
+				).build());
 
 		return ddmStorageAdapterGetResponse.getDDMFormValues();
 	}
@@ -199,23 +193,23 @@ public class DDMStorageAdapterTest {
 			DDMFormValues ddmFormValues, DDMStorageAdapter ddmStorageAdapter)
 		throws Exception {
 
-		DDMStorageAdapterSaveRequest.Builder
-			ddmStorageAdapterSaveRequestBuilder =
-				DDMStorageAdapterSaveRequest.Builder.newBuilder(
-					TestPropsValues.getUserId(), TestPropsValues.getGroupId(),
-					ddmFormValues);
-
 		DDMStorageAdapterSaveResponse ddmStorageAdapterSaveResponse =
-			ddmStorageAdapter.save(ddmStorageAdapterSaveRequestBuilder.build());
+			ddmStorageAdapter.save(
+				DDMStorageAdapterSaveRequest.Builder.newBuilder(
+					TestPropsValues.getUserId(), ddmFormValues
+				).build());
 
 		return ddmStorageAdapterSaveResponse.getPrimaryKey();
 	}
 
-	private static final String _STORAGE_TYPE_JSON = "json";
+	private static final String _STORAGE_TYPE_JSON =
+		StorageType.DEFAULT.getValue();
 
 	private static final String _STORAGE_TYPE_TEST = "test";
 
+	@Inject
 	private static DDMStorageAdapterTracker _ddmStorageAdapterTracker;
+
 	private static ServiceRegistration<DDMStorageAdapter> _serviceRegistration;
 
 	private static class DDMTestStorageAdapter implements DDMStorageAdapter {

@@ -22,17 +22,11 @@
 String redirect = ParamUtil.getString(request, "redirect");
 
 if (Validator.isNull(redirect)) {
-	String mvcRenderCommandName = "/blogs/view";
-
-	PortletURL portletURL = renderResponse.createRenderURL();
-
-	if (Objects.equals(portletName, BlogsPortletKeys.BLOGS_AGGREGATOR)) {
-		mvcRenderCommandName = "/blogs_aggregator/view";
-	}
-
-	portletURL.setParameter("mvcRenderCommandName", mvcRenderCommandName);
-
-	redirect = portletURL.toString();
+	redirect = PortletURLBuilder.createRenderURL(
+		renderResponse
+	).setMVCRenderCommandName(
+		"/blogs/view"
+	).buildString();
 }
 
 BlogsEntry entry = (BlogsEntry)request.getAttribute(WebKeys.BLOGS_ENTRY);
@@ -101,7 +95,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 		<c:if test="<%= (previousEntry != null) || (nextEntry != null) %>">
 			<clay:row>
 				<clay:col
-					cssClass="col-md-offset-1 entry-navigation"
+					cssClass="entry-navigation mx-md-auto"
 					md="10"
 				>
 					<h2>
@@ -129,7 +123,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 
 	<clay:row>
 		<clay:col
-			cssClass="col-md-offset-2"
+			cssClass="offset-md-2"
 			md="8"
 		>
 			<c:if test="<%= blogsPortletInstanceConfiguration.enableComments() %>">

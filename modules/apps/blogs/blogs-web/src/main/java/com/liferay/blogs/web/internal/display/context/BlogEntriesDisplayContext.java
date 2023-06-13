@@ -21,6 +21,7 @@ import com.liferay.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.blogs.service.BlogsEntryServiceUtil;
 import com.liferay.blogs.web.internal.security.permission.resource.BlogsEntryPermission;
 import com.liferay.blogs.web.internal.util.BlogsUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.dao.search.SearchContainerResults;
@@ -32,6 +33,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
@@ -135,17 +137,41 @@ public class BlogEntriesDisplayContext {
 		return displayStyle;
 	}
 
+	public String getOrderByCol() {
+		if (Validator.isNotNull(_orderByCol)) {
+			return _orderByCol;
+		}
+
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			_httpServletRequest, BlogsPortletKeys.BLOGS_ADMIN,
+			"entries-order-by-col", _getDefaultOrderByCol());
+
+		return _orderByCol;
+	}
+
+	public String getOrderByType() {
+		if (Validator.isNotNull(_orderByType)) {
+			return _orderByType;
+		}
+
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_httpServletRequest, BlogsPortletKeys.BLOGS_ADMIN,
+			"entries-order-by-type", "asc");
+
+		return _orderByType;
+	}
+
 	public SearchContainer<BlogsEntry> getSearchContainer()
 		throws PortalException, PortletException {
 
-		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
-
-		portletURL.setParameter("mvcRenderCommandName", "/blogs/view");
-
-		String entriesNavigation = ParamUtil.getString(
-			_httpServletRequest, "entriesNavigation");
-
-		portletURL.setParameter("entriesNavigation", entriesNavigation);
+		PortletURL portletURL = PortletURLBuilder.createRenderURL(
+			_liferayPortletResponse
+		).setMVCRenderCommandName(
+			"/blogs/view"
+		).setParameter(
+			"entriesNavigation",
+			ParamUtil.getString(_httpServletRequest, "entriesNavigation")
+		).buildPortletURL();
 
 		SearchContainer<BlogsEntry> entriesSearchContainer =
 			new SearchContainer<>(
@@ -153,20 +179,10 @@ public class BlogEntriesDisplayContext {
 				PortletURLUtil.clone(portletURL, _liferayPortletResponse), null,
 				"no-entries-were-found");
 
-		String orderByCol = ParamUtil.getString(
-			_httpServletRequest, "orderByCol", "title");
-
-		entriesSearchContainer.setOrderByCol(orderByCol);
-
-		String orderByType = ParamUtil.getString(
-			_httpServletRequest, "orderByType", "asc");
-
-		entriesSearchContainer.setOrderByType(orderByType);
-
+		entriesSearchContainer.setOrderByCol(getOrderByCol());
 		entriesSearchContainer.setOrderByComparator(
-			BlogsUtil.getOrderByComparator(
-				entriesSearchContainer.getOrderByCol(),
-				entriesSearchContainer.getOrderByType()));
+			BlogsUtil.getOrderByComparator(getOrderByCol(), getOrderByType()));
+		entriesSearchContainer.setOrderByType(getOrderByType());
 
 		entriesSearchContainer.setRowChecker(
 			new EmptyOnClickRowChecker(_liferayPortletResponse));
@@ -174,6 +190,17 @@ public class BlogEntriesDisplayContext {
 		_populateResults(entriesSearchContainer);
 
 		return entriesSearchContainer;
+	}
+
+	private String _getDefaultOrderByCol() {
+		String mvcRenderCommandName = ParamUtil.getString(
+			_httpServletRequest, "mvcRenderCommandName");
+
+		if (mvcRenderCommandName.equals("/blogs/search")) {
+			return "relevance";
+		}
+
+		return "title";
 	}
 
 	private void _populateResults(SearchContainer<BlogsEntry> searchContainer)
@@ -262,22 +289,22 @@ public class BlogEntriesDisplayContext {
 				searchContext.setOwnerUserId(themeDisplay.getUserId());
 			}
 
-			String orderByCol = ParamUtil.getString(
-				_httpServletRequest, "orderByCol", "title");
-			String orderByType = ParamUtil.getString(
-				_httpServletRequest, "orderByType", "asc");
-
 			Sort sort = null;
 
 			boolean orderByAsc = false;
 
-			if (Objects.equals(orderByType, "asc")) {
+			if (Objects.equals(getOrderByType(), "asc")) {
 				orderByAsc = true;
 			}
+
+			String orderByCol = getOrderByCol();
 
 			if (Objects.equals(orderByCol, "display-date")) {
 				sort = new Sort(
 					Field.DISPLAY_DATE, Sort.LONG_TYPE, !orderByAsc);
+			}
+			else if (Objects.equals(orderByCol, "relevance")) {
+				sort = new Sort(null, Sort.SCORE_TYPE, !orderByAsc);
 			}
 			else {
 				sort = new Sort(orderByCol, !orderByAsc);
@@ -320,7 +347,8 @@ public class BlogEntriesDisplayContext {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Blogs search index is stale and contains entry " +
-						searchResult.getClassPK());
+						searchResult.getClassPK(),
+					exception);
 			}
 
 			return Optional.empty();
@@ -333,6 +361,8 @@ public class BlogEntriesDisplayContext {
 	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
+	private String _orderByCol;
+	private String _orderByType;
 	private final PortalPreferences _portalPreferences;
 	private final TrashHelper _trashHelper;
 

@@ -116,7 +116,7 @@ public class DDMFormRuleDeserializerImpl implements DDMFormRuleDeserializer {
 			_jsonFactory.createJSONDeserializer();
 
 		return jsonDeserializer.deserialize(
-			actionJSONObject.toString(), targetClass);
+			actionJSONObject.toJSONString(), targetClass);
 	}
 
 	protected List<SPIDDMFormRuleAction> deserializeSPIDDMFormRuleActions(
@@ -149,7 +149,7 @@ public class DDMFormRuleDeserializerImpl implements DDMFormRuleDeserializer {
 
 		SPIDDMFormRuleCondition[] spiDDMFormRuleConditions =
 			jsonDeserializer.deserialize(
-				conditionsJSONArray.toString(),
+				conditionsJSONArray.toJSONString(),
 				SPIDDMFormRuleCondition[].class);
 
 		return ListUtil.fromArray(spiDDMFormRuleConditions);

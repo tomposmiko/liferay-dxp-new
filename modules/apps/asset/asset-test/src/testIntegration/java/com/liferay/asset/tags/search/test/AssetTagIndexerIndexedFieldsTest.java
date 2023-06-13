@@ -22,8 +22,6 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.SearchEngine;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -53,7 +51,6 @@ import com.liferay.users.admin.test.util.search.UserSearchFixture;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -101,17 +98,13 @@ public class AssetTagIndexerIndexedFieldsTest {
 		_groups = groupSearchFixture.getGroups();
 
 		_indexedFieldsFixture = new IndexedFieldsFixture(
-			resourcePermissionLocalService, searchEngineHelper, uidFactory,
-			documentBuilderFactory);
+			resourcePermissionLocalService, uidFactory, documentBuilderFactory);
 
 		_users = userSearchFixture.getUsers();
 	}
 
 	@Test
 	public void testIndexedFields() throws Exception {
-		Assume.assumeFalse(
-			isNumberSortableImplementedAsDoubleForSearchEngine());
-
 		AssetTag assetTag = _assetTagFixture.createAssetTag();
 
 		String searchTerm = String.valueOf(assetTag.getPrimaryKey());
@@ -140,19 +133,6 @@ public class AssetTagIndexerIndexedFieldsTest {
 				).build()));
 	}
 
-	protected boolean isNumberSortableImplementedAsDoubleForSearchEngine() {
-		SearchEngine searchEngine = searchEngineHelper.getSearchEngine(
-			searchEngineHelper.getDefaultSearchEngineId());
-
-		String vendor = searchEngine.getVendor();
-
-		if (vendor.equals("Solr")) {
-			return true;
-		}
-
-		return false;
-	}
-
 	@Inject
 	protected AssetTagLocalService assetTagLocalService;
 
@@ -166,9 +146,6 @@ public class AssetTagIndexerIndexedFieldsTest {
 
 	@Inject
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
-
-	@Inject
-	protected SearchEngineHelper searchEngineHelper;
 
 	@Inject
 	protected Searcher searcher;

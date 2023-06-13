@@ -19,7 +19,7 @@
 <%
 SearchContainer<?> igSearchContainer = (SearchContainer)request.getAttribute("view.jsp-igSearchContainer");
 
-DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletInstanceSettingsHelper(igRequestHelper);
+DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletInstanceSettingsHelper(new IGRequestHelper(request));
 %>
 
 <liferay-ui:search-container
@@ -94,12 +94,10 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 				if (Validator.isNotNull(fileEntry.getDescription())) {
 					title += " - " + fileEntry.getDescription();
 				}
-
-				row.setCssClass("card-page-item card-page-item-asset");
 				%>
 
 				<liferay-ui:search-container-column-text>
-					<a class="image-link preview" <%= (hasAudio || hasVideo) ? "data-options=\"height=" + playerHeight + "&thumbnailURL=" + HtmlUtil.escapeURL(DLURLHelperUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&videoThumbnail=1")) + "&width=640" + dataOptions + "\"" : StringPool.BLANK %> href="<%= imageURL %>" thumbnailId="<%= thumbnailId %>" title="<%= title %>">
+					<div class="image-link preview" <%= (hasAudio || hasVideo) ? "data-options=\"height=" + playerHeight + "&thumbnailURL=" + HtmlUtil.escapeURL(DLURLHelperUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&videoThumbnail=1")) + "&width=640" + dataOptions + "\"" : StringPool.BLANK %> href="<%= imageURL %>" tabindex="0" thumbnailId="<%= thumbnailId %>" title="<%= title %>">
 						<c:choose>
 							<c:when test="<%= Validator.isNull(thumbnailSrc) %>">
 								<liferay-frontend:icon-vertical-card
@@ -124,7 +122,7 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 								/>
 							</c:otherwise>
 						</c:choose>
-					</a>
+					</div>
 				</liferay-ui:search-container-column-text>
 			</c:when>
 			<c:otherwise>
@@ -135,7 +133,7 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 				</portlet:renderURL>
 
 				<%
-				row.setCssClass("lfr-asset-folder");
+				row.setCssClass("card-page-item card-page-item-directory");
 				%>
 
 				<liferay-ui:search-container-column-text>
@@ -166,10 +164,13 @@ DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletI
 </liferay-ui:search-container>
 
 <%
-PortletURL embeddedPlayerURL = renderResponse.createRenderURL();
-
-embeddedPlayerURL.setParameter("mvcPath", "/image_gallery_display/embedded_player.jsp");
-embeddedPlayerURL.setWindowState(LiferayWindowState.POP_UP);
+PortletURL embeddedPlayerURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCPath(
+	"/image_gallery_display/embedded_player.jsp"
+).setWindowState(
+	LiferayWindowState.POP_UP
+).buildPortletURL();
 %>
 
 <aui:script use="aui-image-viewer,aui-image-viewer-media">
@@ -239,13 +240,17 @@ embeddedPlayerURL.setWindowState(LiferayWindowState.POP_UP);
 							'<iframe frameborder="0" height="{height}" scrolling="no" src="<%= embeddedPlayerURL.toString() %>&<portlet:namespace />thumbnailURL={thumbnailURL}&<portlet:namespace />mp3PreviewURL={mp3PreviewURL}&<portlet:namespace />mp4PreviewURL={mp4PreviewURL}&<portlet:namespace />oggPreviewURL={oggPreviewURL}&<portlet:namespace />ogvPreviewURL={ogvPreviewURL}" width="{width}"></iframe>',
 						matcher: /(.+)&mediaGallery=1/,
 						mediaRegex: /(.+)&mediaGallery=1/,
-						options: A.merge(A.MediaViewerPlugin.DEFAULT_OPTIONS, {
-							mp3PreviewURL: '',
-							mp4PreviewURL: '',
-							oggPreviewURL: '',
-							ogvPreviewURL: '',
-							thumbnailURL: '',
-						}),
+						options: Object.assign(
+							{},
+							A.MediaViewerPlugin.DEFAULT_OPTIONS,
+							{
+								mp3PreviewURL: '',
+								mp4PreviewURL: '',
+								oggPreviewURL: '',
+								ogvPreviewURL: '',
+								thumbnailURL: '',
+							}
+						),
 					},
 				},
 				fn: A.MediaViewerPlugin,
@@ -272,6 +277,24 @@ embeddedPlayerURL.setWindowState(LiferayWindowState.POP_UP);
 		}
 		else {
 			this._player.setHTML(TPL_PLAYER_PLAY);
+		}
+	};
+
+	// LPS-141384
+
+	var onKeydownDefaultFn = imageViewer._onKeydown;
+	imageViewer._onKeydown = function (event) {
+		onKeydownDefaultFn.call(this, event);
+
+		var target = document.activeElement;
+
+		if (
+			!this.get('visible') &&
+			event.isKey('ENTER') &&
+			target.classList.contains('image-link')
+		) {
+			this.show();
+			this.set('currentIndex', this.get('links').indexOf(target));
 		}
 	};
 

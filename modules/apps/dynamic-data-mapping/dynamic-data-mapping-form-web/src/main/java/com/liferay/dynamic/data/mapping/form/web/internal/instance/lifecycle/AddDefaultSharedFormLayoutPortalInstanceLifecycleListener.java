@@ -57,20 +57,10 @@ import org.osgi.service.component.annotations.Reference;
 public class AddDefaultSharedFormLayoutPortalInstanceLifecycleListener
 	extends BasePortalInstanceLifecycleListener {
 
-	public String getFormLayoutURL(
-		ThemeDisplay themeDisplay, boolean privateLayout) {
-
-		StringBundler sb = new StringBundler(3);
-
-		sb.append(themeDisplay.getPortalURL());
-
-		Group group = themeDisplay.getSiteGroup();
-
-		sb.append(group.getPathFriendlyURL(privateLayout, themeDisplay));
-
-		sb.append("/forms/shared/-/form/");
-
-		return sb.toString();
+	public String getFormLayoutURL(ThemeDisplay themeDisplay) {
+		return StringBundler.concat(
+			themeDisplay.getPortalURL(),
+			themeDisplay.getPathFriendlyURLPublic(), "/forms/shared/-/form/");
 	}
 
 	public boolean isSharedLayout(ThemeDisplay themeDisplay) {

@@ -58,6 +58,7 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Html;
@@ -179,9 +180,16 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 		if (Validator.isNotNull(ddmStructureFieldName) &&
 			Validator.isNotNull(ddmStructureFieldValue)) {
 
+			Locale locale = searchContext.getLocale();
+
+			long[] groupIds = searchContext.getGroupIds();
+
+			if (ArrayUtil.isNotEmpty(groupIds)) {
+				locale = _portal.getSiteDefaultLocale(groupIds[0]);
+			}
+
 			QueryFilter queryFilter = _ddmIndexer.createFieldValueQueryFilter(
-				ddmStructureFieldName, ddmStructureFieldValue,
-				searchContext.getLocale());
+				ddmStructureFieldName, ddmStructureFieldValue, locale);
 
 			contextBooleanFilter.add(queryFilter, BooleanClauseOccur.MUST);
 		}
@@ -315,6 +323,10 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 				ddmStructure, fields);
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return;
 		}
 
@@ -477,6 +489,7 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 			Field.TREE_PATH,
 			StringUtil.split(journalArticle.getTreePath(), CharPool.SLASH));
 		document.addKeyword(Field.VERSION, journalArticle.getVersion());
+
 		document.addKeyword(
 			"ddmStructureKey", journalArticle.getDDMStructureKey());
 		document.addKeyword(
@@ -515,9 +528,6 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 				journalArticle.getUrlTitle(
 					LocaleUtil.fromLanguageId(titleAvailableLanguageId)));
 		}
-
-		document.addNumber(
-			"versionCount", GetterUtil.getDouble(journalArticle.getVersion()));
 
 		addDDMStructureAttributes(document, journalArticle);
 
@@ -655,6 +665,10 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 				ddmStructure, fields);
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return StringPool.BLANK;
 		}
 
@@ -779,7 +793,7 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 	}
 
 	protected void reindexArticles(long companyId) throws PortalException {
-		final IndexableActionableDynamicQuery indexableActionableDynamicQuery;
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery;
 
 		if (isIndexAllArticleVersions()) {
 			indexableActionableDynamicQuery =

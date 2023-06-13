@@ -42,6 +42,7 @@ public class CommerceChannelRelWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("commerceChannelRelId", getCommerceChannelRelId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
@@ -57,6 +58,12 @@ public class CommerceChannelRelWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long commerceChannelRelId = (Long)attributes.get(
 			"commerceChannelRelId");
 
@@ -111,6 +118,11 @@ public class CommerceChannelRelWrapper
 		if (commerceChannelId != null) {
 			setCommerceChannelId(commerceChannelId);
 		}
+	}
+
+	@Override
+	public CommerceChannelRel cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
 	}
 
 	/**
@@ -198,6 +210,16 @@ public class CommerceChannelRelWrapper
 	@Override
 	public Date getModifiedDate() {
 		return model.getModifiedDate();
+	}
+
+	/**
+	 * Returns the mvcc version of this commerce channel rel.
+	 *
+	 * @return the mvcc version of this commerce channel rel
+	 */
+	@Override
+	public long getMvccVersion() {
+		return model.getMvccVersion();
 	}
 
 	/**
@@ -318,6 +340,16 @@ public class CommerceChannelRelWrapper
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		model.setModifiedDate(modifiedDate);
+	}
+
+	/**
+	 * Sets the mvcc version of this commerce channel rel.
+	 *
+	 * @param mvccVersion the mvcc version of this commerce channel rel
+	 */
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		model.setMvccVersion(mvccVersion);
 	}
 
 	/**

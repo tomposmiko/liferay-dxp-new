@@ -87,14 +87,14 @@ public class CommerceChannelRelLocalServiceTest {
 			_user.getCompanyId(), _group.getGroupId(), _user.getUserId());
 
 		_commerceChannel1 = CommerceChannelLocalServiceUtil.addCommerceChannel(
-			_group.getGroupId(), "Channel",
+			null, _group.getGroupId(), "Channel",
 			CommerceChannelConstants.CHANNEL_TYPE_SITE, null,
-			_commerceCurrency.getCode(), "ERC", _serviceContext);
+			_commerceCurrency.getCode(), _serviceContext);
 
 		_commerceChannel2 = CommerceChannelLocalServiceUtil.addCommerceChannel(
-			_group.getGroupId(), "Channel Test",
+			null, _group.getGroupId(), "Channel Test",
 			CommerceChannelConstants.CHANNEL_TYPE_SITE, null,
-			_commerceCurrency.getCode(), "ERC-2", _serviceContext);
+			_commerceCurrency.getCode(), _serviceContext);
 
 		_commerceCatalog = CommerceCatalogLocalServiceUtil.addCommerceCatalog(
 			null, RandomTestUtil.randomString(), RandomTestUtil.randomString(),
@@ -129,13 +129,13 @@ public class CommerceChannelRelLocalServiceTest {
 				CPDefinition.class.getName(), _cpDefinition.getCPDefinitionId(),
 				"Channel Test", QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
+		Assert.assertEquals(
+			commerceChannelRels.toString(), 2, commerceChannelRels.size());
+
 		int commerceChannelRelsCount =
 			CommerceChannelRelLocalServiceUtil.getCommerceChannelRelsCount(
 				CPDefinition.class.getName(), _cpDefinition.getCPDefinitionId(),
 				"Channel Test");
-
-		Assert.assertEquals(
-			commerceChannelRels.toString(), 2, commerceChannelRels.size());
 
 		Assert.assertEquals(
 			commerceChannelRels.toString(), 2, commerceChannelRelsCount);

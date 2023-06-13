@@ -3,6 +3,30 @@
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"additionalProperties": false,
 	"definitions": {
+		"ClassFieldReference": {
+			"additionalProperties": false,
+			"properties": {
+				"className": {
+					"title": "The className Schema",
+					"type": "string"
+				},
+				"fieldName": {
+					"title": "The fieldName Schema",
+					"type": "string"
+				},
+				"fieldValue": {
+					"title": "The fieldValue Schema",
+					"type": "string"
+				}
+			},
+			"required": [
+				"className",
+				"fieldName",
+				"fieldValue"
+			],
+			"title": "The ClassFieldReference Schema",
+			"type": "object"
+		},
 		"ClassNameReference": {
 			"additionalProperties": false,
 			"properties": {
@@ -227,6 +251,9 @@
 						}
 					]
 				},
+				"fragmentImageClassPKReference": {
+					"$ref": "#/definitions/FragmentImageClassPKReference"
+				},
 				"title": {
 					"oneOf": [
 						{
@@ -246,6 +273,42 @@
 				}
 			},
 			"title": "The FragmentImage Schema",
+			"type": "object"
+		},
+		"FragmentImageClassPKReference": {
+			"additionalProperties": false,
+			"properties": {
+				"classPKReferences": {
+					"additionalProperties": {
+						"$ref": "#/definitions/ClassPKReference"
+					},
+					"title": "The classPKReferences Schema",
+					"type": "object"
+				},
+				"fragmentImageConfiguration": {
+					"$ref": "#/definitions/FragmentImageConfiguration"
+				}
+			},
+			"title": "The FragmentImageClassPKReference Schema",
+			"type": "object"
+		},
+		"FragmentImageConfiguration": {
+			"additionalProperties": false,
+			"properties": {
+				"landscapeMobile": {
+					"title": "The landscapeMobile Schema",
+					"type": "string"
+				},
+				"portraitMobile": {
+					"title": "The portraitMobile Schema",
+					"type": "string"
+				},
+				"tablet": {
+					"title": "The tablet Schema",
+					"type": "string"
+				}
+			},
+			"title": "The FragmentImageConfiguration Schema",
 			"type": "object"
 		},
 		"FragmentInlineValue": {
@@ -270,6 +333,46 @@
 			"additionalProperties": false,
 			"properties": {
 				"href": {
+					"deprecationMessage": "Deprecated as of Cavanaugh (7.4.x), replaced by FragmentLinkValue.href",
+					"oneOf": [
+						{
+							"$ref": "#/definitions/FragmentInlineValue"
+						},
+						{
+							"$ref": "#/definitions/FragmentMappedValue"
+						}
+					]
+				},
+				"target": {
+					"deprecationMessage": "Deprecated as of Cavanaugh (7.4.x), replaced by FragmentLinkValue.target",
+					"enum": [
+						"Blank",
+						"Parent",
+						"Self",
+						"Top"
+					],
+					"title": "The target Schema",
+					"type": "string"
+				},
+				"value": {
+					"$ref": "#/definitions/FragmentLinkValue",
+					"title": "The value Schema"
+				},
+				"value_i18n": {
+					"additionalProperties": {
+						"$ref": "#/definitions/FragmentLinkValue"
+					},
+					"title": "The value_i18n Schema",
+					"type": "object"
+				}
+			},
+			"title": "The FragmentLink Schema",
+			"type": "object"
+		},
+		"FragmentLinkValue": {
+			"additionalProperties": false,
+			"properties": {
+				"href": {
 					"oneOf": [
 						{
 							"$ref": "#/definitions/FragmentInlineValue"
@@ -290,7 +393,7 @@
 					"type": "string"
 				}
 			},
-			"title": "The FragmentLink Schema",
+			"title": "The FragmentLinkValue Schema",
 			"type": "object"
 		},
 		"FragmentMappedValue": {
@@ -326,6 +429,9 @@
 						},
 						"itemReference": {
 							"oneOf": [
+								{
+									"$ref": "#/definitions/ClassFieldReference"
+								},
 								{
 									"$ref": "#/definitions/ClassPKReference"
 								},
@@ -419,6 +525,10 @@
 					"title": "The height Schema",
 					"type": "string"
 				},
+				"hidden": {
+					"title": "The hidden Schema",
+					"type": "boolean"
+				},
 				"marginBottom": {
 					"title": "The marginBottom Schema",
 					"type": "string"
@@ -501,6 +611,10 @@
 				"fragmentViewportStyle": {
 					"additionalProperties": false,
 					"properties": {
+						"hidden": {
+							"title": "The hidden Schema",
+							"type": "boolean"
+						},
 						"marginBottom": {
 							"title": "The marginBottom Schema",
 							"type": "string"
@@ -644,6 +758,20 @@
 					"minimum": 0,
 					"title": "The numberOfItems Schema",
 					"type": "integer"
+				},
+				"numberOfItemsPerPage": {
+					"minimum": 0,
+					"title": "The numberOfItemsPerPage Schema",
+					"type": "integer"
+				},
+				"paginationType": {
+					"enum": [
+						"None",
+						"Regular",
+						"Simple"
+					],
+					"title": "The paginationType Schema",
+					"type": "string"
 				},
 				"templateKey": {
 					"title": "The templateKey Schema",
@@ -986,10 +1114,6 @@
 					"title": "The fragmentViewports Schema",
 					"type": "array"
 				},
-				"indexed": {
-					"title": "The indexed Schema",
-					"type": "boolean"
-				},
 				"widgetInstances": {
 					"items": {
 						"$ref": "#/definitions/WidgetInstance"
@@ -1021,10 +1145,6 @@
 				},
 				"gutters": {
 					"title": "The gutters Schema",
-					"type": "boolean"
-				},
-				"indexed": {
-					"title": "The indexed Schema",
 					"type": "boolean"
 				},
 				"modulesPerRow": {
@@ -1174,15 +1294,12 @@
 					"title": "The fragmentViewports Schema",
 					"type": "array"
 				},
-				"indexed": {
-					"title": "The indexed Schema",
-					"type": "boolean"
-				},
 				"layout": {
 					"additionalProperties": false,
 					"properties": {
 						"align": {
 							"enum": [
+								"Baseline",
 								"Center",
 								"End",
 								"None",
@@ -1223,7 +1340,8 @@
 						"contentDisplay": {
 							"enum": [
 								"Block",
-								"Flex"
+								"FlexColumn",
+								"FlexRow"
 							],
 							"title": "The contentDisplay Schema",
 							"type": "string"
@@ -1543,6 +1661,24 @@
 					"title": "The masterPage Schema",
 					"type": "object"
 				},
+				"styleBook": {
+					"additionalProperties": false,
+					"properties": {
+						"key": {
+							"title": "The key Schema",
+							"type": "string"
+						},
+						"name": {
+							"title": "The name Schema",
+							"type": "string"
+						}
+					},
+					"required": [
+						"key"
+					],
+					"title": "The styleBook Schema",
+					"type": "object"
+				},
 				"themeName": {
 					"title": "The themeName Schema",
 					"type": "string"
@@ -1554,6 +1690,10 @@
 			},
 			"title": "The settings Schema",
 			"type": "object"
+		},
+		"version": {
+			"title": "The version Schema",
+			"type": "number"
 		}
 	},
 	"required": [

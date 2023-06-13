@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -350,127 +351,149 @@ public class AnnouncementsEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, AnnouncementsEntry>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AnnouncementsEntry.class.getClassLoader(), AnnouncementsEntry.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<AnnouncementsEntry> constructor =
+				(Constructor<AnnouncementsEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<AnnouncementsEntry, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AnnouncementsEntry, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<AnnouncementsEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<AnnouncementsEntry, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", AnnouncementsEntry::getMvccVersion);
-		attributeGetterFunctions.put("uuid", AnnouncementsEntry::getUuid);
-		attributeGetterFunctions.put("entryId", AnnouncementsEntry::getEntryId);
-		attributeGetterFunctions.put(
-			"companyId", AnnouncementsEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", AnnouncementsEntry::getUserId);
-		attributeGetterFunctions.put(
-			"userName", AnnouncementsEntry::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", AnnouncementsEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", AnnouncementsEntry::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", AnnouncementsEntry::getClassNameId);
-		attributeGetterFunctions.put("classPK", AnnouncementsEntry::getClassPK);
-		attributeGetterFunctions.put("title", AnnouncementsEntry::getTitle);
-		attributeGetterFunctions.put("content", AnnouncementsEntry::getContent);
-		attributeGetterFunctions.put("url", AnnouncementsEntry::getUrl);
-		attributeGetterFunctions.put("type", AnnouncementsEntry::getType);
-		attributeGetterFunctions.put(
-			"displayDate", AnnouncementsEntry::getDisplayDate);
-		attributeGetterFunctions.put(
-			"expirationDate", AnnouncementsEntry::getExpirationDate);
-		attributeGetterFunctions.put(
-			"priority", AnnouncementsEntry::getPriority);
-		attributeGetterFunctions.put("alert", AnnouncementsEntry::getAlert);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<AnnouncementsEntry, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<AnnouncementsEntry, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<AnnouncementsEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", AnnouncementsEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AnnouncementsEntry, Long>)
 				AnnouncementsEntry::setMvccVersion);
+		attributeGetterFunctions.put("uuid", AnnouncementsEntry::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<AnnouncementsEntry, String>)
 				AnnouncementsEntry::setUuid);
+		attributeGetterFunctions.put("entryId", AnnouncementsEntry::getEntryId);
 		attributeSetterBiConsumers.put(
 			"entryId",
 			(BiConsumer<AnnouncementsEntry, Long>)
 				AnnouncementsEntry::setEntryId);
+		attributeGetterFunctions.put(
+			"companyId", AnnouncementsEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AnnouncementsEntry, Long>)
 				AnnouncementsEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", AnnouncementsEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<AnnouncementsEntry, Long>)
 				AnnouncementsEntry::setUserId);
+		attributeGetterFunctions.put(
+			"userName", AnnouncementsEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<AnnouncementsEntry, String>)
 				AnnouncementsEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", AnnouncementsEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<AnnouncementsEntry, Date>)
 				AnnouncementsEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", AnnouncementsEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<AnnouncementsEntry, Date>)
 				AnnouncementsEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", AnnouncementsEntry::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<AnnouncementsEntry, Long>)
 				AnnouncementsEntry::setClassNameId);
+		attributeGetterFunctions.put("classPK", AnnouncementsEntry::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<AnnouncementsEntry, Long>)
 				AnnouncementsEntry::setClassPK);
+		attributeGetterFunctions.put("title", AnnouncementsEntry::getTitle);
 		attributeSetterBiConsumers.put(
 			"title",
 			(BiConsumer<AnnouncementsEntry, String>)
 				AnnouncementsEntry::setTitle);
+		attributeGetterFunctions.put("content", AnnouncementsEntry::getContent);
 		attributeSetterBiConsumers.put(
 			"content",
 			(BiConsumer<AnnouncementsEntry, String>)
 				AnnouncementsEntry::setContent);
+		attributeGetterFunctions.put("url", AnnouncementsEntry::getUrl);
 		attributeSetterBiConsumers.put(
 			"url",
 			(BiConsumer<AnnouncementsEntry, String>)AnnouncementsEntry::setUrl);
+		attributeGetterFunctions.put("type", AnnouncementsEntry::getType);
 		attributeSetterBiConsumers.put(
 			"type",
 			(BiConsumer<AnnouncementsEntry, String>)
 				AnnouncementsEntry::setType);
+		attributeGetterFunctions.put(
+			"displayDate", AnnouncementsEntry::getDisplayDate);
 		attributeSetterBiConsumers.put(
 			"displayDate",
 			(BiConsumer<AnnouncementsEntry, Date>)
 				AnnouncementsEntry::setDisplayDate);
+		attributeGetterFunctions.put(
+			"expirationDate", AnnouncementsEntry::getExpirationDate);
 		attributeSetterBiConsumers.put(
 			"expirationDate",
 			(BiConsumer<AnnouncementsEntry, Date>)
 				AnnouncementsEntry::setExpirationDate);
+		attributeGetterFunctions.put(
+			"priority", AnnouncementsEntry::getPriority);
 		attributeSetterBiConsumers.put(
 			"priority",
 			(BiConsumer<AnnouncementsEntry, Integer>)
 				AnnouncementsEntry::setPriority);
+		attributeGetterFunctions.put("alert", AnnouncementsEntry::getAlert);
 		attributeSetterBiConsumers.put(
 			"alert",
 			(BiConsumer<AnnouncementsEntry, Boolean>)
 				AnnouncementsEntry::setAlert);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -970,6 +993,51 @@ public class AnnouncementsEntryModelImpl
 	}
 
 	@Override
+	public AnnouncementsEntry cloneWithOriginalValues() {
+		AnnouncementsEntryImpl announcementsEntryImpl =
+			new AnnouncementsEntryImpl();
+
+		announcementsEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		announcementsEntryImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		announcementsEntryImpl.setEntryId(
+			this.<Long>getColumnOriginalValue("entryId"));
+		announcementsEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		announcementsEntryImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		announcementsEntryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		announcementsEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		announcementsEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		announcementsEntryImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		announcementsEntryImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		announcementsEntryImpl.setTitle(
+			this.<String>getColumnOriginalValue("title"));
+		announcementsEntryImpl.setContent(
+			this.<String>getColumnOriginalValue("content"));
+		announcementsEntryImpl.setUrl(
+			this.<String>getColumnOriginalValue("url"));
+		announcementsEntryImpl.setType(
+			this.<String>getColumnOriginalValue("type_"));
+		announcementsEntryImpl.setDisplayDate(
+			this.<Date>getColumnOriginalValue("displayDate"));
+		announcementsEntryImpl.setExpirationDate(
+			this.<Date>getColumnOriginalValue("expirationDate"));
+		announcementsEntryImpl.setPriority(
+			this.<Integer>getColumnOriginalValue("priority"));
+		announcementsEntryImpl.setAlert(
+			this.<Boolean>getColumnOriginalValue("alert"));
+
+		return announcementsEntryImpl;
+	}
+
+	@Override
 	public int compareTo(AnnouncementsEntry announcementsEntry) {
 		int value = 0;
 
@@ -1244,9 +1312,7 @@ public class AnnouncementsEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AnnouncementsEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AnnouncementsEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

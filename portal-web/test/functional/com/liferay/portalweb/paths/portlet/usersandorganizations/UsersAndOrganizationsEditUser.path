@@ -10,9 +10,7 @@
 </thead>
 
 <tbody>
-
 <!--DETAILS-->
-
 <tr>
 	<td>DETAILS_BIRTHDAY_FIELD</td>
 	<td>//input[contains(@id,'birthday')]</td>
@@ -103,9 +101,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--PASSWORD-->
-
 <tr>
 	<td>PASSWORD_CONFIRM_PASSWORD_FIELD</td>
 	<td>//input[contains(@id,'password')]</td>
@@ -126,9 +122,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ORGANIZATIONS-->
-
 <tr>
 	<td>ORGANIZATIONS_SELECT_LINK</td>
 	<td>//a[contains(@id,'selectOrganizationLink')]/span</td>
@@ -139,9 +133,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--SITES-->
-
 <tr>
 	<td>SITES_TABLE_NAME</td>
 	<td>//tr[contains(.,'${key_siteName}')]/td[1]</td>
@@ -157,9 +149,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DEPOT-->
-
 <tr>
 	<td>DEPOT_SELECT_LINK</td>
 	<td>//a[contains(@id,'selectDepotGroupLink')]/span</td>
@@ -200,12 +190,10 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--USER_GROUPS-->
-
 <tr>
 	<td>USER_GROUPS_TABLE_NAME</td>
-	<td>//tr[contains(.,'${key_userGroupName}')]/td[1]</td>
+	<td>//tr[contains(.,'${key_userGroupName}')]/td</td>
 	<td></td>
 </tr>
 <tr>
@@ -228,9 +216,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ROLES_INHERITED_ROLES_SITE_ROLES-->
-
 <tr>
 	<td>ROLES_INHERITED_SITE_ROLES_TABLE_TITLE</td>
 	<td>//div[contains(@class,'inherited-site-roles')]//span[contains(.,'${key_roleTitle}')]</td>
@@ -241,17 +227,10 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ROLES_ORGANIZATION_ROLES-->
-
 <tr>
 	<td>ROLES_ORGANIZATION_SELECT_CHOOSE_BUTTON</td>
 	<td>//*[*[normalize-space(text())='${key_roleTitle}']]/..//following-sibling::td/*[contains(.,'Choose')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>ROLES_ORGANIZATION_ROLES_SELECT_LINK</td>
-	<td>//a[contains(@id,'selectOrganizationRoleLink')]/span</td>
 	<td></td>
 </tr>
 <tr>
@@ -264,9 +243,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ROLES_REGULAR_ROLES-->
-
 <tr>
 	<td>ROLES_REGULAR_SELECT_CHOOSE_BUTTON</td>
 	<td>//tr/td[normalize-space(text())='${key_roleTitle}']/..//button[contains(.,'Choose')]</td>
@@ -278,41 +255,32 @@
 	<td></td>
 </tr>
 <tr>
-	<td>ROLES_REGULAR_ROLES_SELECT_LINK</td>
-	<td>//a[contains(@id,'selectRegularRoleLink')]/span</td>
-	<td></td>
-</tr>
-<tr>
 	<td>ROLES_REGULAR_ROLES_TABLE_TITLE</td>
 	<td>//tr[contains(.,'${key_regularRoleName}')]/td[1]</td>
 	<td></td>
 </tr>
 <tr>
+	<td>ROLES_SELECT_LINK</td>
+	<td>//a[contains(@id,'select${key_RoleType}Link')]/span</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ROLES_SITE_ROLES-->
-
 <tr>
 	<td>ROLES_SITE_ROLES_TABLE_TITLE</td>
 	<td>//tr[contains(.,'${key_siteRoleName}')]/td[1]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>ROLES_SITE_ROLES_SELECT_LINK</td>
-	<td>//a[contains(@id,'selectSiteRoleLink')]/span</td>
-	<td></td>
-</tr>
-<tr>
 	<td></td>
 	<td></td>
 	<td></td>
 </tr>
-
 <!--PERSONAL_SITE-->
-
 <tr>
 	<td>PERSONAL_SITE_LABEL</td>
 	<td>//div[contains(@class,'sheet-section')]//h3[contains(.,'${key_subtitle}')]</td>
@@ -333,9 +301,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--DISPLAY_SETTINGS-->
-
 <tr>
 	<td>DISPLAY_SETTINGS_GREETING_FIELD</td>
 	<td>//input[contains(@name,'greeting')]</td>
@@ -346,9 +312,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ALERTS_AND_ANNOUNCEMENTS_DELIVERY-->
-
 <tr>
 	<td>ALERTS_AND_ANNOUNCEMENTS_DELIVERY_CHECKBOX</td>
 	<td>//input[contains(@title,'${key_announcementType}') and contains(@id,'${key_notificationType}')]</td>
@@ -359,9 +323,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CATEGORIZATION-->
-
 <tr>
 	<td>CATEGORIZATION_LABEL</td>
 	<td>//div/label[@class='control-label' and contains(.,'Categorization')]</td>
@@ -377,12 +339,10 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CUSTOM_FIELDS-->
-
 <tr>
 	<td>CUSTOM_FIELDS_LABEL</td>
-	<td>//div/label[@class='control-label' and contains(.,'${key_customFieldName}')]</td>
+	<td>//div/label[contains(@class,'control-label') and contains(.,'${key_customFieldName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -390,9 +350,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--UPLOAD_IMAGE-->
-
 <tr>
 	<td>UPLOAD_IMAGE_SELECT</td>
 	<td>//label[contains(@id,'uploadImage')]</td>
@@ -408,9 +366,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CONTACT-->
-
 <tr>
 	<td>CONTACT_ADD_BUTTON</td>
 	<td>//a[contains(@class,'btn') and contains(@class,'${key_contactType}')]</td>

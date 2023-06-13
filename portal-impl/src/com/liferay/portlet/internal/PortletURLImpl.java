@@ -185,7 +185,7 @@ public class PortletURLImpl
 			}
 			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
-					_log.warn("Layout cannot be found for " + _plid);
+					_log.warn("Layout cannot be found for " + _plid, exception);
 				}
 			}
 		}
@@ -1195,9 +1195,10 @@ public class PortletURLImpl
 		String result = sb.toString();
 
 		if (!CookieKeys.hasSessionId(_httpServletRequest)) {
-			HttpSession session = _httpServletRequest.getSession();
+			HttpSession httpSession = _httpServletRequest.getSession();
 
-			result = PortalUtil.getURLWithSessionId(result, session.getId());
+			result = PortalUtil.getURLWithSessionId(
+				result, httpSession.getId());
 		}
 
 		if (!_escapeXml) {
@@ -1259,6 +1260,10 @@ public class PortletURLImpl
 			return URLCodec.encodeURL(Encryptor.encrypt(key, value));
 		}
 		catch (EncryptorException encryptorException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(encryptorException, encryptorException);
+			}
+
 			return value;
 		}
 	}
@@ -1458,13 +1463,10 @@ public class PortletURLImpl
 						namespace.length());
 				}
 
-				if (resourceParameterNames.contains(renderParameterName)) {
-					continue;
-				}
-
-				if (_lifecycle.equals(PortletRequest.RESOURCE_PHASE) &&
-					_mutableRenderParametersImpl.isPublic(
-						renderParameterName)) {
+				if (resourceParameterNames.contains(renderParameterName) ||
+					(_lifecycle.equals(PortletRequest.RESOURCE_PHASE) &&
+					 _mutableRenderParametersImpl.isPublic(
+						 renderParameterName))) {
 
 					continue;
 				}

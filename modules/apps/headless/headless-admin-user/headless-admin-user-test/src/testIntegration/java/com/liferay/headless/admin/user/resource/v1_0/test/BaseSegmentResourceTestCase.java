@@ -48,27 +48,25 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -218,9 +216,7 @@ public abstract class BaseSegmentResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantSegment),
 				(List<Segment>)page.getItems());
-			assertValid(
-				page,
-				testGetSiteSegmentsPage_getExpectedActions(irrelevantSiteId));
+			assertValid(page);
 		}
 
 		Segment segment1 = testGetSiteSegmentsPage_addSegment(
@@ -236,16 +232,7 @@ public abstract class BaseSegmentResourceTestCase {
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(segment1, segment2), (List<Segment>)page.getItems());
-		assertValid(page, testGetSiteSegmentsPage_getExpectedActions(siteId));
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetSiteSegmentsPage_getExpectedActions(Long siteId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
+		assertValid(page);
 	}
 
 	@Test
@@ -326,8 +313,8 @@ public abstract class BaseSegmentResourceTestCase {
 
 		Assert.assertEquals(0, segmentsJSONObject.get("totalCount"));
 
-		Segment segment1 = testGraphQLGetSiteSegmentsPage_addSegment();
-		Segment segment2 = testGraphQLGetSiteSegmentsPage_addSegment();
+		Segment segment1 = testGraphQLSegment_addSegment();
+		Segment segment2 = testGraphQLSegment_addSegment();
 
 		segmentsJSONObject = JSONUtil.getValueAsJSONObject(
 			invokeGraphQLQuery(graphQLField), "JSONObject/data",
@@ -339,12 +326,6 @@ public abstract class BaseSegmentResourceTestCase {
 			Arrays.asList(segment1, segment2),
 			Arrays.asList(
 				SegmentSerDes.toDTOs(segmentsJSONObject.getString("items"))));
-	}
-
-	protected Segment testGraphQLGetSiteSegmentsPage_addSegment()
-		throws Exception {
-
-		return testGraphQLSegment_addSegment();
 	}
 
 	@Test
@@ -376,10 +357,7 @@ public abstract class BaseSegmentResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantSegment),
 				(List<Segment>)page.getItems());
-			assertValid(
-				page,
-				testGetSiteUserAccountSegmentsPage_getExpectedActions(
-					irrelevantSiteId, irrelevantUserAccountId));
+			assertValid(page);
 		}
 
 		Segment segment1 = testGetSiteUserAccountSegmentsPage_addSegment(
@@ -395,20 +373,7 @@ public abstract class BaseSegmentResourceTestCase {
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(segment1, segment2), (List<Segment>)page.getItems());
-		assertValid(
-			page,
-			testGetSiteUserAccountSegmentsPage_getExpectedActions(
-				siteId, userAccountId));
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetSiteUserAccountSegmentsPage_getExpectedActions(
-				Long siteId, Long userAccountId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
+		assertValid(page);
 	}
 
 	protected Segment testGetSiteUserAccountSegmentsPage_addSegment(
@@ -550,6 +515,14 @@ public abstract class BaseSegmentResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("criteriaValue", additionalAssertFieldName)) {
+				if (segment.getCriteriaValue() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("name", additionalAssertFieldName)) {
 				if (segment.getName() == null) {
 					valid = false;
@@ -575,12 +548,6 @@ public abstract class BaseSegmentResourceTestCase {
 	}
 
 	protected void assertValid(Page<Segment> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<Segment> page, Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<Segment> segments = page.getItems();
@@ -595,20 +562,6 @@ public abstract class BaseSegmentResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -702,6 +655,17 @@ public abstract class BaseSegmentResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("criteriaValue", additionalAssertFieldName)) {
+				if (!equals(
+						(Map)segment1.getCriteriaValue(),
+						(Map)segment2.getCriteriaValue())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("dateCreated", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						segment1.getDateCreated(), segment2.getDateCreated())) {
@@ -788,16 +752,14 @@ public abstract class BaseSegmentResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -814,10 +776,6 @@ public abstract class BaseSegmentResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -827,18 +785,18 @@ public abstract class BaseSegmentResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -865,6 +823,11 @@ public abstract class BaseSegmentResourceTestCase {
 			sb.append("'");
 
 			return sb.toString();
+		}
+
+		if (entityFieldName.equals("criteriaValue")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("dateCreated")) {
@@ -1029,115 +992,6 @@ public abstract class BaseSegmentResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -1212,6 +1066,18 @@ public abstract class BaseSegmentResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseSegmentResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

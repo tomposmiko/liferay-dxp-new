@@ -97,6 +97,34 @@ public class WorkflowInstance implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean completed;
 
+	@Schema(description = "The instance's current node names.")
+	public String[] getCurrentNodeNames() {
+		return currentNodeNames;
+	}
+
+	public void setCurrentNodeNames(String[] currentNodeNames) {
+		this.currentNodeNames = currentNodeNames;
+	}
+
+	@JsonIgnore
+	public void setCurrentNodeNames(
+		UnsafeSupplier<String[], Exception> currentNodeNamesUnsafeSupplier) {
+
+		try {
+			currentNodeNames = currentNodeNamesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(description = "The instance's current node names.")
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected String[] currentNodeNames;
+
 	@Schema(description = "The instance's completion date.")
 	public Date getDateCompletion() {
 		return dateCompletion;
@@ -312,6 +340,30 @@ public class WorkflowInstance implements Serializable {
 			sb.append("\"completed\": ");
 
 			sb.append(completed);
+		}
+
+		if (currentNodeNames != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"currentNodeNames\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < currentNodeNames.length; i++) {
+				sb.append("\"");
+
+				sb.append(_escape(currentNodeNames[i]));
+
+				sb.append("\"");
+
+				if ((i + 1) < currentNodeNames.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
 
 		if (dateCompletion != null) {

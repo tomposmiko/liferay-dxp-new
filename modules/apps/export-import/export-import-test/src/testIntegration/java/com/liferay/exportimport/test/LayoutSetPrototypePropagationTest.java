@@ -26,6 +26,8 @@ import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.LayoutParentLayoutIdException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
@@ -222,8 +224,6 @@ public class LayoutSetPrototypePropagationTest
 		Assert.assertEquals(
 			_initialPrototypeLayoutsCount, getGroupLayoutCount());
 
-		MergeLayoutPrototypesThreadLocal.setSkipMerge(false);
-
 		LayoutServiceUtil.getLayouts(
 			group.getGroupId(), false, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
 			false, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
@@ -320,38 +320,6 @@ public class LayoutSetPrototypePropagationTest
 	@Test
 	public void testLayoutPropagationWithLinkEnabled() throws Exception {
 		doTestLayoutPropagation(true);
-	}
-
-	@Test
-	public void testLayoutPropagationWithMasterLayout() throws Exception {
-		Layout siteTemplateMasterLayout = LayoutTestUtil.addTypeContentLayout(
-			_layoutSetPrototypeGroup, true, false);
-
-		LayoutTestUtil.addTypeContentLayout(
-			_layoutSetPrototypeGroup, true, false,
-			siteTemplateMasterLayout.getPlid());
-
-		propagateChanges(group);
-
-		LayoutTestUtil.addTypeContentLayout(
-			_layoutSetPrototypeGroup, true, false,
-			siteTemplateMasterLayout.getPlid());
-
-		propagateChanges(group);
-
-		Assert.assertEquals(
-			0,
-			LayoutLocalServiceUtil.getMasterLayoutsCount(
-				group.getGroupId(), siteTemplateMasterLayout.getPlid()));
-
-		Layout siteMasterLayout = LayoutLocalServiceUtil.getFriendlyURLLayout(
-			group.getGroupId(), false,
-			siteTemplateMasterLayout.getFriendlyURL());
-
-		Assert.assertEquals(
-			4,
-			LayoutLocalServiceUtil.getMasterLayoutsCount(
-				group.getGroupId(), siteMasterLayout.getPlid()));
 	}
 
 	@Test
@@ -557,6 +525,9 @@ public class LayoutSetPrototypePropagationTest
 					"dashboard");
 		}
 		catch (PrincipalException principalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(principalException, principalException);
+			}
 		}
 	}
 
@@ -884,8 +855,6 @@ public class LayoutSetPrototypePropagationTest
 		LayoutSet layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
 			group.getGroupId(), false);
 
-		MergeLayoutPrototypesThreadLocal.setSkipMerge(false);
-
 		SitesUtil.mergeLayoutSetPrototypeLayouts(group, layoutSet);
 
 		Thread.sleep(2000);
@@ -957,12 +926,21 @@ public class LayoutSetPrototypePropagationTest
 				layoutSetPrototypeLinkEnabled);
 		}
 		catch (LayoutParentLayoutIdException layoutParentLayoutIdException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					layoutParentLayoutIdException,
+					layoutParentLayoutIdException);
+			}
+
 			Assert.assertTrue(
 				"Unable to add a child page to a page associated to a " +
 					"template with link disabled",
 				layoutSetPrototypeLinkEnabled);
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		LayoutSetPrototypePropagationTest.class);
 
 	private int _initialLayoutCount;
 	private int _initialPrototypeLayoutsCount;

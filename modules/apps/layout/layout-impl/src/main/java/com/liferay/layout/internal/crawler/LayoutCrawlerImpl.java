@@ -16,38 +16,27 @@ package com.liferay.layout.internal.crawler;
 
 import com.liferay.layout.crawler.LayoutCrawler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.CookieKeys;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.util.HttpImpl;
 
 import java.net.InetAddress;
 
 import java.util.Locale;
 import java.util.Objects;
 
-import org.apache.http.HttpResponse;
+import javax.servlet.http.Cookie;
+
 import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.util.EntityUtils;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -58,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = LayoutCrawler.class)
 public class LayoutCrawlerImpl implements LayoutCrawler {
 
+	@Override
 	public String getLayoutContent(Layout layout, Locale locale)
 		throws Exception {
 
@@ -68,33 +58,57 @@ public class LayoutCrawlerImpl implements LayoutCrawler {
 			return StringPool.BLANK;
 		}
 
-		RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
-
-		RequestConfig requestConfig = requestConfigBuilder.setConnectTimeout(
-			_TIMEOUT
-		).setConnectionRequestTimeout(
-			_TIMEOUT
-		).setSocketTimeout(
-			_TIMEOUT
-		).setCookieSpec(
-			CookieSpecs.STANDARD
-		).build();
-
-		HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-
-		HttpClient httpClient = httpClientBuilder.setDefaultRequestConfig(
-			requestConfig
-		).setUserAgent(
-			_USER_AGENT
-		).build();
-
-		ThemeDisplay themeDisplay = new ThemeDisplay();
-
 		Company company = _companyLocalService.getCompany(
 			layout.getCompanyId());
 
-		themeDisplay.setCompany(company);
+		Http.Options options = new Http.Options();
 
+		options.addHeader(HttpHeaders.USER_AGENT, _USER_AGENT);
+		options.addHeader("Host", company.getVirtualHostname());
+
+		Cookie cookie = new Cookie(
+			CookieKeys.GUEST_LANGUAGE_ID, LocaleUtil.toLanguageId(locale));
+
+		cookie.setDomain(inetAddress.getHostName());
+
+		options.setCookies(new Cookie[] {cookie});
+
+		ThemeDisplay themeDisplay = _getThemeDisplay(
+			layout, locale, inetAddress, company);
+
+		options.setLocation(_portal.getLayoutFullURL(layout, themeDisplay));
+
+		String response = _http.URLtoString(options);
+
+		Http.Response httpResponse = options.getResponse();
+
+		if (httpResponse.getResponseCode() == HttpStatus.SC_OK) {
+			return response;
+		}
+
+		return StringPool.BLANK;
+	}
+
+	private String _getI18nPath(Locale locale) {
+		Locale defaultLocale = _language.getLocale(locale.getLanguage());
+
+		if (LocaleUtil.equals(defaultLocale, locale)) {
+			return StringPool.SLASH + defaultLocale.getLanguage();
+		}
+
+		return StringPool.SLASH + locale.toLanguageTag();
+	}
+
+	private ThemeDisplay _getThemeDisplay(
+			Layout layout, Locale locale, InetAddress inetAddress,
+			Company company)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = new ThemeDisplay();
+
+		themeDisplay.setCompany(company);
+		themeDisplay.setI18nLanguageId(locale.toString());
+		themeDisplay.setI18nPath(_getI18nPath(locale));
 		themeDisplay.setLanguageId(LocaleUtil.toLanguageId(locale));
 		themeDisplay.setLayout(layout);
 		themeDisplay.setLayoutSet(layout.getLayoutSet());
@@ -105,36 +119,7 @@ public class LayoutCrawlerImpl implements LayoutCrawler {
 			_portal.getPortalServerPort(_isHttpsEnabled()));
 		themeDisplay.setSiteGroupId(layout.getGroupId());
 
-		HttpGet httpGet = new HttpGet(
-			_http.addParameter(
-				_portal.getLayoutFullURL(layout, themeDisplay), "p_l_mode",
-				Constants.SEARCH));
-
-		httpGet.setHeader("Host", company.getVirtualHostname());
-
-		HttpClientContext httpClientContext = new HttpClientContext();
-
-		CookieStore cookieStore = new BasicCookieStore();
-
-		BasicClientCookie basicClientCookie = new BasicClientCookie(
-			CookieKeys.GUEST_LANGUAGE_ID, LocaleUtil.toLanguageId(locale));
-
-		basicClientCookie.setDomain(inetAddress.getHostName());
-
-		cookieStore.addCookie(basicClientCookie);
-
-		httpClientContext.setCookieStore(cookieStore);
-
-		HttpResponse httpResponse = httpClient.execute(
-			httpGet, httpClientContext);
-
-		StatusLine statusLine = httpResponse.getStatusLine();
-
-		if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
-			return EntityUtils.toString(httpResponse.getEntity());
-		}
-
-		return StringPool.BLANK;
+		return themeDisplay;
 	}
 
 	private boolean _isHttpsEnabled() {
@@ -150,11 +135,6 @@ public class LayoutCrawlerImpl implements LayoutCrawler {
 		return false;
 	}
 
-	private static final int _TIMEOUT = GetterUtil.getInteger(
-		com.liferay.portal.util.PropsUtil.get(
-			HttpImpl.class.getName() + ".timeout"),
-		5000);
-
 	private static final String _USER_AGENT = "Liferay Page Crawler";
 
 	@Reference
@@ -162,6 +142,9 @@ public class LayoutCrawlerImpl implements LayoutCrawler {
 
 	@Reference
 	private Http _http;
+
+	@Reference
+	private Language _language;
 
 	@Reference
 	private Portal _portal;

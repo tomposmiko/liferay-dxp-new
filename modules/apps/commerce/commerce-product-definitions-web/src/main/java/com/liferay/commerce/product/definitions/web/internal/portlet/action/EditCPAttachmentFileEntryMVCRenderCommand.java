@@ -42,6 +42,7 @@ import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -49,7 +50,8 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.commerce.product.configuration.AttachmentsConfiguration",
-	enabled = false, immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, enabled = false,
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + CPPortletKeys.CP_DEFINITIONS,
 		"mvc.command.name=/cp_definitions/edit_cp_attachment_file_entry"

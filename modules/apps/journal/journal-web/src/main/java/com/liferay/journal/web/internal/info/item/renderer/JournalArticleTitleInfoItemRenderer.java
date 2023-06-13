@@ -14,14 +14,15 @@
 
 package com.liferay.journal.web.internal.info.item.renderer;
 
+import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
+import com.liferay.asset.kernel.model.AssetRenderer;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.info.item.renderer.InfoItemRenderer;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -30,8 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Pavel Savinov
@@ -44,10 +43,7 @@ public class JournalArticleTitleInfoItemRenderer
 
 	@Override
 	public String getLabel(Locale locale) {
-		ResourceBundle resourceBundle =
-			_resourceBundleLoader.loadResourceBundle(locale);
-
-		return LanguageUtil.get(resourceBundle, "title");
+		return LanguageUtil.get(locale, "title");
 	}
 
 	@Override
@@ -55,14 +51,17 @@ public class JournalArticleTitleInfoItemRenderer
 		JournalArticle article, HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
 
-		if (!JournalArticleRendererUtil.isShowArticle(
-				httpServletRequest, article)) {
-
-			return;
-		}
-
 		try {
-			httpServletRequest.setAttribute(WebKeys.JOURNAL_ARTICLE, article);
+			AssetRendererFactory<?> assetRendererFactory =
+				AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClass(
+					JournalArticle.class);
+
+			AssetRenderer<?> assetRenderer =
+				assetRendererFactory.getAssetRenderer(
+					article.getResourcePrimKey());
+
+			httpServletRequest.setAttribute(
+				WebKeys.ASSET_RENDERER, assetRenderer);
 
 			RequestDispatcher requestDispatcher =
 				_servletContext.getRequestDispatcher(
@@ -81,13 +80,6 @@ public class JournalArticleTitleInfoItemRenderer
 	public void setServletContext(ServletContext servletContext) {
 		_servletContext = servletContext;
 	}
-
-	@Reference(
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY,
-		target = "(bundle.symbolic.name=com.liferay.journal.web)"
-	)
-	private volatile ResourceBundleLoader _resourceBundleLoader;
 
 	private ServletContext _servletContext;
 

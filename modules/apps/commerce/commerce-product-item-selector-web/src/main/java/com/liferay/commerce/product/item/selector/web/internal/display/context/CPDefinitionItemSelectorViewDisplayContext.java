@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.product.item.selector.web.internal.display.context;
 
+import com.liferay.commerce.product.constants.CPField;
 import com.liferay.commerce.product.item.selector.web.internal.CPDefinitionItemSelectorView;
 import com.liferay.commerce.product.item.selector.web.internal.search.CPDefinitionItemSelectorChecker;
 import com.liferay.commerce.product.item.selector.web.internal.util.CPItemSelectorViewUtil;
@@ -22,6 +23,7 @@ import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.service.CPDefinitionService;
 import com.liferay.commerce.product.type.CPType;
 import com.liferay.commerce.product.type.CPTypeServicesTracker;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -121,11 +123,25 @@ public class CPDefinitionItemSelectorViewDisplayContext
 		Sort sort = CPItemSelectorViewUtil.getCPDefinitionSort(
 			getOrderByCol(), getOrderByType());
 
-		BaseModelSearchResult<CPDefinition> cpDefinitionBaseModelSearchResult =
-			_cpDefinitionService.searchCPDefinitions(
-				cpRequestHelper.getCompanyId(), getKeywords(),
-				WorkflowConstants.STATUS_APPROVED, searchContainer.getStart(),
-				searchContainer.getEnd(), sort);
+		BaseModelSearchResult<CPDefinition> cpDefinitionBaseModelSearchResult;
+
+		long commerceChannelGroupId = ParamUtil.getLong(
+			httpServletRequest, CPField.COMMERCE_CHANNEL_GROUP_ID);
+
+		if (commerceChannelGroupId != 0) {
+			cpDefinitionBaseModelSearchResult =
+				_cpDefinitionService.searchCPDefinitionsByChannelGroupId(
+					cpRequestHelper.getCompanyId(), commerceChannelGroupId,
+					getKeywords(), WorkflowConstants.STATUS_APPROVED,
+					searchContainer.getStart(), searchContainer.getEnd(), sort);
+		}
+		else {
+			cpDefinitionBaseModelSearchResult =
+				_cpDefinitionService.searchCPDefinitions(
+					cpRequestHelper.getCompanyId(), getKeywords(),
+					WorkflowConstants.STATUS_APPROVED,
+					searchContainer.getStart(), searchContainer.getEnd(), sort);
+		}
 
 		searchContainer.setTotal(cpDefinitionBaseModelSearchResult.getLength());
 		searchContainer.setResults(
@@ -139,6 +155,10 @@ public class CPDefinitionItemSelectorViewDisplayContext
 
 		if (cpInstances.size() > 1) {
 			return LanguageUtil.get(locale, "multiple-skus");
+		}
+
+		if (cpInstances.isEmpty()) {
+			return StringPool.BLANK;
 		}
 
 		CPInstance cpInstance = cpInstances.get(0);

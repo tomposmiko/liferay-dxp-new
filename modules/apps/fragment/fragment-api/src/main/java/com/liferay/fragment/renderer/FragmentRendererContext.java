@@ -32,6 +32,8 @@ public interface FragmentRendererContext {
 
 	public Optional<Map<String, Object>> getFieldValuesOptional();
 
+	public String getFragmentElementId();
+
 	public FragmentEntryLink getFragmentEntryLink();
 
 	public Locale getLocale();
@@ -47,12 +49,6 @@ public interface FragmentRendererContext {
 	public String getPreviewVersion();
 
 	public long[] getSegmentsEntryIds();
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public long[] getSegmentsExperienceIds();
 
 	public boolean isUseCachedContent();
 

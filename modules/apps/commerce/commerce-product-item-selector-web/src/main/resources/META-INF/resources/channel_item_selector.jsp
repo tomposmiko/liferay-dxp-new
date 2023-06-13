@@ -20,7 +20,6 @@
 CommerceChannelItemSelectorViewDisplayContext commerceChannelItemSelectorViewDisplayContext = (CommerceChannelItemSelectorViewDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 
 SearchContainer<CommerceChannel> commerceChannelSearchContainer = commerceChannelItemSelectorViewDisplayContext.getSearchContainer();
-String itemSelectedEventName = commerceChannelItemSelectorViewDisplayContext.getItemSelectedEventName();
 PortletURL portletURL = commerceChannelItemSelectorViewDisplayContext.getPortletURL();
 %>
 
@@ -58,7 +57,7 @@ PortletURL portletURL = commerceChannelItemSelectorViewDisplayContext.getPortlet
 	</liferay-frontend:management-bar-filters>
 </liferay-frontend:management-bar>
 
-<div class="container-fluid-1280" id="<portlet:namespace />commerceChannelSelectorWrapper">
+<div class="container-fluid container-fluid-max-xl" id="<portlet:namespace />commerceChannelSelectorWrapper">
 	<liferay-ui:search-container
 		id="commerceChannels"
 		searchContainer="<%= commerceChannelSearchContainer %>"
@@ -80,12 +79,12 @@ PortletURL portletURL = commerceChannelItemSelectorViewDisplayContext.getPortlet
 			%>
 
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				property="name"
 			/>
 
 			<liferay-ui:search-container-column-date
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="create-date"
 				property="createDate"
 			/>
@@ -97,32 +96,3 @@ PortletURL portletURL = commerceChannelItemSelectorViewDisplayContext.getPortlet
 		/>
 	</liferay-ui:search-container>
 </div>
-
-<aui:script use="liferay-search-container">
-	var searchContainer = Liferay.SearchContainer.get(
-		'<portlet:namespace />commerceChannels'
-	);
-
-	searchContainer.on('rowToggled', function (event) {
-		var allSelectedElements = event.elements.allSelectedElements;
-		var arr = [];
-
-		allSelectedElements.each(function () {
-			var row = this.ancestor('tr');
-
-			var data = row.getDOM().dataset;
-
-			arr.push({
-				commerceChannelId: data.commerceChannelId,
-				name: data.name,
-			});
-		});
-
-		Liferay.Util.getOpener().Liferay.fire(
-			'<%= HtmlUtil.escapeJS(itemSelectedEventName) %>',
-			{
-				data: arr,
-			}
-		);
-	});
-</aui:script>

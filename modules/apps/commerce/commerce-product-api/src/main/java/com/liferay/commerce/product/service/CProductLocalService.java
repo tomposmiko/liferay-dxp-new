@@ -81,7 +81,7 @@ public interface CProductLocalService
 	public CProduct addCProduct(CProduct cProduct);
 
 	public CProduct addCProduct(
-			long groupId, long userId, String externalReferenceCode,
+			String externalReferenceCode, long groupId, long userId,
 			ServiceContext serviceContext)
 		throws PortalException;
 
@@ -211,11 +211,20 @@ public interface CProductLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CProduct fetchCProduct(long CProductId);
 
-	@Deprecated
+	/**
+	 * Returns the c product with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the c product's external reference code
+	 * @return the matching c product, or <code>null</code> if a matching c product could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CProduct fetchCProductByExternalReferenceCode(
 		long companyId, String externalReferenceCode);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCProductByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CProduct fetchCProductByReferenceCode(
@@ -248,7 +257,14 @@ public interface CProductLocalService
 	public CProduct getCProductByCPInstanceUuid(String cpInstanceUuid)
 		throws PortalException;
 
-	@Deprecated
+	/**
+	 * Returns the c product with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the c product's external reference code
+	 * @return the matching c product
+	 * @throws PortalException if a matching c product could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CProduct getCProductByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -352,7 +368,7 @@ public interface CProductLocalService
 	public CProduct updateCProduct(CProduct cProduct);
 
 	public CProduct updateCProductExternalReferenceCode(
-			long cProductId, String externalReferenceCode)
+			String externalReferenceCode, long cProductId)
 		throws PortalException;
 
 	public CProduct updatePublishedCPDefinitionId(

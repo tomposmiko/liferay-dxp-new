@@ -14,13 +14,13 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			Site.tearDownCP();
+			JSONDepot.deleteDepot(depotName = "Test Depot Name");
 
-			Depot.tearDownCP();
+			Site.tearDownCP();
 
 			DMDocument.tearDownCP();
 
@@ -30,57 +30,17 @@ definition {
 		}
 	}
 
-	@description = "This ensures that a depot can be accessed in the list view."
-	@priority = 5
-	test AccessInListView {
-		JSONDepot.addDepot(
-			depotDescription = "This is the description of a depot",
-			depotName = "Test Depot Name");
-
-		DepotNavigator.openDepotAdmin();
-
-		LexiconEntry.changeDisplayStyle(displayStyle = "list");
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			listView = "true");
-
-		DepotNavigator.gotoPortlet(portlet = "Web Content");
-	}
-
-	@description = "This ensures that a depot can be accessed in the table view."
-	@priority = 5
-	test AccessInTableView {
-		JSONDepot.addDepot(
-			depotDescription = "This is the description of a depot",
-			depotName = "Test Depot Name");
-
-		DepotNavigator.openDepotAdmin();
-
-		LexiconEntry.changeDisplayStyle(displayStyle = "table");
-
-		DepotNavigator.gotoDepot(
-			depotName = "Test Depot Name",
-			tableView = "true");
-
-		DepotNavigator.gotoPortlet(portlet = "Documents and Media");
-	}
-
-	@description = "This ensures that a depot can be accessed when the Applications Menu is disabled at the system level."
-	@priority = 5
-	test AccessWithDisabledAppsMenuAtSystemScope {
-		property test.name.skip.portal.instance = "Depot#AccessWithDisabledAppsMenuAtSystemScope";
+	@description = "This ensures that a depot can be accessed through the Product Menu when the Applications Menu is disabled."
+	@priority = "5"
+	@refactordone
+	test CanAccessAppsViaProductMenu {
+		property test.name.skip.portal.instance = "DepotEntry#CanAccessAppsViaProductMenu";
 
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
 
-		SystemSettings.openSystemSettingsAdmin();
-
-		SystemSettings.gotoConfiguration(
-			configurationCategory = "Navigation",
-			configurationName = "Applications Menu",
-			configurationScope = "Virtual Instance Scope");
+		SystemSettings.openToConfigInSystemSettings(portlet = "Applications Menu");
 
 		FormFields.disableCheckbox(fieldName = "Enable Applications Menu");
 
@@ -91,130 +51,57 @@ definition {
 
 			DepotNavigator.gotoDepot(depotName = "Test Depot Name");
 
-			DepotNavigator.gotoPortlet(portlet = ${application});
+			DepotNavigator.gotoPortlet(portlet = "${application}");
 		}
 	}
 
-	@description = "This ensures that a user can not create a repository with the same escape characters name as another repository."
-	@priority = 5
-	test AddDuplicateWithEscapeCharacters {
-		DepotNavigator.openDepotAdmin();
-
-		Depot.addDepot(
-			depotDescription = "This is the description of a depot",
-			depotName = "&");
-
-		DepotNavigator.openDepotAdmin();
-
-		Depot.addDepot(
-			depot = "Duplicate",
-			depotName = "&");
-
-		DepotNavigator.openDepotAdmin();
-
-		Depot.deleteCP(depotName = "&");
-
-		Depot.viewDefaultCP();
-	}
-
-	@description = "This ensures that users cannot create the same name as another site name."
-	@priority = 5
-	test AddNameThatDuplicatesSite {
-		JSONGroup.addGroup(groupName = "Site Name");
-
-		DepotNavigator.openDepotAdmin();
-
-		Depot.addDepot(
-			depot = "Duplicate",
-			depotName = "Site Name");
-
-		DepotNavigator.openDepotAdmin();
-
-		Depot.viewDefaultCP();
-	}
-
-	@description = "This ensures that users cannot create the same name as another translated repository name."
-	@priority = 4
-	test AddNameThatDuplicatesTranslation {
-		JSONDepot.addDepot(
-			depotDescription = "This is the description of a depot",
-			depotName = "Test Depot Name");
-
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDefineCustomLanguages(depotName = "Test Depot Name");
-
-		Depot.viewLanguageItems(depotLanguage = "Spanish (Spain)");
-
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDefineCustomLanguages(depotName = "Test Depot Name");
-
-		Depot.moveLanguage(
-			depotLanguage = "Spanish (Spain)",
-			moveDown = "true");
-
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDefineCustomLanguages(depotName = "Test Depot Name");
-
-		Depot.viewLanguageItems(
-			depotLanguage = "Spanish (Spain)",
-			lastLanguageItem = "true");
-
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDefineCustomLanguages(depotName = "Test Depot Name");
-
-		Depot.configureDefaultLanguage(
-			defaultDepotLanguage = "Spanish (Spain)",
-			locale = "es_ES");
-
-		DepotNavigator.openDepotAdmin();
-
-		Depot.editDepot(
-			depotName = "Test Depot Name",
-			depotNameEdit = "título",
-			language = "es-ES");
-
-		DepotNavigator.openDepotAdmin();
-
-		Depot.addDepot(
-			depot = "Duplicate",
-			depotName = "título");
-	}
-
-	@description = "This ensures that users cannot create a site with the same name as an existing depot."
-	@priority = 5
-	test AddSiteThatDuplicatesName {
-		JSONDepot.addDepot(
-			depotDescription = "This depot will duplicate a site name",
-			depotName = "Site Name");
+	@description = "This tests the basic flow the user will take to add a depot through the UI."
+	@priority = "5"
+	@refactordone
+	@uitest
+	test CanAddDepot {
+		property environment.acceptance = "true";
+		property portal.acceptance = "true";
 
 		ApplicationsMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Sites");
+			category = "Content",
+			panel = "Applications",
+			portlet = "Asset Libraries");
 
-		LexiconEntry.gotoAdd();
+		Depot.addDepot(
+			depotDescription = "This is the description of a depot",
+			depotName = "Test Depot Name");
 
-		LexiconCard.clickCard(card = "Blank Site");
+		DepotNavigator.openDepotAdmin();
 
-		SelectFrame(locator1 = "IFrame#MODAL_BODY");
-
-		PortletEntry.inputName(name = "Site Name");
-
-		Button.clickAdd();
-
-		Alert.viewErrorMessage(errorMessage = "Please enter a unique name.");
+		DepotNavigator.gotoDepot(depotName = "Test Depot Name");
 	}
 
-	@description = "This ensures that a depot can be deleted."
-	@priority = 5
-	test DeleteDepot {
+	@description = "This ensures that a depot containing a folder and some files can be deleted."
+	@priority = "4"
+	@refactordone
+	test CanDeleteDepotWithContent {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
+
+		JSONFolder.addFolder(
+			dmFolderDescription = "DM Folder Description",
+			dmFolderName = "DM Folder Name",
+			groupName = "Test Depot Name");
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentTitle = "This is a document",
+			groupName = "Test Depot Name",
+			mimeType = "application/msword",
+			sourceFileName = "Document_1.doc");
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "This is an image",
+			groupName = "Test Depot Name",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_2.jpg");
 
 		DepotNavigator.openDepotAdmin();
 
@@ -223,34 +110,13 @@ definition {
 		Depot.viewDefaultCP();
 	}
 
-	@description = "This ensures that a depot with a folder can be deleted."
-	@priority = 4
-	test DeleteDepotWithFolder {
+	@description = "This ensures that an empty depot can be deleted."
+	@priority = "5"
+	@refactordone
+	test CanDeleteEmptyDepot {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
-
-		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
-
-		DMFolder.addCP(dmFolderName = "DM Folder Name");
-
-		DepotNavigator.openDepotAdmin();
-
-		Depot.deleteCP(depotName = "Test Depot Name");
-
-		Depot.viewDefaultCP();
-	}
-
-	@description = "This ensures that a depot with multiple files can be deleted."
-	@priority = 4
-	test DeleteDepotWithMultipleFiles {
-		JSONDepot.addDepot(
-			depotDescription = "This is the description of a depot",
-			depotName = "Test Depot Name");
-
-		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
-
-		DMDocument.addMultipleCP(dmDocumentFileList = "Document_1.doc,Document_2.jpg,Document_3.xls");
 
 		DepotNavigator.openDepotAdmin();
 
@@ -260,8 +126,10 @@ definition {
 	}
 
 	@description = "This ensures that a depot can be deleted in the list view."
-	@priority = 5
-	test DeleteInListView {
+	@priority = "5"
+	@refactordone
+	@uitest
+	test CanDeleteInListView {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
@@ -276,8 +144,10 @@ definition {
 	}
 
 	@description = "This ensures that a depot can be deleted in the table view."
-	@priority = 5
-	test DeleteInTableView {
+	@priority = "5"
+	@refactordone
+	@uitest
+	test CanDeleteInTableView {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
@@ -291,39 +161,14 @@ definition {
 		Depot.viewDefaultCP();
 	}
 
-	@description = "This ensures that a depot can be deleted when the Applications Menu is disabled at the instance level."
-	@priority = 5
-	test DeleteWithDisabledAppsMenuAtInstanceScope {
-		PortalSettings.disableApplicationsMenu();
-
-		ProductMenuHelper.openProductMenu();
-
-		ProductMenu.gotoPortletWhenDisableApplicationsMenu(
-			category = "Content",
-			panel = "Applications Menu-Applications",
-			portlet = "Asset Libraries");
-
-		Depot.addDepot(
-			depotDescription = "This is the description of a depot",
-			depotName = "Test Depot Name");
-
-		ProductMenu.gotoPortletWhenDisableApplicationsMenu(
-			category = "Content",
-			panel = "Applications Menu-Applications",
-			portlet = "Asset Libraries");
-
-		Depot.deleteCP(depotName = "Test Depot Name");
-
-		Depot.viewDefaultCP();
-	}
-
 	@description = "This ensures that a user can deselect depots and delete the reselected ones in cards view."
-	@priority = 5
-	test DeselectAndDeleteInCardsView {
+	@priority = "5"
+	@refactordone
+	test CanDeselectAndDeleteInCardsView {
 		for (var depotName : list "Test Depot Name 1,Test Depot Name 2,Test Depot Name 3") {
 			JSONDepot.addDepot(
 				depotDescription = "This is the description of a depot",
-				depotName = ${depotName});
+				depotName = "${depotName}");
 		}
 
 		DepotNavigator.openDepotAdmin();
@@ -356,12 +201,13 @@ definition {
 	}
 
 	@description = "This ensures that a user can deselect depots and delete the reselected ones in list view."
-	@priority = 4
-	test DeselectAndDeleteInListView {
+	@priority = "4"
+	@refactordone
+	test CanDeselectAndDeleteInListView {
 		for (var depotName : list "Test Depot Name 1,Test Depot Name 2,Test Depot Name 3") {
 			JSONDepot.addDepot(
 				depotDescription = "This is the description of a depot",
-				depotName = ${depotName});
+				depotName = "${depotName}");
 		}
 
 		DepotNavigator.openDepotAdmin();
@@ -398,12 +244,13 @@ definition {
 	}
 
 	@description = "This ensures that a user can deselect depots and delete the reselected ones in table view."
-	@priority = 4
-	test DeselectAndDeleteInTableView {
+	@priority = "4"
+	@refactordone
+	test CanDeselectAndDeleteInTableView {
 		for (var depotName : list "Test Depot Name 1,Test Depot Name 2,Test Depot Name 3") {
 			JSONDepot.addDepot(
 				depotDescription = "This is the description of a depot",
-				depotName = ${depotName});
+				depotName = "${depotName}");
 		}
 
 		DepotNavigator.openDepotAdmin();
@@ -439,9 +286,78 @@ definition {
 		Depot.viewDefaultCP();
 	}
 
-	@description = "This ensures that a depot can be edited."
-	@priority = 5
-	test EditDepot {
+	@description = "This ensures that a depot can be edited in the list view."
+	@priority = "5"
+	@refactordone
+	@uitest
+	test CanEditInListView {
+		JSONDepot.addDepot(
+			depotDescription = "This is the description of a depot",
+			depotName = "Test Depot Name");
+
+		DepotNavigator.openDepotAdmin();
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+
+		DepotNavigator.gotoDepot(
+			depotName = "Test Depot Name",
+			listView = "true");
+
+		DepotNavigator.openDepotAdmin();
+
+		Depot.editDepot(
+			depotDescriptionEdit = "This is an edited description of a depot",
+			depotName = "Test Depot Name",
+			depotNameEdit = "Edited Test Depot Name",
+			listView = "true");
+
+		DepotNavigator.openDepotAdmin();
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+
+		DepotNavigator.gotoDepot(
+			depotName = "Edited Test Depot Name",
+			listView = "true");
+	}
+
+	@description = "This ensures that a depot can be edited in the table view."
+	@priority = "5"
+	@refactordone
+	@uitest
+	test CanEditInTableView {
+		JSONDepot.addDepot(
+			depotDescription = "This is the description of a depot",
+			depotName = "Test Depot Name");
+
+		DepotNavigator.openDepotAdmin();
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "table");
+
+		DepotNavigator.gotoDepot(
+			depotName = "Test Depot Name",
+			tableView = "true");
+
+		DepotNavigator.openDepotAdmin();
+
+		Depot.editDepot(
+			depotDescriptionEdit = "This is an edited description of a depot",
+			depotName = "Test Depot Name",
+			depotNameEdit = "Edited Test Depot Name",
+			tableView = "true");
+
+		DepotNavigator.openDepotAdmin();
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "table");
+
+		DepotNavigator.gotoDepot(
+			depotName = "Edited Test Depot Name",
+			tableView = "true");
+	}
+
+	@description = "This ensures that the depot name and description can be edited."
+	@priority = "5"
+	@refactordone
+	test CanEditNameAndDescription {
 		property portal.acceptance = "true";
 
 		JSONDepot.addDepot(
@@ -460,61 +376,159 @@ definition {
 		DepotNavigator.gotoDepot(depotName = "Edited Test Depot Name");
 	}
 
-	@description = "This ensures that a depot can be edited in the list view."
-	@priority = 5
-	test EditInListView {
+	@description = "This ensures that a depot can be edited via settings."
+	@priority = "4"
+	@refactordone
+	@uitest
+	test CanEditNameViaSettings {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
 
 		DepotNavigator.openDepotAdmin();
 
-		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+		DepotNavigator.gotoDepotPortlet(
+			depotName = "Test Depot Name",
+			portlet = "Asset Library Settings");
 
 		Depot.editDepot(
 			depotDescriptionEdit = "This is an edited description of a depot",
 			depotName = "Test Depot Name",
 			depotNameEdit = "Edited Test Depot Name",
-			listView = "true");
+			settings = "true");
 
 		DepotNavigator.openDepotAdmin();
 
-		LexiconEntry.changeDisplayStyle(displayStyle = "list");
-
-		DepotNavigator.gotoDepot(
-			depotName = "Edited Test Depot Name",
-			listView = "true");
+		DepotNavigator.gotoDepot(depotName = "Edited Test Depot Name");
 	}
 
-	@description = "This ensures that a depot can be edited in the table view."
-	@priority = 5
-	test EditInTableView {
+	@description = "This test covers LPS-120834. It ensures that a user can not redirect to the depot via Space icon."
+	@priority = "5"
+	@refactordone
+	test CannotAccessDepotViaSite {
+		property portal.acceptance = "true";
+
+		Navigator.openURL();
+
+		ProductMenuHelper.openProductMenu();
+
+		ProductMenuHelper.openWorkspace();
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		WaitForVisible(
+			locator1 = "NavBar#NAV_ITEM_LINK",
+			value1 = "${navItem}");
+
+		AssertElementNotPresent(
+			locator1 = "NavBar#NAV_ITEM_LINK",
+			navItem = "Asset Libraries",
+			value1 = "Asset Libraries");
+	}
+
+	// May need to update test after LPS-133688 is fixed
+
+	@description = "This ensures that a user can not create a repository with the same escape characters name as another repository."
+	@priority = "5"
+	@refactordone
+	test CannotAddDuplicateWithEscapeCharacters {
+		DepotNavigator.openDepotAdmin();
+
+		Depot.addDepot(
+			depotDescription = "This is the description of a depot",
+			depotName = "&");
+
+		DepotNavigator.openDepotAdmin();
+
+		Depot.addDepot(
+			depotName = "&",
+			duplicate = "true");
+
+		DepotNavigator.openDepotAdmin();
+
+		AssertElementNotPresent(
+			key_card = "&",
+			key_index = "2",
+			locator1 = "Card#CARD_PAGE_ITEM");
+	}
+
+	@description = "This ensures that users cannot create the same name as another site name."
+	@priority = "5"
+	@refactordone
+	test CannotAddNameThatDuplicatesSite {
+		JSONGroup.addGroup(groupName = "Site Name");
+
+		DepotNavigator.openDepotAdmin();
+
+		Depot.addDepot(
+			depotName = "Site Name",
+			duplicate = "true");
+
+		DepotNavigator.openDepotAdmin();
+
+		Depot.viewDefaultCP();
+	}
+
+	@description = "This ensures that users cannot create the same name as another translated repository name."
+	@priority = "4"
+	@refactordone
+	test CannotAddNameThatDuplicatesTranslation {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
 
 		DepotNavigator.openDepotAdmin();
 
-		LexiconEntry.changeDisplayStyle(displayStyle = "table");
+		DepotNavigator.gotoDefineCustomLanguages(depotName = "Test Depot Name");
 
-		Depot.editDepot(
-			depotDescriptionEdit = "This is an edited description of a depot",
-			depotName = "Test Depot Name",
-			depotNameEdit = "Edited Test Depot Name",
-			tableView = "true");
+		Depot.configureDefaultLanguage(
+			defaultDepotLanguage = "Spanish (Spain)",
+			locale = "es_ES");
 
 		DepotNavigator.openDepotAdmin();
 
-		LexiconEntry.changeDisplayStyle(displayStyle = "table");
+		Depot.editDepot(
+			depotName = "Test Depot Name",
+			depotNameEdit = "título",
+			language = "es-ES");
 
-		DepotNavigator.gotoDepot(
-			depotName = "Edited Test Depot Name",
-			tableView = "true");
+		DepotNavigator.openDepotAdmin();
+
+		Depot.addDepot(
+			depotName = "título",
+			duplicate = "true");
+	}
+
+	@description = "This ensures that users cannot create a site with the same name as an existing depot."
+	@priority = "5"
+	@refactordone
+	test CannotAddSiteThatDuplicatesName {
+		JSONDepot.addDepot(
+			depotDescription = "This depot will duplicate a site name",
+			depotName = "Site Name");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites");
+
+		LexiconEntry.gotoAdd();
+
+		LexiconCard.clickCard(card = "Blank Site");
+
+		PortletEntry.inputName(name = "Site Name");
+
+		Button.clickSave();
+
+		AssertTextEquals(
+			locator1 = "Message#ERROR_FORM_FIELD_REQUIRED",
+			value1 = "Please enter a unique name.");
 	}
 
 	@description = "This ensures that users cannot edit repository name same as another repository name."
-	@priority = 5
-	test RenameToDuplicate {
+	@priority = "5"
+	@refactordone
+	test CannotRenameWithDuplicateTitle {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");
@@ -526,9 +540,9 @@ definition {
 		DepotNavigator.openDepotAdmin();
 
 		Depot.editDepot(
-			depot = "Duplicate",
 			depotName = "Test Depot Name 2",
-			depotNameEdit = "Test Depot Name");
+			depotNameEdit = "Test Depot Name",
+			duplicate = "true");
 
 		DepotNavigator.openDepotAdmin();
 
@@ -536,8 +550,9 @@ definition {
 	}
 
 	@description = "This ensures that a depot's description can be searched."
-	@priority = 5
-	test SearchForDepotDescription {
+	@priority = "5"
+	@refactordone
+	test CanSearchForDepotDescription {
 		JSONDepot.addDepot(
 			depotDescription = "Description 1",
 			depotName = "Depot 1");
@@ -561,26 +576,21 @@ definition {
 		Depot.viewSearchResult(
 			excludedResults = "Should not be returned in search",
 			includedResults = "Depot 1,Depot 2,Depot 3",
-			resultCount = 3,
+			resultCount = "3",
 			searchTerm = "Description");
 
 		DepotNavigator.gotoDepot(depotName = "Depot 1");
 	}
 
 	@description = "This ensures that a depot's title can be searched."
-	@priority = 5
-	test SearchForDepotTitle {
-		JSONDepot.addDepot(
-			depotDescription = "",
-			depotName = "Depot 1");
-
-		JSONDepot.addDepot(
-			depotDescription = "",
-			depotName = "Depot 2");
-
-		JSONDepot.addDepot(
-			depotDescription = "",
-			depotName = "Depot 3");
+	@priority = "5"
+	@refactordone
+	test CanSearchForDepotTitle {
+		for (var depotName : list "Depot 1,Depot 2,Depot 3") {
+			JSONDepot.addDepot(
+				depotDescription = "",
+				depotName = "${depotName}");
+		}
 
 		JSONDepot.addDepot(
 			depotDescription = "",
@@ -588,26 +598,29 @@ definition {
 
 		DepotNavigator.openDepotAdmin();
 
-		Pause(locator1 = 3000);
+		AssertElementPresent(
+			key_card = "Depot 1",
+			locator1 = "Card#CARD_TITLE");
 
 		Search.searchCP(searchTerm = "Depot");
 
 		Depot.viewSearchResult(
 			excludedResults = "Should not be returned in search",
 			includedResults = "Depot 1,Depot 2,Depot 3",
-			resultCount = 3,
+			resultCount = "3",
 			searchTerm = "Depot");
 
 		DepotNavigator.gotoDepot(depotName = "Depot 1");
 	}
 
 	@description = "This ensures that all depots can be deleted when the user selects all."
-	@priority = 4
-	test SelectAllAndDelete {
+	@priority = "4"
+	@refactordone
+	test CanSelectAllAndDelete {
 		for (var depotName : list "Test Depot Name 1,Test Depot Name 2,Test Depot Name 3") {
 			JSONDepot.addDepot(
 				depotDescription = "This is the description of a depot",
-				depotName = ${depotName});
+				depotName = "${depotName}");
 		}
 
 		DepotNavigator.openDepotAdmin();
@@ -620,12 +633,13 @@ definition {
 	}
 
 	@description = "This ensures that all depots can be deleted in the list view when the user selects all."
-	@priority = 4
-	test SelectAllAndDeleteInListView {
+	@priority = "4"
+	@refactordone
+	test CanSelectAllAndDeleteInListView {
 		for (var depotName : list "Test Depot Name 1,Test Depot Name 2,Test Depot Name 3") {
 			JSONDepot.addDepot(
 				depotDescription = "This is the description of a depot",
-				depotName = ${depotName});
+				depotName = "${depotName}");
 		}
 
 		DepotNavigator.openDepotAdmin();
@@ -640,12 +654,13 @@ definition {
 	}
 
 	@description = "This ensures that all depots can be deleted in the table view when the user selects all."
-	@priority = 4
-	test SelectAllAndDeleteInTableView {
+	@priority = "4"
+	@refactordone
+	test CanSelectAllAndDeleteInTableView {
 		for (var depotName : list "Test Depot Name 1,Test Depot Name 2,Test Depot Name 3") {
 			JSONDepot.addDepot(
 				depotDescription = "This is the description of a depot",
-				depotName = ${depotName});
+				depotName = "${depotName}");
 		}
 
 		DepotNavigator.openDepotAdmin();
@@ -659,32 +674,12 @@ definition {
 		Depot.viewDefaultCP();
 	}
 
-	@description = "This ensures that a depot can be added."
-	@priority = 5
-	test Smoke {
-		property environment.acceptance = "true";
-		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
-		property portal.acceptance = "true";
-
-		ApplicationsMenu.gotoPortlet(
-			category = "Content",
-			panel = "Applications",
-			portlet = "Asset Libraries");
-
-		Depot.addDepot(
-			depotDescription = "This is the description of a depot",
-			depotName = "Test Depot Name");
-
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoDepot(depotName = "Test Depot Name");
-	}
-
 	@description = "This ensures that the number of connected sites can be viewed in the card view."
-	@priority = 5
-	test ViewConnectionsInCardView {
+	@priority = "5"
+	@refactordone
+	test CanViewConnectionsInCardView {
 		for (var siteName : list "Site Name 1,Site Name 2,Site Name 3") {
-			JSONGroup.addGroup(groupName = ${siteName});
+			JSONGroup.addGroup(groupName = "${siteName}");
 		}
 
 		JSONDepot.addDepot(
@@ -695,60 +690,49 @@ definition {
 
 		Depot.viewConnectedSiteNumber(
 			cardView = "true",
-			connectedSiteNumber = 0,
+			connectedSiteNumber = "0",
 			depotName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
-
-		DepotNavigator.gotoSites(depotName = "Test Depot Name");
-
-		Depot.connectSite(siteList = "Site Name 1,Site Name 2,Site Name 3");
+		for (var siteName : list "Site Name 1,Site Name 2,Site Name 3") {
+			JSONDepot.connectSite(
+				depotName = "Test Depot Name",
+				groupName = "${siteName}");
+		}
 
 		DepotNavigator.openDepotAdmin();
 
 		Depot.viewConnectedSiteNumber(
 			cardView = "true",
-			connectedSiteNumber = 3,
+			connectedSiteNumber = "3",
 			depotName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
-
-		DepotNavigator.gotoSites(depotName = "Test Depot Name");
-
-		Depot.disconnectSite(siteList = "Site Name 2,Site Name 3");
+		for (var siteName : list "Site Name 2,Site Name 3") {
+			JSONDepot.disconnectSite(groupName = "${siteName}");
+		}
 
 		DepotNavigator.openDepotAdmin();
 
 		Depot.viewConnectedSiteNumber(
 			cardView = "true",
-			connectedSiteNumber = 1,
+			connectedSiteNumber = "1",
 			depotName = "Test Depot Name");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
-
-		DepotNavigator.gotoSites(depotName = "Test Depot Name");
-
-		Depot.disconnectSite(siteList = "Site Name 1");
+		JSONDepot.disconnectSite(groupName = "Site Name 1");
 
 		DepotNavigator.openDepotAdmin();
 
 		Depot.viewConnectedSiteNumber(
 			cardView = "true",
-			connectedSiteNumber = 0,
+			connectedSiteNumber = "0",
 			depotName = "Test Depot Name");
 	}
 
 	@description = "This ensures that the number of connected sites can be viewed in the table view."
-	@priority = 5
-	test ViewConnectionsInTableView {
+	@priority = "5"
+	@refactordone
+	test CanViewConnectionsInTableView {
 		for (var siteName : list "Site Name 1,Site Name 2,Site Name 3") {
-			JSONGroup.addGroup(groupName = ${siteName});
+			JSONGroup.addGroup(groupName = "${siteName}");
 		}
 
 		JSONDepot.addDepot(
@@ -758,52 +742,40 @@ definition {
 		DepotNavigator.openDepotAdmin();
 
 		Depot.viewConnectedSiteNumber(
-			connectedSiteNumber = 0,
+			connectedSiteNumber = "0",
 			depotName = "Test Depot Name",
 			tableView = "true");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
-
-		DepotNavigator.gotoSites(depotName = "Test Depot Name");
-
-		Depot.connectSite(siteList = "Site Name 1,Site Name 2,Site Name 3");
+		for (var siteName : list "Site Name 1,Site Name 2,Site Name 3") {
+			JSONDepot.connectSite(
+				depotName = "Test Depot Name",
+				groupName = "${siteName}");
+		}
 
 		DepotNavigator.openDepotAdmin();
 
 		Depot.viewConnectedSiteNumber(
-			connectedSiteNumber = 3,
+			connectedSiteNumber = "3",
 			depotName = "Test Depot Name",
 			tableView = "true");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
-
-		DepotNavigator.gotoSites(depotName = "Test Depot Name");
-
-		Depot.disconnectSite(siteList = "Site Name 2,Site Name 3");
+		for (var siteName : list "Site Name 2,Site Name 3") {
+			JSONDepot.disconnectSite(groupName = "${siteName}");
+		}
 
 		DepotNavigator.openDepotAdmin();
 
 		Depot.viewConnectedSiteNumber(
-			connectedSiteNumber = 1,
+			connectedSiteNumber = "1",
 			depotName = "Test Depot Name",
 			tableView = "true");
 
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
-
-		DepotNavigator.gotoSites(depotName = "Test Depot Name");
-
-		Depot.disconnectSite(siteList = "Site Name 1");
+		JSONDepot.disconnectSite(groupName = "Site Name 1");
 
 		DepotNavigator.openDepotAdmin();
 
 		Depot.viewConnectedSiteNumber(
-			connectedSiteNumber = 0,
+			connectedSiteNumber = "0",
 			depotName = "Test Depot Name",
 			tableView = "true");
 	}

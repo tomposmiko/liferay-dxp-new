@@ -16,54 +16,51 @@ package com.liferay.headless.delivery.internal.resource.v1_0;
 
 import com.liferay.headless.delivery.dto.v1_0.NavigationMenu;
 import com.liferay.headless.delivery.resource.v1_0.NavigationMenuResource;
-import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.GroupedModel;
+import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParser;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortField;
-import com.liferay.portal.odata.sort.SortParser;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
 import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.permission.ModelPermissionsUtil;
+import com.liferay.portal.vulcan.permission.PermissionUtil;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.ActionUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Array;
-
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Generated;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -276,6 +273,129 @@ public abstract class BaseNavigationMenuResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
+	 * curl -X 'GET' 'http://localhost:8080/o/headless-delivery/v1.0/navigation-menus/{navigationMenuId}/permissions'  -u 'test@liferay.com:test'
+	 */
+	@io.swagger.v3.oas.annotations.Parameters(
+		value = {
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
+				name = "navigationMenuId"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "roleNames"
+			)
+		}
+	)
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {
+			@io.swagger.v3.oas.annotations.tags.Tag(name = "NavigationMenu")
+		}
+	)
+	@javax.ws.rs.GET
+	@javax.ws.rs.Path("/navigation-menus/{navigationMenuId}/permissions")
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
+	@Override
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getNavigationMenuPermissionsPage(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("navigationMenuId")
+				Long navigationMenuId,
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.ws.rs.QueryParam("roleNames")
+				String roleNames)
+		throws Exception {
+
+		String resourceName = getPermissionCheckerResourceName(
+			navigationMenuId);
+		Long resourceId = getPermissionCheckerResourceId(navigationMenuId);
+
+		PermissionUtil.checkPermission(
+			ActionKeys.PERMISSIONS, groupLocalService, resourceName, resourceId,
+			getPermissionCheckerGroupId(navigationMenuId));
+
+		return toPermissionPage(
+			HashMapBuilder.put(
+				"get",
+				addAction(
+					ActionKeys.PERMISSIONS, "getNavigationMenuPermissionsPage",
+					resourceName, resourceId)
+			).put(
+				"replace",
+				addAction(
+					ActionKeys.PERMISSIONS, "putNavigationMenuPermissionsPage",
+					resourceName, resourceId)
+			).build(),
+			resourceId, resourceName, roleNames);
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'PUT' 'http://localhost:8080/o/headless-delivery/v1.0/navigation-menus/{navigationMenuId}/permissions'  -u 'test@liferay.com:test'
+	 */
+	@io.swagger.v3.oas.annotations.Parameters(
+		value = {
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
+				name = "navigationMenuId"
+			)
+		}
+	)
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {
+			@io.swagger.v3.oas.annotations.tags.Tag(name = "NavigationMenu")
+		}
+	)
+	@javax.ws.rs.Path("/navigation-menus/{navigationMenuId}/permissions")
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
+	@javax.ws.rs.PUT
+	@Override
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			putNavigationMenuPermissionsPage(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("navigationMenuId")
+				Long navigationMenuId,
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
+		throws Exception {
+
+		String resourceName = getPermissionCheckerResourceName(
+			navigationMenuId);
+		Long resourceId = getPermissionCheckerResourceId(navigationMenuId);
+
+		PermissionUtil.checkPermission(
+			ActionKeys.PERMISSIONS, groupLocalService, resourceName, resourceId,
+			getPermissionCheckerGroupId(navigationMenuId));
+
+		resourcePermissionLocalService.updateResourcePermissions(
+			contextCompany.getCompanyId(),
+			getPermissionCheckerGroupId(navigationMenuId), resourceName,
+			String.valueOf(resourceId),
+			ModelPermissionsUtil.toModelPermissions(
+				contextCompany.getCompanyId(), permissions, resourceId,
+				resourceName, resourceActionLocalService,
+				resourcePermissionLocalService, roleLocalService));
+
+		return toPermissionPage(
+			HashMapBuilder.put(
+				"get",
+				addAction(
+					ActionKeys.PERMISSIONS, "getNavigationMenuPermissionsPage",
+					resourceName, resourceId)
+			).put(
+				"replace",
+				addAction(
+					ActionKeys.PERMISSIONS, "putNavigationMenuPermissionsPage",
+					resourceName, resourceId)
+			).build(),
+			resourceId, resourceName, null);
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/navigation-menus'  -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
@@ -405,65 +525,155 @@ public abstract class BaseNavigationMenuResourceImpl
 		).build();
 	}
 
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'GET' 'http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/navigation-menus/permissions'  -u 'test@liferay.com:test'
+	 */
+	@io.swagger.v3.oas.annotations.Parameters(
+		value = {
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
+				name = "siteId"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "roleNames"
+			)
+		}
+	)
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {
+			@io.swagger.v3.oas.annotations.tags.Tag(name = "NavigationMenu")
+		}
+	)
+	@javax.ws.rs.GET
+	@javax.ws.rs.Path("/sites/{siteId}/navigation-menus/permissions")
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
+	@Override
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getSiteNavigationMenuPermissionsPage(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("siteId")
+				Long siteId,
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.ws.rs.QueryParam("roleNames")
+				String roleNames)
+		throws Exception {
+
+		String portletName = getPermissionCheckerPortletName(siteId);
+
+		PermissionUtil.checkPermission(
+			ActionKeys.PERMISSIONS, groupLocalService, portletName, siteId,
+			siteId);
+
+		return toPermissionPage(
+			HashMapBuilder.put(
+				"get",
+				addAction(
+					ActionKeys.PERMISSIONS,
+					"getSiteNavigationMenuPermissionsPage", portletName, siteId)
+			).put(
+				"replace",
+				addAction(
+					ActionKeys.PERMISSIONS,
+					"putSiteNavigationMenuPermissionsPage", portletName, siteId)
+			).build(),
+			siteId, portletName, roleNames);
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'PUT' 'http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/navigation-menus/permissions'  -u 'test@liferay.com:test'
+	 */
+	@io.swagger.v3.oas.annotations.Parameters(
+		value = {
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
+				name = "siteId"
+			)
+		}
+	)
+	@io.swagger.v3.oas.annotations.tags.Tags(
+		value = {
+			@io.swagger.v3.oas.annotations.tags.Tag(name = "NavigationMenu")
+		}
+	)
+	@javax.ws.rs.Path("/sites/{siteId}/navigation-menus/permissions")
+	@javax.ws.rs.Produces({"application/json", "application/xml"})
+	@javax.ws.rs.PUT
+	@Override
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			putSiteNavigationMenuPermissionsPage(
+				@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+				@javax.validation.constraints.NotNull
+				@javax.ws.rs.PathParam("siteId")
+				Long siteId,
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
+		throws Exception {
+
+		String portletName = getPermissionCheckerPortletName(siteId);
+
+		PermissionUtil.checkPermission(
+			ActionKeys.PERMISSIONS, groupLocalService, portletName, siteId,
+			siteId);
+
+		resourcePermissionLocalService.updateResourcePermissions(
+			contextCompany.getCompanyId(), siteId, portletName,
+			String.valueOf(siteId),
+			ModelPermissionsUtil.toModelPermissions(
+				contextCompany.getCompanyId(), permissions, siteId, portletName,
+				resourceActionLocalService, resourcePermissionLocalService,
+				roleLocalService));
+
+		return toPermissionPage(
+			HashMapBuilder.put(
+				"get",
+				addAction(
+					ActionKeys.PERMISSIONS,
+					"getSiteNavigationMenuPermissionsPage", portletName, siteId)
+			).put(
+				"replace",
+				addAction(
+					ActionKeys.PERMISSIONS,
+					"putSiteNavigationMenuPermissionsPage", portletName, siteId)
+			).build(),
+			siteId, portletName, null);
+	}
+
 	@Override
 	@SuppressWarnings("PMD.UnusedLocalVariable")
 	public void create(
-			Collection<NavigationMenu> navigationMenus,
+			java.util.Collection<NavigationMenu> navigationMenus,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
 		UnsafeConsumer<NavigationMenu, Exception> navigationMenuUnsafeConsumer =
-			null;
+			navigationMenu -> {
+			};
 
-		String createStrategy = (String)parameters.getOrDefault(
-			"createStrategy", "INSERT");
-
-		if ("INSERT".equalsIgnoreCase(createStrategy)) {
-			if (parameters.containsKey("siteId")) {
-				navigationMenuUnsafeConsumer =
-					navigationMenu -> postSiteNavigationMenu(
-						(Long)parameters.get("siteId"), navigationMenu);
-			}
-			else {
-				throw new NotSupportedException(
-					"One of the following parameters must be specified: [siteId]");
-			}
+		if (parameters.containsKey("siteId")) {
+			navigationMenuUnsafeConsumer =
+				navigationMenu -> postSiteNavigationMenu(
+					(Long)parameters.get("siteId"), navigationMenu);
 		}
 
-		if (navigationMenuUnsafeConsumer == null) {
-			throw new NotSupportedException(
-				"Create strategy \"" + createStrategy +
-					"\" is not supported for NavigationMenu");
-		}
-
-		if (contextBatchUnsafeConsumer != null) {
-			contextBatchUnsafeConsumer.accept(
-				navigationMenus, navigationMenuUnsafeConsumer);
-		}
-		else {
-			for (NavigationMenu navigationMenu : navigationMenus) {
-				navigationMenuUnsafeConsumer.accept(navigationMenu);
-			}
+		for (NavigationMenu navigationMenu : navigationMenus) {
+			navigationMenuUnsafeConsumer.accept(navigationMenu);
 		}
 	}
 
 	@Override
 	public void delete(
-			Collection<NavigationMenu> navigationMenus,
+			java.util.Collection<NavigationMenu> navigationMenus,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
 		for (NavigationMenu navigationMenu : navigationMenus) {
 			deleteNavigationMenu(navigationMenu.getId());
 		}
-	}
-
-	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray("INSERT");
-	}
-
-	public Set<String> getAvailableUpdateStrategies() {
-		return SetUtil.fromArray("UPDATE");
 	}
 
 	@Override
@@ -481,10 +691,6 @@ public abstract class BaseNavigationMenuResourceImpl
 		return null;
 	}
 
-	public String getVersion() {
-		return "v1.0";
-	}
-
 	@Override
 	public Page<NavigationMenu> read(
 			Filter filter, Pagination pagination, Sort[] sorts,
@@ -496,8 +702,7 @@ public abstract class BaseNavigationMenuResourceImpl
 				(Long)parameters.get("siteId"), pagination);
 		}
 		else {
-			throw new NotSupportedException(
-				"One of the following parameters must be specified: [siteId]");
+			return null;
 		}
 	}
 
@@ -525,59 +730,81 @@ public abstract class BaseNavigationMenuResourceImpl
 
 	@Override
 	public void update(
-			Collection<NavigationMenu> navigationMenus,
+			java.util.Collection<NavigationMenu> navigationMenus,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
-		UnsafeConsumer<NavigationMenu, Exception> navigationMenuUnsafeConsumer =
-			null;
-
-		String updateStrategy = (String)parameters.getOrDefault(
-			"updateStrategy", "UPDATE");
-
-		if ("UPDATE".equalsIgnoreCase(updateStrategy)) {
-			navigationMenuUnsafeConsumer = navigationMenu -> putNavigationMenu(
+		for (NavigationMenu navigationMenu : navigationMenus) {
+			putNavigationMenu(
 				navigationMenu.getId() != null ? navigationMenu.getId() :
-					_parseLong((String)parameters.get("navigationMenuId")),
+					Long.parseLong((String)parameters.get("navigationMenuId")),
 				navigationMenu);
-		}
-
-		if (navigationMenuUnsafeConsumer == null) {
-			throw new NotSupportedException(
-				"Update strategy \"" + updateStrategy +
-					"\" is not supported for NavigationMenu");
-		}
-
-		if (contextBatchUnsafeConsumer != null) {
-			contextBatchUnsafeConsumer.accept(
-				navigationMenus, navigationMenuUnsafeConsumer);
-		}
-		else {
-			for (NavigationMenu navigationMenu : navigationMenus) {
-				navigationMenuUnsafeConsumer.accept(navigationMenu);
-			}
 		}
 	}
 
-	private Long _parseLong(String value) {
-		if (value != null) {
-			return Long.parseLong(value);
+	protected String getPermissionCheckerActionsResourceName(Object id)
+		throws Exception {
+
+		return getPermissionCheckerResourceName(id);
+	}
+
+	protected Long getPermissionCheckerGroupId(Object id) throws Exception {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected String getPermissionCheckerPortletName(Object id)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long getPermissionCheckerResourceId(Object id) throws Exception {
+		return GetterUtil.getLong(id);
+	}
+
+	protected String getPermissionCheckerResourceName(Object id)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Page<com.liferay.portal.vulcan.permission.Permission>
+			toPermissionPage(
+				Map<String, Map<String, String>> actions, long id,
+				String resourceName, String roleNames)
+		throws Exception {
+
+		List<ResourceAction> resourceActions =
+			resourceActionLocalService.getResourceActions(resourceName);
+
+		if (Validator.isNotNull(roleNames)) {
+			return Page.of(
+				actions,
+				transform(
+					PermissionUtil.getRoles(
+						contextCompany, roleLocalService,
+						StringUtil.split(roleNames)),
+					role -> PermissionUtil.toPermission(
+						contextCompany.getCompanyId(), id, resourceActions,
+						resourceName, resourcePermissionLocalService, role)));
 		}
 
-		return null;
+		return Page.of(
+			actions,
+			transform(
+				PermissionUtil.getResourcePermissions(
+					contextCompany.getCompanyId(), id, resourceName,
+					resourcePermissionLocalService),
+				resourcePermission -> PermissionUtil.toPermission(
+					resourceActions, resourcePermission,
+					roleLocalService.getRole(resourcePermission.getRoleId()))));
 	}
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
 		this.contextAcceptLanguage = contextAcceptLanguage;
-	}
-
-	public void setContextBatchUnsafeConsumer(
-		UnsafeBiConsumer
-			<Collection<NavigationMenu>,
-			 UnsafeConsumer<NavigationMenu, Exception>, Exception>
-				contextBatchUnsafeConsumer) {
-
-		this.contextBatchUnsafeConsumer = contextBatchUnsafeConsumer;
 	}
 
 	public void setContextCompany(
@@ -640,18 +867,6 @@ public abstract class BaseNavigationMenuResourceImpl
 		this.roleLocalService = roleLocalService;
 	}
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider) {
-		this.sortParserProvider = sortParserProvider;
-	}
-
-	public void setVulcanBatchEngineImportTaskResource(
-		VulcanBatchEngineImportTaskResource
-			vulcanBatchEngineImportTaskResource) {
-
-		this.vulcanBatchEngineImportTaskResource =
-			vulcanBatchEngineImportTaskResource;
-	}
-
 	@Override
 	public Filter toFilter(
 		String filterString, Map<String, List<String>> multivaluedMap) {
@@ -672,49 +887,9 @@ public abstract class BaseNavigationMenuResourceImpl
 		}
 		catch (Exception exception) {
 			_log.error("Invalid filter " + filterString, exception);
-
-			return null;
-		}
-	}
-
-	@Override
-	public Sort[] toSorts(String sortString) {
-		if (Validator.isNull(sortString)) {
-			return null;
 		}
 
-		try {
-			SortParser sortParser = sortParserProvider.provide(
-				getEntityModel(Collections.emptyMap()));
-
-			if (sortParser == null) {
-				return null;
-			}
-
-			com.liferay.portal.odata.sort.Sort oDataSort =
-				new com.liferay.portal.odata.sort.Sort(
-					sortParser.parse(sortString));
-
-			List<SortField> sortFields = oDataSort.getSortFields();
-
-			Sort[] sorts = new Sort[sortFields.size()];
-
-			for (int i = 0; i < sortFields.size(); i++) {
-				SortField sortField = sortFields.get(i);
-
-				sorts[i] = new Sort(
-					sortField.getSortableFieldName(
-						contextAcceptLanguage.getPreferredLocale()),
-					!sortField.isAscending());
-			}
-
-			return sorts;
-		}
-		catch (Exception exception) {
-			_log.error("Invalid sort " + sortString, exception);
-
-			return new Sort[0];
-		}
+		return null;
 	}
 
 	protected Map<String, String> addAction(
@@ -751,85 +926,35 @@ public abstract class BaseNavigationMenuResourceImpl
 			actionName, siteId, methodName, null, permissionName, siteId);
 	}
 
-	protected <T, R, E extends Throwable> List<R> transform(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction) {
+	protected <T, R> List<R> transform(
+		java.util.Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction) {
 
 		return TransformUtil.transform(collection, unsafeFunction);
 	}
 
-	protected <T, R, E extends Throwable> R[] transform(
-		T[] array, UnsafeFunction<T, R, E> unsafeFunction, Class<?> clazz) {
+	protected <T, R> R[] transform(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction,
+		Class<?> clazz) {
 
 		return TransformUtil.transform(array, unsafeFunction, clazz);
 	}
 
-	protected <T, R, E extends Throwable> R[] transformToArray(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-		Class<?> clazz) {
+	protected <T, R> R[] transformToArray(
+		java.util.Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction, Class<?> clazz) {
 
 		return TransformUtil.transformToArray(
 			collection, unsafeFunction, clazz);
 	}
 
-	protected <T, R, E extends Throwable> List<R> transformToList(
-		T[] array, UnsafeFunction<T, R, E> unsafeFunction) {
+	protected <T, R> List<R> transformToList(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction) {
 
 		return TransformUtil.transformToList(array, unsafeFunction);
 	}
 
-	protected <T, R, E extends Throwable> long[] transformToLongArray(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction) {
-
-		try {
-			return unsafeTransformToLongArray(collection, unsafeFunction);
-		}
-		catch (Throwable throwable) {
-			throw new RuntimeException(throwable);
-		}
-	}
-
-	protected <T, R, E extends Throwable> List<R> unsafeTransform(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return TransformUtil.unsafeTransform(collection, unsafeFunction);
-	}
-
-	protected <T, R, E extends Throwable> R[] unsafeTransform(
-			T[] array, UnsafeFunction<T, R, E> unsafeFunction, Class<?> clazz)
-		throws E {
-
-		return TransformUtil.unsafeTransform(array, unsafeFunction, clazz);
-	}
-
-	protected <T, R, E extends Throwable> R[] unsafeTransformToArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-			Class<?> clazz)
-		throws E {
-
-		return TransformUtil.unsafeTransformToArray(
-			collection, unsafeFunction, clazz);
-	}
-
-	protected <T, R, E extends Throwable> List<R> unsafeTransformToList(
-			T[] array, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return TransformUtil.unsafeTransformToList(array, unsafeFunction);
-	}
-
-	protected <T, R, E extends Throwable> long[] unsafeTransformToLongArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return (long[])_unsafeTransformToPrimitiveArray(
-			collection, unsafeFunction, long[].class);
-	}
-
 	protected AcceptLanguage contextAcceptLanguage;
-	protected UnsafeBiConsumer
-		<Collection<NavigationMenu>, UnsafeConsumer<NavigationMenu, Exception>,
-		 Exception> contextBatchUnsafeConsumer;
 	protected com.liferay.portal.kernel.model.Company contextCompany;
 	protected HttpServletRequest contextHttpServletRequest;
 	protected HttpServletResponse contextHttpServletResponse;
@@ -842,26 +967,8 @@ public abstract class BaseNavigationMenuResourceImpl
 	protected ResourceActionLocalService resourceActionLocalService;
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
 	protected RoleLocalService roleLocalService;
-	protected SortParserProvider sortParserProvider;
 	protected VulcanBatchEngineImportTaskResource
 		vulcanBatchEngineImportTaskResource;
-
-	private <T, R, E extends Throwable> Object _unsafeTransformToPrimitiveArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-			Class<?> clazz)
-		throws E {
-
-		List<R> list = unsafeTransform(collection, unsafeFunction);
-
-		Object array = clazz.cast(
-			Array.newInstance(clazz.getComponentType(), list.size()));
-
-		for (int i = 0; i < list.size(); i++) {
-			Array.set(array, i, list.get(i));
-		}
-
-		return array;
-	}
 
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseNavigationMenuResourceImpl.class);

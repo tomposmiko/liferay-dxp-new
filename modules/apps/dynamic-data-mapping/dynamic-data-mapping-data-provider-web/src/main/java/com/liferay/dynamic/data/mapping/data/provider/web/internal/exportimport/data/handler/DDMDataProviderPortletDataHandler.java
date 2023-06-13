@@ -48,11 +48,11 @@ public class DDMDataProviderPortletDataHandler extends BasePortletDataHandler {
 
 	public static final String NAMESPACE = "ddm-data-provider";
 
-	public static final String SCHEMA_VERSION = "1.0.0";
+	public static final String SCHEMA_VERSION = "4.0.0";
 
 	@Override
 	public String doExportData(
-			final PortletDataContext portletDataContext, String portletId,
+			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
 		throws Exception {
 

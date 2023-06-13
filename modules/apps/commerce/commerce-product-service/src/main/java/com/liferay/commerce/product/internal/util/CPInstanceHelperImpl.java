@@ -14,8 +14,9 @@
 
 package com.liferay.commerce.product.internal.util;
 
-import com.liferay.commerce.account.constants.CommerceAccountConstants;
+import com.liferay.adaptive.media.image.html.AMImageHTMLTagFactory;
 import com.liferay.commerce.account.util.CommerceAccountHelper;
+import com.liferay.commerce.media.CommerceMediaProvider;
 import com.liferay.commerce.media.CommerceMediaResolver;
 import com.liferay.commerce.product.catalog.CPCatalogEntry;
 import com.liferay.commerce.product.catalog.CPSku;
@@ -44,12 +45,15 @@ import com.liferay.commerce.product.util.JsonHelper;
 import com.liferay.commerce.product.util.comparator.CPDefinitionOptionValueRelPriorityComparator;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.Portal;
@@ -92,6 +96,15 @@ public class CPInstanceHelperImpl implements CPInstanceHelper {
 
 		return _fetchCPInstanceBySKUContributors(
 			cpDefinitionId, serializedDDMFormValues);
+	}
+
+	@Override
+	public CPInstance fetchReplacementCPInstance(
+			long cProductId, String cpInstanceUuid)
+		throws PortalException {
+
+		return _cpInstanceLocalService.fetchCProductInstance(
+			cProductId, cpInstanceUuid);
 	}
 
 	@Override
@@ -266,6 +279,25 @@ public class CPInstanceHelperImpl implements CPInstanceHelper {
 	}
 
 	@Override
+	public String getCPInstanceAdaptiveMediaImageHTMLTag(
+			long commerceAccountId, long companyId, long cpInstanceId)
+		throws Exception {
+
+		FileVersion fileVersion = getCPInstanceImageFileVersion(
+			commerceAccountId, companyId, cpInstanceId);
+
+		String originalImgTag = StringBundler.concat(
+			"<img class=\"aspect-ratio-bg-cover aspect-ratio-item ",
+			"aspect-ratio-item-center-middle aspect-ratio-item-fluid ",
+			"card-type-asset-icon\" src=\"",
+			getCPInstanceThumbnailSrc(commerceAccountId, cpInstanceId),
+			"\" />");
+
+		return _amImageHTMLTagFactory.create(
+			originalImgTag, fileVersion.getFileEntry());
+	}
+
+	@Override
 	public Map<CPDefinitionOptionRel, List<CPDefinitionOptionValueRel>>
 			getCPInstanceCPDefinitionOptionRelsMap(long cpInstanceId)
 		throws PortalException {
@@ -360,7 +392,72 @@ public class CPInstanceHelperImpl implements CPInstanceHelper {
 	}
 
 	@Override
-	public String getCPInstanceThumbnailSrc(long cpInstanceId)
+	public FileVersion getCPInstanceImageFileVersion(
+			long commerceAccountId, long companyId, long cpInstanceId)
+		throws Exception {
+
+		CPInstance cpInstance = _cpInstanceLocalService.fetchCPInstance(
+			cpInstanceId);
+
+		if (cpInstance == null) {
+			return null;
+		}
+
+		CPDefinition cpDefinition = _cpDefinitionLocalService.getCPDefinition(
+			cpInstance.getCPDefinitionId());
+
+		if (!_commerceProductViewPermission.contains(
+				PermissionThreadLocal.getPermissionChecker(), commerceAccountId,
+				cpDefinition.getCPDefinitionId())) {
+
+			return null;
+		}
+
+		Map<String, List<String>>
+			cpDefinitionOptionRelKeysCPDefinitionOptionValueRelKeys =
+				_cpDefinitionOptionRelLocalService.
+					getCPDefinitionOptionRelKeysCPDefinitionOptionValueRelKeys(
+						cpInstanceId);
+
+		JSONArray keyValuesJSONArray = _jsonHelper.toJSONArray(
+			cpDefinitionOptionRelKeysCPDefinitionOptionValueRelKeys);
+
+		List<CPAttachmentFileEntry> cpAttachmentFileEntries =
+			_cpAttachmentFileEntryLocalService.getCPAttachmentFileEntries(
+				cpInstance.getCPDefinitionId(), keyValuesJSONArray.toString(),
+				CPAttachmentFileEntryConstants.TYPE_IMAGE, 0, 1);
+
+		if (cpAttachmentFileEntries.isEmpty()) {
+			CPAttachmentFileEntry cpAttachmentFileEntry =
+				_cpDefinitionLocalService.getDefaultImageCPAttachmentFileEntry(
+					cpInstance.getCPDefinitionId());
+
+			if (cpAttachmentFileEntry != null) {
+				FileEntry fileEntry = cpAttachmentFileEntry.fetchFileEntry();
+
+				if (fileEntry != null) {
+					return fileEntry.getFileVersion();
+				}
+			}
+
+			FileEntry fileEntry =
+				_commerceMediaProvider.getDefaultImageFileEntry(
+					companyId, cpDefinition.getGroupId());
+
+			return fileEntry.getFileVersion();
+		}
+
+		CPAttachmentFileEntry cpAttachmentFileEntry =
+			cpAttachmentFileEntries.get(0);
+
+		FileEntry fileEntry = cpAttachmentFileEntry.fetchFileEntry();
+
+		return fileEntry.getFileVersion();
+	}
+
+	@Override
+	public String getCPInstanceThumbnailSrc(
+			long commerceAccountId, long cpInstanceId)
 		throws Exception {
 
 		CPInstance cpInstance = _cpInstanceLocalService.fetchCPInstance(
@@ -387,14 +484,14 @@ public class CPInstanceHelperImpl implements CPInstanceHelper {
 		if (cpAttachmentFileEntries.isEmpty()) {
 			CPDefinition cpDefinition = cpInstance.getCPDefinition();
 
-			return cpDefinition.getDefaultImageThumbnailSrc();
+			return cpDefinition.getDefaultImageThumbnailSrc(commerceAccountId);
 		}
 
 		CPAttachmentFileEntry cpAttachmentFileEntry =
 			cpAttachmentFileEntries.get(0);
 
 		return _commerceMediaResolver.getThumbnailURL(
-			CommerceAccountConstants.ACCOUNT_ID_GUEST,
+			commerceAccountId,
 			cpAttachmentFileEntry.getCPAttachmentFileEntryId());
 	}
 
@@ -621,10 +718,16 @@ public class CPInstanceHelperImpl implements CPInstanceHelper {
 	}
 
 	@Reference
+	private AMImageHTMLTagFactory _amImageHTMLTagFactory;
+
+	@Reference
 	private CommerceAccountHelper _commerceAccountHelper;
 
 	@Reference
 	private CommerceChannelLocalService _commerceChannelLocalService;
+
+	@Reference
+	private CommerceMediaProvider _commerceMediaProvider;
 
 	@Reference
 	private CommerceMediaResolver _commerceMediaResolver;

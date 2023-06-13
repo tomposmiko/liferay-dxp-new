@@ -51,40 +51,6 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 @Component(immediate = true, service = UserPersonalSitePermissions.class)
 public class UserPersonalSitePermissions {
 
-	public void initPermissions(List<Company> companies, Portlet portlet) {
-		String rootPortletId = portlet.getRootPortletId();
-
-		for (Company company : companies) {
-			long companyId = company.getCompanyId();
-
-			Role powerUserRole = getPowerUserRole(companyId);
-
-			if (powerUserRole == null) {
-				continue;
-			}
-
-			Group userPersonalSiteGroup = getUserPersonalSiteGroup(companyId);
-
-			if (userPersonalSiteGroup == null) {
-				continue;
-			}
-
-			try {
-				initPermissions(
-					companyId, powerUserRole.getRoleId(), rootPortletId,
-					userPersonalSiteGroup.getGroupId());
-			}
-			catch (PortalException portalException) {
-				_log.error(
-					StringBundler.concat(
-						"Unable to initialize user personal site permissions ",
-						"for portlet ", portlet.getPortletId(), " in company ",
-						companyId),
-					portalException);
-			}
-		}
-	}
-
 	public void initPermissions(long companyId, List<Portlet> portlets) {
 		Role powerUserRole = getPowerUserRole(companyId);
 
@@ -114,6 +80,11 @@ public class UserPersonalSitePermissions {
 					portalException);
 			}
 		}
+	}
+
+	public void initPermissions(Portlet portlet) {
+		_companyLocalService.forEachCompany(
+			company -> _initPermissions(company, portlet));
 	}
 
 	@Activate
@@ -203,6 +174,36 @@ public class UserPersonalSitePermissions {
 		}
 	}
 
+	private void _initPermissions(Company company, Portlet portlet) {
+		long companyId = company.getCompanyId();
+
+		Role powerUserRole = getPowerUserRole(companyId);
+
+		if (powerUserRole == null) {
+			return;
+		}
+
+		Group userPersonalSiteGroup = getUserPersonalSiteGroup(companyId);
+
+		if (userPersonalSiteGroup == null) {
+			return;
+		}
+
+		try {
+			initPermissions(
+				companyId, powerUserRole.getRoleId(),
+				portlet.getRootPortletId(), userPersonalSiteGroup.getGroupId());
+		}
+		catch (PortalException portalException) {
+			_log.error(
+				StringBundler.concat(
+					"Unable to initialize user personal site permissions for ",
+					"portlet ", portlet.getPortletId(), " in company ",
+					company.getCompanyId()),
+				portalException);
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		UserPersonalSitePermissions.class);
 
@@ -229,8 +230,10 @@ public class UserPersonalSitePermissions {
 		implements ServiceTrackerCustomizer<PanelApp, PanelApp> {
 
 		@Override
-		public PanelApp addingService(ServiceReference<PanelApp> reference) {
-			PanelApp panelApp = _bundleContext.getService(reference);
+		public PanelApp addingService(
+			ServiceReference<PanelApp> serviceReference) {
+
+			PanelApp panelApp = _bundleContext.getService(serviceReference);
 
 			try {
 				Portlet portlet = panelApp.getPortlet();
@@ -251,12 +254,12 @@ public class UserPersonalSitePermissions {
 					return panelApp;
 				}
 
-				initPermissions(_companyLocalService.getCompanies(), portlet);
+				initPermissions(portlet);
 
 				return panelApp;
 			}
 			catch (Throwable throwable) {
-				_bundleContext.ungetService(reference);
+				_bundleContext.ungetService(serviceReference);
 
 				throw throwable;
 			}

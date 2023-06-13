@@ -26,6 +26,7 @@ import com.liferay.commerce.price.list.service.persistence.CommercePriceListComm
 import com.liferay.commerce.price.list.service.persistence.CommercePriceListCommerceAccountGroupRelPersistence;
 import com.liferay.commerce.price.list.service.persistence.CommercePriceListDiscountRelPersistence;
 import com.liferay.commerce.price.list.service.persistence.CommercePriceListFinder;
+import com.liferay.commerce.price.list.service.persistence.CommercePriceListOrderTypeRelPersistence;
 import com.liferay.commerce.price.list.service.persistence.CommercePriceListPersistence;
 import com.liferay.commerce.price.list.service.persistence.CommerceTierPriceEntryPersistence;
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
@@ -48,8 +49,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -435,6 +434,7 @@ public abstract class CommercePriceListDiscountRelLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -454,6 +454,7 @@ public abstract class CommercePriceListDiscountRelLocalServiceBaseImpl
 				(CommercePriceListDiscountRel)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<CommercePriceListDiscountRel> getBasePersistence() {
 		return commercePriceListDiscountRelPersistence;
 	}
@@ -910,6 +911,56 @@ public abstract class CommercePriceListDiscountRelLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the commerce price list order type rel local service.
+	 *
+	 * @return the commerce price list order type rel local service
+	 */
+	public com.liferay.commerce.price.list.service.
+		CommercePriceListOrderTypeRelLocalService
+			getCommercePriceListOrderTypeRelLocalService() {
+
+		return commercePriceListOrderTypeRelLocalService;
+	}
+
+	/**
+	 * Sets the commerce price list order type rel local service.
+	 *
+	 * @param commercePriceListOrderTypeRelLocalService the commerce price list order type rel local service
+	 */
+	public void setCommercePriceListOrderTypeRelLocalService(
+		com.liferay.commerce.price.list.service.
+			CommercePriceListOrderTypeRelLocalService
+				commercePriceListOrderTypeRelLocalService) {
+
+		this.commercePriceListOrderTypeRelLocalService =
+			commercePriceListOrderTypeRelLocalService;
+	}
+
+	/**
+	 * Returns the commerce price list order type rel persistence.
+	 *
+	 * @return the commerce price list order type rel persistence
+	 */
+	public CommercePriceListOrderTypeRelPersistence
+		getCommercePriceListOrderTypeRelPersistence() {
+
+		return commercePriceListOrderTypeRelPersistence;
+	}
+
+	/**
+	 * Sets the commerce price list order type rel persistence.
+	 *
+	 * @param commercePriceListOrderTypeRelPersistence the commerce price list order type rel persistence
+	 */
+	public void setCommercePriceListOrderTypeRelPersistence(
+		CommercePriceListOrderTypeRelPersistence
+			commercePriceListOrderTypeRelPersistence) {
+
+		this.commercePriceListOrderTypeRelPersistence =
+			commercePriceListOrderTypeRelPersistence;
+	}
+
+	/**
 	 * Returns the commerce tier price entry local service.
 	 *
 	 * @return the commerce tier price entry local service
@@ -1243,6 +1294,17 @@ public abstract class CommercePriceListDiscountRelLocalServiceBaseImpl
 		commercePriceListDiscountRelPersistence;
 
 	@BeanReference(
+		type = com.liferay.commerce.price.list.service.CommercePriceListOrderTypeRelLocalService.class
+	)
+	protected com.liferay.commerce.price.list.service.
+		CommercePriceListOrderTypeRelLocalService
+			commercePriceListOrderTypeRelLocalService;
+
+	@BeanReference(type = CommercePriceListOrderTypeRelPersistence.class)
+	protected CommercePriceListOrderTypeRelPersistence
+		commercePriceListOrderTypeRelPersistence;
+
+	@BeanReference(
 		type = com.liferay.commerce.price.list.service.CommerceTierPriceEntryLocalService.class
 	)
 	protected
@@ -1283,9 +1345,6 @@ public abstract class CommercePriceListDiscountRelLocalServiceBaseImpl
 
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommercePriceListDiscountRelLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

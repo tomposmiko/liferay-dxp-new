@@ -48,6 +48,7 @@ public class ElasticsearchIndexWriterTest extends BaseIndexingTestCase {
 		LiferayUnitTestRule.INSTANCE;
 
 	@Before
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 
@@ -55,6 +56,7 @@ public class ElasticsearchIndexWriterTest extends BaseIndexingTestCase {
 	}
 
 	@After
+	@Override
 	public void tearDown() throws SearchException {
 		Stream<Document> stream = _documents.stream();
 

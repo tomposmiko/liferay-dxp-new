@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -228,108 +229,130 @@ public class MFATimeBasedOTPEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, MFATimeBasedOTPEntry>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			MFATimeBasedOTPEntry.class.getClassLoader(),
+			MFATimeBasedOTPEntry.class, ModelWrapper.class);
+
+		try {
+			Constructor<MFATimeBasedOTPEntry> constructor =
+				(Constructor<MFATimeBasedOTPEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<MFATimeBasedOTPEntry, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<MFATimeBasedOTPEntry, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<MFATimeBasedOTPEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<MFATimeBasedOTPEntry, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", MFATimeBasedOTPEntry::getMvccVersion);
-		attributeGetterFunctions.put(
-			"mfaTimeBasedOTPEntryId",
-			MFATimeBasedOTPEntry::getMfaTimeBasedOTPEntryId);
-		attributeGetterFunctions.put(
-			"companyId", MFATimeBasedOTPEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", MFATimeBasedOTPEntry::getUserId);
-		attributeGetterFunctions.put(
-			"userName", MFATimeBasedOTPEntry::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", MFATimeBasedOTPEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", MFATimeBasedOTPEntry::getModifiedDate);
-		attributeGetterFunctions.put(
-			"failedAttempts", MFATimeBasedOTPEntry::getFailedAttempts);
-		attributeGetterFunctions.put(
-			"lastFailDate", MFATimeBasedOTPEntry::getLastFailDate);
-		attributeGetterFunctions.put(
-			"lastFailIP", MFATimeBasedOTPEntry::getLastFailIP);
-		attributeGetterFunctions.put(
-			"lastSuccessDate", MFATimeBasedOTPEntry::getLastSuccessDate);
-		attributeGetterFunctions.put(
-			"lastSuccessIP", MFATimeBasedOTPEntry::getLastSuccessIP);
-		attributeGetterFunctions.put(
-			"sharedSecret", MFATimeBasedOTPEntry::getSharedSecret);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<MFATimeBasedOTPEntry, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<MFATimeBasedOTPEntry, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<MFATimeBasedOTPEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", MFATimeBasedOTPEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<MFATimeBasedOTPEntry, Long>)
 				MFATimeBasedOTPEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"mfaTimeBasedOTPEntryId",
+			MFATimeBasedOTPEntry::getMfaTimeBasedOTPEntryId);
 		attributeSetterBiConsumers.put(
 			"mfaTimeBasedOTPEntryId",
 			(BiConsumer<MFATimeBasedOTPEntry, Long>)
 				MFATimeBasedOTPEntry::setMfaTimeBasedOTPEntryId);
+		attributeGetterFunctions.put(
+			"companyId", MFATimeBasedOTPEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<MFATimeBasedOTPEntry, Long>)
 				MFATimeBasedOTPEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", MFATimeBasedOTPEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<MFATimeBasedOTPEntry, Long>)
 				MFATimeBasedOTPEntry::setUserId);
+		attributeGetterFunctions.put(
+			"userName", MFATimeBasedOTPEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<MFATimeBasedOTPEntry, String>)
 				MFATimeBasedOTPEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", MFATimeBasedOTPEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<MFATimeBasedOTPEntry, Date>)
 				MFATimeBasedOTPEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", MFATimeBasedOTPEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<MFATimeBasedOTPEntry, Date>)
 				MFATimeBasedOTPEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"failedAttempts", MFATimeBasedOTPEntry::getFailedAttempts);
 		attributeSetterBiConsumers.put(
 			"failedAttempts",
 			(BiConsumer<MFATimeBasedOTPEntry, Integer>)
 				MFATimeBasedOTPEntry::setFailedAttempts);
+		attributeGetterFunctions.put(
+			"lastFailDate", MFATimeBasedOTPEntry::getLastFailDate);
 		attributeSetterBiConsumers.put(
 			"lastFailDate",
 			(BiConsumer<MFATimeBasedOTPEntry, Date>)
 				MFATimeBasedOTPEntry::setLastFailDate);
+		attributeGetterFunctions.put(
+			"lastFailIP", MFATimeBasedOTPEntry::getLastFailIP);
 		attributeSetterBiConsumers.put(
 			"lastFailIP",
 			(BiConsumer<MFATimeBasedOTPEntry, String>)
 				MFATimeBasedOTPEntry::setLastFailIP);
+		attributeGetterFunctions.put(
+			"lastSuccessDate", MFATimeBasedOTPEntry::getLastSuccessDate);
 		attributeSetterBiConsumers.put(
 			"lastSuccessDate",
 			(BiConsumer<MFATimeBasedOTPEntry, Date>)
 				MFATimeBasedOTPEntry::setLastSuccessDate);
+		attributeGetterFunctions.put(
+			"lastSuccessIP", MFATimeBasedOTPEntry::getLastSuccessIP);
 		attributeSetterBiConsumers.put(
 			"lastSuccessIP",
 			(BiConsumer<MFATimeBasedOTPEntry, String>)
 				MFATimeBasedOTPEntry::setLastSuccessIP);
+		attributeGetterFunctions.put(
+			"sharedSecret", MFATimeBasedOTPEntry::getSharedSecret);
 		attributeSetterBiConsumers.put(
 			"sharedSecret",
 			(BiConsumer<MFATimeBasedOTPEntry, String>)
 				MFATimeBasedOTPEntry::setSharedSecret);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -646,6 +669,41 @@ public class MFATimeBasedOTPEntryModelImpl
 	}
 
 	@Override
+	public MFATimeBasedOTPEntry cloneWithOriginalValues() {
+		MFATimeBasedOTPEntryImpl mfaTimeBasedOTPEntryImpl =
+			new MFATimeBasedOTPEntryImpl();
+
+		mfaTimeBasedOTPEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		mfaTimeBasedOTPEntryImpl.setMfaTimeBasedOTPEntryId(
+			this.<Long>getColumnOriginalValue("mfaTimeBasedOTPEntryId"));
+		mfaTimeBasedOTPEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		mfaTimeBasedOTPEntryImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		mfaTimeBasedOTPEntryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		mfaTimeBasedOTPEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		mfaTimeBasedOTPEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		mfaTimeBasedOTPEntryImpl.setFailedAttempts(
+			this.<Integer>getColumnOriginalValue("failedAttempts"));
+		mfaTimeBasedOTPEntryImpl.setLastFailDate(
+			this.<Date>getColumnOriginalValue("lastFailDate"));
+		mfaTimeBasedOTPEntryImpl.setLastFailIP(
+			this.<String>getColumnOriginalValue("lastFailIP"));
+		mfaTimeBasedOTPEntryImpl.setLastSuccessDate(
+			this.<Date>getColumnOriginalValue("lastSuccessDate"));
+		mfaTimeBasedOTPEntryImpl.setLastSuccessIP(
+			this.<String>getColumnOriginalValue("lastSuccessIP"));
+		mfaTimeBasedOTPEntryImpl.setSharedSecret(
+			this.<String>getColumnOriginalValue("sharedSecret"));
+
+		return mfaTimeBasedOTPEntryImpl;
+	}
+
+	@Override
 	public int compareTo(MFATimeBasedOTPEntry mfaTimeBasedOTPEntry) {
 		long primaryKey = mfaTimeBasedOTPEntry.getPrimaryKey();
 
@@ -890,9 +948,7 @@ public class MFATimeBasedOTPEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, MFATimeBasedOTPEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					MFATimeBasedOTPEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

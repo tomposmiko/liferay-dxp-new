@@ -8,18 +8,15 @@ definition {
 	setUp {
 		SignIn.signIn();
 
-		Smoke.viewWelcomePage();
+		var portalURL = PropsUtil.get("portal.url");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Search");
+		AssertLocation(value1 = "${portalURL}/web/guest?SM_USER=test@liferay.com");
 
-		SearchAdministration.executeSearchActions(actionsDescription = "Reindex all search indexes.");
+		SearchAdministration.executeReindex();
 	}
 
-	@description = "This is a basic test for modern site building components such as Content Pages, Page Templates, Fragments, Display Page Templates, and Navigation Menus. After the upgrade is complete, all of those elements should still be present, and a user should still be able to perform basic modern site building functions."
-	@priority = 5
+	@description = "This is a basic test for modern site building components such as Content Pages, Page Templates, Fragments, Display Page Templates, and Navigation Menus. After the upgrade is complete, all of those elements should still be present, and a user should still be able to perform basic modern site building functions. This is a use case for LPS-106776."
+	@priority = "5"
 	test ConfigurePageEditorAfterUpgrade721 {
 		property data.archive.type = "data-archive-page-editor";
 		property database.types = "mariadb,mysql,postgresql";
@@ -30,7 +27,7 @@ definition {
 		Upgrade.configurePageEditor();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ConfigurePageEditorAfterUpgrade72101 {
 		property data.archive.type = "data-archive-page-editor";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql";
@@ -41,7 +38,8 @@ definition {
 		Upgrade.configurePageEditor();
 	}
 
-	@priority = 5
+	@description = "This is a use case for LPS-106776. Fragment configuration persists after upgrating."
+	@priority = "5"
 	test ViewContributedFragmentStyleAfterUpgrade721 {
 		property data.archive.type = "data-archive-contributed-fragments";
 		property database.types = "mariadb,mysql,postgresql";
@@ -50,107 +48,13 @@ definition {
 		Upgrade.viewContributedFragmentStyle();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewContributedFragmentStyleAfterUpgrade72101 {
 		property data.archive.type = "data-archive-contributed-fragments";
 		property database.types = "db2,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property portal.version = "7.2.10.1";
 
 		Upgrade.viewContributedFragmentStyle();
-	}
-
-	@description = "This is a use case for LPS-123098 and LPS-135373. View existing Banner Center fragment on page after upgrade from 7.2."
-	@priority = 4
-	test ViewEditedInlineContentOfBannerCenterAfterUpgrade721 {
-		property data.archive.type = "data-archive-banner-center";
-		property database.types = "mariadb,mysql,postgresql";
-		property portal.version = "7.2.1";
-
-		task ("View the edited inline content at view mode") {
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name",
-				siteName = "Guest");
-
-			for (var text : list "Edited Banner Title,Edited Banner Subtitle,Edited Banner Link") {
-				AssertVisible(locator1 = "//div[contains(@class,'banner')]//*[normalize-space(text())='${text}']");
-			}
-
-			AssertVisible(locator1 = "//div[contains(@class,'banner')][contains(@style,'Document_1.jpg')]");
-		}
-
-		task ("View the edited inline content at edit mode") {
-			ContentPages.clickPencil();
-
-			PageEditor.viewFragmentEditableText(
-				contributed = "false",
-				editableText = "Edited Banner Title",
-				fragmentName = "Element",
-				id = "01-title");
-
-			PageEditor.viewFragmentEditableText(
-				contributed = "false",
-				editableText = "Edited Banner Subtitle",
-				fragmentName = "Element",
-				id = "02-subtitle");
-
-			PageEditor.viewFragmentEditableText(
-				contributed = "false",
-				editableText = "Edited Banner Link",
-				fragmentName = "Element",
-				id = "03-link");
-
-			AssertVisible(
-				key_fragmentName = "Element",
-				key_imageName = "Document_1.jpg",
-				locator1 = "Fragment#FRAGMENT_CONTENT_BACKGROUND_IMAGE");
-		}
-	}
-
-	@description = "This is a use case for LPS-123098 and LPS-135373. View existing Banner Center fragment on page after upgrade from 7.2."
-	@priority = 4
-	test ViewEditedInlineContentOfBannerCenterAfterUpgrade72101 {
-		property data.archive.type = "data-archive-banner-center";
-		property database.types = "db2,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
-		property portal.version = "7.2.10.1";
-
-		task ("View the edited inline content at view mode") {
-			Navigator.gotoSitePage(
-				pageName = "Test Page Name",
-				siteName = "Guest");
-
-			for (var text : list "Edited Banner Title,Edited Banner Subtitle,Edited Banner Link") {
-				AssertVisible(locator1 = "//div[contains(@class,'banner')]//*[normalize-space(text())='${text}']");
-			}
-
-			AssertVisible(locator1 = "//div[contains(@class,'banner')][contains(@style,'Document_1.jpg')]");
-		}
-
-		task ("View the edited inline content at edit mode") {
-			ContentPages.clickPencil();
-
-			PageEditor.viewFragmentEditableText(
-				contributed = "false",
-				editableText = "Edited Banner Title",
-				fragmentName = "Element",
-				id = "01-title");
-
-			PageEditor.viewFragmentEditableText(
-				contributed = "false",
-				editableText = "Edited Banner Subtitle",
-				fragmentName = "Element",
-				id = "02-subtitle");
-
-			PageEditor.viewFragmentEditableText(
-				contributed = "false",
-				editableText = "Edited Banner Link",
-				fragmentName = "Element",
-				id = "03-link");
-
-			AssertVisible(
-				key_fragmentName = "Element",
-				key_imageName = "Document_1.jpg",
-				locator1 = "Fragment#FRAGMENT_CONTENT_BACKGROUND_IMAGE");
-		}
 	}
 
 }

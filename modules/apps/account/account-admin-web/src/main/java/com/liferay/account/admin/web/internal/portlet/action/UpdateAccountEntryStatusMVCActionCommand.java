@@ -15,11 +15,12 @@
 package com.liferay.account.admin.web.internal.portlet.action;
 
 import com.liferay.account.constants.AccountPortletKeys;
-import com.liferay.account.service.AccountEntryLocalService;
+import com.liferay.account.service.AccountEntryService;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -34,6 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_ENTRIES_ADMIN,
+		"javax.portlet.name=" + AccountPortletKeys.ACCOUNT_ENTRIES_MANAGEMENT,
 		"mvc.command.name=/account_admin/update_account_entry_status"
 	},
 	service = MVCActionCommand.class
@@ -52,14 +54,20 @@ public class UpdateAccountEntryStatusMVCActionCommand
 			actionRequest, "accountEntryIds");
 
 		if (cmd.equals(Constants.DEACTIVATE)) {
-			_accountEntryLocalService.deactivateAccountEntries(accountEntryIds);
+			_accountEntryService.deactivateAccountEntries(accountEntryIds);
 		}
 		else if (cmd.equals(Constants.RESTORE)) {
-			_accountEntryLocalService.activateAccountEntries(accountEntryIds);
+			_accountEntryService.activateAccountEntries(accountEntryIds);
+		}
+
+		String redirect = ParamUtil.getString(actionRequest, "redirect");
+
+		if (Validator.isNotNull(redirect)) {
+			sendRedirect(actionRequest, actionResponse, redirect);
 		}
 	}
 
 	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
+	private AccountEntryService _accountEntryService;
 
 }

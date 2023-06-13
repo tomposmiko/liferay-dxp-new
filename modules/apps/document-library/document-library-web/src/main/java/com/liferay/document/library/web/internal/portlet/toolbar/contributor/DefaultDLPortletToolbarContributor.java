@@ -167,10 +167,10 @@ public class DefaultDLPortletToolbarContributor
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
 		if (Objects.equals(
-				portletDisplay.getPortletName(),
+				portletDisplay.getRootPortletId(),
 				DLPortletKeys.DOCUMENT_LIBRARY) ||
 			Objects.equals(
-				portletDisplay.getPortletName(),
+				portletDisplay.getRootPortletId(),
 				DLPortletKeys.MEDIA_GALLERY_DISPLAY)) {
 
 			return true;
@@ -179,9 +179,8 @@ public class DefaultDLPortletToolbarContributor
 		return false;
 	}
 
-	private ServiceTrackerList
-		<DLPortletToolbarContributorContext, DLPortletToolbarContributorContext>
-			_dlPortletToolbarContributorContexts;
+	private ServiceTrackerList<DLPortletToolbarContributorContext>
+		_dlPortletToolbarContributorContexts;
 
 	@Reference
 	private DLPortletToolbarContributorHelper

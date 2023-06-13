@@ -83,4 +83,7 @@ public interface NullConvertibleEntryModel
 	 */
 	public void setName(String name);
 
+	@Override
+	public NullConvertibleEntry cloneWithOriginalValues();
+
 }

@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -240,82 +241,104 @@ public class ChangesetCollectionModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, ChangesetCollection>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ChangesetCollection.class.getClassLoader(),
+			ChangesetCollection.class, ModelWrapper.class);
+
+		try {
+			Constructor<ChangesetCollection> constructor =
+				(Constructor<ChangesetCollection>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<ChangesetCollection, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<ChangesetCollection, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<ChangesetCollection, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<ChangesetCollection, Object>>();
-
-		attributeGetterFunctions.put(
-			"changesetCollectionId",
-			ChangesetCollection::getChangesetCollectionId);
-		attributeGetterFunctions.put(
-			"groupId", ChangesetCollection::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", ChangesetCollection::getCompanyId);
-		attributeGetterFunctions.put("userId", ChangesetCollection::getUserId);
-		attributeGetterFunctions.put(
-			"userName", ChangesetCollection::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", ChangesetCollection::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", ChangesetCollection::getModifiedDate);
-		attributeGetterFunctions.put("name", ChangesetCollection::getName);
-		attributeGetterFunctions.put(
-			"description", ChangesetCollection::getDescription);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<ChangesetCollection, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<ChangesetCollection, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<ChangesetCollection, ?>>();
 
+		attributeGetterFunctions.put(
+			"changesetCollectionId",
+			ChangesetCollection::getChangesetCollectionId);
 		attributeSetterBiConsumers.put(
 			"changesetCollectionId",
 			(BiConsumer<ChangesetCollection, Long>)
 				ChangesetCollection::setChangesetCollectionId);
+		attributeGetterFunctions.put(
+			"groupId", ChangesetCollection::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<ChangesetCollection, Long>)
 				ChangesetCollection::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", ChangesetCollection::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<ChangesetCollection, Long>)
 				ChangesetCollection::setCompanyId);
+		attributeGetterFunctions.put("userId", ChangesetCollection::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<ChangesetCollection, Long>)
 				ChangesetCollection::setUserId);
+		attributeGetterFunctions.put(
+			"userName", ChangesetCollection::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<ChangesetCollection, String>)
 				ChangesetCollection::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", ChangesetCollection::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<ChangesetCollection, Date>)
 				ChangesetCollection::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", ChangesetCollection::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<ChangesetCollection, Date>)
 				ChangesetCollection::setModifiedDate);
+		attributeGetterFunctions.put("name", ChangesetCollection::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<ChangesetCollection, String>)
 				ChangesetCollection::setName);
+		attributeGetterFunctions.put(
+			"description", ChangesetCollection::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<ChangesetCollection, String>)
 				ChangesetCollection::setDescription);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -595,6 +618,33 @@ public class ChangesetCollectionModelImpl
 	}
 
 	@Override
+	public ChangesetCollection cloneWithOriginalValues() {
+		ChangesetCollectionImpl changesetCollectionImpl =
+			new ChangesetCollectionImpl();
+
+		changesetCollectionImpl.setChangesetCollectionId(
+			this.<Long>getColumnOriginalValue("changesetCollectionId"));
+		changesetCollectionImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		changesetCollectionImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		changesetCollectionImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		changesetCollectionImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		changesetCollectionImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		changesetCollectionImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		changesetCollectionImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		changesetCollectionImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+
+		return changesetCollectionImpl;
+	}
+
+	@Override
 	public int compareTo(ChangesetCollection changesetCollection) {
 		long primaryKey = changesetCollection.getPrimaryKey();
 
@@ -806,9 +856,7 @@ public class ChangesetCollectionModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, ChangesetCollection>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					ChangesetCollection.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

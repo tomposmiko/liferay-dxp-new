@@ -35,8 +35,6 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PortalClassPathUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.registry.BasicRegistryImpl;
-import com.liferay.registry.RegistryUtil;
 
 import java.io.File;
 
@@ -126,7 +124,6 @@ public class CounterLocalServiceTest {
 	public void testConcurrentIncrement() throws Exception {
 		List<String> arguments = new ArrayList<>();
 
-		arguments.add("-Dliferay.mode=test");
 		arguments.add("-Dsun.zip.disableMemoryMapping=true");
 
 		for (String property :
@@ -142,25 +139,18 @@ public class CounterLocalServiceTest {
 		ProcessConfig portalProcessConfig =
 			PortalClassPathUtil.getPortalProcessConfig();
 
-		ProtectionDomain protectionDomain =
-			CounterLocalServiceTest.class.getProtectionDomain();
-
-		CodeSource codeSource = protectionDomain.getCodeSource();
-
-		URL url = codeSource.getLocation();
-
-		File file = new File(url.toURI());
-
 		ProcessConfig.Builder builder = new ProcessConfig.Builder();
 
 		builder.setArguments(arguments);
 		builder.setBootstrapClassPath(
-			portalProcessConfig.getBootstrapClassPath());
+			_prependClassPath(
+				portalProcessConfig.getBootstrapClassPath(),
+				LiferayIntegrationTestRule.class));
 		builder.setReactClassLoader(PortalClassLoaderUtil.getClassLoader());
 		builder.setRuntimeClassPath(
-			StringBundler.concat(
-				file.getPath(), File.pathSeparator,
-				portalProcessConfig.getRuntimeClassPath()));
+			_prependClassPath(
+				portalProcessConfig.getRuntimeClassPath(),
+				CounterLocalServiceTest.class));
 
 		ProcessConfig processConfig = builder.build();
 
@@ -199,6 +189,21 @@ public class CounterLocalServiceTest {
 		}
 	}
 
+	private String _prependClassPath(String baseClassPath, Class<?> clazz)
+		throws Exception {
+
+		ProtectionDomain protectionDomain = clazz.getProtectionDomain();
+
+		CodeSource codeSource = protectionDomain.getCodeSource();
+
+		URL url = codeSource.getLocation();
+
+		File file = new File(url.toURI());
+
+		return StringBundler.concat(
+			file.getPath(), File.pathSeparator, baseClassPath);
+	}
+
 	private static final String _COUNTER_NAME =
 		CounterLocalServiceTest.class.getName();
 
@@ -224,8 +229,6 @@ public class CounterLocalServiceTest {
 
 		@Override
 		public Long[] call() throws ProcessException {
-			RegistryUtil.setRegistry(new BasicRegistryImpl());
-
 			System.setProperty(
 				PropsKeys.COUNTER_INCREMENT + "." + _counterName, "1");
 

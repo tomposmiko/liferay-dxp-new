@@ -24,6 +24,7 @@ import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetEntryServiceUtil;
 import com.liferay.asset.kernel.service.AssetLinkLocalServiceUtil;
 import com.liferay.asset.taglib.internal.item.selector.ItemSelectorUtil;
+import com.liferay.asset.util.comparator.AssetRendererFactoryTypeNameComparator;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.criteria.AssetEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.asset.criterion.AssetEntryItemSelectorCriterion;
@@ -37,7 +38,6 @@ import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.CollatorUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -52,16 +52,10 @@ import com.liferay.staging.StagingGroupHelper;
 import com.liferay.staging.StagingGroupHelperUtil;
 import com.liferay.taglib.util.TagResourceBundleUtil;
 
-import java.io.Serializable;
-
-import java.text.Collator;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -118,9 +112,12 @@ public class InputAssetLinksDisplayContext {
 	}
 
 	public List<AssetRendererFactory<?>> getAssetRendererFactories() {
-		return ListUtil.filter(
+		List<AssetRendererFactory<?>> assetRendererFactories =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactories(
-				_themeDisplay.getCompanyId()),
+				_themeDisplay.getCompanyId());
+
+		assetRendererFactories = ListUtil.filter(
+			assetRendererFactories,
 			assetRendererFactory -> {
 				if (assetRendererFactory.isLinkable() &&
 					assetRendererFactory.isSelectable()) {
@@ -130,6 +127,11 @@ public class InputAssetLinksDisplayContext {
 
 				return false;
 			});
+
+		return ListUtil.sort(
+			assetRendererFactories,
+			new AssetRendererFactoryTypeNameComparator(
+				_themeDisplay.getLocale()));
 	}
 
 	public String getAssetType(AssetEntry entry) {
@@ -238,9 +240,7 @@ public class InputAssetLinksDisplayContext {
 			}
 		}
 
-		return ListUtil.sort(
-			selectorEntries,
-			new SelectorEntriesMessageComparator(_themeDisplay.getLocale()));
+		return selectorEntries;
 	}
 
 	private List<AssetLink> _createAssetLinks() throws PortalException {
@@ -320,7 +320,7 @@ public class InputAssetLinksDisplayContext {
 	}
 
 	private PortletURL _getAssetEntryItemSelectorPortletURL(
-		AssetRendererFactory<?> rendererFactory, long subtypeSelectionId) {
+		AssetRendererFactory<?> assetRendererFactory, long subtypeSelectionId) {
 
 		AssetEntryItemSelectorCriterion assetEntryItemSelectorCriterion =
 			new AssetEntryItemSelectorCriterion();
@@ -336,13 +336,20 @@ public class InputAssetLinksDisplayContext {
 		assetEntryItemSelectorCriterion.setSubtypeSelectionId(
 			subtypeSelectionId);
 		assetEntryItemSelectorCriterion.setTypeSelection(
-			rendererFactory.getClassName());
+			assetRendererFactory.getClassName());
 
 		ItemSelector itemSelector = ItemSelectorUtil.getItemSelector();
 
-		return itemSelector.getItemSelectorURL(
+		PortletURL portletURL = itemSelector.getItemSelectorURL(
 			RequestBackedPortletURLFactoryUtil.create(_portletRequest),
 			getEventName(), assetEntryItemSelectorCriterion);
+
+		if (_assetEntryId > 0) {
+			portletURL.setParameter(
+				"refererAssetEntryId", String.valueOf(_assetEntryId));
+		}
+
+		return portletURL;
 	}
 
 	private List<Map<String, Object>> _getSelectorEntries(
@@ -523,29 +530,5 @@ public class InputAssetLinksDisplayContext {
 	private Boolean _stagedLocally;
 	private Boolean _stagedReferrerPortlet;
 	private final ThemeDisplay _themeDisplay;
-
-	private class SelectorEntriesMessageComparator
-		implements Comparator<Map<String, Object>>, Serializable {
-
-		public SelectorEntriesMessageComparator(Locale locale) {
-			_collator = CollatorUtil.getInstance(locale);
-		}
-
-		@Override
-		public int compare(Map<String, Object> map1, Map<String, Object> map2) {
-			String message1 = StringPool.BLANK;
-			String message2 = StringPool.BLANK;
-
-			if (map1.containsKey("message") && map2.containsKey("message")) {
-				message1 = (String)map1.get("message");
-				message2 = (String)map2.get("message");
-			}
-
-			return _collator.compare(message1, message2);
-		}
-
-		private final Collator _collator;
-
-	}
 
 }

@@ -35,7 +35,9 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -104,12 +106,11 @@ public class CalendarDisplayContext {
 	}
 
 	public String getClearResultsURL() throws PortletException {
-		PortletURL clearResultsURL = PortletURLUtil.clone(
-			getPortletURL(), _renderResponse);
-
-		clearResultsURL.setParameter("keywords", StringPool.BLANK);
-
-		return clearResultsURL.toString();
+		return PortletURLBuilder.create(
+			PortletURLUtil.clone(getPortletURL(), _renderResponse)
+		).setKeywords(
+			StringPool.BLANK
+		).buildString();
 	}
 
 	public CreationMenu getCreationMenu() {
@@ -259,29 +260,21 @@ public class CalendarDisplayContext {
 			_renderRequest, "active", Boolean.TRUE.toString());
 
 		return NavigationItemList.of(
-			() -> {
-				NavigationItem navigationItem = new NavigationItem();
-
-				navigationItem.setActive(tabs1.equals("calendar"));
-				navigationItem.setHref(
-					_renderResponse.createRenderURL(), "tabs1", "calendar");
-				navigationItem.setLabel(
-					LanguageUtil.get(httpServletRequest, "calendar"));
-
-				return navigationItem;
-			},
-			() -> {
-				NavigationItem navigationItem = new NavigationItem();
-
-				navigationItem.setActive(tabs1.equals("resources"));
-				navigationItem.setHref(
-					_renderResponse.createRenderURL(), "tabs1", "resources",
-					"scope", scope, "active", active);
-				navigationItem.setLabel(
-					LanguageUtil.get(httpServletRequest, "resources"));
-
-				return navigationItem;
-			});
+			NavigationItemBuilder.setActive(
+				tabs1.equals("calendar")
+			).setHref(
+				_renderResponse.createRenderURL(), "tabs1", "calendar"
+			).setLabel(
+				LanguageUtil.get(httpServletRequest, "calendar")
+			).build(),
+			NavigationItemBuilder.setActive(
+				tabs1.equals("resources")
+			).setHref(
+				_renderResponse.createRenderURL(), "tabs1", "resources",
+				"scope", scope, "active", active
+			).setLabel(
+				LanguageUtil.get(httpServletRequest, "resources")
+			).build());
 	}
 
 	public List<Calendar> getOtherCalendars(User user, long[] calendarIds)
@@ -297,14 +290,11 @@ public class CalendarDisplayContext {
 			}
 			catch (PrincipalException principalException) {
 				if (_log.isInfoEnabled()) {
-					StringBundler sb = new StringBundler(4);
-
-					sb.append("No ");
-					sb.append(ActionKeys.VIEW);
-					sb.append(" permission for user ");
-					sb.append(user.getUserId());
-
-					_log.info(sb.toString(), principalException);
+					_log.info(
+						StringBundler.concat(
+							"No ", ActionKeys.VIEW, " permission for user ",
+							user.getUserId()),
+						principalException);
 				}
 
 				continue;
@@ -360,23 +350,27 @@ public class CalendarDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/view.jsp"
+		).setKeywords(
+			() -> {
+				String keywords = getKeywords();
 
-		portletURL.setParameter("mvcPath", "/view.jsp");
-		portletURL.setParameter("tabs1", "resources");
+				if (Validator.isNotNull(keywords)) {
+					return keywords;
+				}
 
-		String keywords = getKeywords();
-
-		if (Validator.isNotNull(keywords)) {
-			portletURL.setParameter("keywords", keywords);
-		}
-
-		portletURL.setParameter(
-			"active", ParamUtil.getString(_renderRequest, "active"));
-		portletURL.setParameter(
-			"scope", ParamUtil.getString(_renderRequest, "scope"));
-
-		return portletURL;
+				return null;
+			}
+		).setTabs1(
+			"resources"
+		).setParameter(
+			"active", ParamUtil.getString(_renderRequest, "active")
+		).setParameter(
+			"scope", ParamUtil.getString(_renderRequest, "scope")
+		).buildPortletURL();
 	}
 
 	public SearchContainer<?> getSearch() {
@@ -392,9 +386,7 @@ public class CalendarDisplayContext {
 	}
 
 	public String getSearchActionURL() {
-		PortletURL portletURL = getPortletURL();
-
-		return portletURL.toString();
+		return String.valueOf(getPortletURL());
 	}
 
 	public String getSearchContainerId() {
@@ -408,11 +400,7 @@ public class CalendarDisplayContext {
 	}
 
 	public boolean isDisabledManagementBar() {
-		if (hasResults()) {
-			return false;
-		}
-
-		if (isSearch()) {
+		if (hasResults() || isSearch()) {
 			return false;
 		}
 

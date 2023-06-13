@@ -30,7 +30,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "add-category"));
 	<portlet:param name="redirect" value="<%= String.valueOf(redirect) %>" />
 </portlet:actionURL>
 
-<aui:form action="<%= addLogCategoryURL %>" cssClass="container-fluid-1280" method="post" name="fm">
+<aui:form action="<%= addLogCategoryURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
 	<aui:fieldset-group markupView="lexicon">
 		<aui:fieldset>
 			<aui:input cssClass="lfr-input-text-container" label="logger-name" name="loggerName" type="text" />
@@ -38,10 +38,10 @@ renderResponse.setTitle(LanguageUtil.get(request, "add-category"));
 			<aui:select label="log-level" name="priority">
 
 				<%
-				for (int i = 0; i < Levels.ALL_LEVELS.length; i++) {
+				for (int i = 0; i < _ALL_PRIORITIES.length; i++) {
 				%>
 
-					<aui:option label="<%= Levels.ALL_LEVELS[i] %>" selected="<%= Level.INFO.equals(Levels.ALL_LEVELS[i]) %>" />
+					<aui:option label="<%= _ALL_PRIORITIES[i] %>" selected="<%= Objects.equals(String.valueOf(Level.INFO), _ALL_PRIORITIES[i]) %>" />
 
 				<%
 				}

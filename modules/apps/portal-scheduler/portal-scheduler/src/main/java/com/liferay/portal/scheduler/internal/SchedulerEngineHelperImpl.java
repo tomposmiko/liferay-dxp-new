@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.cal.Duration;
 import com.liferay.portal.kernel.cal.Recurrence;
 import com.liferay.portal.kernel.cal.RecurrenceSerializer;
 import com.liferay.portal.kernel.cluster.ClusterableContextThreadLocal;
+import com.liferay.portal.kernel.dependency.manager.DependencyManagerSyncUtil;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -34,6 +35,7 @@ import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.model.CompanyConstants;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.scheduler.JobState;
 import com.liferay.portal.kernel.scheduler.SchedulerEngine;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
@@ -47,7 +49,7 @@ import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListen
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListenerWrapper;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.InetAddressUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -88,7 +90,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  * @author Michael C. Han
  */
 @Component(
-	configurationPid = "com.liferay.portal.scheduler.internal.configuration.SchedulerEngineHelperConfiguration",
+	configurationPid = "com.liferay.portal.scheduler.configuration.SchedulerEngineHelperConfiguration",
 	enabled = false, immediate = true, service = SchedulerEngineHelper.class
 )
 public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
@@ -563,9 +565,10 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 		MessageListener messageListener, SchedulerEntry schedulerEntry,
 		String destinationName) {
 
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-		properties.put("destination.name", destinationName);
+		Dictionary<String, Object> properties =
+			HashMapDictionaryBuilder.<String, Object>put(
+				"destination.name", destinationName
+			).build();
 
 		Class<?> messageListenerClass = messageListener.getClass();
 
@@ -779,6 +782,13 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 			"(objectClass=" + SchedulerEventMessageListener.class.getName() +
 				")",
 			new SchedulerEventMessageListenerServiceTrackerCustomizer());
+
+		DependencyManagerSyncUtil.registerSyncCallable(
+			() -> {
+				start();
+
+				return null;
+			});
 	}
 
 	protected void addWeeklyDayPos(
@@ -849,9 +859,10 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 		Destination destination = _destinationFactory.createDestination(
 			destinationConfiguration);
 
-		Dictionary<String, Object> dictionary = new HashMapDictionary<>();
-
-		dictionary.put("destination.name", destination.getName());
+		Dictionary<String, Object> dictionary =
+			HashMapDictionaryBuilder.<String, Object>put(
+				"destination.name", destination.getName()
+			).build();
 
 		ServiceRegistration<Destination> serviceRegistration =
 			bundleContext.registerService(
@@ -903,6 +914,9 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 	private JSONFactory _jsonFactory;
 	private final Map<String, ServiceRegistration<MessageListener>>
 		_messageListenerServiceRegistrations = new ConcurrentHashMap<>();
+
+	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED)
+	private ModuleServiceLifecycle _moduleServiceLifecycle;
 
 	@Reference
 	private Portal _portal;
@@ -987,14 +1001,11 @@ public class SchedulerEngineHelperImpl implements SchedulerEngineHelper {
 					return null;
 				}
 
-				Dictionary<String, Object> properties =
-					new HashMapDictionary<>();
-
-				properties.put("destination.name", destinationName);
-
 				serviceRegistration = bundleContext.registerService(
 					MessageListener.class, schedulerEventMessageListener,
-					properties);
+					HashMapDictionaryBuilder.<String, Object>put(
+						"destination.name", destinationName
+					).build());
 
 				_messageListenerServiceRegistrations.put(
 					schedulerEntry.getEventListenerClass(),

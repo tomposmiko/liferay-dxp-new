@@ -18,13 +18,13 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.query.Queries;
@@ -37,12 +37,9 @@ import com.liferay.portal.search.tuning.synonyms.web.internal.request.SearchSyno
 import com.liferay.portal.search.tuning.synonyms.web.internal.request.SearchSynonymSetResponse;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionURL;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -60,8 +57,7 @@ public class SynonymsDisplayBuilder {
 		HttpServletRequest httpServletRequest, Language language, Portal portal,
 		Queries queries, RenderRequest renderRequest,
 		RenderResponse renderResponse, SearchEngineAdapter searchEngineAdapter,
-		SearchEngineInformation searchEngineInformation, Sorts sorts,
-		SynonymSetIndexNameBuilder synonymSetIndexNameBuilder) {
+		Sorts sorts, SynonymSetIndexNameBuilder synonymSetIndexNameBuilder) {
 
 		_documentToSynonymSetTranslator = documentToSynonymSetTranslator;
 		_httpServletRequest = httpServletRequest;
@@ -71,7 +67,6 @@ public class SynonymsDisplayBuilder {
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 		_searchEngineAdapter = searchEngineAdapter;
-		_searchEngineInformation = searchEngineInformation;
 		_sorts = sorts;
 		_synonymSetIndexNameBuilder = synonymSetIndexNameBuilder;
 	}
@@ -79,12 +74,6 @@ public class SynonymsDisplayBuilder {
 	public SynonymsDisplayContext build() {
 		SynonymsDisplayContext synonymsDisplayContext =
 			new SynonymsDisplayContext();
-
-		if (Objects.equals(
-				_searchEngineInformation.getVendorString(), "Solr")) {
-
-			return synonymsDisplayContext;
-		}
 
 		synonymsDisplayContext.setCreationMenu(getCreationMenu());
 
@@ -109,15 +98,15 @@ public class SynonymsDisplayBuilder {
 	}
 
 	protected RenderURL buildEditRenderURL(SynonymSet synonymSet) {
-		RenderURL editRenderURL = _renderResponse.createRenderURL();
-
-		editRenderURL.setParameter(
-			"mvcRenderCommandName", "/synonyms/edit_synonym_sets");
-		editRenderURL.setParameter(
-			"redirect", _portal.getCurrentURL(_httpServletRequest));
-		editRenderURL.setParameter("synonymSetId", synonymSet.getId());
-
-		return editRenderURL;
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCRenderCommandName(
+			"/synonyms/edit_synonym_sets"
+		).setRedirect(
+			_portal.getCurrentURL(_httpServletRequest)
+		).setParameter(
+			"synonymSetId", synonymSet.getSynonymSetDocumentId()
+		).buildRenderURL();
 	}
 
 	protected SearchContainer<SynonymSetDisplayContext> buildSearchContainer() {
@@ -163,7 +152,8 @@ public class SynonymsDisplayBuilder {
 
 		synonymSetDisplayContext.setDisplayedSynonymSet(
 			getDisplayedSynonymSet(synonyms));
-		synonymSetDisplayContext.setSynonymSetId(synonymSet.getId());
+		synonymSetDisplayContext.setSynonymSetId(
+			synonymSet.getSynonymSetDocumentId());
 		synonymSetDisplayContext.setSynonyms(synonyms);
 
 		return synonymSetDisplayContext;
@@ -197,17 +187,19 @@ public class SynonymsDisplayBuilder {
 		).add(
 			dropdownItem -> {
 				dropdownItem.putData("action", "delete");
-
-				ActionURL deleteURL = _renderResponse.createActionURL();
-
-				deleteURL.setParameter(
-					ActionRequest.ACTION_NAME, "/synonyms/delete_synonym_sets");
-				deleteURL.setParameter(Constants.CMD, Constants.DELETE);
-				deleteURL.setParameter("rowIds", synonymSet.getId());
-				deleteURL.setParameter(
-					"redirect", _portal.getCurrentURL(_httpServletRequest));
-
-				dropdownItem.putData("deleteURL", deleteURL.toString());
+				dropdownItem.putData(
+					"deleteURL",
+					PortletURLBuilder.createActionURL(
+						_renderResponse
+					).setActionName(
+						"/synonyms/delete_synonym_sets"
+					).setCMD(
+						Constants.DELETE
+					).setRedirect(
+						_portal.getCurrentURL(_httpServletRequest)
+					).setParameter(
+						"rowIds", synonymSet.getSynonymSetDocumentId()
+					).buildString());
 
 				dropdownItem.setIcon("times");
 				dropdownItem.setLabel(
@@ -258,11 +250,11 @@ public class SynonymsDisplayBuilder {
 	}
 
 	private PortletURL _getPortletURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
-
-		portletURL.setParameter("mvcPath", "/view.jsp");
-
-		return portletURL;
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/view.jsp"
+		).buildPortletURL();
 	}
 
 	private final DocumentToSynonymSetTranslator
@@ -274,7 +266,6 @@ public class SynonymsDisplayBuilder {
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 	private final SearchEngineAdapter _searchEngineAdapter;
-	private final SearchEngineInformation _searchEngineInformation;
 	private final Sorts _sorts;
 	private final SynonymSetIndexNameBuilder _synonymSetIndexNameBuilder;
 

@@ -396,7 +396,7 @@ public interface SiteFriendlyURLPersistence
 	 * @param companyId the company ID
 	 * @return the matching site friendly urls
 	 */
-	public java.util.List<SiteFriendlyURL> findByC_G(
+	public java.util.List<SiteFriendlyURL> findByG_C(
 		long groupId, long companyId);
 
 	/**
@@ -412,7 +412,7 @@ public interface SiteFriendlyURLPersistence
 	 * @param end the upper bound of the range of site friendly urls (not inclusive)
 	 * @return the range of matching site friendly urls
 	 */
-	public java.util.List<SiteFriendlyURL> findByC_G(
+	public java.util.List<SiteFriendlyURL> findByG_C(
 		long groupId, long companyId, int start, int end);
 
 	/**
@@ -429,7 +429,7 @@ public interface SiteFriendlyURLPersistence
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching site friendly urls
 	 */
-	public java.util.List<SiteFriendlyURL> findByC_G(
+	public java.util.List<SiteFriendlyURL> findByG_C(
 		long groupId, long companyId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<SiteFriendlyURL>
 			orderByComparator);
@@ -449,7 +449,7 @@ public interface SiteFriendlyURLPersistence
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching site friendly urls
 	 */
-	public java.util.List<SiteFriendlyURL> findByC_G(
+	public java.util.List<SiteFriendlyURL> findByG_C(
 		long groupId, long companyId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<SiteFriendlyURL>
 			orderByComparator,
@@ -464,7 +464,7 @@ public interface SiteFriendlyURLPersistence
 	 * @return the first matching site friendly url
 	 * @throws NoSuchFriendlyURLException if a matching site friendly url could not be found
 	 */
-	public SiteFriendlyURL findByC_G_First(
+	public SiteFriendlyURL findByG_C_First(
 			long groupId, long companyId,
 			com.liferay.portal.kernel.util.OrderByComparator<SiteFriendlyURL>
 				orderByComparator)
@@ -478,7 +478,7 @@ public interface SiteFriendlyURLPersistence
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching site friendly url, or <code>null</code> if a matching site friendly url could not be found
 	 */
-	public SiteFriendlyURL fetchByC_G_First(
+	public SiteFriendlyURL fetchByG_C_First(
 		long groupId, long companyId,
 		com.liferay.portal.kernel.util.OrderByComparator<SiteFriendlyURL>
 			orderByComparator);
@@ -492,7 +492,7 @@ public interface SiteFriendlyURLPersistence
 	 * @return the last matching site friendly url
 	 * @throws NoSuchFriendlyURLException if a matching site friendly url could not be found
 	 */
-	public SiteFriendlyURL findByC_G_Last(
+	public SiteFriendlyURL findByG_C_Last(
 			long groupId, long companyId,
 			com.liferay.portal.kernel.util.OrderByComparator<SiteFriendlyURL>
 				orderByComparator)
@@ -506,7 +506,7 @@ public interface SiteFriendlyURLPersistence
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching site friendly url, or <code>null</code> if a matching site friendly url could not be found
 	 */
-	public SiteFriendlyURL fetchByC_G_Last(
+	public SiteFriendlyURL fetchByG_C_Last(
 		long groupId, long companyId,
 		com.liferay.portal.kernel.util.OrderByComparator<SiteFriendlyURL>
 			orderByComparator);
@@ -521,7 +521,7 @@ public interface SiteFriendlyURLPersistence
 	 * @return the previous, current, and next site friendly url
 	 * @throws NoSuchFriendlyURLException if a site friendly url with the primary key could not be found
 	 */
-	public SiteFriendlyURL[] findByC_G_PrevAndNext(
+	public SiteFriendlyURL[] findByG_C_PrevAndNext(
 			long siteFriendlyURLId, long groupId, long companyId,
 			com.liferay.portal.kernel.util.OrderByComparator<SiteFriendlyURL>
 				orderByComparator)
@@ -533,7 +533,7 @@ public interface SiteFriendlyURLPersistence
 	 * @param groupId the group ID
 	 * @param companyId the company ID
 	 */
-	public void removeByC_G(long groupId, long companyId);
+	public void removeByG_C(long groupId, long companyId);
 
 	/**
 	 * Returns the number of site friendly urls where groupId = &#63; and companyId = &#63;.
@@ -542,7 +542,7 @@ public interface SiteFriendlyURLPersistence
 	 * @param companyId the company ID
 	 * @return the number of matching site friendly urls
 	 */
-	public int countByC_G(long groupId, long companyId);
+	public int countByG_C(long groupId, long companyId);
 
 	/**
 	 * Returns the site friendly url where companyId = &#63; and friendlyURL = &#63; or throws a <code>NoSuchFriendlyURLException</code> if it could not be found.
@@ -603,7 +603,7 @@ public interface SiteFriendlyURLPersistence
 	 * @return the matching site friendly url
 	 * @throws NoSuchFriendlyURLException if a matching site friendly url could not be found
 	 */
-	public SiteFriendlyURL findByC_G_L(
+	public SiteFriendlyURL findByG_C_L(
 			long groupId, long companyId, String languageId)
 		throws NoSuchFriendlyURLException;
 
@@ -615,7 +615,7 @@ public interface SiteFriendlyURLPersistence
 	 * @param languageId the language ID
 	 * @return the matching site friendly url, or <code>null</code> if a matching site friendly url could not be found
 	 */
-	public SiteFriendlyURL fetchByC_G_L(
+	public SiteFriendlyURL fetchByG_C_L(
 		long groupId, long companyId, String languageId);
 
 	/**
@@ -627,7 +627,7 @@ public interface SiteFriendlyURLPersistence
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching site friendly url, or <code>null</code> if a matching site friendly url could not be found
 	 */
-	public SiteFriendlyURL fetchByC_G_L(
+	public SiteFriendlyURL fetchByG_C_L(
 		long groupId, long companyId, String languageId,
 		boolean useFinderCache);
 
@@ -639,7 +639,7 @@ public interface SiteFriendlyURLPersistence
 	 * @param languageId the language ID
 	 * @return the site friendly url that was removed
 	 */
-	public SiteFriendlyURL removeByC_G_L(
+	public SiteFriendlyURL removeByG_C_L(
 			long groupId, long companyId, String languageId)
 		throws NoSuchFriendlyURLException;
 
@@ -651,7 +651,7 @@ public interface SiteFriendlyURLPersistence
 	 * @param languageId the language ID
 	 * @return the number of matching site friendly urls
 	 */
-	public int countByC_G_L(long groupId, long companyId, String languageId);
+	public int countByG_C_L(long groupId, long companyId, String languageId);
 
 	/**
 	 * Returns the site friendly url where companyId = &#63; and friendlyURL = &#63; and languageId = &#63; or throws a <code>NoSuchFriendlyURLException</code> if it could not be found.

@@ -230,11 +230,6 @@ public class DLFileEntryExtensionTest extends BaseDLAppTestCase {
 	}
 
 	@Test
-	public void testAddFileEntryEmptyFileName() throws Exception {
-		testAddFileEntryBasic("", _FILE_NAME, "txt", _FILE_NAME);
-	}
-
-	@Test
 	public void testAddFileEntryEmptyFileNameAndExtension() throws Exception {
 		testAddFileEntryBasic("", _STRIPPED_FILE_NAME, "", _STRIPPED_FILE_NAME);
 	}
@@ -280,14 +275,6 @@ public class DLFileEntryExtensionTest extends BaseDLAppTestCase {
 
 		testAddFileEntryBasic(
 			_STRIPPED_FILE_NAME, _STRIPPED_FILE_NAME, "", _STRIPPED_FILE_NAME);
-	}
-
-	@Test
-	public void testAddFileEntryTitleEqualToFileNamePlusExtension()
-		throws Exception {
-
-		testAddFileEntryBasic(
-			_STRIPPED_FILE_NAME, _FILE_NAME, "txt", _FILE_NAME);
 	}
 
 	@Test
@@ -371,10 +358,10 @@ public class DLFileEntryExtensionTest extends BaseDLAppTestCase {
 				group.getGroupId(), TestPropsValues.getUserId());
 
 		return DLAppLocalServiceUtil.addFileEntry(
-			TestPropsValues.getUserId(), group.getGroupId(),
+			null, TestPropsValues.getUserId(), group.getGroupId(),
 			parentFolder.getFolderId(), sourceFileName, ContentTypes.TEXT_PLAIN,
 			title, StringPool.BLANK, StringPool.BLANK,
-			TestDataConstants.TEST_BYTE_ARRAY, serviceContext);
+			TestDataConstants.TEST_BYTE_ARRAY, null, null, serviceContext);
 	}
 
 	protected void renameFileEntry(
@@ -389,6 +376,7 @@ public class DLFileEntryExtensionTest extends BaseDLAppTestCase {
 			fileEntry.getFileEntryId(), sourceFileName, ContentTypes.TEXT_PLAIN,
 			title, StringPool.BLANK, StringPool.BLANK,
 			DLVersionNumberIncrease.MINOR, TestDataConstants.TEST_BYTE_ARRAY,
+			fileEntry.getExpirationDate(), fileEntry.getReviewDate(),
 			serviceContext);
 	}
 

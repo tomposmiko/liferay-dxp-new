@@ -1,5 +1,7 @@
 <#assign
 	is_login_page = getterUtil.getBoolean(themeDisplay.getThemeSetting("is-login-page"))
+	mini_cart_display_total_items_count = getterUtil.getBoolean(themeDisplay.getThemeSetting("mini-cart-display-total-items-count"))
+	mini_cart_keep_open = getterUtil.getBoolean(themeDisplay.getThemeSetting("mini-cart-keep-open"))
 	redirect_to_private_layouts = getterUtil.getBoolean(themeDisplay.getThemeSetting("redirect-to-private-layouts"))
 	show_account_selector = getterUtil.getBoolean(themeDisplay.getThemeSetting("show-account-selector"))
 	show_mini_cart = getterUtil.getBoolean(themeDisplay.getThemeSetting("show-mini-cart"))
@@ -25,9 +27,7 @@
 	/>
 </#if>
 
-<#macro site_navigation_menu_main
-	default_preferences = ""
->
+<#macro site_navigation_menu_main default_preferences = "">
 	<@liferay_portlet["runtime"]
 		defaultPreferences=default_preferences
 		instanceId="siteNavigationMenuPortlet_main"
@@ -35,9 +35,7 @@
 	/>
 </#macro>
 
-<#macro site_navigation_menu_sub_navigation
-	default_preferences = ""
->
+<#macro site_navigation_menu_sub_navigation default_preferences = "">
 	<@liferay_portlet["runtime"]
 		defaultPreferences=default_preferences
 		instanceId="siteNavigationMenuPortlet_sub_navigation"

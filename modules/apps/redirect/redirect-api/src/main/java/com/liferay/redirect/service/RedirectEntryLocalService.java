@@ -147,11 +147,9 @@ public interface RedirectEntryLocalService
 	 *
 	 * @param redirectEntry the redirect entry
 	 * @return the redirect entry that was removed
-	 * @throws PortalException
 	 */
 	@Indexable(type = IndexableType.DELETE)
-	public RedirectEntry deleteRedirectEntry(RedirectEntry redirectEntry)
-		throws PortalException;
+	public RedirectEntry deleteRedirectEntry(RedirectEntry redirectEntry);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public <T> T dslQuery(DSLQuery dslQuery);

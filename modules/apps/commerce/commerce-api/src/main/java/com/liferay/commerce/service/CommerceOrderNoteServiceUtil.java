@@ -47,6 +47,17 @@ public class CommerceOrderNoteServiceUtil {
 			commerceOrderId, content, restricted, serviceContext);
 	}
 
+	public static CommerceOrderNote addOrUpdateCommerceOrderNote(
+			String externalReferenceCode, long commerceOrderNoteId,
+			long commerceOrderId, String content, boolean restricted,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addOrUpdateCommerceOrderNote(
+			externalReferenceCode, commerceOrderNoteId, commerceOrderId,
+			content, restricted, serviceContext);
+	}
+
 	public static void deleteCommerceOrderNote(long commerceOrderNoteId)
 		throws PortalException {
 
@@ -54,11 +65,11 @@ public class CommerceOrderNoteServiceUtil {
 	}
 
 	public static CommerceOrderNote fetchByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
+			String externalReferenceCode, long companyId)
 		throws PortalException {
 
 		return getService().fetchByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	public static CommerceOrderNote fetchCommerceOrderNote(
@@ -118,17 +129,6 @@ public class CommerceOrderNoteServiceUtil {
 
 		return getService().updateCommerceOrderNote(
 			commerceOrderNoteId, content, restricted);
-	}
-
-	public static CommerceOrderNote upsertCommerceOrderNote(
-			long commerceOrderNoteId, long commerceOrderId, String content,
-			boolean restricted, String externalReferenceCode,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		return getService().upsertCommerceOrderNote(
-			commerceOrderNoteId, commerceOrderId, content, restricted,
-			externalReferenceCode, serviceContext);
 	}
 
 	public static CommerceOrderNoteService getService() {

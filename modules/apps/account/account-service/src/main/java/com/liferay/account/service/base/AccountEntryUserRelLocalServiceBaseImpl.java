@@ -17,7 +17,6 @@ package com.liferay.account.service.base;
 import com.liferay.account.model.AccountEntryUserRel;
 import com.liferay.account.service.AccountEntryUserRelLocalService;
 import com.liferay.account.service.AccountEntryUserRelLocalServiceUtil;
-import com.liferay.account.service.persistence.AccountEntryPersistence;
 import com.liferay.account.service.persistence.AccountEntryUserRelPersistence;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
@@ -33,8 +32,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -326,6 +323,7 @@ public abstract class AccountEntryUserRelLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -344,6 +342,7 @@ public abstract class AccountEntryUserRelLocalServiceBaseImpl
 			(AccountEntryUserRel)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<AccountEntryUserRel> getBasePersistence() {
 		return accountEntryUserRelPersistence;
 	}
@@ -491,17 +490,7 @@ public abstract class AccountEntryUserRelLocalServiceBaseImpl
 	protected AccountEntryUserRelPersistence accountEntryUserRelPersistence;
 
 	@Reference
-	protected AccountEntryPersistence accountEntryPersistence;
-
-	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AccountEntryUserRelLocalServiceBaseImpl.class);
 
 }

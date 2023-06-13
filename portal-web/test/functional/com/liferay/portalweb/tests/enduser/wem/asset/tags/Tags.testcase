@@ -19,7 +19,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -27,7 +27,7 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test CannotAddEmptyTag {
 		Tag.addWithNullTitleCP(tagName = " ");
 
@@ -36,7 +36,7 @@ definition {
 		Portlet.viewEmptyMessage(message = "There are no tags.");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test CannotMergeSingleTagViewWarning {
 		JSONAssettag.addTag(
 			groupName = "Guest",
@@ -51,7 +51,7 @@ definition {
 		Tag.mergeSingleTagWarning();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test DeleteMultipleTagsFromToolbar {
 		for (var i : list "1,2,3") {
 			JSONAssettag.addTag(
@@ -72,7 +72,7 @@ definition {
 		Portlet.viewEmptyMessage(message = "There are no tags.");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test DeleteTagFromMenu {
 		property portal.acceptance = "true";
 
@@ -91,7 +91,7 @@ definition {
 		Portlet.viewEmptyMessage(message = "There are no tags.");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test DeleteTagFromToolbar {
 		JSONAssettag.addTag(
 			groupName = "Guest",
@@ -108,7 +108,7 @@ definition {
 		Portlet.viewEmptyMessage(message = "There are no tags.");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test EditTagAndCancel {
 		JSONAssettag.addTag(
 			groupName = "Guest",
@@ -131,7 +131,7 @@ definition {
 		AssertTextNotPresent(value1 = "tagname2");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test EditTagAndSave {
 		property portal.acceptance = "true";
 
@@ -156,7 +156,7 @@ definition {
 		AssertTextNotPresent(value1 = "tagname1");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test MergeMultipleTags {
 		for (var i : list "1,2,3") {
 			JSONAssettag.addTag(
@@ -178,7 +178,7 @@ definition {
 
 		Tag.mergeTags(
 			mergedTag = "tagname1",
-			tagNameList = "tagname3,tagname2,tagname1");
+			tagNameList = "tagname1,tagname2,tagname3");
 
 		Tag.viewCP(tagName = "tagname1");
 
@@ -187,7 +187,7 @@ definition {
 		}
 	}
 
-	@priority = 3
+	@priority = "3"
 	test MergeTagsSelectAdditionalTag {
 		for (var i : list "1,2,3,4,5,6,7") {
 			JSONAssettag.addTag(
@@ -201,7 +201,7 @@ definition {
 			Tag.viewCP(tagName = "tagname${i}");
 		}
 
-		Pagination.changePagination(itemsPerPage = 4);
+		Pagination.changePagination(itemsPerPage = "4");
 
 		Pagination.viewResults(results = "Showing 1 to 4 of 7 entries.");
 
@@ -226,7 +226,7 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ToggleDisplayStyles {
 		JSONAssettag.addTag(
 			groupName = "Guest",
@@ -243,16 +243,16 @@ definition {
 		LexiconEntry.changeDisplayStyle(displayStyle = "table");
 
 		AssertTextEquals(
-			key_columnNumber = 2,
+			key_columnNumber = "2",
 			locator1 = "ContentRow#ENTRY_CONTENT_LIST_COLUMN",
 			value1 = "tagname1");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewTagsPagination {
-		var index = 1;
+		var index = "1";
 
-		while (${index} != 10) {
+		while ("${index}" != "10") {
 			JSONAssettag.addTag(
 				groupName = "Guest",
 				tagName = "tagname0${index}");
@@ -260,7 +260,7 @@ definition {
 			var index = ${index} + 1;
 		}
 
-		while (${index} != 26) {
+		while ("${index}" != "26") {
 			JSONAssettag.addTag(
 				groupName = "Guest",
 				tagName = "tagname${index}");
@@ -274,11 +274,11 @@ definition {
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "Pagination#ITEMS_PER_PAGE_SELECT",
-			value1 = "20 Entries");
+			value1 = "20 Entries Per page");
 
 		Pagination.viewResults(results = "Showing 1 to 20 of 24 entries.");
 
-		Pagination.changePagination(itemsPerPage = 4);
+		Pagination.changePagination(itemsPerPage = "4");
 
 		Pagination.viewResults(results = "Showing 1 to 4 of 24 entries.");
 	}

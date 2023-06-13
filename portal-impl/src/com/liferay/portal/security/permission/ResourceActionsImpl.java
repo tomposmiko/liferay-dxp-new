@@ -14,6 +14,8 @@
 
 package com.liferay.portal.security.permission;
 
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
@@ -30,6 +32,7 @@ import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -53,8 +56,6 @@ import com.liferay.portal.kernel.xml.DocumentType;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.registry.collections.ServiceTrackerCollections;
-import com.liferay.registry.collections.ServiceTrackerList;
 
 import java.io.InputStream;
 
@@ -570,6 +571,7 @@ public class ResourceActionsImpl implements ResourceActions {
 		return false;
 	}
 
+	@Override
 	public void populateModelResources(
 			ClassLoader classLoader, String... sources)
 		throws ResourceActionsException {
@@ -593,6 +595,7 @@ public class ResourceActionsImpl implements ResourceActions {
 		}
 	}
 
+	@Override
 	public void populateModelResources(Document document)
 		throws ResourceActionsException {
 
@@ -618,6 +621,7 @@ public class ResourceActionsImpl implements ResourceActions {
 		}
 	}
 
+	@Override
 	public void populatePortletResource(
 			Portlet portlet, ClassLoader classLoader, String... sources)
 		throws ResourceActionsException {
@@ -644,6 +648,7 @@ public class ResourceActionsImpl implements ResourceActions {
 			_getPortletResourceActions(portletResourceName, portlet));
 	}
 
+	@Override
 	public void populatePortletResources(
 			ClassLoader classLoader, String... sources)
 		throws ResourceActionsException {
@@ -1040,10 +1045,10 @@ public class ResourceActionsImpl implements ResourceActions {
 
 		Locale locale = null;
 
-		HttpSession session = httpServletRequest.getSession(false);
+		HttpSession httpSession = httpServletRequest.getSession(false);
 
-		if (session != null) {
-			locale = (Locale)session.getAttribute(WebKeys.LOCALE);
+		if (httpSession != null) {
+			locale = (Locale)httpSession.getAttribute(WebKeys.LOCALE);
 		}
 
 		if (locale == null) {
@@ -1097,6 +1102,9 @@ public class ResourceActionsImpl implements ResourceActions {
 							group.getParentGroupId());
 					}
 					catch (Exception exception) {
+						if (_log.isDebugEnabled()) {
+							_log.debug(exception, exception);
+						}
 					}
 				}
 
@@ -1252,7 +1260,20 @@ public class ResourceActionsImpl implements ResourceActions {
 					modelResourceElement.elementText("root"));
 
 				if (root) {
-					_portletRootModelResources.put(portletName, modelName);
+					String existingModelName =
+						_portletRootModelResources.putIfAbsent(
+							portletName, modelName);
+
+					if (Validator.isNotNull(existingModelName) &&
+						!Objects.equals(existingModelName, modelName)) {
+
+						throw new ResourceActionsException(
+							StringBundler.concat(
+								"Portlet ", portletName,
+								" cannot be assigned to both ",
+								existingModelName, " and ", modelName,
+								" as root model resources. See LPS-135983."));
+					}
 				}
 			}
 
@@ -1490,7 +1511,8 @@ public class ResourceActionsImpl implements ResourceActions {
 	private static class ResourceBundleLoaderListHolder {
 
 		private static final ServiceTrackerList<ResourceBundleLoader>
-			_resourceBundleLoaders = ServiceTrackerCollections.openList(
+			_resourceBundleLoaders = ServiceTrackerListFactory.open(
+				SystemBundleUtil.getBundleContext(),
 				ResourceBundleLoader.class);
 
 	}

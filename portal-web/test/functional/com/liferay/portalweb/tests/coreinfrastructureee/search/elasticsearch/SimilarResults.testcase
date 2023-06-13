@@ -16,12 +16,13 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	test AssertDisplayTemplate {
+	@priority = "4"
+	test AssertSimilarResultsDisplayTemplate {
 		for (var count : list "1,2,3") {
 			JSONWebcontent.addWebContent(
 				content = "WC Content",
@@ -34,8 +35,8 @@ definition {
 		SearchPortlets.configureSimilarResults(
 			displayTemplate = "Compact Layout",
 			fields = "localized_title_en_US",
-			minimumDocumentFrequency = 1,
-			minimumTermFrequency = 1);
+			minimumDocumentFrequency = "1",
+			minimumTermFrequency = "1");
 
 		AssetPublisherPortlet.clickAssetTitle(assetTitle = "WC Title 1");
 
@@ -68,7 +69,8 @@ definition {
 			locator1 = "Search#SIMILAR_RESULTS_CARD_TITLE");
 	}
 
-	test AssertMatchesAssetType {
+	@priority = "4"
+	test AssertSimilarResultsMatchesAssetType {
 		for (var count : list "1,2,3") {
 			JSONBlog.addEntry(
 				entryContent = "Blogs Content",
@@ -105,8 +107,8 @@ definition {
 		SearchPortlets.configureSimilarResults(
 			displayTemplate = "Compact Layout",
 			fields = "localized_title_en_US",
-			minimumDocumentFrequency = 1,
-			minimumTermFrequency = 1);
+			minimumDocumentFrequency = "1",
+			minimumTermFrequency = "1");
 
 		AssetPublisherPortlet.clickAssetTitle(assetTitle = "Similar Results Blogs Title 1");
 
@@ -247,7 +249,8 @@ definition {
 			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
 	}
 
-	test ConfigureDocumentFrequency {
+	@priority = "4"
+	test ConfigureSimilarResultsDocumentFrequency {
 		property test.name.skip.portal.instance = "SimilarResults#ConfigureSimilarResultsDocumentFrequency";
 
 		JSONWebcontent.addWebContent(
@@ -270,12 +273,7 @@ definition {
 			groupName = "Guest",
 			title = "Charlie");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Search");
-
-		SearchAdministration.executeSearchActions(actionsDescription = "Reindex all search indexes.");
+		SearchAdministration.executeReindex();
 
 		Navigator.openURL();
 
@@ -284,8 +282,8 @@ definition {
 		SearchPortlets.configureSimilarResults(
 			displayTemplate = "Compact Layout",
 			fields = "localized_title_en_US",
-			minimumDocumentFrequency = 3,
-			minimumTermFrequency = 1);
+			minimumDocumentFrequency = "3",
+			minimumTermFrequency = "1");
 
 		AssetPublisherPortlet.clickAssetTitle(assetTitle = "Alpha Bravo Charlie");
 
@@ -302,8 +300,8 @@ definition {
 			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
 
 		SearchPortlets.configureSimilarResults(
-			maximumDocumentFrequency = 2,
-			minimumDocumentFrequency = 1);
+			maximumDocumentFrequency = "2",
+			minimumDocumentFrequency = "1");
 
 		AssertElementPresent(
 			key_linkResultTitle = "Alpha Bravo",
@@ -318,7 +316,8 @@ definition {
 			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
 	}
 
-	test ConfigureFields {
+	@priority = "4"
+	test ConfigureSimilarResultsFields {
 		JSONBlog.addEntry(
 			entryContent = "Content",
 			entryTitle = "No Match Content");
@@ -342,8 +341,8 @@ definition {
 		SearchPortlets.configureSimilarResults(
 			displayTemplate = "Compact Layout",
 			fields = "content_en_US",
-			minimumDocumentFrequency = 1,
-			minimumTermFrequency = 1);
+			minimumDocumentFrequency = "1",
+			minimumTermFrequency = "1");
 
 		AssetPublisherPortlet.clickAssetTitle(assetTitle = "Similar Results Blogs Title");
 
@@ -366,12 +365,13 @@ definition {
 			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
 	}
 
-	test ConfigureMaximumItemDisplay {
+	@priority = "4"
+	test ConfigureSimilarResultsMaximumItemDisplay {
 		for (var titleName : list "Alpha,Bravo,Charlie,Delta,Echo,Foxtrot") {
 			JSONWebcontent.addWebContent(
-				content = ${titleName},
+				content = "${titleName}",
 				groupName = "Guest",
-				title = ${titleName});
+				title = "${titleName}");
 		}
 
 		JSONWebcontent.addWebContent(
@@ -384,9 +384,9 @@ definition {
 		SearchPortlets.configureSimilarResults(
 			displayTemplate = "Compact Layout",
 			fields = "localized_title_en_US",
-			maximumItemDisplay = 0,
-			minimumDocumentFrequency = 1,
-			minimumTermFrequency = 1);
+			maximumItemDisplay = "0",
+			minimumDocumentFrequency = "1",
+			minimumTermFrequency = "1");
 
 		AssetPublisherPortlet.clickAssetTitle(assetTitle = "Alpha Bravo Charlie Delta Echo Foxtrot");
 
@@ -395,23 +395,24 @@ definition {
 			locator1 = "Message#INFO_SPECIFIC_WIDGET",
 			value1 = "no similar results available");
 
-		SearchPortlets.configureSimilarResults(maximumItemDisplay = 5);
+		SearchPortlets.configureSimilarResults(maximumItemDisplay = "5");
 
 		AssertElementPresent(
-			key_resultPosition = 5,
+			key_resultPosition = "5",
 			locator1 = "Search#SIMILAR_RESULTS_SPECIFIC_POSITION");
 
 		AssertElementNotPresent(
-			key_resultPosition = 6,
+			key_resultPosition = "6",
 			locator1 = "Search#SIMILAR_RESULTS_SPECIFIC_POSITION");
 	}
 
-	test ConfigureMaximumQueryTerms {
+	@priority = "4"
+	test ConfigureSimilarResultsMaximumQueryTerms {
 		for (var count : list "One, Two, Three") {
 			JSONWebcontent.addWebContent(
 				content = "WC Content",
 				groupName = "Guest",
-				title = ${count});
+				title = "${count}");
 		}
 
 		JSONWebcontent.addWebContent(
@@ -424,22 +425,23 @@ definition {
 		SearchPortlets.configureSimilarResults(
 			displayTemplate = "Compact Layout",
 			fields = "localized_title_en_US",
-			maximumQueryTerms = 2,
-			minimumDocumentFrequency = 1,
-			minimumTermFrequency = 1);
+			maximumQueryTerms = "2",
+			minimumDocumentFrequency = "1",
+			minimumTermFrequency = "1");
 
 		AssetPublisherPortlet.clickAssetTitle(assetTitle = "One Two Three");
 
 		AssertElementPresent(
-			key_resultPosition = 2,
+			key_resultPosition = "2",
 			locator1 = "Search#SIMILAR_RESULTS_SPECIFIC_POSITION");
 
 		AssertElementNotPresent(
-			key_resultPosition = 3,
+			key_resultPosition = "3",
 			locator1 = "Search#SIMILAR_RESULTS_SPECIFIC_POSITION");
 	}
 
-	test ConfigureMinimumShouldMatch {
+	@priority = "4"
+	test ConfigureSimilarResultsMinimumShouldMatch {
 		JSONWebcontent.addWebContent(
 			content = "WC Content",
 			groupName = "Guest",
@@ -465,9 +467,9 @@ definition {
 		SearchPortlets.configureSimilarResults(
 			displayTemplate = "Compact Layout",
 			fields = "localized_title_en_US",
-			minimumDocumentFrequency = 1,
+			minimumDocumentFrequency = "1",
 			minimumShouldMatch = "25%",
-			minimumTermFrequency = 1);
+			minimumTermFrequency = "1");
 
 		AssetPublisherPortlet.clickAssetTitle(assetTitle = "Similar Results Web Content");
 
@@ -498,7 +500,8 @@ definition {
 			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
 	}
 
-	test ConfigureStopWords {
+	@priority = "4"
+	test ConfigureSimilarResultsStopWords {
 		JSONWebcontent.addWebContent(
 			content = "No Match",
 			groupName = "Guest",
@@ -524,8 +527,8 @@ definition {
 		SearchPortlets.configureSimilarResults(
 			displayTemplate = "Compact Layout",
 			fields = "content_en_US,localized_title_en_US",
-			minimumDocumentFrequency = 1,
-			minimumTermFrequency = 1,
+			minimumDocumentFrequency = "1",
+			minimumTermFrequency = "1",
 			stopWords = "Alpha");
 
 		AssetPublisherPortlet.clickAssetTitle(assetTitle = "Alpha Bravo Charlie");
@@ -557,12 +560,13 @@ definition {
 			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
 	}
 
-	test ConfigureTermFrequency {
+	@priority = "4"
+	test ConfigureSimilarResultsTermFrequency {
 		for (var count : list "One, Two, Three") {
 			JSONWebcontent.addWebContent(
 				content = "WC Content",
 				groupName = "Guest",
-				title = ${count});
+				title = "${count}");
 		}
 
 		JSONWebcontent.addWebContent(
@@ -575,18 +579,18 @@ definition {
 		SearchPortlets.configureSimilarResults(
 			displayTemplate = "Compact Layout",
 			fields = "localized_title_en_US",
-			minimumDocumentFrequency = 1,
-			minimumTermFrequency = 1);
+			minimumDocumentFrequency = "1",
+			minimumTermFrequency = "1");
 
 		AssetPublisherPortlet.clickAssetTitle(assetTitle = "One Two Two Three Three Three");
 
 		for (var count : list "One, Two, Three") {
 			AssertElementPresent(
-				key_linkResultTitle = ${count},
+				key_linkResultTitle = "${count}",
 				locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
 		}
 
-		SearchPortlets.configureSimilarResults(minimumTermFrequency = 3);
+		SearchPortlets.configureSimilarResults(minimumTermFrequency = "3");
 
 		AssertElementPresent(
 			key_linkResultTitle = "Three",
@@ -600,7 +604,7 @@ definition {
 			key_linkResultTitle = "Two",
 			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
 
-		SearchPortlets.configureSimilarResults(minimumTermFrequency = 4);
+		SearchPortlets.configureSimilarResults(minimumTermFrequency = "4");
 
 		AssertElementNotPresent(
 			key_linkResultTitle = "One",
@@ -615,7 +619,8 @@ definition {
 			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
 	}
 
-	test ConfigureWordLength {
+	@priority = "4"
+	test ConfigureSimilarResultsWordLength {
 		JSONWebcontent.addWebContent(
 			content = "WC Content",
 			groupName = "Guest",
@@ -636,9 +641,9 @@ definition {
 		SearchPortlets.configureSimilarResults(
 			displayTemplate = "Compact Layout",
 			fields = "localized_title_en_US",
-			minimumDocumentFrequency = 1,
-			minimumTermFrequency = 1,
-			minimumWordLength = 6);
+			minimumDocumentFrequency = "1",
+			minimumTermFrequency = "1",
+			minimumWordLength = "6");
 
 		AssetPublisherPortlet.clickAssetTitle(assetTitle = "Alpha Bravo Charlie");
 
@@ -650,7 +655,7 @@ definition {
 			key_linkResultTitle = "Alpha Bravo",
 			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
 
-		SearchPortlets.configureSimilarResults(minimumWordLength = 8);
+		SearchPortlets.configureSimilarResults(minimumWordLength = "8");
 
 		AssertElementNotPresent(
 			key_linkResultTitle = "Alpha Bravo",
@@ -661,8 +666,8 @@ definition {
 			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
 
 		SearchPortlets.configureSimilarResults(
-			maximumWordLength = 5,
-			minimumWordLength = 5);
+			maximumWordLength = "5",
+			minimumWordLength = "5");
 
 		AssertElementPresent(
 			key_linkResultTitle = "Alpha Bravo",
@@ -673,7 +678,8 @@ definition {
 			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
 	}
 
-	test ViewOnContentPages {
+	@priority = "4"
+	test ViewSimilarResultsOnContentPages {
 		JSONWebcontent.addWebContent(
 			content = "WC Content",
 			groupName = "Guest",
@@ -684,7 +690,7 @@ definition {
 			groupName = "Guest",
 			title = "Similar Results WC Title 2");
 
-		SitePages.openPagesAdmin(siteURLKey = "guest");
+		PagesAdmin.openPagesAdmin(siteURLKey = "guest");
 
 		ContentPages.addPage(pageName = "Similar Results Page");
 
@@ -694,7 +700,7 @@ definition {
 
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/guest/similar-results-page");
 
-		ContentPages.clickPencil();
+		ContentPages.gotoPageEditor();
 
 		PageEditor.addWidget(
 			portletName = "Similar Results",
@@ -703,8 +709,8 @@ definition {
 		SearchPortlets.configureSimilarResults(
 			displayTemplate = "Compact Layout",
 			fields = "localized_title_en_US",
-			minimumDocumentFrequency = 1,
-			minimumTermFrequency = 1);
+			minimumDocumentFrequency = "1",
+			minimumTermFrequency = "1");
 
 		PageEditor.clickPublish();
 

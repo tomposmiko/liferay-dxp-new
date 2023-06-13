@@ -657,8 +657,8 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
-			<description>Whether the article is being newly created. Deprecated as of 7.3.0, with no direct replacement.</description>
-			<name>new</name>
+			<description>A primary key of the parent entry of the asset entry to select an asset display page for.</description>
+			<name>parentClassPK</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>

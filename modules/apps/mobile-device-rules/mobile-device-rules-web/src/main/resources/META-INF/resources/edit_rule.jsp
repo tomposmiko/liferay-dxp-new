@@ -52,7 +52,7 @@ renderResponse.setTitle(title);
 	<portlet:param name="mvcRenderCommandName" value="/mobile_device_rules/edit_rule" />
 </portlet:actionURL>
 
-<aui:form action="<%= editRuleURL %>" cssClass="container-fluid-1280" enctype="multipart/form-data" method="post" name="fm">
+<aui:form action="<%= editRuleURL %>" cssClass="container-fluid container-fluid-max-xl container-form-lg" enctype="multipart/form-data" method="post" name="fm">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= (rule == null) ? Constants.ADD : Constants.UPDATE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="ruleGroupId" type="hidden" value="<%= ruleGroupId %>" />
@@ -103,17 +103,18 @@ renderResponse.setTitle(title);
 			</c:choose>
 		</aui:fieldset>
 
-		<div id="<portlet:namespace />typeSettings">
+		<div id="<%= liferayPortletResponse.getNamespace() %>typeSettings">
 			<c:if test="<%= Validator.isNotNull(editorJSP) %>">
 				<liferay-util:include page="<%= editorJSP %>" servletContext="<%= application %>" />
 			</c:if>
 		</div>
-	</aui:fieldset-group>
 
-	<aui:button-row>
-		<aui:button type="submit" />
-		<aui:button href="<%= redirect %>" value="cancel" />
-	</aui:button-row>
+		<div class="sheet-footer">
+			<aui:button type="submit" />
+
+			<aui:button href="<%= redirect %>" value="cancel" />
+		</div>
+	</aui:fieldset-group>
 </aui:form>
 
 <portlet:resourceURL id="/mobile_device_rules/edit_rule" var="editorURL" />
@@ -133,10 +134,10 @@ renderResponse.setTitle(title);
 					'&<portlet:namespace />type=' +
 					<%= ruleId %>
 			)
-				.then(function (response) {
+				.then((response) => {
 					return response.text();
 				})
-				.then(function (response) {
+				.then((response) => {
 					typeSettingsContainer.innerHTML = response;
 				});
 		};

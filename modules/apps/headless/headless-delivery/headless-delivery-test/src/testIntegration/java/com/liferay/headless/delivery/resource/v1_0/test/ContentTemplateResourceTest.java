@@ -37,13 +37,13 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.test.rule.Inject;
 
 import java.io.InputStream;
 
 import java.util.Collections;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -54,51 +54,16 @@ import org.junit.runner.RunWith;
 public class ContentTemplateResourceTest
 	extends BaseContentTemplateResourceTestCase {
 
+	@Ignore
 	@Override
 	@Test
-	public void testGetAssetLibraryContentTemplatesPageWithSortInteger()
-		throws Exception {
-
-		testGetAssetLibraryContentTemplatesPageWithSort(
-			EntityField.Type.INTEGER,
-			(entityField, contentTemplate1, contentTemplate2) -> {
-				if (BeanTestUtil.hasProperty(
-						contentTemplate1, entityField.getName())) {
-
-					BeanTestUtil.setProperty(
-						contentTemplate1, entityField.getName(), 0);
-				}
-
-				if (BeanTestUtil.hasProperty(
-						contentTemplate2, entityField.getName())) {
-
-					BeanTestUtil.setProperty(
-						contentTemplate2, entityField.getName(), 1);
-				}
-			});
+	public void testGetAssetLibraryContentTemplatesPageWithFilterStringEquals() {
 	}
 
+	@Ignore
+	@Override
 	@Test
-	public void testGetSiteContentTemplatesPageWithSortInteger()
-		throws Exception {
-
-		testGetSiteContentTemplatesPageWithSort(
-			EntityField.Type.INTEGER,
-			(entityField, contentTemplate1, contentTemplate2) -> {
-				if (BeanTestUtil.hasProperty(
-						contentTemplate1, entityField.getName())) {
-
-					BeanTestUtil.setProperty(
-						contentTemplate1, entityField.getName(), 0);
-				}
-
-				if (BeanTestUtil.hasProperty(
-						contentTemplate2, entityField.getName())) {
-
-					BeanTestUtil.setProperty(
-						contentTemplate2, entityField.getName(), 1);
-				}
-			});
+	public void testGetSiteContentTemplatesPageWithFilterStringEquals() {
 	}
 
 	@Override
@@ -152,8 +117,8 @@ public class ContentTemplateResourceTest
 		DDMStructure ddmStructure = ddmStructureTestHelper.addStructure(
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			_deserialize(_read("test-structured-content-structure.json")),
-			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+			_deserialize(_read("test-ddm-structure.json")),
+			StorageType.DEFAULT.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
 		DDMTemplate ddmTemplate = DDMTemplateLocalServiceUtil.addTemplate(
 			TestPropsValues.getUserId(), group.getGroupId(),

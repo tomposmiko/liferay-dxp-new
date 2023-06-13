@@ -15,12 +15,10 @@ import React, {useEffect, useState} from 'react';
 import CodeMirrorEditor from '../CodeMirrorEditor';
 
 function JSONInput({
-	autocompleteSchema,
 	disabled,
 	value,
 	label = Liferay.Language.get('json[stands-for]'),
 	nullable,
-	readOnly = false,
 	required = true,
 	name,
 	setFieldValue,
@@ -52,12 +50,7 @@ function JSONInput({
 				)}
 			</label>
 
-			<CodeMirrorEditor
-				autocompleteSchema={autocompleteSchema}
-				onChange={setEditValue}
-				readOnly={readOnly}
-				value={editValue}
-			/>
+			<CodeMirrorEditor onChange={setEditValue} value={editValue} />
 		</div>
 	);
 }

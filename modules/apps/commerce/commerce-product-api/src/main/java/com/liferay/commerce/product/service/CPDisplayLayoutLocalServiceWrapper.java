@@ -27,25 +27,14 @@ public class CPDisplayLayoutLocalServiceWrapper
 	implements CPDisplayLayoutLocalService,
 			   ServiceWrapper<CPDisplayLayoutLocalService> {
 
+	public CPDisplayLayoutLocalServiceWrapper() {
+		this(null);
+	}
+
 	public CPDisplayLayoutLocalServiceWrapper(
 		CPDisplayLayoutLocalService cpDisplayLayoutLocalService) {
 
 		_cpDisplayLayoutLocalService = cpDisplayLayoutLocalService;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x)
-	 */
-	@Deprecated
-	@Override
-	public com.liferay.commerce.product.model.CPDisplayLayout
-			addCPDisplayLayout(
-				Class<?> clazz, long classPK, String layoutUuid,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _cpDisplayLayoutLocalService.addCPDisplayLayout(
-			clazz, classPK, layoutUuid, serviceContext);
 	}
 
 	/**
@@ -151,16 +140,9 @@ public class CPDisplayLayoutLocalServiceWrapper
 			CPDisplayLayoutId);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
 	@Override
-	public void deleteCPDisplayLayoutByGroupIdAndLayoutUuid(
-		long groupId, String layoutUuid) {
-
-		_cpDisplayLayoutLocalService.
-			deleteCPDisplayLayoutByGroupIdAndLayoutUuid(groupId, layoutUuid);
+	public void deleteCPDisplayLayouts(Class<?> clazz, long classPK) {
+		_cpDisplayLayoutLocalService.deleteCPDisplayLayouts(clazz, classPK);
 	}
 
 	/**
@@ -280,18 +262,18 @@ public class CPDisplayLayoutLocalServiceWrapper
 
 	@Override
 	public com.liferay.commerce.product.model.CPDisplayLayout
-		fetchCPDisplayLayout(Class<?> clazz, long classPK) {
-
-		return _cpDisplayLayoutLocalService.fetchCPDisplayLayout(
-			clazz, classPK);
-	}
-
-	@Override
-	public com.liferay.commerce.product.model.CPDisplayLayout
 		fetchCPDisplayLayout(long CPDisplayLayoutId) {
 
 		return _cpDisplayLayoutLocalService.fetchCPDisplayLayout(
 			CPDisplayLayoutId);
+	}
+
+	@Override
+	public com.liferay.commerce.product.model.CPDisplayLayout
+		fetchCPDisplayLayout(long groupId, Class<?> clazz, long classPK) {
+
+		return _cpDisplayLayoutLocalService.fetchCPDisplayLayout(
+			groupId, clazz, classPK);
 	}
 
 	@Override
@@ -508,11 +490,12 @@ public class CPDisplayLayoutLocalServiceWrapper
 
 	@Override
 	public com.liferay.commerce.product.model.CPDisplayLayout
-			updateCPDisplayLayout(long cpDisplayLayoutId, String layoutUuid)
+			updateCPDisplayLayout(
+				long cpDisplayLayoutId, long classPK, String layoutUuid)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDisplayLayoutLocalService.updateCPDisplayLayout(
-			cpDisplayLayoutId, layoutUuid);
+			cpDisplayLayoutId, classPK, layoutUuid);
 	}
 
 	@Override

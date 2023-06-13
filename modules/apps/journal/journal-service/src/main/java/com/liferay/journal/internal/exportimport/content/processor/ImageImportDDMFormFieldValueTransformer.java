@@ -16,7 +16,7 @@ package com.liferay.journal.internal.exportimport.content.processor;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLAppService;
-import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
+import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.util.DDMFormFieldValueTransformer;
@@ -68,7 +68,7 @@ public class ImageImportDDMFormFieldValueTransformer
 
 	@Override
 	public String getFieldType() {
-		return DDMFormFieldType.IMAGE;
+		return DDMFormFieldTypeConstants.IMAGE;
 	}
 
 	@Override
@@ -107,14 +107,11 @@ public class ImageImportDDMFormFieldValueTransformer
 
 			value.addString(locale, fileEntryJSON);
 
-			StringBundler sb = new StringBundler(4);
-
-			sb.append("//dynamic-element[@type='image']");
-			sb.append("/dynamic-content[contains(text(),");
-			sb.append(HtmlUtil.escapeXPathAttribute(valueString));
-			sb.append(")]");
-
-			XPath xPath = SAXReaderUtil.createXPath(sb.toString());
+			XPath xPath = SAXReaderUtil.createXPath(
+				StringBundler.concat(
+					"//dynamic-element[@type='image']",
+					"/dynamic-content[contains(text(),",
+					HtmlUtil.escapeXPathAttribute(valueString), ")]"));
 
 			List<Node> imageNodes = xPath.selectNodes(_document);
 
@@ -160,9 +157,7 @@ public class ImageImportDDMFormFieldValueTransformer
 	}
 
 	protected String toJSON(FileEntry fileEntry, String type, String alt) {
-		JournalArticle article = (JournalArticle)_stagedModel;
-
-		JSONObject jsonObject = JSONUtil.put(
+		return JSONUtil.put(
 			"alt", alt
 		).put(
 			"fileEntryId", fileEntry.getFileEntryId()
@@ -171,16 +166,19 @@ public class ImageImportDDMFormFieldValueTransformer
 		).put(
 			"name", fileEntry.getFileName()
 		).put(
-			"resourcePrimKey", article.getResourcePrimKey()
+			"resourcePrimKey",
+			() -> {
+				JournalArticle article = (JournalArticle)_stagedModel;
+
+				return article.getResourcePrimKey();
+			}
 		).put(
 			"title", fileEntry.getTitle()
 		).put(
 			"type", type
 		).put(
 			"uuid", fileEntry.getUuid()
-		);
-
-		return jsonObject.toString();
+		).toString();
 	}
 
 	private void _setContent(String content) {
@@ -189,7 +187,7 @@ public class ImageImportDDMFormFieldValueTransformer
 		}
 		catch (DocumentException documentException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Invalid content:\n" + content);
+				_log.debug("Invalid content:\n" + content, documentException);
 			}
 		}
 	}

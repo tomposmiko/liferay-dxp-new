@@ -30,7 +30,7 @@ import com.liferay.dynamic.data.mapping.util.DDMDisplayRegistry;
 import com.liferay.dynamic.data.mapping.util.DDMDisplayTabItem;
 import com.liferay.dynamic.data.mapping.util.DDMTemplateHelper;
 import com.liferay.dynamic.data.mapping.util.DDMUtil;
-import com.liferay.dynamic.data.mapping.web.internal.context.util.DDMWebRequestHelper;
+import com.liferay.dynamic.data.mapping.web.internal.context.helper.DDMWebRequestHelper;
 import com.liferay.dynamic.data.mapping.web.internal.search.StructureSearch;
 import com.liferay.dynamic.data.mapping.web.internal.search.StructureSearchTerms;
 import com.liferay.dynamic.data.mapping.web.internal.search.TemplateSearch;
@@ -46,6 +46,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -54,9 +55,8 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.PortalPreferences;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.template.TemplateHandler;
@@ -176,12 +176,11 @@ public class DDMDisplayContext {
 	}
 
 	public String getClearResultsURL() throws PortletException {
-		PortletURL clearResultsURL = PortletURLUtil.clone(
-			getPortletURL(), _renderResponse);
-
-		clearResultsURL.setParameter("keywords", StringPool.BLANK);
-
-		return clearResultsURL.toString();
+		return PortletURLBuilder.create(
+			PortletURLUtil.clone(getPortletURL(), _renderResponse)
+		).setKeywords(
+			StringPool.BLANK
+		).buildString();
 	}
 
 	public DDMDisplay getDDMDisplay() {
@@ -263,43 +262,27 @@ public class DDMDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		PortalPreferences portalPreferences =
-			PortletPreferencesFactoryUtil.getPortalPreferences(_renderRequest);
-
-		String orderByCol = ParamUtil.getString(_renderRequest, "orderByCol");
-
-		if (Validator.isNull(orderByCol)) {
-			orderByCol = portalPreferences.getValue(
-				DDMPortletKeys.DYNAMIC_DATA_MAPPING, "entries-order-by-col",
-				"modified-date");
-		}
-		else {
-			portalPreferences.setValue(
-				DDMPortletKeys.DYNAMIC_DATA_MAPPING, "entries-order-by-col",
-				orderByCol);
+		if (Validator.isNotNull(_orderByCol)) {
+			return _orderByCol;
 		}
 
-		return orderByCol;
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			_renderRequest, DDMPortletKeys.DYNAMIC_DATA_MAPPING,
+			"entries-order-by-col", "modified-date");
+
+		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		PortalPreferences portalPreferences =
-			PortletPreferencesFactoryUtil.getPortalPreferences(_renderRequest);
-
-		String orderByType = ParamUtil.getString(_renderRequest, "orderByType");
-
-		if (Validator.isNull(orderByType)) {
-			orderByType = portalPreferences.getValue(
-				DDMPortletKeys.DYNAMIC_DATA_MAPPING, "entries-order-by-type",
-				"asc");
-		}
-		else {
-			portalPreferences.setValue(
-				DDMPortletKeys.DYNAMIC_DATA_MAPPING, "entries-order-by-type",
-				orderByType);
+		if (Validator.isNotNull(_orderByType)) {
+			return _orderByType;
 		}
 
-		return orderByType;
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_renderRequest, DDMPortletKeys.DYNAMIC_DATA_MAPPING,
+			"entries-order-by-type", "asc");
+
+		return _orderByType;
 	}
 
 	public String getRefererPortletName() {
@@ -323,15 +306,17 @@ public class DDMDisplayContext {
 
 		return CreationMenuBuilder.addPrimaryDropdownItem(
 			dropdownItem -> {
-				PortletURL redirectURL = _renderResponse.createRenderURL();
-
-				redirectURL.setParameter("mvcPath", "/select_structure.jsp");
-				redirectURL.setParameter(
-					"classPK", String.valueOf(getClassPK()));
-				redirectURL.setParameter(
+				PortletURL redirectURL = PortletURLBuilder.createRenderURL(
+					_renderResponse
+				).setMVCPath(
+					"/select_structure.jsp"
+				).setParameter(
+					"classPK", getClassPK()
+				).setParameter(
 					"eventName",
 					ParamUtil.getString(
-						_renderRequest, "eventName", "selectStructure"));
+						_renderRequest, "eventName", "selectStructure")
+				).buildPortletURL();
 
 				dropdownItem.setHref(
 					_renderResponse.createRenderURL(), "mvcPath",
@@ -345,51 +330,53 @@ public class DDMDisplayContext {
 	}
 
 	public String getSelectStructureSearchActionURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
-
-		portletURL.setParameter("mvcPath", "/select_structure.jsp");
-		portletURL.setParameter(
-			"classPK",
-			String.valueOf(ParamUtil.getLong(_renderRequest, "classPK")));
-		portletURL.setParameter(
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/select_structure.jsp"
+		).setParameter(
+			"classPK", ParamUtil.getLong(_renderRequest, "classPK")
+		).setParameter(
 			"eventName",
-			ParamUtil.getString(
-				_renderRequest, "eventName", "selectStructure"));
-
-		return portletURL.toString();
+			ParamUtil.getString(_renderRequest, "eventName", "selectStructure")
+		).buildString();
 	}
 
 	public String getSelectTemplateSearchActionURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
-
-		portletURL.setParameter("mvcPath", "/select_template.jsp");
-		portletURL.setParameter(
-			"templateId",
-			String.valueOf(ParamUtil.getLong(_renderRequest, "templateId")));
-		portletURL.setParameter(
-			"classNameId", String.valueOf(getClassNameId()));
-		portletURL.setParameter(
-			"classPK",
-			String.valueOf(ParamUtil.getLong(_renderRequest, "classPK")));
-		portletURL.setParameter(
-			"resourceClassNameId", String.valueOf(getResourceClassNameId()));
-		portletURL.setParameter(
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/select_template.jsp"
+		).setParameter(
+			"classNameId", getClassNameId()
+		).setParameter(
+			"classPK", ParamUtil.getLong(_renderRequest, "classPK")
+		).setParameter(
 			"eventName",
-			ParamUtil.getString(_renderRequest, "eventName", "selectTemplate"));
-
-		return portletURL.toString();
+			ParamUtil.getString(_renderRequest, "eventName", "selectTemplate")
+		).setParameter(
+			"resourceClassNameId", getResourceClassNameId()
+		).setParameter(
+			"templateId", ParamUtil.getLong(_renderRequest, "templateId")
+		).buildString();
 	}
 
 	public String getSortingURL() throws Exception {
-		PortletURL sortingURL = PortletURLUtil.clone(
-			getPortletURL(), _renderResponse);
+		return PortletURLBuilder.create(
+			PortletURLUtil.clone(getPortletURL(), _renderResponse)
+		).setParameter(
+			"orderByType",
+			() -> {
+				String orderByType = ParamUtil.getString(
+					_renderRequest, "orderByType");
 
-		String orderByType = ParamUtil.getString(_renderRequest, "orderByType");
+				if (orderByType.equals("asc")) {
+					return "desc";
+				}
 
-		sortingURL.setParameter(
-			"orderByType", orderByType.equals("asc") ? "desc" : "asc");
-
-		return sortingURL.toString();
+				return "asc";
+			}
+		).buildString();
 	}
 
 	public Set<String> getStorageTypes() {
@@ -401,38 +388,32 @@ public class DDMDisplayContext {
 			return null;
 		}
 
-		PortletURL redirectURL = _renderResponse.createRenderURL();
-
-		redirectURL.setParameter("mvcPath", "/view.jsp");
-		redirectURL.setParameter(
-			"groupId", String.valueOf(_ddmWebRequestHelper.getScopeGroupId()));
-
-		PortletURL addTemplateURL = _renderResponse.createRenderURL();
-
-		addTemplateURL.setParameter("mvcPath", "/edit_structure.jsp");
-		addTemplateURL.setParameter("redirect", redirectURL.toString());
-		addTemplateURL.setParameter(
-			"groupId", String.valueOf(_ddmWebRequestHelper.getScopeGroupId()));
+		PortletURL redirectURL = PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/view.jsp"
+		).setParameter(
+			"groupId", _ddmWebRequestHelper.getScopeGroupId()
+		).buildPortletURL();
 
 		return CreationMenuBuilder.addPrimaryDropdownItem(
-			getCreationMenuDropdownItem(addTemplateURL, "add")
+			getCreationMenuDropdownItem(
+				PortletURLBuilder.createRenderURL(
+					_renderResponse
+				).setMVCPath(
+					"/edit_structure.jsp"
+				).setRedirect(
+					redirectURL
+				).setParameter(
+					"groupId", _ddmWebRequestHelper.getScopeGroupId()
+				).buildPortletURL(),
+				"add")
 		).build();
 	}
 
 	public SearchContainer<DDMStructure> getStructureSearch() throws Exception {
 		StructureSearch structureSearch = new StructureSearch(
 			_renderRequest, getPortletURL());
-
-		String orderByCol = getOrderByCol();
-		String orderByType = getOrderByType();
-
-		OrderByComparator<DDMStructure> orderByComparator =
-			DDMUtil.getStructureOrderByComparator(
-				getOrderByCol(), getOrderByType());
-
-		structureSearch.setOrderByCol(orderByCol);
-		structureSearch.setOrderByComparator(orderByComparator);
-		structureSearch.setOrderByType(orderByType);
 
 		if (structureSearch.isSearch()) {
 			structureSearch.setEmptyResultsMessage(
@@ -447,6 +428,12 @@ public class DDMDisplayContext {
 					getScopedStructureLabel(), false));
 		}
 
+		structureSearch.setOrderByCol(getOrderByCol());
+		structureSearch.setOrderByComparator(
+			DDMUtil.getStructureOrderByComparator(
+				getOrderByCol(), getOrderByType()));
+		structureSearch.setOrderByType(getOrderByType());
+
 		setDDMStructureSearchResults(structureSearch);
 		setDDMStructureSearchTotal(structureSearch);
 
@@ -454,16 +441,15 @@ public class DDMDisplayContext {
 	}
 
 	public String getStructureSearchActionURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
-
-		portletURL.setParameter("mvcPath", "/view.jsp");
-		portletURL.setParameter(
-			"tabs1",
-			ParamUtil.getString(_renderRequest, "tabs1", "structures"));
-		portletURL.setParameter(
-			"groupId", String.valueOf(_ddmWebRequestHelper.getScopeGroupId()));
-
-		return portletURL.toString();
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/view.jsp"
+		).setTabs1(
+			ParamUtil.getString(_renderRequest, "tabs1", "structures")
+		).setParameter(
+			"groupId", _ddmWebRequestHelper.getScopeGroupId()
+		).buildString();
 	}
 
 	public String getStructureSearchContainerId() {
@@ -481,21 +467,21 @@ public class DDMDisplayContext {
 						DDMStructure.class)) {
 
 					PortletURL addTemplateURL =
-						_renderResponse.createRenderURL();
-
-					addTemplateURL.setParameter(
-						"mvcPath", "/edit_template.jsp");
-					addTemplateURL.setParameter(
-						"groupId",
-						String.valueOf(_ddmWebRequestHelper.getScopeGroupId()));
-					addTemplateURL.setParameter(
-						"classNameId", String.valueOf(getClassNameId()));
-					addTemplateURL.setParameter(
-						"classPK", String.valueOf(getClassPK()));
-					addTemplateURL.setParameter(
-						"resourceClassNameId",
-						String.valueOf(getResourceClassNameId()));
-					addTemplateURL.setParameter("mode", getTemplateMode());
+						PortletURLBuilder.createRenderURL(
+							_renderResponse
+						).setMVCPath(
+							"/edit_template.jsp"
+						).setParameter(
+							"classNameId", getClassNameId()
+						).setParameter(
+							"classPK", getClassPK()
+						).setParameter(
+							"groupId", _ddmWebRequestHelper.getScopeGroupId()
+						).setParameter(
+							"mode", getTemplateMode()
+						).setParameter(
+							"resourceClassNameId", getResourceClassNameId()
+						).buildPortletURL();
 
 					String message = "add";
 
@@ -537,16 +523,17 @@ public class DDMDisplayContext {
 
 					if (!templateHandlers.isEmpty()) {
 						PortletURL addPortletDisplayTemplateURL =
-							_renderResponse.createRenderURL();
-
-						addPortletDisplayTemplateURL.setParameter(
-							"mvcPath", "/edit_template.jsp");
-						addPortletDisplayTemplateURL.setParameter(
-							"groupId",
-							String.valueOf(
-								_ddmWebRequestHelper.getScopeGroupId()));
-						addPortletDisplayTemplateURL.setParameter(
-							"type", DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY);
+							PortletURLBuilder.createRenderURL(
+								_renderResponse
+							).setMVCPath(
+								"/edit_template.jsp"
+							).setParameter(
+								"groupId",
+								_ddmWebRequestHelper.getScopeGroupId()
+							).setParameter(
+								"type",
+								DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY
+							).buildPortletURL();
 
 						for (TemplateHandler templateHandler :
 								templateHandlers) {
@@ -603,26 +590,26 @@ public class DDMDisplayContext {
 	}
 
 	public String getTemplateSearchActionURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
-
-		portletURL.setParameter("mvcPath", "/view_template.jsp");
-		portletURL.setParameter(
-			"tabs1", ParamUtil.getString(_renderRequest, "tabs1", "templates"));
-		portletURL.setParameter(
-			"templateId",
-			String.valueOf(ParamUtil.getLong(_renderRequest, "templateId")));
-		portletURL.setParameter(
-			"groupId", String.valueOf(_ddmWebRequestHelper.getScopeGroupId()));
-		portletURL.setParameter(
-			"classNameId", String.valueOf(getClassNameId()));
-		portletURL.setParameter("classPK", String.valueOf(getClassPK()));
-		portletURL.setParameter(
-			"resourceClassNameId", String.valueOf(getResourceClassNameId()));
-		portletURL.setParameter(
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/view_template.jsp"
+		).setTabs1(
+			ParamUtil.getString(_renderRequest, "tabs1", "templates")
+		).setParameter(
+			"classNameId", getClassNameId()
+		).setParameter(
+			"classPK", getClassPK()
+		).setParameter(
 			"eventName",
-			ParamUtil.getString(_renderRequest, "eventName", "selectTemplate"));
-
-		return portletURL.toString();
+			ParamUtil.getString(_renderRequest, "eventName", "selectTemplate")
+		).setParameter(
+			"groupId", _ddmWebRequestHelper.getScopeGroupId()
+		).setParameter(
+			"resourceClassNameId", getResourceClassNameId()
+		).setParameter(
+			"templateId", ParamUtil.getLong(_renderRequest, "templateId")
+		).buildString();
 	}
 
 	public String getTemplateSearchContainerId() {
@@ -819,8 +806,10 @@ public class DDMDisplayContext {
 			portletURL.setParameter("classNameId", String.valueOf(classNameId));
 		}
 
-		if (classNameId != 0) {
-			portletURL.setParameter("classPK", String.valueOf(getClassPK()));
+		long classPK = getClassPK();
+
+		if (classPK != 0) {
+			portletURL.setParameter("classPK", String.valueOf(classPK));
 		}
 
 		long resourceClassNameId = getResourceClassNameId();
@@ -1134,6 +1123,8 @@ public class DDMDisplayContext {
 	private final DDMTemplateService _ddmTemplateService;
 	private final DDMWebConfiguration _ddmWebConfiguration;
 	private final DDMWebRequestHelper _ddmWebRequestHelper;
+	private String _orderByCol;
+	private String _orderByType;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 	private final StorageAdapterRegistry _storageAdapterRegistry;

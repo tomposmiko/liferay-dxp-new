@@ -16,6 +16,7 @@ package com.liferay.user.groups.admin.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -58,39 +59,46 @@ public class SelectUserGroupManagementToolbarDisplayContext {
 	}
 
 	public String getClearResultsURL() {
-		PortletURL clearResultsURL = getPortletURL();
-
-		clearResultsURL.setParameter("keywords", StringPool.BLANK);
-
-		return clearResultsURL.toString();
+		return PortletURLBuilder.create(
+			getPortletURL()
+		).setKeywords(
+			StringPool.BLANK
+		).buildString();
 	}
 
 	public PortletURL getPortletURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/select_user_group.jsp"
+		).setKeywords(
+			() -> {
+				String[] keywords = ParamUtil.getStringValues(
+					_httpServletRequest, "keywords");
 
-		portletURL.setParameter("mvcPath", "/select_user_group.jsp");
+				if (ArrayUtil.isNotEmpty(keywords)) {
+					return keywords[keywords.length - 1];
+				}
 
-		User selUser = _getSelectedUser();
+				return null;
+			}
+		).setParameter(
+			"eventName",
+			ParamUtil.getString(
+				_httpServletRequest, "eventName",
+				_renderResponse.getNamespace() + "selectUserGroup")
+		).setParameter(
+			"p_u_i_d",
+			() -> {
+				User selUser = _getSelectedUser();
 
-		if (selUser != null) {
-			portletURL.setParameter(
-				"p_u_i_d", String.valueOf(selUser.getUserId()));
-		}
+				if (selUser != null) {
+					return selUser.getUserId();
+				}
 
-		String eventName = ParamUtil.getString(
-			_httpServletRequest, "eventName",
-			_renderResponse.getNamespace() + "selectUserGroup");
-
-		portletURL.setParameter("eventName", eventName);
-
-		String[] keywords = ParamUtil.getStringValues(
-			_httpServletRequest, "keywords");
-
-		if (ArrayUtil.isNotEmpty(keywords)) {
-			portletURL.setParameter("keywords", keywords[keywords.length - 1]);
-		}
-
-		return portletURL;
+				return null;
+			}
+		).buildPortletURL();
 	}
 
 	public String getSearchActionURL() {

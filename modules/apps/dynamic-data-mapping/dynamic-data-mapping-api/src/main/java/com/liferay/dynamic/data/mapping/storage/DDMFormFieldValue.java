@@ -68,6 +68,10 @@ public class DDMFormFieldValue implements Serializable {
 		return false;
 	}
 
+	public Object getConfirmationValue() {
+		return _confirmationValue;
+	}
+
 	public DDMFormField getDDMFormField() {
 		DDMForm ddmForm = _ddmFormValues.getDDMForm();
 
@@ -202,6 +206,10 @@ public class DDMFormFieldValue implements Serializable {
 		}
 	}
 
+	public void setConfirmationValue(Object confirmationValue) {
+		_confirmationValue = confirmationValue;
+	}
+
 	public void setDDMFormValues(DDMFormValues ddmFormValues) {
 		for (DDMFormFieldValue nestedDDMFormFieldValue :
 				_nestedDDMFormFieldValues) {
@@ -234,6 +242,7 @@ public class DDMFormFieldValue implements Serializable {
 		_value = value;
 	}
 
+	private Object _confirmationValue;
 	private DDMFormValues _ddmFormValues;
 	private String _fieldReference;
 	private String _instanceId = StringUtil.randomString();

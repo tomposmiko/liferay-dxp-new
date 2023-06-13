@@ -17,6 +17,7 @@ package com.liferay.frontend.taglib.servlet.taglib;
 import com.liferay.frontend.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.taglib.util.IncludeTag;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 
@@ -29,9 +30,11 @@ public class SidebarPanelTag extends IncludeTag {
 	public int doEndTag() throws JspException {
 		setAttributeNamespace(_ATTRIBUTE_NAMESPACE);
 
+		HttpServletRequest httpServletRequest = getRequest();
+
 		setNamespacedAttribute(
-			request, "searchContainerId", _searchContainerId);
-		setNamespacedAttribute(request, "resourceURL", _resourceURL);
+			httpServletRequest, "searchContainerId", _searchContainerId);
+		setNamespacedAttribute(httpServletRequest, "resourceURL", _resourceURL);
 
 		return super.doEndTag();
 	}
@@ -40,9 +43,15 @@ public class SidebarPanelTag extends IncludeTag {
 	public int doStartTag() throws JspException {
 		setAttributeNamespace(_ATTRIBUTE_NAMESPACE);
 
+		setNamespacedAttribute(getRequest(), "closeButton", _closeButton);
+
 		super.doStartTag();
 
 		return EVAL_BODY_INCLUDE;
+	}
+
+	public boolean getCloseButton() {
+		return _closeButton;
 	}
 
 	public String getResourceURL() {
@@ -53,11 +62,15 @@ public class SidebarPanelTag extends IncludeTag {
 		return _searchContainerId;
 	}
 
+	public void setCloseButton(boolean closeButton) {
+		_closeButton = closeButton;
+	}
+
 	@Override
 	public void setPageContext(PageContext pageContext) {
 		super.setPageContext(pageContext);
 
-		servletContext = ServletContextUtil.getServletContext();
+		setServletContext(ServletContextUtil.getServletContext());
 	}
 
 	public void setResourceURL(String resourceURL) {
@@ -72,6 +85,7 @@ public class SidebarPanelTag extends IncludeTag {
 	protected void cleanUp() {
 		super.cleanUp();
 
+		_closeButton = true;
 		_resourceURL = null;
 		_searchContainerId = null;
 	}
@@ -93,6 +107,7 @@ public class SidebarPanelTag extends IncludeTag {
 
 	private static final String _START_PAGE = "/sidebar_panel/start.jsp";
 
+	private boolean _closeButton = true;
 	private String _resourceURL;
 	private String _searchContainerId;
 

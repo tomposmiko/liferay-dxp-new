@@ -54,22 +54,21 @@ const TabItem = ({item}) => {
 	return (
 		<li
 			className={classNames('sidebar-body__add-panel__tab-item', {
-				disabled: item.disabled,
-				multiline: isContent,
+				'disabled': item.disabled,
+				'multiline': isContent,
 				'sidebar-body__add-panel__tab-portlet-item':
 					item.data.portletItemId,
 			})}
 			ref={item.disabled ? null : sourceRef}
 		>
-			<div
-				className="sidebar-body__add-panel__tab-item-body"
-				title={item.label}
-			>
+			<div className="sidebar-body__add-panel__tab-item-body">
 				<div className="icon">
 					<ClayIcon symbol={item.icon} />
 				</div>
+
 				<div className="text">
-					<div className="mr-1 text-truncate title">{item.label}</div>
+					<div className="text-truncate title">{item.label}</div>
+
 					{isContent && (
 						<div className="subtitle text-truncate">
 							{item.category}
@@ -80,15 +79,14 @@ const TabItem = ({item}) => {
 
 			{!item.disabled && (
 				<ClayButton
-					aria-label={`${Liferay.Language.get('add-content')}`}
 					className="btn-monospaced sidebar-body__add-panel__tab-item-add"
-					data-tooltip-align="top-left"
 					displayType="unstyled"
 					onClick={() => addItem({item, plid, setWidgets, widgets})}
 					small
-					title={`${Liferay.Language.get('add-content')}`}
+					title={item.name}
 				>
 					<ClayIcon symbol="plus" />
+
 					<span className="sr-only">{item.name}</span>
 				</ClayButton>
 			)}

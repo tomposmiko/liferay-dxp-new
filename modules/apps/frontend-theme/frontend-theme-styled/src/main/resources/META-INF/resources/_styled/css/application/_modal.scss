@@ -33,7 +33,11 @@
 }
 
 .modal-dialog {
-	@include media-breakpoint-up(sm) {
+	&:not(.dialog-iframe-modal):not(.modal-full-screen) {
+		position: relative;
+	}
+
+	&.dialog-iframe-modal {
 		max-width: none;
 	}
 
@@ -43,6 +47,11 @@
 
 	.yui3-resize-handles-wrapper {
 		pointer-events: all;
+
+		.yui3-resize-handle-inner-br {
+			bottom: 0;
+			right: 0;
+		}
 	}
 }
 
@@ -59,15 +68,5 @@
 			padding-left: 0;
 			padding-right: 0;
 		}
-	}
-}
-
-html.modal-open {
-	overflow: initial;
-}
-
-.modal-open {
-	.modal {
-		overflow: hidden;
 	}
 }

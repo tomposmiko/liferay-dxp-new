@@ -20,13 +20,12 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.CountryService;
 import com.liferay.portal.kernel.service.CountryServiceUtil;
+import com.liferay.portal.kernel.service.persistence.CountryLocalizationPersistence;
 import com.liferay.portal.kernel.service.persistence.CountryPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 
@@ -53,6 +52,29 @@ public abstract class CountryServiceBaseImpl
 	 *
 	 * Never modify or reference this class directly. Use <code>CountryService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>CountryServiceUtil</code>.
 	 */
+
+	/**
+	 * Returns the country local service.
+	 *
+	 * @return the country local service
+	 */
+	public com.liferay.portal.kernel.service.CountryLocalService
+		getCountryLocalService() {
+
+		return countryLocalService;
+	}
+
+	/**
+	 * Sets the country local service.
+	 *
+	 * @param countryLocalService the country local service
+	 */
+	public void setCountryLocalService(
+		com.liferay.portal.kernel.service.CountryLocalService
+			countryLocalService) {
+
+		this.countryLocalService = countryLocalService;
+	}
 
 	/**
 	 * Returns the country remote service.
@@ -111,6 +133,26 @@ public abstract class CountryServiceBaseImpl
 			counterLocalService) {
 
 		this.counterLocalService = counterLocalService;
+	}
+
+	/**
+	 * Returns the country localization persistence.
+	 *
+	 * @return the country localization persistence
+	 */
+	public CountryLocalizationPersistence getCountryLocalizationPersistence() {
+		return countryLocalizationPersistence;
+	}
+
+	/**
+	 * Sets the country localization persistence.
+	 *
+	 * @param countryLocalizationPersistence the country localization persistence
+	 */
+	public void setCountryLocalizationPersistence(
+		CountryLocalizationPersistence countryLocalizationPersistence) {
+
+		this.countryLocalizationPersistence = countryLocalizationPersistence;
 	}
 
 	public void afterPropertiesSet() {
@@ -176,6 +218,12 @@ public abstract class CountryServiceBaseImpl
 		}
 	}
 
+	@BeanReference(
+		type = com.liferay.portal.kernel.service.CountryLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.CountryLocalService
+		countryLocalService;
+
 	@BeanReference(type = CountryService.class)
 	protected CountryService countryService;
 
@@ -188,7 +236,7 @@ public abstract class CountryServiceBaseImpl
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		CountryServiceBaseImpl.class);
+	@BeanReference(type = CountryLocalizationPersistence.class)
+	protected CountryLocalizationPersistence countryLocalizationPersistence;
 
 }

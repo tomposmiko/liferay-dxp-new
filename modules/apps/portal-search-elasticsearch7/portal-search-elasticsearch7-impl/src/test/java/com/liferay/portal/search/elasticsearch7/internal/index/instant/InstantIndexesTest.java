@@ -14,7 +14,6 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.index.instant;
 
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.elasticsearch7.internal.index.IndexDefinitionsHolderImpl;
@@ -28,7 +27,6 @@ import com.liferay.portal.search.elasticsearch7.internal.test.util.microcontaine
 import com.liferay.portal.search.elasticsearch7.spi.index.IndexRegistrar;
 import com.liferay.portal.search.spi.index.IndexDefinition;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.PropsImpl;
 
 import java.io.IOException;
 
@@ -45,7 +43,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -54,14 +51,11 @@ import org.junit.Test;
 public class InstantIndexesTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		PropsUtil.setProps(new PropsImpl());
-
 		_elasticsearchFixture = new ElasticsearchFixture(
 			InstantIndexesTest.class.getSimpleName());
 

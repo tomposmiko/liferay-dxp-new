@@ -33,6 +33,7 @@ import com.liferay.redirect.model.RedirectNotFoundEntryModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -231,90 +232,112 @@ public class RedirectNotFoundEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, RedirectNotFoundEntry>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			RedirectNotFoundEntry.class.getClassLoader(),
+			RedirectNotFoundEntry.class, ModelWrapper.class);
+
+		try {
+			Constructor<RedirectNotFoundEntry> constructor =
+				(Constructor<RedirectNotFoundEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<RedirectNotFoundEntry, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<RedirectNotFoundEntry, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<RedirectNotFoundEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<RedirectNotFoundEntry, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", RedirectNotFoundEntry::getMvccVersion);
-		attributeGetterFunctions.put(
-			"redirectNotFoundEntryId",
-			RedirectNotFoundEntry::getRedirectNotFoundEntryId);
-		attributeGetterFunctions.put(
-			"groupId", RedirectNotFoundEntry::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", RedirectNotFoundEntry::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", RedirectNotFoundEntry::getUserId);
-		attributeGetterFunctions.put(
-			"userName", RedirectNotFoundEntry::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", RedirectNotFoundEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", RedirectNotFoundEntry::getModifiedDate);
-		attributeGetterFunctions.put(
-			"ignored", RedirectNotFoundEntry::getIgnored);
-		attributeGetterFunctions.put("url", RedirectNotFoundEntry::getUrl);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<RedirectNotFoundEntry, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<RedirectNotFoundEntry, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<RedirectNotFoundEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", RedirectNotFoundEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<RedirectNotFoundEntry, Long>)
 				RedirectNotFoundEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"redirectNotFoundEntryId",
+			RedirectNotFoundEntry::getRedirectNotFoundEntryId);
 		attributeSetterBiConsumers.put(
 			"redirectNotFoundEntryId",
 			(BiConsumer<RedirectNotFoundEntry, Long>)
 				RedirectNotFoundEntry::setRedirectNotFoundEntryId);
+		attributeGetterFunctions.put(
+			"groupId", RedirectNotFoundEntry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<RedirectNotFoundEntry, Long>)
 				RedirectNotFoundEntry::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", RedirectNotFoundEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<RedirectNotFoundEntry, Long>)
 				RedirectNotFoundEntry::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", RedirectNotFoundEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<RedirectNotFoundEntry, Long>)
 				RedirectNotFoundEntry::setUserId);
+		attributeGetterFunctions.put(
+			"userName", RedirectNotFoundEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<RedirectNotFoundEntry, String>)
 				RedirectNotFoundEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", RedirectNotFoundEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<RedirectNotFoundEntry, Date>)
 				RedirectNotFoundEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", RedirectNotFoundEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<RedirectNotFoundEntry, Date>)
 				RedirectNotFoundEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"ignored", RedirectNotFoundEntry::getIgnored);
 		attributeSetterBiConsumers.put(
 			"ignored",
 			(BiConsumer<RedirectNotFoundEntry, Boolean>)
 				RedirectNotFoundEntry::setIgnored);
+		attributeGetterFunctions.put("url", RedirectNotFoundEntry::getUrl);
 		attributeSetterBiConsumers.put(
 			"url",
 			(BiConsumer<RedirectNotFoundEntry, String>)
 				RedirectNotFoundEntry::setUrl);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -590,6 +613,35 @@ public class RedirectNotFoundEntryModelImpl
 	}
 
 	@Override
+	public RedirectNotFoundEntry cloneWithOriginalValues() {
+		RedirectNotFoundEntryImpl redirectNotFoundEntryImpl =
+			new RedirectNotFoundEntryImpl();
+
+		redirectNotFoundEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		redirectNotFoundEntryImpl.setRedirectNotFoundEntryId(
+			this.<Long>getColumnOriginalValue("redirectNotFoundEntryId"));
+		redirectNotFoundEntryImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		redirectNotFoundEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		redirectNotFoundEntryImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		redirectNotFoundEntryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		redirectNotFoundEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		redirectNotFoundEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		redirectNotFoundEntryImpl.setIgnored(
+			this.<Boolean>getColumnOriginalValue("ignored"));
+		redirectNotFoundEntryImpl.setUrl(
+			this.<String>getColumnOriginalValue("url"));
+
+		return redirectNotFoundEntryImpl;
+	}
+
+	@Override
 	public int compareTo(RedirectNotFoundEntry redirectNotFoundEntry) {
 		long primaryKey = redirectNotFoundEntry.getPrimaryKey();
 
@@ -800,9 +852,7 @@ public class RedirectNotFoundEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, RedirectNotFoundEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					RedirectNotFoundEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

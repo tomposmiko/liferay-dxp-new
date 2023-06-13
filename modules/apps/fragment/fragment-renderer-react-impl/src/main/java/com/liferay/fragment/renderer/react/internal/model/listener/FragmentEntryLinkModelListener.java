@@ -77,7 +77,10 @@ public class FragmentEntryLinkModelListener
 	}
 
 	@Override
-	public void onAfterUpdate(FragmentEntryLink fragmentEntryLink) {
+	public void onAfterUpdate(
+		FragmentEntryLink originalFragmentEntryLink,
+		FragmentEntryLink fragmentEntryLink) {
+
 		if (!_isReactFragmentEntry(fragmentEntryLink.getFragmentEntryId())) {
 			return;
 		}
@@ -134,12 +137,24 @@ public class FragmentEntryLinkModelListener
 
 	private String _getJs(FragmentEntryLink fragmentEntryLink) {
 		return StringUtil.replace(
-			fragmentEntryLink.getJs(), "'__FRAGMENT_MODULE_NAME__'",
-			StringBundler.concat(
-				StringPool.APOSTROPHE,
-				ModuleNameUtil.getModuleResolvedId(
-					_jsPackage, _getModuleName(fragmentEntryLink)),
-				StringPool.APOSTROPHE));
+			fragmentEntryLink.getJs(),
+			new String[] {
+				"'__FRAGMENT_MODULE_NAME__'", "'__REACT_PROVIDER__$react'",
+				"'frontend-js-react-web$react'"
+			},
+			new String[] {
+				StringBundler.concat(
+					StringPool.APOSTROPHE,
+					ModuleNameUtil.getModuleResolvedId(
+						_jsPackage, _getModuleName(fragmentEntryLink)),
+					StringPool.APOSTROPHE),
+				StringBundler.concat(
+					StringPool.APOSTROPHE, _DEPENDENCY_PORTAL_REACT,
+					StringPool.APOSTROPHE),
+				StringBundler.concat(
+					StringPool.APOSTROPHE, _DEPENDENCY_PORTAL_REACT,
+					StringPool.APOSTROPHE)
+			});
 	}
 
 	private String _getModuleName(FragmentEntryLink fragmentEntryLink) {
@@ -160,8 +175,11 @@ public class FragmentEntryLinkModelListener
 		return false;
 	}
 
+	private static final String _DEPENDENCY_PORTAL_REACT =
+		"liferay!frontend-js-react-web$react";
+
 	private static final List<String> _dependencies = Collections.singletonList(
-		"frontend-js-react-web$react");
+		_DEPENDENCY_PORTAL_REACT);
 
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;

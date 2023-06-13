@@ -66,11 +66,11 @@ request.setAttribute("view_suggestions.jsp-searchContainer", kbCommentsSearchCon
 <clay:management-toolbar
 	actionDropdownItems="<%= kbSuggestionListManagementToolbarDisplayContext.getActionDropdownItems() %>"
 	clearResultsURL="<%= kbSuggestionListManagementToolbarDisplayContext.getClearResultsURL() %>"
-	componentId="kbSuggestionListManagementToolbar"
 	disabled="<%= kbSuggestionListManagementToolbarDisplayContext.isDisabled() %>"
 	filterDropdownItems="<%= kbSuggestionListManagementToolbarDisplayContext.getFilterDropdownItems() %>"
 	filterLabelItems="<%= kbSuggestionListManagementToolbarDisplayContext.getFilterLabelItems() %>"
 	itemsTotal="<%= kbSuggestionListManagementToolbarDisplayContext.getTotal() %>"
+	propsTransformer="admin/js/SuggestionsManagementToolbarPropsTransformer"
 	searchContainerId="kbComments"
 	selectable="<%= true %>"
 	showSearch="<%= false %>"
@@ -89,35 +89,3 @@ request.setAttribute("view_suggestions.jsp-searchContainer", kbCommentsSearchCon
 
 	<liferay-util:include page="/admin/common/view_suggestions_by_status.jsp" servletContext="<%= application %>" />
 </clay:container-fluid>
-
-<script>
-	var deleteKBComments = function () {
-		if (
-			confirm(
-				'<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />'
-			)
-		) {
-			var form = document.getElementById('<portlet:namespace />fm');
-
-			if (form) {
-				submitForm(form);
-			}
-		}
-	};
-
-	var ACTIONS = {
-		deleteKBComments: deleteKBComments,
-	};
-
-	Liferay.componentReady('kbSuggestionListManagementToolbar').then(function (
-		managementToolbar
-	) {
-		managementToolbar.on('actionItemClicked', function (event) {
-			var itemData = event.data.item.data;
-
-			if (itemData && itemData.action && ACTIONS[itemData.action]) {
-				ACTIONS[itemData.action]();
-			}
-		});
-	});
-</script>

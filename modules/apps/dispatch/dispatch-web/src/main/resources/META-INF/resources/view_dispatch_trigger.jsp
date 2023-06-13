@@ -19,10 +19,13 @@
 <%
 DispatchTriggerDisplayContext dispatchTriggerDisplayContext = (DispatchTriggerDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 
-PortletURL portletURL = dispatchTriggerDisplayContext.getPortletURL();
-
-portletURL.setParameter("tabs1", "dispatch-trigger");
-portletURL.setParameter("searchContainerId", "dispatchTriggers");
+PortletURL portletURL = PortletURLBuilder.create(
+	dispatchTriggerDisplayContext.getPortletURL()
+).setTabs1(
+	"dispatch-trigger"
+).setParameter(
+	"searchContainerId", "dispatchTriggers"
+).buildPortletURL();
 %>
 
 <clay:navigation-bar
@@ -49,15 +52,6 @@ portletURL.setParameter("searchContainerId", "dispatchTriggers");
 					keyProperty="dispatchTriggerId"
 					modelVar="dispatchTrigger"
 				>
-
-					<%
-					PortletURL rowURL = renderResponse.createRenderURL();
-
-					rowURL.setParameter("mvcRenderCommandName", "/dispatch/edit_dispatch_trigger");
-					rowURL.setParameter("redirect", currentURL);
-					rowURL.setParameter("dispatchTriggerId", String.valueOf(dispatchTrigger.getDispatchTriggerId()));
-					%>
-
 					<liferay-ui:search-container-column-jsp
 						cssClass="entry-action-column"
 						path="/dispatch_trigger_action.jsp"
@@ -65,13 +59,23 @@ portletURL.setParameter("searchContainerId", "dispatchTriggers");
 
 					<liferay-ui:search-container-column-text
 						cssClass="important table-cell-expand"
-						href="<%= rowURL %>"
+						href='<%=
+							PortletURLBuilder.createRenderURL(
+								renderResponse
+							).setMVCRenderCommandName(
+								"/dispatch/edit_dispatch_trigger"
+							).setRedirect(
+								currentURL
+							).setParameter(
+								"dispatchTriggerId", dispatchTrigger.getDispatchTriggerId()
+							).buildPortletURL()
+						%>'
 						property="name"
 					/>
 
 					<liferay-ui:search-container-column-text
 						name="task-executor-type"
-						value="<%= dispatchTriggerDisplayContext.getDispatchTaskExecutorName(dispatchTrigger.getDispatchTaskExecutorType(), locale) %>"
+						property="dispatchTaskExecutorType"
 					/>
 
 					<liferay-ui:search-container-column-text
@@ -84,9 +88,19 @@ portletURL.setParameter("searchContainerId", "dispatchTriggers");
 						property="createDate"
 					/>
 
+					<%
+					DispatchTriggerMetadata dispatchTriggerMetadata = dispatchTriggerDisplayContext.getDispatchTriggerMetadata(dispatchTrigger.getDispatchTriggerId());
+
+					String nextFireDateString = LanguageUtil.get(request, "not-scheduled");
+
+					if (dispatchTriggerMetadata.isDispatchTaskExecutorReady() && (dispatchTrigger.getNextFireDate() != null)) {
+						nextFireDateString = fastDateFormat.format(dispatchTrigger.getNextFireDate());
+					}
+					%>
+
 					<liferay-ui:search-container-column-text
 						name="next-fire-date"
-						value="<%= dispatchTriggerDisplayContext.getNextFireDateString(dispatchTrigger.getDispatchTriggerId()) %>"
+						value="<%= nextFireDateString %>"
 					/>
 
 					<liferay-ui:search-container-column-text
@@ -98,15 +112,28 @@ portletURL.setParameter("searchContainerId", "dispatchTriggers");
 						DispatchTaskStatus dispatchTaskStatus = dispatchTrigger.getDispatchTaskStatus();
 						%>
 
-						<h6 class="status-row-<%= row.getRowId() %> background-task-status-row background-task-status-<%= dispatchTaskStatus.getLabel() %> <%= dispatchTaskStatus.getCssClass() %>">
+						<h6 class="background-task-status-row background-task-status-<%= dispatchTaskStatus.getLabel() %> <%= dispatchTaskStatus.getCssClass() %>">
 							<liferay-ui:message key="<%= dispatchTaskStatus.getLabel() %>" />
 						</h6>
 					</liferay-ui:search-container-column-text>
 
-					<liferay-ui:search-container-column-jsp
-						cssClass="table-cell-ws-nowrap"
-						path="/trigger/buttons.jsp"
-					/>
+					<c:choose>
+						<c:when test="<%= dispatchTriggerMetadata.isDispatchTaskExecutorReady() %>">
+							<liferay-ui:search-container-column-jsp
+								cssClass="table-cell-ws-nowrap"
+								path="/trigger/buttons.jsp"
+							/>
+						</c:when>
+						<c:otherwise>
+							<liferay-ui:search-container-column-text
+								cssClass="important table-cell-ws-nowrap"
+							>
+								<h6 class="background-task-status-row text-warning">
+									<liferay-ui:message key="incomplete" />
+								</h6>
+							</liferay-ui:search-container-column-text>
+						</c:otherwise>
+					</c:choose>
 				</liferay-ui:search-container-row>
 
 				<liferay-ui:search-iterator

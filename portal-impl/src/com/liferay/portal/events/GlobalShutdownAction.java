@@ -17,7 +17,6 @@ package com.liferay.portal.events;
 import com.liferay.document.library.kernel.document.conversion.DocumentConversionUtil;
 import com.liferay.petra.executor.PortalExecutorManager;
 import com.liferay.petra.lang.CentralizedThreadLocal;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.fabric.server.FabricServerUtil;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -27,7 +26,6 @@ import com.liferay.portal.kernel.deploy.auto.AutoDeployDir;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployUtil;
 import com.liferay.portal.kernel.deploy.hot.HotDeployUtil;
 import com.liferay.portal.kernel.events.SimpleAction;
-import com.liferay.portal.kernel.javadoc.JavadocManagerUtil;
 import com.liferay.portal.kernel.log.Jdk14LogFactoryImpl;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -96,10 +94,6 @@ public class GlobalShutdownAction extends SimpleAction {
 		// Authentication
 
 		AuthPublicPathRegistry.unregister(PropsValues.AUTH_PUBLIC_PATHS);
-
-		// Javadoc
-
-		JavadocManagerUtil.unload(StringPool.BLANK);
 
 		// OpenOffice
 
@@ -174,6 +168,9 @@ public class GlobalShutdownAction extends SimpleAction {
 			LogFactoryUtil.setLogFactory(new Jdk14LogFactoryImpl());
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 
 		// Thread local registry
@@ -204,6 +201,9 @@ public class GlobalShutdownAction extends SimpleAction {
 					thread.interrupt();
 				}
 				catch (Exception exception) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(exception, exception);
+					}
 				}
 			}
 

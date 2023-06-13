@@ -31,7 +31,6 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
@@ -44,15 +43,12 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.engine.ConnectionInformation;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
 import com.liferay.portal.search.test.util.indexing.DocumentFixture;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -61,7 +57,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -91,7 +86,6 @@ public class DDMIndexerImplTest {
 	public void setUp() throws Exception {
 		ddmFixture.setUp();
 		documentFixture.setUp();
-
 		setUpPortalUtil();
 		setUpPropsUtil();
 
@@ -103,25 +97,6 @@ public class DDMIndexerImplTest {
 		ddmFixture.tearDown();
 
 		documentFixture.tearDown();
-	}
-
-	@Test
-	public void testExtractIndexableAttributes() {
-		String fieldName = "text1";
-		String indexType = "text";
-
-		_testExtractIndexableAttributes(
-			createDDMFormField(fieldName, indexType), StringPool.BLANK);
-		_testExtractIndexableAttributes(
-			createDDMFormField(fieldName, indexType), "Create New");
-		_testExtractIndexableAttributes(
-			createDDMFormField(fieldName, indexType), "null");
-
-		DDMFormField ddmFormField = createDDMFormField(fieldName, indexType);
-
-		ddmFormField.setRepeatable(true);
-
-		_testExtractIndexableAttributes(ddmFormField, StringPool.BLANK);
 	}
 
 	@Test
@@ -307,28 +282,6 @@ public class DDMIndexerImplTest {
 				ReflectionTestUtil.setFieldValue(
 					this, "_ddmIndexerConfiguration", ddmIndexerConfiguration);
 
-				searchEngineInformation = new SearchEngineInformation() {
-
-					public String getClientVersionString() {
-						return null;
-					}
-
-					public List<ConnectionInformation>
-						getConnectionInformationList() {
-
-						return null;
-					}
-
-					public String getNodesString() {
-						return null;
-					}
-
-					public String getVendorString() {
-						return null;
-					}
-
-				};
-
 				setDDMFormValuesToFieldsConverter(
 					new DDMFormValuesToFieldsConverterImpl());
 			}
@@ -392,27 +345,6 @@ public class DDMIndexerImplTest {
 		createDDMFormJSONSerializer();
 	protected DDMIndexer ddmIndexer;
 	protected final DocumentFixture documentFixture = new DocumentFixture();
-
-	private void _testExtractIndexableAttributes(
-		DDMFormField ddmFormField, String fieldValue) {
-
-		DDMForm ddmForm = DDMFormTestUtil.createDDMForm(
-			Collections.singleton(LocaleUtil.US), LocaleUtil.US);
-
-		ddmForm.addDDMFormField(ddmFormField);
-
-		Assert.assertEquals(
-			fieldValue,
-			ddmIndexer.extractIndexableAttributes(
-				createDDMStructure(ddmForm),
-				createDDMFormValues(
-					ddmForm,
-					DDMFormValuesTestUtil.createDDMFormFieldValue(
-						"text1",
-						DDMFormValuesTestUtil.createLocalizedValue(
-							fieldValue, LocaleUtil.US))),
-				LocaleUtil.US));
-	}
 
 	private Map<String, String> _withSortableValues(Map<String, String> map) {
 		Set<Map.Entry<String, String>> entrySet = map.entrySet();

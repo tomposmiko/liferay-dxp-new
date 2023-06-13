@@ -14,7 +14,6 @@
 
 package com.liferay.headless.form.internal.resource.v1_0.factory;
 
-import com.liferay.headless.form.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.form.resource.v1_0.FormDocumentResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,18 +33,14 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -53,7 +48,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +58,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Javier Gamarra
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/headless-form/v1.0/FormDocument",
-	service = FormDocumentResource.Factory.class
-)
+@Component(immediate = true, service = FormDocumentResource.Factory.class)
 @Generated("")
 public class FormDocumentResourceFactoryImpl
 	implements FormDocumentResource.Factory {
@@ -79,7 +73,9 @@ public class FormDocumentResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return _formDocumentResourceProxyProviderFunction.apply(
+				return (FormDocumentResource)ProxyUtil.newProxyInstance(
+					FormDocumentResource.class.getClassLoader(),
+					new Class<?>[] {FormDocumentResource.class},
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -138,32 +134,14 @@ public class FormDocumentResourceFactoryImpl
 		};
 	}
 
-	private static Function<InvocationHandler, FormDocumentResource>
-		_getProxyProviderFunction() {
+	@Activate
+	protected void activate() {
+		FormDocumentResource.FactoryHolder.factory = this;
+	}
 
-		Class<?> proxyClass = ProxyUtil.getProxyClass(
-			FormDocumentResource.class.getClassLoader(),
-			FormDocumentResource.class);
-
-		try {
-			Constructor<FormDocumentResource> constructor =
-				(Constructor<FormDocumentResource>)proxyClass.getConstructor(
-					InvocationHandler.class);
-
-			return invocationHandler -> {
-				try {
-					return constructor.newInstance(invocationHandler);
-				}
-				catch (ReflectiveOperationException
-							reflectiveOperationException) {
-
-					throw new InternalError(reflectiveOperationException);
-				}
-			};
-		}
-		catch (NoSuchMethodException noSuchMethodException) {
-			throw new InternalError(noSuchMethodException);
-		}
+	@Deactivate
+	protected void deactivate() {
+		FormDocumentResource.FactoryHolder.factory = null;
 	}
 
 	private Object _invoke(
@@ -186,7 +164,7 @@ public class FormDocumentResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		FormDocumentResource formDocumentResource =
@@ -210,7 +188,6 @@ public class FormDocumentResourceFactoryImpl
 		formDocumentResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		formDocumentResource.setRoleLocalService(_roleLocalService);
-		formDocumentResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(formDocumentResource, arguments);
@@ -226,10 +203,6 @@ public class FormDocumentResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
-
-	private static final Function<InvocationHandler, FormDocumentResource>
-		_formDocumentResourceProxyProviderFunction =
-			_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
@@ -252,6 +225,9 @@ public class FormDocumentResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -260,9 +236,6 @@ public class FormDocumentResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

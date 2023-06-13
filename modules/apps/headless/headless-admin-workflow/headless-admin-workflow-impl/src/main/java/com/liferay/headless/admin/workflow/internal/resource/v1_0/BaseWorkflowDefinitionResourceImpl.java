@@ -19,6 +19,7 @@ import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowDefinitionResou
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.GroupedModel;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -27,16 +28,12 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.ActionUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Array;
-
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -66,11 +63,19 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 		value = {
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "active"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
 				name = "page"
 			),
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
 				name = "pageSize"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "sort"
 			)
 		}
 	)
@@ -84,7 +89,11 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	@javax.ws.rs.Produces({"application/json", "application/xml"})
 	@Override
 	public Page<WorkflowDefinition> getWorkflowDefinitionsPage(
-			@javax.ws.rs.core.Context Pagination pagination)
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.ws.rs.QueryParam("active")
+			Boolean active,
+			@javax.ws.rs.core.Context Pagination pagination,
+			@javax.ws.rs.core.Context Sort[] sorts)
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
@@ -100,6 +109,10 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 			@io.swagger.v3.oas.annotations.Parameter(
 				in = io.swagger.v3.oas.annotations.enums.ParameterIn.PATH,
 				name = "name"
+			),
+			@io.swagger.v3.oas.annotations.Parameter(
+				in = io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY,
+				name = "version"
 			)
 		}
 	)
@@ -115,7 +128,10 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	public WorkflowDefinition getWorkflowDefinitionByName(
 			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
 			@javax.validation.constraints.NotNull @javax.ws.rs.PathParam("name")
-			String name)
+			String name,
+			@io.swagger.v3.oas.annotations.Parameter(hidden = true)
+			@javax.ws.rs.QueryParam("version")
+			Integer version)
 		throws Exception {
 
 		return new WorkflowDefinition();
@@ -315,10 +331,6 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 		this.roleLocalService = roleLocalService;
 	}
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider) {
-		this.sortParserProvider = sortParserProvider;
-	}
-
 	protected Map<String, String> addAction(
 		String actionName, GroupedModel groupedModel, String methodName) {
 
@@ -353,79 +365,32 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 			actionName, siteId, methodName, null, permissionName, siteId);
 	}
 
-	protected <T, R, E extends Throwable> List<R> transform(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction) {
+	protected <T, R> List<R> transform(
+		java.util.Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction) {
 
 		return TransformUtil.transform(collection, unsafeFunction);
 	}
 
-	protected <T, R, E extends Throwable> R[] transform(
-		T[] array, UnsafeFunction<T, R, E> unsafeFunction, Class<?> clazz) {
+	protected <T, R> R[] transform(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction,
+		Class<?> clazz) {
 
 		return TransformUtil.transform(array, unsafeFunction, clazz);
 	}
 
-	protected <T, R, E extends Throwable> R[] transformToArray(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-		Class<?> clazz) {
+	protected <T, R> R[] transformToArray(
+		java.util.Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction, Class<?> clazz) {
 
 		return TransformUtil.transformToArray(
 			collection, unsafeFunction, clazz);
 	}
 
-	protected <T, R, E extends Throwable> List<R> transformToList(
-		T[] array, UnsafeFunction<T, R, E> unsafeFunction) {
+	protected <T, R> List<R> transformToList(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction) {
 
 		return TransformUtil.transformToList(array, unsafeFunction);
-	}
-
-	protected <T, R, E extends Throwable> long[] transformToLongArray(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction) {
-
-		try {
-			return unsafeTransformToLongArray(collection, unsafeFunction);
-		}
-		catch (Throwable throwable) {
-			throw new RuntimeException(throwable);
-		}
-	}
-
-	protected <T, R, E extends Throwable> List<R> unsafeTransform(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return TransformUtil.unsafeTransform(collection, unsafeFunction);
-	}
-
-	protected <T, R, E extends Throwable> R[] unsafeTransform(
-			T[] array, UnsafeFunction<T, R, E> unsafeFunction, Class<?> clazz)
-		throws E {
-
-		return TransformUtil.unsafeTransform(array, unsafeFunction, clazz);
-	}
-
-	protected <T, R, E extends Throwable> R[] unsafeTransformToArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-			Class<?> clazz)
-		throws E {
-
-		return TransformUtil.unsafeTransformToArray(
-			collection, unsafeFunction, clazz);
-	}
-
-	protected <T, R, E extends Throwable> List<R> unsafeTransformToList(
-			T[] array, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return TransformUtil.unsafeTransformToList(array, unsafeFunction);
-	}
-
-	protected <T, R, E extends Throwable> long[] unsafeTransformToLongArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return (long[])_unsafeTransformToPrimitiveArray(
-			collection, unsafeFunction, long[].class);
 	}
 
 	protected AcceptLanguage contextAcceptLanguage;
@@ -441,24 +406,6 @@ public abstract class BaseWorkflowDefinitionResourceImpl
 	protected ResourceActionLocalService resourceActionLocalService;
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
 	protected RoleLocalService roleLocalService;
-	protected SortParserProvider sortParserProvider;
-
-	private <T, R, E extends Throwable> Object _unsafeTransformToPrimitiveArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-			Class<?> clazz)
-		throws E {
-
-		List<R> list = unsafeTransform(collection, unsafeFunction);
-
-		Object array = clazz.cast(
-			Array.newInstance(clazz.getComponentType(), list.size()));
-
-		for (int i = 0; i < list.size(); i++) {
-			Array.set(array, i, list.get(i));
-		}
-
-		return array;
-	}
 
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseWorkflowDefinitionResourceImpl.class);

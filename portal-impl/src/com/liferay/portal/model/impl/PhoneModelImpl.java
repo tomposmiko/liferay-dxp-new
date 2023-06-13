@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -321,68 +322,89 @@ public class PhoneModelImpl extends BaseModelImpl<Phone> implements PhoneModel {
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Phone, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Phone>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Phone, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Phone, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Phone.class.getClassLoader(), Phone.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", Phone::getMvccVersion);
-		attributeGetterFunctions.put("uuid", Phone::getUuid);
-		attributeGetterFunctions.put("phoneId", Phone::getPhoneId);
-		attributeGetterFunctions.put("companyId", Phone::getCompanyId);
-		attributeGetterFunctions.put("userId", Phone::getUserId);
-		attributeGetterFunctions.put("userName", Phone::getUserName);
-		attributeGetterFunctions.put("createDate", Phone::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", Phone::getModifiedDate);
-		attributeGetterFunctions.put("classNameId", Phone::getClassNameId);
-		attributeGetterFunctions.put("classPK", Phone::getClassPK);
-		attributeGetterFunctions.put("number", Phone::getNumber);
-		attributeGetterFunctions.put("extension", Phone::getExtension);
-		attributeGetterFunctions.put("typeId", Phone::getTypeId);
-		attributeGetterFunctions.put("primary", Phone::getPrimary);
+		try {
+			Constructor<Phone> constructor =
+				(Constructor<Phone>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Phone, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Phone, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Phone, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Phone, Object>>();
 		Map<String, BiConsumer<Phone, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Phone, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", Phone::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion", (BiConsumer<Phone, Long>)Phone::setMvccVersion);
+		attributeGetterFunctions.put("uuid", Phone::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<Phone, String>)Phone::setUuid);
+		attributeGetterFunctions.put("phoneId", Phone::getPhoneId);
 		attributeSetterBiConsumers.put(
 			"phoneId", (BiConsumer<Phone, Long>)Phone::setPhoneId);
+		attributeGetterFunctions.put("companyId", Phone::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<Phone, Long>)Phone::setCompanyId);
+		attributeGetterFunctions.put("userId", Phone::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<Phone, Long>)Phone::setUserId);
+		attributeGetterFunctions.put("userName", Phone::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<Phone, String>)Phone::setUserName);
+		attributeGetterFunctions.put("createDate", Phone::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<Phone, Date>)Phone::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", Phone::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate", (BiConsumer<Phone, Date>)Phone::setModifiedDate);
+		attributeGetterFunctions.put("classNameId", Phone::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId", (BiConsumer<Phone, Long>)Phone::setClassNameId);
+		attributeGetterFunctions.put("classPK", Phone::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK", (BiConsumer<Phone, Long>)Phone::setClassPK);
+		attributeGetterFunctions.put("number", Phone::getNumber);
 		attributeSetterBiConsumers.put(
 			"number", (BiConsumer<Phone, String>)Phone::setNumber);
+		attributeGetterFunctions.put("extension", Phone::getExtension);
 		attributeSetterBiConsumers.put(
 			"extension", (BiConsumer<Phone, String>)Phone::setExtension);
+		attributeGetterFunctions.put("typeId", Phone::getTypeId);
 		attributeSetterBiConsumers.put(
 			"typeId", (BiConsumer<Phone, Long>)Phone::setTypeId);
+		attributeGetterFunctions.put("primary", Phone::getPrimary);
 		attributeSetterBiConsumers.put(
 			"primary", (BiConsumer<Phone, Boolean>)Phone::setPrimary);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -805,6 +827,33 @@ public class PhoneModelImpl extends BaseModelImpl<Phone> implements PhoneModel {
 	}
 
 	@Override
+	public Phone cloneWithOriginalValues() {
+		PhoneImpl phoneImpl = new PhoneImpl();
+
+		phoneImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		phoneImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		phoneImpl.setPhoneId(this.<Long>getColumnOriginalValue("phoneId"));
+		phoneImpl.setCompanyId(this.<Long>getColumnOriginalValue("companyId"));
+		phoneImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		phoneImpl.setUserName(this.<String>getColumnOriginalValue("userName"));
+		phoneImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		phoneImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		phoneImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		phoneImpl.setClassPK(this.<Long>getColumnOriginalValue("classPK"));
+		phoneImpl.setNumber(this.<String>getColumnOriginalValue("number_"));
+		phoneImpl.setExtension(
+			this.<String>getColumnOriginalValue("extension"));
+		phoneImpl.setTypeId(this.<Long>getColumnOriginalValue("typeId"));
+		phoneImpl.setPrimary(this.<Boolean>getColumnOriginalValue("primary_"));
+
+		return phoneImpl;
+	}
+
+	@Override
 	public int compareTo(Phone phone) {
 		int value = 0;
 
@@ -1025,9 +1074,7 @@ public class PhoneModelImpl extends BaseModelImpl<Phone> implements PhoneModel {
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Phone>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Phone.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

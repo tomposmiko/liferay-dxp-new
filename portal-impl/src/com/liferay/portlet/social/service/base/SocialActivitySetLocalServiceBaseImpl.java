@@ -29,8 +29,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -45,8 +43,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.social.kernel.model.SocialActivitySet;
 import com.liferay.social.kernel.service.SocialActivitySetLocalService;
 import com.liferay.social.kernel.service.SocialActivitySetLocalServiceUtil;
-import com.liferay.social.kernel.service.persistence.SocialActivityFinder;
-import com.liferay.social.kernel.service.persistence.SocialActivityPersistence;
 import com.liferay.social.kernel.service.persistence.SocialActivitySetFinder;
 import com.liferay.social.kernel.service.persistence.SocialActivitySetPersistence;
 
@@ -313,6 +309,7 @@ public abstract class SocialActivitySetLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -331,6 +328,7 @@ public abstract class SocialActivitySetLocalServiceBaseImpl
 			(SocialActivitySet)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<SocialActivitySet> getBasePersistence() {
 		return socialActivitySetPersistence;
 	}
@@ -472,69 +470,6 @@ public abstract class SocialActivitySetLocalServiceBaseImpl
 		this.counterLocalService = counterLocalService;
 	}
 
-	/**
-	 * Returns the social activity local service.
-	 *
-	 * @return the social activity local service
-	 */
-	public com.liferay.social.kernel.service.SocialActivityLocalService
-		getSocialActivityLocalService() {
-
-		return socialActivityLocalService;
-	}
-
-	/**
-	 * Sets the social activity local service.
-	 *
-	 * @param socialActivityLocalService the social activity local service
-	 */
-	public void setSocialActivityLocalService(
-		com.liferay.social.kernel.service.SocialActivityLocalService
-			socialActivityLocalService) {
-
-		this.socialActivityLocalService = socialActivityLocalService;
-	}
-
-	/**
-	 * Returns the social activity persistence.
-	 *
-	 * @return the social activity persistence
-	 */
-	public SocialActivityPersistence getSocialActivityPersistence() {
-		return socialActivityPersistence;
-	}
-
-	/**
-	 * Sets the social activity persistence.
-	 *
-	 * @param socialActivityPersistence the social activity persistence
-	 */
-	public void setSocialActivityPersistence(
-		SocialActivityPersistence socialActivityPersistence) {
-
-		this.socialActivityPersistence = socialActivityPersistence;
-	}
-
-	/**
-	 * Returns the social activity finder.
-	 *
-	 * @return the social activity finder
-	 */
-	public SocialActivityFinder getSocialActivityFinder() {
-		return socialActivityFinder;
-	}
-
-	/**
-	 * Sets the social activity finder.
-	 *
-	 * @param socialActivityFinder the social activity finder
-	 */
-	public void setSocialActivityFinder(
-		SocialActivityFinder socialActivityFinder) {
-
-		this.socialActivityFinder = socialActivityFinder;
-	}
-
 	public void afterPropertiesSet() {
 		persistedModelLocalServiceRegistry.register(
 			"com.liferay.social.kernel.model.SocialActivitySet",
@@ -639,21 +574,6 @@ public abstract class SocialActivitySetLocalServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@BeanReference(
-		type = com.liferay.social.kernel.service.SocialActivityLocalService.class
-	)
-	protected com.liferay.social.kernel.service.SocialActivityLocalService
-		socialActivityLocalService;
-
-	@BeanReference(type = SocialActivityPersistence.class)
-	protected SocialActivityPersistence socialActivityPersistence;
-
-	@BeanReference(type = SocialActivityFinder.class)
-	protected SocialActivityFinder socialActivityFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SocialActivitySetLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

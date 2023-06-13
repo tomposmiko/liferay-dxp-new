@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.search.facet.FacetPostProcessor;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.search.configuration.DefaultSearchResultPermissionFilterConfiguration;
-import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
 
 import java.util.Map;
 
@@ -57,7 +56,6 @@ public class SearchResultPermissionFilterFactoryImpl
 			relatedEntryIndexerRegistry,
 			searchContext -> _search(
 				searchResultPermissionFilterSearcher, searchContext),
-			searchRequestBuilderFactory,
 			_defaultSearchResultPermissionFilterConfiguration);
 	}
 
@@ -81,9 +79,6 @@ public class SearchResultPermissionFilterFactoryImpl
 
 	@Reference
 	protected RelatedEntryIndexerRegistry relatedEntryIndexerRegistry;
-
-	@Reference
-	protected SearchRequestBuilderFactory searchRequestBuilderFactory;
 
 	private Hits _search(
 		SearchResultPermissionFilterSearcher

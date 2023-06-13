@@ -42,11 +42,11 @@ public class CommercePaymentMethodGroupRelServiceUtil {
 	 */
 	public static com.liferay.commerce.model.CommerceAddressRestriction
 			addCommerceAddressRestriction(
-				long userId, long groupId, long classPK, long commerceCountryId)
+				long groupId, long classPK, long countryId)
 		throws PortalException {
 
 		return getService().addCommerceAddressRestriction(
-			userId, groupId, classPK, commerceCountryId);
+			groupId, classPK, countryId);
 	}
 
 	/**
@@ -55,26 +55,25 @@ public class CommercePaymentMethodGroupRelServiceUtil {
 	@Deprecated
 	public static com.liferay.commerce.model.CommerceAddressRestriction
 			addCommerceAddressRestriction(
-				long classPK, long commerceCountryId,
+				long classPK, long countryId,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addCommerceAddressRestriction(
-			classPK, commerceCountryId, serviceContext);
+			classPK, countryId, serviceContext);
 	}
 
 	public static CommercePaymentMethodGroupRel
 			addCommercePaymentMethodGroupRel(
-				long userId, long groupId,
-				Map<java.util.Locale, String> nameMap,
+				long groupId, Map<java.util.Locale, String> nameMap,
 				Map<java.util.Locale, String> descriptionMap,
 				java.io.File imageFile, String engineKey, double priority,
 				boolean active)
 		throws PortalException {
 
 		return getService().addCommercePaymentMethodGroupRel(
-			userId, groupId, nameMap, descriptionMap, imageFile, engineKey,
-			priority, active);
+			groupId, nameMap, descriptionMap, imageFile, engineKey, priority,
+			active);
 	}
 
 	public static void deleteCommerceAddressRestriction(
@@ -191,11 +190,11 @@ public class CommercePaymentMethodGroupRelServiceUtil {
 
 	public static List<CommercePaymentMethodGroupRel>
 			getCommercePaymentMethodGroupRels(
-				long groupId, long commerceCountryId, boolean active)
+				long groupId, long countryId, boolean active)
 		throws PortalException {
 
 		return getService().getCommercePaymentMethodGroupRels(
-			groupId, commerceCountryId, active);
+			groupId, countryId, active);
 	}
 
 	public static int getCommercePaymentMethodGroupRelsCount(long groupId)

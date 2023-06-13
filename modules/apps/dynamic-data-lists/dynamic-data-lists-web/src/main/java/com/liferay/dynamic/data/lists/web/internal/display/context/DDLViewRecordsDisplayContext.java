@@ -23,7 +23,7 @@ import com.liferay.dynamic.data.lists.model.DDLRecordVersion;
 import com.liferay.dynamic.data.lists.service.DDLRecordLocalServiceUtil;
 import com.liferay.dynamic.data.lists.util.comparator.DDLRecordCreateDateComparator;
 import com.liferay.dynamic.data.lists.util.comparator.DDLRecordModifiedDateComparator;
-import com.liferay.dynamic.data.lists.web.internal.display.context.util.DDLRequestHelper;
+import com.liferay.dynamic.data.lists.web.internal.display.context.helper.DDLRequestHelper;
 import com.liferay.dynamic.data.lists.web.internal.search.RecordSearch;
 import com.liferay.dynamic.data.lists.web.internal.security.permission.resource.DDLRecordSetPermission;
 import com.liferay.dynamic.data.mapping.exception.StorageException;
@@ -40,6 +40,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuil
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
@@ -50,6 +51,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
@@ -128,12 +130,11 @@ public class DDLViewRecordsDisplayContext {
 	}
 
 	public String getClearResultsURL() throws PortletException {
-		PortletURL clearResultsURL = PortletURLUtil.clone(
-			getPortletURL(), _liferayPortletResponse);
-
-		clearResultsURL.setParameter("keywords", StringPool.BLANK);
-
-		return clearResultsURL.toString();
+		return PortletURLBuilder.create(
+			PortletURLUtil.clone(getPortletURL(), _liferayPortletResponse)
+		).setKeywords(
+			StringPool.BLANK
+		).buildString();
 	}
 
 	public CreationMenu getCreationMenu() throws PortalException {
@@ -193,7 +194,13 @@ public class DDLViewRecordsDisplayContext {
 				addDDMFormField(ddmFormFields, ddmFormField);
 			}
 
-			_ddmFormFields = ddmFormFields;
+			int totalColumns = _TOTAL_COLUMNS;
+
+			if (ddmFormFields.size() < totalColumns) {
+				totalColumns = ddmFormFields.size();
+			}
+
+			_ddmFormFields = ddmFormFields.subList(0, totalColumns);
 		}
 
 		return _ddmFormFields;
@@ -258,65 +265,103 @@ public class DDLViewRecordsDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		return ParamUtil.getString(
-			_liferayPortletRequest, "orderByCol", "modified-date");
+		if (Validator.isNotNull(_orderByCol)) {
+			return _orderByCol;
+		}
+
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			_liferayPortletRequest, DDLPortletKeys.DYNAMIC_DATA_LISTS,
+			"view-records-order-by-col", "modified-date");
+
+		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		return ParamUtil.getString(
-			_liferayPortletRequest, "orderByType", "asc");
+		if (Validator.isNotNull(_orderByType)) {
+			return _orderByType;
+		}
+
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_liferayPortletRequest, DDLPortletKeys.DYNAMIC_DATA_LISTS,
+			"view-records-order-by-type", "asc");
+
+		return _orderByType;
 	}
 
 	public PortletURL getPortletURL() {
-		PortletURL portletURL = PortletURLUtil.getCurrent(
-			_liferayPortletRequest, _liferayPortletResponse);
+		return PortletURLBuilder.create(
+			PortletURLUtil.getCurrent(
+				_liferayPortletRequest, _liferayPortletResponse)
+		).setMVCPath(
+			getMVCPath()
+		).setRedirect(
+			ParamUtil.getString(_liferayPortletRequest, "redirect")
+		).setKeywords(
+			() -> {
+				String keywords = getKeywords();
 
-		portletURL.setParameter("mvcPath", getMVCPath());
-		portletURL.setParameter(
-			"redirect",
-			ParamUtil.getString(_liferayPortletRequest, "redirect"));
-		portletURL.setParameter(
-			"recordSetId", String.valueOf(_ddlRecordSet.getRecordSetId()));
+				if (Validator.isNotNull(keywords)) {
+					return keywords;
+				}
 
-		String delta = ParamUtil.getString(_liferayPortletRequest, "delta");
+				return null;
+			}
+		).setParameter(
+			"delta",
+			() -> {
+				String delta = ParamUtil.getString(
+					_liferayPortletRequest, "delta");
 
-		if (Validator.isNotNull(delta)) {
-			portletURL.setParameter("delta", delta);
-		}
+				if (Validator.isNotNull(delta)) {
+					return delta;
+				}
 
-		String displayStyle = getDisplayStyle();
+				return null;
+			}
+		).setParameter(
+			"displayStyle",
+			() -> {
+				String displayStyle = getDisplayStyle();
 
-		if (Validator.isNotNull(displayStyle)) {
-			portletURL.setParameter("displayStyle", displayStyle);
-		}
+				if (Validator.isNotNull(displayStyle)) {
+					return displayStyle;
+				}
 
-		String keywords = getKeywords();
+				return null;
+			}
+		).setParameter(
+			"orderByCol",
+			() -> {
+				String orderByCol = getOrderByCol();
 
-		if (Validator.isNotNull(keywords)) {
-			portletURL.setParameter("keywords", keywords);
-		}
+				if (Validator.isNotNull(orderByCol)) {
+					return orderByCol;
+				}
 
-		String orderByCol = getOrderByCol();
+				return null;
+			}
+		).setParameter(
+			"orderByType",
+			() -> {
+				String orderByType = getOrderByType();
 
-		if (Validator.isNotNull(orderByCol)) {
-			portletURL.setParameter("orderByCol", orderByCol);
-		}
+				if (Validator.isNotNull(orderByType)) {
+					return orderByType;
+				}
 
-		String orderByType = getOrderByType();
-
-		if (Validator.isNotNull(orderByType)) {
-			portletURL.setParameter("orderByType", orderByType);
-		}
-
-		return portletURL;
+				return null;
+			}
+		).setParameter(
+			"recordSetId", _ddlRecordSet.getRecordSetId()
+		).buildPortletURL();
 	}
 
 	public SearchContainer<?> getSearch() throws PortalException {
-		String displayStyle = getDisplayStyle();
-
-		PortletURL portletURL = getPortletURL();
-
-		portletURL.setParameter("displayStyle", displayStyle);
+		PortletURL portletURL = PortletURLBuilder.create(
+			getPortletURL()
+		).setParameter(
+			"displayStyle", getDisplayStyle()
+		).buildPortletURL();
 
 		List<String> headerNames = new ArrayList<>();
 
@@ -339,16 +384,6 @@ public class DDLViewRecordsDisplayContext {
 		SearchContainer<DDLRecord> recordSearch = new RecordSearch(
 			_liferayPortletRequest, portletURL, headerNames);
 
-		if (!_user.isDefaultUser()) {
-			recordSearch.setRowChecker(
-				new EmptyOnClickRowChecker(_liferayPortletResponse));
-		}
-
-		recordSearch.setOrderByCol(getOrderByCol());
-		recordSearch.setOrderByComparator(
-			getDDLRecordOrderByComparator(getOrderByCol(), getOrderByType()));
-		recordSearch.setOrderByType(getOrderByType());
-
 		if (recordSearch.isSearch()) {
 			recordSearch.setEmptyResultsMessage(
 				LanguageUtil.format(
@@ -359,6 +394,16 @@ public class DDLViewRecordsDisplayContext {
 			recordSearch.setEmptyResultsMessage("there-are-no-records");
 		}
 
+		recordSearch.setOrderByCol(getOrderByCol());
+		recordSearch.setOrderByComparator(
+			getDDLRecordOrderByComparator(getOrderByCol(), getOrderByType()));
+		recordSearch.setOrderByType(getOrderByType());
+
+		if (!_user.isDefaultUser()) {
+			recordSearch.setRowChecker(
+				new EmptyOnClickRowChecker(_liferayPortletResponse));
+		}
+
 		setDDLRecordSearchResults(recordSearch);
 		setDDLRecordSearchTotal(recordSearch);
 
@@ -366,15 +411,15 @@ public class DDLViewRecordsDisplayContext {
 	}
 
 	public String getSearchActionURL() {
-		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
-
-		portletURL.setParameter("mvcPath", getMVCPath());
-		portletURL.setParameter(
-			"redirect", PortalUtil.getCurrentURL(_liferayPortletRequest));
-		portletURL.setParameter(
-			"recordSetId", String.valueOf(_ddlRecordSet.getRecordSetId()));
-
-		return portletURL.toString();
+		return PortletURLBuilder.createRenderURL(
+			_liferayPortletResponse
+		).setMVCPath(
+			getMVCPath()
+		).setRedirect(
+			PortalUtil.getCurrentURL(_liferayPortletRequest)
+		).setParameter(
+			"recordSetId", _ddlRecordSet.getRecordSetId()
+		).buildString();
 	}
 
 	public String getSearchContainerId() {
@@ -382,16 +427,21 @@ public class DDLViewRecordsDisplayContext {
 	}
 
 	public String getSortingURL() throws Exception {
-		PortletURL sortingURL = PortletURLUtil.clone(
-			getPortletURL(), _liferayPortletResponse);
+		return PortletURLBuilder.create(
+			PortletURLUtil.clone(getPortletURL(), _liferayPortletResponse)
+		).setParameter(
+			"orderByType",
+			() -> {
+				String orderByType = ParamUtil.getString(
+					_liferayPortletRequest, "orderByType");
 
-		String orderByType = ParamUtil.getString(
-			_liferayPortletRequest, "orderByType");
+				if (orderByType.equals("asc")) {
+					return "desc";
+				}
 
-		sortingURL.setParameter(
-			"orderByType", orderByType.equals("asc") ? "desc" : "asc");
-
-		return sortingURL.toString();
+				return "asc";
+			}
+		).buildString();
 	}
 
 	public int getTotalItems() throws PortalException {
@@ -431,11 +481,7 @@ public class DDLViewRecordsDisplayContext {
 	}
 
 	public boolean isDisabledManagementBar() throws PortalException {
-		if (hasResults()) {
-			return false;
-		}
-
-		if (isSearch()) {
+		if (hasResults() || isSearch()) {
 			return false;
 		}
 
@@ -664,6 +710,8 @@ public class DDLViewRecordsDisplayContext {
 		recordSearch.setTotal(total);
 	}
 
+	private static final int _TOTAL_COLUMNS = 5;
+
 	private final DDLRecordSet _ddlRecordSet;
 	private final DDLRequestHelper _ddlRequestHelper;
 	private List<DDMFormField> _ddmFormFields;
@@ -671,6 +719,8 @@ public class DDLViewRecordsDisplayContext {
 	private final long _formDDMTemplateId;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
+	private String _orderByCol;
+	private String _orderByType;
 	private final User _user;
 
 }

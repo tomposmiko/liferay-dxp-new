@@ -14,7 +14,6 @@
 
 package com.liferay.headless.commerce.delivery.catalog.internal.resource.v1_0.factory;
 
-import com.liferay.headless.commerce.delivery.catalog.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.commerce.delivery.catalog.resource.v1_0.RelatedProductResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,18 +33,14 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -53,7 +48,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -62,7 +59,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @generated
  */
 @Component(
-	property = "resource.locator.key=/headless-commerce-delivery-catalog/v1.0/RelatedProduct",
+	enabled = false, immediate = true,
 	service = RelatedProductResource.Factory.class
 )
 @Generated("")
@@ -79,7 +76,9 @@ public class RelatedProductResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return _relatedProductResourceProxyProviderFunction.apply(
+				return (RelatedProductResource)ProxyUtil.newProxyInstance(
+					RelatedProductResource.class.getClassLoader(),
+					new Class<?>[] {RelatedProductResource.class},
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -138,32 +137,14 @@ public class RelatedProductResourceFactoryImpl
 		};
 	}
 
-	private static Function<InvocationHandler, RelatedProductResource>
-		_getProxyProviderFunction() {
+	@Activate
+	protected void activate() {
+		RelatedProductResource.FactoryHolder.factory = this;
+	}
 
-		Class<?> proxyClass = ProxyUtil.getProxyClass(
-			RelatedProductResource.class.getClassLoader(),
-			RelatedProductResource.class);
-
-		try {
-			Constructor<RelatedProductResource> constructor =
-				(Constructor<RelatedProductResource>)proxyClass.getConstructor(
-					InvocationHandler.class);
-
-			return invocationHandler -> {
-				try {
-					return constructor.newInstance(invocationHandler);
-				}
-				catch (ReflectiveOperationException
-							reflectiveOperationException) {
-
-					throw new InternalError(reflectiveOperationException);
-				}
-			};
-		}
-		catch (NoSuchMethodException noSuchMethodException) {
-			throw new InternalError(noSuchMethodException);
-		}
+	@Deactivate
+	protected void deactivate() {
+		RelatedProductResource.FactoryHolder.factory = null;
 	}
 
 	private Object _invoke(
@@ -186,7 +167,7 @@ public class RelatedProductResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		RelatedProductResource relatedProductResource =
@@ -211,7 +192,6 @@ public class RelatedProductResourceFactoryImpl
 		relatedProductResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		relatedProductResource.setRoleLocalService(_roleLocalService);
-		relatedProductResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(relatedProductResource, arguments);
@@ -227,10 +207,6 @@ public class RelatedProductResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
-
-	private static final Function<InvocationHandler, RelatedProductResource>
-		_relatedProductResourceProxyProviderFunction =
-			_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
@@ -253,6 +229,9 @@ public class RelatedProductResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -261,9 +240,6 @@ public class RelatedProductResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

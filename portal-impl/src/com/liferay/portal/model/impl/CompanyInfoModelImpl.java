@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -217,43 +218,65 @@ public class CompanyInfoModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<CompanyInfo, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, CompanyInfo>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<CompanyInfo, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<CompanyInfo, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CompanyInfo.class.getClassLoader(), CompanyInfo.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", CompanyInfo::getMvccVersion);
-		attributeGetterFunctions.put(
-			"companyInfoId", CompanyInfo::getCompanyInfoId);
-		attributeGetterFunctions.put("companyId", CompanyInfo::getCompanyId);
-		attributeGetterFunctions.put("key", CompanyInfo::getKey);
+		try {
+			Constructor<CompanyInfo> constructor =
+				(Constructor<CompanyInfo>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<CompanyInfo, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<CompanyInfo, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<CompanyInfo, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<CompanyInfo, Object>>();
 		Map<String, BiConsumer<CompanyInfo, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<CompanyInfo, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CompanyInfo::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<CompanyInfo, Long>)CompanyInfo::setMvccVersion);
+		attributeGetterFunctions.put(
+			"companyInfoId", CompanyInfo::getCompanyInfoId);
 		attributeSetterBiConsumers.put(
 			"companyInfoId",
 			(BiConsumer<CompanyInfo, Long>)CompanyInfo::setCompanyInfoId);
+		attributeGetterFunctions.put("companyId", CompanyInfo::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CompanyInfo, Long>)CompanyInfo::setCompanyId);
+		attributeGetterFunctions.put("key", CompanyInfo::getKey);
 		attributeSetterBiConsumers.put(
 			"key", (BiConsumer<CompanyInfo, String>)CompanyInfo::setKey);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -391,6 +414,21 @@ public class CompanyInfoModelImpl
 		companyInfoImpl.setKey(getKey());
 
 		companyInfoImpl.resetOriginalValues();
+
+		return companyInfoImpl;
+	}
+
+	@Override
+	public CompanyInfo cloneWithOriginalValues() {
+		CompanyInfoImpl companyInfoImpl = new CompanyInfoImpl();
+
+		companyInfoImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		companyInfoImpl.setCompanyInfoId(
+			this.<Long>getColumnOriginalValue("companyInfoId"));
+		companyInfoImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		companyInfoImpl.setKey(this.<String>getColumnOriginalValue("key_"));
 
 		return companyInfoImpl;
 	}
@@ -567,9 +605,7 @@ public class CompanyInfoModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CompanyInfo>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CompanyInfo.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

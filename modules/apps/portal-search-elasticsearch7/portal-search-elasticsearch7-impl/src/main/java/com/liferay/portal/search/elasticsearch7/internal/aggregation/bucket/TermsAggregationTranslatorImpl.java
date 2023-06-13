@@ -71,7 +71,7 @@ public class TermsAggregationTranslatorImpl
 				termsAggregation.getMinDocCount());
 		}
 
-		if (ListUtil.isNotEmpty(termsAggregation.getOrders())) {
+		if (!ListUtil.isEmpty(termsAggregation.getOrders())) {
 			List<BucketOrder> bucketOrders = _orderTranslator.translate(
 				termsAggregation.getOrders());
 

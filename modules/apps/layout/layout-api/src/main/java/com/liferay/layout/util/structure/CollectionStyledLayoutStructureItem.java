@@ -55,7 +55,13 @@ public class CollectionStyledLayoutStructureItem
 				collectionStyledLayoutStructureItem._numberOfColumns) ||
 			!Objects.equals(
 				_numberOfItems,
-				collectionStyledLayoutStructureItem._numberOfItems)) {
+				collectionStyledLayoutStructureItem._numberOfItems) ||
+			!Objects.equals(
+				_numberOfItemsPerPage,
+				collectionStyledLayoutStructureItem._numberOfItemsPerPage) ||
+			!Objects.equals(
+				_paginationType,
+				collectionStyledLayoutStructureItem._paginationType)) {
 
 			return false;
 		}
@@ -81,6 +87,12 @@ public class CollectionStyledLayoutStructureItem
 			"numberOfColumns", _numberOfColumns
 		).put(
 			"numberOfItems", _numberOfItems
+		).put(
+			"numberOfItemsPerPage", _numberOfItemsPerPage
+		).put(
+			"paginationType", _paginationType
+		).put(
+			"showAllItems", _showAllItems
 		).put(
 			"templateKey", _templateKey
 		);
@@ -115,6 +127,14 @@ public class CollectionStyledLayoutStructureItem
 		return _numberOfItems;
 	}
 
+	public int getNumberOfItemsPerPage() {
+		return _numberOfItemsPerPage;
+	}
+
+	public String getPaginationType() {
+		return _paginationType;
+	}
+
 	public String getTemplateKey() {
 		return _templateKey;
 	}
@@ -122,6 +142,10 @@ public class CollectionStyledLayoutStructureItem
 	@Override
 	public int hashCode() {
 		return HashUtil.hash(0, getItemId());
+	}
+
+	public boolean isShowAllItems() {
+		return _showAllItems;
 	}
 
 	public void setCollectionJSONObject(JSONObject collectionJSONObject) {
@@ -151,6 +175,18 @@ public class CollectionStyledLayoutStructureItem
 		_numberOfItems = numberOfItems;
 	}
 
+	public void setNumberOfItemsPerPage(int numberOfItemsPerPage) {
+		_numberOfItemsPerPage = numberOfItemsPerPage;
+	}
+
+	public void setPaginationType(String paginationType) {
+		_paginationType = paginationType;
+	}
+
+	public void setShowAllItems(Boolean showAllItems) {
+		_showAllItems = showAllItems;
+	}
+
 	public void setTemplateKey(String templateKey) {
 		_templateKey = templateKey;
 	}
@@ -162,6 +198,10 @@ public class CollectionStyledLayoutStructureItem
 		if (itemConfigJSONObject.has("collection")) {
 			setCollectionJSONObject(
 				itemConfigJSONObject.getJSONObject("collection"));
+		}
+
+		if (itemConfigJSONObject.has("showAllItems")) {
+			setShowAllItems(itemConfigJSONObject.getBoolean("showAllItems"));
 		}
 
 		if (itemConfigJSONObject.has("listItemStyle")) {
@@ -180,6 +220,15 @@ public class CollectionStyledLayoutStructureItem
 			setNumberOfItems(itemConfigJSONObject.getInt("numberOfItems"));
 		}
 
+		if (itemConfigJSONObject.has("numberOfItemsPerPage")) {
+			setNumberOfItemsPerPage(
+				itemConfigJSONObject.getInt("numberOfItemsPerPage"));
+		}
+
+		if (itemConfigJSONObject.has("paginationType")) {
+			setPaginationType(itemConfigJSONObject.getString("paginationType"));
+		}
+
 		if (itemConfigJSONObject.has("templateKey")) {
 			setTemplateKey(itemConfigJSONObject.getString("templateKey"));
 		}
@@ -190,6 +239,9 @@ public class CollectionStyledLayoutStructureItem
 	private String _listStyle;
 	private int _numberOfColumns = 1;
 	private int _numberOfItems = 5;
+	private int _numberOfItemsPerPage = 5;
+	private String _paginationType;
+	private boolean _showAllItems;
 	private String _templateKey;
 
 }

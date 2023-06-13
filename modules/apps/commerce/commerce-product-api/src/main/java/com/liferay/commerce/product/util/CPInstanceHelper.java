@@ -24,6 +24,7 @@ import com.liferay.commerce.product.model.CPDefinitionOptionValueRel;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CPInstanceOptionValueRel;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.KeyValuePair;
 
 import java.util.List;
@@ -40,6 +41,10 @@ public interface CPInstanceHelper {
 
 	public CPInstance fetchCPInstance(
 			long cpDefinitionId, String serializedDDMFormValues)
+		throws PortalException;
+
+	public CPInstance fetchReplacementCPInstance(
+			long cProductId, String cpInstanceUuid)
 		throws PortalException;
 
 	public List<CPDefinitionOptionValueRel> filterCPDefinitionOptionValueRels(
@@ -66,6 +71,10 @@ public interface CPInstanceHelper {
 			getCPDefinitionOptionRelsMap(long cpDefinitionId, String json)
 		throws PortalException;
 
+	public String getCPInstanceAdaptiveMediaImageHTMLTag(
+			long commerceAccountId, long companyId, long cpInstanceId)
+		throws Exception;
+
 	public Map<CPDefinitionOptionRel, List<CPDefinitionOptionValueRel>>
 			getCPInstanceCPDefinitionOptionRelsMap(long cpInstanceId)
 		throws PortalException;
@@ -78,7 +87,13 @@ public interface CPInstanceHelper {
 	public List<CPInstanceOptionValueRel>
 		getCPInstanceCPInstanceOptionValueRels(long cpInstanceId);
 
-	public String getCPInstanceThumbnailSrc(long cpInstanceId) throws Exception;
+	public FileVersion getCPInstanceImageFileVersion(
+			long commerceAccountId, long companyId, long cpInstanceId)
+		throws Exception;
+
+	public String getCPInstanceThumbnailSrc(
+			long commerceAccountId, long cpInstanceId)
+		throws Exception;
 
 	public CPInstance getDefaultCPInstance(long cpDefinitionId)
 		throws PortalException;

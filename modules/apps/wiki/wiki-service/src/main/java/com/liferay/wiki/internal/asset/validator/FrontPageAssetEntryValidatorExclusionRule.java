@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -37,7 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.wiki.configuration.WikiGroupServiceConfiguration",
-	immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = "model.class.name=com.liferay.wiki.model.WikiPage",
 	service = AssetEntryValidatorExclusionRule.class
 )
@@ -89,7 +90,8 @@ public class FrontPageAssetEntryValidatorExclusionRule
 	private static final Log _log = LogFactoryUtil.getLog(
 		FrontPageAssetEntryValidatorExclusionRule.class);
 
-	private WikiGroupServiceConfiguration _wikiGroupServiceConfiguration;
+	private volatile WikiGroupServiceConfiguration
+		_wikiGroupServiceConfiguration;
 
 	@Reference(unbind = "-")
 	private WikiPageLocalService _wikiPageLocalService;

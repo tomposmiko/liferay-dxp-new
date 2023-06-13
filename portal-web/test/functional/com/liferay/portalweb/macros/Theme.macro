@@ -1,19 +1,33 @@
 definition {
 
+	macro changeCurrentTheme {
+		WaitForLiferayEvent.initializeLiferayEventLog();
+
+		Click(locator1 = "SitePagesEditPage#CHANGE_CURRENT_THEME_BUTTON");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		LexiconCard.viewCardTitle(card = "${themeName}");
+
+		LexiconCard.clickCardTitle(card = "${themeName}");
+
+		SelectFrameTop(value1 = "relative=top");
+	}
+
 	macro configureLookAndFeelCustomCSS {
 		Type(
 			key_text = "regularCss",
 			locator1 = "TextArea#ANY",
-			value1 = ${cssText});
+			value1 = "${cssText}");
 	}
 
 	macro configureLookAndFeelShowFooter {
-		if (${showFooter} == "true") {
+		if ("${showFooter}" == "true") {
 			Check.checkToggleSwitch(
 				key_toggleSwitchLabel = "Show Footer",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
 		}
-		else if (${showFooter} == "false") {
+		else if ("${showFooter}" == "false") {
 			Uncheck.uncheckToggleSwitch(
 				key_toggleSwitchLabel = "Show Footer",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
@@ -21,12 +35,12 @@ definition {
 	}
 
 	macro configureLookAndFeelShowHeader {
-		if (${showHeader} == "true") {
+		if ("${showHeader}" == "true") {
 			Check.checkToggleSwitch(
 				key_toggleSwitchLabel = "Show Header",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
 		}
-		else if (${showHeader} == "false") {
+		else if ("${showHeader}" == "false") {
 			Uncheck.uncheckToggleSwitch(
 				key_toggleSwitchLabel = "Show Header",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
@@ -34,12 +48,12 @@ definition {
 	}
 
 	macro configureLookAndFeelShowHeaderSearch {
-		if (${showHeaderSearch} == "true") {
+		if ("${showHeaderSearch}" == "true") {
 			Check.checkToggleSwitch(
 				key_toggleSwitchLabel = "Show Header Search",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
 		}
-		else if (${showHeaderSearch} == "false") {
+		else if ("${showHeaderSearch}" == "false") {
 			Uncheck.uncheckToggleSwitch(
 				key_toggleSwitchLabel = "Show Header Search",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
@@ -47,12 +61,12 @@ definition {
 	}
 
 	macro configureLookAndFeelShowMaxMinAppLinks {
-		if (${showMaxMinAppLinks} == "true") {
+		if ("${showMaxMinAppLinks}" == "true") {
 			Check.checkToggleSwitch(
 				key_toggleSwitchLabel = "Show Maximize/Minimize Application Links",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
 		}
-		else if (${showMaxMinAppLinks} == "false") {
+		else if ("${showMaxMinAppLinks}" == "false") {
 			Uncheck.uncheckToggleSwitch(
 				key_toggleSwitchLabel = "Show Maximize/Minimize Application Links",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
@@ -64,39 +78,15 @@ definition {
 	}
 
 	macro configureLookAndFeelWrapWidgetPageContent {
-		if (${wrapWidgetPageContent} == "true") {
+		if ("${wrapWidgetPageContent}" == "true") {
 			Check.checkToggleSwitch(
 				key_toggleSwitchLabel = "Wrap Widget Page Content",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
 		}
-		else if (${wrapWidgetPageContent} == "false") {
+		else if ("${wrapWidgetPageContent}" == "false") {
 			Uncheck.uncheckToggleSwitch(
 				key_toggleSwitchLabel = "Wrap Widget Page Content",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
-		}
-	}
-
-	macro deployThemeWar {
-		AntCommand(
-			locator1 = "build-test.xml",
-			value1 = "deploy-dependency-war -Dliferay.dependency.war=${themeName}.war");
-
-		AntCommand(
-			locator1 = "build-test.xml",
-			value1 = "copy-log-file");
-
-		var projectDir = PropsUtil.get("project.dir");
-
-		var logContent = FileUtil.read("${projectDir}/log");
-
-		while (!(contains(${logContent}, "STARTED ${themeName}"))) {
-			Pause(locator1 = 3000);
-
-			AntCommand(
-				locator1 = "build-test.xml",
-				value1 = "copy-log-file");
-
-			var logContent = FileUtil.read("${projectDir}/log");
 		}
 	}
 
@@ -129,9 +119,9 @@ definition {
 			locator1 = "MenuItem#ANY_MENU_ITEM",
 			value1 = "Restore");
 
-		// Refresh step is a workaround for LPS-91762
-
-		Refresh();
+		AssertTextPresent(
+			locator1 = "Portlet#PORTLET_CONTENT",
+			value1 = "Embedded alerts are thought to be used inside context as forms");
 	}
 
 	macro viewTestThemeBackgroundColor {

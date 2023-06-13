@@ -19,6 +19,8 @@ import com.liferay.document.library.kernel.exception.NoSuchFolderException;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.kernel.service.DLAppServiceUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -84,9 +86,9 @@ public class DLFileEntryPermissionCheckerTest extends BasePermissionTestCase {
 				group.getGroupId(), TestPropsValues.getUserId());
 
 		return DLAppLocalServiceUtil.addFileEntry(
-			TestPropsValues.getUserId(), group.getGroupId(), folderId,
+			null, TestPropsValues.getUserId(), group.getGroupId(), folderId,
 			RandomTestUtil.randomString() + ".txt", ContentTypes.TEXT_PLAIN,
-			TestDataConstants.TEST_BYTE_ARRAY, serviceContext);
+			TestDataConstants.TEST_BYTE_ARRAY, null, null, serviceContext);
 	}
 
 	@Override
@@ -101,6 +103,9 @@ public class DLFileEntryPermissionCheckerTest extends BasePermissionTestCase {
 				name);
 		}
 		catch (NoSuchFolderException noSuchFolderException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(noSuchFolderException, noSuchFolderException);
+			}
 		}
 
 		ServiceContext serviceContext =
@@ -128,6 +133,9 @@ public class DLFileEntryPermissionCheckerTest extends BasePermissionTestCase {
 			ResourceConstants.SCOPE_INDIVIDUAL,
 			String.valueOf(group.getGroupId()), ActionKeys.VIEW);
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLFileEntryPermissionCheckerTest.class);
 
 	@Inject(
 		filter = "model.class.name=com.liferay.portal.kernel.repository.model.FileEntry"

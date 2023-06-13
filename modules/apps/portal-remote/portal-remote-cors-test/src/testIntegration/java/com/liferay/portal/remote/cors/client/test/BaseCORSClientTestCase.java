@@ -24,6 +24,7 @@ import com.liferay.petra.process.local.LocalProcessExecutor;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.File;
@@ -144,27 +145,20 @@ public abstract class BaseCORSClientTestCase {
 
 		Future<String[]> future = processChannel.getProcessNoticeableFuture();
 
-		try {
-			String[] results = future.get();
+		String[] results = future.get();
 
-			if (allowOrigin) {
-				Assert.assertEquals(_TEST_CORS_URI, results[0]);
-			}
-			else {
-				Assert.assertNull(results[0]);
-			}
-
-			if (!HttpMethod.OPTIONS.equals(method)) {
-				Assert.assertNotEquals(StringPool.BLANK, results[1]);
-			}
-
-			Assert.assertEquals("200", results[2]);
+		if (allowOrigin) {
+			Assert.assertEquals(_TEST_CORS_URI, results[0]);
 		}
-		catch (Exception exception) {
-			if (allowOrigin) {
-				throw exception;
-			}
+		else {
+			Assert.assertNull(results[0]);
 		}
+
+		if (!HttpMethod.OPTIONS.equals(method)) {
+			Assert.assertNotEquals(StringPool.BLANK, results[1]);
+		}
+
+		Assert.assertEquals("200", results[2]);
 	}
 
 	protected void createFactoryConfiguration(
@@ -173,10 +167,9 @@ public abstract class BaseCORSClientTestCase {
 		CountDownLatch countDownLatch = new CountDownLatch(1);
 
 		Dictionary<String, Object> registrationProperties =
-			new HashMapDictionary<>();
-
-		registrationProperties.put(
-			Constants.SERVICE_PID, configurationClassName);
+			HashMapDictionaryBuilder.<String, Object>put(
+				Constants.SERVICE_PID, configurationClassName
+			).build();
 
 		ServiceRegistration<ManagedServiceFactory> serviceRegistration =
 			_bundleContext.registerService(
@@ -197,11 +190,9 @@ public abstract class BaseCORSClientTestCase {
 					public void updated(
 						String pid, Dictionary<String, ?> updatedProperties) {
 
-						if (updatedProperties == null) {
-							return;
-						}
+						if ((updatedProperties == null) ||
+							(properties.size() > updatedProperties.size())) {
 
-						if (properties.size() > updatedProperties.size()) {
 							return;
 						}
 
@@ -309,7 +300,6 @@ public abstract class BaseCORSClientTestCase {
 			arguments.add("-Djvm.debug=true");
 		}
 
-		arguments.add("-Dliferay.mode=test");
 		arguments.add("-Dsun.net.http.allowRestrictedHeaders=true");
 		arguments.add("-Dsun.zip.disableMemoryMapping=true");
 

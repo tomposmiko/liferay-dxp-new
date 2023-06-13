@@ -16,12 +16,13 @@ package com.liferay.roles.admin.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownGroupItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownGroupItemBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
-import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -112,28 +113,23 @@ public class EditRoleAssignmentsManagementToolbarDisplayContext {
 		}
 
 		return DropdownItemList.of(
-			() -> {
-				DropdownItem dropdownItem = new DropdownItem();
-
-				dropdownItem.setHref(
-					StringBundler.concat(
-						"javascript:", _renderResponse.getNamespace(),
-						"unsetRoleAssignments();"));
-				dropdownItem.setIcon("times-circle");
-				dropdownItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "remove"));
-				dropdownItem.setQuickAction(true);
-
-				return dropdownItem;
-			});
+			DropdownItemBuilder.putData(
+				"action", "unsetRoleAssignments"
+			).setIcon(
+				"times-circle"
+			).setLabel(
+				LanguageUtil.get(_httpServletRequest, "remove")
+			).setQuickAction(
+				true
+			).build());
 	}
 
 	public String getClearResultsURL() {
-		PortletURL clearResultsURL = getPortletURL();
-
-		clearResultsURL.setParameter("keywords", StringPool.BLANK);
-
-		return clearResultsURL.toString();
+		return PortletURLBuilder.create(
+			getPortletURL()
+		).setKeywords(
+			StringPool.BLANK
+		).buildString();
 	}
 
 	public CreationMenu getCreationMenu() {
@@ -145,28 +141,26 @@ public class EditRoleAssignmentsManagementToolbarDisplayContext {
 			dropdownItem -> {
 				dropdownItem.putData("action", "addSegmentEntry");
 
-				PortletURL addSegmentEntryURL =
-					PortletProviderUtil.getPortletURL(
-						_renderRequest, SegmentsEntry.class.getName(),
-						PortletProvider.Action.EDIT);
-
-				addSegmentEntryURL.setParameter(
-					"redirect",
-					ParamUtil.getString(_httpServletRequest, "redirect"));
-				addSegmentEntryURL.setParameter(
-					"backURL",
-					ParamUtil.getString(_httpServletRequest, "backURL"));
-
-				ThemeDisplay themeDisplay =
-					(ThemeDisplay)_httpServletRequest.getAttribute(
-						WebKeys.THEME_DISPLAY);
-
-				addSegmentEntryURL.setParameter(
-					"groupId",
-					String.valueOf(themeDisplay.getCompanyGroupId()));
-
 				dropdownItem.putData(
-					"addSegmentEntryURL", addSegmentEntryURL.toString());
+					"addSegmentEntryURL",
+					PortletURLBuilder.create(
+						PortletProviderUtil.getPortletURL(
+							_renderRequest, SegmentsEntry.class.getName(),
+							PortletProvider.Action.EDIT)
+					).setRedirect(
+						ParamUtil.getString(_httpServletRequest, "redirect")
+					).setBackURL(
+						ParamUtil.getString(_httpServletRequest, "backURL")
+					).setParameter(
+						"groupId",
+						() -> {
+							ThemeDisplay themeDisplay =
+								(ThemeDisplay)_httpServletRequest.getAttribute(
+									WebKeys.THEME_DISPLAY);
+
+							return themeDisplay.getCompanyGroupId();
+						}
+					).buildString());
 
 				dropdownItem.putData(
 					"sessionKey", RolesAdminWebKeys.MODAL_SEGMENT_STATE);
@@ -177,55 +171,32 @@ public class EditRoleAssignmentsManagementToolbarDisplayContext {
 		).build();
 	}
 
-	public String getDefaultEventHandler() {
-		return "EDIT_ROLE_ASSIGNMENTS_MANAGEMENT_TOOLBAR_DEFAULT_EVENT_HANDLER";
-	}
-
 	public List<DropdownItem> getFilterDropdownItems() {
 		return DropdownItemList.of(
-			() -> {
-				DropdownGroupItem dropdownGroupItem = new DropdownGroupItem();
-
-				dropdownGroupItem.setDropdownItems(
-					DropdownItemList.of(
-						() -> {
-							DropdownItem dropdownItem = new DropdownItem();
-
-							dropdownItem.setActive(true);
-							dropdownItem.setHref(StringPool.BLANK);
-							dropdownItem.setLabel(
-								LanguageUtil.get(_httpServletRequest, "all"));
-
-							return dropdownItem;
-						}));
-				dropdownGroupItem.setLabel(
-					LanguageUtil.get(
-						_httpServletRequest, "filter-by-navigation"));
-
-				return dropdownGroupItem;
-			},
-			() -> {
-				DropdownGroupItem dropdownGroupItem = new DropdownGroupItem();
-
-				dropdownGroupItem.setDropdownItems(
-					DropdownItemList.of(
-						() -> {
-							DropdownItem dropdownItem = new DropdownItem();
-
-							dropdownItem.setActive(
-								Objects.equals(getOrderByCol(), "name"));
-							dropdownItem.setHref(
-								getPortletURL(), "orderByCol", "name");
-							dropdownItem.setLabel(
-								LanguageUtil.get(_httpServletRequest, "name"));
-
-							return dropdownItem;
-						}));
-				dropdownGroupItem.setLabel(
-					LanguageUtil.get(_httpServletRequest, "order-by"));
-
-				return dropdownGroupItem;
-			});
+			DropdownGroupItemBuilder.setDropdownItems(
+				DropdownItemList.of(
+					DropdownItemBuilder.setActive(
+						true
+					).setHref(
+						StringPool.BLANK
+					).setLabel(
+						LanguageUtil.get(_httpServletRequest, "all")
+					).build())
+			).setLabel(
+				LanguageUtil.get(_httpServletRequest, "filter-by-navigation")
+			).build(),
+			DropdownGroupItemBuilder.setDropdownItems(
+				DropdownItemList.of(
+					DropdownItemBuilder.setActive(
+						Objects.equals(getOrderByCol(), "name")
+					).setHref(
+						getPortletURL(), "orderByCol", "name"
+					).setLabel(
+						LanguageUtil.get(_httpServletRequest, "name")
+					).build())
+			).setLabel(
+				LanguageUtil.get(_httpServletRequest, "order-by")
+			).build());
 	}
 
 	public SearchContainer<Group> getGroupSearchContainer() {
@@ -416,14 +387,16 @@ public class EditRoleAssignmentsManagementToolbarDisplayContext {
 	}
 
 	public String getSearchActionURL() {
-		PortletURL searchActionURL = getPortletURL();
+		return PortletURLBuilder.create(
+			getPortletURL()
+		).setRedirect(
+			() -> {
+				PortletURL currentURL = PortletURLUtil.getCurrent(
+					_renderRequest, _renderResponse);
 
-		PortletURL currentURL = PortletURLUtil.getCurrent(
-			_renderRequest, _renderResponse);
-
-		searchActionURL.setParameter("redirect", currentURL.toString());
-
-		return searchActionURL.toString();
+				return currentURL.toString();
+			}
+		).buildString();
 	}
 
 	public SearchContainer<?> getSearchContainer() throws Exception {
@@ -452,13 +425,12 @@ public class EditRoleAssignmentsManagementToolbarDisplayContext {
 	}
 
 	public String getSortingURL() {
-		PortletURL sortingURL = getPortletURL();
-
-		sortingURL.setParameter(
+		return PortletURLBuilder.create(
+			getPortletURL()
+		).setParameter(
 			"orderByType",
-			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc");
-
-		return sortingURL.toString();
+			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc"
+		).buildString();
 	}
 
 	public String getTabs2() {

@@ -16,7 +16,7 @@ package com.liferay.commerce.channel.web.internal.display.context;
 
 import com.liferay.commerce.account.configuration.CommerceAccountGroupServiceConfiguration;
 import com.liferay.commerce.account.constants.CommerceAccountConstants;
-import com.liferay.commerce.channel.web.internal.display.context.util.CommerceChannelRequestHelper;
+import com.liferay.commerce.channel.web.internal.display.context.helper.CommerceChannelRequestHelper;
 import com.liferay.commerce.configuration.CommerceOrderCheckoutConfiguration;
 import com.liferay.commerce.configuration.CommerceOrderFieldsConfiguration;
 import com.liferay.commerce.constants.CommerceConstants;
@@ -38,6 +38,7 @@ import com.liferay.commerce.product.service.CPTaxCategoryLocalService;
 import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.commerce.tax.configuration.CommerceShippingTaxConfiguration;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.NoSuchWorkflowDefinitionLinkException;
@@ -52,8 +53,8 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
-import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -137,7 +138,7 @@ public class CommerceChannelDisplayContext
 				CommerceShippingTaxConfiguration.class,
 				new GroupServiceSettingsLocator(
 					commerceChannel.getGroupId(),
-					CommerceConstants.TAX_SERVICE_NAME));
+					CommerceConstants.SERVICE_NAME_COMMERCE_TAX));
 
 		return _cpTaxCategoryLocalService.fetchCPTaxCategory(
 			commerceShippingTaxConfiguration.taxCategoryId());
@@ -152,43 +153,36 @@ public class CommerceChannelDisplayContext
 	}
 
 	public String getAddChannelURL() throws Exception {
-		PortletURL editCommerceChannelPortletURL =
+		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, CPPortletKeys.COMMERCE_CHANNELS,
-				PortletRequest.RENDER_PHASE);
-
-		editCommerceChannelPortletURL.setParameter(
-			"mvcRenderCommandName", "/commerce_channels/add_commerce_channel");
-
-		editCommerceChannelPortletURL.setWindowState(LiferayWindowState.POP_UP);
-
-		PortletURL portletURL = getPortletURL();
-
-		editCommerceChannelPortletURL.setParameter(
-			"redirect", portletURL.toString());
-
-		return editCommerceChannelPortletURL.toString();
+				PortletRequest.RENDER_PHASE)
+		).setMVCRenderCommandName(
+			"/commerce_channels/add_commerce_channel"
+		).setRedirect(
+			getPortletURL()
+		).setWindowState(
+			LiferayWindowState.POP_UP
+		).buildString();
 	}
 
 	public String getAddPaymentMethodURL(String commercePaymentMethodEngineKey)
 		throws Exception {
 
-		PortletURL portletURL = PortletProviderUtil.getPortletURL(
-			httpServletRequest, CommercePaymentMethodGroupRel.class.getName(),
-			PortletProvider.Action.EDIT);
-
-		portletURL.setParameter(
-			"mvcRenderCommandName",
-			"/commerce_payment_methods/edit_commerce_payment_method_group_rel");
-		portletURL.setParameter(
-			"commerceChannelId", String.valueOf(getCommerceChannelId()));
-
-		portletURL.setParameter(
-			"commercePaymentMethodEngineKey", commercePaymentMethodEngineKey);
-
-		portletURL.setWindowState(LiferayWindowState.POP_UP);
-
-		return portletURL.toString();
+		return PortletURLBuilder.create(
+			PortletProviderUtil.getPortletURL(
+				httpServletRequest,
+				CommercePaymentMethodGroupRel.class.getName(),
+				PortletProvider.Action.EDIT)
+		).setMVCRenderCommandName(
+			"/commerce_payment_methods/edit_commerce_payment_method_group_rel"
+		).setParameter(
+			"commerceChannelId", getCommerceChannelId()
+		).setParameter(
+			"commercePaymentMethodEngineKey", commercePaymentMethodEngineKey
+		).setWindowState(
+			LiferayWindowState.POP_UP
+		).buildString();
 	}
 
 	public String getChannelURL(CommerceChannel commerceChannel)
@@ -271,14 +265,13 @@ public class CommerceChannelDisplayContext
 	}
 
 	public PortletURL getEditCommerceChannelRenderURL() {
-		PortletURL portletURL = _portal.getControlPanelPortletURL(
-			cpRequestHelper.getRequest(), CPPortletKeys.COMMERCE_CHANNELS,
-			PortletRequest.RENDER_PHASE);
-
-		portletURL.setParameter(
-			"mvcRenderCommandName", "/commerce_channels/edit_commerce_channel");
-
-		return portletURL;
+		return PortletURLBuilder.create(
+			_portal.getControlPanelPortletURL(
+				cpRequestHelper.getRequest(), CPPortletKeys.COMMERCE_CHANNELS,
+				PortletRequest.RENDER_PHASE)
+		).setMVCRenderCommandName(
+			"/commerce_channels/edit_commerce_channel"
+		).buildPortletURL();
 	}
 
 	public List<HeaderActionModel> getHeaderActionModels() {
@@ -366,8 +359,12 @@ public class CommerceChannelDisplayContext
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		return PortalPermissionUtil.contains(
-			themeDisplay.getPermissionChecker(),
+		PortletResourcePermission portletResourcePermission =
+			_commerceChannelModelResourcePermission.
+				getPortletResourcePermission();
+
+		return portletResourcePermission.contains(
+			themeDisplay.getPermissionChecker(), null,
 			CPActionKeys.ADD_COMMERCE_CHANNEL);
 	}
 
@@ -409,7 +406,7 @@ public class CommerceChannelDisplayContext
 				CommerceOrderCheckoutConfiguration.class,
 				new GroupServiceSettingsLocator(
 					commerceChannel.getGroupId(),
-					CommerceConstants.ORDER_SERVICE_NAME));
+					CommerceConstants.SERVICE_NAME_COMMERCE_ORDER));
 
 		return commerceOrderCheckoutConfiguration.guestCheckoutEnabled();
 	}
@@ -422,7 +419,7 @@ public class CommerceChannelDisplayContext
 				CommerceOrderFieldsConfiguration.class,
 				new GroupServiceSettingsLocator(
 					commerceChannel.getGroupId(),
-					CommerceConstants.ORDER_SERVICE_NAME));
+					CommerceConstants.SERVICE_NAME_COMMERCE_ORDER));
 
 		return commerceOrderFieldsConfiguration.showPurchaseOrderNumber();
 	}
@@ -462,7 +459,7 @@ public class CommerceChannelDisplayContext
 				CommerceOrderFieldsConfiguration.class,
 				new GroupServiceSettingsLocator(
 					commerceChannel.getGroupId(),
-					CommerceConstants.ORDER_FIELDS_SERVICE_NAME));
+					CommerceConstants.SERVICE_NAME_COMMERCE_ORDER_FIELDS));
 
 		return _commerceOrderFieldsConfiguration;
 	}

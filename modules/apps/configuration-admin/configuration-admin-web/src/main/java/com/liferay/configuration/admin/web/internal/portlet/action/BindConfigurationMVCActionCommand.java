@@ -45,9 +45,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.util.PropsValues;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -118,21 +116,37 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 			configurationModel = configurationModels.get(pid);
 		}
 
-		Configuration configuration =
+		configurationModel = _getConfigurationModel(
 			_configurationModelRetriever.getConfiguration(
 				pid, configurationScopeDisplayContext.getScope(),
-				configurationScopeDisplayContext.getScopePK());
+				configurationScopeDisplayContext.getScopePK()),
+			configurationModel);
 
 		if (configurationModel.isFactory() && pid.equals(factoryPid)) {
-			configuration = null;
+			if (_log.isDebugEnabled()) {
+				_log.debug("Writing a new factory instance for service " + pid);
+			}
+
+			configurationModel = _getConfigurationModel(
+				null, configurationModel);
 		}
 
-		configurationModel = new ConfigurationModel(
-			configurationModel.getBundleLocation(),
-			configurationModel.getBundleSymbolicName(),
-			configurationModel.getClassLoader(), configuration,
-			configurationModel.getExtendedObjectClassDefinition(),
-			configurationModel.isFactory());
+		if (!configurationModel.hasScopeConfiguration(
+				configurationScopeDisplayContext.getScope())) {
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"Writing a new scoped instance for service ", pid,
+						" at scope ",
+						configurationScopeDisplayContext.getScope(),
+						" for scope ID ",
+						configurationScopeDisplayContext.getScopePK()));
+			}
+
+			configurationModel = _getConfigurationModel(
+				null, configurationModel);
+		}
 
 		Dictionary<String, Object> properties = null;
 
@@ -163,7 +177,7 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 
 		try {
 			configureTargetService(
-				configurationModel, configuration, properties,
+				configurationModel, properties,
 				configurationScopeDisplayContext.getScope(),
 				configurationScopeDisplayContext.getScopePK());
 
@@ -192,7 +206,7 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 	}
 
 	protected void configureTargetService(
-			ConfigurationModel configurationModel, Configuration configuration,
+			ConfigurationModel configurationModel,
 			Dictionary<String, Object> properties,
 			ExtendedObjectClassDefinition.Scope scope, Serializable scopePK)
 		throws ConfigurationModelListenerException, PortletException {
@@ -202,6 +216,8 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 		}
 
 		try {
+			Configuration configuration = configurationModel.getConfiguration();
+
 			boolean scoped = !scope.equals(
 				ExtendedObjectClassDefinition.Scope.SYSTEM.getValue());
 
@@ -269,35 +285,6 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 			if (configurationModel.isFactory()) {
 				configuredProperties.put(
 					"configuration.cleaner.ignore", "true");
-
-				String fileName = (String)configuredProperties.get(
-					"felix.fileinstall.filename");
-
-				if (Validator.isNull(fileName)) {
-					String pid = configuration.getPid();
-
-					int index = pid.lastIndexOf('.');
-
-					String factoryPid = pid.substring(index + 1);
-
-					StringBundler sb = new StringBundler(4);
-
-					sb.append(configuration.getFactoryPid());
-					sb.append(StringPool.DASH);
-					sb.append(factoryPid);
-					sb.append(".config");
-
-					File file = new File(
-						PropsValues.MODULE_FRAMEWORK_CONFIGS_DIR,
-						sb.toString());
-
-					file = file.getAbsoluteFile();
-
-					fileName = String.valueOf(file.toURI());
-
-					configuredProperties.put(
-						"felix.fileinstall.filename", fileName);
-				}
 			}
 
 			configuration.update(configuredProperties);
@@ -369,6 +356,17 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 		}
 
 		return properties;
+	}
+
+	private ConfigurationModel _getConfigurationModel(
+		Configuration configuration, ConfigurationModel configurationModel) {
+
+		return new ConfigurationModel(
+			configurationModel.getBundleLocation(),
+			configurationModel.getBundleSymbolicName(),
+			configurationModel.getClassLoader(), configuration,
+			configurationModel.getExtendedObjectClassDefinition(),
+			configurationModel.isFactory());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

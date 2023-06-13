@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -243,79 +244,101 @@ public class MemberRequestModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<MemberRequest, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, MemberRequest>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<MemberRequest, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<MemberRequest, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			MemberRequest.class.getClassLoader(), MemberRequest.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"memberRequestId", MemberRequest::getMemberRequestId);
-		attributeGetterFunctions.put("groupId", MemberRequest::getGroupId);
-		attributeGetterFunctions.put("companyId", MemberRequest::getCompanyId);
-		attributeGetterFunctions.put("userId", MemberRequest::getUserId);
-		attributeGetterFunctions.put("userName", MemberRequest::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", MemberRequest::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", MemberRequest::getModifiedDate);
-		attributeGetterFunctions.put("key", MemberRequest::getKey);
-		attributeGetterFunctions.put(
-			"receiverUserId", MemberRequest::getReceiverUserId);
-		attributeGetterFunctions.put(
-			"invitedRoleId", MemberRequest::getInvitedRoleId);
-		attributeGetterFunctions.put(
-			"invitedTeamId", MemberRequest::getInvitedTeamId);
-		attributeGetterFunctions.put("status", MemberRequest::getStatus);
+		try {
+			Constructor<MemberRequest> constructor =
+				(Constructor<MemberRequest>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<MemberRequest, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<MemberRequest, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<MemberRequest, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<MemberRequest, Object>>();
 		Map<String, BiConsumer<MemberRequest, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<MemberRequest, ?>>();
 
+		attributeGetterFunctions.put(
+			"memberRequestId", MemberRequest::getMemberRequestId);
 		attributeSetterBiConsumers.put(
 			"memberRequestId",
 			(BiConsumer<MemberRequest, Long>)MemberRequest::setMemberRequestId);
+		attributeGetterFunctions.put("groupId", MemberRequest::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<MemberRequest, Long>)MemberRequest::setGroupId);
+		attributeGetterFunctions.put("companyId", MemberRequest::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<MemberRequest, Long>)MemberRequest::setCompanyId);
+		attributeGetterFunctions.put("userId", MemberRequest::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<MemberRequest, Long>)MemberRequest::setUserId);
+		attributeGetterFunctions.put("userName", MemberRequest::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<MemberRequest, String>)MemberRequest::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", MemberRequest::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<MemberRequest, Date>)MemberRequest::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", MemberRequest::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<MemberRequest, Date>)MemberRequest::setModifiedDate);
+		attributeGetterFunctions.put("key", MemberRequest::getKey);
 		attributeSetterBiConsumers.put(
 			"key", (BiConsumer<MemberRequest, String>)MemberRequest::setKey);
+		attributeGetterFunctions.put(
+			"receiverUserId", MemberRequest::getReceiverUserId);
 		attributeSetterBiConsumers.put(
 			"receiverUserId",
 			(BiConsumer<MemberRequest, Long>)MemberRequest::setReceiverUserId);
+		attributeGetterFunctions.put(
+			"invitedRoleId", MemberRequest::getInvitedRoleId);
 		attributeSetterBiConsumers.put(
 			"invitedRoleId",
 			(BiConsumer<MemberRequest, Long>)MemberRequest::setInvitedRoleId);
+		attributeGetterFunctions.put(
+			"invitedTeamId", MemberRequest::getInvitedTeamId);
 		attributeSetterBiConsumers.put(
 			"invitedTeamId",
 			(BiConsumer<MemberRequest, Long>)MemberRequest::setInvitedTeamId);
+		attributeGetterFunctions.put("status", MemberRequest::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<MemberRequest, Integer>)MemberRequest::setStatus);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -649,6 +672,37 @@ public class MemberRequestModelImpl
 	}
 
 	@Override
+	public MemberRequest cloneWithOriginalValues() {
+		MemberRequestImpl memberRequestImpl = new MemberRequestImpl();
+
+		memberRequestImpl.setMemberRequestId(
+			this.<Long>getColumnOriginalValue("memberRequestId"));
+		memberRequestImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		memberRequestImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		memberRequestImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		memberRequestImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		memberRequestImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		memberRequestImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		memberRequestImpl.setKey(this.<String>getColumnOriginalValue("key_"));
+		memberRequestImpl.setReceiverUserId(
+			this.<Long>getColumnOriginalValue("receiverUserId"));
+		memberRequestImpl.setInvitedRoleId(
+			this.<Long>getColumnOriginalValue("invitedRoleId"));
+		memberRequestImpl.setInvitedTeamId(
+			this.<Long>getColumnOriginalValue("invitedTeamId"));
+		memberRequestImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
+
+		return memberRequestImpl;
+	}
+
+	@Override
 	public int compareTo(MemberRequest memberRequest) {
 		int value = 0;
 
@@ -859,9 +913,7 @@ public class MemberRequestModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, MemberRequest>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					MemberRequest.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

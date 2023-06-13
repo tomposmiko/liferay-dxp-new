@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -78,10 +79,11 @@ public class CommerceVirtualOrderItemModelImpl
 	public static final String TABLE_NAME = "CommerceVirtualOrderItem";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"uuid_", Types.VARCHAR}, {"commerceVirtualOrderItemId", Types.BIGINT},
-		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
-		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
-		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
+		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
+		{"commerceVirtualOrderItemId", Types.BIGINT}, {"groupId", Types.BIGINT},
+		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
+		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
+		{"modifiedDate", Types.TIMESTAMP},
 		{"commerceOrderItemId", Types.BIGINT}, {"fileEntryId", Types.BIGINT},
 		{"url", Types.VARCHAR}, {"activationStatus", Types.INTEGER},
 		{"duration", Types.BIGINT}, {"usages", Types.INTEGER},
@@ -93,6 +95,7 @@ public class CommerceVirtualOrderItemModelImpl
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("commerceVirtualOrderItemId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
@@ -114,7 +117,7 @@ public class CommerceVirtualOrderItemModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CommerceVirtualOrderItem (uuid_ VARCHAR(75) null,commerceVirtualOrderItemId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commerceOrderItemId LONG,fileEntryId LONG,url VARCHAR(75) null,activationStatus INTEGER,duration LONG,usages INTEGER,maxUsages INTEGER,active_ BOOLEAN,startDate DATE null,endDate DATE null)";
+		"create table CommerceVirtualOrderItem (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,commerceVirtualOrderItemId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commerceOrderItemId LONG,fileEntryId LONG,url VARCHAR(75) null,activationStatus INTEGER,duration LONG,usages INTEGER,maxUsages INTEGER,active_ BOOLEAN,startDate DATE null,endDate DATE null)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table CommerceVirtualOrderItem";
@@ -197,6 +200,7 @@ public class CommerceVirtualOrderItemModelImpl
 
 		CommerceVirtualOrderItem model = new CommerceVirtualOrderItemImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setUuid(soapModel.getUuid());
 		model.setCommerceVirtualOrderItemId(
 			soapModel.getCommerceVirtualOrderItemId());
@@ -336,141 +340,184 @@ public class CommerceVirtualOrderItemModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CommerceVirtualOrderItem>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceVirtualOrderItem.class.getClassLoader(),
+			CommerceVirtualOrderItem.class, ModelWrapper.class);
+
+		try {
+			Constructor<CommerceVirtualOrderItem> constructor =
+				(Constructor<CommerceVirtualOrderItem>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<CommerceVirtualOrderItem, Object>>
 		_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommerceVirtualOrderItem, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceVirtualOrderItem, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceVirtualOrderItem, Object>>();
-
-		attributeGetterFunctions.put("uuid", CommerceVirtualOrderItem::getUuid);
-		attributeGetterFunctions.put(
-			"commerceVirtualOrderItemId",
-			CommerceVirtualOrderItem::getCommerceVirtualOrderItemId);
-		attributeGetterFunctions.put(
-			"groupId", CommerceVirtualOrderItem::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceVirtualOrderItem::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceVirtualOrderItem::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceVirtualOrderItem::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceVirtualOrderItem::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceVirtualOrderItem::getModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceOrderItemId",
-			CommerceVirtualOrderItem::getCommerceOrderItemId);
-		attributeGetterFunctions.put(
-			"fileEntryId", CommerceVirtualOrderItem::getFileEntryId);
-		attributeGetterFunctions.put("url", CommerceVirtualOrderItem::getUrl);
-		attributeGetterFunctions.put(
-			"activationStatus", CommerceVirtualOrderItem::getActivationStatus);
-		attributeGetterFunctions.put(
-			"duration", CommerceVirtualOrderItem::getDuration);
-		attributeGetterFunctions.put(
-			"usages", CommerceVirtualOrderItem::getUsages);
-		attributeGetterFunctions.put(
-			"maxUsages", CommerceVirtualOrderItem::getMaxUsages);
-		attributeGetterFunctions.put(
-			"active", CommerceVirtualOrderItem::getActive);
-		attributeGetterFunctions.put(
-			"startDate", CommerceVirtualOrderItem::getStartDate);
-		attributeGetterFunctions.put(
-			"endDate", CommerceVirtualOrderItem::getEndDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CommerceVirtualOrderItem, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceVirtualOrderItem, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceVirtualOrderItem, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CommerceVirtualOrderItem::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CommerceVirtualOrderItem, Long>)
+				CommerceVirtualOrderItem::setMvccVersion);
+		attributeGetterFunctions.put("uuid", CommerceVirtualOrderItem::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CommerceVirtualOrderItem, String>)
 				CommerceVirtualOrderItem::setUuid);
+		attributeGetterFunctions.put(
+			"commerceVirtualOrderItemId",
+			CommerceVirtualOrderItem::getCommerceVirtualOrderItemId);
 		attributeSetterBiConsumers.put(
 			"commerceVirtualOrderItemId",
 			(BiConsumer<CommerceVirtualOrderItem, Long>)
 				CommerceVirtualOrderItem::setCommerceVirtualOrderItemId);
+		attributeGetterFunctions.put(
+			"groupId", CommerceVirtualOrderItem::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceVirtualOrderItem, Long>)
 				CommerceVirtualOrderItem::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceVirtualOrderItem::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceVirtualOrderItem, Long>)
 				CommerceVirtualOrderItem::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceVirtualOrderItem::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceVirtualOrderItem, Long>)
 				CommerceVirtualOrderItem::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceVirtualOrderItem::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceVirtualOrderItem, String>)
 				CommerceVirtualOrderItem::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceVirtualOrderItem::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceVirtualOrderItem, Date>)
 				CommerceVirtualOrderItem::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceVirtualOrderItem::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceVirtualOrderItem, Date>)
 				CommerceVirtualOrderItem::setModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceOrderItemId",
+			CommerceVirtualOrderItem::getCommerceOrderItemId);
 		attributeSetterBiConsumers.put(
 			"commerceOrderItemId",
 			(BiConsumer<CommerceVirtualOrderItem, Long>)
 				CommerceVirtualOrderItem::setCommerceOrderItemId);
+		attributeGetterFunctions.put(
+			"fileEntryId", CommerceVirtualOrderItem::getFileEntryId);
 		attributeSetterBiConsumers.put(
 			"fileEntryId",
 			(BiConsumer<CommerceVirtualOrderItem, Long>)
 				CommerceVirtualOrderItem::setFileEntryId);
+		attributeGetterFunctions.put("url", CommerceVirtualOrderItem::getUrl);
 		attributeSetterBiConsumers.put(
 			"url",
 			(BiConsumer<CommerceVirtualOrderItem, String>)
 				CommerceVirtualOrderItem::setUrl);
+		attributeGetterFunctions.put(
+			"activationStatus", CommerceVirtualOrderItem::getActivationStatus);
 		attributeSetterBiConsumers.put(
 			"activationStatus",
 			(BiConsumer<CommerceVirtualOrderItem, Integer>)
 				CommerceVirtualOrderItem::setActivationStatus);
+		attributeGetterFunctions.put(
+			"duration", CommerceVirtualOrderItem::getDuration);
 		attributeSetterBiConsumers.put(
 			"duration",
 			(BiConsumer<CommerceVirtualOrderItem, Long>)
 				CommerceVirtualOrderItem::setDuration);
+		attributeGetterFunctions.put(
+			"usages", CommerceVirtualOrderItem::getUsages);
 		attributeSetterBiConsumers.put(
 			"usages",
 			(BiConsumer<CommerceVirtualOrderItem, Integer>)
 				CommerceVirtualOrderItem::setUsages);
+		attributeGetterFunctions.put(
+			"maxUsages", CommerceVirtualOrderItem::getMaxUsages);
 		attributeSetterBiConsumers.put(
 			"maxUsages",
 			(BiConsumer<CommerceVirtualOrderItem, Integer>)
 				CommerceVirtualOrderItem::setMaxUsages);
+		attributeGetterFunctions.put(
+			"active", CommerceVirtualOrderItem::getActive);
 		attributeSetterBiConsumers.put(
 			"active",
 			(BiConsumer<CommerceVirtualOrderItem, Boolean>)
 				CommerceVirtualOrderItem::setActive);
+		attributeGetterFunctions.put(
+			"startDate", CommerceVirtualOrderItem::getStartDate);
 		attributeSetterBiConsumers.put(
 			"startDate",
 			(BiConsumer<CommerceVirtualOrderItem, Date>)
 				CommerceVirtualOrderItem::setStartDate);
+		attributeGetterFunctions.put(
+			"endDate", CommerceVirtualOrderItem::getEndDate);
 		attributeSetterBiConsumers.put(
 			"endDate",
 			(BiConsumer<CommerceVirtualOrderItem, Date>)
 				CommerceVirtualOrderItem::setEndDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@JSON
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@JSON
@@ -889,6 +936,7 @@ public class CommerceVirtualOrderItemModelImpl
 		CommerceVirtualOrderItemImpl commerceVirtualOrderItemImpl =
 			new CommerceVirtualOrderItemImpl();
 
+		commerceVirtualOrderItemImpl.setMvccVersion(getMvccVersion());
 		commerceVirtualOrderItemImpl.setUuid(getUuid());
 		commerceVirtualOrderItemImpl.setCommerceVirtualOrderItemId(
 			getCommerceVirtualOrderItemId());
@@ -911,6 +959,53 @@ public class CommerceVirtualOrderItemModelImpl
 		commerceVirtualOrderItemImpl.setEndDate(getEndDate());
 
 		commerceVirtualOrderItemImpl.resetOriginalValues();
+
+		return commerceVirtualOrderItemImpl;
+	}
+
+	@Override
+	public CommerceVirtualOrderItem cloneWithOriginalValues() {
+		CommerceVirtualOrderItemImpl commerceVirtualOrderItemImpl =
+			new CommerceVirtualOrderItemImpl();
+
+		commerceVirtualOrderItemImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		commerceVirtualOrderItemImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		commerceVirtualOrderItemImpl.setCommerceVirtualOrderItemId(
+			this.<Long>getColumnOriginalValue("commerceVirtualOrderItemId"));
+		commerceVirtualOrderItemImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		commerceVirtualOrderItemImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commerceVirtualOrderItemImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commerceVirtualOrderItemImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commerceVirtualOrderItemImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commerceVirtualOrderItemImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commerceVirtualOrderItemImpl.setCommerceOrderItemId(
+			this.<Long>getColumnOriginalValue("commerceOrderItemId"));
+		commerceVirtualOrderItemImpl.setFileEntryId(
+			this.<Long>getColumnOriginalValue("fileEntryId"));
+		commerceVirtualOrderItemImpl.setUrl(
+			this.<String>getColumnOriginalValue("url"));
+		commerceVirtualOrderItemImpl.setActivationStatus(
+			this.<Integer>getColumnOriginalValue("activationStatus"));
+		commerceVirtualOrderItemImpl.setDuration(
+			this.<Long>getColumnOriginalValue("duration"));
+		commerceVirtualOrderItemImpl.setUsages(
+			this.<Integer>getColumnOriginalValue("usages"));
+		commerceVirtualOrderItemImpl.setMaxUsages(
+			this.<Integer>getColumnOriginalValue("maxUsages"));
+		commerceVirtualOrderItemImpl.setActive(
+			this.<Boolean>getColumnOriginalValue("active_"));
+		commerceVirtualOrderItemImpl.setStartDate(
+			this.<Date>getColumnOriginalValue("startDate"));
+		commerceVirtualOrderItemImpl.setEndDate(
+			this.<Date>getColumnOriginalValue("endDate"));
 
 		return commerceVirtualOrderItemImpl;
 	}
@@ -990,6 +1085,8 @@ public class CommerceVirtualOrderItemModelImpl
 	public CacheModel<CommerceVirtualOrderItem> toCacheModel() {
 		CommerceVirtualOrderItemCacheModel commerceVirtualOrderItemCacheModel =
 			new CommerceVirtualOrderItemCacheModel();
+
+		commerceVirtualOrderItemCacheModel.mvccVersion = getMvccVersion();
 
 		commerceVirtualOrderItemCacheModel.uuid = getUuid();
 
@@ -1168,11 +1265,11 @@ public class CommerceVirtualOrderItemModelImpl
 		private static final Function
 			<InvocationHandler, CommerceVirtualOrderItem>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						CommerceVirtualOrderItem.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private String _uuid;
 	private long _commerceVirtualOrderItemId;
 	private long _groupId;
@@ -1222,6 +1319,7 @@ public class CommerceVirtualOrderItemModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put(
 			"commerceVirtualOrderItemId", _commerceVirtualOrderItemId);
@@ -1265,41 +1363,43 @@ public class CommerceVirtualOrderItemModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("uuid_", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("commerceVirtualOrderItemId", 2L);
+		columnBitmasks.put("uuid_", 2L);
 
-		columnBitmasks.put("groupId", 4L);
+		columnBitmasks.put("commerceVirtualOrderItemId", 4L);
 
-		columnBitmasks.put("companyId", 8L);
+		columnBitmasks.put("groupId", 8L);
 
-		columnBitmasks.put("userId", 16L);
+		columnBitmasks.put("companyId", 16L);
 
-		columnBitmasks.put("userName", 32L);
+		columnBitmasks.put("userId", 32L);
 
-		columnBitmasks.put("createDate", 64L);
+		columnBitmasks.put("userName", 64L);
 
-		columnBitmasks.put("modifiedDate", 128L);
+		columnBitmasks.put("createDate", 128L);
 
-		columnBitmasks.put("commerceOrderItemId", 256L);
+		columnBitmasks.put("modifiedDate", 256L);
 
-		columnBitmasks.put("fileEntryId", 512L);
+		columnBitmasks.put("commerceOrderItemId", 512L);
 
-		columnBitmasks.put("url", 1024L);
+		columnBitmasks.put("fileEntryId", 1024L);
 
-		columnBitmasks.put("activationStatus", 2048L);
+		columnBitmasks.put("url", 2048L);
 
-		columnBitmasks.put("duration", 4096L);
+		columnBitmasks.put("activationStatus", 4096L);
 
-		columnBitmasks.put("usages", 8192L);
+		columnBitmasks.put("duration", 8192L);
 
-		columnBitmasks.put("maxUsages", 16384L);
+		columnBitmasks.put("usages", 16384L);
 
-		columnBitmasks.put("active_", 32768L);
+		columnBitmasks.put("maxUsages", 32768L);
 
-		columnBitmasks.put("startDate", 65536L);
+		columnBitmasks.put("active_", 65536L);
 
-		columnBitmasks.put("endDate", 131072L);
+		columnBitmasks.put("startDate", 131072L);
+
+		columnBitmasks.put("endDate", 262144L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

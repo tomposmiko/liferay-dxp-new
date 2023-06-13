@@ -16,7 +16,6 @@ package com.liferay.data.engine.rest.internal.resource.v2_0;
 
 import com.liferay.data.engine.rest.dto.v2_0.DataListView;
 import com.liferay.data.engine.rest.resource.v2_0.DataListViewResource;
-import com.liferay.petra.function.UnsafeBiConsumer;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -29,15 +28,10 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParser;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortField;
-import com.liferay.portal.odata.sort.SortParser;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
 import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
@@ -49,21 +43,16 @@ import com.liferay.portal.vulcan.util.TransformUtil;
 
 import java.io.Serializable;
 
-import java.lang.reflect.Array;
-
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Generated;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -425,63 +414,29 @@ public abstract class BaseDataListViewResourceImpl
 	@Override
 	@SuppressWarnings("PMD.UnusedLocalVariable")
 	public void create(
-			Collection<DataListView> dataListViews,
+			java.util.Collection<DataListView> dataListViews,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
 		UnsafeConsumer<DataListView, Exception> dataListViewUnsafeConsumer =
-			null;
+			dataListView -> postDataDefinitionDataListView(
+				Long.parseLong((String)parameters.get("dataDefinitionId")),
+				dataListView);
 
-		String createStrategy = (String)parameters.getOrDefault(
-			"createStrategy", "INSERT");
-
-		if ("INSERT".equalsIgnoreCase(createStrategy)) {
-			if (parameters.containsKey("dataDefinitionId")) {
-				dataListViewUnsafeConsumer =
-					dataListView -> postDataDefinitionDataListView(
-						_parseLong((String)parameters.get("dataDefinitionId")),
-						dataListView);
-			}
-			else {
-				throw new NotSupportedException(
-					"One of the following parameters must be specified: [dataDefinitionId]");
-			}
-		}
-
-		if (dataListViewUnsafeConsumer == null) {
-			throw new NotSupportedException(
-				"Create strategy \"" + createStrategy +
-					"\" is not supported for DataListView");
-		}
-
-		if (contextBatchUnsafeConsumer != null) {
-			contextBatchUnsafeConsumer.accept(
-				dataListViews, dataListViewUnsafeConsumer);
-		}
-		else {
-			for (DataListView dataListView : dataListViews) {
-				dataListViewUnsafeConsumer.accept(dataListView);
-			}
+		for (DataListView dataListView : dataListViews) {
+			dataListViewUnsafeConsumer.accept(dataListView);
 		}
 	}
 
 	@Override
 	public void delete(
-			Collection<DataListView> dataListViews,
+			java.util.Collection<DataListView> dataListViews,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
 		for (DataListView dataListView : dataListViews) {
 			deleteDataListView(dataListView.getId());
 		}
-	}
-
-	public Set<String> getAvailableCreateStrategies() {
-		return SetUtil.fromArray("INSERT");
-	}
-
-	public Set<String> getAvailableUpdateStrategies() {
-		return SetUtil.fromArray("UPDATE");
 	}
 
 	@Override
@@ -499,25 +454,15 @@ public abstract class BaseDataListViewResourceImpl
 		return null;
 	}
 
-	public String getVersion() {
-		return "v2.0";
-	}
-
 	@Override
 	public Page<DataListView> read(
 			Filter filter, Pagination pagination, Sort[] sorts,
 			Map<String, Serializable> parameters, String search)
 		throws Exception {
 
-		if (parameters.containsKey("dataDefinitionId")) {
-			return getDataDefinitionDataListViewsPage(
-				_parseLong((String)parameters.get("dataDefinitionId")),
-				(String)parameters.get("keywords"), pagination, sorts);
-		}
-		else {
-			throw new NotSupportedException(
-				"One of the following parameters must be specified: [dataDefinitionId]");
-		}
+		return getDataDefinitionDataListViewsPage(
+			Long.parseLong((String)parameters.get("dataDefinitionId")),
+			(String)parameters.get("keywords"), pagination, sorts);
 	}
 
 	@Override
@@ -544,58 +489,20 @@ public abstract class BaseDataListViewResourceImpl
 
 	@Override
 	public void update(
-			Collection<DataListView> dataListViews,
+			java.util.Collection<DataListView> dataListViews,
 			Map<String, Serializable> parameters)
 		throws Exception {
 
-		UnsafeConsumer<DataListView, Exception> dataListViewUnsafeConsumer =
-			null;
-
-		String updateStrategy = (String)parameters.getOrDefault(
-			"updateStrategy", "UPDATE");
-
-		if ("UPDATE".equalsIgnoreCase(updateStrategy)) {
-			dataListViewUnsafeConsumer = dataListView -> putDataListView(
+		for (DataListView dataListView : dataListViews) {
+			putDataListView(
 				dataListView.getId() != null ? dataListView.getId() :
-					_parseLong((String)parameters.get("dataListViewId")),
+					Long.parseLong((String)parameters.get("dataListViewId")),
 				dataListView);
 		}
-
-		if (dataListViewUnsafeConsumer == null) {
-			throw new NotSupportedException(
-				"Update strategy \"" + updateStrategy +
-					"\" is not supported for DataListView");
-		}
-
-		if (contextBatchUnsafeConsumer != null) {
-			contextBatchUnsafeConsumer.accept(
-				dataListViews, dataListViewUnsafeConsumer);
-		}
-		else {
-			for (DataListView dataListView : dataListViews) {
-				dataListViewUnsafeConsumer.accept(dataListView);
-			}
-		}
-	}
-
-	private Long _parseLong(String value) {
-		if (value != null) {
-			return Long.parseLong(value);
-		}
-
-		return null;
 	}
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
 		this.contextAcceptLanguage = contextAcceptLanguage;
-	}
-
-	public void setContextBatchUnsafeConsumer(
-		UnsafeBiConsumer
-			<Collection<DataListView>, UnsafeConsumer<DataListView, Exception>,
-			 Exception> contextBatchUnsafeConsumer) {
-
-		this.contextBatchUnsafeConsumer = contextBatchUnsafeConsumer;
 	}
 
 	public void setContextCompany(
@@ -658,18 +565,6 @@ public abstract class BaseDataListViewResourceImpl
 		this.roleLocalService = roleLocalService;
 	}
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider) {
-		this.sortParserProvider = sortParserProvider;
-	}
-
-	public void setVulcanBatchEngineImportTaskResource(
-		VulcanBatchEngineImportTaskResource
-			vulcanBatchEngineImportTaskResource) {
-
-		this.vulcanBatchEngineImportTaskResource =
-			vulcanBatchEngineImportTaskResource;
-	}
-
 	@Override
 	public Filter toFilter(
 		String filterString, Map<String, List<String>> multivaluedMap) {
@@ -690,49 +585,9 @@ public abstract class BaseDataListViewResourceImpl
 		}
 		catch (Exception exception) {
 			_log.error("Invalid filter " + filterString, exception);
-
-			return null;
-		}
-	}
-
-	@Override
-	public Sort[] toSorts(String sortString) {
-		if (Validator.isNull(sortString)) {
-			return null;
 		}
 
-		try {
-			SortParser sortParser = sortParserProvider.provide(
-				getEntityModel(Collections.emptyMap()));
-
-			if (sortParser == null) {
-				return null;
-			}
-
-			com.liferay.portal.odata.sort.Sort oDataSort =
-				new com.liferay.portal.odata.sort.Sort(
-					sortParser.parse(sortString));
-
-			List<SortField> sortFields = oDataSort.getSortFields();
-
-			Sort[] sorts = new Sort[sortFields.size()];
-
-			for (int i = 0; i < sortFields.size(); i++) {
-				SortField sortField = sortFields.get(i);
-
-				sorts[i] = new Sort(
-					sortField.getSortableFieldName(
-						contextAcceptLanguage.getPreferredLocale()),
-					!sortField.isAscending());
-			}
-
-			return sorts;
-		}
-		catch (Exception exception) {
-			_log.error("Invalid sort " + sortString, exception);
-
-			return new Sort[0];
-		}
+		return null;
 	}
 
 	protected Map<String, String> addAction(
@@ -769,85 +624,35 @@ public abstract class BaseDataListViewResourceImpl
 			actionName, siteId, methodName, null, permissionName, siteId);
 	}
 
-	protected <T, R, E extends Throwable> List<R> transform(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction) {
+	protected <T, R> List<R> transform(
+		java.util.Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction) {
 
 		return TransformUtil.transform(collection, unsafeFunction);
 	}
 
-	protected <T, R, E extends Throwable> R[] transform(
-		T[] array, UnsafeFunction<T, R, E> unsafeFunction, Class<?> clazz) {
+	protected <T, R> R[] transform(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction,
+		Class<?> clazz) {
 
 		return TransformUtil.transform(array, unsafeFunction, clazz);
 	}
 
-	protected <T, R, E extends Throwable> R[] transformToArray(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-		Class<?> clazz) {
+	protected <T, R> R[] transformToArray(
+		java.util.Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction, Class<?> clazz) {
 
 		return TransformUtil.transformToArray(
 			collection, unsafeFunction, clazz);
 	}
 
-	protected <T, R, E extends Throwable> List<R> transformToList(
-		T[] array, UnsafeFunction<T, R, E> unsafeFunction) {
+	protected <T, R> List<R> transformToList(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction) {
 
 		return TransformUtil.transformToList(array, unsafeFunction);
 	}
 
-	protected <T, R, E extends Throwable> long[] transformToLongArray(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction) {
-
-		try {
-			return unsafeTransformToLongArray(collection, unsafeFunction);
-		}
-		catch (Throwable throwable) {
-			throw new RuntimeException(throwable);
-		}
-	}
-
-	protected <T, R, E extends Throwable> List<R> unsafeTransform(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return TransformUtil.unsafeTransform(collection, unsafeFunction);
-	}
-
-	protected <T, R, E extends Throwable> R[] unsafeTransform(
-			T[] array, UnsafeFunction<T, R, E> unsafeFunction, Class<?> clazz)
-		throws E {
-
-		return TransformUtil.unsafeTransform(array, unsafeFunction, clazz);
-	}
-
-	protected <T, R, E extends Throwable> R[] unsafeTransformToArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-			Class<?> clazz)
-		throws E {
-
-		return TransformUtil.unsafeTransformToArray(
-			collection, unsafeFunction, clazz);
-	}
-
-	protected <T, R, E extends Throwable> List<R> unsafeTransformToList(
-			T[] array, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return TransformUtil.unsafeTransformToList(array, unsafeFunction);
-	}
-
-	protected <T, R, E extends Throwable> long[] unsafeTransformToLongArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return (long[])_unsafeTransformToPrimitiveArray(
-			collection, unsafeFunction, long[].class);
-	}
-
 	protected AcceptLanguage contextAcceptLanguage;
-	protected UnsafeBiConsumer
-		<Collection<DataListView>, UnsafeConsumer<DataListView, Exception>,
-		 Exception> contextBatchUnsafeConsumer;
 	protected com.liferay.portal.kernel.model.Company contextCompany;
 	protected HttpServletRequest contextHttpServletRequest;
 	protected HttpServletResponse contextHttpServletResponse;
@@ -860,26 +665,8 @@ public abstract class BaseDataListViewResourceImpl
 	protected ResourceActionLocalService resourceActionLocalService;
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
 	protected RoleLocalService roleLocalService;
-	protected SortParserProvider sortParserProvider;
 	protected VulcanBatchEngineImportTaskResource
 		vulcanBatchEngineImportTaskResource;
-
-	private <T, R, E extends Throwable> Object _unsafeTransformToPrimitiveArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-			Class<?> clazz)
-		throws E {
-
-		List<R> list = unsafeTransform(collection, unsafeFunction);
-
-		Object array = clazz.cast(
-			Array.newInstance(clazz.getComponentType(), list.size()));
-
-		for (int i = 0; i < list.size(); i++) {
-			Array.set(array, i, list.get(i));
-		}
-
-		return array;
-	}
 
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseDataListViewResourceImpl.class);

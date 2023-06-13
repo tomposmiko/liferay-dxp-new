@@ -15,13 +15,16 @@
 package com.liferay.document.library.internal.display.context;
 
 import com.liferay.document.library.configuration.DLConfiguration;
+import com.liferay.document.library.constants.DLContentTypes;
 import com.liferay.document.library.display.context.DLMimeTypeDisplayContext;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 
 /**
@@ -29,6 +32,7 @@ import org.osgi.service.component.annotations.Modified;
  */
 @Component(
 	configurationPid = "com.liferay.document.library.configuration.DLConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	service = DLMimeTypeDisplayContext.class
 )
 public class DefaultDLMimeTypeDisplayContext
@@ -43,11 +47,6 @@ public class DefaultDLMimeTypeDisplayContext
 					_dlConfiguration.compressedFileMimeTypes(), mimeType)) {
 
 			return "file-icon-color-0";
-		}
-		else if (_containsMimeType(
-					_dlConfiguration.multimediaFileMimeTypes(), mimeType)) {
-
-			return "file-icon-color-5";
 		}
 		else if (_containsMimeType(
 					_dlConfiguration.presentationFileMimeTypes(), mimeType)) {
@@ -69,6 +68,9 @@ public class DefaultDLMimeTypeDisplayContext
 
 			return "file-icon-color-3";
 		}
+		else if (_isMultimediaFileMimeType(mimeType)) {
+			return "file-icon-color-5";
+		}
 
 		return "file-icon-color-0";
 	}
@@ -82,15 +84,6 @@ public class DefaultDLMimeTypeDisplayContext
 					_dlConfiguration.compressedFileMimeTypes(), mimeType)) {
 
 			return "document-compressed";
-		}
-		else if (_containsMimeType(
-					_dlConfiguration.multimediaFileMimeTypes(), mimeType)) {
-
-			if (mimeType.startsWith("image")) {
-				return "document-image";
-			}
-
-			return "document-multimedia";
 		}
 		else if (_containsMimeType(
 					_dlConfiguration.presentationFileMimeTypes(), mimeType)) {
@@ -111,6 +104,13 @@ public class DefaultDLMimeTypeDisplayContext
 					_dlConfiguration.vectorialFileMimeTypes(), mimeType)) {
 
 			return "document-vector";
+		}
+		else if (_isMultimediaFileMimeType(mimeType)) {
+			if (mimeType.startsWith("image")) {
+				return "document-image";
+			}
+
+			return "document-multimedia";
 		}
 
 		return "document-default";
@@ -137,6 +137,17 @@ public class DefaultDLMimeTypeDisplayContext
 					return true;
 				}
 			}
+		}
+
+		return false;
+	}
+
+	private boolean _isMultimediaFileMimeType(String mimeType) {
+		if (Objects.equals(mimeType, DLContentTypes.VIDEO_EXTERNAL_SHORTCUT) ||
+			_containsMimeType(
+				_dlConfiguration.multimediaFileMimeTypes(), mimeType)) {
+
+			return true;
 		}
 
 		return false;

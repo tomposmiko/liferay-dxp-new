@@ -135,9 +135,6 @@ public class I18nFilter extends BasePortalFilter {
 			requestURI = requestURI.substring(contextPath.length());
 		}
 
-		requestURI = StringUtil.replace(
-			requestURI, StringPool.DOUBLE_SLASH, StringPool.SLASH);
-
 		String i18nLanguageId = prependI18nLanguageId(
 			httpServletRequest, PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE);
 
@@ -150,6 +147,9 @@ public class I18nFilter extends BasePortalFilter {
 		if (!LanguageUtil.isAvailableLocale(locale)) {
 			return null;
 		}
+
+		requestURI = StringUtil.replace(
+			requestURI, StringPool.DOUBLE_SLASH, StringPool.SLASH);
 
 		String i18nPathLanguageId = PortalUtil.getI18nPathLanguageId(
 			locale, i18nLanguageId);
@@ -197,14 +197,9 @@ public class I18nFilter extends BasePortalFilter {
 			Group group = layoutSet.getGroup();
 
 			if (groupFriendlyURL.equals(group.getFriendlyURL())) {
-				String layoutURL = requestURI.substring(friendlyURLEnd);
-
-				if (Validator.isNull(layoutURL)) {
-					redirect = contextPath + i18nPath + StringPool.SLASH;
-				}
-				else {
-					redirect = contextPath + i18nPath + layoutURL;
-				}
+				redirect =
+					contextPath + i18nPath +
+						requestURI.substring(friendlyURLEnd);
 			}
 		}
 
@@ -225,9 +220,9 @@ public class I18nFilter extends BasePortalFilter {
 	protected String getRequestedLanguageId(
 		HttpServletRequest httpServletRequest, String userLanguageId) {
 
-		HttpSession session = httpServletRequest.getSession();
+		HttpSession httpSession = httpServletRequest.getSession();
 
-		Locale locale = (Locale)session.getAttribute(WebKeys.LOCALE);
+		Locale locale = (Locale)httpSession.getAttribute(WebKeys.LOCALE);
 
 		String requestedLanguageId = null;
 

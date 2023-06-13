@@ -18,8 +18,10 @@ import com.liferay.analytics.settings.configuration.AnalyticsConfiguration;
 import com.liferay.analytics.settings.web.internal.constants.AnalyticsSettingsWebKeys;
 import com.liferay.analytics.settings.web.internal.search.OrganizationChecker;
 import com.liferay.analytics.settings.web.internal.search.OrganizationSearch;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.OrganizationConstants;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
@@ -58,8 +60,9 @@ public class OrganizationDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = ParamUtil.getString(
-			_renderRequest, "orderByType", "asc");
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_renderRequest, AnalyticsSettingsWebKeys.ANALYTICS_CONFIGURATION,
+			"organization-order-by-type", "asc");
 
 		return _orderByType;
 	}
@@ -95,13 +98,11 @@ public class OrganizationDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
-
-		portletURL.setParameter(
-			"mvcRenderCommandName",
-			"/analytics_settings/edit_synced_contacts_organizations");
-
-		return portletURL;
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCRenderCommandName(
+			"/analytics_settings/edit_synced_contacts_organizations"
+		).buildPortletURL();
 	}
 
 	private long _getCompanyId() {
@@ -126,8 +127,9 @@ public class OrganizationDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = ParamUtil.getString(
-			_renderRequest, "orderByCol", "organization-name");
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			_renderRequest, AnalyticsSettingsWebKeys.ANALYTICS_CONFIGURATION,
+			"organization-order-by-col", "organization-name");
 
 		return _orderByCol;
 	}
@@ -139,7 +141,7 @@ public class OrganizationDisplayContext {
 	}
 
 	private boolean _isOrderByAscending() {
-		if (Objects.equals(getOrderByType(), "asc")) {
+		if (Objects.equals("asc", getOrderByType())) {
 			return true;
 		}
 

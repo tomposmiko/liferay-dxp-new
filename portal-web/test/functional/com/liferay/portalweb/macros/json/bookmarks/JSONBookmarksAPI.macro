@@ -7,7 +7,7 @@ definition {
 		var portalURL = JSONCompany.getPortalURL();
 
 		if (isSet(description)) {
-			var description = ${description};
+			var description = "${description}";
 		}
 		else {
 			var description = "";
@@ -22,9 +22,10 @@ definition {
 				-d url=${url}
 				-d description=${description}
 				-d serviceContext=${serviceContext}
+
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
 	@summary = "Helper function to add a Bookmarks Folder via JSON"
@@ -34,7 +35,7 @@ definition {
 		var portalURL = JSONCompany.getPortalURL();
 
 		if (isSet(folderDescription)) {
-			var description = ${folderDescription};
+			var description = "${folderDescription}";
 		}
 		else {
 			var description = "";
@@ -49,7 +50,7 @@ definition {
 				-d serviceContext=${serviceContext}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
 	@summary = "Helper function to get the 'folderId' for the folder '${folderName}'"
@@ -63,18 +64,13 @@ definition {
 				-u test@liferay.com:test \
 				-d groupId=${groupId}
 		''';
+		var folderId = JSONCurlUtil.post("${curl}", "$.[?(@['name'] == '${folderName}')]['folderId']");
 
-		var folderId = JSONCurlUtil.post(${curl}, "$.[?(@['name'] == '${folderName}')]['folderId']");
-
-		var folderId = StringUtil.replace(${folderId}, "[\"", "");
-
-		var folderId = StringUtil.replace(${folderId}, "\"]", "");
-
-		if (${folderId} == "") {
+		if ("${folderId}" == "") {
 			fail("FAIL. Cannot find folder.");
 		}
 		else {
-			return ${folderId};
+			return "${folderId}";
 		}
 	}
 

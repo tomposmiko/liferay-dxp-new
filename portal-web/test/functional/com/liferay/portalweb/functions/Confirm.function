@@ -2,6 +2,10 @@
 @summary = "Execute the confirmation of a confirmation window"
 definition {
 
+	function acceptAlert {
+		selenium.acceptAlert();
+	}
+
 	function confirm {
 		selenium.getConfirmation();
 
@@ -14,6 +18,10 @@ definition {
 
 	function dismissAlert {
 		selenium.dismissAlert();
+	}
+
+	function typeAlert {
+		selenium.typeAlert();
 	}
 
 }

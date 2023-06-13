@@ -14,23 +14,25 @@
 
 package com.liferay.commerce.warehouse.web.internal.display.context;
 
+import com.liferay.commerce.country.CommerceCountryManager;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouse;
 import com.liferay.commerce.inventory.service.CommerceInventoryWarehouseService;
-import com.liferay.commerce.model.CommerceCountry;
-import com.liferay.commerce.product.display.context.util.CPRequestHelper;
+import com.liferay.commerce.product.display.context.helper.CPRequestHelper;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.model.CommerceChannelRel;
 import com.liferay.commerce.product.service.CommerceChannelRelService;
 import com.liferay.commerce.product.service.CommerceChannelService;
-import com.liferay.commerce.service.CommerceCountryService;
 import com.liferay.commerce.util.CommerceUtil;
 import com.liferay.frontend.taglib.servlet.taglib.ManagementBarFilterItem;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.service.CountryService;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -42,7 +44,6 @@ import java.util.stream.Stream;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
-import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -55,14 +56,15 @@ public class CommerceInventoryWarehousesDisplayContext {
 	public CommerceInventoryWarehousesDisplayContext(
 		CommerceChannelRelService commerceChannelRelService,
 		CommerceChannelService commerceChannelService,
-		CommerceCountryService commerceCountryService,
+		CommerceCountryManager commerceCountryManager,
 		CommerceInventoryWarehouseService commerceInventoryWarehouseService,
-		HttpServletRequest httpServletRequest) {
+		CountryService countryService, HttpServletRequest httpServletRequest) {
 
 		_commerceChannelRelService = commerceChannelRelService;
 		_commerceChannelService = commerceChannelService;
-		_commerceCountryService = commerceCountryService;
+		_commerceCountryManager = commerceCountryManager;
 		_commerceInventoryWarehouseService = commerceInventoryWarehouseService;
+		_countryService = countryService;
 
 		_cpRequestHelper = new CPRequestHelper(httpServletRequest);
 	}
@@ -95,26 +97,6 @@ public class CommerceInventoryWarehousesDisplayContext {
 			_cpRequestHelper.getCompanyId());
 	}
 
-	public CommerceCountry getCommerceCountry(long commerceCountryId)
-		throws PortalException {
-
-		return _commerceCountryService.getCommerceCountry(commerceCountryId);
-	}
-
-	public CommerceCountry getCommerceCountry(
-			String commerceCountryTwoLettersIsoCode)
-		throws PortalException {
-
-		return _commerceCountryService.getCommerceCountry(
-			_cpRequestHelper.getCompanyId(), commerceCountryTwoLettersIsoCode);
-	}
-
-	public String getCommerceCountryTwoLettersIsoCode() {
-		return ParamUtil.getString(
-			_cpRequestHelper.getRenderRequest(), "countryTwoLettersISOCode",
-			null);
-	}
-
 	public CommerceInventoryWarehouse getCommerceInventoryWarehouse()
 		throws PortalException {
 
@@ -135,25 +117,41 @@ public class CommerceInventoryWarehousesDisplayContext {
 		return _commerceInventoryWarehouse;
 	}
 
+	public Country getCountry(long countryId) throws PortalException {
+		return _countryService.getCountry(countryId);
+	}
+
+	public Country getCountry(String countryTwoLettersIsoCode)
+		throws PortalException {
+
+		return _countryService.getCountryByA2(
+			_cpRequestHelper.getCompanyId(), countryTwoLettersIsoCode);
+	}
+
+	public String getCountryTwoLettersIsoCode() {
+		return ParamUtil.getString(
+			_cpRequestHelper.getRenderRequest(), "countryTwoLettersISOCode",
+			null);
+	}
+
 	public List<ManagementBarFilterItem> getManagementBarFilterItems()
 		throws PortalException, PortletException {
 
-		List<CommerceCountry> commerceCountries =
-			_commerceCountryService.getWarehouseCommerceCountries(
-				_cpRequestHelper.getCompanyId(), true);
+		List<Country> countries = _commerceCountryManager.getWarehouseCountries(
+			_cpRequestHelper.getCompanyId(), true);
 
-		commerceCountries = ListUtil.unique(commerceCountries);
+		countries = ListUtil.unique(countries);
 
 		List<ManagementBarFilterItem> managementBarFilterItems =
-			new ArrayList<>(commerceCountries.size() + 1);
+			new ArrayList<>(countries.size() + 1);
 
 		managementBarFilterItems.add(getManagementBarFilterItem(-1, "all"));
 
-		for (CommerceCountry commerceCountry : commerceCountries) {
+		for (Country country : countries) {
 			managementBarFilterItems.add(
 				getManagementBarFilterItem(
-					commerceCountry.getCommerceCountryId(),
-					commerceCountry.getName(_cpRequestHelper.getLocale())));
+					country.getCountryId(),
+					country.getName(_cpRequestHelper.getLocale())));
 		}
 
 		return managementBarFilterItems;
@@ -172,26 +170,31 @@ public class CommerceInventoryWarehousesDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
-		RenderResponse renderResponse = _cpRequestHelper.getRenderResponse();
+		return PortletURLBuilder.createRenderURL(
+			_cpRequestHelper.getRenderResponse()
+		).setKeywords(
+			getKeywords()
+		).setNavigation(
+			getNavigation()
+		).setParameter(
+			"countryTwoLettersISOCode", getCountryTwoLettersIsoCode()
+		).setParameter(
+			"delta",
+			() -> {
+				String delta = ParamUtil.getString(
+					_cpRequestHelper.getRenderRequest(), "delta");
 
-		PortletURL portletURL = renderResponse.createRenderURL();
+				if (Validator.isNotNull(delta)) {
+					return delta;
+				}
 
-		portletURL.setParameter(
-			"countryTwoLettersISOCode", getCommerceCountryTwoLettersIsoCode());
-
-		String delta = ParamUtil.getString(
-			_cpRequestHelper.getRenderRequest(), "delta");
-
-		if (Validator.isNotNull(delta)) {
-			portletURL.setParameter("delta", delta);
-		}
-
-		portletURL.setParameter("keywords", getKeywords());
-		portletURL.setParameter("navigation", getNavigation());
-		portletURL.setParameter("orderByCol", getOrderByCol());
-		portletURL.setParameter("orderByType", getOrderByType());
-
-		return portletURL;
+				return null;
+			}
+		).setParameter(
+			"orderByCol", getOrderByCol()
+		).setParameter(
+			"orderByType", getOrderByType()
+		).buildPortletURL();
 	}
 
 	public SearchContainer<CommerceInventoryWarehouse> getSearchContainer()
@@ -202,8 +205,7 @@ public class CommerceInventoryWarehousesDisplayContext {
 		}
 
 		Boolean active = null;
-		String commerceCountryTwoLettersIsoCode =
-			getCommerceCountryTwoLettersIsoCode();
+		String countryTwoLettersIsoCode = getCountryTwoLettersIsoCode();
 
 		String emptyResultsMessage = "no-warehouses-were-found";
 		boolean search = isSearch();
@@ -219,15 +221,14 @@ public class CommerceInventoryWarehousesDisplayContext {
 			emptyResultsMessage = "there-are-no-inactive-warehouses";
 		}
 
-		if (Validator.isNotNull(commerceCountryTwoLettersIsoCode)) {
+		if (Validator.isNotNull(countryTwoLettersIsoCode)) {
 			emptyResultsMessage += "-in-x";
 
-			CommerceCountry commerceCountry = getCommerceCountry(
-				commerceCountryTwoLettersIsoCode);
+			Country country = getCountry(countryTwoLettersIsoCode);
 
 			emptyResultsMessage = LanguageUtil.format(
 				_cpRequestHelper.getRequest(), emptyResultsMessage,
-				commerceCountry.getName(_cpRequestHelper.getLocale()));
+				country.getTitle(_cpRequestHelper.getLocale()));
 		}
 
 		_searchContainer = new SearchContainer<>(
@@ -252,19 +253,18 @@ public class CommerceInventoryWarehousesDisplayContext {
 		_searchContainer.setSearch(search);
 
 		List<CommerceInventoryWarehouse> commerceInventoryWarehouses =
-			_commerceInventoryWarehouseService.
-				searchCommerceInventoryWarehouses(
-					_cpRequestHelper.getCompanyId(), active,
-					commerceCountryTwoLettersIsoCode, getKeywords(),
-					_searchContainer.getStart(), _searchContainer.getEnd(),
-					CommerceUtil.getCommerceInventoryWarehouseSort(
-						orderByCol, orderByType));
+			_commerceInventoryWarehouseService.search(
+				_cpRequestHelper.getCompanyId(), active,
+				countryTwoLettersIsoCode, getKeywords(),
+				_searchContainer.getStart(), _searchContainer.getEnd(),
+				CommerceUtil.getCommerceInventoryWarehouseSort(
+					orderByCol, orderByType));
 
 		int commerceInventoryWarehousesCount =
 			_commerceInventoryWarehouseService.
 				searchCommerceInventoryWarehousesCount(
 					_cpRequestHelper.getCompanyId(), active,
-					commerceCountryTwoLettersIsoCode, getKeywords());
+					countryTwoLettersIsoCode, getKeywords());
 
 		_searchContainer.setResults(commerceInventoryWarehouses);
 		_searchContainer.setTotal(commerceInventoryWarehousesCount);
@@ -288,7 +288,7 @@ public class CommerceInventoryWarehousesDisplayContext {
 	}
 
 	protected ManagementBarFilterItem getManagementBarFilterItem(
-			long commerceCountryId, String label)
+			long countryId, String label)
 		throws PortalException, PortletException {
 
 		boolean active = false;
@@ -296,22 +296,18 @@ public class CommerceInventoryWarehousesDisplayContext {
 		PortletURL portletURL = PortletURLUtil.clone(
 			getPortletURL(), _cpRequestHelper.getRenderResponse());
 
-		if (commerceCountryId > 0) {
-			String commerceCountryTwoLettersIsoCode =
-				getCommerceCountryTwoLettersIsoCode();
-			CommerceCountry commerceCountry = getCommerceCountry(
-				commerceCountryId);
+		if (countryId > 0) {
+			String countryTwoLettersIsoCode = getCountryTwoLettersIsoCode();
+			Country country = getCountry(countryId);
 
-			if (Validator.isNotNull(commerceCountryTwoLettersIsoCode) &&
-				commerceCountryTwoLettersIsoCode.equals(
-					commerceCountry.getTwoLettersISOCode())) {
+			if (Validator.isNotNull(countryTwoLettersIsoCode) &&
+				countryTwoLettersIsoCode.equals(country.getA2())) {
 
 				active = true;
 			}
 
 			portletURL.setParameter(
-				"countryTwoLettersISOCode",
-				commerceCountry.getTwoLettersISOCode());
+				"countryTwoLettersISOCode", country.getA2());
 		}
 		else {
 			portletURL.setParameter(
@@ -319,8 +315,7 @@ public class CommerceInventoryWarehousesDisplayContext {
 		}
 
 		return new ManagementBarFilterItem(
-			active, String.valueOf(commerceCountryId), label,
-			portletURL.toString());
+			active, String.valueOf(countryId), label, portletURL.toString());
 	}
 
 	protected String getNavigation() {
@@ -338,10 +333,11 @@ public class CommerceInventoryWarehousesDisplayContext {
 
 	private final CommerceChannelRelService _commerceChannelRelService;
 	private final CommerceChannelService _commerceChannelService;
-	private final CommerceCountryService _commerceCountryService;
+	private final CommerceCountryManager _commerceCountryManager;
 	private CommerceInventoryWarehouse _commerceInventoryWarehouse;
 	private final CommerceInventoryWarehouseService
 		_commerceInventoryWarehouseService;
+	private final CountryService _countryService;
 	private final CPRequestHelper _cpRequestHelper;
 	private String _keywords;
 	private SearchContainer<CommerceInventoryWarehouse> _searchContainer;

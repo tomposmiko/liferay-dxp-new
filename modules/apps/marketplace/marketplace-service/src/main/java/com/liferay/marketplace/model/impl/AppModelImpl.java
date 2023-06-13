@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -105,7 +106,7 @@ public class AppModelImpl extends BaseModelImpl<App> implements AppModel {
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table Marketplace_App (uuid_ VARCHAR(75) null,appId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,remoteAppId LONG,title VARCHAR(75) null,description STRING null,category VARCHAR(75) null,iconURL STRING null,version VARCHAR(75) null,required BOOLEAN)";
+		"create table Marketplace_App (uuid_ VARCHAR(75) null,appId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,remoteAppId LONG,title VARCHAR(255) null,description STRING null,category VARCHAR(255) null,iconURL STRING null,version VARCHAR(75) null,required BOOLEAN)";
 
 	public static final String TABLE_SQL_DROP = "drop table Marketplace_App";
 
@@ -300,68 +301,89 @@ public class AppModelImpl extends BaseModelImpl<App> implements AppModel {
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<App, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, App>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<App, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<App, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			App.class.getClassLoader(), App.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("uuid", App::getUuid);
-		attributeGetterFunctions.put("appId", App::getAppId);
-		attributeGetterFunctions.put("companyId", App::getCompanyId);
-		attributeGetterFunctions.put("userId", App::getUserId);
-		attributeGetterFunctions.put("userName", App::getUserName);
-		attributeGetterFunctions.put("createDate", App::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", App::getModifiedDate);
-		attributeGetterFunctions.put("remoteAppId", App::getRemoteAppId);
-		attributeGetterFunctions.put("title", App::getTitle);
-		attributeGetterFunctions.put("description", App::getDescription);
-		attributeGetterFunctions.put("category", App::getCategory);
-		attributeGetterFunctions.put("iconURL", App::getIconURL);
-		attributeGetterFunctions.put("version", App::getVersion);
-		attributeGetterFunctions.put("required", App::getRequired);
+		try {
+			Constructor<App> constructor =
+				(Constructor<App>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<App, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<App, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<App, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<App, Object>>();
 		Map<String, BiConsumer<App, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<App, ?>>();
 
+		attributeGetterFunctions.put("uuid", App::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<App, String>)App::setUuid);
+		attributeGetterFunctions.put("appId", App::getAppId);
 		attributeSetterBiConsumers.put(
 			"appId", (BiConsumer<App, Long>)App::setAppId);
+		attributeGetterFunctions.put("companyId", App::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<App, Long>)App::setCompanyId);
+		attributeGetterFunctions.put("userId", App::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<App, Long>)App::setUserId);
+		attributeGetterFunctions.put("userName", App::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<App, String>)App::setUserName);
+		attributeGetterFunctions.put("createDate", App::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<App, Date>)App::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", App::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate", (BiConsumer<App, Date>)App::setModifiedDate);
+		attributeGetterFunctions.put("remoteAppId", App::getRemoteAppId);
 		attributeSetterBiConsumers.put(
 			"remoteAppId", (BiConsumer<App, Long>)App::setRemoteAppId);
+		attributeGetterFunctions.put("title", App::getTitle);
 		attributeSetterBiConsumers.put(
 			"title", (BiConsumer<App, String>)App::setTitle);
+		attributeGetterFunctions.put("description", App::getDescription);
 		attributeSetterBiConsumers.put(
 			"description", (BiConsumer<App, String>)App::setDescription);
+		attributeGetterFunctions.put("category", App::getCategory);
 		attributeSetterBiConsumers.put(
 			"category", (BiConsumer<App, String>)App::setCategory);
+		attributeGetterFunctions.put("iconURL", App::getIconURL);
 		attributeSetterBiConsumers.put(
 			"iconURL", (BiConsumer<App, String>)App::setIconURL);
+		attributeGetterFunctions.put("version", App::getVersion);
 		attributeSetterBiConsumers.put(
 			"version", (BiConsumer<App, String>)App::setVersion);
+		attributeGetterFunctions.put("required", App::getRequired);
 		attributeSetterBiConsumers.put(
 			"required", (BiConsumer<App, Boolean>)App::setRequired);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -759,6 +781,31 @@ public class AppModelImpl extends BaseModelImpl<App> implements AppModel {
 	}
 
 	@Override
+	public App cloneWithOriginalValues() {
+		AppImpl appImpl = new AppImpl();
+
+		appImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		appImpl.setAppId(this.<Long>getColumnOriginalValue("appId"));
+		appImpl.setCompanyId(this.<Long>getColumnOriginalValue("companyId"));
+		appImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		appImpl.setUserName(this.<String>getColumnOriginalValue("userName"));
+		appImpl.setCreateDate(this.<Date>getColumnOriginalValue("createDate"));
+		appImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		appImpl.setRemoteAppId(
+			this.<Long>getColumnOriginalValue("remoteAppId"));
+		appImpl.setTitle(this.<String>getColumnOriginalValue("title"));
+		appImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		appImpl.setCategory(this.<String>getColumnOriginalValue("category"));
+		appImpl.setIconURL(this.<String>getColumnOriginalValue("iconURL"));
+		appImpl.setVersion(this.<String>getColumnOriginalValue("version"));
+		appImpl.setRequired(this.<Boolean>getColumnOriginalValue("required"));
+
+		return appImpl;
+	}
+
+	@Override
 	public int compareTo(App app) {
 		long primaryKey = app.getPrimaryKey();
 
@@ -999,9 +1046,7 @@ public class AppModelImpl extends BaseModelImpl<App> implements AppModel {
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, App>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					App.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

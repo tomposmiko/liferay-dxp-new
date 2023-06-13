@@ -19,7 +19,7 @@
 	}
 
 	.lfr-form-content {
-		padding: 15px;
+		padding: 24px 12px;
 	}
 
 	.portlet-body,
@@ -40,11 +40,10 @@
 	.portlet-configuration-body-content,
 	.process-list,
 	.roles-selector-body {
-		> .container-fluid-1280,
+		> .container-fluid-max-xl,
 		.container-view {
 			padding-top: 20px;
 
-			> .nav-tabs-default,
 			.nav-tabs-underline {
 				margin-left: -$grid-gutter-width / 2;
 				margin-right: -$grid-gutter-width / 2;
@@ -52,7 +51,7 @@
 			}
 		}
 
-		> .lfr-nav + .container-fluid-1280 {
+		> .lfr-nav + .container-fluid-max-xl {
 			padding-top: 0;
 		}
 	}
@@ -61,8 +60,7 @@
 		padding: $modal-inner-padding;
 	}
 
-	.management-bar-default,
-	.navbar-default {
+	.management-bar-default {
 		border-left-width: 0;
 		border-radius: 0;
 		border-right-width: 0;
@@ -170,11 +168,17 @@
 		}
 	}
 
-	.lfr-dynamic-uploader.hide-dialog-footer {
-		bottom: 0;
+	.lfr-dynamic-uploader {
+		display: table;
+		table-layout: fixed;
+		width: 100%;
 
-		+ .dialog-footer {
-			display: none;
+		&.hide-dialog-footer {
+			bottom: 0;
+
+			+ .dialog-footer {
+				display: none;
+			}
 		}
 	}
 

@@ -28,10 +28,13 @@ if (Validator.isNull(redirect)) {
 	redirect = String.valueOf(renderResponse.createRenderURL());
 }
 
-PortletURL searchURL = renderResponse.createRenderURL();
-
-searchURL.setParameter("mvcRenderCommandName", "/configuration_admin/search");
-searchURL.setParameter("redirect", redirect);
+PortletURL searchURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCRenderCommandName(
+	"/configuration_admin/search_results"
+).setRedirect(
+	redirect
+).buildPortletURL();
 
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
@@ -39,13 +42,15 @@ portletDisplay.setURLBack(redirect);
 renderResponse.setTitle(LanguageUtil.get(request, "search-results"));
 %>
 
-<clay:management-toolbar
-	clearResultsURL="<%= redirect %>"
-	itemsTotal="<%= configurationEntryIterator.getTotal() %>"
-	searchActionURL="<%= searchURL.toString() %>"
-	selectable="<%= false %>"
-	showSearch="<%= true %>"
-/>
+<div class="sticky-top" style="top: 56px;">
+	<clay:management-toolbar
+		clearResultsURL="<%= redirect %>"
+		itemsTotal="<%= configurationEntryIterator.getTotal() %>"
+		searchActionURL="<%= searchURL.toString() %>"
+		selectable="<%= false %>"
+		showSearch="<%= true %>"
+	/>
+</div>
 
 <clay:container-fluid
 	cssClass="container-view"
@@ -65,14 +70,14 @@ renderResponse.setTitle(LanguageUtil.get(request, "search-results"));
 			modelVar="configurationEntry"
 		>
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="name"
 			>
 				<aui:a href="<%= configurationEntry.getEditURL(renderRequest, renderResponse) %>"><strong><%= configurationEntry.getName() %></strong></aui:a>
 			</liferay-ui:search-container-column-text>
 
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="category"
 			>
 
@@ -101,7 +106,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "search-results"));
 			</liferay-ui:search-container-column-text>
 
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="scope"
 			>
 				<c:choose>

@@ -85,10 +85,10 @@ public class DDMUserPersonalFolderUploadFileEntryHandler
 					themeDisplay.getScopeGroupId(), folderId, curFileName));
 
 			return _dlAppService.addFileEntry(
-				repositoryId, folderId, uniqueFileName,
+				null, repositoryId, folderId, uniqueFileName,
 				uploadPortletRequest.getContentType(_PARAMETER_NAME),
 				uniqueFileName, _getDescription(uploadPortletRequest),
-				StringPool.BLANK, inputStream, size,
+				StringPool.BLANK, inputStream, size, null, null,
 				_getServiceContext(uploadPortletRequest));
 		}
 	}

@@ -26,8 +26,23 @@
 	<td></td>
 </tr>
 <tr>
+	<td>DISPLAY_PAGE_PREVIEW_ITEM_SELECTOR</td>
+	<td>//button[contains(@class,'display-page-preview-item-selector')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>HEADING</td>
 	<td>//*[@data-qa-id='headerTitle']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>HEADING_LABEL</td>
+	<td>//*[@data-qa-id='headerTitle']//following-sibling::span//span[contains(@class,'label-item')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MERGE</td>
+	<td>//*[@data-qa-id='controlMenu']//*[name()='svg'][contains(@class,'lexicon-icon-merge')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -70,9 +85,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ADMIN-->
-
 <tr>
 	<td>ADMIN_SITE_ADMINISTRATION_USERS</td>
 	<td>//div[contains(@id,'product_menu')]//a[contains(.,'Users')]</td>

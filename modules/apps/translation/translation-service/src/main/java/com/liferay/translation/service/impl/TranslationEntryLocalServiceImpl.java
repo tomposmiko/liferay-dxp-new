@@ -21,12 +21,18 @@ import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
 import com.liferay.info.item.updater.InfoItemFieldValuesUpdater;
 import com.liferay.petra.io.StreamUtil;
+import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -34,6 +40,7 @@ import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.translation.exporter.TranslationInfoItemFieldValuesExporter;
 import com.liferay.translation.importer.TranslationInfoItemFieldValuesImporter;
 import com.liferay.translation.model.TranslationEntry;
+import com.liferay.translation.model.TranslationEntryTable;
 import com.liferay.translation.service.base.TranslationEntryLocalServiceBaseImpl;
 
 import java.io.ByteArrayInputStream;
@@ -59,6 +66,7 @@ import org.osgi.service.component.annotations.Reference;
 public class TranslationEntryLocalServiceImpl
 	extends TranslationEntryLocalServiceBaseImpl {
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public TranslationEntry addOrUpdateTranslationEntry(
 			long groupId, String languageId,
@@ -68,6 +76,8 @@ public class TranslationEntryLocalServiceImpl
 		throws PortalException {
 
 		try {
+			infoItemReference = infoItemFieldValues.getInfoItemReference();
+
 			return addOrUpdateTranslationEntry(
 				groupId, infoItemReference.getClassName(),
 				infoItemReference.getClassPK(),
@@ -84,6 +94,7 @@ public class TranslationEntryLocalServiceImpl
 		}
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public TranslationEntry addOrUpdateTranslationEntry(
 			long groupId, String className, long classPK, String content,
@@ -144,6 +155,36 @@ public class TranslationEntryLocalServiceImpl
 	}
 
 	@Override
+	public void deleteTranslationEntries(long classNameId, long classPK)
+		throws PortalException {
+
+		ActionableDynamicQuery actionableDynamicQuery =
+			translationEntryLocalService.getActionableDynamicQuery();
+
+		actionableDynamicQuery.setAddCriteriaMethod(
+			dynamicQuery -> {
+				dynamicQuery.add(
+					RestrictionsFactoryUtil.eq("classNameId", classNameId));
+				dynamicQuery.add(
+					RestrictionsFactoryUtil.eq("classPK", classPK));
+			});
+		actionableDynamicQuery.setPerformActionMethod(
+			(TranslationEntry translationEntry) ->
+				translationEntryLocalService.deleteTranslationEntry(
+					translationEntry));
+
+		actionableDynamicQuery.performActions();
+	}
+
+	@Override
+	public void deleteTranslationEntries(String className, long classPK)
+		throws PortalException {
+
+		translationEntryLocalService.deleteTranslationEntries(
+			_portal.getClassNameId(className), classPK);
+	}
+
+	@Override
 	public TranslationEntry fetchTranslationEntry(
 		String className, long classPK, String languageId) {
 
@@ -168,6 +209,34 @@ public class TranslationEntryLocalServiceImpl
 	}
 
 	@Override
+	public int getTranslationEntriesCount(
+		String className, long classPK, int[] statuses, boolean exclude) {
+
+		return translationEntryPersistence.dslQueryCount(
+			DSLQueryFactoryUtil.count(
+			).from(
+				TranslationEntryTable.INSTANCE
+			).where(
+				TranslationEntryTable.INSTANCE.classNameId.eq(
+					_portal.getClassNameId(className)
+				).and(
+					TranslationEntryTable.INSTANCE.classPK.eq(classPK)
+				).and(
+					() -> {
+						if (exclude) {
+							return TranslationEntryTable.INSTANCE.status.notIn(
+								ArrayUtil.toArray(statuses));
+						}
+
+						return TranslationEntryTable.INSTANCE.status.in(
+							ArrayUtil.toArray(statuses));
+					}
+				)
+			));
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
 	public TranslationEntry updateStatus(
 			long userId, long translationEntryId, int status,
 			ServiceContext serviceContext,
@@ -178,7 +247,7 @@ public class TranslationEntryLocalServiceImpl
 			translationEntryPersistence.findByPrimaryKey(translationEntryId);
 
 		if (status == WorkflowConstants.STATUS_APPROVED) {
-			return _updateInfoItem(translationEntry);
+			_updateInfoItem(translationEntry);
 		}
 
 		translationEntry.setStatus(status);
@@ -194,7 +263,7 @@ public class TranslationEntryLocalServiceImpl
 		return translationEntryPersistence.update(translationEntry);
 	}
 
-	private TranslationEntry _updateInfoItem(TranslationEntry translationEntry)
+	private void _updateInfoItem(TranslationEntry translationEntry)
 		throws PortalException {
 
 		try {
@@ -221,8 +290,6 @@ public class TranslationEntryLocalServiceImpl
 							translationEntry.getClassPK()),
 						new ByteArrayInputStream(
 							content.getBytes(StandardCharsets.UTF_8))));
-
-			return deleteTranslationEntry(translationEntry);
 		}
 		catch (PortalException | RuntimeException exception) {
 			throw exception;

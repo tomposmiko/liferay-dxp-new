@@ -71,7 +71,7 @@ public class DDMFormContextToDDMFormValues
 		DDMForm ddmForm = ddmFormContextDeserializerRequest.getProperty(
 			"ddmForm");
 
-		if (Validator.isNull(serializedFormContext)) {
+		if (ddmForm == null) {
 			throw new IllegalStateException(
 				"The property \"ddmForm\" is required");
 		}

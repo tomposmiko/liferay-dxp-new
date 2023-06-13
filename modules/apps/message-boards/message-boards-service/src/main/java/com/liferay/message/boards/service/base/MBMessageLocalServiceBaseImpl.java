@@ -26,8 +26,6 @@ import com.liferay.message.boards.service.MBMessageLocalService;
 import com.liferay.message.boards.service.MBMessageLocalServiceUtil;
 import com.liferay.message.boards.service.persistence.MBMessageFinder;
 import com.liferay.message.boards.service.persistence.MBMessagePersistence;
-import com.liferay.message.boards.service.persistence.MBThreadFinder;
-import com.liferay.message.boards.service.persistence.MBThreadPersistence;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
@@ -50,8 +48,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -278,6 +274,49 @@ public abstract class MBMessageLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the message-boards message with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the message-boards message's external reference code
+	 * @return the matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
+	 */
+	@Override
+	public MBMessage fetchMBMessageByExternalReferenceCode(
+		long groupId, String externalReferenceCode) {
+
+		return mbMessagePersistence.fetchByG_ERC(
+			groupId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchMBMessageByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public MBMessage fetchMBMessageByReferenceCode(
+		long groupId, String externalReferenceCode) {
+
+		return fetchMBMessageByExternalReferenceCode(
+			groupId, externalReferenceCode);
+	}
+
+	/**
+	 * Returns the message-boards message with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the message-boards message's external reference code
+	 * @return the matching message-boards message
+	 * @throws PortalException if a matching message-boards message could not be found
+	 */
+	@Override
+	public MBMessage getMBMessageByExternalReferenceCode(
+			long groupId, String externalReferenceCode)
+		throws PortalException {
+
+		return mbMessagePersistence.findByG_ERC(groupId, externalReferenceCode);
+	}
+
+	/**
 	 * Returns the message-boards message with the primary key.
 	 *
 	 * @param messageId the primary key of the message-boards message
@@ -485,6 +524,7 @@ public abstract class MBMessageLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -501,6 +541,7 @@ public abstract class MBMessageLocalServiceBaseImpl
 		return mbMessageLocalService.deleteMBMessage((MBMessage)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<MBMessage> getBasePersistence() {
 		return mbMessagePersistence;
 	}
@@ -708,54 +749,5 @@ public abstract class MBMessageLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.ClassNameLocalService
-		classNameLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.CompanyLocalService
-		companyLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.GroupLocalService
-		groupLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
-		workflowInstanceLinkLocalService;
-
-	@Reference
-	protected com.liferay.asset.kernel.service.AssetEntryLocalService
-		assetEntryLocalService;
-
-	@Reference
-	protected com.liferay.asset.kernel.service.AssetLinkLocalService
-		assetLinkLocalService;
-
-	@Reference
-	protected com.liferay.expando.kernel.service.ExpandoRowLocalService
-		expandoRowLocalService;
-
-	@Reference
-	protected com.liferay.ratings.kernel.service.RatingsStatsLocalService
-		ratingsStatsLocalService;
-
-	@Reference
-	protected MBThreadPersistence mbThreadPersistence;
-
-	@Reference
-	protected MBThreadFinder mbThreadFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MBMessageLocalServiceBaseImpl.class);
 
 }

@@ -14,7 +14,6 @@
 
 package com.liferay.headless.admin.workflow.internal.resource.v1_0.factory;
 
-import com.liferay.headless.admin.workflow.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowLogResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,18 +33,14 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -53,7 +48,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +58,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Javier Gamarra
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/headless-admin-workflow/v1.0/WorkflowLog",
-	service = WorkflowLogResource.Factory.class
-)
+@Component(immediate = true, service = WorkflowLogResource.Factory.class)
 @Generated("")
 public class WorkflowLogResourceFactoryImpl
 	implements WorkflowLogResource.Factory {
@@ -79,7 +73,9 @@ public class WorkflowLogResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return _workflowLogResourceProxyProviderFunction.apply(
+				return (WorkflowLogResource)ProxyUtil.newProxyInstance(
+					WorkflowLogResource.class.getClassLoader(),
+					new Class<?>[] {WorkflowLogResource.class},
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -138,32 +134,14 @@ public class WorkflowLogResourceFactoryImpl
 		};
 	}
 
-	private static Function<InvocationHandler, WorkflowLogResource>
-		_getProxyProviderFunction() {
+	@Activate
+	protected void activate() {
+		WorkflowLogResource.FactoryHolder.factory = this;
+	}
 
-		Class<?> proxyClass = ProxyUtil.getProxyClass(
-			WorkflowLogResource.class.getClassLoader(),
-			WorkflowLogResource.class);
-
-		try {
-			Constructor<WorkflowLogResource> constructor =
-				(Constructor<WorkflowLogResource>)proxyClass.getConstructor(
-					InvocationHandler.class);
-
-			return invocationHandler -> {
-				try {
-					return constructor.newInstance(invocationHandler);
-				}
-				catch (ReflectiveOperationException
-							reflectiveOperationException) {
-
-					throw new InternalError(reflectiveOperationException);
-				}
-			};
-		}
-		catch (NoSuchMethodException noSuchMethodException) {
-			throw new InternalError(noSuchMethodException);
-		}
+	@Deactivate
+	protected void deactivate() {
+		WorkflowLogResource.FactoryHolder.factory = null;
 	}
 
 	private Object _invoke(
@@ -186,7 +164,7 @@ public class WorkflowLogResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		WorkflowLogResource workflowLogResource =
@@ -210,7 +188,6 @@ public class WorkflowLogResourceFactoryImpl
 		workflowLogResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		workflowLogResource.setRoleLocalService(_roleLocalService);
-		workflowLogResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(workflowLogResource, arguments);
@@ -226,9 +203,6 @@ public class WorkflowLogResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
-
-	private static final Function<InvocationHandler, WorkflowLogResource>
-		_workflowLogResourceProxyProviderFunction = _getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
@@ -251,6 +225,9 @@ public class WorkflowLogResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -259,9 +236,6 @@ public class WorkflowLogResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

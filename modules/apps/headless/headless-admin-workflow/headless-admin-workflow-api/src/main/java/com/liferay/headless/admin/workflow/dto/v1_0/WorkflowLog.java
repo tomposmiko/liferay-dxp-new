@@ -156,6 +156,34 @@ public class WorkflowLog implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
+	@Schema(description = "The log's description.")
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	@JsonIgnore
+	public void setDescription(
+		UnsafeSupplier<String, Exception> descriptionUnsafeSupplier) {
+
+		try {
+			description = descriptionUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(description = "The log's description.")
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected String description;
+
 	@Schema(description = "The log's ID.")
 	public Long getId() {
 		return id;
@@ -484,6 +512,20 @@ public class WorkflowLog implements Serializable {
 			sb.append("\"");
 		}
 
+		if (description != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"description\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(description));
+
+			sb.append("\"");
+		}
+
 		if (id != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -601,8 +643,9 @@ public class WorkflowLog implements Serializable {
 	@GraphQLName("Type")
 	public static enum Type {
 
-		TASK_ASSIGN("TaskAssign"), TASK_COMPLETION("TaskCompletion"),
-		TASK_UPDATE("TaskUpdate"), TRANSITION("Transition");
+		NODE_ENTRY("NodeEntry"), TASK_ASSIGN("TaskAssign"),
+		TASK_COMPLETION("TaskCompletion"), TASK_UPDATE("TaskUpdate"),
+		TRANSITION("Transition");
 
 		@JsonCreator
 		public static Type create(String value) {

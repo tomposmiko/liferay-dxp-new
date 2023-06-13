@@ -57,8 +57,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -274,7 +272,13 @@ public abstract class CPTaxCategoryLocalServiceBaseImpl
 		return cpTaxCategoryPersistence.fetchByPrimaryKey(CPTaxCategoryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp tax category with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp tax category's external reference code
+	 * @return the matching cp tax category, or <code>null</code> if a matching cp tax category could not be found
+	 */
 	@Override
 	public CPTaxCategory fetchCPTaxCategoryByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -283,6 +287,9 @@ public abstract class CPTaxCategoryLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPTaxCategoryByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public CPTaxCategory fetchCPTaxCategoryByReferenceCode(
@@ -292,7 +299,14 @@ public abstract class CPTaxCategoryLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp tax category with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp tax category's external reference code
+	 * @return the matching cp tax category
+	 * @throws PortalException if a matching cp tax category could not be found
+	 */
 	@Override
 	public CPTaxCategory getCPTaxCategoryByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -361,6 +375,7 @@ public abstract class CPTaxCategoryLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -379,6 +394,7 @@ public abstract class CPTaxCategoryLocalServiceBaseImpl
 			(CPTaxCategory)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<CPTaxCategory> getBasePersistence() {
 		return cpTaxCategoryPersistence;
 	}
@@ -1860,9 +1876,6 @@ public abstract class CPTaxCategoryLocalServiceBaseImpl
 
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CPTaxCategoryLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

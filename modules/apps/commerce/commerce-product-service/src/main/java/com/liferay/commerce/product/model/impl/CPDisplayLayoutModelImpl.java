@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -77,18 +78,19 @@ public class CPDisplayLayoutModelImpl
 	public static final String TABLE_NAME = "CPDisplayLayout";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"uuid_", Types.VARCHAR}, {"CPDisplayLayoutId", Types.BIGINT},
-		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
-		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
-		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
-		{"classNameId", Types.BIGINT}, {"classPK", Types.BIGINT},
-		{"layoutUuid", Types.VARCHAR}
+		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
+		{"CPDisplayLayoutId", Types.BIGINT}, {"groupId", Types.BIGINT},
+		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
+		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
+		{"modifiedDate", Types.TIMESTAMP}, {"classNameId", Types.BIGINT},
+		{"classPK", Types.BIGINT}, {"layoutUuid", Types.VARCHAR}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("CPDisplayLayoutId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
@@ -103,7 +105,7 @@ public class CPDisplayLayoutModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CPDisplayLayout (uuid_ VARCHAR(75) null,CPDisplayLayoutId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,layoutUuid VARCHAR(75) null)";
+		"create table CPDisplayLayout (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,CPDisplayLayoutId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,layoutUuid VARCHAR(75) null)";
 
 	public static final String TABLE_SQL_DROP = "drop table CPDisplayLayout";
 
@@ -195,6 +197,7 @@ public class CPDisplayLayoutModelImpl
 
 		CPDisplayLayout model = new CPDisplayLayoutImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setUuid(soapModel.getUuid());
 		model.setCPDisplayLayoutId(soapModel.getCPDisplayLayoutId());
 		model.setGroupId(soapModel.getGroupId());
@@ -324,82 +327,124 @@ public class CPDisplayLayoutModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CPDisplayLayout>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CPDisplayLayout.class.getClassLoader(), CPDisplayLayout.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<CPDisplayLayout> constructor =
+				(Constructor<CPDisplayLayout>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<CPDisplayLayout, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CPDisplayLayout, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CPDisplayLayout, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<CPDisplayLayout, Object>>();
-
-		attributeGetterFunctions.put("uuid", CPDisplayLayout::getUuid);
-		attributeGetterFunctions.put(
-			"CPDisplayLayoutId", CPDisplayLayout::getCPDisplayLayoutId);
-		attributeGetterFunctions.put("groupId", CPDisplayLayout::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CPDisplayLayout::getCompanyId);
-		attributeGetterFunctions.put("userId", CPDisplayLayout::getUserId);
-		attributeGetterFunctions.put("userName", CPDisplayLayout::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CPDisplayLayout::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CPDisplayLayout::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", CPDisplayLayout::getClassNameId);
-		attributeGetterFunctions.put("classPK", CPDisplayLayout::getClassPK);
-		attributeGetterFunctions.put(
-			"layoutUuid", CPDisplayLayout::getLayoutUuid);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CPDisplayLayout, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CPDisplayLayout, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<CPDisplayLayout, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CPDisplayLayout::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CPDisplayLayout, Long>)CPDisplayLayout::setMvccVersion);
+		attributeGetterFunctions.put("uuid", CPDisplayLayout::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CPDisplayLayout, String>)CPDisplayLayout::setUuid);
+		attributeGetterFunctions.put(
+			"CPDisplayLayoutId", CPDisplayLayout::getCPDisplayLayoutId);
 		attributeSetterBiConsumers.put(
 			"CPDisplayLayoutId",
 			(BiConsumer<CPDisplayLayout, Long>)
 				CPDisplayLayout::setCPDisplayLayoutId);
+		attributeGetterFunctions.put("groupId", CPDisplayLayout::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CPDisplayLayout, Long>)CPDisplayLayout::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CPDisplayLayout::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CPDisplayLayout, Long>)CPDisplayLayout::setCompanyId);
+		attributeGetterFunctions.put("userId", CPDisplayLayout::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CPDisplayLayout, Long>)CPDisplayLayout::setUserId);
+		attributeGetterFunctions.put("userName", CPDisplayLayout::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CPDisplayLayout, String>)CPDisplayLayout::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CPDisplayLayout::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CPDisplayLayout, Date>)CPDisplayLayout::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CPDisplayLayout::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CPDisplayLayout, Date>)
 				CPDisplayLayout::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", CPDisplayLayout::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<CPDisplayLayout, Long>)CPDisplayLayout::setClassNameId);
+		attributeGetterFunctions.put("classPK", CPDisplayLayout::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<CPDisplayLayout, Long>)CPDisplayLayout::setClassPK);
+		attributeGetterFunctions.put(
+			"layoutUuid", CPDisplayLayout::getLayoutUuid);
 		attributeSetterBiConsumers.put(
 			"layoutUuid",
 			(BiConsumer<CPDisplayLayout, String>)
 				CPDisplayLayout::setLayoutUuid);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@JSON
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@JSON
@@ -743,6 +788,7 @@ public class CPDisplayLayoutModelImpl
 	public Object clone() {
 		CPDisplayLayoutImpl cpDisplayLayoutImpl = new CPDisplayLayoutImpl();
 
+		cpDisplayLayoutImpl.setMvccVersion(getMvccVersion());
 		cpDisplayLayoutImpl.setUuid(getUuid());
 		cpDisplayLayoutImpl.setCPDisplayLayoutId(getCPDisplayLayoutId());
 		cpDisplayLayoutImpl.setGroupId(getGroupId());
@@ -756,6 +802,38 @@ public class CPDisplayLayoutModelImpl
 		cpDisplayLayoutImpl.setLayoutUuid(getLayoutUuid());
 
 		cpDisplayLayoutImpl.resetOriginalValues();
+
+		return cpDisplayLayoutImpl;
+	}
+
+	@Override
+	public CPDisplayLayout cloneWithOriginalValues() {
+		CPDisplayLayoutImpl cpDisplayLayoutImpl = new CPDisplayLayoutImpl();
+
+		cpDisplayLayoutImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		cpDisplayLayoutImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		cpDisplayLayoutImpl.setCPDisplayLayoutId(
+			this.<Long>getColumnOriginalValue("CPDisplayLayoutId"));
+		cpDisplayLayoutImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		cpDisplayLayoutImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		cpDisplayLayoutImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		cpDisplayLayoutImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		cpDisplayLayoutImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		cpDisplayLayoutImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		cpDisplayLayoutImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		cpDisplayLayoutImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		cpDisplayLayoutImpl.setLayoutUuid(
+			this.<String>getColumnOriginalValue("layoutUuid"));
 
 		return cpDisplayLayoutImpl;
 	}
@@ -833,6 +911,8 @@ public class CPDisplayLayoutModelImpl
 	public CacheModel<CPDisplayLayout> toCacheModel() {
 		CPDisplayLayoutCacheModel cpDisplayLayoutCacheModel =
 			new CPDisplayLayoutCacheModel();
+
+		cpDisplayLayoutCacheModel.mvccVersion = getMvccVersion();
 
 		cpDisplayLayoutCacheModel.uuid = getUuid();
 
@@ -974,12 +1054,11 @@ public class CPDisplayLayoutModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CPDisplayLayout>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CPDisplayLayout.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private String _uuid;
 	private long _CPDisplayLayoutId;
 	private long _groupId;
@@ -1022,6 +1101,7 @@ public class CPDisplayLayoutModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put("CPDisplayLayoutId", _CPDisplayLayoutId);
 		_columnOriginalValues.put("groupId", _groupId);
@@ -1056,27 +1136,29 @@ public class CPDisplayLayoutModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("uuid_", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("CPDisplayLayoutId", 2L);
+		columnBitmasks.put("uuid_", 2L);
 
-		columnBitmasks.put("groupId", 4L);
+		columnBitmasks.put("CPDisplayLayoutId", 4L);
 
-		columnBitmasks.put("companyId", 8L);
+		columnBitmasks.put("groupId", 8L);
 
-		columnBitmasks.put("userId", 16L);
+		columnBitmasks.put("companyId", 16L);
 
-		columnBitmasks.put("userName", 32L);
+		columnBitmasks.put("userId", 32L);
 
-		columnBitmasks.put("createDate", 64L);
+		columnBitmasks.put("userName", 64L);
 
-		columnBitmasks.put("modifiedDate", 128L);
+		columnBitmasks.put("createDate", 128L);
 
-		columnBitmasks.put("classNameId", 256L);
+		columnBitmasks.put("modifiedDate", 256L);
 
-		columnBitmasks.put("classPK", 512L);
+		columnBitmasks.put("classNameId", 512L);
 
-		columnBitmasks.put("layoutUuid", 1024L);
+		columnBitmasks.put("classPK", 1024L);
+
+		columnBitmasks.put("layoutUuid", 2048L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

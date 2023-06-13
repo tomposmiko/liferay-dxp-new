@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -219,61 +220,83 @@ public class ServiceComponentModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, ServiceComponent>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ServiceComponent.class.getClassLoader(), ServiceComponent.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<ServiceComponent> constructor =
+				(Constructor<ServiceComponent>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<ServiceComponent, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<ServiceComponent, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<ServiceComponent, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<ServiceComponent, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", ServiceComponent::getMvccVersion);
-		attributeGetterFunctions.put(
-			"serviceComponentId", ServiceComponent::getServiceComponentId);
-		attributeGetterFunctions.put(
-			"buildNamespace", ServiceComponent::getBuildNamespace);
-		attributeGetterFunctions.put(
-			"buildNumber", ServiceComponent::getBuildNumber);
-		attributeGetterFunctions.put(
-			"buildDate", ServiceComponent::getBuildDate);
-		attributeGetterFunctions.put("data", ServiceComponent::getData);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<ServiceComponent, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<ServiceComponent, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<ServiceComponent, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", ServiceComponent::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<ServiceComponent, Long>)
 				ServiceComponent::setMvccVersion);
+		attributeGetterFunctions.put(
+			"serviceComponentId", ServiceComponent::getServiceComponentId);
 		attributeSetterBiConsumers.put(
 			"serviceComponentId",
 			(BiConsumer<ServiceComponent, Long>)
 				ServiceComponent::setServiceComponentId);
+		attributeGetterFunctions.put(
+			"buildNamespace", ServiceComponent::getBuildNamespace);
 		attributeSetterBiConsumers.put(
 			"buildNamespace",
 			(BiConsumer<ServiceComponent, String>)
 				ServiceComponent::setBuildNamespace);
+		attributeGetterFunctions.put(
+			"buildNumber", ServiceComponent::getBuildNumber);
 		attributeSetterBiConsumers.put(
 			"buildNumber",
 			(BiConsumer<ServiceComponent, Long>)
 				ServiceComponent::setBuildNumber);
+		attributeGetterFunctions.put(
+			"buildDate", ServiceComponent::getBuildDate);
 		attributeSetterBiConsumers.put(
 			"buildDate",
 			(BiConsumer<ServiceComponent, Long>)ServiceComponent::setBuildDate);
+		attributeGetterFunctions.put("data", ServiceComponent::getData);
 		attributeSetterBiConsumers.put(
 			"data",
 			(BiConsumer<ServiceComponent, String>)ServiceComponent::setData);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -455,6 +478,26 @@ public class ServiceComponentModelImpl
 		serviceComponentImpl.setData(getData());
 
 		serviceComponentImpl.resetOriginalValues();
+
+		return serviceComponentImpl;
+	}
+
+	@Override
+	public ServiceComponent cloneWithOriginalValues() {
+		ServiceComponentImpl serviceComponentImpl = new ServiceComponentImpl();
+
+		serviceComponentImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		serviceComponentImpl.setServiceComponentId(
+			this.<Long>getColumnOriginalValue("serviceComponentId"));
+		serviceComponentImpl.setBuildNamespace(
+			this.<String>getColumnOriginalValue("buildNamespace"));
+		serviceComponentImpl.setBuildNumber(
+			this.<Long>getColumnOriginalValue("buildNumber"));
+		serviceComponentImpl.setBuildDate(
+			this.<Long>getColumnOriginalValue("buildDate"));
+		serviceComponentImpl.setData(
+			this.<String>getColumnOriginalValue("data_"));
 
 		return serviceComponentImpl;
 	}
@@ -659,9 +702,7 @@ public class ServiceComponentModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, ServiceComponent>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					ServiceComponent.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

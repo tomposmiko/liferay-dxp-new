@@ -140,23 +140,22 @@ public class JournalFeedReferencesExportImportContentProcessor
 			return null;
 		}
 
-		Map<String, String> map = HashMapBuilder.put(
+		return HashMapBuilder.put(
 			"endPos", String.valueOf(endPos)
 		).put(
 			"feedId", pathArray[1]
 		).put(
-			"groupId", pathArray[0]
+			"groupId",
+			() -> {
+				String groupIdString = pathArray[0];
+
+				if (groupIdString.equals("@group_id@")) {
+					return String.valueOf(groupId);
+				}
+
+				return groupIdString;
+			}
 		).build();
-
-		String groupIdString = MapUtil.getString(map, "groupId");
-
-		if (groupIdString.equals("@group_id@")) {
-			groupIdString = String.valueOf(groupId);
-
-			map.put("groupId", groupIdString);
-		}
-
-		return map;
 	}
 
 	protected boolean isValidateJournalFeedReferences() {
@@ -244,14 +243,11 @@ public class JournalFeedReferencesExportImportContentProcessor
 
 				String path = ExportImportPathUtil.getModelPath(journalFeed);
 
-				StringBundler exportedReferenceSB = new StringBundler(4);
-
-				exportedReferenceSB.append(Portal.FRIENDLY_URL_SEPARATOR);
-				exportedReferenceSB.append("[$journalfeed-reference=");
-				exportedReferenceSB.append(path);
-				exportedReferenceSB.append("$]");
-
-				sb.replace(beginPos, endPos, exportedReferenceSB.toString());
+				sb.replace(
+					beginPos, endPos,
+					StringBundler.concat(
+						Portal.FRIENDLY_URL_SEPARATOR,
+						"[$journalfeed-reference=", path, "$]"));
 			}
 			catch (Exception exception) {
 				StringBundler exceptionSB = new StringBundler(6);
@@ -426,34 +422,14 @@ public class JournalFeedReferencesExportImportContentProcessor
 								class.getName(),
 							new NoSuchFeedException());
 
-				exportImportContentValidationException.setJournalArticleFeedURL(
-					_getJournalFeedReferenceURL(content, beginPos, endPos));
-
 				exportImportContentValidationException.setStagedModelClassName(
 					JournalFeed.class.getName());
-
-				exportImportContentValidationException.setType(
-					ExportImportContentValidationException.
-						JOURNAL_FEED_NOT_FOUND);
 
 				throw exportImportContentValidationException;
 			}
 
 			endPos = beginPos - 1;
 		}
-	}
-
-	private String _getJournalFeedReferenceURL(
-		String content, int beginPos, int endPos) {
-
-		endPos = StringUtil.indexOfAny(
-			content, _JOURNAL_FEED_REFERENCE_STOP_CHARS, beginPos, endPos);
-
-		if (endPos == -1) {
-			return null;
-		}
-
-		return content.substring(beginPos, endPos);
 	}
 
 	private static final String _JOURNAL_FEED_FRIENDLY_URL = "/-/journal/rss/";

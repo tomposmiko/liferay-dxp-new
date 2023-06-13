@@ -60,30 +60,11 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().addAssetCategory(assetCategory);
 	}
 
-	public static void addAssetEntryAssetCategories(
-		long entryId, List<AssetCategory> assetCategories) {
-
-		getService().addAssetEntryAssetCategories(entryId, assetCategories);
-	}
-
-	public static void addAssetEntryAssetCategories(
-		long entryId, long[] categoryIds) {
-
-		getService().addAssetEntryAssetCategories(entryId, categoryIds);
-	}
-
-	public static void addAssetEntryAssetCategory(
-		long entryId, AssetCategory assetCategory) {
-
-		getService().addAssetEntryAssetCategory(entryId, assetCategory);
-	}
-
-	public static void addAssetEntryAssetCategory(
-		long entryId, long categoryId) {
-
-		getService().addAssetEntryAssetCategory(entryId, categoryId);
-	}
-
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addCategory(String, long, long, long, Map, Map, long, String[], ServiceContext)}
+	 */
+	@Deprecated
 	public static AssetCategory addCategory(
 			long userId, long groupId, long parentCategoryId,
 			Map<java.util.Locale, String> titleMap,
@@ -106,6 +87,19 @@ public class AssetCategoryLocalServiceUtil {
 			userId, groupId, title, vocabularyId, serviceContext);
 	}
 
+	public static AssetCategory addCategory(
+			String externalReferenceCode, long userId, long groupId,
+			long parentCategoryId, Map<java.util.Locale, String> titleMap,
+			Map<java.util.Locale, String> descriptionMap, long vocabularyId,
+			String[] categoryProperties,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addCategory(
+			externalReferenceCode, userId, groupId, parentCategoryId, titleMap,
+			descriptionMap, vocabularyId, categoryProperties, serviceContext);
+	}
+
 	public static void addCategoryResources(
 			AssetCategory category, boolean addGroupPermissions,
 			boolean addGuestPermissions)
@@ -122,10 +116,6 @@ public class AssetCategoryLocalServiceUtil {
 		throws PortalException {
 
 		getService().addCategoryResources(category, modelPermissions);
-	}
-
-	public static void clearAssetEntryAssetCategories(long entryId) {
-		getService().clearAssetEntryAssetCategories(entryId);
 	}
 
 	/**
@@ -179,30 +169,6 @@ public class AssetCategoryLocalServiceUtil {
 		throws PortalException {
 
 		return getService().deleteAssetCategory(categoryId);
-	}
-
-	public static void deleteAssetEntryAssetCategories(
-		long entryId, List<AssetCategory> assetCategories) {
-
-		getService().deleteAssetEntryAssetCategories(entryId, assetCategories);
-	}
-
-	public static void deleteAssetEntryAssetCategories(
-		long entryId, long[] categoryIds) {
-
-		getService().deleteAssetEntryAssetCategories(entryId, categoryIds);
-	}
-
-	public static void deleteAssetEntryAssetCategory(
-		long entryId, AssetCategory assetCategory) {
-
-		getService().deleteAssetEntryAssetCategory(entryId, assetCategory);
-	}
-
-	public static void deleteAssetEntryAssetCategory(
-		long entryId, long categoryId) {
-
-		getService().deleteAssetEntryAssetCategory(entryId, categoryId);
 	}
 
 	public static void deleteCategories(List<AssetCategory> categories)
@@ -341,20 +307,29 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().fetchAssetCategory(categoryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the asset category with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the asset category's external reference code
+	 * @return the matching asset category, or <code>null</code> if a matching asset category could not be found
+	 */
 	public static AssetCategory fetchAssetCategoryByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
+		long groupId, String externalReferenceCode) {
 
 		return getService().fetchAssetCategoryByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			groupId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAssetCategoryByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static AssetCategory fetchAssetCategoryByReferenceCode(
-		long companyId, String externalReferenceCode) {
+		long groupId, String externalReferenceCode) {
 
 		return getService().fetchAssetCategoryByReferenceCode(
-			companyId, externalReferenceCode);
+			groupId, externalReferenceCode);
 	}
 
 	/**
@@ -456,13 +431,20 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().getAssetCategory(categoryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the asset category with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the asset category's external reference code
+	 * @return the matching asset category
+	 * @throws PortalException if a matching asset category could not be found
+	 */
 	public static AssetCategory getAssetCategoryByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
+			long groupId, String externalReferenceCode)
 		throws PortalException {
 
 		return getService().getAssetCategoryByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			groupId, externalReferenceCode);
 	}
 
 	/**
@@ -478,40 +460,6 @@ public class AssetCategoryLocalServiceUtil {
 		throws PortalException {
 
 		return getService().getAssetCategoryByUuidAndGroupId(uuid, groupId);
-	}
-
-	public static List<AssetCategory> getAssetEntryAssetCategories(
-		long entryId) {
-
-		return getService().getAssetEntryAssetCategories(entryId);
-	}
-
-	public static List<AssetCategory> getAssetEntryAssetCategories(
-		long entryId, int start, int end) {
-
-		return getService().getAssetEntryAssetCategories(entryId, start, end);
-	}
-
-	public static List<AssetCategory> getAssetEntryAssetCategories(
-		long entryId, int start, int end,
-		OrderByComparator<AssetCategory> orderByComparator) {
-
-		return getService().getAssetEntryAssetCategories(
-			entryId, start, end, orderByComparator);
-	}
-
-	public static int getAssetEntryAssetCategoriesCount(long entryId) {
-		return getService().getAssetEntryAssetCategoriesCount(entryId);
-	}
-
-	/**
-	 * Returns the entryIds of the asset entries associated with the asset category.
-	 *
-	 * @param categoryId the categoryId of the asset category
-	 * @return long[] the entryIds of asset entries associated with the asset category
-	 */
-	public static long[] getAssetEntryPrimaryKeys(long categoryId) {
-		return getService().getAssetEntryPrimaryKeys(categoryId);
 	}
 
 	public static List<AssetCategory> getCategories() {
@@ -670,16 +618,6 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().getVocabularyRootCategoriesCount(vocabularyId);
 	}
 
-	public static boolean hasAssetEntryAssetCategories(long entryId) {
-		return getService().hasAssetEntryAssetCategories(entryId);
-	}
-
-	public static boolean hasAssetEntryAssetCategory(
-		long entryId, long categoryId) {
-
-		return getService().hasAssetEntryAssetCategory(entryId, categoryId);
-	}
-
 	public static AssetCategory mergeCategories(
 			long fromCategoryId, long toCategoryId)
 		throws PortalException {
@@ -746,12 +684,6 @@ public class AssetCategoryLocalServiceUtil {
 		return getService().searchCategories(
 			companyId, groupIds, title, vocabularyIds, parentCategoryIds, start,
 			end, sort);
-	}
-
-	public static void setAssetEntryAssetCategories(
-		long entryId, long[] categoryIds) {
-
-		getService().setAssetEntryAssetCategories(entryId, categoryIds);
 	}
 
 	/**

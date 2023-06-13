@@ -41,7 +41,7 @@ const SubmitWarningModal = ({
 				<p>{message}</p>
 
 				{errors.map((error, index) => (
-					<ErrorListItem error={error} key={index} />
+					<ErrorListItem item={error} key={index} />
 				))}
 			</ClayModal.Body>
 

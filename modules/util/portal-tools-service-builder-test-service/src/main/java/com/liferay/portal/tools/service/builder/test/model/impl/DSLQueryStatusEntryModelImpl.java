@@ -30,6 +30,7 @@ import com.liferay.portal.tools.service.builder.test.model.DSLQueryStatusEntryMo
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -215,53 +216,75 @@ public class DSLQueryStatusEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, DSLQueryStatusEntry>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DSLQueryStatusEntry.class.getClassLoader(),
+			DSLQueryStatusEntry.class, ModelWrapper.class);
+
+		try {
+			Constructor<DSLQueryStatusEntry> constructor =
+				(Constructor<DSLQueryStatusEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<DSLQueryStatusEntry, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DSLQueryStatusEntry, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<DSLQueryStatusEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<DSLQueryStatusEntry, Object>>();
-
-		attributeGetterFunctions.put(
-			"dslQueryStatusEntryId",
-			DSLQueryStatusEntry::getDslQueryStatusEntryId);
-		attributeGetterFunctions.put(
-			"dslQueryEntryId", DSLQueryStatusEntry::getDslQueryEntryId);
-		attributeGetterFunctions.put("status", DSLQueryStatusEntry::getStatus);
-		attributeGetterFunctions.put(
-			"statusDate", DSLQueryStatusEntry::getStatusDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<DSLQueryStatusEntry, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<DSLQueryStatusEntry, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<DSLQueryStatusEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"dslQueryStatusEntryId",
+			DSLQueryStatusEntry::getDslQueryStatusEntryId);
 		attributeSetterBiConsumers.put(
 			"dslQueryStatusEntryId",
 			(BiConsumer<DSLQueryStatusEntry, Long>)
 				DSLQueryStatusEntry::setDslQueryStatusEntryId);
+		attributeGetterFunctions.put(
+			"dslQueryEntryId", DSLQueryStatusEntry::getDslQueryEntryId);
 		attributeSetterBiConsumers.put(
 			"dslQueryEntryId",
 			(BiConsumer<DSLQueryStatusEntry, Long>)
 				DSLQueryStatusEntry::setDslQueryEntryId);
+		attributeGetterFunctions.put("status", DSLQueryStatusEntry::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<DSLQueryStatusEntry, String>)
 				DSLQueryStatusEntry::setStatus);
+		attributeGetterFunctions.put(
+			"statusDate", DSLQueryStatusEntry::getStatusDate);
 		attributeSetterBiConsumers.put(
 			"statusDate",
 			(BiConsumer<DSLQueryStatusEntry, Date>)
 				DSLQueryStatusEntry::setStatusDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -391,6 +414,23 @@ public class DSLQueryStatusEntryModelImpl
 		dslQueryStatusEntryImpl.setStatusDate(getStatusDate());
 
 		dslQueryStatusEntryImpl.resetOriginalValues();
+
+		return dslQueryStatusEntryImpl;
+	}
+
+	@Override
+	public DSLQueryStatusEntry cloneWithOriginalValues() {
+		DSLQueryStatusEntryImpl dslQueryStatusEntryImpl =
+			new DSLQueryStatusEntryImpl();
+
+		dslQueryStatusEntryImpl.setDslQueryStatusEntryId(
+			this.<Long>getColumnOriginalValue("dslQueryStatusEntryId"));
+		dslQueryStatusEntryImpl.setDslQueryEntryId(
+			this.<Long>getColumnOriginalValue("dslQueryEntryId"));
+		dslQueryStatusEntryImpl.setStatus(
+			this.<String>getColumnOriginalValue("status"));
+		dslQueryStatusEntryImpl.setStatusDate(
+			this.<Date>getColumnOriginalValue("statusDate"));
 
 		return dslQueryStatusEntryImpl;
 	}
@@ -576,9 +616,7 @@ public class DSLQueryStatusEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DSLQueryStatusEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DSLQueryStatusEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

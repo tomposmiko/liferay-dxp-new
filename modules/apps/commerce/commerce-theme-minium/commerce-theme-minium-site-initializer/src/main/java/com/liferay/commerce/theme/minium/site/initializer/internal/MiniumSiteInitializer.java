@@ -14,6 +14,8 @@
 
 package com.liferay.commerce.theme.minium.site.initializer.internal;
 
+import com.liferay.account.settings.AccountEntryGroupSettings;
+import com.liferay.commerce.account.configuration.CommerceAccountGroupServiceConfiguration;
 import com.liferay.commerce.account.constants.CommerceAccountConstants;
 import com.liferay.commerce.account.util.CommerceAccountRoleHelper;
 import com.liferay.commerce.currency.model.CommerceCurrency;
@@ -51,11 +53,11 @@ import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CPMeasurementUnitLocalService;
 import com.liferay.commerce.product.service.CommerceCatalogLocalService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
-import com.liferay.commerce.service.CommerceCountryLocalService;
 import com.liferay.commerce.service.CommerceShippingMethodLocalService;
 import com.liferay.commerce.shipping.engine.fixed.service.CommerceShippingFixedOptionLocalService;
 import com.liferay.commerce.theme.minium.SiteInitializerDependencyResolver;
 import com.liferay.commerce.theme.minium.SiteInitializerDependencyResolverThreadLocal;
+import com.liferay.commerce.util.AccountEntryAllowedTypesUtil;
 import com.liferay.commerce.util.CommerceShippingEngineRegistry;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -175,6 +177,10 @@ public class MiniumSiteInitializer implements SiteInitializer {
 			if (siteInitializerDependencyResolver != null) {
 				_siteInitializerDependencyResolver =
 					siteInitializerDependencyResolver;
+			}
+			else {
+				_siteInitializerDependencyResolver =
+					_defaultSiteInitializerDependencyResolver;
 			}
 
 			ServiceContext serviceContext = getServiceContext(groupId);
@@ -304,7 +310,6 @@ public class MiniumSiteInitializer implements SiteInitializer {
 
 		_groupLocalService.updateGroup(group);
 
-		_commerceCountryLocalService.importDefaultCountries(serviceContext);
 		_commerceCurrencyLocalService.importDefaultValues(serviceContext);
 		_cpMeasurementUnitLocalService.importDefaultValues(serviceContext);
 
@@ -322,6 +327,9 @@ public class MiniumSiteInitializer implements SiteInitializer {
 			String.valueOf(CommerceAccountConstants.SITE_TYPE_B2B));
 
 		modifiableSettings.store();
+
+		_accountEntryGroupSettings.setAllowedTypes(
+			serviceContext.getScopeGroupId(), _getAllowedTypes(groupId));
 	}
 
 	protected CommerceCatalog createCatalog(ServiceContext serviceContext)
@@ -334,9 +342,9 @@ public class MiniumSiteInitializer implements SiteInitializer {
 				serviceContext.getCompanyId());
 
 		return _commerceCatalogLocalService.addCommerceCatalog(
-			group.getName(serviceContext.getLanguageId()),
+			StringPool.BLANK, group.getName(serviceContext.getLanguageId()),
 			commerceCurrency.getCode(), serviceContext.getLanguageId(),
-			StringPool.BLANK, serviceContext);
+			serviceContext);
 	}
 
 	protected CommerceChannel createChannel(
@@ -346,11 +354,10 @@ public class MiniumSiteInitializer implements SiteInitializer {
 		Group group = serviceContext.getScopeGroup();
 
 		return _commerceChannelLocalService.addCommerceChannel(
-			group.getGroupId(),
+			StringPool.BLANK, group.getGroupId(),
 			group.getName(serviceContext.getLanguageId()) + " Portal",
 			CommerceChannelConstants.CHANNEL_TYPE_SITE, null,
-			commerceCatalog.getCommerceCurrencyCode(), StringPool.BLANK,
-			serviceContext);
+			commerceCatalog.getCommerceCurrencyCode(), serviceContext);
 	}
 
 	protected void createRoles(
@@ -552,6 +559,21 @@ public class MiniumSiteInitializer implements SiteInitializer {
 			role.getRoleId(), "VIEW_PRICE");
 	}
 
+	private String[] _getAllowedTypes(long commerceChannelGroupId)
+		throws Exception {
+
+		CommerceAccountGroupServiceConfiguration
+			commerceAccountGroupServiceConfiguration =
+				_configurationProvider.getConfiguration(
+					CommerceAccountGroupServiceConfiguration.class,
+					new GroupServiceSettingsLocator(
+						commerceChannelGroupId,
+						CommerceAccountConstants.SERVICE_NAME));
+
+		return AccountEntryAllowedTypesUtil.getAllowedTypes(
+			commerceAccountGroupServiceConfiguration.commerceSiteType());
+	}
+
 	private long[] _getCProductIds(JSONArray jsonArray) {
 		List<Long> cProductIdsList = new ArrayList<>();
 
@@ -705,21 +727,9 @@ public class MiniumSiteInitializer implements SiteInitializer {
 			_log.info("Importing commerce price entries...");
 		}
 
-		JSONArray jsonArray = _getJSONArray("price-entries.json");
-
-		for (int i = 0; i < jsonArray.length(); i++) {
-			JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-			String sku = jsonObject.getString("sku");
-
-			String externalReferenceCode =
-				sku + _siteInitializerDependencyResolver.getKey();
-
-			jsonObject.put("externalReferenceCode", externalReferenceCode);
-		}
-
 		_commercePriceEntriesImporter.importCommercePriceEntries(
-			jsonArray, catalogGroupId, serviceContext.getUserId());
+			_getJSONArray("price-entries.json"), catalogGroupId,
+			serviceContext.getUserId());
 
 		if (_log.isInfoEnabled()) {
 			_log.info("Commerce price entries successfully imported");
@@ -776,34 +786,14 @@ public class MiniumSiteInitializer implements SiteInitializer {
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
 
 				String externalReferenceCode = jsonObject.getString(
-					"ExternalReferenceCode");
+					"externalReferenceCode");
 
 				String newExternalReferenceCode =
 					externalReferenceCode +
 						_siteInitializerDependencyResolver.getKey();
 
 				jsonObject.put(
-					"ExternalReferenceCode", newExternalReferenceCode);
-
-				JSONArray skusJSONArray = jsonObject.getJSONArray("Skus");
-
-				if (skusJSONArray != null) {
-					for (int j = 0; j < skusJSONArray.length(); j++) {
-						JSONObject skuJSONObject = skusJSONArray.getJSONObject(
-							j);
-
-						String skuExternalReferenceCode =
-							skuJSONObject.getString("ExternalReferenceCode");
-
-						String newSkuExternalReferenceCode =
-							skuExternalReferenceCode +
-								_siteInitializerDependencyResolver.getKey();
-
-						skuJSONObject.put(
-							"ExternalReferenceCode",
-							newSkuExternalReferenceCode);
-					}
-				}
+					"externalReferenceCode", newExternalReferenceCode);
 			}
 		}
 
@@ -1024,6 +1014,9 @@ public class MiniumSiteInitializer implements SiteInitializer {
 		MiniumSiteInitializer.class);
 
 	@Reference
+	private AccountEntryGroupSettings _accountEntryGroupSettings;
+
+	@Reference
 	private AssetCategoriesImporter _assetCategoriesImporter;
 
 	@Reference
@@ -1043,9 +1036,6 @@ public class MiniumSiteInitializer implements SiteInitializer {
 
 	@Reference
 	private CommerceChannelLocalService _commerceChannelLocalService;
-
-	@Reference
-	private CommerceCountryLocalService _commerceCountryLocalService;
 
 	@Reference
 	private CommerceCurrencyLocalService _commerceCurrencyLocalService;
@@ -1112,6 +1102,12 @@ public class MiniumSiteInitializer implements SiteInitializer {
 	@Reference
 	private DDMFormImporter _ddmFormImporter;
 
+	@Reference(
+		target = "(site.initializer.key=" + MiniumSiteInitializer.KEY + ")"
+	)
+	private SiteInitializerDependencyResolver
+		_defaultSiteInitializerDependencyResolver;
+
 	@Reference
 	private DLImporter _dlImporter;
 
@@ -1147,9 +1143,6 @@ public class MiniumSiteInitializer implements SiteInitializer {
 	@Reference
 	private SettingsFactory _settingsFactory;
 
-	@Reference(
-		target = "(site.initializer.key=" + MiniumSiteInitializer.KEY + ")"
-	)
 	private SiteInitializerDependencyResolver
 		_siteInitializerDependencyResolver;
 

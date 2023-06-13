@@ -43,6 +43,7 @@ import com.liferay.journal.service.JournalArticleResourceLocalServiceUtil;
 import com.liferay.journal.util.JournalContent;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -109,17 +110,16 @@ public class JournalContentDisplayContext {
 				ddmTemplateModelResourcePermission)
 		throws PortalException {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
 		JournalContentDisplayContext journalContentDisplayContext =
 			(JournalContentDisplayContext)portletRequest.getAttribute(
-				JournalContentWebKeys.JOURNAL_CONTENT_DISPLAY_CONTEXT);
+				getRequestAttributeName(portletDisplay.getId()));
 
 		if (journalContentDisplayContext == null) {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)portletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
-			PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
-
 			JournalContentPortletInstanceConfiguration
 				journalContentPortletInstanceConfiguration =
 					portletDisplay.getPortletInstanceConfiguration(
@@ -131,22 +131,16 @@ public class JournalContentDisplayContext {
 				ddmStructureClassNameId, ddmTemplateModelResourcePermission);
 
 			portletRequest.setAttribute(
-				JournalContentWebKeys.JOURNAL_CONTENT_DISPLAY_CONTEXT,
+				getRequestAttributeName(portletDisplay.getId()),
 				journalContentDisplayContext);
 		}
 
 		return journalContentDisplayContext;
 	}
 
-	public void clearCache() throws PortalException {
-		if (Validator.isNotNull(getArticleId())) {
-			JournalContent journalContent =
-				(JournalContent)_portletRequest.getAttribute(
-					JournalWebKeys.JOURNAL_CONTENT);
-
-			journalContent.clearCache(
-				getArticleGroupId(), getArticleId(), getDDMTemplateKey());
-		}
+	public static String getRequestAttributeName(String portletName) {
+		return JournalContentWebKeys.JOURNAL_CONTENT_DISPLAY_CONTEXT +
+			StringPool.POUND + portletName;
 	}
 
 	public JournalArticle getArticle() throws PortalException {
@@ -706,16 +700,18 @@ public class JournalContentDisplayContext {
 				assetRendererFactory.getAssetRenderer(
 					getArticle(), AssetRendererFactory.TYPE_LATEST_APPROVED);
 
-			PortletURL portletURL = latestArticleAssetRenderer.getURLEdit(
-				PortalUtil.getLiferayPortletRequest(_portletRequest), null,
-				LiferayWindowState.NORMAL, _themeDisplay.getURLCurrent());
+			return PortletURLBuilder.create(
+				latestArticleAssetRenderer.getURLEdit(
+					PortalUtil.getLiferayPortletRequest(_portletRequest), null,
+					LiferayWindowState.NORMAL, _themeDisplay.getURLCurrent())
+			).setPortletResource(
+				() -> {
+					PortletDisplay portletDisplay =
+						_themeDisplay.getPortletDisplay();
 
-			PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
-
-			portletURL.setParameter(
-				"portletResource", portletDisplay.getPortletName());
-
-			return portletURL.toString();
+					return portletDisplay.getPortletName();
+				}
+			).buildString();
 		}
 		catch (Exception exception) {
 			_log.error("Unable to get edit URL", exception);
@@ -731,18 +727,19 @@ public class JournalContentDisplayContext {
 			return StringPool.BLANK;
 		}
 
-		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-			_portletRequest, JournalPortletKeys.JOURNAL,
-			PortletRequest.RENDER_PHASE);
-
-		portletURL.setParameter("mvcPath", "/edit_ddm_template.jsp");
-		portletURL.setParameter("redirect", _themeDisplay.getURLCurrent());
-
-		portletURL.setParameter(
-			"ddmTemplateId", String.valueOf(ddmTemplate.getTemplateId()));
-		portletURL.setPortletMode(PortletMode.VIEW);
-
-		return portletURL.toString();
+		return PortletURLBuilder.create(
+			PortalUtil.getControlPanelPortletURL(
+				_portletRequest, JournalPortletKeys.JOURNAL,
+				PortletRequest.RENDER_PHASE)
+		).setMVCPath(
+			"/edit_ddm_template.jsp"
+		).setRedirect(
+			_themeDisplay.getURLCurrent()
+		).setParameter(
+			"ddmTemplateId", ddmTemplate.getTemplateId()
+		).setPortletMode(
+			PortletMode.VIEW
+		).buildString();
 	}
 
 	public String getURLViewHistory() {
@@ -752,15 +749,17 @@ public class JournalContentDisplayContext {
 			Group group = GroupLocalServiceUtil.fetchGroup(
 				article.getGroupId());
 
-			PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-				_portletRequest, group, JournalPortletKeys.JOURNAL, 0, 0,
-				PortletRequest.RENDER_PHASE);
-
-			portletURL.setParameter("mvcPath", "/view_article_history.jsp");
-			portletURL.setParameter("backURL", _themeDisplay.getURLCurrent());
-			portletURL.setParameter("articleId", article.getArticleId());
-
-			return portletURL.toString();
+			return PortletURLBuilder.create(
+				PortalUtil.getControlPanelPortletURL(
+					_portletRequest, group, JournalPortletKeys.JOURNAL, 0, 0,
+					PortletRequest.RENDER_PHASE)
+			).setMVCPath(
+				"/view_article_history.jsp"
+			).setBackURL(
+				_themeDisplay.getURLCurrent()
+			).setParameter(
+				"articleId", article.getArticleId()
+			).buildString();
 		}
 		catch (Exception exception) {
 			_log.error("Unable to get view history URL", exception);
@@ -895,15 +894,19 @@ public class JournalContentDisplayContext {
 
 		JournalArticleDisplay articleDisplay = getArticleDisplay();
 
-		if ((articleDisplay == null) || !hasViewPermission()) {
+		if ((articleDisplay == null) || !hasViewPermission() || isExpired()) {
 			_showArticle = false;
 
 			return _showArticle;
 		}
 
-		if ((article.isPending() || article.isScheduled() || isExpired()) &&
-			!isPreview()) {
+		if (article.isScheduled() && !isPreview()) {
+			_showArticle = false;
 
+			return _showArticle;
+		}
+
+		if (article.isPending() && !isPreview()) {
 			_showArticle = false;
 
 			return _showArticle;
@@ -1061,6 +1064,9 @@ public class JournalContentDisplayContext {
 			return (JournalArticle)assetRenderer.getAssetObject();
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 
 		return null;

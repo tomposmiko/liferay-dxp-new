@@ -71,26 +71,24 @@ public class AssetDisplayPageFriendlyURLProviderImpl
 			return null;
 		}
 
-		if (!AssetDisplayPageUtil.hasAssetDisplayPage(
-				layoutDisplayPageObjectProvider.getGroupId(),
-				layoutDisplayPageObjectProvider.getClassNameId(),
-				layoutDisplayPageObjectProvider.getClassPK(),
-				layoutDisplayPageObjectProvider.getClassTypeId())) {
+		long groupId = themeDisplay.getScopeGroupId();
 
-			return null;
+		if ((layoutDisplayPageObjectProvider.getGroupId() != 0) &&
+			(groupId != layoutDisplayPageObjectProvider.getGroupId())) {
+
+			Group layoutDisplayPageObjectGroup = _groupLocalService.getGroup(
+				layoutDisplayPageObjectProvider.getGroupId());
+
+			if (!layoutDisplayPageObjectGroup.isCompany() &&
+				!layoutDisplayPageObjectGroup.isDepot()) {
+
+				groupId = layoutDisplayPageObjectGroup.getGroupId();
+			}
 		}
 
-		StringBundler sb = new StringBundler(3);
-
-		sb.append(
-			_getGroupFriendlyURL(
-				layoutDisplayPageObjectProvider.getGroupId(), locale,
-				themeDisplay));
-
-		sb.append(layoutDisplayPageProvider.getURLSeparator());
-		sb.append(layoutDisplayPageObjectProvider.getURLTitle(locale));
-
-		return sb.toString();
+		return _getFriendlyURL(
+			groupId, layoutDisplayPageProvider, layoutDisplayPageObjectProvider,
+			locale, themeDisplay);
 	}
 
 	@Override
@@ -100,6 +98,27 @@ public class AssetDisplayPageFriendlyURLProviderImpl
 
 		return getFriendlyURL(
 			className, classPK, themeDisplay.getLocale(), themeDisplay);
+	}
+
+	private String _getFriendlyURL(
+			long groupId,
+			LayoutDisplayPageProvider<?> layoutDisplayPageProvider,
+			LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider,
+			Locale locale, ThemeDisplay themeDisplay)
+		throws PortalException {
+
+		if (!AssetDisplayPageUtil.hasAssetDisplayPage(
+				groupId, layoutDisplayPageObjectProvider.getClassNameId(),
+				layoutDisplayPageObjectProvider.getClassPK(),
+				layoutDisplayPageObjectProvider.getClassTypeId())) {
+
+			return null;
+		}
+
+		return StringBundler.concat(
+			_getGroupFriendlyURL(groupId, locale, themeDisplay),
+			layoutDisplayPageProvider.getURLSeparator(),
+			layoutDisplayPageObjectProvider.getURLTitle(locale));
 	}
 
 	private String _getGroupFriendlyURL(
@@ -116,7 +135,8 @@ public class AssetDisplayPageFriendlyURLProviderImpl
 				_setThemeDisplayI18n(clonedThemeDisplay, locale);
 
 				return _portal.getGroupFriendlyURL(
-					group.getPublicLayoutSet(), clonedThemeDisplay);
+					group.getPublicLayoutSet(), clonedThemeDisplay, false,
+					false);
 			}
 			catch (CloneNotSupportedException cloneNotSupportedException) {
 				throw new PortalException(cloneNotSupportedException);
@@ -124,7 +144,7 @@ public class AssetDisplayPageFriendlyURLProviderImpl
 		}
 
 		return _portal.getGroupFriendlyURL(
-			group.getPublicLayoutSet(), themeDisplay);
+			group.getPublicLayoutSet(), themeDisplay, false, false);
 	}
 
 	private String _getI18nPath(Locale locale) {

@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -288,57 +289,79 @@ public class PluginSettingModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<PluginSetting, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, PluginSetting>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<PluginSetting, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<PluginSetting, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			PluginSetting.class.getClassLoader(), PluginSetting.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", PluginSetting::getMvccVersion);
-		attributeGetterFunctions.put(
-			"pluginSettingId", PluginSetting::getPluginSettingId);
-		attributeGetterFunctions.put("companyId", PluginSetting::getCompanyId);
-		attributeGetterFunctions.put("pluginId", PluginSetting::getPluginId);
-		attributeGetterFunctions.put(
-			"pluginType", PluginSetting::getPluginType);
-		attributeGetterFunctions.put("roles", PluginSetting::getRoles);
-		attributeGetterFunctions.put("active", PluginSetting::getActive);
+		try {
+			Constructor<PluginSetting> constructor =
+				(Constructor<PluginSetting>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<PluginSetting, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<PluginSetting, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<PluginSetting, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<PluginSetting, Object>>();
 		Map<String, BiConsumer<PluginSetting, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<PluginSetting, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", PluginSetting::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<PluginSetting, Long>)PluginSetting::setMvccVersion);
+		attributeGetterFunctions.put(
+			"pluginSettingId", PluginSetting::getPluginSettingId);
 		attributeSetterBiConsumers.put(
 			"pluginSettingId",
 			(BiConsumer<PluginSetting, Long>)PluginSetting::setPluginSettingId);
+		attributeGetterFunctions.put("companyId", PluginSetting::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<PluginSetting, Long>)PluginSetting::setCompanyId);
+		attributeGetterFunctions.put("pluginId", PluginSetting::getPluginId);
 		attributeSetterBiConsumers.put(
 			"pluginId",
 			(BiConsumer<PluginSetting, String>)PluginSetting::setPluginId);
+		attributeGetterFunctions.put(
+			"pluginType", PluginSetting::getPluginType);
 		attributeSetterBiConsumers.put(
 			"pluginType",
 			(BiConsumer<PluginSetting, String>)PluginSetting::setPluginType);
+		attributeGetterFunctions.put("roles", PluginSetting::getRoles);
 		attributeSetterBiConsumers.put(
 			"roles",
 			(BiConsumer<PluginSetting, String>)PluginSetting::setRoles);
+		attributeGetterFunctions.put("active", PluginSetting::getActive);
 		attributeSetterBiConsumers.put(
 			"active",
 			(BiConsumer<PluginSetting, Boolean>)PluginSetting::setActive);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -567,6 +590,28 @@ public class PluginSettingModelImpl
 	}
 
 	@Override
+	public PluginSetting cloneWithOriginalValues() {
+		PluginSettingImpl pluginSettingImpl = new PluginSettingImpl();
+
+		pluginSettingImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		pluginSettingImpl.setPluginSettingId(
+			this.<Long>getColumnOriginalValue("pluginSettingId"));
+		pluginSettingImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		pluginSettingImpl.setPluginId(
+			this.<String>getColumnOriginalValue("pluginId"));
+		pluginSettingImpl.setPluginType(
+			this.<String>getColumnOriginalValue("pluginType"));
+		pluginSettingImpl.setRoles(
+			this.<String>getColumnOriginalValue("roles"));
+		pluginSettingImpl.setActive(
+			this.<Boolean>getColumnOriginalValue("active_"));
+
+		return pluginSettingImpl;
+	}
+
+	@Override
 	public int compareTo(PluginSetting pluginSetting) {
 		long primaryKey = pluginSetting.getPrimaryKey();
 
@@ -756,9 +801,7 @@ public class PluginSettingModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, PluginSetting>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					PluginSetting.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

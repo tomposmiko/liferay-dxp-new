@@ -14,9 +14,6 @@
 
 package com.liferay.util.ant;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-
 import java.io.File;
 
 import org.apache.axis.tools.ant.wsdl.NamespaceMapping;
@@ -54,10 +51,8 @@ public class Wsdl2JavaTask {
 			wsdl2Java.execute();
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			exception.printStackTrace();
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(Wsdl2JavaTask.class);
 
 }

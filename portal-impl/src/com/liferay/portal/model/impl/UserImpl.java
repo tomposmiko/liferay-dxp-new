@@ -186,8 +186,10 @@ public class UserImpl extends UserBaseImpl {
 	/**
 	 * Returns the user's digest.
 	 *
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
 	 * @return the user's digest
 	 */
+	@Deprecated
 	@Override
 	public String getDigest() {
 		String digest = super.getDigest();
@@ -202,9 +204,11 @@ public class UserImpl extends UserBaseImpl {
 	/**
 	 * Returns a digest for the user, incorporating the password.
 	 *
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
 	 * @param  password a password to incorporate with the digest
 	 * @return a digest for the user, incorporating the password
 	 */
+	@Deprecated
 	@Override
 	public String getDigest(String password) {
 		if (Validator.isNull(getScreenName())) {
@@ -334,12 +338,10 @@ public class UserImpl extends UserBaseImpl {
 		String profileFriendlyURL = getProfileFriendlyURL();
 
 		if (profileFriendlyURL != null) {
-			String portalURL = themeDisplay.getPortalURL();
-
 			return PortalUtil.addPreservedParameters(
 				themeDisplay,
 				StringBundler.concat(
-					portalURL, PortalUtil.getPathContext(),
+					themeDisplay.getPortalURL(), PortalUtil.getPathContext(),
 					profileFriendlyURL));
 		}
 
@@ -886,13 +888,24 @@ public class UserImpl extends UserBaseImpl {
 	}
 
 	@Override
+	public void setContact(Contact contact) {
+		_contact = contact;
+	}
+
+	/**
+	 * Sets the user's digest.
+	 *
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public void setDigest(String digest) {
+		super.setDigest(digest);
+	}
+
+	@Override
 	public void setLanguageId(String languageId) {
-		if (isDefaultUser()) {
-			_locale = LocaleUtil.fromLanguageId(languageId, false);
-		}
-		else {
-			_locale = LocaleUtil.fromLanguageId(languageId);
-		}
+		_locale = LocaleUtil.fromLanguageId(languageId);
 
 		super.setLanguageId(LocaleUtil.toLanguageId(_locale));
 	}

@@ -220,6 +220,10 @@ public class MediaWikiImporter implements WikiImporter {
 				page = _wikiPageLocalService.getPage(node.getNodeId(), title);
 			}
 			catch (NoSuchPageException noSuchPageException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(noSuchPageException, noSuchPageException);
+				}
+
 				page = _wikiPageLocalService.addPage(
 					authorUserId, node.getNodeId(), title,
 					WikiPageConstants.NEW, null, true, serviceContext);
@@ -249,11 +253,9 @@ public class MediaWikiImporter implements WikiImporter {
 	}
 
 	protected boolean isValidImage(String[] paths, InputStream inputStream) {
-		if (_specialMediaWikiDirs.contains(paths[0])) {
-			return false;
-		}
+		if (_specialMediaWikiDirs.contains(paths[0]) ||
+			((paths.length > 1) && _specialMediaWikiDirs.contains(paths[1]))) {
 
-		if ((paths.length > 1) && _specialMediaWikiDirs.contains(paths[1])) {
 			return false;
 		}
 
@@ -305,14 +307,12 @@ public class MediaWikiImporter implements WikiImporter {
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				StringBundler sb = new StringBundler(4);
-
-				sb.append("Could not move ");
-				sb.append(_wikiGroupServiceConfiguration.frontPageName());
-				sb.append(" to the title provided: ");
-				sb.append(frontPageTitle);
-
-				_log.warn(sb.toString(), exception);
+				_log.warn(
+					StringBundler.concat(
+						"Could not move ",
+						_wikiGroupServiceConfiguration.frontPageName(),
+						" to the title provided: ", frontPageTitle),
+					exception);
 			}
 		}
 	}
@@ -331,11 +331,6 @@ public class MediaWikiImporter implements WikiImporter {
 			return;
 		}
 
-		ProgressTracker progressTracker =
-			ProgressTrackerThreadLocal.getProgressTracker();
-
-		int count = 0;
-
 		ZipReader zipReader = ZipReaderFactoryUtil.getZipReader(
 			imagesInputStream);
 
@@ -345,6 +340,11 @@ public class MediaWikiImporter implements WikiImporter {
 			throw new ImportFilesException();
 		}
 
+		ProgressTracker progressTracker =
+			ProgressTrackerThreadLocal.getProgressTracker();
+
+		int count = 0;
+
 		int total = entries.size();
 
 		if (total > 0) {
@@ -353,6 +353,10 @@ public class MediaWikiImporter implements WikiImporter {
 					node.getNodeId(), SHARED_IMAGES_TITLE);
 			}
 			catch (NoSuchPageException noSuchPageException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(noSuchPageException, noSuchPageException);
+				}
+
 				ServiceContext serviceContext = new ServiceContext();
 
 				serviceContext.setAddGroupPermissions(true);
@@ -405,9 +409,9 @@ public class MediaWikiImporter implements WikiImporter {
 
 					inputStreamOVPs.clear();
 
-					percentage = Math.min(50 + ((i * 50) / total), 99);
-
 					if (progressTracker != null) {
+						percentage = Math.min(50 + ((i * 50) / total), 99);
+
 						progressTracker.setPercent(percentage);
 					}
 				}
@@ -625,13 +629,13 @@ public class MediaWikiImporter implements WikiImporter {
 	protected List<String> readSpecialNamespaces(Element root)
 		throws ImportFilesException {
 
-		List<String> namespaces = new ArrayList<>();
-
 		Element siteinfoElement = root.element("siteinfo");
 
 		if (siteinfoElement == null) {
 			throw new ImportFilesException("Invalid pages XML file");
 		}
+
+		List<String> namespaces = new ArrayList<>();
 
 		Element namespacesElement = siteinfoElement.element("namespaces");
 
@@ -790,7 +794,7 @@ public class MediaWikiImporter implements WikiImporter {
 	private static final Pattern _redirectPattern = Pattern.compile(
 		"#REDIRECT \\[\\[([^\\]]*)\\]\\]");
 	private static final Set<String> _specialMediaWikiDirs = SetUtil.fromArray(
-		new String[] {"archive", "temp", "thumb"});
+		"archive", "temp", "thumb");
 
 	@Reference
 	private AssetTagLocalService _assetTagLocalService;

@@ -20,6 +20,7 @@ import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryLocalService;
 import com.liferay.blogs.service.BlogsEntryService;
 import com.liferay.blogs.web.internal.security.permission.resource.BlogsEntryPermission;
+import com.liferay.blogs.web.internal.util.BlogsEntryAssetEntryUtil;
 import com.liferay.blogs.web.internal.util.BlogsEntryUtil;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.comment.CommentManager;
@@ -64,6 +65,8 @@ public class BlogsPortletDisplayTemplateHandler
 	@Override
 	public Map<String, Object> getCustomContextObjects() {
 		return HashMapBuilder.<String, Object>put(
+			"blogsEntryAssetEntryUtil", _blogsEntryAssetEntryUtil
+		).put(
 			"blogsEntryPermission", _blogsEntryPermission
 		).put(
 			"blogsEntryUtil", _blogsEntryUtil
@@ -105,6 +108,10 @@ public class BlogsPortletDisplayTemplateHandler
 
 		TemplateVariableGroup blogsUtilTemplateVariableGroup =
 			new TemplateVariableGroup("blogs-util", restrictedVariables);
+
+		blogsUtilTemplateVariableGroup.addVariable(
+			"blogs-entry-asset-entry-util", BlogsEntryAssetEntryUtil.class,
+			"blogsEntryAssetEntryUtil");
 
 		templateVariableGroups.put(
 			"blogs-util", blogsUtilTemplateVariableGroup);
@@ -148,6 +155,9 @@ public class BlogsPortletDisplayTemplateHandler
 	private volatile BlogsConfiguration _blogsConfiguration;
 
 	@Reference
+	private BlogsEntryAssetEntryUtil _blogsEntryAssetEntryUtil;
+
+	@Reference
 	private BlogsEntryPermission _blogsEntryPermission;
 
 	@Reference
@@ -163,7 +173,7 @@ public class BlogsPortletDisplayTemplateHandler
 	private Portal _portal;
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.blogs.service)(&(release.schema.version>=2.1.0)(!(release.schema.version>=3.0.0))))"
+		target = "(&(release.bundle.symbolic.name=com.liferay.blogs.service)(&(release.schema.version>=3.0.0)(!(release.schema.version>=4.0.0))))"
 	)
 	private Release _release;
 

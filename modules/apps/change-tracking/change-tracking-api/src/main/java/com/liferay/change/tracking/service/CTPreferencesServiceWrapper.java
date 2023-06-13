@@ -26,6 +26,10 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class CTPreferencesServiceWrapper
 	implements CTPreferencesService, ServiceWrapper<CTPreferencesService> {
 
+	public CTPreferencesServiceWrapper() {
+		this(null);
+	}
+
 	public CTPreferencesServiceWrapper(
 		CTPreferencesService ctPreferencesService) {
 
@@ -34,11 +38,19 @@ public class CTPreferencesServiceWrapper
 
 	@Override
 	public com.liferay.change.tracking.model.CTPreferences checkoutCTCollection(
-			long companyId, long ctCollectionId, long userId)
+			long companyId, long userId, long ctCollectionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ctPreferencesService.checkoutCTCollection(
-			companyId, ctCollectionId, userId);
+			companyId, userId, ctCollectionId);
+	}
+
+	@Override
+	public com.liferay.change.tracking.model.CTPreferences enablePublications(
+			long companyId, boolean enable)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _ctPreferencesService.enablePublications(companyId, enable);
 	}
 
 	/**

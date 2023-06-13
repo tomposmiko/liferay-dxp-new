@@ -22,16 +22,12 @@ import com.liferay.portal.kernel.template.TemplateException;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.template.TemplateResourceCache;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.template.ClassLoaderResourceParser;
 import com.liferay.portal.template.TemplateContextHelper;
 import com.liferay.portal.template.velocity.configuration.VelocityEngineConfiguration;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.FileImpl;
-import com.liferay.portal.util.PropsImpl;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -54,7 +50,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -64,16 +59,11 @@ import org.junit.Test;
 public class VelocityTemplateTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		FileUtil fileUtil = new FileUtil();
-
-		fileUtil.setFile(new FileImpl());
-
 		_templateResourceCache = new VelocityTemplateResourceCache() {
 
 			@Override
@@ -84,8 +74,6 @@ public class VelocityTemplateTest {
 		};
 
 		_velocityTemplateResourceLoader = new VelocityTemplateResourceLoader();
-
-		PropsUtil.setProps(new PropsImpl());
 
 		ReflectionTestUtil.setFieldValue(
 			_velocityTemplateResourceLoader, "_velocityTemplateResourceCache",

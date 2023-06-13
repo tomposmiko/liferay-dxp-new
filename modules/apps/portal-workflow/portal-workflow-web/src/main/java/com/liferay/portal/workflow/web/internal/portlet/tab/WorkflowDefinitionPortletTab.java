@@ -30,7 +30,7 @@ import com.liferay.portal.workflow.constants.WorkflowWebKeys;
 import com.liferay.portal.workflow.portlet.tab.BaseWorkflowPortletTab;
 import com.liferay.portal.workflow.portlet.tab.WorkflowPortletTab;
 import com.liferay.portal.workflow.web.internal.display.context.WorkflowDefinitionDisplayContext;
-import com.liferay.portal.workflow.web.internal.request.prepocessor.WorkflowPreprocessorHelper;
+import com.liferay.portal.workflow.web.internal.request.preprocessor.helper.WorkflowPreprocessorHelper;
 
 import java.util.Map;
 import java.util.Objects;
@@ -43,6 +43,7 @@ import javax.servlet.ServletContext;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -51,7 +52,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.workflow.configuration.WorkflowDefinitionConfiguration",
-	immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = "portal.workflow.tabs.name=" + WorkflowWebKeys.WORKFLOW_TAB_DEFINITION,
 	service = WorkflowPortletTab.class
 )
@@ -79,9 +80,7 @@ public class WorkflowDefinitionPortletTab extends BaseWorkflowPortletTab {
 			WorkflowDefinitionDisplayContext displayContext =
 				new WorkflowDefinitionDisplayContext(
 					renderRequest,
-					ResourceBundleLoaderUtil.
-						getResourceBundleLoaderByBundleSymbolicName(
-							"com.liferay.portal.workflow.web"),
+					ResourceBundleLoaderUtil.getPortalResourceBundleLoader(),
 					userLocalService);
 
 			displayContext.setCompanyAdministratorCanPublish(
@@ -166,6 +165,6 @@ public class WorkflowDefinitionPortletTab extends BaseWorkflowPortletTab {
 	@Reference
 	protected WorkflowPreprocessorHelper workflowPreprocessorHelper;
 
-	private boolean _companyAdministratorCanPublish;
+	private volatile boolean _companyAdministratorCanPublish;
 
 }

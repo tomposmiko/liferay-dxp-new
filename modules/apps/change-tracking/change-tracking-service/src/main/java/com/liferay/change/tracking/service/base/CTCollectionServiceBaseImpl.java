@@ -18,18 +18,12 @@ import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.service.CTCollectionService;
 import com.liferay.change.tracking.service.CTCollectionServiceUtil;
 import com.liferay.change.tracking.service.persistence.CTCollectionPersistence;
-import com.liferay.change.tracking.service.persistence.CTEntryPersistence;
-import com.liferay.change.tracking.service.persistence.CTMessagePersistence;
-import com.liferay.change.tracking.service.persistence.CTPreferencesPersistence;
-import com.liferay.change.tracking.service.persistence.CTProcessPersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -150,20 +144,5 @@ public abstract class CTCollectionServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected CTEntryPersistence ctEntryPersistence;
-
-	@Reference
-	protected CTMessagePersistence ctMessagePersistence;
-
-	@Reference
-	protected CTPreferencesPersistence ctPreferencesPersistence;
-
-	@Reference
-	protected CTProcessPersistence ctProcessPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CTCollectionServiceBaseImpl.class);
 
 }

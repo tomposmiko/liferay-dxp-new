@@ -35,6 +35,7 @@ import com.liferay.portal.reports.engine.console.model.EntrySoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -293,96 +294,117 @@ public class EntryModelImpl extends BaseModelImpl<Entry> implements EntryModel {
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Entry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Entry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Entry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Entry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Entry.class.getClassLoader(), Entry.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("entryId", Entry::getEntryId);
-		attributeGetterFunctions.put("groupId", Entry::getGroupId);
-		attributeGetterFunctions.put("companyId", Entry::getCompanyId);
-		attributeGetterFunctions.put("userId", Entry::getUserId);
-		attributeGetterFunctions.put("userName", Entry::getUserName);
-		attributeGetterFunctions.put("createDate", Entry::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", Entry::getModifiedDate);
-		attributeGetterFunctions.put("definitionId", Entry::getDefinitionId);
-		attributeGetterFunctions.put("format", Entry::getFormat);
-		attributeGetterFunctions.put(
-			"scheduleRequest", Entry::getScheduleRequest);
-		attributeGetterFunctions.put("startDate", Entry::getStartDate);
-		attributeGetterFunctions.put("endDate", Entry::getEndDate);
-		attributeGetterFunctions.put("repeating", Entry::getRepeating);
-		attributeGetterFunctions.put("recurrence", Entry::getRecurrence);
-		attributeGetterFunctions.put(
-			"emailNotifications", Entry::getEmailNotifications);
-		attributeGetterFunctions.put("emailDelivery", Entry::getEmailDelivery);
-		attributeGetterFunctions.put("portletId", Entry::getPortletId);
-		attributeGetterFunctions.put("pageURL", Entry::getPageURL);
-		attributeGetterFunctions.put(
-			"reportParameters", Entry::getReportParameters);
-		attributeGetterFunctions.put("errorMessage", Entry::getErrorMessage);
-		attributeGetterFunctions.put("status", Entry::getStatus);
+		try {
+			Constructor<Entry> constructor =
+				(Constructor<Entry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Entry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Entry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Entry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Entry, Object>>();
 		Map<String, BiConsumer<Entry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Entry, ?>>();
 
+		attributeGetterFunctions.put("entryId", Entry::getEntryId);
 		attributeSetterBiConsumers.put(
 			"entryId", (BiConsumer<Entry, Long>)Entry::setEntryId);
+		attributeGetterFunctions.put("groupId", Entry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<Entry, Long>)Entry::setGroupId);
+		attributeGetterFunctions.put("companyId", Entry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<Entry, Long>)Entry::setCompanyId);
+		attributeGetterFunctions.put("userId", Entry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<Entry, Long>)Entry::setUserId);
+		attributeGetterFunctions.put("userName", Entry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<Entry, String>)Entry::setUserName);
+		attributeGetterFunctions.put("createDate", Entry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<Entry, Date>)Entry::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", Entry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate", (BiConsumer<Entry, Date>)Entry::setModifiedDate);
+		attributeGetterFunctions.put("definitionId", Entry::getDefinitionId);
 		attributeSetterBiConsumers.put(
 			"definitionId", (BiConsumer<Entry, Long>)Entry::setDefinitionId);
+		attributeGetterFunctions.put("format", Entry::getFormat);
 		attributeSetterBiConsumers.put(
 			"format", (BiConsumer<Entry, String>)Entry::setFormat);
+		attributeGetterFunctions.put(
+			"scheduleRequest", Entry::getScheduleRequest);
 		attributeSetterBiConsumers.put(
 			"scheduleRequest",
 			(BiConsumer<Entry, Boolean>)Entry::setScheduleRequest);
+		attributeGetterFunctions.put("startDate", Entry::getStartDate);
 		attributeSetterBiConsumers.put(
 			"startDate", (BiConsumer<Entry, Date>)Entry::setStartDate);
+		attributeGetterFunctions.put("endDate", Entry::getEndDate);
 		attributeSetterBiConsumers.put(
 			"endDate", (BiConsumer<Entry, Date>)Entry::setEndDate);
+		attributeGetterFunctions.put("repeating", Entry::getRepeating);
 		attributeSetterBiConsumers.put(
 			"repeating", (BiConsumer<Entry, Boolean>)Entry::setRepeating);
+		attributeGetterFunctions.put("recurrence", Entry::getRecurrence);
 		attributeSetterBiConsumers.put(
 			"recurrence", (BiConsumer<Entry, String>)Entry::setRecurrence);
+		attributeGetterFunctions.put(
+			"emailNotifications", Entry::getEmailNotifications);
 		attributeSetterBiConsumers.put(
 			"emailNotifications",
 			(BiConsumer<Entry, String>)Entry::setEmailNotifications);
+		attributeGetterFunctions.put("emailDelivery", Entry::getEmailDelivery);
 		attributeSetterBiConsumers.put(
 			"emailDelivery",
 			(BiConsumer<Entry, String>)Entry::setEmailDelivery);
+		attributeGetterFunctions.put("portletId", Entry::getPortletId);
 		attributeSetterBiConsumers.put(
 			"portletId", (BiConsumer<Entry, String>)Entry::setPortletId);
+		attributeGetterFunctions.put("pageURL", Entry::getPageURL);
 		attributeSetterBiConsumers.put(
 			"pageURL", (BiConsumer<Entry, String>)Entry::setPageURL);
+		attributeGetterFunctions.put(
+			"reportParameters", Entry::getReportParameters);
 		attributeSetterBiConsumers.put(
 			"reportParameters",
 			(BiConsumer<Entry, String>)Entry::setReportParameters);
+		attributeGetterFunctions.put("errorMessage", Entry::getErrorMessage);
 		attributeSetterBiConsumers.put(
 			"errorMessage", (BiConsumer<Entry, String>)Entry::setErrorMessage);
+		attributeGetterFunctions.put("status", Entry::getStatus);
 		attributeSetterBiConsumers.put(
 			"status", (BiConsumer<Entry, String>)Entry::setStatus);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -870,6 +892,46 @@ public class EntryModelImpl extends BaseModelImpl<Entry> implements EntryModel {
 	}
 
 	@Override
+	public Entry cloneWithOriginalValues() {
+		EntryImpl entryImpl = new EntryImpl();
+
+		entryImpl.setEntryId(this.<Long>getColumnOriginalValue("entryId"));
+		entryImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		entryImpl.setCompanyId(this.<Long>getColumnOriginalValue("companyId"));
+		entryImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		entryImpl.setUserName(this.<String>getColumnOriginalValue("userName"));
+		entryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		entryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		entryImpl.setDefinitionId(
+			this.<Long>getColumnOriginalValue("definitionId"));
+		entryImpl.setFormat(this.<String>getColumnOriginalValue("format"));
+		entryImpl.setScheduleRequest(
+			this.<Boolean>getColumnOriginalValue("scheduleRequest"));
+		entryImpl.setStartDate(this.<Date>getColumnOriginalValue("startDate"));
+		entryImpl.setEndDate(this.<Date>getColumnOriginalValue("endDate"));
+		entryImpl.setRepeating(
+			this.<Boolean>getColumnOriginalValue("repeating"));
+		entryImpl.setRecurrence(
+			this.<String>getColumnOriginalValue("recurrence"));
+		entryImpl.setEmailNotifications(
+			this.<String>getColumnOriginalValue("emailNotifications"));
+		entryImpl.setEmailDelivery(
+			this.<String>getColumnOriginalValue("emailDelivery"));
+		entryImpl.setPortletId(
+			this.<String>getColumnOriginalValue("portletId"));
+		entryImpl.setPageURL(this.<String>getColumnOriginalValue("pageURL"));
+		entryImpl.setReportParameters(
+			this.<String>getColumnOriginalValue("reportParameters"));
+		entryImpl.setErrorMessage(
+			this.<String>getColumnOriginalValue("errorMessage"));
+		entryImpl.setStatus(this.<String>getColumnOriginalValue("status"));
+
+		return entryImpl;
+	}
+
+	@Override
 	public int compareTo(Entry entry) {
 		int value = 0;
 
@@ -1156,9 +1218,7 @@ public class EntryModelImpl extends BaseModelImpl<Entry> implements EntryModel {
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Entry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Entry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

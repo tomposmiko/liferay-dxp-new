@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -222,53 +223,75 @@ public class ExpandoRowModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<ExpandoRow, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, ExpandoRow>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<ExpandoRow, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<ExpandoRow, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ExpandoRow.class.getClassLoader(), ExpandoRow.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", ExpandoRow::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", ExpandoRow::getCtCollectionId);
-		attributeGetterFunctions.put("rowId", ExpandoRow::getRowId);
-		attributeGetterFunctions.put("companyId", ExpandoRow::getCompanyId);
-		attributeGetterFunctions.put(
-			"modifiedDate", ExpandoRow::getModifiedDate);
-		attributeGetterFunctions.put("tableId", ExpandoRow::getTableId);
-		attributeGetterFunctions.put("classPK", ExpandoRow::getClassPK);
+		try {
+			Constructor<ExpandoRow> constructor =
+				(Constructor<ExpandoRow>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<ExpandoRow, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<ExpandoRow, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<ExpandoRow, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<ExpandoRow, Object>>();
 		Map<String, BiConsumer<ExpandoRow, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<ExpandoRow, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", ExpandoRow::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<ExpandoRow, Long>)ExpandoRow::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", ExpandoRow::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<ExpandoRow, Long>)ExpandoRow::setCtCollectionId);
+		attributeGetterFunctions.put("rowId", ExpandoRow::getRowId);
 		attributeSetterBiConsumers.put(
 			"rowId", (BiConsumer<ExpandoRow, Long>)ExpandoRow::setRowId);
+		attributeGetterFunctions.put("companyId", ExpandoRow::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<ExpandoRow, Long>)ExpandoRow::setCompanyId);
+		attributeGetterFunctions.put(
+			"modifiedDate", ExpandoRow::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<ExpandoRow, Date>)ExpandoRow::setModifiedDate);
+		attributeGetterFunctions.put("tableId", ExpandoRow::getTableId);
 		attributeSetterBiConsumers.put(
 			"tableId", (BiConsumer<ExpandoRow, Long>)ExpandoRow::setTableId);
+		attributeGetterFunctions.put("classPK", ExpandoRow::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK", (BiConsumer<ExpandoRow, Long>)ExpandoRow::setClassPK);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -447,6 +470,25 @@ public class ExpandoRowModelImpl
 		expandoRowImpl.setClassPK(getClassPK());
 
 		expandoRowImpl.resetOriginalValues();
+
+		return expandoRowImpl;
+	}
+
+	@Override
+	public ExpandoRow cloneWithOriginalValues() {
+		ExpandoRowImpl expandoRowImpl = new ExpandoRowImpl();
+
+		expandoRowImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		expandoRowImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		expandoRowImpl.setRowId(this.<Long>getColumnOriginalValue("rowId_"));
+		expandoRowImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		expandoRowImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		expandoRowImpl.setTableId(this.<Long>getColumnOriginalValue("tableId"));
+		expandoRowImpl.setClassPK(this.<Long>getColumnOriginalValue("classPK"));
 
 		return expandoRowImpl;
 	}
@@ -631,9 +673,7 @@ public class ExpandoRowModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, ExpandoRow>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					ExpandoRow.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

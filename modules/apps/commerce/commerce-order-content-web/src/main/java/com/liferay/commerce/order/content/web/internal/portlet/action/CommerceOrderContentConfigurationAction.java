@@ -18,6 +18,7 @@ import com.liferay.commerce.constants.CommerceOrderConstants;
 import com.liferay.commerce.constants.CommercePortletKeys;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.order.content.web.internal.display.context.CommerceOrderContentDisplayContext;
+import com.liferay.commerce.order.importer.type.CommerceOrderImporterTypeRegistry;
 import com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelService;
 import com.liferay.commerce.percentage.PercentageFormatter;
 import com.liferay.commerce.price.CommerceOrderPriceCalculation;
@@ -25,7 +26,10 @@ import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.service.CommerceAddressService;
 import com.liferay.commerce.service.CommerceOrderNoteService;
 import com.liferay.commerce.service.CommerceOrderService;
+import com.liferay.commerce.service.CommerceOrderTypeService;
 import com.liferay.commerce.service.CommerceShipmentItemService;
+import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.item.selector.ItemSelector;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
@@ -56,7 +60,7 @@ public class CommerceOrderContentConfigurationAction
 
 	@Override
 	public String getJspPath(HttpServletRequest httpServletRequest) {
-		return "/placed_orders/configuration.jsp";
+		return "/placed_commerce_orders/configuration.jsp";
 	}
 
 	@Override
@@ -70,10 +74,13 @@ public class CommerceOrderContentConfigurationAction
 				commerceOrderContentDisplayContext =
 					new CommerceOrderContentDisplayContext(
 						_commerceAddressService, _commerceChannelLocalService,
+						_commerceOrderImporterTypeRegistry,
 						_commerceOrderNoteService,
 						_commerceOrderPriceCalculation, _commerceOrderService,
+						_commerceOrderTypeService,
 						_commercePaymentMethodGroupRelService,
-						_commerceShipmentItemService, httpServletRequest,
+						_commerceShipmentItemService, _dlAppLocalService,
+						httpServletRequest, _itemSelector,
 						_modelResourcePermission, _percentageFormatter,
 						_portletResourcePermission);
 
@@ -107,6 +114,10 @@ public class CommerceOrderContentConfigurationAction
 	private CommerceChannelLocalService _commerceChannelLocalService;
 
 	@Reference
+	private CommerceOrderImporterTypeRegistry
+		_commerceOrderImporterTypeRegistry;
+
+	@Reference
 	private CommerceOrderNoteService _commerceOrderNoteService;
 
 	@Reference
@@ -116,11 +127,20 @@ public class CommerceOrderContentConfigurationAction
 	private CommerceOrderService _commerceOrderService;
 
 	@Reference
+	private CommerceOrderTypeService _commerceOrderTypeService;
+
+	@Reference
 	private CommercePaymentMethodGroupRelService
 		_commercePaymentMethodGroupRelService;
 
 	@Reference
 	private CommerceShipmentItemService _commerceShipmentItemService;
+
+	@Reference
+	private DLAppLocalService _dlAppLocalService;
+
+	@Reference
+	private ItemSelector _itemSelector;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.commerce.model.CommerceOrder)"

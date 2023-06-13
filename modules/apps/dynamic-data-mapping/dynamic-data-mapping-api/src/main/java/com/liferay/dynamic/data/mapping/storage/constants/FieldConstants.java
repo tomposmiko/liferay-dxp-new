@@ -14,6 +14,9 @@
 
 package com.liferay.dynamic.data.mapping.storage.constants;
 
+import com.liferay.dynamic.data.mapping.util.NumberUtil;
+import com.liferay.dynamic.data.mapping.util.NumericDDMFormFieldUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -24,11 +27,8 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
-import java.math.BigDecimal;
-
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.text.ParseException;
 
 import java.util.Collections;
@@ -93,30 +93,69 @@ public class FieldConstants {
 		Serializable serializable = null;
 
 		if (isNumericType(type)) {
-			NumberFormat numberFormat = null;
+			DecimalFormat decimalFormat = null;
 
-			if (StringUtil.equals(locale.getLanguage(), "ar")) {
-				numberFormat = _getArabicDecimalFormat(locale);
-			}
-			else if (locale.equals(LocaleUtil.ROOT)) {
-				numberFormat = NumberFormat.getInstance(defaultLocale);
+			if (locale.equals(LocaleUtil.ROOT)) {
+				decimalFormat = NumericDDMFormFieldUtil.getDecimalFormat(
+					defaultLocale);
 			}
 			else {
-				numberFormat = NumberFormat.getInstance(locale);
+				decimalFormat = NumericDDMFormFieldUtil.getDecimalFormat(
+					locale);
 			}
 
 			if (type.equals(FieldConstants.DOUBLE) ||
 				type.equals(FieldConstants.FLOAT)) {
 
-				numberFormat.setMinimumFractionDigits(1);
+				decimalFormat.setMinimumFractionDigits(1);
 			}
+
+			value = GetterUtil.getString(value);
 
 			try {
-				Number number = numberFormat.parse(GetterUtil.getString(value));
+				Number number = decimalFormat.parse(
+					GetterUtil.getString(value));
 
-				serializable = getSerializable(type, number.toString());
+				String formattedValue = String.valueOf(number);
+
+				if ((number.doubleValue() > Integer.MAX_VALUE) ||
+					formattedValue.matches(_SCIENTIFIC_NOTATION_PATTERN)) {
+
+					return value;
+				}
+
+				DecimalFormatSymbols decimalFormatSymbols =
+					decimalFormat.getDecimalFormatSymbols();
+
+				String[] valueParts = StringUtil.split(
+					value, decimalFormatSymbols.getDecimalSeparator());
+
+				if (valueParts.length > 1) {
+					String decimalPart = valueParts[1];
+
+					if ((decimalPart.length() > 1) &&
+						StringUtil.endsWith(decimalPart, "0")) {
+
+						return value;
+					}
+				}
+
+				if (!NumberUtil.hasDecimalSeparator(formattedValue) &&
+					NumberUtil.hasDecimalSeparator(value)) {
+
+					formattedValue = StringBundler.concat(
+						formattedValue, StringPool.PERIOD,
+						value.substring(
+							NumberUtil.getDecimalSeparatorIndex(value) + 1));
+				}
+
+				serializable = getSerializable(type, formattedValue);
 			}
 			catch (ParseException parseException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(parseException, parseException);
+				}
+
 				serializable = getSerializable(type, value);
 			}
 		}
@@ -127,7 +166,7 @@ public class FieldConstants {
 		return serializable;
 	}
 
-	public static final Serializable getSerializable(
+	public static Serializable getSerializable(
 		String type, List<Serializable> values) {
 
 		if (Validator.isNull(type)) {
@@ -170,9 +209,7 @@ public class FieldConstants {
 		return values.toArray(new String[0]);
 	}
 
-	public static final Serializable getSerializable(
-		String type, String value) {
-
+	public static Serializable getSerializable(String type, String value) {
 		if (Validator.isNull(type)) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("Invalid type " + type);
@@ -192,13 +229,17 @@ public class FieldConstants {
 			return value;
 		}
 		else if (type.equals(DOUBLE)) {
-			if (value.matches(_SCIENTIFIC_NOTATION_PATTERN)) {
-				return new BigDecimal(value.trim());
+			if (!NumberUtil.hasDecimalSeparator(value)) {
+				return GetterUtil.getInteger(value);
 			}
 
 			return GetterUtil.getDouble(value);
 		}
 		else if (type.equals(FLOAT)) {
+			if (!NumberUtil.hasDecimalSeparator(value)) {
+				return GetterUtil.getInteger(value);
+			}
+
 			return GetterUtil.getFloat(value);
 		}
 		else if (type.equals(INTEGER)) {
@@ -217,7 +258,7 @@ public class FieldConstants {
 		return value;
 	}
 
-	public static final boolean isNumericType(String type) {
+	public static boolean isNumericType(String type) {
 		if (type.equals(DOUBLE) || type.equals(FLOAT) || type.equals(INTEGER) ||
 			type.equals(LONG) || type.equals(NUMBER) || type.equals(SHORT)) {
 
@@ -225,24 +266,6 @@ public class FieldConstants {
 		}
 
 		return false;
-	}
-
-	private static DecimalFormat _getArabicDecimalFormat(Locale locale) {
-		DecimalFormat decimalFormat = (DecimalFormat)DecimalFormat.getInstance(
-			locale);
-
-		DecimalFormatSymbols decimalFormatSymbols =
-			decimalFormat.getDecimalFormatSymbols();
-
-		decimalFormatSymbols.setZeroDigit('0');
-
-		decimalFormat.setDecimalFormatSymbols(decimalFormatSymbols);
-
-		decimalFormat.setGroupingUsed(false);
-		decimalFormat.setMaximumFractionDigits(Integer.MAX_VALUE);
-		decimalFormat.setParseBigDecimal(true);
-
-		return decimalFormat;
 	}
 
 	private static final String _SCIENTIFIC_NOTATION_PATTERN =

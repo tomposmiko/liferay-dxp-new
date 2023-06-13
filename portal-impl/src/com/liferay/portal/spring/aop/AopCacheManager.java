@@ -15,20 +15,19 @@
 package com.liferay.portal.spring.aop;
 
 import com.liferay.portal.cache.thread.local.ThreadLocalCacheAdvice;
+import com.liferay.portal.dao.jdbc.aop.DynamicDataSourceAdvice;
 import com.liferay.portal.increment.BufferedIncrementAdvice;
 import com.liferay.portal.internal.cluster.ClusterableAdvice;
 import com.liferay.portal.kernel.aop.ChainableMethodAdvice;
+import com.liferay.portal.kernel.dao.jdbc.aop.DynamicDataSourceTargetSource;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
+import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.search.IndexableAdvice;
 import com.liferay.portal.security.access.control.AccessControlAdvice;
 import com.liferay.portal.service.ServiceContextAdvice;
 import com.liferay.portal.spring.transaction.TransactionHandler;
 import com.liferay.portal.systemevent.SystemEventAdvice;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceReference;
-import com.liferay.registry.ServiceTracker;
-import com.liferay.registry.ServiceTrackerCustomizer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,6 +35,11 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Preston Crary
@@ -74,6 +78,14 @@ public class AopCacheManager {
 			chainableMethodAdvices.add(new ClusterableAdvice());
 		}
 
+		DynamicDataSourceTargetSource dynamicDataSourceTargetSource =
+			InfrastructureUtil.getDynamicDataSourceTargetSource();
+
+		if (dynamicDataSourceTargetSource != null) {
+			chainableMethodAdvices.add(
+				new DynamicDataSourceAdvice(dynamicDataSourceTargetSource));
+		}
+
 		chainableMethodAdvices.add(new IndexableAdvice());
 
 		chainableMethodAdvices.add(new RetryAdvice());
@@ -103,6 +115,8 @@ public class AopCacheManager {
 
 	private static final Set<AopInvocationHandler> _aopInvocationHandlers =
 		new HashSet<>();
+	private static final BundleContext _bundleContext =
+		SystemBundleUtil.getBundleContext();
 	private static final List<ChainableMethodAdvice> _chainableMethodAdvices =
 		_createStaticChainableMethodAdvices();
 
@@ -114,10 +128,8 @@ public class AopCacheManager {
 		public ChainableMethodAdvice addingService(
 			ServiceReference<ChainableMethodAdvice> serviceReference) {
 
-			Registry registry = RegistryUtil.getRegistry();
-
-			ChainableMethodAdvice chainableMethodAdvice = registry.getService(
-				serviceReference);
+			ChainableMethodAdvice chainableMethodAdvice =
+				_bundleContext.getService(serviceReference);
 
 			synchronized (AopCacheManager.class) {
 				int index = Collections.binarySearch(
@@ -161,9 +173,7 @@ public class AopCacheManager {
 				_reset();
 			}
 
-			Registry registry = RegistryUtil.getRegistry();
-
-			registry.ungetService(serviceReference);
+			_bundleContext.ungetService(serviceReference);
 		}
 
 		private void _reset() {
@@ -181,10 +191,8 @@ public class AopCacheManager {
 	}
 
 	static {
-		Registry registry = RegistryUtil.getRegistry();
-
-		ServiceTracker<?, ?> serviceTracker = registry.trackServices(
-			ChainableMethodAdvice.class,
+		ServiceTracker<?, ?> serviceTracker = new ServiceTracker<>(
+			_bundleContext, ChainableMethodAdvice.class,
 			new ChainableMethodAdviceServiceTrackerCustomizer());
 
 		serviceTracker.open();

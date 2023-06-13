@@ -14,7 +14,6 @@
 
 package com.liferay.headless.delivery.internal.resource.v1_0.factory;
 
-import com.liferay.headless.delivery.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.delivery.resource.v1_0.LanguageResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,18 +33,14 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -53,7 +48,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +58,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Javier Gamarra
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/headless-delivery/v1.0/Language",
-	service = LanguageResource.Factory.class
-)
+@Component(immediate = true, service = LanguageResource.Factory.class)
 @Generated("")
 public class LanguageResourceFactoryImpl implements LanguageResource.Factory {
 
@@ -78,7 +72,9 @@ public class LanguageResourceFactoryImpl implements LanguageResource.Factory {
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return _languageResourceProxyProviderFunction.apply(
+				return (LanguageResource)ProxyUtil.newProxyInstance(
+					LanguageResource.class.getClassLoader(),
+					new Class<?>[] {LanguageResource.class},
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -137,31 +133,14 @@ public class LanguageResourceFactoryImpl implements LanguageResource.Factory {
 		};
 	}
 
-	private static Function<InvocationHandler, LanguageResource>
-		_getProxyProviderFunction() {
+	@Activate
+	protected void activate() {
+		LanguageResource.FactoryHolder.factory = this;
+	}
 
-		Class<?> proxyClass = ProxyUtil.getProxyClass(
-			LanguageResource.class.getClassLoader(), LanguageResource.class);
-
-		try {
-			Constructor<LanguageResource> constructor =
-				(Constructor<LanguageResource>)proxyClass.getConstructor(
-					InvocationHandler.class);
-
-			return invocationHandler -> {
-				try {
-					return constructor.newInstance(invocationHandler);
-				}
-				catch (ReflectiveOperationException
-							reflectiveOperationException) {
-
-					throw new InternalError(reflectiveOperationException);
-				}
-			};
-		}
-		catch (NoSuchMethodException noSuchMethodException) {
-			throw new InternalError(noSuchMethodException);
-		}
+	@Deactivate
+	protected void deactivate() {
+		LanguageResource.FactoryHolder.factory = null;
 	}
 
 	private Object _invoke(
@@ -184,7 +163,7 @@ public class LanguageResourceFactoryImpl implements LanguageResource.Factory {
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		LanguageResource languageResource =
@@ -208,7 +187,6 @@ public class LanguageResourceFactoryImpl implements LanguageResource.Factory {
 		languageResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		languageResource.setRoleLocalService(_roleLocalService);
-		languageResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(languageResource, arguments);
@@ -224,9 +202,6 @@ public class LanguageResourceFactoryImpl implements LanguageResource.Factory {
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
-
-	private static final Function<InvocationHandler, LanguageResource>
-		_languageResourceProxyProviderFunction = _getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
@@ -248,6 +223,9 @@ public class LanguageResourceFactoryImpl implements LanguageResource.Factory {
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -256,9 +234,6 @@ public class LanguageResourceFactoryImpl implements LanguageResource.Factory {
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

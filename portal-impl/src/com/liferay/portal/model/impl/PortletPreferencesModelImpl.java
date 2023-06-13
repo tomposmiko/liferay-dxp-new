@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -75,8 +76,7 @@ public class PortletPreferencesModelImpl
 		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
 		{"portletPreferencesId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"ownerId", Types.BIGINT}, {"ownerType", Types.INTEGER},
-		{"plid", Types.BIGINT}, {"portletId", Types.VARCHAR},
-		{"preferences", Types.CLOB}
+		{"plid", Types.BIGINT}, {"portletId", Types.VARCHAR}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -91,11 +91,10 @@ public class PortletPreferencesModelImpl
 		TABLE_COLUMNS_MAP.put("ownerType", Types.INTEGER);
 		TABLE_COLUMNS_MAP.put("plid", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("portletId", Types.VARCHAR);
-		TABLE_COLUMNS_MAP.put("preferences", Types.CLOB);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table PortletPreferences (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,portletPreferencesId LONG not null,companyId LONG,ownerId LONG,ownerType INTEGER,plid LONG,portletId VARCHAR(200) null,preferences TEXT null,primary key (portletPreferencesId, ctCollectionId))";
+		"create table PortletPreferences (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,portletPreferencesId LONG not null,companyId LONG,ownerId LONG,ownerType INTEGER,plid LONG,portletId VARCHAR(200) null,primary key (portletPreferencesId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP = "drop table PortletPreferences";
 
@@ -189,7 +188,6 @@ public class PortletPreferencesModelImpl
 		model.setOwnerType(soapModel.getOwnerType());
 		model.setPlid(soapModel.getPlid());
 		model.setPortletId(soapModel.getPortletId());
-		model.setPreferences(soapModel.getPreferences());
 
 		return model;
 	}
@@ -308,81 +306,97 @@ public class PortletPreferencesModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, PortletPreferences>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			PortletPreferences.class.getClassLoader(), PortletPreferences.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<PortletPreferences> constructor =
+				(Constructor<PortletPreferences>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<PortletPreferences, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<PortletPreferences, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<PortletPreferences, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<PortletPreferences, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", PortletPreferences::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", PortletPreferences::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"portletPreferencesId",
-			PortletPreferences::getPortletPreferencesId);
-		attributeGetterFunctions.put(
-			"companyId", PortletPreferences::getCompanyId);
-		attributeGetterFunctions.put("ownerId", PortletPreferences::getOwnerId);
-		attributeGetterFunctions.put(
-			"ownerType", PortletPreferences::getOwnerType);
-		attributeGetterFunctions.put("plid", PortletPreferences::getPlid);
-		attributeGetterFunctions.put(
-			"portletId", PortletPreferences::getPortletId);
-		attributeGetterFunctions.put(
-			"preferences", PortletPreferences::getPreferences);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<PortletPreferences, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<PortletPreferences, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<PortletPreferences, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", PortletPreferences::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<PortletPreferences, Long>)
 				PortletPreferences::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", PortletPreferences::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<PortletPreferences, Long>)
 				PortletPreferences::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"portletPreferencesId",
+			PortletPreferences::getPortletPreferencesId);
 		attributeSetterBiConsumers.put(
 			"portletPreferencesId",
 			(BiConsumer<PortletPreferences, Long>)
 				PortletPreferences::setPortletPreferencesId);
+		attributeGetterFunctions.put(
+			"companyId", PortletPreferences::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<PortletPreferences, Long>)
 				PortletPreferences::setCompanyId);
+		attributeGetterFunctions.put("ownerId", PortletPreferences::getOwnerId);
 		attributeSetterBiConsumers.put(
 			"ownerId",
 			(BiConsumer<PortletPreferences, Long>)
 				PortletPreferences::setOwnerId);
+		attributeGetterFunctions.put(
+			"ownerType", PortletPreferences::getOwnerType);
 		attributeSetterBiConsumers.put(
 			"ownerType",
 			(BiConsumer<PortletPreferences, Integer>)
 				PortletPreferences::setOwnerType);
+		attributeGetterFunctions.put("plid", PortletPreferences::getPlid);
 		attributeSetterBiConsumers.put(
 			"plid",
 			(BiConsumer<PortletPreferences, Long>)PortletPreferences::setPlid);
+		attributeGetterFunctions.put(
+			"portletId", PortletPreferences::getPortletId);
 		attributeSetterBiConsumers.put(
 			"portletId",
 			(BiConsumer<PortletPreferences, String>)
 				PortletPreferences::setPortletId);
-		attributeSetterBiConsumers.put(
-			"preferences",
-			(BiConsumer<PortletPreferences, String>)
-				PortletPreferences::setPreferences);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -559,26 +573,6 @@ public class PortletPreferencesModelImpl
 		return getColumnOriginalValue("portletId");
 	}
 
-	@JSON
-	@Override
-	public String getPreferences() {
-		if (_preferences == null) {
-			return "";
-		}
-		else {
-			return _preferences;
-		}
-	}
-
-	@Override
-	public void setPreferences(String preferences) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_preferences = preferences;
-	}
-
 	public long getColumnBitmask() {
 		if (_columnBitmask > 0) {
 			return _columnBitmask;
@@ -646,9 +640,33 @@ public class PortletPreferencesModelImpl
 		portletPreferencesImpl.setOwnerType(getOwnerType());
 		portletPreferencesImpl.setPlid(getPlid());
 		portletPreferencesImpl.setPortletId(getPortletId());
-		portletPreferencesImpl.setPreferences(getPreferences());
 
 		portletPreferencesImpl.resetOriginalValues();
+
+		return portletPreferencesImpl;
+	}
+
+	@Override
+	public PortletPreferences cloneWithOriginalValues() {
+		PortletPreferencesImpl portletPreferencesImpl =
+			new PortletPreferencesImpl();
+
+		portletPreferencesImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		portletPreferencesImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		portletPreferencesImpl.setPortletPreferencesId(
+			this.<Long>getColumnOriginalValue("portletPreferencesId"));
+		portletPreferencesImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		portletPreferencesImpl.setOwnerId(
+			this.<Long>getColumnOriginalValue("ownerId"));
+		portletPreferencesImpl.setOwnerType(
+			this.<Integer>getColumnOriginalValue("ownerType"));
+		portletPreferencesImpl.setPlid(
+			this.<Long>getColumnOriginalValue("plid"));
+		portletPreferencesImpl.setPortletId(
+			this.<String>getColumnOriginalValue("portletId"));
 
 		return portletPreferencesImpl;
 	}
@@ -748,14 +766,6 @@ public class PortletPreferencesModelImpl
 			portletPreferencesCacheModel.portletId = null;
 		}
 
-		portletPreferencesCacheModel.preferences = getPreferences();
-
-		String preferences = portletPreferencesCacheModel.preferences;
-
-		if ((preferences != null) && (preferences.length() == 0)) {
-			portletPreferencesCacheModel.preferences = null;
-		}
-
 		return portletPreferencesCacheModel;
 	}
 
@@ -843,9 +853,7 @@ public class PortletPreferencesModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, PortletPreferences>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					PortletPreferences.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -857,7 +865,6 @@ public class PortletPreferencesModelImpl
 	private int _ownerType;
 	private long _plid;
 	private String _portletId;
-	private String _preferences;
 
 	public <T> T getColumnValue(String columnName) {
 		Function<PortletPreferences, Object> function =
@@ -895,7 +902,6 @@ public class PortletPreferencesModelImpl
 		_columnOriginalValues.put("ownerType", _ownerType);
 		_columnOriginalValues.put("plid", _plid);
 		_columnOriginalValues.put("portletId", _portletId);
-		_columnOriginalValues.put("preferences", _preferences);
 	}
 
 	private transient Map<String, Object> _columnOriginalValues;
@@ -924,8 +930,6 @@ public class PortletPreferencesModelImpl
 		columnBitmasks.put("plid", 64L);
 
 		columnBitmasks.put("portletId", 128L);
-
-		columnBitmasks.put("preferences", 256L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

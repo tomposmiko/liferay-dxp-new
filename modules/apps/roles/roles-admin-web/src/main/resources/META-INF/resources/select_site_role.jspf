@@ -135,10 +135,12 @@ SearchContainer<Role> roleSearchContainer = selectRoleManagementToolbarDisplayCo
 				/>
 			</liferay-ui:search-container>
 
-			<aui:script require="metal-dom/src/dom as dom">
+			<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
 				var form = document.<portlet:namespace />selectSiteRoleFm;
 
-				dom.delegate(form, 'click', '.group-selector-button', function (event) {
+				var delegate = delegateModule.default;
+
+				delegate(form, 'click', '.group-selector-button', (event) => {
 					Liferay.Util.postForm(form, {
 						data: {
 							groupId: event.delegateTarget.dataset.groupid,
@@ -201,20 +203,6 @@ SearchContainer<Role> roleSearchContainer = selectRoleManagementToolbarDisplayCo
 						<c:if test="<%= Validator.isNull(p_u_i_d) || SiteMembershipPolicyUtil.isRoleAllowed((selUser != null) ? selUser.getUserId() : 0, group.getGroupId(), role.getRoleId()) %>">
 
 							<%
-							Map<String, Object> data = HashMapBuilder.<String, Object>put(
-								"entityid", role.getRoleId()
-							).put(
-								"entityname", role.getTitle(locale)
-							).put(
-								"groupdescriptivename", group.getDescriptiveName(locale)
-							).put(
-								"groupid", group.getGroupId()
-							).put(
-								"iconcssclass", RolesAdminUtil.getIconCssClass(role)
-							).put(
-								"searchcontainername", "siteRoles"
-							).build();
-
 							boolean disabled = false;
 
 							if (selUser != null) {
@@ -239,7 +227,26 @@ SearchContainer<Role> roleSearchContainer = selectRoleManagementToolbarDisplayCo
 							}
 							%>
 
-							<aui:button cssClass="selector-button" data="<%= data %>" disabled="<%= disabled %>" value="choose" />
+							<aui:button
+								cssClass="selector-button"
+								data='<%=
+									HashMapBuilder.<String, Object>put(
+										"entityid", role.getRoleId()
+									).put(
+										"entityname", role.getTitle(locale)
+									).put(
+										"groupdescriptivename", group.getDescriptiveName(locale)
+									).put(
+										"groupid", group.getGroupId()
+									).put(
+										"iconcssclass", RolesAdminUtil.getIconCssClass(role)
+									).put(
+										"searchcontainername", "siteRoles"
+									).build()
+								%>'
+								disabled="<%= disabled %>"
+								value="choose"
+							/>
 						</c:if>
 					</liferay-ui:search-container-column-text>
 				</liferay-ui:search-container-row>
@@ -248,13 +255,6 @@ SearchContainer<Role> roleSearchContainer = selectRoleManagementToolbarDisplayCo
 					markupView="lexicon"
 				/>
 			</liferay-ui:search-container>
-
-			<aui:script use="aui-base">
-				Liferay.Util.selectEntityHandler(
-					'#<portlet:namespace />selectSiteRoleFm',
-					'<%= HtmlUtil.escapeJS(eventName) %>'
-				);
-			</aui:script>
 		</c:when>
 	</c:choose>
 </aui:form>

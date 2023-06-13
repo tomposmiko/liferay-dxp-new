@@ -39,7 +39,7 @@ public class FriendlyURLNormalizerImpl implements FriendlyURLNormalizer {
 
 	@Override
 	public String normalize(String friendlyURL) {
-		return _normalize(friendlyURL, false, false);
+		return normalize(friendlyURL, false);
 	}
 
 	@Override
@@ -94,8 +94,6 @@ public class FriendlyURLNormalizerImpl implements FriendlyURLNormalizer {
 				}
 			}
 			else {
-				c = Character.toLowerCase(c);
-
 				if (charsetEncoder == null) {
 					charsetEncoder = CharsetEncoderUtil.getCharsetEncoder(
 						StringPool.UTF8);
@@ -163,13 +161,8 @@ public class FriendlyURLNormalizerImpl implements FriendlyURLNormalizer {
 	}
 
 	@Override
-	public String normalizeWithPeriods(String friendlyURL) {
-		return _normalize(friendlyURL, true, false);
-	}
-
-	@Override
 	public String normalizeWithPeriodsAndSlashes(String friendlyURL) {
-		return _normalize(friendlyURL, true, true);
+		return normalize(friendlyURL, true);
 	}
 
 	protected String normalize(String friendlyURL, boolean periodsAndSlashes) {
@@ -197,57 +190,6 @@ public class FriendlyURLNormalizerImpl implements FriendlyURLNormalizer {
 					 (c == CharPool.UNDERLINE) ||
 					 (!periodsAndSlashes &&
 					  ((c == CharPool.SLASH) || (c == CharPool.PERIOD)))) {
-
-				sb.append(c);
-			}
-			else {
-				if ((i == 0) || (CharPool.DASH != sb.charAt(sb.length() - 1))) {
-					sb.append(CharPool.DASH);
-
-					if (c != CharPool.DASH) {
-						modified = true;
-					}
-				}
-				else {
-					modified = true;
-				}
-			}
-		}
-
-		if (modified) {
-			return sb.toString();
-		}
-
-		return friendlyURL;
-	}
-
-	private String _normalize(
-		String friendlyURL, boolean periods, boolean slashes) {
-
-		if (Validator.isNull(friendlyURL)) {
-			return friendlyURL;
-		}
-
-		friendlyURL = Normalizer.normalizeToAscii(friendlyURL);
-
-		StringBuilder sb = new StringBuilder(friendlyURL.length());
-
-		boolean modified = false;
-
-		for (int i = 0; i < friendlyURL.length(); i++) {
-			char c = friendlyURL.charAt(i);
-
-			if ((CharPool.UPPER_CASE_A <= c) && (c <= CharPool.UPPER_CASE_Z)) {
-				sb.append((char)(c + 32));
-
-				modified = true;
-			}
-			else if (((CharPool.LOWER_CASE_A <= c) &&
-					  (c <= CharPool.LOWER_CASE_Z)) ||
-					 ((CharPool.NUMBER_0 <= c) && (c <= CharPool.NUMBER_9)) ||
-					 (c == CharPool.UNDERLINE) ||
-					 (!periods && (c == CharPool.PERIOD)) ||
-					 (!slashes && (c == CharPool.SLASH))) {
 
 				sb.append(c);
 			}

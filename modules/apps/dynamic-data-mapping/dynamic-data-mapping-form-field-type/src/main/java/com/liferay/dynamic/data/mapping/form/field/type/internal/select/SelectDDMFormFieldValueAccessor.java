@@ -15,6 +15,7 @@
 package com.liferay.dynamic.data.mapping.form.field.type.internal.select;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueAccessor;
+import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
@@ -28,6 +29,7 @@ import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
@@ -43,7 +45,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Renato Rego
  */
 @Component(
-	immediate = true, property = "ddm.form.field.type.name=select",
+	immediate = true,
+	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.SELECT,
 	service = {
 		DDMFormFieldValueAccessor.class, SelectDDMFormFieldValueAccessor.class
 	}
@@ -79,11 +82,11 @@ public class SelectDDMFormFieldValueAccessor
 				optionsValuesJSONArray.getString(i));
 
 			if (matcher.matches()) {
-				JSONArray jsonArray = createJSONArray("[]");
-
-				jsonArray.put(getOptionsLabels(ddmFormFieldValue, locale));
-
-				return jsonArray;
+				return createJSONArray(
+					StringBundler.concat(
+						StringPool.OPEN_BRACKET,
+						getOptionsLabels(ddmFormFieldValue, locale),
+						StringPool.CLOSE_BRACKET));
 			}
 		}
 
@@ -174,7 +177,7 @@ public class SelectDDMFormFieldValueAccessor
 					ddmFormFieldOptions.getOptionLabels(optionValue);
 
 				if (optionLabel != null) {
-					sb.append(optionLabel.getString(locale));
+					sb.append(HtmlUtil.escape(optionLabel.getString(locale)));
 				}
 				else {
 					sb.append(optionValue);

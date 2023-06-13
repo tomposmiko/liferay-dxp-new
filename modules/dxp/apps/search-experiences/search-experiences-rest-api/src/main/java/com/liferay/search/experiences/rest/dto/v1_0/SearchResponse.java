@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
@@ -36,8 +35,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Generated;
-
-import javax.validation.Valid;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -58,35 +55,6 @@ public class SearchResponse implements Serializable {
 	public static SearchResponse unsafeToDTO(String json) {
 		return ObjectMapperUtil.unsafeReadValue(SearchResponse.class, json);
 	}
-
-	@Schema
-	@Valid
-	public Map[] getErrors() {
-		return errors;
-	}
-
-	public void setErrors(Map[] errors) {
-		this.errors = errors;
-	}
-
-	@JsonIgnore
-	public void setErrors(
-		UnsafeSupplier<Map[], Exception> errorsUnsafeSupplier) {
-
-		try {
-			errors = errorsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Map[] errors;
 
 	@Schema
 	public Integer getPage() {
@@ -143,35 +111,6 @@ public class SearchResponse implements Serializable {
 	protected Integer pageSize;
 
 	@Schema
-	@Valid
-	public Object getRequest() {
-		return request;
-	}
-
-	public void setRequest(Object request) {
-		this.request = request;
-	}
-
-	@JsonIgnore
-	public void setRequest(
-		UnsafeSupplier<Object, Exception> requestUnsafeSupplier) {
-
-		try {
-			request = requestUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Object request;
-
-	@Schema
 	public String getRequestString() {
 		return requestString;
 	}
@@ -198,35 +137,6 @@ public class SearchResponse implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String requestString;
-
-	@Schema
-	@Valid
-	public Object getResponse() {
-		return response;
-	}
-
-	public void setResponse(Object response) {
-		this.response = response;
-	}
-
-	@JsonIgnore
-	public void setResponse(
-		UnsafeSupplier<Object, Exception> responseUnsafeSupplier) {
-
-		try {
-			response = responseUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Object response;
 
 	@Schema
 	public String getResponseString() {
@@ -257,21 +167,20 @@ public class SearchResponse implements Serializable {
 	protected String responseString;
 
 	@Schema
-	@Valid
-	public SearchHits getSearchHits() {
-		return searchHits;
+	public Integer getTotalHits() {
+		return totalHits;
 	}
 
-	public void setSearchHits(SearchHits searchHits) {
-		this.searchHits = searchHits;
+	public void setTotalHits(Integer totalHits) {
+		this.totalHits = totalHits;
 	}
 
 	@JsonIgnore
-	public void setSearchHits(
-		UnsafeSupplier<SearchHits, Exception> searchHitsUnsafeSupplier) {
+	public void setTotalHits(
+		UnsafeSupplier<Integer, Exception> totalHitsUnsafeSupplier) {
 
 		try {
-			searchHits = searchHitsUnsafeSupplier.get();
+			totalHits = totalHitsUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -283,36 +192,7 @@ public class SearchResponse implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected SearchHits searchHits;
-
-	@Schema
-	@Valid
-	public SearchRequest getSearchRequest() {
-		return searchRequest;
-	}
-
-	public void setSearchRequest(SearchRequest searchRequest) {
-		this.searchRequest = searchRequest;
-	}
-
-	@JsonIgnore
-	public void setSearchRequest(
-		UnsafeSupplier<SearchRequest, Exception> searchRequestUnsafeSupplier) {
-
-		try {
-			searchRequest = searchRequestUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected SearchRequest searchRequest;
+	protected Integer totalHits;
 
 	@Override
 	public boolean equals(Object object) {
@@ -341,26 +221,6 @@ public class SearchResponse implements Serializable {
 
 		sb.append("{");
 
-		if (errors != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"errors\": ");
-
-			sb.append("[");
-
-			for (int i = 0; i < errors.length; i++) {
-				sb.append(errors[i]);
-
-				if ((i + 1) < errors.length) {
-					sb.append(", ");
-				}
-			}
-
-			sb.append("]");
-		}
-
 		if (page != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -381,26 +241,6 @@ public class SearchResponse implements Serializable {
 			sb.append(pageSize);
 		}
 
-		if (request != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"request\": ");
-
-			if (request instanceof Map) {
-				sb.append(JSONFactoryUtil.createJSONObject((Map<?, ?>)request));
-			}
-			else if (request instanceof String) {
-				sb.append("\"");
-				sb.append(_escape((String)request));
-				sb.append("\"");
-			}
-			else {
-				sb.append(request);
-			}
-		}
-
 		if (requestString != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -413,27 +253,6 @@ public class SearchResponse implements Serializable {
 			sb.append(_escape(requestString));
 
 			sb.append("\"");
-		}
-
-		if (response != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"response\": ");
-
-			if (response instanceof Map) {
-				sb.append(
-					JSONFactoryUtil.createJSONObject((Map<?, ?>)response));
-			}
-			else if (response instanceof String) {
-				sb.append("\"");
-				sb.append(_escape((String)response));
-				sb.append("\"");
-			}
-			else {
-				sb.append(response);
-			}
 		}
 
 		if (responseString != null) {
@@ -450,24 +269,14 @@ public class SearchResponse implements Serializable {
 			sb.append("\"");
 		}
 
-		if (searchHits != null) {
+		if (totalHits != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"searchHits\": ");
+			sb.append("\"totalHits\": ");
 
-			sb.append(String.valueOf(searchHits));
-		}
-
-		if (searchRequest != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"searchRequest\": ");
-
-			sb.append(String.valueOf(searchRequest));
+			sb.append(totalHits);
 		}
 
 		sb.append("}");

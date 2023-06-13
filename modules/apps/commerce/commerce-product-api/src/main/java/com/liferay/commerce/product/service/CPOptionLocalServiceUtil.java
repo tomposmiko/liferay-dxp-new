@@ -61,16 +61,32 @@ public class CPOptionLocalServiceUtil {
 	}
 
 	public static CPOption addCPOption(
-			long userId, Map<java.util.Locale, String> nameMap,
+			String externalReferenceCode, long userId,
+			Map<java.util.Locale, String> nameMap,
 			Map<java.util.Locale, String> descriptionMap,
 			String ddmFormFieldTypeName, boolean facetable, boolean required,
-			boolean skuContributor, String key, String externalReferenceCode,
+			boolean skuContributor, String key,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addCPOption(
-			userId, nameMap, descriptionMap, ddmFormFieldTypeName, facetable,
-			required, skuContributor, key, externalReferenceCode,
+			externalReferenceCode, userId, nameMap, descriptionMap,
+			ddmFormFieldTypeName, facetable, required, skuContributor, key,
+			serviceContext);
+	}
+
+	public static CPOption addOrUpdateCPOption(
+			String externalReferenceCode, long userId,
+			Map<java.util.Locale, String> nameMap,
+			Map<java.util.Locale, String> descriptionMap,
+			String ddmFormFieldTypeName, boolean facetable, boolean required,
+			boolean skuContributor, String key,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addOrUpdateCPOption(
+			externalReferenceCode, userId, nameMap, descriptionMap,
+			ddmFormFieldTypeName, facetable, required, skuContributor, key,
 			serviceContext);
 	}
 
@@ -228,21 +244,29 @@ public class CPOptionLocalServiceUtil {
 	}
 
 	public static CPOption fetchByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
+		String externalReferenceCode, long companyId) {
 
 		return getService().fetchByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	public static CPOption fetchCPOption(long CPOptionId) {
 		return getService().fetchCPOption(CPOptionId);
 	}
 
-	public static CPOption fetchCPOption(long companyId, String key) {
+	public static CPOption fetchCPOption(long companyId, String key)
+		throws PortalException {
+
 		return getService().fetchCPOption(companyId, key);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option's external reference code
+	 * @return the matching cp option, or <code>null</code> if a matching cp option could not be found
+	 */
 	public static CPOption fetchCPOptionByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
 
@@ -250,6 +274,9 @@ public class CPOptionLocalServiceUtil {
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPOptionByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static CPOption fetchCPOptionByReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -302,7 +329,14 @@ public class CPOptionLocalServiceUtil {
 		return getService().getCPOption(companyId, key);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option's external reference code
+	 * @return the matching cp option
+	 * @throws PortalException if a matching cp option could not be found
+	 */
 	public static CPOption getCPOptionByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
 		throws PortalException {
@@ -424,18 +458,12 @@ public class CPOptionLocalServiceUtil {
 			facetable, required, skuContributor, key, serviceContext);
 	}
 
-	public static CPOption upsertCPOption(
-			long userId, Map<java.util.Locale, String> nameMap,
-			Map<java.util.Locale, String> descriptionMap,
-			String ddmFormFieldTypeName, boolean facetable, boolean required,
-			boolean skuContributor, String key, String externalReferenceCode,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static CPOption updateCPOptionExternalReferenceCode(
+			String externalReferenceCode, long cpOptionId)
 		throws PortalException {
 
-		return getService().upsertCPOption(
-			userId, nameMap, descriptionMap, ddmFormFieldTypeName, facetable,
-			required, skuContributor, key, externalReferenceCode,
-			serviceContext);
+		return getService().updateCPOptionExternalReferenceCode(
+			externalReferenceCode, cpOptionId);
 	}
 
 	public static CPOptionLocalService getService() {

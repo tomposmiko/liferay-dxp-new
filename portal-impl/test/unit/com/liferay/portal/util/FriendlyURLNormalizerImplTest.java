@@ -16,9 +16,6 @@ package com.liferay.portal.util;
 
 import com.liferay.petra.nio.CharsetEncoderUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.util.File;
-import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.net.URLEncoder;
@@ -26,7 +23,6 @@ import java.net.URLEncoder;
 import java.nio.charset.CharsetEncoder;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,13 +36,6 @@ public class FriendlyURLNormalizerImplTest {
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() {
-		HttpUtil httpUtil = new HttpUtil();
-
-		httpUtil.setHttp(new HttpImpl());
-	}
 
 	@Test
 	public void testNormalizeBlank() {
@@ -151,26 +140,13 @@ public class FriendlyURLNormalizerImplTest {
 	@Test
 	public void testNormalizeWithEncodingUnicode() throws Exception {
 		_testNormalizeWithEncodingUnicode("\u5F15");
-
-		String expectedText = new String(
-			_file.getBytes(
-				FriendlyURLNormalizerImplTest.class.getResourceAsStream(
-					"dependencies/test-normalize-with-encoding-arabic.txt")));
-
-		_testNormalizeWithEncodingUnicode(expectedText);
-
-		expectedText = new String(
-			_file.getBytes(
-				FriendlyURLNormalizerImplTest.class.getResourceAsStream(
-					"dependencies/test-normalize-with-encoding-japanese.txt")));
-
-		_testNormalizeWithEncodingUnicode(expectedText);
-
+		_testNormalizeWithEncodingUnicode("テスト");
+		_testNormalizeWithEncodingUnicode("اختبار");
 		_testNormalizeWithEncodingUnicode("\uD801\uDC37");
 		_testNormalizeWithEncodingUnicode(
 			String.valueOf(Character.MAX_HIGH_SURROGATE));
 
-		String value = expectedText;
+		String value = "テスト";
 
 		String encodedValue = URLEncoder.encode(value, StringPool.UTF8);
 
@@ -210,50 +186,6 @@ public class FriendlyURLNormalizerImplTest {
 	}
 
 	@Test
-	public void testNormalizeWithPeriods() {
-		String friendlyURLPrefix = RandomTestUtil.randomString();
-		String friendlyURLSuffix = RandomTestUtil.randomString();
-
-		Assert.assertEquals(
-			_friendlyURLNormalizerImpl.normalize(
-				friendlyURLPrefix + friendlyURLSuffix),
-			_friendlyURLNormalizerImpl.normalizeWithPeriods(
-				friendlyURLPrefix + friendlyURLSuffix));
-		Assert.assertEquals(
-			_friendlyURLNormalizerImpl.normalize(
-				friendlyURLPrefix + StringPool.DASH + friendlyURLSuffix),
-			_friendlyURLNormalizerImpl.normalizeWithPeriods(
-				friendlyURLPrefix + StringPool.PERIOD + friendlyURLSuffix));
-		Assert.assertEquals(
-			_friendlyURLNormalizerImpl.normalize(
-				friendlyURLPrefix + StringPool.SLASH + friendlyURLSuffix),
-			_friendlyURLNormalizerImpl.normalizeWithPeriods(
-				friendlyURLPrefix + StringPool.SLASH + friendlyURLSuffix));
-	}
-
-	@Test
-	public void testNormalizeWithPeriodsAndSlashes() {
-		String friendlyURLPrefix = RandomTestUtil.randomString();
-		String friendlyURLSuffix = RandomTestUtil.randomString();
-
-		Assert.assertEquals(
-			_friendlyURLNormalizerImpl.normalize(
-				friendlyURLPrefix + friendlyURLSuffix),
-			_friendlyURLNormalizerImpl.normalizeWithPeriodsAndSlashes(
-				friendlyURLPrefix + friendlyURLSuffix));
-		Assert.assertEquals(
-			_friendlyURLNormalizerImpl.normalize(
-				friendlyURLPrefix + StringPool.DASH + friendlyURLSuffix),
-			_friendlyURLNormalizerImpl.normalizeWithPeriodsAndSlashes(
-				friendlyURLPrefix + StringPool.PERIOD + friendlyURLSuffix));
-		Assert.assertEquals(
-			_friendlyURLNormalizerImpl.normalize(
-				friendlyURLPrefix + StringPool.DASH + friendlyURLSuffix),
-			_friendlyURLNormalizerImpl.normalizeWithPeriodsAndSlashes(
-				friendlyURLPrefix + StringPool.SLASH + friendlyURLSuffix));
-	}
-
-	@Test
 	public void testNormalizeWordWithNonasciiCharacters() {
 		Assert.assertEquals(
 			"wordnc", _friendlyURLNormalizerImpl.normalize("word\u00F1\u00C7"));
@@ -265,7 +197,6 @@ public class FriendlyURLNormalizerImplTest {
 			_friendlyURLNormalizerImpl.normalizeWithEncoding(s));
 	}
 
-	private final File _file = FileImpl.getInstance();
 	private final FriendlyURLNormalizerImpl _friendlyURLNormalizerImpl =
 		new FriendlyURLNormalizerImpl();
 

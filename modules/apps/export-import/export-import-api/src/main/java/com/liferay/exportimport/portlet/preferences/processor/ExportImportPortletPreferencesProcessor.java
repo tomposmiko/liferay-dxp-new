@@ -30,10 +30,6 @@ public interface ExportImportPortletPreferencesProcessor {
 
 	public List<Capability> getImportCapabilities();
 
-	public default boolean isPublishDisplayedContent() {
-		return true;
-	}
-
 	public PortletPreferences processExportPortletPreferences(
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences)

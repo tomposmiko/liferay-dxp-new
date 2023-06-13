@@ -17,6 +17,7 @@ package com.liferay.dynamic.data.lists.service.persistence;
 import com.liferay.dynamic.data.lists.exception.NoSuchRecordSetException;
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -32,7 +33,8 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @ProviderType
-public interface DDLRecordSetPersistence extends BasePersistence<DDLRecordSet> {
+public interface DDLRecordSetPersistence
+	extends BasePersistence<DDLRecordSet>, CTPersistence<DDLRecordSet> {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -665,7 +667,7 @@ public interface DDLRecordSetPersistence extends BasePersistence<DDLRecordSet> {
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DDLRecordSetModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param start the lower bound of the range of ddl record sets
 	 * @param end the upper bound of the range of ddl record sets (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -899,7 +901,7 @@ public interface DDLRecordSetPersistence extends BasePersistence<DDLRecordSet> {
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DDLRecordSetModelImpl</code>.
 	 * </p>
 	 *
-	 * @param DDMStructureIds the ddm structure IDs
+	 * @param DDMStructureId the ddm structure ID
 	 * @param start the lower bound of the range of ddl record sets
 	 * @param end the upper bound of the range of ddl record sets (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)

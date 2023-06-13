@@ -1,4 +1,5 @@
 create table CPLCommerceGroupAccountRel (
+	mvccVersion LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
 	CPLCommerceAccountGroupRelId LONG not null primary key,
 	companyId LONG,
@@ -13,6 +14,7 @@ create table CPLCommerceGroupAccountRel (
 );
 
 create table CommercePriceEntry (
+	mvccVersion LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
 	externalReferenceCode VARCHAR(75) null,
 	commercePriceEntryId LONG not null primary key,
@@ -43,6 +45,7 @@ create table CommercePriceEntry (
 );
 
 create table CommercePriceList (
+	mvccVersion LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
 	externalReferenceCode VARCHAR(75) null,
 	commercePriceListId LONG not null primary key,
@@ -69,6 +72,7 @@ create table CommercePriceList (
 );
 
 create table CommercePriceListAccountRel (
+	mvccVersion LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
 	commercePriceListAccountRelId LONG not null primary key,
 	companyId LONG,
@@ -83,6 +87,7 @@ create table CommercePriceListAccountRel (
 );
 
 create table CommercePriceListChannelRel (
+	mvccVersion LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
 	CommercePriceListChannelRelId LONG not null primary key,
 	companyId LONG,
@@ -97,6 +102,7 @@ create table CommercePriceListChannelRel (
 );
 
 create table CommercePriceListDiscountRel (
+	mvccVersion LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
 	commercePriceListDiscountRelId LONG not null primary key,
 	companyId LONG,
@@ -110,7 +116,23 @@ create table CommercePriceListDiscountRel (
 	lastPublishDate DATE null
 );
 
+create table CommercePriceListOrderTypeRel (
+	mvccVersion LONG default 0 not null,
+	uuid_ VARCHAR(75) null,
+	CPriceListOrderTypeRelId LONG not null primary key,
+	companyId LONG,
+	userId LONG,
+	userName VARCHAR(75) null,
+	createDate DATE null,
+	modifiedDate DATE null,
+	commercePriceListId LONG,
+	commerceOrderTypeId LONG,
+	priority INTEGER,
+	lastPublishDate DATE null
+);
+
 create table CommerceTierPriceEntry (
+	mvccVersion LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
 	externalReferenceCode VARCHAR(75) null,
 	commerceTierPriceEntryId LONG not null primary key,

@@ -72,8 +72,7 @@ public class ShippingMethodCheckoutStepDisplayContext {
 		CommerceAddress shippingAddress = _commerceOrder.getShippingAddress();
 
 		return _commerceShippingMethodLocalService.getCommerceShippingMethods(
-			_commerceOrder.getGroupId(), shippingAddress.getCommerceCountryId(),
-			true);
+			_commerceOrder.getGroupId(), shippingAddress.getCountryId(), true);
 	}
 
 	public String getCommerceShippingOptionKey(
@@ -95,21 +94,12 @@ public class ShippingMethodCheckoutStepDisplayContext {
 			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(commerceShippingOption.getLabel());
-		sb.append(" (+");
-
-		CommerceContext commerceContext = _getCommerceContext();
-
-		sb.append(
+		return StringBundler.concat(
+			commerceShippingOption.getLabel(), " (+",
 			_commercePriceFormatter.format(
-				commerceContext.getCommerceCurrency(),
-				commerceShippingOption.getAmount(), themeDisplay.getLocale()));
-
-		sb.append(CharPool.CLOSE_PARENTHESIS);
-
-		return sb.toString();
+				_commerceOrder.getCommerceCurrency(),
+				commerceShippingOption.getAmount(), themeDisplay.getLocale()),
+			CharPool.CLOSE_PARENTHESIS);
 	}
 
 	public List<CommerceShippingOption> getCommerceShippingOptions(

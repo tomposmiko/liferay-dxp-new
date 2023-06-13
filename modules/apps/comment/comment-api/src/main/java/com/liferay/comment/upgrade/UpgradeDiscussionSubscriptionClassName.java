@@ -50,7 +50,16 @@ public class UpgradeDiscussionSubscriptionClassName extends UpgradeProcess {
 	}
 
 	public UpgradeDiscussionSubscriptionClassName(
-		AssetEntryLocalService assetEntryLocalService,
+		ClassNameLocalService classNameLocalService,
+		SubscriptionLocalService subscriptionLocalService,
+		String oldSubscriptionClassName, DeletionMode deletionMode) {
+
+		this(
+			classNameLocalService, subscriptionLocalService,
+			oldSubscriptionClassName, deletionMode, null);
+	}
+
+	public UpgradeDiscussionSubscriptionClassName(
 		ClassNameLocalService classNameLocalService,
 		SubscriptionLocalService subscriptionLocalService,
 		String oldSubscriptionClassName,
@@ -60,20 +69,6 @@ public class UpgradeDiscussionSubscriptionClassName extends UpgradeProcess {
 		this(
 			classNameLocalService, subscriptionLocalService,
 			oldSubscriptionClassName, null, unsafeBiFunction);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x)
-	 */
-	@Deprecated
-	public UpgradeDiscussionSubscriptionClassName(
-		ClassNameLocalService classNameLocalService,
-		SubscriptionLocalService subscriptionLocalService,
-		String oldSubscriptionClassName, DeletionMode deletionMode) {
-
-		this(
-			classNameLocalService, subscriptionLocalService,
-			oldSubscriptionClassName, deletionMode, null);
 	}
 
 	/**

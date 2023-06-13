@@ -62,6 +62,7 @@ import com.liferay.calendar.web.internal.util.CalendarResourceUtil;
 import com.liferay.calendar.web.internal.util.CalendarUtil;
 import com.liferay.calendar.workflow.constants.CalendarBookingWorkflowConstants;
 import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.dao.orm.custom.sql.CustomSQL;
@@ -148,7 +149,6 @@ import javax.portlet.PortletConfig;
 import javax.portlet.PortletException;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
@@ -236,6 +236,10 @@ public class CalendarPortlet extends MVCPortlet {
 				jsonObject.put("success", true);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
+
 				String message = themeDisplay.translate(
 					"an-unexpected-error-occurred-while-importing-your-file");
 
@@ -946,24 +950,20 @@ public class CalendarPortlet extends MVCPortlet {
 	protected java.util.Calendar getJCalendar(
 		PortletRequest portletRequest, String name) {
 
+		int month = ParamUtil.getInteger(portletRequest, name + "Month");
+		int day = ParamUtil.getInteger(portletRequest, name + "Day");
+		int year = ParamUtil.getInteger(portletRequest, name + "Year");
 		int hour = ParamUtil.getInteger(portletRequest, name + "Hour");
+		int minute = ParamUtil.getInteger(portletRequest, name + "Minute");
 
-		if (ParamUtil.getInteger(portletRequest, name + "AmPm") ==
-				java.util.Calendar.PM) {
+		int amPm = ParamUtil.getInteger(portletRequest, name + "AmPm");
 
+		if (amPm == java.util.Calendar.PM) {
 			hour += 12;
 		}
 
-		TimeZone timeZone = ParamUtil.getBoolean(portletRequest, "allDay") ?
-			TimeZoneUtil.getTimeZone(StringPool.UTC) :
-				getTimeZone(portletRequest);
-
 		return JCalendarUtil.getJCalendar(
-			ParamUtil.getInteger(portletRequest, name + "Year"),
-			ParamUtil.getInteger(portletRequest, name + "Month"),
-			ParamUtil.getInteger(portletRequest, name + "Day"), hour,
-			ParamUtil.getInteger(portletRequest, name + "Minute"), 0, 0,
-			timeZone);
+			year, month, day, hour, minute, 0, 0, getTimeZone(portletRequest));
 	}
 
 	protected String getNotificationTypeSettings(
@@ -1210,18 +1210,19 @@ public class CalendarPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		PortletURL redirectURL = PortletURLFactoryUtil.create(
-			actionRequest, themeDisplay.getPpid(), themeDisplay.getPlid(),
-			PortletRequest.RENDER_PHASE);
-
-		redirectURL.setParameter("mvcPath", "/view_calendar_booking.jsp");
-		redirectURL.setParameter(
-			"calendarBookingId",
-			String.valueOf(calendarBooking.getCalendarBookingId()));
-		redirectURL.setParameter("instanceIndex", "0");
-		redirectURL.setWindowState(LiferayWindowState.POP_UP);
-
-		return redirectURL.toString();
+		return PortletURLBuilder.create(
+			PortletURLFactoryUtil.create(
+				actionRequest, themeDisplay.getPpid(), themeDisplay.getPlid(),
+				PortletRequest.RENDER_PHASE)
+		).setMVCPath(
+			"/view_calendar_booking.jsp"
+		).setParameter(
+			"calendarBookingId", calendarBooking.getCalendarBookingId()
+		).setParameter(
+			"instanceIndex", "0"
+		).setWindowState(
+			LiferayWindowState.POP_UP
+		).buildString();
 	}
 
 	@Override
@@ -1330,7 +1331,6 @@ public class CalendarPortlet extends MVCPortlet {
 
 		long[] calendarIds = ParamUtil.getLongValues(
 			resourceRequest, "calendarIds");
-		TimeZone timeZone = getTimeZone(resourceRequest);
 
 		if (!ArrayUtil.isEmpty(calendarIds)) {
 			java.util.Calendar endTimeJCalendar = getJCalendar(
@@ -1343,7 +1343,7 @@ public class CalendarPortlet extends MVCPortlet {
 			calendarBookings = _calendarBookingService.search(
 				themeDisplay.getCompanyId(), new long[0], calendarIds,
 				new long[0], -1, null, startTimeJCalendar.getTimeInMillis(),
-				endTimeJCalendar.getTimeInMillis(), timeZone, true, statuses,
+				endTimeJCalendar.getTimeInMillis(), true, statuses,
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS,
 				new CalendarBookingStartTimeComparator(true));
 
@@ -1358,7 +1358,7 @@ public class CalendarPortlet extends MVCPortlet {
 		}
 
 		JSONArray jsonArray = CalendarUtil.toCalendarBookingsJSONArray(
-			themeDisplay, calendarBookings, timeZone);
+			themeDisplay, calendarBookings, getTimeZone(resourceRequest));
 
 		writeJSON(resourceRequest, resourceResponse, jsonArray);
 	}
@@ -1477,11 +1477,9 @@ public class CalendarPortlet extends MVCPortlet {
 
 			CalendarResource calendarResource = calendar.getCalendarResource();
 
-			if (!calendarResource.isActive()) {
-				continue;
-			}
+			if (!calendarResource.isActive() ||
+				(calendarResource.isUser() && !showUserEvents)) {
 
-			if (calendarResource.isUser() && !showUserEvents) {
 				continue;
 			}
 
@@ -1626,25 +1624,28 @@ public class CalendarPortlet extends MVCPortlet {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		long calendarId = ParamUtil.getLong(resourceRequest, "calendarId");
+		writeJSON(
+			resourceRequest, resourceResponse,
+			JSONUtil.put(
+				"hasExclusiveCalendarBooking",
+				() -> {
+					long calendarId = ParamUtil.getLong(
+						resourceRequest, "calendarId");
 
-		Calendar calendar = _calendarService.getCalendar(calendarId);
+					Calendar calendar = _calendarService.getCalendar(
+						calendarId);
 
-		java.util.Calendar endTimeJCalendar = getJCalendar(
-			resourceRequest, "endTime");
+					java.util.Calendar endTimeJCalendar = getJCalendar(
+						resourceRequest, "endTime");
 
-		java.util.Calendar startTimeJCalendar = getJCalendar(
-			resourceRequest, "startTime");
+					java.util.Calendar startTimeJCalendar = getJCalendar(
+						resourceRequest, "startTime");
 
-		boolean result =
-			_calendarBookingLocalService.hasExclusiveCalendarBooking(
-				calendar, startTimeJCalendar.getTimeInMillis(),
-				endTimeJCalendar.getTimeInMillis());
-
-		JSONObject jsonObject = JSONUtil.put(
-			"hasExclusiveCalendarBooking", result);
-
-		writeJSON(resourceRequest, resourceResponse, jsonObject);
+					return _calendarBookingLocalService.
+						hasExclusiveCalendarBooking(
+							calendar, startTimeJCalendar.getTimeInMillis(),
+							endTimeJCalendar.getTimeInMillis());
+				}));
 	}
 
 	protected void serveResourceCalendars(

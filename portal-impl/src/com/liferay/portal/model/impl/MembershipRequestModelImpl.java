@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -304,91 +305,113 @@ public class MembershipRequestModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, MembershipRequest>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			MembershipRequest.class.getClassLoader(), MembershipRequest.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<MembershipRequest> constructor =
+				(Constructor<MembershipRequest>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<MembershipRequest, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<MembershipRequest, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<MembershipRequest, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<MembershipRequest, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", MembershipRequest::getMvccVersion);
-		attributeGetterFunctions.put(
-			"membershipRequestId", MembershipRequest::getMembershipRequestId);
-		attributeGetterFunctions.put("groupId", MembershipRequest::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", MembershipRequest::getCompanyId);
-		attributeGetterFunctions.put("userId", MembershipRequest::getUserId);
-		attributeGetterFunctions.put(
-			"createDate", MembershipRequest::getCreateDate);
-		attributeGetterFunctions.put(
-			"comments", MembershipRequest::getComments);
-		attributeGetterFunctions.put(
-			"replyComments", MembershipRequest::getReplyComments);
-		attributeGetterFunctions.put(
-			"replyDate", MembershipRequest::getReplyDate);
-		attributeGetterFunctions.put(
-			"replierUserId", MembershipRequest::getReplierUserId);
-		attributeGetterFunctions.put(
-			"statusId", MembershipRequest::getStatusId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<MembershipRequest, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<MembershipRequest, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<MembershipRequest, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", MembershipRequest::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<MembershipRequest, Long>)
 				MembershipRequest::setMvccVersion);
+		attributeGetterFunctions.put(
+			"membershipRequestId", MembershipRequest::getMembershipRequestId);
 		attributeSetterBiConsumers.put(
 			"membershipRequestId",
 			(BiConsumer<MembershipRequest, Long>)
 				MembershipRequest::setMembershipRequestId);
+		attributeGetterFunctions.put("groupId", MembershipRequest::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<MembershipRequest, Long>)MembershipRequest::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", MembershipRequest::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<MembershipRequest, Long>)
 				MembershipRequest::setCompanyId);
+		attributeGetterFunctions.put("userId", MembershipRequest::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<MembershipRequest, Long>)MembershipRequest::setUserId);
+		attributeGetterFunctions.put(
+			"createDate", MembershipRequest::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<MembershipRequest, Date>)
 				MembershipRequest::setCreateDate);
+		attributeGetterFunctions.put(
+			"comments", MembershipRequest::getComments);
 		attributeSetterBiConsumers.put(
 			"comments",
 			(BiConsumer<MembershipRequest, String>)
 				MembershipRequest::setComments);
+		attributeGetterFunctions.put(
+			"replyComments", MembershipRequest::getReplyComments);
 		attributeSetterBiConsumers.put(
 			"replyComments",
 			(BiConsumer<MembershipRequest, String>)
 				MembershipRequest::setReplyComments);
+		attributeGetterFunctions.put(
+			"replyDate", MembershipRequest::getReplyDate);
 		attributeSetterBiConsumers.put(
 			"replyDate",
 			(BiConsumer<MembershipRequest, Date>)
 				MembershipRequest::setReplyDate);
+		attributeGetterFunctions.put(
+			"replierUserId", MembershipRequest::getReplierUserId);
 		attributeSetterBiConsumers.put(
 			"replierUserId",
 			(BiConsumer<MembershipRequest, Long>)
 				MembershipRequest::setReplierUserId);
+		attributeGetterFunctions.put(
+			"statusId", MembershipRequest::getStatusId);
 		attributeSetterBiConsumers.put(
 			"statusId",
 			(BiConsumer<MembershipRequest, Long>)
 				MembershipRequest::setStatusId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -703,6 +726,37 @@ public class MembershipRequestModelImpl
 	}
 
 	@Override
+	public MembershipRequest cloneWithOriginalValues() {
+		MembershipRequestImpl membershipRequestImpl =
+			new MembershipRequestImpl();
+
+		membershipRequestImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		membershipRequestImpl.setMembershipRequestId(
+			this.<Long>getColumnOriginalValue("membershipRequestId"));
+		membershipRequestImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		membershipRequestImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		membershipRequestImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		membershipRequestImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		membershipRequestImpl.setComments(
+			this.<String>getColumnOriginalValue("comments"));
+		membershipRequestImpl.setReplyComments(
+			this.<String>getColumnOriginalValue("replyComments"));
+		membershipRequestImpl.setReplyDate(
+			this.<Date>getColumnOriginalValue("replyDate"));
+		membershipRequestImpl.setReplierUserId(
+			this.<Long>getColumnOriginalValue("replierUserId"));
+		membershipRequestImpl.setStatusId(
+			this.<Long>getColumnOriginalValue("statusId"));
+
+		return membershipRequestImpl;
+	}
+
+	@Override
 	public int compareTo(MembershipRequest membershipRequest) {
 		int value = 0;
 
@@ -911,9 +965,7 @@ public class MembershipRequestModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, MembershipRequest>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					MembershipRequest.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

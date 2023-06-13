@@ -41,6 +41,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang3.time.StopWatch;
 
 /**
@@ -50,11 +52,14 @@ public class OpenIdConnectMetadataFactoryImpl
 	implements OpenIdConnectMetadataFactory {
 
 	public OpenIdConnectMetadataFactoryImpl(
-			String providerName, String[] idTokenSigningAlgValues,
-			String issuerURL, String[] subjectTypes, String jwksURL,
+			String providerName, String registeredIdTokenSigningAlg,
+			String[] idTokenSigningAlgValues, String issuerURL,
+			String[] subjectTypes, String jwksURL,
 			String authorizationEndPointURL, String tokenEndPointURL,
 			String userInfoEndPointURL)
 		throws OpenIdConnectServiceException.ProviderException {
+
+		// TODO LPS-139642
 
 		_providerName = providerName;
 
@@ -77,10 +82,7 @@ public class OpenIdConnectMetadataFactoryImpl
 			List<JWSAlgorithm> jwsAlgorithms = new ArrayList<>();
 
 			for (String idTokenSigningAlgValue : idTokenSigningAlgValues) {
-				if (!Validator.isBlank(idTokenSigningAlgValue)) {
-					jwsAlgorithms.add(
-						JWSAlgorithm.parse(idTokenSigningAlgValue));
-				}
+				jwsAlgorithms.add(JWSAlgorithm.parse(idTokenSigningAlgValue));
 			}
 
 			_oidcProviderMetadata.setIDTokenJWSAlgs(jwsAlgorithms);
@@ -89,6 +91,8 @@ public class OpenIdConnectMetadataFactoryImpl
 				new URI(tokenEndPointURL));
 			_oidcProviderMetadata.setUserInfoEndpointURI(
 				new URI(userInfoEndPointURL));
+
+			_initOpenIdConnectClientMetadata(registeredIdTokenSigningAlg);
 
 			refreshClientMetadata(_oidcProviderMetadata);
 		}
@@ -112,16 +116,18 @@ public class OpenIdConnectMetadataFactoryImpl
 	public OpenIdConnectMetadataFactoryImpl(
 		String providerName, URL discoveryEndPointURL) {
 
-		this(providerName, discoveryEndPointURL, 0);
+		this(providerName, discoveryEndPointURL, 0, null);
 	}
 
 	public OpenIdConnectMetadataFactoryImpl(
-		String providerName, URL discoveryEndPointURL,
-		long cacheInMilliseconds) {
+		String providerName, URL discoveryEndPointURL, long cacheInMilliseconds,
+		String registeredIdTokenSigningAlg) {
 
 		_providerName = providerName;
 		_discoveryEndPointURL = discoveryEndPointURL;
 		_cacheInMilliseconds = cacheInMilliseconds;
+
+		_initOpenIdConnectClientMetadata(registeredIdTokenSigningAlg);
 	}
 
 	@Override
@@ -187,8 +193,9 @@ public class OpenIdConnectMetadataFactoryImpl
 
 			HTTPResponse httpResponse = httpRequest.send();
 
-			_oidcProviderMetadata = OIDCProviderMetadata.parse(
-				httpResponse.getContentAsJSONObject());
+			JSONObject jsonObject = httpResponse.getContentAsJSONObject();
+
+			_oidcProviderMetadata = OIDCProviderMetadata.parse(jsonObject);
 
 			refreshClientMetadata(_oidcProviderMetadata);
 
@@ -215,10 +222,13 @@ public class OpenIdConnectMetadataFactoryImpl
 		}
 	}
 
+	/**
+	 * Client metadata has nothing to with provider metadata, but in order to
+	 * minimize potential breaking changes, we will leave this behavior even
+	 * though it is goes beyond the specification.
+	 */
 	protected synchronized void refreshClientMetadata(
 		OIDCProviderMetadata oidcProviderMetadata) {
-
-		_oidcClientMetadata = new OIDCClientMetadata();
 
 		List<JWEAlgorithm> jweAlgorithms =
 			oidcProviderMetadata.getIDTokenJWEAlgs();
@@ -227,14 +237,30 @@ public class OpenIdConnectMetadataFactoryImpl
 			_oidcClientMetadata.setIDTokenJWEAlg(jweAlgorithms.get(0));
 		}
 
-		List<JWSAlgorithm> jwsAlgorithms =
-			oidcProviderMetadata.getIDTokenJWSAlgs();
-
-		if (ListUtil.isNotEmpty(jwsAlgorithms)) {
-			_oidcClientMetadata.setIDTokenJWSAlg(jwsAlgorithms.get(0));
-		}
-
 		_oidcClientMetadata.setJWKSetURI(oidcProviderMetadata.getJWKSetURI());
+	}
+
+	private void _initOpenIdConnectClientMetadata(
+		String registeredIdTokenSigningAlg) {
+
+		_oidcClientMetadata = new OIDCClientMetadata();
+
+		_oidcClientMetadata.applyDefaults();
+
+		if (!Validator.isBlank(registeredIdTokenSigningAlg)) {
+			_oidcClientMetadata.setIDTokenJWSAlg(
+				JWSAlgorithm.parse(registeredIdTokenSigningAlg));
+		}
+		else {
+			if (_log.isWarnEnabled()) {
+				JWSAlgorithm jwsAlgorithm =
+					_oidcClientMetadata.getIDTokenJWSAlg();
+
+				_log.warn(
+					"Using the default ID token signing algorithm " +
+						jwsAlgorithm.getName());
+			}
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

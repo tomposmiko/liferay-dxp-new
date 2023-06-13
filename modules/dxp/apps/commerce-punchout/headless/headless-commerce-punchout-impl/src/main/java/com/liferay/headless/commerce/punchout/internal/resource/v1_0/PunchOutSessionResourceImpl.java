@@ -65,6 +65,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import javax.validation.constraints.NotNull;
+
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.InternalServerErrorException;
@@ -84,8 +86,9 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class PunchOutSessionResourceImpl
 	extends BasePunchOutSessionResourceImpl {
 
+	@Override
 	public PunchOutSession postPunchOutSessionRequest(
-			PunchOutSession punchOutSession)
+			@NotNull PunchOutSession punchOutSession)
 		throws Exception {
 
 		com.liferay.portal.kernel.model.Group buyerGroup = _fetchGroup(
@@ -309,7 +312,7 @@ public class PunchOutSessionResourceImpl
 	private CommerceAccount _fetchBusinessCommerceAccount(
 		String externalReferenceCode) {
 
-		return _commerceAccountLocalService.fetchCommerceAccountByReferenceCode(
+		return _commerceAccountLocalService.fetchByExternalReferenceCode(
 			contextCompany.getCompanyId(), externalReferenceCode);
 	}
 
@@ -419,8 +422,8 @@ public class PunchOutSessionResourceImpl
 			}
 
 			_commerceOrderItemLocalService.addCommerceOrderItem(
-				commerceOrder.getCommerceOrderId(), cartItem.getSkuId(),
-				cartItem.getQuantity(), cartItem.getShippedQuantity(), null,
+				commerceOrder.getCommerceOrderId(), cartItem.getSkuId(), null,
+				cartItem.getQuantity(), cartItem.getShippedQuantity(),
 				commerceContext,
 				_serviceContextHelper.getServiceContext(groupId));
 		}

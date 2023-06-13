@@ -55,8 +55,7 @@ import com.liferay.portal.workflow.kaleo.model.KaleoTransition;
 import com.liferay.portal.workflow.kaleo.runtime.ExecutionContext;
 import com.liferay.portal.workflow.kaleo.runtime.KaleoSignaler;
 import com.liferay.portal.workflow.kaleo.runtime.WorkflowEngine;
-import com.liferay.portal.workflow.kaleo.runtime.internal.node.NodeExecutorFactory;
-import com.liferay.portal.workflow.kaleo.runtime.node.NodeExecutor;
+import com.liferay.portal.workflow.kaleo.runtime.internal.node.TaskNodeExecutor;
 import com.liferay.portal.workflow.kaleo.runtime.util.WorkflowContextUtil;
 import com.liferay.portal.workflow.kaleo.runtime.util.comparator.KaleoInstanceOrderByComparator;
 
@@ -67,7 +66,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -192,20 +190,14 @@ public class DefaultWorkflowEngineImpl
 			KaleoInstanceToken kaleoInstanceToken =
 				kaleoTimerInstanceToken.getKaleoInstanceToken();
 
-			final ExecutionContext executionContext = new ExecutionContext(
+			ExecutionContext executionContext = new ExecutionContext(
 				kaleoInstanceToken, kaleoTimerInstanceToken, workflowContext,
 				serviceContext);
 
 			executionContext.setKaleoTaskInstanceToken(
 				kaleoTimerInstanceToken.getKaleoTaskInstanceToken());
 
-			final KaleoNode currentKaleoNode =
-				kaleoInstanceToken.getCurrentKaleoNode();
-
-			NodeExecutor nodeExecutor = _nodeExecutorFactory.getNodeExecutor(
-				currentKaleoNode.getType());
-
-			nodeExecutor.executeTimer(currentKaleoNode, executionContext);
+			_taskNodeExecutor.executeTimer(executionContext);
 
 			kaleoTimerInstanceToken =
 				kaleoTimerInstanceTokenLocalService.getKaleoTimerInstanceToken(
@@ -221,16 +213,12 @@ public class DefaultWorkflowEngineImpl
 			}
 
 			TransactionCommitCallbackUtil.registerCallback(
-				new Callable<Void>() {
+				() -> {
+					_kaleoSignaler.signalExecute(
+						kaleoInstanceToken.getCurrentKaleoNode(),
+						executionContext);
 
-					@Override
-					public Void call() throws Exception {
-						_kaleoSignaler.signalExecute(
-							currentKaleoNode, executionContext);
-
-						return null;
-					}
-
+					return null;
 				});
 
 			return executionContext;
@@ -456,8 +444,8 @@ public class DefaultWorkflowEngineImpl
 
 	@Override
 	public List<WorkflowInstance> search(
-			Long userId, String assetClassName, String assetTitle,
-			String assetDescription, String nodeName,
+			Long userId, Boolean active, String assetClassName,
+			String assetTitle, String assetDescription, String nodeName,
 			String kaleoDefinitionName, Boolean completed, int start, int end,
 			OrderByComparator<WorkflowInstance> orderByComparator,
 			ServiceContext serviceContext)
@@ -466,9 +454,9 @@ public class DefaultWorkflowEngineImpl
 		try {
 			WorkflowModelSearchResult<WorkflowInstance>
 				workflowModelSearchResult = searchWorkflowInstances(
-					userId, assetClassName, assetTitle, assetDescription,
-					nodeName, kaleoDefinitionName, completed, start, end,
-					orderByComparator, serviceContext);
+					userId, active, assetClassName, assetTitle,
+					assetDescription, nodeName, kaleoDefinitionName, completed,
+					false, start, end, orderByComparator, serviceContext);
 
 			return workflowModelSearchResult.getWorkflowModels();
 		}
@@ -482,16 +470,16 @@ public class DefaultWorkflowEngineImpl
 
 	@Override
 	public int searchCount(
-			Long userId, String assetClassName, String assetTitle,
-			String assetDescription, String nodeName,
+			Long userId, Boolean active, String assetClassName,
+			String assetTitle, String assetDescription, String nodeName,
 			String kaleoDefinitionName, Boolean completed,
 			ServiceContext serviceContext)
 		throws WorkflowException {
 
 		try {
 			return kaleoInstanceLocalService.searchCount(
-				userId, assetClassName, assetTitle, assetDescription, nodeName,
-				kaleoDefinitionName, completed, serviceContext);
+				userId, active, assetClassName, assetTitle, assetDescription,
+				nodeName, kaleoDefinitionName, completed, serviceContext);
 		}
 		catch (Exception exception) {
 			throw new WorkflowException(exception);
@@ -500,9 +488,10 @@ public class DefaultWorkflowEngineImpl
 
 	@Override
 	public WorkflowModelSearchResult<WorkflowInstance> searchWorkflowInstances(
-			Long userId, String assetClassName, String assetTitle,
-			String assetDescription, String nodeName,
-			String kaleoDefinitionName, Boolean completed, int start, int end,
+			Long userId, Boolean active, String assetClassName,
+			String assetTitle, String assetDescription, String nodeName,
+			String kaleoDefinitionName, Boolean completed,
+			boolean searchByActiveWorkflowHandlers, int start, int end,
 			OrderByComparator<WorkflowInstance> orderByComparator,
 			ServiceContext serviceContext)
 		throws WorkflowException {
@@ -510,8 +499,9 @@ public class DefaultWorkflowEngineImpl
 		try {
 			BaseModelSearchResult<KaleoInstance> baseModelSearchResult =
 				kaleoInstanceLocalService.searchKaleoInstances(
-					userId, assetClassName, assetTitle, assetDescription,
-					nodeName, kaleoDefinitionName, completed, start, end,
+					userId, active, assetClassName, assetTitle,
+					assetDescription, nodeName, kaleoDefinitionName, completed,
+					searchByActiveWorkflowHandlers, start, end,
 					KaleoInstanceOrderByComparator.getOrderByComparator(
 						orderByComparator, _kaleoWorkflowModelConverter,
 						serviceContext),
@@ -532,9 +522,21 @@ public class DefaultWorkflowEngineImpl
 
 	@Override
 	public WorkflowInstance signalWorkflowInstance(
-			long workflowInstanceId, final String transitionName,
+			long workflowInstanceId, String transitionName,
 			Map<String, Serializable> workflowContext,
 			ServiceContext serviceContext)
+		throws WorkflowException {
+
+		return signalWorkflowInstance(
+			workflowInstanceId, transitionName, workflowContext, serviceContext,
+			false);
+	}
+
+	@Override
+	public WorkflowInstance signalWorkflowInstance(
+			long workflowInstanceId, String transitionName,
+			Map<String, Serializable> workflowContext,
+			ServiceContext serviceContext, boolean waitForCompletion)
 		throws WorkflowException {
 
 		try {
@@ -557,26 +559,22 @@ public class DefaultWorkflowEngineImpl
 
 			serviceContext.setScopeGroupId(kaleoInstanceToken.getGroupId());
 
-			final ExecutionContext executionContext = new ExecutionContext(
+			ExecutionContext executionContext = new ExecutionContext(
 				kaleoInstanceToken, workflowContext, serviceContext);
 
 			TransactionCommitCallbackUtil.registerCallback(
-				new Callable<Void>() {
-
-					@Override
-					public Void call() throws Exception {
-						try {
-							_kaleoSignaler.signalExit(
-								transitionName, executionContext);
-						}
-						catch (Exception exception) {
-							throw new WorkflowException(
-								"Unable to signal next transition", exception);
-						}
-
-						return null;
+				() -> {
+					try {
+						_kaleoSignaler.signalExit(
+							transitionName, executionContext,
+							waitForCompletion);
+					}
+					catch (Exception exception) {
+						throw new WorkflowException(
+							"Unable to signal next transition", exception);
 					}
 
+					return null;
 				});
 
 			return _kaleoWorkflowModelConverter.toWorkflowInstance(
@@ -593,9 +591,20 @@ public class DefaultWorkflowEngineImpl
 	@Override
 	public WorkflowInstance startWorkflowInstance(
 			String workflowDefinitionName, Integer workflowDefinitionVersion,
-			final String transitionName,
-			Map<String, Serializable> workflowContext,
+			String transitionName, Map<String, Serializable> workflowContext,
 			ServiceContext serviceContext)
+		throws WorkflowException {
+
+		return startWorkflowInstance(
+			workflowDefinitionName, workflowDefinitionVersion, transitionName,
+			workflowContext, serviceContext, false);
+	}
+
+	@Override
+	public WorkflowInstance startWorkflowInstance(
+			String workflowDefinitionName, Integer workflowDefinitionVersion,
+			String transitionName, Map<String, Serializable> workflowContext,
+			ServiceContext serviceContext, boolean waitForCompletion)
 		throws WorkflowException {
 
 		try {
@@ -657,26 +666,22 @@ public class DefaultWorkflowEngineImpl
 			kaleoLogLocalService.addWorkflowInstanceStartKaleoLog(
 				rootKaleoInstanceToken, serviceContext);
 
-			final ExecutionContext executionContext = new ExecutionContext(
+			ExecutionContext executionContext = new ExecutionContext(
 				rootKaleoInstanceToken, workflowContext, serviceContext);
 
 			TransactionCommitCallbackUtil.registerCallback(
-				new Callable<Void>() {
-
-					@Override
-					public Void call() throws Exception {
-						try {
-							_kaleoSignaler.signalEntry(
-								transitionName, executionContext);
-						}
-						catch (Exception exception) {
-							throw new WorkflowException(
-								"Unable to start workflow", exception);
-						}
-
-						return null;
+				() -> {
+					try {
+						_kaleoSignaler.signalEntry(
+							transitionName, executionContext,
+							waitForCompletion);
+					}
+					catch (Exception exception) {
+						throw new WorkflowException(
+							"Unable to start workflow", exception);
 					}
 
+					return null;
 				});
 
 			return _kaleoWorkflowModelConverter.toWorkflowInstance(
@@ -709,6 +714,31 @@ public class DefaultWorkflowEngineImpl
 		}
 		catch (Exception exception) {
 			throw new WorkflowException(exception);
+		}
+	}
+
+	@Override
+	public WorkflowInstance updateWorkflowInstanceActive(
+			long userId, long companyId, long workflowInstanceId,
+			boolean active)
+		throws WorkflowException {
+
+		try {
+			ServiceContext serviceContext = new ServiceContext();
+
+			serviceContext.setCompanyId(companyId);
+			serviceContext.setUserId(userId);
+
+			KaleoInstance kaleoInstance =
+				kaleoInstanceLocalService.updateActive(
+					userId, workflowInstanceId, active);
+
+			return _kaleoWorkflowModelConverter.toWorkflowInstance(
+				kaleoInstance,
+				kaleoInstance.getRootKaleoInstanceToken(serviceContext));
+		}
+		catch (PortalException portalException) {
+			throw new WorkflowException(portalException);
 		}
 	}
 
@@ -877,7 +907,7 @@ public class DefaultWorkflowEngineImpl
 	private KaleoWorkflowModelConverter _kaleoWorkflowModelConverter;
 
 	@Reference
-	private NodeExecutorFactory _nodeExecutorFactory;
+	private TaskNodeExecutor _taskNodeExecutor;
 
 	@Reference
 	private WorkflowDeployer _workflowDeployer;

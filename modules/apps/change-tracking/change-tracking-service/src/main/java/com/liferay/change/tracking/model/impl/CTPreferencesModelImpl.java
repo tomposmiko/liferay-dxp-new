@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -290,61 +291,83 @@ public class CTPreferencesModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<CTPreferences, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, CTPreferences>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<CTPreferences, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<CTPreferences, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CTPreferences.class.getClassLoader(), CTPreferences.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", CTPreferences::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctPreferencesId", CTPreferences::getCtPreferencesId);
-		attributeGetterFunctions.put("companyId", CTPreferences::getCompanyId);
-		attributeGetterFunctions.put("userId", CTPreferences::getUserId);
-		attributeGetterFunctions.put(
-			"ctCollectionId", CTPreferences::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"previousCtCollectionId", CTPreferences::getPreviousCtCollectionId);
-		attributeGetterFunctions.put(
-			"confirmationEnabled", CTPreferences::getConfirmationEnabled);
+		try {
+			Constructor<CTPreferences> constructor =
+				(Constructor<CTPreferences>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<CTPreferences, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<CTPreferences, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<CTPreferences, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<CTPreferences, Object>>();
 		Map<String, BiConsumer<CTPreferences, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<CTPreferences, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CTPreferences::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<CTPreferences, Long>)CTPreferences::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctPreferencesId", CTPreferences::getCtPreferencesId);
 		attributeSetterBiConsumers.put(
 			"ctPreferencesId",
 			(BiConsumer<CTPreferences, Long>)CTPreferences::setCtPreferencesId);
+		attributeGetterFunctions.put("companyId", CTPreferences::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CTPreferences, Long>)CTPreferences::setCompanyId);
+		attributeGetterFunctions.put("userId", CTPreferences::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CTPreferences, Long>)CTPreferences::setUserId);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CTPreferences::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<CTPreferences, Long>)CTPreferences::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"previousCtCollectionId", CTPreferences::getPreviousCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"previousCtCollectionId",
 			(BiConsumer<CTPreferences, Long>)
 				CTPreferences::setPreviousCtCollectionId);
+		attributeGetterFunctions.put(
+			"confirmationEnabled", CTPreferences::getConfirmationEnabled);
 		attributeSetterBiConsumers.put(
 			"confirmationEnabled",
 			(BiConsumer<CTPreferences, Boolean>)
 				CTPreferences::setConfirmationEnabled);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -586,6 +609,28 @@ public class CTPreferencesModelImpl
 	}
 
 	@Override
+	public CTPreferences cloneWithOriginalValues() {
+		CTPreferencesImpl ctPreferencesImpl = new CTPreferencesImpl();
+
+		ctPreferencesImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		ctPreferencesImpl.setCtPreferencesId(
+			this.<Long>getColumnOriginalValue("ctPreferencesId"));
+		ctPreferencesImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		ctPreferencesImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		ctPreferencesImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		ctPreferencesImpl.setPreviousCtCollectionId(
+			this.<Long>getColumnOriginalValue("previousCtCollectionId"));
+		ctPreferencesImpl.setConfirmationEnabled(
+			this.<Boolean>getColumnOriginalValue("confirmationEnabled"));
+
+		return ctPreferencesImpl;
+	}
+
+	@Override
 	public int compareTo(CTPreferences ctPreferences) {
 		long primaryKey = ctPreferences.getPrimaryKey();
 
@@ -758,9 +803,7 @@ public class CTPreferencesModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CTPreferences>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CTPreferences.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

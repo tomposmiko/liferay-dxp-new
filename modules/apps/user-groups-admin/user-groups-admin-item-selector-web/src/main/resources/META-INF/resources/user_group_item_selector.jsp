@@ -79,12 +79,12 @@ PortletURL portletURL = userGroupItemSelectorViewDisplayContext.getPortletURL();
 			%>
 
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				property="name"
 			/>
 
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				property="description"
 			/>
 		</liferay-ui:search-container-row>
@@ -102,7 +102,7 @@ PortletURL portletURL = userGroupItemSelectorViewDisplayContext.getPortletURL();
 		'<portlet:namespace />userGroups'
 	);
 
-	searchContainer.on('rowToggled', function (event) {
+	searchContainer.on('rowToggled', (event) => {
 		var allSelectedElements = event.elements.allSelectedElements;
 		var arr = [];
 

@@ -65,7 +65,7 @@ public class PriceList implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(PriceList.class, json);
 	}
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getActive() {
 		return active;
 	}
@@ -94,7 +94,7 @@ public class PriceList implements Serializable {
 	protected Boolean active;
 
 	@DecimalMin("0")
-	@Schema(example = "23130")
+	@Schema
 	public Long getCatalogId() {
 		return catalogId;
 	}
@@ -122,7 +122,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long catalogId;
 
-	@Schema(example = "EUR")
+	@Schema
 	public String getCurrencyCode() {
 		return currencyCode;
 	}
@@ -236,7 +236,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date expirationDate;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -265,7 +265,7 @@ public class PriceList implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -291,7 +291,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@Schema(example = "Laptops, Beverages")
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -318,7 +318,7 @@ public class PriceList implements Serializable {
 	@NotEmpty
 	protected String name;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getNeverExpire() {
 		return neverExpire;
 	}
@@ -407,7 +407,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected PriceListAccountGroup[] priceListAccountGroups;
 
-	@Schema(example = "1.2")
+	@Schema
 	public Double getPriority() {
 		return priority;
 	}

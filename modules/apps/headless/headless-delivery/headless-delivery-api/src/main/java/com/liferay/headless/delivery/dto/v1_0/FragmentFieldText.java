@@ -46,7 +46,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("FragmentFieldText")
+@GraphQLName(
+	description = "Represents a fragment field with text.",
+	value = "FragmentFieldText"
+)
 @JsonFilter("Liferay.Vulcan")
 @XmlRootElement(name = "FragmentFieldText")
 public class FragmentFieldText implements Serializable {
@@ -59,7 +62,7 @@ public class FragmentFieldText implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(FragmentFieldText.class, json);
 	}
 
-	@Schema
+	@Schema(description = "A link to a fragment.")
 	@Valid
 	public FragmentLink getFragmentLink() {
 		return fragmentLink;
@@ -84,11 +87,11 @@ public class FragmentFieldText implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A link to a fragment.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected FragmentLink fragmentLink;
 
-	@Schema
+	@Schema(description = "The fragment field's text.")
 	@Valid
 	public Object getText() {
 		return text;
@@ -111,7 +114,7 @@ public class FragmentFieldText implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The fragment field's text.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Object text;
 

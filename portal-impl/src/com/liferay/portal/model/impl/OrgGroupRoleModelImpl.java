@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -227,47 +228,69 @@ public class OrgGroupRoleModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<OrgGroupRole, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, OrgGroupRole>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<OrgGroupRole, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<OrgGroupRole, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			OrgGroupRole.class.getClassLoader(), OrgGroupRole.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", OrgGroupRole::getMvccVersion);
-		attributeGetterFunctions.put(
-			"organizationId", OrgGroupRole::getOrganizationId);
-		attributeGetterFunctions.put("groupId", OrgGroupRole::getGroupId);
-		attributeGetterFunctions.put("roleId", OrgGroupRole::getRoleId);
-		attributeGetterFunctions.put("companyId", OrgGroupRole::getCompanyId);
+		try {
+			Constructor<OrgGroupRole> constructor =
+				(Constructor<OrgGroupRole>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<OrgGroupRole, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<OrgGroupRole, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<OrgGroupRole, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<OrgGroupRole, Object>>();
 		Map<String, BiConsumer<OrgGroupRole, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<OrgGroupRole, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", OrgGroupRole::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<OrgGroupRole, Long>)OrgGroupRole::setMvccVersion);
+		attributeGetterFunctions.put(
+			"organizationId", OrgGroupRole::getOrganizationId);
 		attributeSetterBiConsumers.put(
 			"organizationId",
 			(BiConsumer<OrgGroupRole, Long>)OrgGroupRole::setOrganizationId);
+		attributeGetterFunctions.put("groupId", OrgGroupRole::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<OrgGroupRole, Long>)OrgGroupRole::setGroupId);
+		attributeGetterFunctions.put("roleId", OrgGroupRole::getRoleId);
 		attributeSetterBiConsumers.put(
 			"roleId", (BiConsumer<OrgGroupRole, Long>)OrgGroupRole::setRoleId);
+		attributeGetterFunctions.put("companyId", OrgGroupRole::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<OrgGroupRole, Long>)OrgGroupRole::setCompanyId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -410,6 +433,23 @@ public class OrgGroupRoleModelImpl
 		orgGroupRoleImpl.setCompanyId(getCompanyId());
 
 		orgGroupRoleImpl.resetOriginalValues();
+
+		return orgGroupRoleImpl;
+	}
+
+	@Override
+	public OrgGroupRole cloneWithOriginalValues() {
+		OrgGroupRoleImpl orgGroupRoleImpl = new OrgGroupRoleImpl();
+
+		orgGroupRoleImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		orgGroupRoleImpl.setOrganizationId(
+			this.<Long>getColumnOriginalValue("organizationId"));
+		orgGroupRoleImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		orgGroupRoleImpl.setRoleId(this.<Long>getColumnOriginalValue("roleId"));
+		orgGroupRoleImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
 
 		return orgGroupRoleImpl;
 	}
@@ -576,9 +616,7 @@ public class OrgGroupRoleModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, OrgGroupRole>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					OrgGroupRole.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

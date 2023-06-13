@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -28,32 +28,7 @@ definition {
 		}
 	}
 
-	@description = "This test covers LPS-164469. It ensures that the Not Found message is shown when a guest user access the manage URL."
-	@priority = 3
-	test CanViewNotFoundWhenGuestAccessManageURL {
-		property custom.properties = "virtual.hosts.default.site.name=Guest";
-		property test.name.skip.portal.instance = "Personalmenu#CanViewNotFoundWhenGuestAccessManageURL";
-
-		var portalURL = PropsUtil.get("portal.url");
-
-		task ("Given: Logout the user via personal menu") {
-			UserBar.signOut();
-		}
-
-		task ("When: Access the manage URL by a guest user") {
-			Navigator.openSpecificURL(url = "${portalURL}/manage");
-		}
-
-		task ("Then: Assert the Not Found message displays") {
-			AssertTextPresent(value1 = "The requested resource could not be found.");
-
-			AssertTextEquals(
-				locator1 = "Home#ERROR_MESSAGE_ALERT_ERROR",
-				value1 = "Not Found");
-		}
-	}
-
-	@priority = 4
+	@priority = "4"
 	test ConfigureLookAndFeelCurrentSiteAndMyDashboard {
 		PortalSettings.gotoConfiguration(
 			configurationCategory = "Users",
@@ -78,7 +53,7 @@ definition {
 		AssertTextPresent(value1 = "My Dashboard");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ConfigureShowInControlMenu {
 		AssertElementNotPresent.assertElementNotPresent(locator1 = "UserBar#USER_AVATAR_IN_CONTROL_MENU");
 
@@ -98,22 +73,22 @@ definition {
 		AssertElementPresent.assertElementPresent(locator1 = "UserBar#USER_AVATAR_IN_NAVIGATION_USER_PERSONAL_BAR_PORTLET");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test EnableStaging {
 		property test.name.skip.portal.instance = "Personalmenu#EnableStaging";
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
 			portlet = "Staging");
 
-		Staging.activateStagingCP(siteName = ${siteName});
+		Staging.activateStagingCP(siteName = "${siteName}");
 
 		Navigator.gotoStagedSitePage(
 			defaultSite = "true",
 			pageName = "Home",
-			siteName = ${siteName});
+			siteName = "${siteName}");
 
 		ProductMenuHelper.closeProductMenu();
 
@@ -135,16 +110,16 @@ definition {
 		AssertElementPresent.assertElementPresent(locator1 = "UsersAndOrganizations#MY_ORGANIZATION_PORTLET");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test NavigateToMySites {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		UserBar.gotoDropdownItem(dropdownItem = "My Sites");
 
-		Site.viewSelectSiteViaPersonalMenuMySites(siteName = ${siteName});
+		Site.viewSelectSiteViaPersonalMenuMySites(siteName = "${siteName}");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test RenderAppsWithCurrentTheme {
 		Navigator.openURL();
 
@@ -209,7 +184,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-106534."
-	@priority = 4
+	@priority = "4"
 	test UpdateAddressFromUserProfile {
 		UserBar.viewUserDefaultIcon();
 
@@ -220,7 +195,7 @@ definition {
 		User.addAddressViaMyAccount(
 			userAddressCity = "Diamond Bar",
 			userAddressCountry = "United States",
-			userAddressPostalCode = 91765,
+			userAddressPostalCode = "91765",
 			userAddressRegion = "California",
 			userAddressStreet1 = "1400 Montefino Ave");
 
@@ -232,7 +207,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-120825."
-	@priority = 4
+	@priority = "4"
 	test UpdateUserInformation {
 		UserBar.viewUserDefaultIcon();
 
@@ -248,13 +223,18 @@ definition {
 			userLastName = "Test",
 			userScreenName = "testscreen");
 
-		User.editUserInformation(
-			userEmailAddressEdit = "test@liferay.com",
-			userScreenNameEdit = "test");
+		JSONUser.updateUser(
+			creatorEmailAddress = "testadmin@liferay.com",
+			creatorPassword = "test",
+			screenNameUpdate = "test",
+			userEmailAddress = "testadmin@liferay.com",
+			userEmailAddressUpdate = "test@liferay.com",
+			userFirstName = "Test",
+			userLastName = "Test");
 	}
 
 	@description = "This is a use case for LPS-105387."
-	@priority = 5
+	@priority = "5"
 	test UpdateUserPortrait {
 		UserBar.viewUserDefaultIcon();
 
@@ -267,7 +247,7 @@ definition {
 		UserBar.viewUserPortraitMatchConfiguration();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewMyAccountUser {
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",
@@ -305,7 +285,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-76106."
-	@priority = 5
+	@priority = "5"
 	test ViewMyAccountUserViaURL {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -339,13 +319,13 @@ definition {
 			userLoginFullName = "Test Test");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewMyAccountViaSignInPortlet {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(
+		PagesAdmin.addPublicPage(
 			pageName = "Sign In Page",
 			sitePageType = "Widget Page");
 
@@ -360,7 +340,7 @@ definition {
 		MyAccount.view();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewMyOrganizations {
 		JSONUser.addUser(
 			userEmailAddress = "user1@liferay.com",
@@ -402,11 +382,11 @@ definition {
 		LexiconEntry.viewNoEntry(rowEntry = "Organization2 Name");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewNoMyDashboardMyProfileLink {
 		property custom.properties = "jsonws.web.service.paths.excludes=${line.separator}layout.user.private.layouts.power.user.required=true${line.separator}layout.user.public.layouts.power.user.required=true";
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONUser.addUser(
 			userEmailAddress = "user1@liferay.com",
@@ -439,6 +419,32 @@ definition {
 		UserBar.viewNoDropdownItem(dropdownItem = "My Dashboard");
 
 		UserBar.viewNoDropdownItem(dropdownItem = "My Profile");
+	}
+
+	@ignore = "true"
+	@priority = "3"
+	test ViewUserIconIsAccessibleViaKeyboard {
+		AssertAccessible();
+
+		KeyPress(
+			locator1 = "Button#SUBMIT",
+			value1 = "\TAB");
+
+		KeyPress(
+			locator1 = "UserBar#USER_AVATAR_BUTTON",
+			value1 = "\ENTER");
+
+		KeyPress(
+			key_dropdownItem = "My Profile",
+			locator1 = "UserBar#USER_AVATAR_DROPDOWN_ITEM",
+			value1 = "\TAB");
+
+		KeyPress(
+			key_dropdownItem = "My Dashboard",
+			locator1 = "UserBar#USER_AVATAR_DROPDOWN_ITEM",
+			value1 = "\ENTER");
+
+		AssertAccessible();
 	}
 
 }

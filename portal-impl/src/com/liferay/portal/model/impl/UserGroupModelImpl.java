@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -368,82 +369,104 @@ public class UserGroupModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<UserGroup, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, UserGroup>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<UserGroup, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<UserGroup, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			UserGroup.class.getClassLoader(), UserGroup.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", UserGroup::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", UserGroup::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", UserGroup::getUuid);
-		attributeGetterFunctions.put(
-			"externalReferenceCode", UserGroup::getExternalReferenceCode);
-		attributeGetterFunctions.put("userGroupId", UserGroup::getUserGroupId);
-		attributeGetterFunctions.put("companyId", UserGroup::getCompanyId);
-		attributeGetterFunctions.put("userId", UserGroup::getUserId);
-		attributeGetterFunctions.put("userName", UserGroup::getUserName);
-		attributeGetterFunctions.put("createDate", UserGroup::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", UserGroup::getModifiedDate);
-		attributeGetterFunctions.put(
-			"parentUserGroupId", UserGroup::getParentUserGroupId);
-		attributeGetterFunctions.put("name", UserGroup::getName);
-		attributeGetterFunctions.put("description", UserGroup::getDescription);
-		attributeGetterFunctions.put(
-			"addedByLDAPImport", UserGroup::getAddedByLDAPImport);
+		try {
+			Constructor<UserGroup> constructor =
+				(Constructor<UserGroup>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<UserGroup, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<UserGroup, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<UserGroup, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<UserGroup, Object>>();
 		Map<String, BiConsumer<UserGroup, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<UserGroup, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", UserGroup::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<UserGroup, Long>)UserGroup::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", UserGroup::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<UserGroup, Long>)UserGroup::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", UserGroup::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<UserGroup, String>)UserGroup::setUuid);
+		attributeGetterFunctions.put(
+			"externalReferenceCode", UserGroup::getExternalReferenceCode);
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<UserGroup, String>)UserGroup::setExternalReferenceCode);
+		attributeGetterFunctions.put("userGroupId", UserGroup::getUserGroupId);
 		attributeSetterBiConsumers.put(
 			"userGroupId",
 			(BiConsumer<UserGroup, Long>)UserGroup::setUserGroupId);
+		attributeGetterFunctions.put("companyId", UserGroup::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<UserGroup, Long>)UserGroup::setCompanyId);
+		attributeGetterFunctions.put("userId", UserGroup::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<UserGroup, Long>)UserGroup::setUserId);
+		attributeGetterFunctions.put("userName", UserGroup::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<UserGroup, String>)UserGroup::setUserName);
+		attributeGetterFunctions.put("createDate", UserGroup::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<UserGroup, Date>)UserGroup::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", UserGroup::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<UserGroup, Date>)UserGroup::setModifiedDate);
+		attributeGetterFunctions.put(
+			"parentUserGroupId", UserGroup::getParentUserGroupId);
 		attributeSetterBiConsumers.put(
 			"parentUserGroupId",
 			(BiConsumer<UserGroup, Long>)UserGroup::setParentUserGroupId);
+		attributeGetterFunctions.put("name", UserGroup::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<UserGroup, String>)UserGroup::setName);
+		attributeGetterFunctions.put("description", UserGroup::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<UserGroup, String>)UserGroup::setDescription);
+		attributeGetterFunctions.put(
+			"addedByLDAPImport", UserGroup::getAddedByLDAPImport);
 		attributeSetterBiConsumers.put(
 			"addedByLDAPImport",
 			(BiConsumer<UserGroup, Boolean>)UserGroup::setAddedByLDAPImport);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -851,6 +874,39 @@ public class UserGroupModelImpl
 	}
 
 	@Override
+	public UserGroup cloneWithOriginalValues() {
+		UserGroupImpl userGroupImpl = new UserGroupImpl();
+
+		userGroupImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		userGroupImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		userGroupImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		userGroupImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
+		userGroupImpl.setUserGroupId(
+			this.<Long>getColumnOriginalValue("userGroupId"));
+		userGroupImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		userGroupImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		userGroupImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		userGroupImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		userGroupImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		userGroupImpl.setParentUserGroupId(
+			this.<Long>getColumnOriginalValue("parentUserGroupId"));
+		userGroupImpl.setName(this.<String>getColumnOriginalValue("name"));
+		userGroupImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		userGroupImpl.setAddedByLDAPImport(
+			this.<Boolean>getColumnOriginalValue("addedByLDAPImport"));
+
+		return userGroupImpl;
+	}
+
+	@Override
 	public int compareTo(UserGroup userGroup) {
 		int value = 0;
 
@@ -1082,9 +1138,7 @@ public class UserGroupModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, UserGroup>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					UserGroup.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

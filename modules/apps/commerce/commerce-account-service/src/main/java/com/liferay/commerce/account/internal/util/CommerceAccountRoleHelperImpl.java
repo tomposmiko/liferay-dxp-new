@@ -14,16 +14,16 @@
 
 package com.liferay.commerce.account.internal.util;
 
+import com.liferay.account.constants.AccountConstants;
+import com.liferay.account.model.AccountRole;
+import com.liferay.account.service.AccountRoleLocalService;
 import com.liferay.commerce.account.constants.CommerceAccountActionKeys;
 import com.liferay.commerce.account.constants.CommerceAccountConstants;
-import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.util.CommerceAccountRoleHelper;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
@@ -69,11 +69,13 @@ public class CommerceAccountRoleHelperImpl
 			serviceContext.getCompanyId(), name);
 
 		if (role == null) {
-			role = _roleLocalService.addRole(
-				serviceContext.getUserId(), null, 0, name,
+			AccountRole accountRole = _accountRoleLocalService.addAccountRole(
+				serviceContext.getUserId(),
+				AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT, name,
 				Collections.singletonMap(serviceContext.getLocale(), name),
-				Collections.emptyMap(), RoleConstants.TYPE_SITE,
-				StringPool.BLANK, serviceContext);
+				Collections.emptyMap());
+
+			role = accountRole.getRole();
 		}
 
 		_setRolePermissions(role, serviceContext);
@@ -116,7 +118,9 @@ public class CommerceAccountRoleHelperImpl
 					ActionKeys.VIEW, CommerceAccountActionKeys.VIEW_ADDRESSES,
 					CommerceAccountActionKeys.VIEW_MEMBERS
 				});
-
+			resourceActionIds.put(
+				"com.liferay.commerce.model.CommerceOrderType",
+				new String[] {ActionKeys.VIEW});
 			resourceActionIds.put(
 				"com.liferay.commerce.order",
 				new String[] {
@@ -130,20 +134,22 @@ public class CommerceAccountRoleHelperImpl
 					CommerceAccountConstants.ROLE_NAME_ACCOUNT_BUYER)) {
 
 			resourceActionIds.put(
-				CommerceAccount.class.getName(),
-				new String[] {
-					CommerceAccountActionKeys.MANAGE_ADDRESSES,
-					CommerceAccountActionKeys.VIEW_ADDRESSES
-				});
-			resourceActionIds.put(
 				"com.liferay.commerce.order",
 				new String[] {
 					"ADD_COMMERCE_ORDER", "CHECKOUT_OPEN_COMMERCE_ORDERS",
 					"VIEW_COMMERCE_ORDERS", "VIEW_OPEN_COMMERCE_ORDERS"
 				});
+
+			resourceActionIds.put(
+				"com.liferay.commerce.model.CommerceOrderType",
+				new String[] {ActionKeys.VIEW});
 		}
 		else if (name.equals(
 					CommerceAccountConstants.ROLE_NAME_ACCOUNT_ORDER_MANAGER)) {
+
+			resourceActionIds.put(
+				"com.liferay.commerce.model.CommerceOrderType",
+				new String[] {ActionKeys.VIEW});
 
 			resourceActionIds.put(
 				"com.liferay.commerce.order",
@@ -157,6 +163,9 @@ public class CommerceAccountRoleHelperImpl
 
 		_setRolePermissions(role, resourceActionIds, serviceContext);
 	}
+
+	@Reference
+	private AccountRoleLocalService _accountRoleLocalService;
 
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;

@@ -16,6 +16,7 @@ package com.liferay.portal.search.web.internal.search.results.portlet;
 
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.util.AssetRendererFactoryLookup;
+import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -44,7 +45,7 @@ import com.liferay.portal.search.web.internal.display.context.SearchResultPrefer
 import com.liferay.portal.search.web.internal.document.DocumentFormPermissionChecker;
 import com.liferay.portal.search.web.internal.document.DocumentFormPermissionCheckerImpl;
 import com.liferay.portal.search.web.internal.portlet.shared.search.NullPortletURL;
-import com.liferay.portal.search.web.internal.portlet.shared.task.PortletSharedRequestHelper;
+import com.liferay.portal.search.web.internal.portlet.shared.task.helper.PortletSharedRequestHelper;
 import com.liferay.portal.search.web.internal.result.display.builder.SearchResultSummaryDisplayBuilder;
 import com.liferay.portal.search.web.internal.result.display.context.SearchResultSummaryDisplayContext;
 import com.liferay.portal.search.web.internal.search.results.constants.SearchResultsPortletKeys;
@@ -174,16 +175,21 @@ public class SearchResultsPortlet extends MVCPortlet {
 			isRenderNothing(renderRequest, searchRequest));
 
 		int paginationDelta = Optional.ofNullable(
-			portletSharedSearchResponse.getPaginationDelta()
+			searchRequest.getSize()
 		).orElse(
 			SearchContainer.DEFAULT_DELTA
 		);
+		int paginationStart = 0;
 
-		int paginationStart = Optional.ofNullable(
-			portletSharedSearchResponse.getPaginationStart()
+		int from = Optional.ofNullable(
+			searchRequest.getFrom()
 		).orElse(
 			0
 		);
+
+		if (from > 0) {
+			paginationStart = (from / paginationDelta) + 1;
+		}
 
 		searchResultsPortletDisplayContext.setSearchContainer(
 			buildSearchContainer(
@@ -306,9 +312,7 @@ public class SearchResultsPortlet extends MVCPortlet {
 					portletURLFactory, searchResultsPortletPreferences,
 					searchResultPreferences);
 
-			if ((searchResultSummaryDisplayContext != null) &&
-				!searchResultSummaryDisplayContext.isTemporarilyUnavailable()) {
-
+			if (searchResultSummaryDisplayContext != null) {
 				searchResultsSummariesHolder.put(
 					document, searchResultSummaryDisplayContext);
 			}
@@ -352,6 +356,8 @@ public class SearchResultsPortlet extends MVCPortlet {
 			language
 		).setLocale(
 			themeDisplay.getLocale()
+		).setObjectDefinitionLocalService(
+			objectDefinitionLocalService
 		).setPortletURLFactory(
 			portletURLFactory
 		).setRenderRequest(
@@ -475,6 +481,9 @@ public class SearchResultsPortlet extends MVCPortlet {
 
 	@Reference
 	protected Language language;
+
+	@Reference
+	protected ObjectDefinitionLocalService objectDefinitionLocalService;
 
 	@Reference
 	protected PortletSharedRequestHelper portletSharedRequestHelper;

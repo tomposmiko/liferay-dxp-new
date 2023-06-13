@@ -54,23 +54,25 @@ const ClayColorPickerWithState = ({
 	}, [inputValue]);
 
 	return (
-		<ClayColorPicker
-			colors={customColors}
-			disabled={readOnly}
-			label={Liferay.Language.get('color-field-type-label')}
-			name={name}
-			onBlur={onBlur}
-			onColorsChange={setCustoms}
-			onFocus={onFocus}
-			onValueChange={(value) => {
-				if (value !== color) {
-					setColor(value);
-					onValueChange(value);
-				}
-			}}
-			spritemap={spritemap}
-			value={color}
-		/>
+		<>
+			<input name={name} type="hidden" value={color} />
+			<ClayColorPicker
+				colors={customColors}
+				disabled={readOnly}
+				label={Liferay.Language.get('color-field-type-label')}
+				onBlur={onBlur}
+				onColorsChange={setCustoms}
+				onFocus={onFocus}
+				onValueChange={(value) => {
+					if (value !== color) {
+						setColor(value);
+						onValueChange(value);
+					}
+				}}
+				spritemap={spritemap}
+				value={color}
+			/>
+		</>
 	);
 };
 
@@ -89,9 +91,7 @@ const ColorPicker = ({
 	let previousShow = false;
 
 	const observer = new MutationObserver((mutationsList, observer) => {
-		for (let i = 0; i < mutationsList.length; i++) {
-			const mutation = mutationsList[i];
-
+		for (const mutation of mutationsList) {
 			if (
 				mutation.type === 'attributes' &&
 				mutation.attributeName === 'class'

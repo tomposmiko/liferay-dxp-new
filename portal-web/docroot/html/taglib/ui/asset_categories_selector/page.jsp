@@ -49,9 +49,9 @@ vocabularies.sort(new AssetVocabularyGroupLocalizedTitleComparator(scopeGroupId,
 	<c:when test="<%= Validator.isNotNull(className) %>">
 
 		<%
-		vocabularies = AssetUtil.filterVocabularies(vocabularies, className, classTypePK);
-
 		long classNameId = PortalUtil.getClassNameId(className);
+
+		vocabularies = ListUtil.filter(vocabularies, assetVocabulary -> assetVocabulary.isAssociatedToClassNameIdAndClassTypePK(classNameId, classTypePK));
 
 		for (AssetVocabulary vocabulary : vocabularies) {
 			vocabulary = vocabulary.toEscapedModel();

@@ -16,7 +16,6 @@ package com.liferay.segments.web.internal.portlet.action;
 
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.segments.constants.SegmentsPortletKeys;
 import com.liferay.segments.criteria.contributor.SegmentsCriteriaContributorRegistry;
 import com.liferay.segments.provider.SegmentsEntryProviderRegistry;
@@ -57,7 +56,6 @@ public class EditSegmentsEntryMVCRenderCommand implements MVCRenderCommand {
 
 		EditSegmentsEntryDisplayContext editSegmentsEntryDisplayContext =
 			new EditSegmentsEntryDisplayContext(
-				_filterParserProvider,
 				_portal.getHttpServletRequest(renderRequest), renderRequest,
 				renderResponse, _segmentsCriteriaContributorRegistry,
 				_segmentsEntryProviderRegistry, _segmentsEntryService);
@@ -68,9 +66,6 @@ public class EditSegmentsEntryMVCRenderCommand implements MVCRenderCommand {
 
 		return "/edit_segments_entry.jsp";
 	}
-
-	@Reference
-	private FilterParserProvider _filterParserProvider;
 
 	@Reference
 	private Portal _portal;

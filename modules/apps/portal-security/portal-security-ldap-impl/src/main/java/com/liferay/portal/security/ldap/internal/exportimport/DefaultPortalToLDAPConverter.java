@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.exportimport.UserOperation;
+import com.liferay.portal.security.ldap.ContactConverterKeys;
 import com.liferay.portal.security.ldap.GroupConverterKeys;
 import com.liferay.portal.security.ldap.SafeLdapName;
 import com.liferay.portal.security.ldap.SafeLdapNameFactory;
@@ -110,20 +111,14 @@ public class DefaultPortalToLDAPConverter implements PortalToLDAPConverter {
 			return groupBinding.getNameInNamespace();
 		}
 
-		StringBundler sb = new StringBundler(5);
-
-		sb.append(
+		return StringBundler.concat(
 			GetterUtil.getString(
 				groupMappings.getProperty(GroupConverterKeys.GROUP_NAME),
-				_DEFAULT_DN));
-		sb.append(StringPool.EQUAL);
-		sb.append(Rdn.escapeValue(userGroup.getName()));
-		sb.append(StringPool.COMMA);
-		sb.append(
+				_DEFAULT_DN),
+			StringPool.EQUAL, Rdn.escapeValue(userGroup.getName()),
+			StringPool.COMMA,
 			_safePortalLDAP.getGroupsDNSafeLdapName(
 				ldapServerId, userGroup.getCompanyId()));
-
-		return sb.toString();
 	}
 
 	@Override
@@ -157,6 +152,20 @@ public class DefaultPortalToLDAPConverter implements PortalToLDAPConverter {
 
 		if (contactMappings.isEmpty() && contactExpandoMappings.isEmpty()) {
 			return null;
+		}
+
+		if (contactExpandoMappings.containsKey(ContactConverterKeys.PREFIX)) {
+			String prefix = contactExpandoMappings.getProperty(
+				ContactConverterKeys.PREFIX);
+
+			contactMappings.put(ContactConverterKeys.PREFIX, prefix);
+		}
+
+		if (contactExpandoMappings.containsKey(ContactConverterKeys.SUFFIX)) {
+			String suffix = contactExpandoMappings.getProperty(
+				ContactConverterKeys.SUFFIX);
+
+			contactMappings.put(ContactConverterKeys.SUFFIX, suffix);
 		}
 
 		Modifications modifications = getModifications(
@@ -424,19 +433,14 @@ public class DefaultPortalToLDAPConverter implements PortalToLDAPConverter {
 			return userBinding.getNameInNamespace();
 		}
 
-		StringBundler sb = new StringBundler(5);
-
-		sb.append(
+		return StringBundler.concat(
 			GetterUtil.getString(
-				userMappings.getProperty(_userDNFieldName), _DEFAULT_DN));
-		sb.append(StringPool.EQUAL);
-		sb.append(BeanPropertiesUtil.getStringSilent(user, _userDNFieldName));
-		sb.append(StringPool.COMMA);
-		sb.append(
+				userMappings.getProperty(_userDNFieldName), _DEFAULT_DN),
+			StringPool.EQUAL,
+			BeanPropertiesUtil.getStringSilent(user, _userDNFieldName),
+			StringPool.COMMA,
 			_safePortalLDAP.getUsersDNSafeLdapName(
 				ldapServerId, user.getCompanyId()));
-
-		return sb.toString();
 	}
 
 	@Override
@@ -725,11 +729,11 @@ public class DefaultPortalToLDAPConverter implements PortalToLDAPConverter {
 
 		boolean listTypeFieldName = false;
 
-		if (fieldName.equals("prefix")) {
+		if (fieldName.equals(ContactConverterKeys.PREFIX)) {
 			fieldName = "prefixId";
 			listTypeFieldName = true;
 		}
-		else if (fieldName.equals("suffix")) {
+		else if (fieldName.equals(ContactConverterKeys.SUFFIX)) {
 			fieldName = "suffixId";
 			listTypeFieldName = true;
 		}

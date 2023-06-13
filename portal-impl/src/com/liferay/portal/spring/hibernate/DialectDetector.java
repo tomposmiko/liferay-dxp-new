@@ -58,15 +58,9 @@ public class DialectDetector {
 		String dialectKey = null;
 
 		try {
-			StringBundler sb = new StringBundler(5);
-
-			sb.append(dbName);
-			sb.append(StringPool.COLON);
-			sb.append(dbMajorVersion);
-			sb.append(StringPool.COLON);
-			sb.append(dbMinorVersion);
-
-			dialectKey = sb.toString();
+			dialectKey = StringBundler.concat(
+				dbName, StringPool.COLON, dbMajorVersion, StringPool.COLON,
+				dbMinorVersion);
 
 			dialect = _dialects.get(dialectKey);
 
@@ -81,22 +75,18 @@ public class DialectDetector {
 						".", dbMinorVersion));
 			}
 
-			String driverName = dbInfo.getDriverName();
-
 			if (dbName.startsWith("HSQL")) {
 				dialect = new HSQLDialect();
 
 				if (_log.isWarnEnabled()) {
-					sb = new StringBundler(6);
-
-					sb.append("Liferay is configured to use Hypersonic as ");
-					sb.append("its database. Do NOT use Hypersonic in ");
-					sb.append("production. Hypersonic is an embedded ");
-					sb.append("database useful for development and ");
-					sb.append("demonstration purposes. The database settings ");
-					sb.append("can be changed in portal-ext.properties.");
-
-					_log.warn(sb.toString());
+					_log.warn(
+						StringBundler.concat(
+							"Liferay is configured to use Hypersonic as its ",
+							"database. Do NOT use Hypersonic in production. ",
+							"Hypersonic is an embedded database useful for ",
+							"development and demonstration purposes. The ",
+							"database settings can be changed in ",
+							"portal-ext.properties."));
 				}
 			}
 			else if (dbName.equals("Adaptive Server Enterprise") &&
@@ -112,7 +102,7 @@ public class DialectDetector {
 			else if (dbName.startsWith("DB2") && (dbMajorVersion >= 9)) {
 				dialect = new DB2Dialect();
 			}
-			else if (StringUtil.startsWith(driverName, "mariadb")) {
+			else if (StringUtil.startsWith(dbInfo.getDriverName(), "mariadb")) {
 				dialect = new MariaDBDialect();
 			}
 			else if (dbName.startsWith("Microsoft") && (dbMajorVersion == 9)) {

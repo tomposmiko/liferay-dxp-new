@@ -32,6 +32,7 @@ import com.liferay.trash.model.TrashVersionModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -231,66 +232,88 @@ public class TrashVersionModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<TrashVersion, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, TrashVersion>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<TrashVersion, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<TrashVersion, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			TrashVersion.class.getClassLoader(), TrashVersion.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", TrashVersion::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", TrashVersion::getCtCollectionId);
-		attributeGetterFunctions.put("versionId", TrashVersion::getVersionId);
-		attributeGetterFunctions.put("companyId", TrashVersion::getCompanyId);
-		attributeGetterFunctions.put("entryId", TrashVersion::getEntryId);
-		attributeGetterFunctions.put(
-			"classNameId", TrashVersion::getClassNameId);
-		attributeGetterFunctions.put("classPK", TrashVersion::getClassPK);
-		attributeGetterFunctions.put(
-			"typeSettings", TrashVersion::getTypeSettings);
-		attributeGetterFunctions.put("status", TrashVersion::getStatus);
+		try {
+			Constructor<TrashVersion> constructor =
+				(Constructor<TrashVersion>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<TrashVersion, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<TrashVersion, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<TrashVersion, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<TrashVersion, Object>>();
 		Map<String, BiConsumer<TrashVersion, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<TrashVersion, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", TrashVersion::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<TrashVersion, Long>)TrashVersion::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", TrashVersion::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<TrashVersion, Long>)TrashVersion::setCtCollectionId);
+		attributeGetterFunctions.put("versionId", TrashVersion::getVersionId);
 		attributeSetterBiConsumers.put(
 			"versionId",
 			(BiConsumer<TrashVersion, Long>)TrashVersion::setVersionId);
+		attributeGetterFunctions.put("companyId", TrashVersion::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<TrashVersion, Long>)TrashVersion::setCompanyId);
+		attributeGetterFunctions.put("entryId", TrashVersion::getEntryId);
 		attributeSetterBiConsumers.put(
 			"entryId",
 			(BiConsumer<TrashVersion, Long>)TrashVersion::setEntryId);
+		attributeGetterFunctions.put(
+			"classNameId", TrashVersion::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<TrashVersion, Long>)TrashVersion::setClassNameId);
+		attributeGetterFunctions.put("classPK", TrashVersion::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<TrashVersion, Long>)TrashVersion::setClassPK);
+		attributeGetterFunctions.put(
+			"typeSettings", TrashVersion::getTypeSettings);
 		attributeSetterBiConsumers.put(
 			"typeSettings",
 			(BiConsumer<TrashVersion, String>)TrashVersion::setTypeSettings);
+		attributeGetterFunctions.put("status", TrashVersion::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<TrashVersion, Integer>)TrashVersion::setStatus);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -546,6 +569,32 @@ public class TrashVersionModelImpl
 	}
 
 	@Override
+	public TrashVersion cloneWithOriginalValues() {
+		TrashVersionImpl trashVersionImpl = new TrashVersionImpl();
+
+		trashVersionImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		trashVersionImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		trashVersionImpl.setVersionId(
+			this.<Long>getColumnOriginalValue("versionId"));
+		trashVersionImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		trashVersionImpl.setEntryId(
+			this.<Long>getColumnOriginalValue("entryId"));
+		trashVersionImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		trashVersionImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		trashVersionImpl.setTypeSettings(
+			this.<String>getColumnOriginalValue("typeSettings"));
+		trashVersionImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
+
+		return trashVersionImpl;
+	}
+
+	@Override
 	public int compareTo(TrashVersion trashVersion) {
 		long primaryKey = trashVersion.getPrimaryKey();
 
@@ -727,9 +776,7 @@ public class TrashVersionModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, TrashVersion>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					TrashVersion.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

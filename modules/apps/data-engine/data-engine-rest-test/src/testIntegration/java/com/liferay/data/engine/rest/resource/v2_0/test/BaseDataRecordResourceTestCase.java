@@ -50,9 +50,8 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -61,16 +60,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -218,10 +219,7 @@ public abstract class BaseDataRecordResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantDataRecord),
 				(List<DataRecord>)page.getItems());
-			assertValid(
-				page,
-				testGetDataDefinitionDataRecordsPage_getExpectedActions(
-					irrelevantDataDefinitionId));
+			assertValid(page);
 		}
 
 		DataRecord dataRecord1 =
@@ -240,34 +238,11 @@ public abstract class BaseDataRecordResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(dataRecord1, dataRecord2),
 			(List<DataRecord>)page.getItems());
-		assertValid(
-			page,
-			testGetDataDefinitionDataRecordsPage_getExpectedActions(
-				dataDefinitionId));
+		assertValid(page);
 
 		dataRecordResource.deleteDataRecord(dataRecord1.getId());
 
 		dataRecordResource.deleteDataRecord(dataRecord2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetDataDefinitionDataRecordsPage_getExpectedActions(
-				Long dataDefinitionId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		Map createBatchAction = new HashMap<>();
-		createBatchAction.put("method", "POST");
-		createBatchAction.put(
-			"href",
-			"http://localhost:8080/o/data-engine/v2.0/data-definitions/{dataDefinitionId}/data-records/batch".
-				replace(
-					"{dataDefinitionId}", String.valueOf(dataDefinitionId)));
-
-		expectedActions.put("createBatch", createBatchAction);
-
-		return expectedActions;
 	}
 
 	@Test
@@ -323,23 +298,9 @@ public abstract class BaseDataRecordResourceTestCase {
 		testGetDataDefinitionDataRecordsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, dataRecord1, dataRecord2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					dataRecord1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetDataDefinitionDataRecordsPageWithSortDouble()
-		throws Exception {
-
-		testGetDataDefinitionDataRecordsPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, dataRecord1, dataRecord2) -> {
-				BeanTestUtil.setProperty(
-					dataRecord1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					dataRecord2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -350,8 +311,8 @@ public abstract class BaseDataRecordResourceTestCase {
 		testGetDataDefinitionDataRecordsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, dataRecord1, dataRecord2) -> {
-				BeanTestUtil.setProperty(dataRecord1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(dataRecord2, entityField.getName(), 1);
+				BeanUtils.setProperty(dataRecord1, entityField.getName(), 0);
+				BeanUtils.setProperty(dataRecord2, entityField.getName(), 1);
 			});
 	}
 
@@ -366,27 +327,27 @@ public abstract class BaseDataRecordResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataRecord1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataRecord2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataRecord1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataRecord2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -394,12 +355,12 @@ public abstract class BaseDataRecordResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataRecord1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataRecord2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -528,10 +489,7 @@ public abstract class BaseDataRecordResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantDataRecord),
 				(List<DataRecord>)page.getItems());
-			assertValid(
-				page,
-				testGetDataRecordCollectionDataRecordsPage_getExpectedActions(
-					irrelevantDataRecordCollectionId));
+			assertValid(page);
 		}
 
 		DataRecord dataRecord1 =
@@ -550,35 +508,11 @@ public abstract class BaseDataRecordResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(dataRecord1, dataRecord2),
 			(List<DataRecord>)page.getItems());
-		assertValid(
-			page,
-			testGetDataRecordCollectionDataRecordsPage_getExpectedActions(
-				dataRecordCollectionId));
+		assertValid(page);
 
 		dataRecordResource.deleteDataRecord(dataRecord1.getId());
 
 		dataRecordResource.deleteDataRecord(dataRecord2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetDataRecordCollectionDataRecordsPage_getExpectedActions(
-				Long dataRecordCollectionId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		Map createBatchAction = new HashMap<>();
-		createBatchAction.put("method", "POST");
-		createBatchAction.put(
-			"href",
-			"http://localhost:8080/o/data-engine/v2.0/data-record-collections/{dataRecordCollectionId}/data-records/batch".
-				replace(
-					"{dataRecordCollectionId}",
-					String.valueOf(dataRecordCollectionId)));
-
-		expectedActions.put("createBatch", createBatchAction);
-
-		return expectedActions;
 	}
 
 	@Test
@@ -634,23 +568,9 @@ public abstract class BaseDataRecordResourceTestCase {
 		testGetDataRecordCollectionDataRecordsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, dataRecord1, dataRecord2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					dataRecord1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetDataRecordCollectionDataRecordsPageWithSortDouble()
-		throws Exception {
-
-		testGetDataRecordCollectionDataRecordsPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, dataRecord1, dataRecord2) -> {
-				BeanTestUtil.setProperty(
-					dataRecord1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					dataRecord2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -661,8 +581,8 @@ public abstract class BaseDataRecordResourceTestCase {
 		testGetDataRecordCollectionDataRecordsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, dataRecord1, dataRecord2) -> {
-				BeanTestUtil.setProperty(dataRecord1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(dataRecord2, entityField.getName(), 1);
+				BeanUtils.setProperty(dataRecord1, entityField.getName(), 0);
+				BeanUtils.setProperty(dataRecord2, entityField.getName(), 1);
 			});
 	}
 
@@ -677,27 +597,27 @@ public abstract class BaseDataRecordResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataRecord1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataRecord2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataRecord1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataRecord2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -705,12 +625,12 @@ public abstract class BaseDataRecordResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataRecord1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataRecord2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -843,7 +763,7 @@ public abstract class BaseDataRecordResourceTestCase {
 
 	@Test
 	public void testGraphQLDeleteDataRecord() throws Exception {
-		DataRecord dataRecord = testGraphQLDeleteDataRecord_addDataRecord();
+		DataRecord dataRecord = testGraphQLDataRecord_addDataRecord();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -856,6 +776,7 @@ public abstract class BaseDataRecordResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteDataRecord"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -869,12 +790,6 @@ public abstract class BaseDataRecordResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected DataRecord testGraphQLDeleteDataRecord_addDataRecord()
-		throws Exception {
-
-		return testGraphQLDataRecord_addDataRecord();
 	}
 
 	@Test
@@ -895,7 +810,7 @@ public abstract class BaseDataRecordResourceTestCase {
 
 	@Test
 	public void testGraphQLGetDataRecord() throws Exception {
-		DataRecord dataRecord = testGraphQLGetDataRecord_addDataRecord();
+		DataRecord dataRecord = testGraphQLDataRecord_addDataRecord();
 
 		Assert.assertTrue(
 			equals(
@@ -934,12 +849,6 @@ public abstract class BaseDataRecordResourceTestCase {
 				"Object/code"));
 	}
 
-	protected DataRecord testGraphQLGetDataRecord_addDataRecord()
-		throws Exception {
-
-		return testGraphQLDataRecord_addDataRecord();
-	}
-
 	@Test
 	public void testPatchDataRecord() throws Exception {
 		DataRecord postDataRecord = testPatchDataRecord_addDataRecord();
@@ -952,8 +861,8 @@ public abstract class BaseDataRecordResourceTestCase {
 
 		DataRecord expectedPatchDataRecord = postDataRecord.clone();
 
-		BeanTestUtil.copyProperties(
-			randomPatchDataRecord, expectedPatchDataRecord);
+		_beanUtilsBean.copyProperties(
+			expectedPatchDataRecord, randomPatchDataRecord);
 
 		DataRecord getDataRecord = dataRecordResource.getDataRecord(
 			patchDataRecord.getId());
@@ -1093,6 +1002,14 @@ public abstract class BaseDataRecordResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("status", additionalAssertFieldName)) {
+				if (dataRecord.getStatus() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			throw new IllegalArgumentException(
 				"Invalid additional assert field name " +
 					additionalAssertFieldName);
@@ -1102,13 +1019,6 @@ public abstract class BaseDataRecordResourceTestCase {
 	}
 
 	protected void assertValid(Page<DataRecord> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<DataRecord> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<DataRecord> dataRecords = page.getItems();
@@ -1123,20 +1033,6 @@ public abstract class BaseDataRecordResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1238,6 +1134,16 @@ public abstract class BaseDataRecordResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("status", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						dataRecord1.getStatus(), dataRecord2.getStatus())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			throw new IllegalArgumentException(
 				"Invalid additional assert field name " +
 					additionalAssertFieldName);
@@ -1275,16 +1181,14 @@ public abstract class BaseDataRecordResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1301,10 +1205,6 @@ public abstract class BaseDataRecordResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1314,18 +1214,18 @@ public abstract class BaseDataRecordResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1352,6 +1252,11 @@ public abstract class BaseDataRecordResourceTestCase {
 		}
 
 		if (entityFieldName.equals("id")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("status")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
 		}
@@ -1402,6 +1307,7 @@ public abstract class BaseDataRecordResourceTestCase {
 			{
 				dataRecordCollectionId = RandomTestUtil.randomLong();
 				id = RandomTestUtil.randomLong();
+				status = RandomTestUtil.randomInt();
 			}
 		};
 	}
@@ -1420,115 +1326,6 @@ public abstract class BaseDataRecordResourceTestCase {
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
-
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
 
 	protected class GraphQLField {
 
@@ -1604,6 +1401,18 @@ public abstract class BaseDataRecordResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseDataRecordResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

@@ -72,7 +72,9 @@ public class MessageBoardThread implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(MessageBoardThread.class, json);
 	}
 
-	@Schema
+	@Schema(
+		description = "Block of actions allowed by the user making the request."
+	)
 	@Valid
 	public Map<String, Map<String, String>> getActions() {
 		return actions;
@@ -98,7 +100,9 @@ public class MessageBoardThread implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "Block of actions allowed by the user making the request."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, Map<String, String>> actions;
 
@@ -193,7 +197,9 @@ public class MessageBoardThread implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
-	@Schema
+	@Schema(
+		description = "The thread's creator statistics (rank, join date, number of posts, ...)"
+	)
 	@Valid
 	public CreatorStatistics getCreatorStatistics() {
 		return creatorStatistics;
@@ -219,11 +225,15 @@ public class MessageBoardThread implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The thread's creator statistics (rank, join date, number of posts, ...)"
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected CreatorStatistics creatorStatistics;
 
-	@Schema
+	@Schema(
+		description = "A list of the custom fields associated with the thread."
+	)
 	@Valid
 	public CustomField[] getCustomFields() {
 		return customFields;
@@ -248,7 +258,9 @@ public class MessageBoardThread implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A list of the custom fields associated with the thread."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected CustomField[] customFields;
 
@@ -517,7 +529,9 @@ public class MessageBoardThread implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean locked;
 
-	@Schema
+	@Schema(
+		description = "The ID of the Message Board Section to which this message is scoped."
+	)
 	public Long getMessageBoardSectionId() {
 		return messageBoardSectionId;
 	}
@@ -541,7 +555,9 @@ public class MessageBoardThread implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The ID of the Message Board Section to which this message is scoped."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long messageBoardSectionId;
 
@@ -609,7 +625,7 @@ public class MessageBoardThread implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfMessageBoardMessages;
 
-	@Schema
+	@Schema(description = "A list of related contents to this thread.")
 	@Valid
 	public RelatedContent[] getRelatedContents() {
 		return relatedContents;
@@ -635,11 +651,13 @@ public class MessageBoardThread implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A list of related contents to this thread.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected RelatedContent[] relatedContents;
 
-	@Schema
+	@Schema(
+		description = "A flag that indicates whether this thread has been seen."
+	)
 	public Boolean getSeen() {
 		return seen;
 	}
@@ -661,7 +679,9 @@ public class MessageBoardThread implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether this thread has been seen."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean seen;
 
@@ -727,7 +747,37 @@ public class MessageBoardThread implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
-	@Schema
+	@Schema(description = "The thread's status.")
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	@JsonIgnore
+	public void setStatus(
+		UnsafeSupplier<String, Exception> statusUnsafeSupplier) {
+
+		try {
+			status = statusUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(description = "The thread's status.")
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected String status;
+
+	@Schema(
+		description = "A flag that indicates whether the user making the requests is subscribed to this thread."
+	)
 	public Boolean getSubscribed() {
 		return subscribed;
 	}
@@ -751,11 +801,13 @@ public class MessageBoardThread implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether the user making the requests is subscribed to this thread."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean subscribed;
 
-	@Schema
+	@Schema(description = "The categories associated with this thread.")
 	@Valid
 	public TaxonomyCategoryBrief[] getTaxonomyCategoryBriefs() {
 		return taxonomyCategoryBriefs;
@@ -783,11 +835,13 @@ public class MessageBoardThread implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The categories associated with this thread.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected TaxonomyCategoryBrief[] taxonomyCategoryBriefs;
 
-	@Schema
+	@Schema(
+		description = "A write-only field that adds `TaxonomyCategory` instances to the thread."
+	)
 	public Long[] getTaxonomyCategoryIds() {
 		return taxonomyCategoryIds;
 	}
@@ -811,7 +865,9 @@ public class MessageBoardThread implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A write-only field that adds `TaxonomyCategory` instances to the thread."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Long[] taxonomyCategoryIds;
 
@@ -1219,6 +1275,20 @@ public class MessageBoardThread implements Serializable {
 			sb.append("\"siteId\": ");
 
 			sb.append(siteId);
+		}
+
+		if (status != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"status\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(status));
+
+			sb.append("\"");
 		}
 
 		if (subscribed != null) {

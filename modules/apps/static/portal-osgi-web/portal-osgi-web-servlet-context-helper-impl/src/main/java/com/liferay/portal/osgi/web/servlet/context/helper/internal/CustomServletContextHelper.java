@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.ServletContextClassLoaderPool;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.osgi.web.servlet.context.helper.definition.WebResourceCollectionDefinition;
@@ -94,11 +93,6 @@ public class CustomServletContextHelper
 		ServletContextClassLoaderPool.register(
 			_servletContext.getServletContextName(),
 			bundleWiring.getClassLoader());
-	}
-
-	@Override
-	public String getMimeType(String name) {
-		return MimeTypesUtil.getContentType(name);
 	}
 
 	@Override
@@ -226,7 +220,7 @@ public class CustomServletContextHelper
 					String patternExtension = urlPattern.substring(2);
 
 					if (Validator.isNotNull(patternExtension) &&
-						Objects.equals(patternExtension, "*")) {
+						Objects.equals("*", patternExtension)) {
 
 						forbidden = true;
 
@@ -329,6 +323,10 @@ public class CustomServletContextHelper
 				HttpServletResponse.SC_FORBIDDEN, path);
 		}
 		catch (IOException ioException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(ioException, ioException);
+			}
+
 			httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
 		}
 

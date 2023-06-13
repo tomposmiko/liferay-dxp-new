@@ -19,7 +19,9 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.util.AssetRendererFactoryLookup;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -27,7 +29,6 @@ import com.liferay.portal.search.web.internal.result.display.context.SearchResul
 
 import java.util.Locale;
 
-import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -69,7 +70,7 @@ public class SearchResultContentDisplayBuilder {
 
 		searchResultContentDisplayContext.setAssetRenderer(assetRenderer);
 
-		final boolean visible;
+		boolean visible;
 
 		if ((assetEntry != null) && (assetRenderer != null) &&
 			assetEntry.isVisible() &&
@@ -101,15 +102,21 @@ public class SearchResultContentDisplayBuilder {
 
 				searchResultContentDisplayContext.setIconEditTarget(title);
 
-				PortletURL editPortletURL = assetRenderer.getURLEdit(
-					_portal.getLiferayPortletRequest(_renderRequest),
-					_portal.getLiferayPortletResponse(_renderResponse));
-
-				editPortletURL.setParameter(
-					"redirect", themeDisplay.getURLCurrent());
-
 				searchResultContentDisplayContext.setIconURLString(
-					editPortletURL.toString());
+					PortletURLBuilder.create(
+						assetRenderer.getURLEdit(
+							_portal.getLiferayPortletRequest(_renderRequest),
+							_portal.getLiferayPortletResponse(_renderResponse))
+					).setRedirect(
+						themeDisplay.getURLCurrent()
+					).setPortletResource(
+						() -> {
+							PortletDisplay portletDisplay =
+								themeDisplay.getPortletDisplay();
+
+							return portletDisplay.getId();
+						}
+					).buildString());
 			}
 
 			searchResultContentDisplayContext.setShowExtraInfo(

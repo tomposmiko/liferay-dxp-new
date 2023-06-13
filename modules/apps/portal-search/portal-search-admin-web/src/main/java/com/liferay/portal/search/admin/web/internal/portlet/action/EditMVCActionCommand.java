@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
-import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.search.IndexWriterHelper;
@@ -30,19 +29,22 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.uuid.PortalUUID;
 import com.liferay.portal.search.admin.web.internal.constants.SearchAdminPortletKeys;
 import com.liferay.portal.search.admin.web.internal.util.DictionaryReindexer;
+import com.liferay.portal.search.spi.reindexer.IndexReindexer;
 
 import java.io.Serializable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -52,6 +54,9 @@ import javax.portlet.PortletSession;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Wade Cao
@@ -88,28 +93,48 @@ public class EditMVCActionCommand extends BaseMVCActionCommand {
 
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
-		String redirect = ParamUtil.getString(actionRequest, "redirect");
-
 		if (cmd.equals("reindex")) {
 			reindex(actionRequest);
+
+			reindexIndexReindexers(actionRequest);
 		}
 		else if (cmd.equals("reindexDictionaries")) {
 			reindexDictionaries(actionRequest);
 		}
+		else if (cmd.equals("reindexIndexReindexer")) {
+			reindexIndexReindexer(actionRequest);
+		}
+
+		String redirect = ParamUtil.getString(actionRequest, "redirect");
+
+		redirect = _http.setParameter(
+			redirect, actionResponse.getNamespace() + "companyIds",
+			StringUtil.merge(
+				ParamUtil.getLongValues(actionRequest, "companyIds")));
+		redirect = _http.setParameter(
+			redirect, actionResponse.getNamespace() + "scope",
+			ParamUtil.getString(actionRequest, "scope"));
 
 		sendRedirect(actionRequest, actionResponse, redirect);
+	}
+
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	protected void addIndexReindexer(IndexReindexer indexReindexer) {
+		Class<?> clazz = indexReindexer.getClass();
+
+		_indexReindexers.put(clazz.getName(), indexReindexer);
 	}
 
 	protected void reindex(final ActionRequest actionRequest) throws Exception {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		long[] companyIds = _portalInstancesLocalService.getCompanyIds();
-
-		if (!ArrayUtil.contains(companyIds, CompanyConstants.SYSTEM)) {
-			companyIds = ArrayUtil.append(
-				new long[] {CompanyConstants.SYSTEM}, companyIds);
-		}
+		long[] companyIds = ParamUtil.getLongValues(
+			actionRequest, "companyIds");
 
 		String className = ParamUtil.getString(actionRequest, "className");
 		Map<String, Serializable> taskContextMap = new HashMap<>();
@@ -188,11 +213,44 @@ public class EditMVCActionCommand extends BaseMVCActionCommand {
 		DictionaryReindexer dictionaryReindexer = new DictionaryReindexer(
 			_indexWriterHelper, _portalInstancesLocalService);
 
-		dictionaryReindexer.reindexDictionaries();
+		dictionaryReindexer.reindexDictionaries(
+			ParamUtil.getLongValues(actionRequest, "companyIds"));
+	}
+
+	protected void reindexIndexReindexer(ActionRequest actionRequest)
+		throws Exception {
+
+		String className = ParamUtil.getString(actionRequest, "className");
+
+		IndexReindexer indexReindexer = _indexReindexers.get(className);
+
+		indexReindexer.reindex(
+			ParamUtil.getLongValues(actionRequest, "companyIds"));
+	}
+
+	protected void reindexIndexReindexers(ActionRequest actionRequest)
+		throws Exception {
+
+		for (IndexReindexer indexReindexer : _indexReindexers.values()) {
+			indexReindexer.reindex(
+				ParamUtil.getLongValues(actionRequest, "companyIds"));
+		}
+	}
+
+	protected void removeIndexReindexer(IndexReindexer indexReindexer) {
+		Class<?> clazz = indexReindexer.getClass();
+
+		_indexReindexers.remove(clazz.getName());
 	}
 
 	@Reference
 	private BackgroundTaskManager _backgroundTaskManager;
+
+	@Reference
+	private Http _http;
+
+	private final Map<String, IndexReindexer> _indexReindexers =
+		new ConcurrentHashMap<>();
 
 	@Reference
 	private IndexWriterHelper _indexWriterHelper;

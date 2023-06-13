@@ -15,9 +15,8 @@
 package com.liferay.adaptive.media.web.internal.background.task;
 
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 
-import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,21 +34,13 @@ public class BackgroundTaskExecutorConfigurator {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		BackgroundTaskExecutor
-			optimizeImagesSingleConfigurationBackgroundTaskExecutor =
-				new OptimizeImagesSingleConfigurationBackgroundTaskExecutor();
+		registerBackgroundTaskExecutor(
+			bundleContext,
+			new OptimizeImagesSingleConfigurationBackgroundTaskExecutor());
 
 		registerBackgroundTaskExecutor(
 			bundleContext,
-			optimizeImagesSingleConfigurationBackgroundTaskExecutor);
-
-		BackgroundTaskExecutor
-			optimizeImagesAllConfigurationsBackgroundTaskExecutor =
-				new OptimizeImagesAllConfigurationsBackgroundTaskExecutor();
-
-		registerBackgroundTaskExecutor(
-			bundleContext,
-			optimizeImagesAllConfigurationsBackgroundTaskExecutor);
+			new OptimizeImagesAllConfigurationsBackgroundTaskExecutor());
 	}
 
 	@Deactivate
@@ -65,16 +56,14 @@ public class BackgroundTaskExecutorConfigurator {
 		BundleContext bundleContext,
 		BackgroundTaskExecutor backgroundTaskExecutor) {
 
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
 		Class<?> clazz = backgroundTaskExecutor.getClass();
-
-		properties.put("background.task.executor.class.name", clazz.getName());
 
 		ServiceRegistration<BackgroundTaskExecutor> serviceRegistration =
 			bundleContext.registerService(
 				BackgroundTaskExecutor.class, backgroundTaskExecutor,
-				properties);
+				HashMapDictionaryBuilder.<String, Object>put(
+					"background.task.executor.class.name", clazz.getName()
+				).build());
 
 		_serviceRegistrations.add(serviceRegistration);
 	}

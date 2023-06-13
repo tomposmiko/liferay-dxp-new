@@ -18,11 +18,6 @@
 
 <%
 String tabs1 = ParamUtil.getString(renderRequest, "tabs1", "reports");
-
-PortletURL portletURL = renderResponse.createRenderURL();
-
-portletURL.setParameter("mvcPath", "/admin/view.jsp");
-portletURL.setParameter("tabs1", tabs1);
 %>
 
 <c:if test="<%= reportsEngineDisplayContext.isAdminPortlet() %>">
@@ -67,7 +62,6 @@ portletURL.setParameter("tabs1", tabs1);
 	disabled="<%= reportsEngineDisplayContext.isDisabled() %>"
 	filterDropdownItems="<%= reportsEngineDisplayContext.getFilterOptions() %>"
 	itemsTotal="<%= reportsEngineDisplayContext.getTotalItems() %>"
-	namespace="<%= liferayPortletResponse.getNamespace() %>"
 	searchActionURL="<%= reportsEngineDisplayContext.getSearchURL() %>"
 	searchContainerId="reportsEngine"
 	searchFormName="fm1"

@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -371,203 +372,225 @@ public class PasswordPolicyModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<PasswordPolicy, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, PasswordPolicy>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<PasswordPolicy, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<PasswordPolicy, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			PasswordPolicy.class.getClassLoader(), PasswordPolicy.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", PasswordPolicy::getMvccVersion);
-		attributeGetterFunctions.put("uuid", PasswordPolicy::getUuid);
-		attributeGetterFunctions.put(
-			"passwordPolicyId", PasswordPolicy::getPasswordPolicyId);
-		attributeGetterFunctions.put("companyId", PasswordPolicy::getCompanyId);
-		attributeGetterFunctions.put("userId", PasswordPolicy::getUserId);
-		attributeGetterFunctions.put("userName", PasswordPolicy::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", PasswordPolicy::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", PasswordPolicy::getModifiedDate);
-		attributeGetterFunctions.put(
-			"defaultPolicy", PasswordPolicy::getDefaultPolicy);
-		attributeGetterFunctions.put("name", PasswordPolicy::getName);
-		attributeGetterFunctions.put(
-			"description", PasswordPolicy::getDescription);
-		attributeGetterFunctions.put(
-			"changeable", PasswordPolicy::getChangeable);
-		attributeGetterFunctions.put(
-			"changeRequired", PasswordPolicy::getChangeRequired);
-		attributeGetterFunctions.put("minAge", PasswordPolicy::getMinAge);
-		attributeGetterFunctions.put(
-			"checkSyntax", PasswordPolicy::getCheckSyntax);
-		attributeGetterFunctions.put(
-			"allowDictionaryWords", PasswordPolicy::getAllowDictionaryWords);
-		attributeGetterFunctions.put(
-			"minAlphanumeric", PasswordPolicy::getMinAlphanumeric);
-		attributeGetterFunctions.put("minLength", PasswordPolicy::getMinLength);
-		attributeGetterFunctions.put(
-			"minLowerCase", PasswordPolicy::getMinLowerCase);
-		attributeGetterFunctions.put(
-			"minNumbers", PasswordPolicy::getMinNumbers);
-		attributeGetterFunctions.put(
-			"minSymbols", PasswordPolicy::getMinSymbols);
-		attributeGetterFunctions.put(
-			"minUpperCase", PasswordPolicy::getMinUpperCase);
-		attributeGetterFunctions.put("regex", PasswordPolicy::getRegex);
-		attributeGetterFunctions.put("history", PasswordPolicy::getHistory);
-		attributeGetterFunctions.put(
-			"historyCount", PasswordPolicy::getHistoryCount);
-		attributeGetterFunctions.put(
-			"expireable", PasswordPolicy::getExpireable);
-		attributeGetterFunctions.put("maxAge", PasswordPolicy::getMaxAge);
-		attributeGetterFunctions.put(
-			"warningTime", PasswordPolicy::getWarningTime);
-		attributeGetterFunctions.put(
-			"graceLimit", PasswordPolicy::getGraceLimit);
-		attributeGetterFunctions.put("lockout", PasswordPolicy::getLockout);
-		attributeGetterFunctions.put(
-			"maxFailure", PasswordPolicy::getMaxFailure);
-		attributeGetterFunctions.put(
-			"lockoutDuration", PasswordPolicy::getLockoutDuration);
-		attributeGetterFunctions.put(
-			"requireUnlock", PasswordPolicy::getRequireUnlock);
-		attributeGetterFunctions.put(
-			"resetFailureCount", PasswordPolicy::getResetFailureCount);
-		attributeGetterFunctions.put(
-			"resetTicketMaxAge", PasswordPolicy::getResetTicketMaxAge);
+		try {
+			Constructor<PasswordPolicy> constructor =
+				(Constructor<PasswordPolicy>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<PasswordPolicy, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<PasswordPolicy, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<PasswordPolicy, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<PasswordPolicy, Object>>();
 		Map<String, BiConsumer<PasswordPolicy, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<PasswordPolicy, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", PasswordPolicy::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setMvccVersion);
+		attributeGetterFunctions.put("uuid", PasswordPolicy::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<PasswordPolicy, String>)PasswordPolicy::setUuid);
+		attributeGetterFunctions.put(
+			"passwordPolicyId", PasswordPolicy::getPasswordPolicyId);
 		attributeSetterBiConsumers.put(
 			"passwordPolicyId",
 			(BiConsumer<PasswordPolicy, Long>)
 				PasswordPolicy::setPasswordPolicyId);
+		attributeGetterFunctions.put("companyId", PasswordPolicy::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setCompanyId);
+		attributeGetterFunctions.put("userId", PasswordPolicy::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setUserId);
+		attributeGetterFunctions.put("userName", PasswordPolicy::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<PasswordPolicy, String>)PasswordPolicy::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", PasswordPolicy::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<PasswordPolicy, Date>)PasswordPolicy::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", PasswordPolicy::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<PasswordPolicy, Date>)PasswordPolicy::setModifiedDate);
+		attributeGetterFunctions.put(
+			"defaultPolicy", PasswordPolicy::getDefaultPolicy);
 		attributeSetterBiConsumers.put(
 			"defaultPolicy",
 			(BiConsumer<PasswordPolicy, Boolean>)
 				PasswordPolicy::setDefaultPolicy);
+		attributeGetterFunctions.put("name", PasswordPolicy::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<PasswordPolicy, String>)PasswordPolicy::setName);
+		attributeGetterFunctions.put(
+			"description", PasswordPolicy::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<PasswordPolicy, String>)PasswordPolicy::setDescription);
+		attributeGetterFunctions.put(
+			"changeable", PasswordPolicy::getChangeable);
 		attributeSetterBiConsumers.put(
 			"changeable",
 			(BiConsumer<PasswordPolicy, Boolean>)PasswordPolicy::setChangeable);
+		attributeGetterFunctions.put(
+			"changeRequired", PasswordPolicy::getChangeRequired);
 		attributeSetterBiConsumers.put(
 			"changeRequired",
 			(BiConsumer<PasswordPolicy, Boolean>)
 				PasswordPolicy::setChangeRequired);
+		attributeGetterFunctions.put("minAge", PasswordPolicy::getMinAge);
 		attributeSetterBiConsumers.put(
 			"minAge",
 			(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setMinAge);
+		attributeGetterFunctions.put(
+			"checkSyntax", PasswordPolicy::getCheckSyntax);
 		attributeSetterBiConsumers.put(
 			"checkSyntax",
 			(BiConsumer<PasswordPolicy, Boolean>)
 				PasswordPolicy::setCheckSyntax);
+		attributeGetterFunctions.put(
+			"allowDictionaryWords", PasswordPolicy::getAllowDictionaryWords);
 		attributeSetterBiConsumers.put(
 			"allowDictionaryWords",
 			(BiConsumer<PasswordPolicy, Boolean>)
 				PasswordPolicy::setAllowDictionaryWords);
+		attributeGetterFunctions.put(
+			"minAlphanumeric", PasswordPolicy::getMinAlphanumeric);
 		attributeSetterBiConsumers.put(
 			"minAlphanumeric",
 			(BiConsumer<PasswordPolicy, Integer>)
 				PasswordPolicy::setMinAlphanumeric);
+		attributeGetterFunctions.put("minLength", PasswordPolicy::getMinLength);
 		attributeSetterBiConsumers.put(
 			"minLength",
 			(BiConsumer<PasswordPolicy, Integer>)PasswordPolicy::setMinLength);
+		attributeGetterFunctions.put(
+			"minLowerCase", PasswordPolicy::getMinLowerCase);
 		attributeSetterBiConsumers.put(
 			"minLowerCase",
 			(BiConsumer<PasswordPolicy, Integer>)
 				PasswordPolicy::setMinLowerCase);
+		attributeGetterFunctions.put(
+			"minNumbers", PasswordPolicy::getMinNumbers);
 		attributeSetterBiConsumers.put(
 			"minNumbers",
 			(BiConsumer<PasswordPolicy, Integer>)PasswordPolicy::setMinNumbers);
+		attributeGetterFunctions.put(
+			"minSymbols", PasswordPolicy::getMinSymbols);
 		attributeSetterBiConsumers.put(
 			"minSymbols",
 			(BiConsumer<PasswordPolicy, Integer>)PasswordPolicy::setMinSymbols);
+		attributeGetterFunctions.put(
+			"minUpperCase", PasswordPolicy::getMinUpperCase);
 		attributeSetterBiConsumers.put(
 			"minUpperCase",
 			(BiConsumer<PasswordPolicy, Integer>)
 				PasswordPolicy::setMinUpperCase);
+		attributeGetterFunctions.put("regex", PasswordPolicy::getRegex);
 		attributeSetterBiConsumers.put(
 			"regex",
 			(BiConsumer<PasswordPolicy, String>)PasswordPolicy::setRegex);
+		attributeGetterFunctions.put("history", PasswordPolicy::getHistory);
 		attributeSetterBiConsumers.put(
 			"history",
 			(BiConsumer<PasswordPolicy, Boolean>)PasswordPolicy::setHistory);
+		attributeGetterFunctions.put(
+			"historyCount", PasswordPolicy::getHistoryCount);
 		attributeSetterBiConsumers.put(
 			"historyCount",
 			(BiConsumer<PasswordPolicy, Integer>)
 				PasswordPolicy::setHistoryCount);
+		attributeGetterFunctions.put(
+			"expireable", PasswordPolicy::getExpireable);
 		attributeSetterBiConsumers.put(
 			"expireable",
 			(BiConsumer<PasswordPolicy, Boolean>)PasswordPolicy::setExpireable);
+		attributeGetterFunctions.put("maxAge", PasswordPolicy::getMaxAge);
 		attributeSetterBiConsumers.put(
 			"maxAge",
 			(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setMaxAge);
+		attributeGetterFunctions.put(
+			"warningTime", PasswordPolicy::getWarningTime);
 		attributeSetterBiConsumers.put(
 			"warningTime",
 			(BiConsumer<PasswordPolicy, Long>)PasswordPolicy::setWarningTime);
+		attributeGetterFunctions.put(
+			"graceLimit", PasswordPolicy::getGraceLimit);
 		attributeSetterBiConsumers.put(
 			"graceLimit",
 			(BiConsumer<PasswordPolicy, Integer>)PasswordPolicy::setGraceLimit);
+		attributeGetterFunctions.put("lockout", PasswordPolicy::getLockout);
 		attributeSetterBiConsumers.put(
 			"lockout",
 			(BiConsumer<PasswordPolicy, Boolean>)PasswordPolicy::setLockout);
+		attributeGetterFunctions.put(
+			"maxFailure", PasswordPolicy::getMaxFailure);
 		attributeSetterBiConsumers.put(
 			"maxFailure",
 			(BiConsumer<PasswordPolicy, Integer>)PasswordPolicy::setMaxFailure);
+		attributeGetterFunctions.put(
+			"lockoutDuration", PasswordPolicy::getLockoutDuration);
 		attributeSetterBiConsumers.put(
 			"lockoutDuration",
 			(BiConsumer<PasswordPolicy, Long>)
 				PasswordPolicy::setLockoutDuration);
+		attributeGetterFunctions.put(
+			"requireUnlock", PasswordPolicy::getRequireUnlock);
 		attributeSetterBiConsumers.put(
 			"requireUnlock",
 			(BiConsumer<PasswordPolicy, Boolean>)
 				PasswordPolicy::setRequireUnlock);
+		attributeGetterFunctions.put(
+			"resetFailureCount", PasswordPolicy::getResetFailureCount);
 		attributeSetterBiConsumers.put(
 			"resetFailureCount",
 			(BiConsumer<PasswordPolicy, Long>)
 				PasswordPolicy::setResetFailureCount);
+		attributeGetterFunctions.put(
+			"resetTicketMaxAge", PasswordPolicy::getResetTicketMaxAge);
 		attributeSetterBiConsumers.put(
 			"resetTicketMaxAge",
 			(BiConsumer<PasswordPolicy, Long>)
 				PasswordPolicy::setResetTicketMaxAge);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -1340,6 +1363,83 @@ public class PasswordPolicyModelImpl
 	}
 
 	@Override
+	public PasswordPolicy cloneWithOriginalValues() {
+		PasswordPolicyImpl passwordPolicyImpl = new PasswordPolicyImpl();
+
+		passwordPolicyImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		passwordPolicyImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		passwordPolicyImpl.setPasswordPolicyId(
+			this.<Long>getColumnOriginalValue("passwordPolicyId"));
+		passwordPolicyImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		passwordPolicyImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		passwordPolicyImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		passwordPolicyImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		passwordPolicyImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		passwordPolicyImpl.setDefaultPolicy(
+			this.<Boolean>getColumnOriginalValue("defaultPolicy"));
+		passwordPolicyImpl.setName(this.<String>getColumnOriginalValue("name"));
+		passwordPolicyImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		passwordPolicyImpl.setChangeable(
+			this.<Boolean>getColumnOriginalValue("changeable"));
+		passwordPolicyImpl.setChangeRequired(
+			this.<Boolean>getColumnOriginalValue("changeRequired"));
+		passwordPolicyImpl.setMinAge(
+			this.<Long>getColumnOriginalValue("minAge"));
+		passwordPolicyImpl.setCheckSyntax(
+			this.<Boolean>getColumnOriginalValue("checkSyntax"));
+		passwordPolicyImpl.setAllowDictionaryWords(
+			this.<Boolean>getColumnOriginalValue("allowDictionaryWords"));
+		passwordPolicyImpl.setMinAlphanumeric(
+			this.<Integer>getColumnOriginalValue("minAlphanumeric"));
+		passwordPolicyImpl.setMinLength(
+			this.<Integer>getColumnOriginalValue("minLength"));
+		passwordPolicyImpl.setMinLowerCase(
+			this.<Integer>getColumnOriginalValue("minLowerCase"));
+		passwordPolicyImpl.setMinNumbers(
+			this.<Integer>getColumnOriginalValue("minNumbers"));
+		passwordPolicyImpl.setMinSymbols(
+			this.<Integer>getColumnOriginalValue("minSymbols"));
+		passwordPolicyImpl.setMinUpperCase(
+			this.<Integer>getColumnOriginalValue("minUpperCase"));
+		passwordPolicyImpl.setRegex(
+			this.<String>getColumnOriginalValue("regex"));
+		passwordPolicyImpl.setHistory(
+			this.<Boolean>getColumnOriginalValue("history"));
+		passwordPolicyImpl.setHistoryCount(
+			this.<Integer>getColumnOriginalValue("historyCount"));
+		passwordPolicyImpl.setExpireable(
+			this.<Boolean>getColumnOriginalValue("expireable"));
+		passwordPolicyImpl.setMaxAge(
+			this.<Long>getColumnOriginalValue("maxAge"));
+		passwordPolicyImpl.setWarningTime(
+			this.<Long>getColumnOriginalValue("warningTime"));
+		passwordPolicyImpl.setGraceLimit(
+			this.<Integer>getColumnOriginalValue("graceLimit"));
+		passwordPolicyImpl.setLockout(
+			this.<Boolean>getColumnOriginalValue("lockout"));
+		passwordPolicyImpl.setMaxFailure(
+			this.<Integer>getColumnOriginalValue("maxFailure"));
+		passwordPolicyImpl.setLockoutDuration(
+			this.<Long>getColumnOriginalValue("lockoutDuration"));
+		passwordPolicyImpl.setRequireUnlock(
+			this.<Boolean>getColumnOriginalValue("requireUnlock"));
+		passwordPolicyImpl.setResetFailureCount(
+			this.<Long>getColumnOriginalValue("resetFailureCount"));
+		passwordPolicyImpl.setResetTicketMaxAge(
+			this.<Long>getColumnOriginalValue("resetTicketMaxAge"));
+
+		return passwordPolicyImpl;
+	}
+
+	@Override
 	public int compareTo(PasswordPolicy passwordPolicy) {
 		long primaryKey = passwordPolicy.getPrimaryKey();
 
@@ -1614,9 +1714,7 @@ public class PasswordPolicyModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, PasswordPolicy>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					PasswordPolicy.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

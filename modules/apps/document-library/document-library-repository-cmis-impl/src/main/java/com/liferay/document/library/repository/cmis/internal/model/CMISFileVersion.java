@@ -51,7 +51,7 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundExcept
 /**
  * @author Alexander Chow
  */
-public class CMISFileVersion extends CMISModel implements FileVersion {
+public class CMISFileVersion extends BaseCMISModel implements FileVersion {
 
 	public CMISFileVersion(
 		CMISRepository cmisRepository, FileEntry fileEntry, String uuid,
@@ -77,6 +77,9 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 			cmisFileVersion.setParentFolder(getParentFolder());
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 
 		cmisFileVersion.setPrimaryKey(getPrimaryKey());
@@ -131,6 +134,11 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 
 	@Override
 	public ExpandoBridge getExpandoBridge() {
+		return null;
+	}
+
+	@Override
+	public Date getExpirationDate() {
 		return null;
 	}
 
@@ -262,6 +270,11 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 	}
 
 	@Override
+	public Date getReviewDate() {
+		return null;
+	}
+
+	@Override
 	public long getSize() {
 		return _document.getContentStreamLength();
 	}
@@ -307,6 +320,10 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 			return UserLocalServiceUtil.getDefaultUserId(getCompanyId());
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return 0;
 		}
 	}
@@ -324,6 +341,10 @@ public class CMISFileVersion extends CMISModel implements FileVersion {
 			return user.getUserUuid();
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return StringPool.BLANK;
 		}
 	}

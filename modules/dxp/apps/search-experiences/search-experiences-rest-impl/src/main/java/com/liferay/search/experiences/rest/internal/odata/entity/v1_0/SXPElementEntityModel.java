@@ -44,9 +44,8 @@ public class SXPElementEntityModel implements EntityModel {
 				locale -> Field.MODIFIED_DATE),
 			new StringEntityField(
 				"description",
-				locale -> Field.getSortableFieldName(
-					LocalizationUtil.getLocalizedName(
-						Field.DESCRIPTION, LocaleUtil.toLanguageId(locale)))),
+				locale -> LocalizationUtil.getLocalizedName(
+					Field.DESCRIPTION, LocaleUtil.toLanguageId(locale))),
 			new StringEntityField(
 				"title",
 				locale -> Field.getSortableFieldName(

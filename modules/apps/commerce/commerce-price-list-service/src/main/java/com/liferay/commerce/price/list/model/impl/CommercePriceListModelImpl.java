@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -78,7 +79,8 @@ public class CommercePriceListModelImpl
 	public static final String TABLE_NAME = "CommercePriceList";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"uuid_", Types.VARCHAR}, {"externalReferenceCode", Types.VARCHAR},
+		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
+		{"externalReferenceCode", Types.VARCHAR},
 		{"commercePriceListId", Types.BIGINT}, {"groupId", Types.BIGINT},
 		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
 		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
@@ -97,6 +99,7 @@ public class CommercePriceListModelImpl
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("externalReferenceCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("commercePriceListId", Types.BIGINT);
@@ -123,7 +126,7 @@ public class CommercePriceListModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CommercePriceList (uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,commercePriceListId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commerceCurrencyId LONG,parentCommercePriceListId LONG,catalogBasePriceList BOOLEAN,netPrice BOOLEAN,type_ VARCHAR(75) null,name VARCHAR(75) null,priority DOUBLE,displayDate DATE null,expirationDate DATE null,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
+		"create table CommercePriceList (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,commercePriceListId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commerceCurrencyId LONG,parentCommercePriceListId LONG,catalogBasePriceList BOOLEAN,netPrice BOOLEAN,type_ VARCHAR(75) null,name VARCHAR(75) null,priority DOUBLE,displayDate DATE null,expirationDate DATE null,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
 
 	public static final String TABLE_SQL_DROP = "drop table CommercePriceList";
 
@@ -246,6 +249,7 @@ public class CommercePriceListModelImpl
 
 		CommercePriceList model = new CommercePriceListImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setUuid(soapModel.getUuid());
 		model.setExternalReferenceCode(soapModel.getExternalReferenceCode());
 		model.setCommercePriceListId(soapModel.getCommercePriceListId());
@@ -388,160 +392,203 @@ public class CommercePriceListModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CommercePriceList>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommercePriceList.class.getClassLoader(), CommercePriceList.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<CommercePriceList> constructor =
+				(Constructor<CommercePriceList>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<CommercePriceList, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CommercePriceList, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommercePriceList, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommercePriceList, Object>>();
-
-		attributeGetterFunctions.put("uuid", CommercePriceList::getUuid);
-		attributeGetterFunctions.put(
-			"externalReferenceCode",
-			CommercePriceList::getExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"commercePriceListId", CommercePriceList::getCommercePriceListId);
-		attributeGetterFunctions.put("groupId", CommercePriceList::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommercePriceList::getCompanyId);
-		attributeGetterFunctions.put("userId", CommercePriceList::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommercePriceList::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommercePriceList::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommercePriceList::getModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceCurrencyId", CommercePriceList::getCommerceCurrencyId);
-		attributeGetterFunctions.put(
-			"parentCommercePriceListId",
-			CommercePriceList::getParentCommercePriceListId);
-		attributeGetterFunctions.put(
-			"catalogBasePriceList", CommercePriceList::getCatalogBasePriceList);
-		attributeGetterFunctions.put(
-			"netPrice", CommercePriceList::getNetPrice);
-		attributeGetterFunctions.put("type", CommercePriceList::getType);
-		attributeGetterFunctions.put("name", CommercePriceList::getName);
-		attributeGetterFunctions.put(
-			"priority", CommercePriceList::getPriority);
-		attributeGetterFunctions.put(
-			"displayDate", CommercePriceList::getDisplayDate);
-		attributeGetterFunctions.put(
-			"expirationDate", CommercePriceList::getExpirationDate);
-		attributeGetterFunctions.put(
-			"lastPublishDate", CommercePriceList::getLastPublishDate);
-		attributeGetterFunctions.put("status", CommercePriceList::getStatus);
-		attributeGetterFunctions.put(
-			"statusByUserId", CommercePriceList::getStatusByUserId);
-		attributeGetterFunctions.put(
-			"statusByUserName", CommercePriceList::getStatusByUserName);
-		attributeGetterFunctions.put(
-			"statusDate", CommercePriceList::getStatusDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CommercePriceList, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommercePriceList, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<CommercePriceList, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CommercePriceList::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CommercePriceList, Long>)
+				CommercePriceList::setMvccVersion);
+		attributeGetterFunctions.put("uuid", CommercePriceList::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CommercePriceList, String>)CommercePriceList::setUuid);
+		attributeGetterFunctions.put(
+			"externalReferenceCode",
+			CommercePriceList::getExternalReferenceCode);
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<CommercePriceList, String>)
 				CommercePriceList::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"commercePriceListId", CommercePriceList::getCommercePriceListId);
 		attributeSetterBiConsumers.put(
 			"commercePriceListId",
 			(BiConsumer<CommercePriceList, Long>)
 				CommercePriceList::setCommercePriceListId);
+		attributeGetterFunctions.put("groupId", CommercePriceList::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommercePriceList, Long>)CommercePriceList::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommercePriceList::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommercePriceList, Long>)
 				CommercePriceList::setCompanyId);
+		attributeGetterFunctions.put("userId", CommercePriceList::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommercePriceList, Long>)CommercePriceList::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommercePriceList::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommercePriceList, String>)
 				CommercePriceList::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommercePriceList::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommercePriceList, Date>)
 				CommercePriceList::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommercePriceList::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommercePriceList, Date>)
 				CommercePriceList::setModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceCurrencyId", CommercePriceList::getCommerceCurrencyId);
 		attributeSetterBiConsumers.put(
 			"commerceCurrencyId",
 			(BiConsumer<CommercePriceList, Long>)
 				CommercePriceList::setCommerceCurrencyId);
+		attributeGetterFunctions.put(
+			"parentCommercePriceListId",
+			CommercePriceList::getParentCommercePriceListId);
 		attributeSetterBiConsumers.put(
 			"parentCommercePriceListId",
 			(BiConsumer<CommercePriceList, Long>)
 				CommercePriceList::setParentCommercePriceListId);
+		attributeGetterFunctions.put(
+			"catalogBasePriceList", CommercePriceList::getCatalogBasePriceList);
 		attributeSetterBiConsumers.put(
 			"catalogBasePriceList",
 			(BiConsumer<CommercePriceList, Boolean>)
 				CommercePriceList::setCatalogBasePriceList);
+		attributeGetterFunctions.put(
+			"netPrice", CommercePriceList::getNetPrice);
 		attributeSetterBiConsumers.put(
 			"netPrice",
 			(BiConsumer<CommercePriceList, Boolean>)
 				CommercePriceList::setNetPrice);
+		attributeGetterFunctions.put("type", CommercePriceList::getType);
 		attributeSetterBiConsumers.put(
 			"type",
 			(BiConsumer<CommercePriceList, String>)CommercePriceList::setType);
+		attributeGetterFunctions.put("name", CommercePriceList::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommercePriceList, String>)CommercePriceList::setName);
+		attributeGetterFunctions.put(
+			"priority", CommercePriceList::getPriority);
 		attributeSetterBiConsumers.put(
 			"priority",
 			(BiConsumer<CommercePriceList, Double>)
 				CommercePriceList::setPriority);
+		attributeGetterFunctions.put(
+			"displayDate", CommercePriceList::getDisplayDate);
 		attributeSetterBiConsumers.put(
 			"displayDate",
 			(BiConsumer<CommercePriceList, Date>)
 				CommercePriceList::setDisplayDate);
+		attributeGetterFunctions.put(
+			"expirationDate", CommercePriceList::getExpirationDate);
 		attributeSetterBiConsumers.put(
 			"expirationDate",
 			(BiConsumer<CommercePriceList, Date>)
 				CommercePriceList::setExpirationDate);
+		attributeGetterFunctions.put(
+			"lastPublishDate", CommercePriceList::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<CommercePriceList, Date>)
 				CommercePriceList::setLastPublishDate);
+		attributeGetterFunctions.put("status", CommercePriceList::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<CommercePriceList, Integer>)
 				CommercePriceList::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", CommercePriceList::getStatusByUserId);
 		attributeSetterBiConsumers.put(
 			"statusByUserId",
 			(BiConsumer<CommercePriceList, Long>)
 				CommercePriceList::setStatusByUserId);
+		attributeGetterFunctions.put(
+			"statusByUserName", CommercePriceList::getStatusByUserName);
 		attributeSetterBiConsumers.put(
 			"statusByUserName",
 			(BiConsumer<CommercePriceList, String>)
 				CommercePriceList::setStatusByUserName);
+		attributeGetterFunctions.put(
+			"statusDate", CommercePriceList::getStatusDate);
 		attributeSetterBiConsumers.put(
 			"statusDate",
 			(BiConsumer<CommercePriceList, Date>)
 				CommercePriceList::setStatusDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@JSON
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@JSON
@@ -1207,6 +1254,7 @@ public class CommercePriceListModelImpl
 		CommercePriceListImpl commercePriceListImpl =
 			new CommercePriceListImpl();
 
+		commercePriceListImpl.setMvccVersion(getMvccVersion());
 		commercePriceListImpl.setUuid(getUuid());
 		commercePriceListImpl.setExternalReferenceCode(
 			getExternalReferenceCode());
@@ -1234,6 +1282,63 @@ public class CommercePriceListModelImpl
 		commercePriceListImpl.setStatusDate(getStatusDate());
 
 		commercePriceListImpl.resetOriginalValues();
+
+		return commercePriceListImpl;
+	}
+
+	@Override
+	public CommercePriceList cloneWithOriginalValues() {
+		CommercePriceListImpl commercePriceListImpl =
+			new CommercePriceListImpl();
+
+		commercePriceListImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		commercePriceListImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		commercePriceListImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
+		commercePriceListImpl.setCommercePriceListId(
+			this.<Long>getColumnOriginalValue("commercePriceListId"));
+		commercePriceListImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		commercePriceListImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commercePriceListImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commercePriceListImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commercePriceListImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commercePriceListImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commercePriceListImpl.setCommerceCurrencyId(
+			this.<Long>getColumnOriginalValue("commerceCurrencyId"));
+		commercePriceListImpl.setParentCommercePriceListId(
+			this.<Long>getColumnOriginalValue("parentCommercePriceListId"));
+		commercePriceListImpl.setCatalogBasePriceList(
+			this.<Boolean>getColumnOriginalValue("catalogBasePriceList"));
+		commercePriceListImpl.setNetPrice(
+			this.<Boolean>getColumnOriginalValue("netPrice"));
+		commercePriceListImpl.setType(
+			this.<String>getColumnOriginalValue("type_"));
+		commercePriceListImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		commercePriceListImpl.setPriority(
+			this.<Double>getColumnOriginalValue("priority"));
+		commercePriceListImpl.setDisplayDate(
+			this.<Date>getColumnOriginalValue("displayDate"));
+		commercePriceListImpl.setExpirationDate(
+			this.<Date>getColumnOriginalValue("expirationDate"));
+		commercePriceListImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+		commercePriceListImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
+		commercePriceListImpl.setStatusByUserId(
+			this.<Long>getColumnOriginalValue("statusByUserId"));
+		commercePriceListImpl.setStatusByUserName(
+			this.<String>getColumnOriginalValue("statusByUserName"));
+		commercePriceListImpl.setStatusDate(
+			this.<Date>getColumnOriginalValue("statusDate"));
 
 		return commercePriceListImpl;
 	}
@@ -1337,6 +1442,8 @@ public class CommercePriceListModelImpl
 	public CacheModel<CommercePriceList> toCacheModel() {
 		CommercePriceListCacheModel commercePriceListCacheModel =
 			new CommercePriceListCacheModel();
+
+		commercePriceListCacheModel.mvccVersion = getMvccVersion();
 
 		commercePriceListCacheModel.uuid = getUuid();
 
@@ -1559,12 +1666,11 @@ public class CommercePriceListModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CommercePriceList>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CommercePriceList.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private String _uuid;
 	private String _externalReferenceCode;
 	private long _commercePriceListId;
@@ -1619,6 +1725,7 @@ public class CommercePriceListModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put(
 			"externalReferenceCode", _externalReferenceCode);
@@ -1669,51 +1776,53 @@ public class CommercePriceListModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("uuid_", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("externalReferenceCode", 2L);
+		columnBitmasks.put("uuid_", 2L);
 
-		columnBitmasks.put("commercePriceListId", 4L);
+		columnBitmasks.put("externalReferenceCode", 4L);
 
-		columnBitmasks.put("groupId", 8L);
+		columnBitmasks.put("commercePriceListId", 8L);
 
-		columnBitmasks.put("companyId", 16L);
+		columnBitmasks.put("groupId", 16L);
 
-		columnBitmasks.put("userId", 32L);
+		columnBitmasks.put("companyId", 32L);
 
-		columnBitmasks.put("userName", 64L);
+		columnBitmasks.put("userId", 64L);
 
-		columnBitmasks.put("createDate", 128L);
+		columnBitmasks.put("userName", 128L);
 
-		columnBitmasks.put("modifiedDate", 256L);
+		columnBitmasks.put("createDate", 256L);
 
-		columnBitmasks.put("commerceCurrencyId", 512L);
+		columnBitmasks.put("modifiedDate", 512L);
 
-		columnBitmasks.put("parentCommercePriceListId", 1024L);
+		columnBitmasks.put("commerceCurrencyId", 1024L);
 
-		columnBitmasks.put("catalogBasePriceList", 2048L);
+		columnBitmasks.put("parentCommercePriceListId", 2048L);
 
-		columnBitmasks.put("netPrice", 4096L);
+		columnBitmasks.put("catalogBasePriceList", 4096L);
 
-		columnBitmasks.put("type_", 8192L);
+		columnBitmasks.put("netPrice", 8192L);
 
-		columnBitmasks.put("name", 16384L);
+		columnBitmasks.put("type_", 16384L);
 
-		columnBitmasks.put("priority", 32768L);
+		columnBitmasks.put("name", 32768L);
 
-		columnBitmasks.put("displayDate", 65536L);
+		columnBitmasks.put("priority", 65536L);
 
-		columnBitmasks.put("expirationDate", 131072L);
+		columnBitmasks.put("displayDate", 131072L);
 
-		columnBitmasks.put("lastPublishDate", 262144L);
+		columnBitmasks.put("expirationDate", 262144L);
 
-		columnBitmasks.put("status", 524288L);
+		columnBitmasks.put("lastPublishDate", 524288L);
 
-		columnBitmasks.put("statusByUserId", 1048576L);
+		columnBitmasks.put("status", 1048576L);
 
-		columnBitmasks.put("statusByUserName", 2097152L);
+		columnBitmasks.put("statusByUserId", 2097152L);
 
-		columnBitmasks.put("statusDate", 4194304L);
+		columnBitmasks.put("statusByUserName", 4194304L);
+
+		columnBitmasks.put("statusDate", 8388608L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

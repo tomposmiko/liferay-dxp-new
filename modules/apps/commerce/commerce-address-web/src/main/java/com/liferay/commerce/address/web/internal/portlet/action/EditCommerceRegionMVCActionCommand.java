@@ -15,15 +15,14 @@
 package com.liferay.commerce.address.web.internal.portlet.action;
 
 import com.liferay.commerce.constants.CommercePortletKeys;
-import com.liferay.commerce.exception.CommerceRegionNameException;
 import com.liferay.commerce.exception.NoSuchRegionException;
-import com.liferay.commerce.model.CommerceRegion;
-import com.liferay.commerce.service.CommerceRegionService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.RegionNameException;
+import com.liferay.portal.kernel.model.Region;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
-import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.RegionService;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.Constants;
@@ -50,25 +49,21 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class EditCommerceRegionMVCActionCommand extends BaseMVCActionCommand {
 
-	protected void deleteCommerceRegions(ActionRequest actionRequest)
-		throws Exception {
+	protected void deleteRegions(ActionRequest actionRequest) throws Exception {
+		long[] deleteRegionIds = null;
 
-		long[] deleteCommerceRegionIds = null;
+		long regionId = ParamUtil.getLong(actionRequest, "regionId");
 
-		long commerceRegionId = ParamUtil.getLong(
-			actionRequest, "commerceRegionId");
-
-		if (commerceRegionId > 0) {
-			deleteCommerceRegionIds = new long[] {commerceRegionId};
+		if (regionId > 0) {
+			deleteRegionIds = new long[] {regionId};
 		}
 		else {
-			deleteCommerceRegionIds = StringUtil.split(
-				ParamUtil.getString(actionRequest, "deleteCommerceRegionIds"),
-				0L);
+			deleteRegionIds = StringUtil.split(
+				ParamUtil.getString(actionRequest, "deleteRegionIds"), 0L);
 		}
 
-		for (long deleteCommerceRegionId : deleteCommerceRegionIds) {
-			_commerceRegionService.deleteCommerceRegion(deleteCommerceRegionId);
+		for (long deleteRegionId : deleteRegionIds) {
+			_regionService.deleteRegion(deleteRegionId);
 		}
 	}
 
@@ -84,7 +79,7 @@ public class EditCommerceRegionMVCActionCommand extends BaseMVCActionCommand {
 				updateCommerceRegion(actionRequest);
 			}
 			else if (cmd.equals(Constants.DELETE)) {
-				deleteCommerceRegions(actionRequest);
+				deleteRegions(actionRequest);
 			}
 			else if (cmd.equals("setActive")) {
 				setActive(actionRequest);
@@ -98,7 +93,7 @@ public class EditCommerceRegionMVCActionCommand extends BaseMVCActionCommand {
 
 				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
 			}
-			else if (exception instanceof CommerceRegionNameException) {
+			else if (exception instanceof RegionNameException) {
 				hideDefaultErrorMessage(actionRequest);
 				hideDefaultSuccessMessage(actionRequest);
 
@@ -117,50 +112,45 @@ public class EditCommerceRegionMVCActionCommand extends BaseMVCActionCommand {
 	protected void setActive(ActionRequest actionRequest)
 		throws PortalException {
 
-		long commerceRegionId = ParamUtil.getLong(
-			actionRequest, "commerceRegionId");
+		long regionId = ParamUtil.getLong(actionRequest, "regionId");
 
 		boolean active = ParamUtil.getBoolean(actionRequest, "active");
 
-		_commerceRegionService.setActive(commerceRegionId, active);
+		_regionService.updateActive(regionId, active);
 	}
 
-	protected CommerceRegion updateCommerceRegion(ActionRequest actionRequest)
+	protected Region updateCommerceRegion(ActionRequest actionRequest)
 		throws Exception {
 
-		long commerceRegionId = ParamUtil.getLong(
-			actionRequest, "commerceRegionId");
+		long regionId = ParamUtil.getLong(actionRequest, "regionId");
 
-		String name = ParamUtil.getString(actionRequest, "name");
-		String code = ParamUtil.getString(actionRequest, "code");
-		double priority = ParamUtil.getDouble(actionRequest, "priority");
 		boolean active = ParamUtil.getBoolean(actionRequest, "active");
+		String regionCode = ParamUtil.getString(actionRequest, "regionCode");
+		String name = ParamUtil.getString(actionRequest, "name");
+		double position = ParamUtil.getDouble(actionRequest, "position");
 
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			CommerceRegion.class.getName(), actionRequest);
+		Region region = null;
 
-		CommerceRegion commerceRegion = null;
+		if (regionId <= 0) {
+			long countryId = ParamUtil.getLong(actionRequest, "countryId");
 
-		if (commerceRegionId <= 0) {
-			long commerceCountryId = ParamUtil.getLong(
-				actionRequest, "commerceCountryId");
-
-			commerceRegion = _commerceRegionService.addCommerceRegion(
-				commerceCountryId, name, code, priority, active,
-				serviceContext);
+			region = _regionService.addRegion(
+				countryId, active, name, position, regionCode,
+				ServiceContextFactory.getInstance(
+					Region.class.getName(), actionRequest));
 		}
 		else {
-			commerceRegion = _commerceRegionService.updateCommerceRegion(
-				commerceRegionId, name, code, priority, active, serviceContext);
+			region = _regionService.updateRegion(
+				regionId, active, name, position, regionCode);
 		}
 
-		return commerceRegion;
+		return region;
 	}
-
-	@Reference
-	private CommerceRegionService _commerceRegionService;
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private RegionService _regionService;
 
 }

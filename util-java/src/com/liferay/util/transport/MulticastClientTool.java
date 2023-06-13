@@ -14,8 +14,7 @@
 
 package com.liferay.util.transport;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.petra.string.StringBundler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,16 +35,14 @@ public class MulticastClientTool {
 			new MulticastClientTool(args);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			exception.printStackTrace();
 
-			StringBuilder sb = new StringBuilder(4);
-
-			sb.append("Usage: java -classpath util-java.jar ");
-			sb.append(MulticastClientTool.class.getName());
-			sb.append("[-g] [-s] -h [multicastAddress] -p [port] [-b]");
-			sb.append("[bindAddress]");
-
-			System.err.println(sb.toString());
+			System.err.println(
+				StringBundler.concat(
+					"Usage: java -classpath util-java.jar ",
+					MulticastClientTool.class.getName(),
+					"[-g] [-s] -h [multicastAddress] -p [port] [-b] ",
+					"[bindAddress]"));
 
 			System.exit(1);
 		}
@@ -117,8 +114,5 @@ public class MulticastClientTool {
 
 		return argsMap;
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MulticastClientTool.class);
 
 }

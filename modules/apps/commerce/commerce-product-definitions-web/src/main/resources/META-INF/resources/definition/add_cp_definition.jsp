@@ -19,7 +19,7 @@
 <commerce-ui:modal-content
 	title='<%= LanguageUtil.get(request, "create-new-product") %>'
 >
-	<aui:form cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "apiSubmit();" %>'>
+	<aui:form cssClass="container-fluid container-fluid-max-xl" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "apiSubmit();" %>'>
 		<aui:input autoFocus="<%= true %>" name="name" required="<%= true %>" type="text" />
 
 		<label class="control-label" for="catalogId"><%= LanguageUtil.get(request, "catalog") %></label>
@@ -35,7 +35,6 @@
 		var <portlet:namespace />defaultLanguageId = null;
 		var <portlet:namespace />productData = {
 			active: true,
-			productStatus: <%= WorkflowConstants.STATUS_DRAFT %>,
 			productType: '<%= ParamUtil.getString(request, "productTypeName") %>',
 		};
 
@@ -44,7 +43,7 @@
 		Liferay.provide(
 			window,
 			'<portlet:namespace />apiSubmit',
-			function () {
+			() => {
 				ModalUtils.isSubmitting();
 
 				var formattedData = Object.assign(
@@ -61,7 +60,7 @@
 				] = document.getElementById('<portlet:namespace />name').value;
 
 				AdminCatalogResource.createProduct(formattedData)
-					.then(function (cpDefinition) {
+					.then((cpDefinition) => {
 						var redirectURL = new Liferay.PortletURL.createURL(
 							'<%= editProductDefinitionURL %>'
 						);

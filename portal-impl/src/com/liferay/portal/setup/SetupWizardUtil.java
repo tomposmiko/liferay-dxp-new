@@ -83,6 +83,10 @@ public class SetupWizardUtil {
 			return defaultUser.getTimeZoneId();
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return PropsValues.COMPANY_DEFAULT_TIME_ZONE;
 		}
 	}
@@ -145,10 +149,11 @@ public class SetupWizardUtil {
 		CompanyLocalServiceUtil.updateDisplay(
 			PortalInstances.getDefaultCompanyId(), languageId, timeZoneId);
 
-		HttpSession session = httpServletRequest.getSession();
+		HttpSession httpSession = httpServletRequest.getSession();
 
-		session.setAttribute(WebKeys.LOCALE, locale);
-		session.setAttribute(WebKeys.SETUP_WIZARD_DEFAULT_LOCALE, languageId);
+		httpSession.setAttribute(WebKeys.LOCALE, locale);
+		httpSession.setAttribute(
+			WebKeys.SETUP_WIZARD_DEFAULT_LOCALE, languageId);
 
 		LanguageUtil.updateCookie(
 			httpServletRequest, httpServletResponse, locale);
@@ -192,11 +197,11 @@ public class SetupWizardUtil {
 
 		_updateCompanyWebId(httpServletRequest, unicodeProperties);
 
-		HttpSession session = httpServletRequest.getSession();
+		HttpSession httpSession = httpServletRequest.getSession();
 
-		session.setAttribute(
+		httpSession.setAttribute(
 			WebKeys.SETUP_WIZARD_PROPERTIES, unicodeProperties);
-		session.setAttribute(
+		httpSession.setAttribute(
 			WebKeys.SETUP_WIZARD_PROPERTIES_FILE_CREATED,
 			_writePropertiesFile(unicodeProperties));
 	}
@@ -379,13 +384,13 @@ public class SetupWizardUtil {
 			PropsKeys.DEFAULT_ADMIN_EMAIL_ADDRESS_PREFIX,
 			emailAddress.substring(0, index));
 
-		HttpSession session = httpServletRequest.getSession();
+		HttpSession httpSession = httpServletRequest.getSession();
 
-		session.setAttribute(WebKeys.EMAIL_ADDRESS, emailAddress);
-		session.setAttribute(
+		httpSession.setAttribute(WebKeys.EMAIL_ADDRESS, emailAddress);
+		httpSession.setAttribute(
 			WebKeys.SETUP_WIZARD_PASSWORD_UPDATED, Boolean.TRUE);
-		session.setAttribute(WebKeys.USER, user);
-		session.setAttribute(WebKeys.USER_ID, user.getUserId());
+		httpSession.setAttribute(WebKeys.USER, user);
+		httpSession.setAttribute(WebKeys.USER_ID, user.getUserId());
 
 		EventsProcessorUtil.process(
 			PropsKeys.LOGIN_EVENTS_POST, PropsValues.LOGIN_EVENTS_POST,
@@ -448,13 +453,11 @@ public class SetupWizardUtil {
 		company.setWebId(companyDefaultWebId);
 		company.setMx(companyDefaultWebId);
 
-		company = CompanyLocalServiceUtil.updateCompany(company);
-
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		themeDisplay.setCompany(company);
+		themeDisplay.setCompany(CompanyLocalServiceUtil.updateCompany(company));
 	}
 
 	private static boolean _writePropertiesFile(

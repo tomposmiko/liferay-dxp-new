@@ -3,9 +3,9 @@
 exports[`Field DocumentLibrary has a helptext 1`] = `
 <div>
   <div
-    aria-labelledby="textField_fieldDetails"
-    class="form-group hide"
-    data-field-name="textField"
+    aria-labelledby="uploadField_fieldDetails"
+    class="form-group has-error hide"
+    data-field-name="uploadField"
     tabindex="0"
   >
     <div
@@ -19,9 +19,9 @@ exports[`Field DocumentLibrary has a helptext 1`] = `
         >
           <input
             aria-label="file"
-            class="form-control field"
+            class="form-control bg-light field"
             disabled=""
-            id="textFieldinputFile"
+            id="uploadFieldinputFile"
             type="text"
             value=""
           />
@@ -31,6 +31,7 @@ exports[`Field DocumentLibrary has a helptext 1`] = `
         >
           <button
             class="select-button btn btn-secondary"
+            disabled=""
             type="button"
           >
             <span
@@ -42,25 +43,39 @@ exports[`Field DocumentLibrary has a helptext 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
-        name="textField"
+        name="uploadField"
         type="hidden"
         value="{}"
       />
     </div>
+    <input
+      name="uploadField_edited"
+      type="hidden"
+      value="false"
+    />
     <span
       aria-hidden="true"
       class="form-text"
-      id="textField_fieldHelp"
     >
       Type something
     </span>
     <span
+      class="form-feedback-group"
+    >
+      <div
+        aria-hidden="true"
+        class="form-feedback-item"
+      >
+         you-need-to-be-signed-in-to-edit-this-field
+      </div>
+    </span>
+    <span
       class="sr-only"
-      id="textField_fieldDetails"
+      id="uploadField_fieldDetails"
     >
       Type something
       <br />
+       you-need-to-be-signed-in-to-edit-this-field
     </span>
   </div>
 </div>
@@ -69,12 +84,13 @@ exports[`Field DocumentLibrary has a helptext 1`] = `
 exports[`Field DocumentLibrary has a label 1`] = `
 <div>
   <div
-    class="form-group hide"
-    data-field-name="textField"
+    class="form-group has-error hide"
+    data-field-name="uploadField"
   >
     <label
-      aria-labelledby="textField_fieldDetails"
+      aria-labelledby="uploadField_fieldDetails"
       class="ddm-label"
+      for="uploadField"
       tabindex="0"
     >
       label
@@ -90,9 +106,9 @@ exports[`Field DocumentLibrary has a label 1`] = `
         >
           <input
             aria-label="file"
-            class="form-control field"
+            class="form-control bg-light field"
             disabled=""
-            id="textFieldinputFile"
+            id="uploadFieldinputFile"
             type="text"
             value=""
           />
@@ -102,6 +118,7 @@ exports[`Field DocumentLibrary has a label 1`] = `
         >
           <button
             class="select-button btn btn-secondary"
+            disabled=""
             type="button"
           >
             <span
@@ -113,18 +130,31 @@ exports[`Field DocumentLibrary has a label 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
-        name="textField"
+        name="uploadField"
         type="hidden"
         value="{}"
       />
     </div>
+    <input
+      name="uploadField_edited"
+      type="hidden"
+      value="false"
+    />
+    <span
+      class="form-feedback-group"
+    >
+      <div
+        aria-hidden="true"
+        class="form-feedback-item"
+      >
+         you-need-to-be-signed-in-to-edit-this-field
+      </div>
+    </span>
     <span
       class="sr-only"
-      id="textField_fieldDetails"
+      id="uploadField_fieldDetails"
     >
-      label
-      <br />
+       you-need-to-be-signed-in-to-edit-this-field
     </span>
   </div>
 </div>
@@ -133,9 +163,9 @@ exports[`Field DocumentLibrary has a label 1`] = `
 exports[`Field DocumentLibrary has a placeholder 1`] = `
 <div>
   <div
-    aria-labelledby="textField_fieldDetails"
-    class="form-group hide"
-    data-field-name="textField"
+    aria-labelledby="uploadField_fieldDetails"
+    class="form-group has-error hide"
+    data-field-name="uploadField"
     tabindex="0"
   >
     <div
@@ -149,9 +179,9 @@ exports[`Field DocumentLibrary has a placeholder 1`] = `
         >
           <input
             aria-label="file"
-            class="form-control field"
+            class="form-control bg-light field"
             disabled=""
-            id="textFieldinputFile"
+            id="uploadFieldinputFile"
             type="text"
             value=""
           />
@@ -161,6 +191,7 @@ exports[`Field DocumentLibrary has a placeholder 1`] = `
         >
           <button
             class="select-button btn btn-secondary"
+            disabled=""
             type="button"
           >
             <span
@@ -172,14 +203,33 @@ exports[`Field DocumentLibrary has a placeholder 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
-        name="textField"
+        name="uploadField"
         placeholder="Placeholder"
         type="hidden"
         value="{}"
       />
     </div>
-    
+    <input
+      name="uploadField_edited"
+      type="hidden"
+      value="false"
+    />
+    <span
+      class="form-feedback-group"
+    >
+      <div
+        aria-hidden="true"
+        class="form-feedback-item"
+      >
+         you-need-to-be-signed-in-to-edit-this-field
+      </div>
+    </span>
+    <span
+      class="sr-only"
+      id="uploadField_fieldDetails"
+    >
+       you-need-to-be-signed-in-to-edit-this-field
+    </span>
   </div>
 </div>
 `;
@@ -187,9 +237,9 @@ exports[`Field DocumentLibrary has a placeholder 1`] = `
 exports[`Field DocumentLibrary has a spritemap 1`] = `
 <div>
   <div
-    aria-labelledby="textField_fieldDetails"
-    class="form-group hide"
-    data-field-name="textField"
+    aria-labelledby="uploadField_fieldDetails"
+    class="form-group has-error hide"
+    data-field-name="uploadField"
     tabindex="0"
   >
     <div
@@ -203,9 +253,9 @@ exports[`Field DocumentLibrary has a spritemap 1`] = `
         >
           <input
             aria-label="file"
-            class="form-control field"
+            class="form-control bg-light field"
             disabled=""
-            id="textFieldinputFile"
+            id="uploadFieldinputFile"
             type="text"
             value=""
           />
@@ -215,6 +265,7 @@ exports[`Field DocumentLibrary has a spritemap 1`] = `
         >
           <button
             class="select-button btn btn-secondary"
+            disabled=""
             type="button"
           >
             <span
@@ -226,13 +277,32 @@ exports[`Field DocumentLibrary has a spritemap 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
-        name="textField"
+        name="uploadField"
         type="hidden"
         value="{}"
       />
     </div>
-    
+    <input
+      name="uploadField_edited"
+      type="hidden"
+      value="false"
+    />
+    <span
+      class="form-feedback-group"
+    >
+      <div
+        aria-hidden="true"
+        class="form-feedback-item"
+      >
+         you-need-to-be-signed-in-to-edit-this-field
+      </div>
+    </span>
+    <span
+      class="sr-only"
+      id="uploadField_fieldDetails"
+    >
+       you-need-to-be-signed-in-to-edit-this-field
+    </span>
   </div>
 </div>
 `;
@@ -240,9 +310,9 @@ exports[`Field DocumentLibrary has a spritemap 1`] = `
 exports[`Field DocumentLibrary has a value 1`] = `
 <div>
   <div
-    aria-labelledby="textField_fieldDetails"
-    class="form-group hide"
-    data-field-name="textField"
+    aria-labelledby="uploadField_fieldDetails"
+    class="form-group has-error hide"
+    data-field-name="uploadField"
     tabindex="0"
   >
     <div
@@ -256,9 +326,9 @@ exports[`Field DocumentLibrary has a value 1`] = `
         >
           <input
             aria-label="file"
-            class="form-control field"
+            class="form-control bg-light field"
             disabled=""
-            id="textFieldinputFile"
+            id="uploadFieldinputFile"
             type="text"
             value=""
           />
@@ -268,6 +338,7 @@ exports[`Field DocumentLibrary has a value 1`] = `
         >
           <button
             class="select-button btn btn-secondary"
+            disabled=""
             type="button"
           >
             <span
@@ -279,13 +350,32 @@ exports[`Field DocumentLibrary has a value 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
-        name="textField"
+        name="uploadField"
         type="hidden"
         value="{\\"id\\":\\"123\\"}"
       />
     </div>
-    
+    <input
+      name="uploadField_edited"
+      type="hidden"
+      value="false"
+    />
+    <span
+      class="form-feedback-group"
+    >
+      <div
+        aria-hidden="true"
+        class="form-feedback-item"
+      >
+         you-need-to-be-signed-in-to-edit-this-field
+      </div>
+    </span>
+    <span
+      class="sr-only"
+      id="uploadField_fieldDetails"
+    >
+       you-need-to-be-signed-in-to-edit-this-field
+    </span>
   </div>
 </div>
 `;
@@ -294,8 +384,8 @@ exports[`Field DocumentLibrary has an id 1`] = `
 <div>
   <div
     aria-labelledby="ID_fieldDetails"
-    class="form-group hide"
-    data-field-name="textField"
+    class="form-group has-error hide"
+    data-field-name="uploadField"
     tabindex="0"
   >
     <div
@@ -309,9 +399,9 @@ exports[`Field DocumentLibrary has an id 1`] = `
         >
           <input
             aria-label="file"
-            class="form-control field"
+            class="form-control bg-light field"
             disabled=""
-            id="textFieldinputFile"
+            id="uploadFieldinputFile"
             type="text"
             value=""
           />
@@ -321,6 +411,7 @@ exports[`Field DocumentLibrary has an id 1`] = `
         >
           <button
             class="select-button btn btn-secondary"
+            disabled=""
             type="button"
           >
             <span
@@ -332,14 +423,33 @@ exports[`Field DocumentLibrary has an id 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
         id="ID"
-        name="textField"
+        name="uploadField"
         type="hidden"
         value="{}"
       />
     </div>
-    
+    <input
+      name="uploadField_edited"
+      type="hidden"
+      value="false"
+    />
+    <span
+      class="form-feedback-group"
+    >
+      <div
+        aria-hidden="true"
+        class="form-feedback-item"
+      >
+         you-need-to-be-signed-in-to-edit-this-field
+      </div>
+    </span>
+    <span
+      class="sr-only"
+      id="ID_fieldDetails"
+    >
+       you-need-to-be-signed-in-to-edit-this-field
+    </span>
   </div>
 </div>
 `;
@@ -347,9 +457,9 @@ exports[`Field DocumentLibrary has an id 1`] = `
 exports[`Field DocumentLibrary is not readOnly 1`] = `
 <div>
   <div
-    aria-labelledby="textField_fieldDetails"
+    aria-labelledby="uploadField_fieldDetails"
     class="form-group hide"
-    data-field-name="textField"
+    data-field-name="uploadField"
     tabindex="0"
   >
     <div
@@ -363,9 +473,8 @@ exports[`Field DocumentLibrary is not readOnly 1`] = `
         >
           <input
             aria-label="file"
-            class="form-control field"
-            disabled=""
-            id="textFieldinputFile"
+            class="form-control bg-light field"
+            id="uploadFieldinputFile"
             type="text"
             value=""
           />
@@ -386,12 +495,16 @@ exports[`Field DocumentLibrary is not readOnly 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
-        name="textField"
+        name="uploadField"
         type="hidden"
         value="{}"
       />
     </div>
+    <input
+      name="uploadField_edited"
+      type="hidden"
+      value="false"
+    />
     
   </div>
 </div>
@@ -400,9 +513,9 @@ exports[`Field DocumentLibrary is not readOnly 1`] = `
 exports[`Field DocumentLibrary is not required 1`] = `
 <div>
   <div
-    aria-labelledby="textField_fieldDetails"
-    class="form-group hide"
-    data-field-name="textField"
+    aria-labelledby="uploadField_fieldDetails"
+    class="form-group has-error hide"
+    data-field-name="uploadField"
     tabindex="0"
   >
     <div
@@ -416,9 +529,9 @@ exports[`Field DocumentLibrary is not required 1`] = `
         >
           <input
             aria-label="file"
-            class="form-control field"
+            class="form-control bg-light field"
             disabled=""
-            id="textFieldinputFile"
+            id="uploadFieldinputFile"
             type="text"
             value=""
           />
@@ -428,6 +541,7 @@ exports[`Field DocumentLibrary is not required 1`] = `
         >
           <button
             class="select-button btn btn-secondary"
+            disabled=""
             type="button"
           >
             <span
@@ -439,13 +553,32 @@ exports[`Field DocumentLibrary is not required 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
-        name="textField"
+        name="uploadField"
         type="hidden"
         value="{}"
       />
     </div>
-    
+    <input
+      name="uploadField_edited"
+      type="hidden"
+      value="false"
+    />
+    <span
+      class="form-feedback-group"
+    >
+      <div
+        aria-hidden="true"
+        class="form-feedback-item"
+      >
+         you-need-to-be-signed-in-to-edit-this-field
+      </div>
+    </span>
+    <span
+      class="sr-only"
+      id="uploadField_fieldDetails"
+    >
+       you-need-to-be-signed-in-to-edit-this-field
+    </span>
   </div>
 </div>
 `;
@@ -453,12 +586,13 @@ exports[`Field DocumentLibrary is not required 1`] = `
 exports[`Field DocumentLibrary renders Label if showLabel is true 1`] = `
 <div>
   <div
-    class="form-group hide"
-    data-field-name="textField"
+    class="form-group has-error hide"
+    data-field-name="uploadField"
   >
     <label
-      aria-labelledby="textField_fieldDetails"
+      aria-labelledby="uploadField_fieldDetails"
       class="ddm-label"
+      for="uploadField"
       tabindex="0"
     >
       text
@@ -474,9 +608,9 @@ exports[`Field DocumentLibrary renders Label if showLabel is true 1`] = `
         >
           <input
             aria-label="file"
-            class="form-control field"
+            class="form-control bg-light field"
             disabled=""
-            id="textFieldinputFile"
+            id="uploadFieldinputFile"
             type="text"
             value=""
           />
@@ -486,6 +620,7 @@ exports[`Field DocumentLibrary renders Label if showLabel is true 1`] = `
         >
           <button
             class="select-button btn btn-secondary"
+            disabled=""
             type="button"
           >
             <span
@@ -497,18 +632,31 @@ exports[`Field DocumentLibrary renders Label if showLabel is true 1`] = `
         </div>
       </div>
       <input
-        class="form-control"
-        name="textField"
+        name="uploadField"
         type="hidden"
         value="{}"
       />
     </div>
+    <input
+      name="uploadField_edited"
+      type="hidden"
+      value="false"
+    />
+    <span
+      class="form-feedback-group"
+    >
+      <div
+        aria-hidden="true"
+        class="form-feedback-item"
+      >
+         you-need-to-be-signed-in-to-edit-this-field
+      </div>
+    </span>
     <span
       class="sr-only"
-      id="textField_fieldDetails"
+      id="uploadField_fieldDetails"
     >
-      text
-      <br />
+       you-need-to-be-signed-in-to-edit-this-field
     </span>
   </div>
 </div>

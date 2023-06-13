@@ -21,6 +21,7 @@ import com.liferay.blogs.web.internal.info.item.BlogsEntryInfoItemFields;
 import com.liferay.expando.info.item.provider.ExpandoInfoItemFieldSetProvider;
 import com.liferay.info.exception.NoSuchInfoItemException;
 import com.liferay.info.field.InfoFieldValue;
+import com.liferay.info.item.ClassPKInfoItemIdentifier;
 import com.liferay.info.item.InfoItemFieldValues;
 import com.liferay.info.item.InfoItemReference;
 import com.liferay.info.item.field.reader.InfoItemFieldReaderFieldSetProvider;
@@ -28,10 +29,12 @@ import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.type.WebImage;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.template.info.item.provider.TemplateInfoItemFieldSetProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +69,9 @@ public class BlogsEntryInfoItemFieldValuesProvider
 			).infoFieldValues(
 				_infoItemFieldReaderFieldSetProvider.getInfoFieldValues(
 					BlogsEntry.class.getName(), blogsEntry)
+			).infoFieldValues(
+				_templateInfoItemFieldSetProvider.getInfoFieldValues(
+					BlogsEntry.class.getName(), blogsEntry)
 			).infoItemReference(
 				new InfoItemReference(
 					BlogsEntry.class.getName(), blogsEntry.getEntryId())
@@ -89,20 +95,30 @@ public class BlogsEntryInfoItemFieldValuesProvider
 				new InfoFieldValue<>(
 					BlogsEntryInfoItemFields.titleInfoField,
 					blogsEntry.getTitle()));
-
 			blogsEntryFieldValues.add(
 				new InfoFieldValue<>(
 					BlogsEntryInfoItemFields.subtitleInfoField,
 					blogsEntry.getSubtitle()));
-
 			blogsEntryFieldValues.add(
 				new InfoFieldValue<>(
 					BlogsEntryInfoItemFields.descriptionInfoField,
 					blogsEntry.getDescription()));
+			blogsEntryFieldValues.add(
+				new InfoFieldValue<>(
+					BlogsEntryInfoItemFields.createDateInfoField,
+					blogsEntry.getCreateDate()));
+			blogsEntryFieldValues.add(
+				new InfoFieldValue<>(
+					BlogsEntryInfoItemFields.modifiedDateInfoField,
+					blogsEntry.getModifiedDate()));
 
 			if (themeDisplay != null) {
 				WebImage smallWebImage = new WebImage(
-					blogsEntry.getSmallImageURL(themeDisplay));
+					blogsEntry.getSmallImageURL(themeDisplay),
+					new InfoItemReference(
+						FileEntry.class.getName(),
+						new ClassPKInfoItemIdentifier(
+							blogsEntry.getSmallImageFileEntryId())));
 
 				smallWebImage.setAlt(blogsEntry.getSmallImageAlt());
 
@@ -112,7 +128,11 @@ public class BlogsEntryInfoItemFieldValuesProvider
 						smallWebImage));
 
 				WebImage coverWebImage = new WebImage(
-					blogsEntry.getCoverImageURL(themeDisplay));
+					blogsEntry.getCoverImageURL(themeDisplay),
+					new InfoItemReference(
+						FileEntry.class.getName(),
+						new ClassPKInfoItemIdentifier(
+							blogsEntry.getCoverImageFileEntryId())));
 
 				coverWebImage.setAlt(blogsEntry.getCoverImageAlt());
 
@@ -152,6 +172,10 @@ public class BlogsEntryInfoItemFieldValuesProvider
 			blogsEntryFieldValues.add(
 				new InfoFieldValue<>(
 					BlogsEntryInfoItemFields.displayDateInfoField,
+					blogsEntry.getDisplayDate()));
+			blogsEntryFieldValues.add(
+				new InfoFieldValue<>(
+					BlogsEntryInfoItemFields.publishDateInfoField,
 					blogsEntry.getDisplayDate()));
 
 			if (themeDisplay != null) {
@@ -206,6 +230,9 @@ public class BlogsEntryInfoItemFieldValuesProvider
 	@Reference
 	private InfoItemFieldReaderFieldSetProvider
 		_infoItemFieldReaderFieldSetProvider;
+
+	@Reference
+	private TemplateInfoItemFieldSetProvider _templateInfoItemFieldSetProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

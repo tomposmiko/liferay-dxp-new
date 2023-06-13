@@ -24,9 +24,7 @@ import java.lang.annotation.Target;
 /**
  * @author László Csontos
  * @author Shuyang Zhou
- * @deprecated As of Athanasius (7.3.x), replaced by DynamicDataSource
  */
-@Deprecated
 @Documented
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)

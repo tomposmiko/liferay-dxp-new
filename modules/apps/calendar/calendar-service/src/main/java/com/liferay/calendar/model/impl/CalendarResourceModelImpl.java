@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -83,15 +84,15 @@ public class CalendarResourceModelImpl
 	public static final String TABLE_NAME = "CalendarResource";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
-		{"calendarResourceId", Types.BIGINT}, {"groupId", Types.BIGINT},
-		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
-		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
-		{"modifiedDate", Types.TIMESTAMP}, {"classNameId", Types.BIGINT},
-		{"classPK", Types.BIGINT}, {"classUuid", Types.VARCHAR},
-		{"code_", Types.VARCHAR}, {"name", Types.VARCHAR},
-		{"description", Types.VARCHAR}, {"active_", Types.BOOLEAN},
-		{"lastPublishDate", Types.TIMESTAMP}
+		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
+		{"uuid_", Types.VARCHAR}, {"calendarResourceId", Types.BIGINT},
+		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
+		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
+		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
+		{"classNameId", Types.BIGINT}, {"classPK", Types.BIGINT},
+		{"classUuid", Types.VARCHAR}, {"code_", Types.VARCHAR},
+		{"name", Types.VARCHAR}, {"description", Types.VARCHAR},
+		{"active_", Types.BOOLEAN}, {"lastPublishDate", Types.TIMESTAMP}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -99,6 +100,7 @@ public class CalendarResourceModelImpl
 
 	static {
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("calendarResourceId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
@@ -118,7 +120,7 @@ public class CalendarResourceModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CalendarResource (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,calendarResourceId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,classUuid VARCHAR(75) null,code_ VARCHAR(75) null,name STRING null,description STRING null,active_ BOOLEAN,lastPublishDate DATE null)";
+		"create table CalendarResource (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,uuid_ VARCHAR(75) null,calendarResourceId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,classUuid VARCHAR(75) null,code_ VARCHAR(75) null,name STRING null,description STRING null,active_ BOOLEAN,lastPublishDate DATE null,primary key (calendarResourceId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP = "drop table CalendarResource";
 
@@ -206,6 +208,7 @@ public class CalendarResourceModelImpl
 		CalendarResource model = new CalendarResourceImpl();
 
 		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
 		model.setUuid(soapModel.getUuid());
 		model.setCalendarResourceId(soapModel.getCalendarResourceId());
 		model.setGroupId(soapModel.getGroupId());
@@ -336,114 +339,142 @@ public class CalendarResourceModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CalendarResource>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CalendarResource.class.getClassLoader(), CalendarResource.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<CalendarResource> constructor =
+				(Constructor<CalendarResource>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<CalendarResource, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CalendarResource, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CalendarResource, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<CalendarResource, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", CalendarResource::getMvccVersion);
-		attributeGetterFunctions.put("uuid", CalendarResource::getUuid);
-		attributeGetterFunctions.put(
-			"calendarResourceId", CalendarResource::getCalendarResourceId);
-		attributeGetterFunctions.put("groupId", CalendarResource::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CalendarResource::getCompanyId);
-		attributeGetterFunctions.put("userId", CalendarResource::getUserId);
-		attributeGetterFunctions.put("userName", CalendarResource::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CalendarResource::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CalendarResource::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", CalendarResource::getClassNameId);
-		attributeGetterFunctions.put("classPK", CalendarResource::getClassPK);
-		attributeGetterFunctions.put(
-			"classUuid", CalendarResource::getClassUuid);
-		attributeGetterFunctions.put("code", CalendarResource::getCode);
-		attributeGetterFunctions.put("name", CalendarResource::getName);
-		attributeGetterFunctions.put(
-			"description", CalendarResource::getDescription);
-		attributeGetterFunctions.put("active", CalendarResource::getActive);
-		attributeGetterFunctions.put(
-			"lastPublishDate", CalendarResource::getLastPublishDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CalendarResource, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CalendarResource, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<CalendarResource, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CalendarResource::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<CalendarResource, Long>)
 				CalendarResource::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CalendarResource::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<CalendarResource, Long>)
+				CalendarResource::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", CalendarResource::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CalendarResource, String>)CalendarResource::setUuid);
+		attributeGetterFunctions.put(
+			"calendarResourceId", CalendarResource::getCalendarResourceId);
 		attributeSetterBiConsumers.put(
 			"calendarResourceId",
 			(BiConsumer<CalendarResource, Long>)
 				CalendarResource::setCalendarResourceId);
+		attributeGetterFunctions.put("groupId", CalendarResource::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CalendarResource, Long>)CalendarResource::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CalendarResource::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CalendarResource, Long>)CalendarResource::setCompanyId);
+		attributeGetterFunctions.put("userId", CalendarResource::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CalendarResource, Long>)CalendarResource::setUserId);
+		attributeGetterFunctions.put("userName", CalendarResource::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CalendarResource, String>)
 				CalendarResource::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CalendarResource::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CalendarResource, Date>)
 				CalendarResource::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CalendarResource::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CalendarResource, Date>)
 				CalendarResource::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", CalendarResource::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<CalendarResource, Long>)
 				CalendarResource::setClassNameId);
+		attributeGetterFunctions.put("classPK", CalendarResource::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<CalendarResource, Long>)CalendarResource::setClassPK);
+		attributeGetterFunctions.put(
+			"classUuid", CalendarResource::getClassUuid);
 		attributeSetterBiConsumers.put(
 			"classUuid",
 			(BiConsumer<CalendarResource, String>)
 				CalendarResource::setClassUuid);
+		attributeGetterFunctions.put("code", CalendarResource::getCode);
 		attributeSetterBiConsumers.put(
 			"code",
 			(BiConsumer<CalendarResource, String>)CalendarResource::setCode);
+		attributeGetterFunctions.put("name", CalendarResource::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CalendarResource, String>)CalendarResource::setName);
+		attributeGetterFunctions.put(
+			"description", CalendarResource::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<CalendarResource, String>)
 				CalendarResource::setDescription);
+		attributeGetterFunctions.put("active", CalendarResource::getActive);
 		attributeSetterBiConsumers.put(
 			"active",
 			(BiConsumer<CalendarResource, Boolean>)CalendarResource::setActive);
+		attributeGetterFunctions.put(
+			"lastPublishDate", CalendarResource::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<CalendarResource, Date>)
 				CalendarResource::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -461,6 +492,21 @@ public class CalendarResourceModelImpl
 		}
 
 		_mvccVersion = mvccVersion;
+	}
+
+	@JSON
+	@Override
+	public long getCtCollectionId() {
+		return _ctCollectionId;
+	}
+
+	@Override
+	public void setCtCollectionId(long ctCollectionId) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_ctCollectionId = ctCollectionId;
 	}
 
 	@JSON
@@ -1178,6 +1224,7 @@ public class CalendarResourceModelImpl
 		CalendarResourceImpl calendarResourceImpl = new CalendarResourceImpl();
 
 		calendarResourceImpl.setMvccVersion(getMvccVersion());
+		calendarResourceImpl.setCtCollectionId(getCtCollectionId());
 		calendarResourceImpl.setUuid(getUuid());
 		calendarResourceImpl.setCalendarResourceId(getCalendarResourceId());
 		calendarResourceImpl.setGroupId(getGroupId());
@@ -1196,6 +1243,50 @@ public class CalendarResourceModelImpl
 		calendarResourceImpl.setLastPublishDate(getLastPublishDate());
 
 		calendarResourceImpl.resetOriginalValues();
+
+		return calendarResourceImpl;
+	}
+
+	@Override
+	public CalendarResource cloneWithOriginalValues() {
+		CalendarResourceImpl calendarResourceImpl = new CalendarResourceImpl();
+
+		calendarResourceImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		calendarResourceImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		calendarResourceImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		calendarResourceImpl.setCalendarResourceId(
+			this.<Long>getColumnOriginalValue("calendarResourceId"));
+		calendarResourceImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		calendarResourceImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		calendarResourceImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		calendarResourceImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		calendarResourceImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		calendarResourceImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		calendarResourceImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		calendarResourceImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		calendarResourceImpl.setClassUuid(
+			this.<String>getColumnOriginalValue("classUuid"));
+		calendarResourceImpl.setCode(
+			this.<String>getColumnOriginalValue("code_"));
+		calendarResourceImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		calendarResourceImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		calendarResourceImpl.setActive(
+			this.<Boolean>getColumnOriginalValue("active_"));
+		calendarResourceImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
 
 		return calendarResourceImpl;
 	}
@@ -1273,6 +1364,8 @@ public class CalendarResourceModelImpl
 			new CalendarResourceCacheModel();
 
 		calendarResourceCacheModel.mvccVersion = getMvccVersion();
+
+		calendarResourceCacheModel.ctCollectionId = getCtCollectionId();
 
 		calendarResourceCacheModel.uuid = getUuid();
 
@@ -1451,13 +1544,12 @@ public class CalendarResourceModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CalendarResource>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CalendarResource.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
 	private long _mvccVersion;
+	private long _ctCollectionId;
 	private String _uuid;
 	private long _calendarResourceId;
 	private long _groupId;
@@ -1508,6 +1600,7 @@ public class CalendarResourceModelImpl
 		_columnOriginalValues = new HashMap<String, Object>();
 
 		_columnOriginalValues.put("mvccVersion", _mvccVersion);
+		_columnOriginalValues.put("ctCollectionId", _ctCollectionId);
 		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put("calendarResourceId", _calendarResourceId);
 		_columnOriginalValues.put("groupId", _groupId);
@@ -1551,37 +1644,39 @@ public class CalendarResourceModelImpl
 
 		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("uuid_", 2L);
+		columnBitmasks.put("ctCollectionId", 2L);
 
-		columnBitmasks.put("calendarResourceId", 4L);
+		columnBitmasks.put("uuid_", 4L);
 
-		columnBitmasks.put("groupId", 8L);
+		columnBitmasks.put("calendarResourceId", 8L);
 
-		columnBitmasks.put("companyId", 16L);
+		columnBitmasks.put("groupId", 16L);
 
-		columnBitmasks.put("userId", 32L);
+		columnBitmasks.put("companyId", 32L);
 
-		columnBitmasks.put("userName", 64L);
+		columnBitmasks.put("userId", 64L);
 
-		columnBitmasks.put("createDate", 128L);
+		columnBitmasks.put("userName", 128L);
 
-		columnBitmasks.put("modifiedDate", 256L);
+		columnBitmasks.put("createDate", 256L);
 
-		columnBitmasks.put("classNameId", 512L);
+		columnBitmasks.put("modifiedDate", 512L);
 
-		columnBitmasks.put("classPK", 1024L);
+		columnBitmasks.put("classNameId", 1024L);
 
-		columnBitmasks.put("classUuid", 2048L);
+		columnBitmasks.put("classPK", 2048L);
 
-		columnBitmasks.put("code_", 4096L);
+		columnBitmasks.put("classUuid", 4096L);
 
-		columnBitmasks.put("name", 8192L);
+		columnBitmasks.put("code_", 8192L);
 
-		columnBitmasks.put("description", 16384L);
+		columnBitmasks.put("name", 16384L);
 
-		columnBitmasks.put("active_", 32768L);
+		columnBitmasks.put("description", 32768L);
 
-		columnBitmasks.put("lastPublishDate", 65536L);
+		columnBitmasks.put("active_", 65536L);
+
+		columnBitmasks.put("lastPublishDate", 131072L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

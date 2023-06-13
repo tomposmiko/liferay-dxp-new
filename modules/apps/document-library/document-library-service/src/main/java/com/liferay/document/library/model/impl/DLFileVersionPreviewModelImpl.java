@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -229,79 +230,101 @@ public class DLFileVersionPreviewModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, DLFileVersionPreview>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DLFileVersionPreview.class.getClassLoader(),
+			DLFileVersionPreview.class, ModelWrapper.class);
+
+		try {
+			Constructor<DLFileVersionPreview> constructor =
+				(Constructor<DLFileVersionPreview>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<DLFileVersionPreview, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DLFileVersionPreview, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<DLFileVersionPreview, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<DLFileVersionPreview, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", DLFileVersionPreview::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", DLFileVersionPreview::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"dlFileVersionPreviewId",
-			DLFileVersionPreview::getDlFileVersionPreviewId);
-		attributeGetterFunctions.put(
-			"groupId", DLFileVersionPreview::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", DLFileVersionPreview::getCompanyId);
-		attributeGetterFunctions.put(
-			"fileEntryId", DLFileVersionPreview::getFileEntryId);
-		attributeGetterFunctions.put(
-			"fileVersionId", DLFileVersionPreview::getFileVersionId);
-		attributeGetterFunctions.put(
-			"previewStatus", DLFileVersionPreview::getPreviewStatus);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<DLFileVersionPreview, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<DLFileVersionPreview, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<DLFileVersionPreview, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", DLFileVersionPreview::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DLFileVersionPreview, Long>)
 				DLFileVersionPreview::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", DLFileVersionPreview::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<DLFileVersionPreview, Long>)
 				DLFileVersionPreview::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"dlFileVersionPreviewId",
+			DLFileVersionPreview::getDlFileVersionPreviewId);
 		attributeSetterBiConsumers.put(
 			"dlFileVersionPreviewId",
 			(BiConsumer<DLFileVersionPreview, Long>)
 				DLFileVersionPreview::setDlFileVersionPreviewId);
+		attributeGetterFunctions.put(
+			"groupId", DLFileVersionPreview::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<DLFileVersionPreview, Long>)
 				DLFileVersionPreview::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", DLFileVersionPreview::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DLFileVersionPreview, Long>)
 				DLFileVersionPreview::setCompanyId);
+		attributeGetterFunctions.put(
+			"fileEntryId", DLFileVersionPreview::getFileEntryId);
 		attributeSetterBiConsumers.put(
 			"fileEntryId",
 			(BiConsumer<DLFileVersionPreview, Long>)
 				DLFileVersionPreview::setFileEntryId);
+		attributeGetterFunctions.put(
+			"fileVersionId", DLFileVersionPreview::getFileVersionId);
 		attributeSetterBiConsumers.put(
 			"fileVersionId",
 			(BiConsumer<DLFileVersionPreview, Long>)
 				DLFileVersionPreview::setFileVersionId);
+		attributeGetterFunctions.put(
+			"previewStatus", DLFileVersionPreview::getPreviewStatus);
 		attributeSetterBiConsumers.put(
 			"previewStatus",
 			(BiConsumer<DLFileVersionPreview, Integer>)
 				DLFileVersionPreview::setPreviewStatus);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -522,6 +545,31 @@ public class DLFileVersionPreviewModelImpl
 	}
 
 	@Override
+	public DLFileVersionPreview cloneWithOriginalValues() {
+		DLFileVersionPreviewImpl dlFileVersionPreviewImpl =
+			new DLFileVersionPreviewImpl();
+
+		dlFileVersionPreviewImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		dlFileVersionPreviewImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		dlFileVersionPreviewImpl.setDlFileVersionPreviewId(
+			this.<Long>getColumnOriginalValue("dlFileVersionPreviewId"));
+		dlFileVersionPreviewImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		dlFileVersionPreviewImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		dlFileVersionPreviewImpl.setFileEntryId(
+			this.<Long>getColumnOriginalValue("fileEntryId"));
+		dlFileVersionPreviewImpl.setFileVersionId(
+			this.<Long>getColumnOriginalValue("fileVersionId"));
+		dlFileVersionPreviewImpl.setPreviewStatus(
+			this.<Integer>getColumnOriginalValue("previewStatus"));
+
+		return dlFileVersionPreviewImpl;
+	}
+
+	@Override
 	public int compareTo(DLFileVersionPreview dlFileVersionPreview) {
 		int value = 0;
 
@@ -711,9 +759,7 @@ public class DLFileVersionPreviewModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DLFileVersionPreview>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DLFileVersionPreview.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

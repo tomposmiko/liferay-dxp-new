@@ -14,9 +14,6 @@
 
 package com.liferay.dynamic.data.mapping.internal.notification;
 
-import com.google.template.soy.data.SanitizedContent;
-import com.google.template.soy.data.UnsafeSanitizedContentOrdainer;
-
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.field.type.DefaultDDMFormFieldValueRenderer;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
@@ -30,9 +27,6 @@ import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.template.soy.data.SoyDataFactory;
-import com.liferay.portal.template.soy.data.SoyHTMLData;
-import com.liferay.portal.template.soy.util.SoyRawData;
 import com.liferay.portal.util.HtmlImpl;
 
 import java.util.Arrays;
@@ -204,33 +198,6 @@ public class DDMFormEmailNotificationSenderTest {
 			"_ddmFormFieldTypeServicesTracker"
 		).set(
 			_ddmFormEmailNotificationSender, _ddmFormFieldTypeServicesTracker
-		);
-
-		MemberMatcher.field(
-			DDMFormEmailNotificationSender.class, "_soyDataFactory"
-		).set(
-			_ddmFormEmailNotificationSender,
-			new SoyDataFactory() {
-
-				@Override
-				public SoyHTMLData createSoyHTMLData(String html) {
-					return null;
-				}
-
-				@Override
-				public SoyRawData createSoyRawData(String html) {
-					return new SoyRawData() {
-
-						@Override
-						public Object getValue() {
-							return UnsafeSanitizedContentOrdainer.ordainAsSafe(
-								html, SanitizedContent.ContentKind.HTML);
-						}
-
-					};
-				}
-
-			}
 		);
 	}
 

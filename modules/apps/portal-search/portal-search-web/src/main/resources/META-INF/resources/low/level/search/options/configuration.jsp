@@ -54,7 +54,7 @@ LowLevelSearchOptionsPortletPreferences lowLevelSearchOptionsPortletPreferences 
 	<liferay-frontend:edit-form-body>
 		<liferay-frontend:fieldset-group>
 			<aui:fieldset>
-				<aui:select helpMessage="connection-id-help" label="connection-id" name="<%= PortletPreferencesJspUtil.getInputName(LowLevelSearchOptionsPortletPreferences.PREFERENCE_KEY_CONNECTION_ID) %>">
+				<aui:select helpMessage="connection-id-help[web]" label="connection-id" name="<%= PortletPreferencesJspUtil.getInputName(LowLevelSearchOptionsPortletPreferences.PREFERENCE_KEY_CONNECTION_ID) %>">
 
 					<%
 					for (String connectionId : configurationDisplayContext.getConnectionIds()) {
@@ -76,7 +76,7 @@ LowLevelSearchOptionsPortletPreferences lowLevelSearchOptionsPortletPreferences 
 
 				<aui:input helpMessage="contributors-to-exclude-help" label="contributors-to-exclude" name="<%= PortletPreferencesJspUtil.getInputName(LowLevelSearchOptionsPortletPreferences.PREFERENCE_KEY_CONTRIBUTORS_TO_EXCLUDE) %>" type="text" value="<%= lowLevelSearchOptionsPortletPreferences.getContributorsToExcludeString() %>" />
 
-				<aui:input helpMessage="federated-search-key-help" label="federated-search-key" name="<%= PortletPreferencesJspUtil.getInputName(LowLevelSearchOptionsPortletPreferences.PREFERENCE_KEY_FEDERATED_SEARCH_KEY) %>" type="text" value="<%= lowLevelSearchOptionsPortletPreferences.getFederatedSearchKeyString() %>" />
+				<aui:input helpMessage="enter-the-key-of-an-alternate-search-this-widget-is-participating-on-if-not-set-widget-participates-on-default-search" label="federated-search-key" name="<%= PortletPreferencesJspUtil.getInputName(LowLevelSearchOptionsPortletPreferences.PREFERENCE_KEY_FEDERATED_SEARCH_KEY) %>" type="text" value="<%= lowLevelSearchOptionsPortletPreferences.getFederatedSearchKeyString() %>" />
 			</aui:fieldset>
 
 			<liferay-frontend:fieldset
@@ -132,12 +132,12 @@ LowLevelSearchOptionsPortletPreferences lowLevelSearchOptionsPortletPreferences 
 
 			var fieldFormRows = Array.prototype.filter.call(
 				document.getElementsByClassName('field-form-row'),
-				function (item) {
+				(item) => {
 					return !item.getAttribute('hidden');
 				}
 			);
 
-			fieldFormRows.forEach(function (item) {
+			fieldFormRows.forEach((item) => {
 				fields.push({
 					key: item.querySelector('.key-input').value,
 					value: item.querySelector('.value-input').value,

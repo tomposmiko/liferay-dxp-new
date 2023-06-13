@@ -31,7 +31,7 @@ KaleoProcess kaleoProcess = (KaleoProcess)row.getObject();
 >
 	<c:if test="<%= KaleoProcessPermission.contains(permissionChecker, kaleoProcess, ActionKeys.VIEW) %>">
 		<portlet:renderURL var="viewURL">
-			<portlet:param name="mvcPath" value="/admin/view_kaleo_process.jsp" />
+			<portlet:param name="mvcPath" value='<%= "/admin/view_kaleo_process.jsp" %>' />
 			<portlet:param name="backURL" value="<%= currentURL %>" />
 			<portlet:param name="kaleoProcessId" value="<%= String.valueOf(kaleoProcess.getKaleoProcessId()) %>" />
 		</portlet:renderURL>
@@ -65,7 +65,7 @@ KaleoProcess kaleoProcess = (KaleoProcess)row.getObject();
 
 	<c:if test="<%= KaleoProcessPermission.contains(permissionChecker, kaleoProcess, ActionKeys.UPDATE) %>">
 		<portlet:renderURL var="editURL">
-			<portlet:param name="mvcPath" value="/admin/edit_kaleo_process.jsp" />
+			<portlet:param name="mvcPath" value='<%= "/admin/edit_kaleo_process.jsp" %>' />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="backURL" value="<%= currentURL %>" />
 			<portlet:param name="kaleoProcessId" value="<%= String.valueOf(kaleoProcess.getKaleoProcessId()) %>" />
@@ -96,7 +96,7 @@ KaleoProcess kaleoProcess = (KaleoProcess)row.getObject();
 	</c:if>
 
 	<c:if test="<%= KaleoProcessPermission.contains(permissionChecker, kaleoProcess, ActionKeys.DELETE) %>">
-		<portlet:actionURL name="/kaleo_forms/delete_kaleo_process" var="deleteURL">
+		<portlet:actionURL name="/kaleo_forms_admin/delete_kaleo_process" var="deleteURL">
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="kaleoProcessId" value="<%= String.valueOf(kaleoProcess.getKaleoProcessId()) %>" />
 		</portlet:actionURL>

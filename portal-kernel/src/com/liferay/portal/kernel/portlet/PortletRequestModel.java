@@ -780,6 +780,9 @@ public class PortletRequestModel implements Serializable {
 					_renderURLExclusive = renderURL.toString();
 				}
 				catch (WindowStateException windowStateException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(windowStateException, windowStateException);
+					}
 				}
 
 				try {
@@ -788,6 +791,9 @@ public class PortletRequestModel implements Serializable {
 					_renderURLMaximized = renderURL.toString();
 				}
 				catch (WindowStateException windowStateException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(windowStateException, windowStateException);
+					}
 				}
 
 				try {
@@ -796,6 +802,9 @@ public class PortletRequestModel implements Serializable {
 					_renderURLMinimized = renderURL.toString();
 				}
 				catch (WindowStateException windowStateException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(windowStateException, windowStateException);
+					}
 				}
 
 				try {
@@ -804,6 +813,9 @@ public class PortletRequestModel implements Serializable {
 					_renderURLNormal = renderURL.toString();
 				}
 				catch (WindowStateException windowStateException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(windowStateException, windowStateException);
+					}
 				}
 
 				try {
@@ -812,6 +824,9 @@ public class PortletRequestModel implements Serializable {
 					_renderURLPopUp = renderURL.toString();
 				}
 				catch (WindowStateException windowStateException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(windowStateException, windowStateException);
+					}
 				}
 			}
 			catch (IllegalStateException illegalStateException) {
@@ -861,21 +876,22 @@ public class PortletRequestModel implements Serializable {
 
 			return !map.isEmpty();
 		}
+		else {
+			String objString = String.valueOf(object);
 
-		String objString = String.valueOf(object);
+			if (Validator.isNull(objString)) {
+				return false;
+			}
 
-		if (Validator.isNull(objString)) {
-			return false;
+			String hashCode = StringPool.AT.concat(
+				StringUtil.toHexString(object.hashCode()));
+
+			if (objString.endsWith(hashCode)) {
+				return false;
+			}
+
+			return true;
 		}
-
-		String hashCode = StringPool.AT.concat(
-			StringUtil.toHexString(object.hashCode()));
-
-		if (objString.endsWith(hashCode)) {
-			return false;
-		}
-
-		return true;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

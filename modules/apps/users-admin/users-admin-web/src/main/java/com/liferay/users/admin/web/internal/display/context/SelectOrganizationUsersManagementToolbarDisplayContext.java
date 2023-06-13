@@ -18,6 +18,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -67,11 +68,11 @@ public class SelectOrganizationUsersManagementToolbarDisplayContext {
 	}
 
 	public String getClearResultsURL() {
-		PortletURL clearResultsURL = getPortletURL();
-
-		clearResultsURL.setParameter("keywords", StringPool.BLANK);
-
-		return clearResultsURL.toString();
+		return PortletURLBuilder.create(
+			getPortletURL()
+		).setKeywords(
+			StringPool.BLANK
+		).buildString();
 	}
 
 	public List<DropdownItem> getFilterDropdownItems() {
@@ -111,26 +112,30 @@ public class SelectOrganizationUsersManagementToolbarDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/select_organization_users.jsp"
+		).setKeywords(
+			() -> {
+				String[] keywords = ParamUtil.getStringValues(
+					_httpServletRequest, "keywords");
 
-		portletURL.setParameter("mvcPath", "/select_organization_users.jsp");
+				if (ArrayUtil.isNotEmpty(keywords)) {
+					return keywords[keywords.length - 1];
+				}
 
-		portletURL.setParameter(
-			"organizationId",
-			String.valueOf(_organization.getOrganizationId()));
-		portletURL.setParameter("displayStyle", _displayStyle);
-
-		String[] keywords = ParamUtil.getStringValues(
-			_httpServletRequest, "keywords");
-
-		if (ArrayUtil.isNotEmpty(keywords)) {
-			portletURL.setParameter("keywords", keywords[keywords.length - 1]);
-		}
-
-		portletURL.setParameter("orderByCol", getOrderByCol());
-		portletURL.setParameter("orderByType", getOrderByType());
-
-		return portletURL;
+				return null;
+			}
+		).setParameter(
+			"displayStyle", _displayStyle
+		).setParameter(
+			"orderByCol", getOrderByCol()
+		).setParameter(
+			"orderByType", getOrderByType()
+		).setParameter(
+			"organizationId", _organization.getOrganizationId()
+		).buildPortletURL();
 	}
 
 	public String getSearchActionURL() {
@@ -198,13 +203,12 @@ public class SelectOrganizationUsersManagementToolbarDisplayContext {
 	}
 
 	public String getSortingURL() {
-		PortletURL sortingURL = getPortletURL();
-
-		sortingURL.setParameter(
+		return PortletURLBuilder.create(
+			getPortletURL()
+		).setParameter(
 			"orderByType",
-			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc");
-
-		return sortingURL.toString();
+			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc"
+		).buildString();
 	}
 
 	public List<ViewTypeItem> getViewTypeItems() {

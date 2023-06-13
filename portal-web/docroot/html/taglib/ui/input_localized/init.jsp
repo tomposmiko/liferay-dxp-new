@@ -22,6 +22,8 @@ page import="com.liferay.taglib.ui.InputEditorTag" %>
 <%
 String randomNamespace = PortalUtil.generateRandomKey(request, "taglib_ui_input_localized") + StringPool.UNDERLINE;
 
+List<String> activeLanguageIds = (List<String>)request.getAttribute("liferay-ui:input-localized:activeLanguageIds");
+boolean adminMode = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-localized:adminMode"));
 boolean autoFocus = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-localized:autoFocus"));
 boolean autoSize = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-localized:autoSize"));
 Set<Locale> availableLocales = (Set<Locale>)request.getAttribute("liferay-ui:input-localized:availableLocales");
@@ -74,6 +76,10 @@ String mainLanguageValue = LocalizationUtil.getLocalization(xml, mainLanguageId,
 
 if (!ignoreRequestValue) {
 	mainLanguageValue = ParamUtil.getString(request, name + StringPool.UNDERLINE + mainLanguageId, mainLanguageValue);
+}
+
+if (Validator.isNull(mainLanguageValue)) {
+	mainLanguageValue = LocalizationUtil.getLocalization(xml, defaultLanguageId, true);
 }
 
 String fieldNamePrefix = StringPool.BLANK;

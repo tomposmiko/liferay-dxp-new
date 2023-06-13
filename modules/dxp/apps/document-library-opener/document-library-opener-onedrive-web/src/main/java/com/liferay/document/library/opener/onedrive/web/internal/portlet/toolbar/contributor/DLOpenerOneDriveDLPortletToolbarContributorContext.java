@@ -37,11 +37,9 @@ import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletRequest;
@@ -138,7 +136,7 @@ public class DLOpenerOneDriveDLPortletToolbarContributorContext
 
 			liferayPortletURL.setParameter(
 				ActionRequest.ACTION_NAME,
-				"/document_library/create_in_office365");
+				"/document_library/create_in_one_drive");
 			liferayPortletURL.setParameter(Constants.CMD, Constants.ADD);
 
 			long repositoryId = BeanPropertiesUtil.getLong(
@@ -164,11 +162,7 @@ public class DLOpenerOneDriveDLPortletToolbarContributorContext
 	}
 
 	private String _translate(PortletRequest portletRequest, String key) {
-		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-			_portal.getLocale(portletRequest),
-			DLOpenerOneDriveDLPortletToolbarContributorContext.class);
-
-		return _language.get(resourceBundle, key);
+		return _language.get(_portal.getLocale(portletRequest), key);
 	}
 
 	private static final String _ICON_COLOR_DOCUMENT = "6";

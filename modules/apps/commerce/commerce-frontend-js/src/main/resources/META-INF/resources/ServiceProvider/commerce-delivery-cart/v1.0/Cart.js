@@ -14,8 +14,8 @@
 
 import AJAX from '../../../utilities/AJAX/index';
 
-const CARTS_PATH = '/carts',
-	CHANNELS_PATH = '/channels';
+const CARTS_PATH = '/carts';
+const CHANNELS_PATH = '/channels';
 
 const VERSION = 'v1.0';
 
@@ -24,31 +24,70 @@ function resolveCartsPath(basePath = '', cartId) {
 }
 
 function resolveChannelsPath(basePath = '', channelId) {
-	return `${basePath}${VERSION}${CHANNELS_PATH}/${channelId}${CARTS_PATH}`;
+	return `${basePath}${VERSION}${CHANNELS_PATH}/${channelId}`;
 }
 
-export default (basePath) => ({
-	createCartByChannelId: (channelId, json) =>
-		AJAX.POST(resolveChannelsPath(basePath, channelId), json),
+function resolveCartsByAccountIdAndChannelIdPath(
+	basePath = '',
+	accountId,
+	channelId
+) {
+	return `${resolveChannelsPath(
+		basePath,
+		channelId
+	)}/account/${accountId}${CARTS_PATH}`;
+}
 
-	createCouponCodeByCartId: (cartId, json) =>
-		AJAX.POST(`${resolveCartsPath(basePath, cartId)}/coupon-code`, json),
+export default function Cart(basePath) {
+	return {
+		cartsByAccountIdAndChannelIdURL: (accountId, channelId) =>
+			resolveCartsByAccountIdAndChannelIdPath(
+				basePath,
+				accountId,
+				channelId
+			),
 
-	deleteCartById: (cartId) => AJAX.DELETE(resolveCartsPath(basePath, cartId)),
+		createCartByChannelId: (channelId, json) =>
+			AJAX.POST(
+				`${resolveChannelsPath(
+					basePath,
+					channelId
+				)}${CARTS_PATH}?nestedFields=cartItems`,
+				json
+			),
 
-	getCartById: (cartId) => AJAX.GET(resolveCartsPath(basePath, cartId)),
+		createCouponCodeByCartId: (cartId, json) =>
+			AJAX.POST(
+				`${resolveCartsPath(basePath, cartId)}/coupon-code`,
+				json
+			),
 
-	getCartByIdWithItems: (cartId) =>
-		AJAX.GET(
-			resolveCartsPath(basePath, cartId) + '?nestedFields=cartItems'
-		),
+		deleteCartById: (cartId) =>
+			AJAX.DELETE(resolveCartsPath(basePath, cartId)),
 
-	getCartsByChannelId: (channelId) =>
-		AJAX.GET(resolveChannelsPath(basePath, channelId)),
+		getCartById: (cartId) => AJAX.GET(resolveCartsPath(basePath, cartId)),
 
-	replaceCartById: (cartId, json) =>
-		AJAX.PUT(resolveCartsPath(basePath, cartId), json),
+		getCartByIdWithItems: (cartId) =>
+			AJAX.GET(
+				resolveCartsPath(basePath, cartId) + '?nestedFields=cartItems'
+			),
 
-	updateCartById: (cartId, jsonProps) =>
-		AJAX.PATCH(resolveCartsPath(basePath, cartId), jsonProps),
-});
+		getCartsByAccountIdAndChannelId: (accountId, channelId) =>
+			AJAX.GET(
+				resolveCartsByAccountIdAndChannelIdPath(
+					basePath,
+					accountId,
+					channelId
+				)
+			),
+
+		replaceCartById: (cartId, json) =>
+			AJAX.PUT(resolveCartsPath(basePath, cartId), json),
+
+		updateCartById: (cartId, jsonProps) =>
+			AJAX.PATCH(
+				resolveCartsPath(basePath, cartId) + '?nestedFields=cartItems',
+				jsonProps
+			),
+	};
+}

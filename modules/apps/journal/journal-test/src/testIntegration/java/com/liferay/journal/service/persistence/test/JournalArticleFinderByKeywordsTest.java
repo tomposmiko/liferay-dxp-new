@@ -115,11 +115,14 @@ public class JournalArticleFinderByKeywordsTest {
 			user.getTimeZone());
 
 		return _journalArticleLocalService.addArticle(
-			user.getUserId(), _group.getGroupId(), 0,
+			null, user.getUserId(), _group.getGroupId(), 0,
 			JournalArticleConstants.CLASS_NAME_ID_DEFAULT, 0, StringPool.BLANK,
 			true, JournalArticleConstants.VERSION_DEFAULT,
 			HashMapBuilder.put(
 				defaultLocale, title
+			).build(),
+			HashMapBuilder.put(
+				defaultLocale, RandomTestUtil.randomString()
 			).build(),
 			HashMapBuilder.put(
 				defaultLocale, RandomTestUtil.randomString()
@@ -144,7 +147,7 @@ public class JournalArticleFinderByKeywordsTest {
 			_journalArticleFinder.findByKeywords(
 				_group.getCompanyId(), _group.getGroupId(), new ArrayList<>(),
 				0, keywords, null, _ddmStructure.getStructureKey(), null, null,
-				null, WorkflowConstants.STATUS_APPROVED, null, -1, -1, null);
+				null, null, WorkflowConstants.STATUS_APPROVED, -1, -1, null);
 
 		Assert.assertEquals(
 			journalArticles.toString(), expectedCount, journalArticles.size());
@@ -152,7 +155,7 @@ public class JournalArticleFinderByKeywordsTest {
 		int count = _journalArticleFinder.countByKeywords(
 			_group.getCompanyId(), _group.getGroupId(), new ArrayList<>(), 0,
 			keywords, null, _ddmStructure.getStructureKey(), null, null, null,
-			WorkflowConstants.STATUS_APPROVED, null);
+			null, WorkflowConstants.STATUS_APPROVED);
 
 		Assert.assertEquals(expectedCount, count);
 	}

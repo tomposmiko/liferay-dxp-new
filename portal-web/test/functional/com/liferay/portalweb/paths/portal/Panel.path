@@ -11,6 +11,11 @@
 
 <tbody>
 <tr>
+	<td>PANEL_NAV_ITEM_LINK</td>
+	<td>//div[contains(@class,'panel-group')]//li[contains(@class,'nav-item')]//a[contains(@class,'nav-link')][normalize-space(text())='${key_itemName}']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PANEL_TITLE</td>
 	<td>//div[contains(@class,'panel-page-category')]//span[contains(.,'${key_componentName}')]</td>
 	<td></td>
@@ -41,18 +46,11 @@
 	<td></td>
 </tr>
 <tr>
-	<td>PANEL_RECYCLE_BIN</td>
-	<td>//div[contains(@class,'panel-heading')]//span[normalize-space()='Recycle Bin']</td>
-	<td></td>
-</tr>
-<tr>
 	<td></td>
 	<td></td>
 	<td></td>
 </tr>
-
 <!--MENU-->
-
 <tr>
 	<td>MENU_ITEM</td>
 	<td>//div[contains(@class,'toggler-content-expanded')]//a[contains(.,'${key_portletName}')]</td>
@@ -63,9 +61,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--ENTRY-->
-
 <tr>
 	<td>ENTRY_ATTACHMENTS</td>
 	<td>//div[contains(@id,'attachmentsHeader')]//a</td>
@@ -73,7 +69,7 @@
 </tr>
 <tr>
 	<td>ENTRY_REPORT_PARAMETERS</td>
-	<td>//div[contains(@id,'report-parametersHeader')]//a</td>
+	<td>//fieldset[contains(@id,'report-parameters')]//span/span[1]</td>
 	<td></td>
 </tr>
 </tbody>

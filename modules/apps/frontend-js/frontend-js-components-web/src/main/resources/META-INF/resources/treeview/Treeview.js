@@ -12,7 +12,7 @@
  * details.
  */
 
-import {useTimeout} from 'frontend-js-react-web';
+import {useTimeout} from '@liferay/frontend-js-react-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useReducer, useRef, useState} from 'react';
 
@@ -36,9 +36,12 @@ function addLinks(nodes, parentId = null) {
 		return {
 			...node,
 			children,
-			nextSiblingId: next != null ? next.id : null,
+			nextSiblingId: next !== null && next !== undefined ? next.id : null,
 			parentId,
-			previousSiblingId: previous != null ? previous.id : null,
+			previousSiblingId:
+				previous !== null && previous !== undefined
+					? previous.id
+					: null,
 		};
 	});
 }
@@ -74,24 +77,36 @@ function computeParentSelection(nodeId, selectedNodeIds, nodes) {
 	return computeParentSelection(node.parentId, nextSelectedNodeIds, nodes);
 }
 
-function filterNodes(nodes, filterQuery) {
-	if (!filterQuery) {
+function getFilterFn(filter) {
+	if (!filter) {
 		return null;
 	}
 
-	filterQuery = filterQuery.toLowerCase();
+	if (typeof filter === 'function') {
+		return filter;
+	}
+
+	const filterLowerCase = filter.toString().toLowerCase();
+
+	return (node) => node.name.toLowerCase().indexOf(filterLowerCase) !== -1;
+}
+
+function filterNodes(nodes, filter) {
+	if (!filter) {
+		return null;
+	}
 
 	const filteredNodes = [];
 
 	nodes.forEach((node) => {
-		if (node.name.toLowerCase().indexOf(filterQuery) !== -1) {
+		if (filter(node)) {
 			filteredNodes.push({
 				...node,
 				children: [],
 			});
 		}
 
-		filteredNodes.push(...filterNodes(node.children, filterQuery));
+		filteredNodes.push(...filterNodes(node.children, filter));
 	});
 
 	return filteredNodes;
@@ -128,7 +143,7 @@ function getLastVisible(node) {
  * Prepares the initial reducer state given the supplied props.
  */
 function init({
-	filterQuery,
+	filter,
 	inheritSelection,
 	initialNodes,
 	initialSelectedNodeIds,
@@ -160,10 +175,12 @@ function init({
 		);
 	});
 
+	const filterFn = getFilterFn(filter);
+
 	return {
 		active: false,
-		filterQuery,
-		filteredNodes: filterNodes(nodes, filterQuery),
+		filter: filterFn,
+		filteredNodes: filterNodes(nodes, filterFn),
 		focusedNodeId: null,
 		inheritSelection,
 		multiSelection,
@@ -461,8 +478,8 @@ function reducer(state, action) {
 		case 'FILTER':
 			return {
 				...state,
-				filterQuery: action.filterQuery,
-				filteredNodes: filterNodes(state.nodes, action.filterQuery),
+				filter: action.filter,
+				filteredNodes: filterNodes(state.nodes, action.filter),
 				focusedNodeId: null,
 			};
 
@@ -715,7 +732,7 @@ function visit(node, callback, nodeMap) {
 
 function Treeview({
 	NodeComponent,
-	filterQuery,
+	filter,
 	inheritSelection,
 	initialSelectedNodeIds,
 	multiSelection,
@@ -724,14 +741,14 @@ function Treeview({
 }) {
 	const delay = useTimeout();
 
-	const focusTimer = useRef();
+	const focusTimerRef = useRef();
 
 	const [, setHasFocus] = useState(false);
 
 	const [state, dispatch] = useReducer(
 		reducer,
 		{
-			filterQuery,
+			filter,
 			inheritSelection,
 			initialNodes,
 			initialSelectedNodeIds,
@@ -743,8 +760,10 @@ function Treeview({
 	const {filteredNodes, nodes, selectedNodeIds} = state;
 
 	useEffect(() => {
-		dispatch({filterQuery, type: 'FILTER'});
-	}, [filterQuery]);
+		const filterFn = getFilterFn(filter);
+
+		dispatch({filter: filterFn, type: 'FILTER'});
+	}, [filter]);
 
 	useEffect(() => {
 		dispatch({newNodes: initialNodes, type: 'UPDATE_NODES'});
@@ -757,9 +776,9 @@ function Treeview({
 	}, [onSelectedNodesChange, selectedNodeIds]);
 
 	const cancelTimer = () => {
-		if (focusTimer.current) {
-			focusTimer.current();
-			focusTimer.current = null;
+		if (focusTimerRef.current) {
+			focusTimerRef.current();
+			focusTimerRef.current = null;
 		}
 	};
 
@@ -798,7 +817,7 @@ function Treeview({
 		// the treeview); so, we defer this state update until the next
 		// tick, giving us a chance to cancel it if needed.
 
-		focusTimer.current = delay(() => {
+		focusTimerRef.current = delay(() => {
 			setHasFocus((hadFocus) => {
 				if (hadFocus) {
 					dispatch({type: 'DEACTIVATE'});
@@ -831,6 +850,8 @@ Treeview.defaultProps = {
 
 Treeview.propTypes = {
 	NodeComponent: PropTypes.func,
+	filter: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+	inheritSelection: PropTypes.bool,
 	initialSelectedNodeIds: PropTypes.arrayOf(PropTypes.string),
 	multiSelection: PropTypes.bool,
 	nodes: PropTypes.arrayOf(

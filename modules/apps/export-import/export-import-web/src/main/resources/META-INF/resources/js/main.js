@@ -823,13 +823,13 @@ AUI.add(
 
 						if (instance._exportLAR) {
 							params.mvcRenderCommandName =
-								'editExportConfiguration';
+								'/export_import/edit_export_configuration';
 							params.tabs2 = 'new-export-process';
 							params.exportConfigurationButtons = 'custom';
 						}
 						else {
 							params.mvcRenderCommandName =
-								'editPublishConfiguration';
+								'/export_import/edit_publish_configuration';
 							params.publishConfigurationButtons = 'custom';
 						}
 
@@ -849,12 +849,6 @@ AUI.add(
 
 						if (privateLayoutNode) {
 							params.privateLayout = privateLayoutNode.val();
-						}
-
-						var rootNodeNameNode = instance.byId('rootNodeName');
-
-						if (rootNodeNameNode) {
-							params.rootNodeName = rootNodeNameNode.val();
 						}
 
 						var portletURL = Liferay.Util.PortletURL.createPortletURL(

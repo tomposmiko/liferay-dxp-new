@@ -32,8 +32,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -319,6 +317,7 @@ public abstract class AMImageEntryLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -337,6 +336,7 @@ public abstract class AMImageEntryLocalServiceBaseImpl
 			(AMImageEntry)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<AMImageEntry> getBasePersistence() {
 		return amImageEntryPersistence;
 	}
@@ -528,8 +528,5 @@ public abstract class AMImageEntryLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AMImageEntryLocalServiceBaseImpl.class);
 
 }

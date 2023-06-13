@@ -101,6 +101,27 @@ public class CommerceInventoryWarehouseItemLocalServiceUtil {
 			quantity);
 	}
 
+	public static CommerceInventoryWarehouseItem
+			addOrUpdateCommerceInventoryWarehouseItem(
+				long userId, long commerceInventoryWarehouseId, String sku,
+				int quantity)
+		throws PortalException {
+
+		return getService().addOrUpdateCommerceInventoryWarehouseItem(
+			userId, commerceInventoryWarehouseId, sku, quantity);
+	}
+
+	public static CommerceInventoryWarehouseItem
+			addOrUpdateCommerceInventoryWarehouseItem(
+				String externalReferenceCode, long companyId, long userId,
+				long commerceInventoryWarehouseId, String sku, int quantity)
+		throws PortalException {
+
+		return getService().addOrUpdateCommerceInventoryWarehouseItem(
+			externalReferenceCode, companyId, userId,
+			commerceInventoryWarehouseId, sku, quantity);
+	}
+
 	public static int countItemsByCompanyId(long companyId, String sku) {
 		return getService().countItemsByCompanyId(companyId, sku);
 	}
@@ -298,7 +319,13 @@ public class CommerceInventoryWarehouseItemLocalServiceUtil {
 			commerceInventoryWarehouseId, sku);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce inventory warehouse item with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse item's external reference code
+	 * @return the matching commerce inventory warehouse item, or <code>null</code> if a matching commerce inventory warehouse item could not be found
+	 */
 	public static CommerceInventoryWarehouseItem
 		fetchCommerceInventoryWarehouseItemByExternalReferenceCode(
 			long companyId, String externalReferenceCode) {
@@ -308,6 +335,9 @@ public class CommerceInventoryWarehouseItemLocalServiceUtil {
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceInventoryWarehouseItemByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static CommerceInventoryWarehouseItem
 		fetchCommerceInventoryWarehouseItemByReferenceCode(
@@ -339,7 +369,14 @@ public class CommerceInventoryWarehouseItemLocalServiceUtil {
 			commerceInventoryWarehouseItemId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce inventory warehouse item with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce inventory warehouse item's external reference code
+	 * @return the matching commerce inventory warehouse item
+	 * @throws PortalException if a matching commerce inventory warehouse item could not be found
+	 */
 	public static CommerceInventoryWarehouseItem
 			getCommerceInventoryWarehouseItemByExternalReferenceCode(
 				long companyId, String externalReferenceCode)
@@ -572,7 +609,7 @@ public class CommerceInventoryWarehouseItemLocalServiceUtil {
 
 	/**
 	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
-	 #upsertCommerceInventoryWarehouseItem(String,
+	 #addOrUpdateCommerceInventoryWarehouseItem(String,
 	 long, long, long, String, int)}
 	 */
 	@Deprecated
@@ -585,27 +622,6 @@ public class CommerceInventoryWarehouseItemLocalServiceUtil {
 		return getService().upsertCommerceInventoryWarehouseItem(
 			companyId, userId, commerceInventoryWarehouseId,
 			externalReferenceCode, sku, quantity);
-	}
-
-	public static CommerceInventoryWarehouseItem
-			upsertCommerceInventoryWarehouseItem(
-				long userId, long commerceInventoryWarehouseId, String sku,
-				int quantity)
-		throws PortalException {
-
-		return getService().upsertCommerceInventoryWarehouseItem(
-			userId, commerceInventoryWarehouseId, sku, quantity);
-	}
-
-	public static CommerceInventoryWarehouseItem
-			upsertCommerceInventoryWarehouseItem(
-				String externalReferenceCode, long companyId, long userId,
-				long commerceInventoryWarehouseId, String sku, int quantity)
-		throws PortalException {
-
-		return getService().upsertCommerceInventoryWarehouseItem(
-			externalReferenceCode, companyId, userId,
-			commerceInventoryWarehouseId, sku, quantity);
 	}
 
 	public static CommerceInventoryWarehouseItemLocalService getService() {

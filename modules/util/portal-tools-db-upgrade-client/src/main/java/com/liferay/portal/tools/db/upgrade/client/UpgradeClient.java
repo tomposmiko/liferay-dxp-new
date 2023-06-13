@@ -189,7 +189,9 @@ public class UpgradeClient {
 		String jvmOptsCommands = _jvmOpts.concat(
 			" -Dexternal-properties=portal-upgrade.properties " +
 				"-Dserver.detector.server.id=" +
-					_appServer.getServerDetectorServerId());
+					_appServer.getServerDetectorServerId() +
+						" -Dliferay.shielded.container.lib.portal.dir=" +
+							_appServer.getPortalShieldedContainerLibDir());
 
 		System.out.println("JVM arguments: " + jvmOptsCommands);
 
@@ -218,10 +220,7 @@ public class UpgradeClient {
 			String line = null;
 
 			while ((line = bufferedReader.readLine()) != null) {
-				if (line.equals(
-						"Running modules upgrades. Connect to Gogo shell to " +
-							"check the status.")) {
-
+				if (line.equals("Exiting DBUpgrader#main(String[]).")) {
 					break;
 				}
 
@@ -360,6 +359,8 @@ public class UpgradeClient {
 		sb.append(File.pathSeparator);
 
 		_appendClassPath(sb, _appServer.getPortalLibDir());
+
+		_appendClassPath(sb, _appServer.getPortalShieldedContainerLibDir());
 
 		_appendClassPath(sb, _appServer.getExtraLibDirs());
 

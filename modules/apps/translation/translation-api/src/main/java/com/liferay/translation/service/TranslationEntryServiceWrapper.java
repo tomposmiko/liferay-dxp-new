@@ -15,6 +15,7 @@
 package com.liferay.translation.service;
 
 import com.liferay.portal.kernel.service.ServiceWrapper;
+import com.liferay.translation.model.TranslationEntry;
 
 /**
  * Provides a wrapper for {@link TranslationEntryService}.
@@ -27,6 +28,10 @@ public class TranslationEntryServiceWrapper
 	implements ServiceWrapper<TranslationEntryService>,
 			   TranslationEntryService {
 
+	public TranslationEntryServiceWrapper() {
+		this(null);
+	}
+
 	public TranslationEntryServiceWrapper(
 		TranslationEntryService translationEntryService) {
 
@@ -34,12 +39,11 @@ public class TranslationEntryServiceWrapper
 	}
 
 	@Override
-	public com.liferay.translation.model.TranslationEntry
-			addOrUpdateTranslationEntry(
-				long groupId,
-				com.liferay.info.item.InfoItemReference infoItemReference,
-				String content, String contentType,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public TranslationEntry addOrUpdateTranslationEntry(
+			long groupId,
+			com.liferay.info.item.InfoItemReference infoItemReference,
+			String content, String contentType,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _translationEntryService.addOrUpdateTranslationEntry(
@@ -47,17 +51,24 @@ public class TranslationEntryServiceWrapper
 	}
 
 	@Override
-	public com.liferay.translation.model.TranslationEntry
-			addOrUpdateTranslationEntry(
-				long groupId, String languageId,
-				com.liferay.info.item.InfoItemReference infoItemReference,
-				com.liferay.info.item.InfoItemFieldValues infoItemFieldValues,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public TranslationEntry addOrUpdateTranslationEntry(
+			long groupId, String languageId,
+			com.liferay.info.item.InfoItemReference infoItemReference,
+			com.liferay.info.item.InfoItemFieldValues infoItemFieldValues,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _translationEntryService.addOrUpdateTranslationEntry(
 			groupId, languageId, infoItemReference, infoItemFieldValues,
 			serviceContext);
+	}
+
+	@Override
+	public TranslationEntry deleteTranslationEntry(long translationEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _translationEntryService.deleteTranslationEntry(
+			translationEntryId);
 	}
 
 	/**

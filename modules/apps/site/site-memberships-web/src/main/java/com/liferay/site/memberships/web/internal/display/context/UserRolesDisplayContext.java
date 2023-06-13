@@ -14,6 +14,7 @@
 
 package com.liferay.site.memberships.web.internal.display.context;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -153,44 +154,70 @@ public class UserRolesDisplayContext {
 	}
 
 	private PortletURL _getPortletURL() throws PortalException {
-		PortletURL portletURL = _renderResponse.createRenderURL();
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/users_roles.jsp"
+		).setKeywords(
+			() -> {
+				String keywords = ParamUtil.getString(
+					_renderRequest, "keywords");
 
-		portletURL.setParameter("p_u_i_d", String.valueOf(_getUserId()));
-		portletURL.setParameter("mvcPath", "/users_roles.jsp");
+				if (Validator.isNotNull(keywords)) {
+					return keywords;
+				}
 
-		String displayStyle = getDisplayStyle();
+				return null;
+			}
+		).setParameter(
+			"displayStyle",
+			() -> {
+				String displayStyle = getDisplayStyle();
 
-		if (Validator.isNotNull(displayStyle)) {
-			portletURL.setParameter("displayStyle", displayStyle);
-		}
+				if (Validator.isNotNull(displayStyle)) {
+					return displayStyle;
+				}
 
-		String keywords = ParamUtil.getString(_renderRequest, "keywords");
+				return null;
+			}
+		).setParameter(
+			"orderByCol",
+			() -> {
+				String orderByCol = ParamUtil.getString(
+					_renderRequest, "orderByCol", "title");
 
-		if (Validator.isNotNull(keywords)) {
-			portletURL.setParameter("keywords", keywords);
-		}
+				if (Validator.isNotNull(orderByCol)) {
+					return orderByCol;
+				}
 
-		String orderByCol = ParamUtil.getString(
-			_renderRequest, "orderByCol", "title");
+				return null;
+			}
+		).setParameter(
+			"orderByType",
+			() -> {
+				String orderByType = ParamUtil.getString(
+					_renderRequest, "orderByType", "asc");
 
-		if (Validator.isNotNull(orderByCol)) {
-			portletURL.setParameter("orderByCol", orderByCol);
-		}
+				if (Validator.isNotNull(orderByType)) {
+					return orderByType;
+				}
 
-		String orderByType = ParamUtil.getString(
-			_renderRequest, "orderByType", "asc");
+				return null;
+			}
+		).setParameter(
+			"p_u_i_d", _getUserId()
+		).setParameter(
+			"roleType",
+			() -> {
+				int roleType = _getRoleType();
 
-		if (Validator.isNotNull(orderByType)) {
-			portletURL.setParameter("orderByType", orderByType);
-		}
+				if (roleType > 0) {
+					return roleType;
+				}
 
-		int roleType = _getRoleType();
-
-		if (roleType > 0) {
-			portletURL.setParameter("roleType", String.valueOf(roleType));
-		}
-
-		return portletURL;
+				return null;
+			}
+		).buildPortletURL();
 	}
 
 	private int _getRoleType() {

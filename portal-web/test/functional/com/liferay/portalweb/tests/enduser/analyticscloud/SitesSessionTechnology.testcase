@@ -24,7 +24,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 
@@ -33,7 +33,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8312 | Test Summary: Session technology card shows what browsers are accessing the site the most"
 	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test ShowsBrowsersAccessingSiteMost {
 		property portal.upstream = "quarantine";
 
@@ -76,7 +76,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Assert Session Technology card is present") {
@@ -102,7 +102,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8313 | Test Summary: Session technology card shows what devices are accessing the site the most"
 	@ignore = "true"
-	@priority = 5
+	@priority = "5"
 	test ShowsDevicesAccessingSiteMost {
 		property portal.upstream = "quarantine";
 
@@ -145,7 +145,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Assert Session Technology card is present") {

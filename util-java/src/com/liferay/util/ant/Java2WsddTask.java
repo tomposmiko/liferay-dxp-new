@@ -29,8 +29,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeMap;
 
 import org.apache.axis.tools.ant.wsdl.Java2WsdlAntTask;
@@ -157,7 +160,7 @@ public class Java2WsddTask {
 
 		// Delete temp directory
 
-		DeleteTask.deleteDirectory(tempDir);
+		_deleteDir(tempDir);
 
 		return new String[] {deployContent, undeployContent};
 	}
@@ -172,17 +175,34 @@ public class Java2WsddTask {
 		}
 	}
 
+	private static void _deleteDir(File file) {
+		Queue<File> queue = new LinkedList<>();
+
+		queue.add(file);
+
+		while ((file = queue.poll()) != null) {
+			if (file.isDirectory()) {
+				File[] files = file.listFiles();
+
+				if (files.length == 0) {
+					file.delete();
+				}
+				else {
+					Collections.addAll(queue, files);
+
+					queue.add(file);
+				}
+			}
+			else {
+				file.delete();
+			}
+		}
+	}
+
 	private static String _format(String content) throws Exception {
 		content = _stripComments(content);
 
 		SAXReader saxReader = new SAXReader();
-
-		saxReader.setFeature(
-			"http://apache.org/xml/features/disallow-doctype-decl", true);
-		saxReader.setFeature(
-			"http://xml.org/sax/features/external-general-entities", false);
-		saxReader.setFeature(
-			"http://xml.org/sax/features/external-parameter-entities", false);
 
 		Document document = saxReader.read(new XMLSafeReader(content));
 

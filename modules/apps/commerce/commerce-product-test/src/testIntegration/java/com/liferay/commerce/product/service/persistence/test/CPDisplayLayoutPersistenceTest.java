@@ -124,6 +124,8 @@ public class CPDisplayLayoutPersistenceTest {
 
 		CPDisplayLayout newCPDisplayLayout = _persistence.create(pk);
 
+		newCPDisplayLayout.setMvccVersion(RandomTestUtil.nextLong());
+
 		newCPDisplayLayout.setUuid(RandomTestUtil.randomString());
 
 		newCPDisplayLayout.setGroupId(RandomTestUtil.nextLong());
@@ -149,6 +151,9 @@ public class CPDisplayLayoutPersistenceTest {
 		CPDisplayLayout existingCPDisplayLayout = _persistence.findByPrimaryKey(
 			newCPDisplayLayout.getPrimaryKey());
 
+		Assert.assertEquals(
+			existingCPDisplayLayout.getMvccVersion(),
+			newCPDisplayLayout.getMvccVersion());
 		Assert.assertEquals(
 			existingCPDisplayLayout.getUuid(), newCPDisplayLayout.getUuid());
 		Assert.assertEquals(
@@ -243,6 +248,15 @@ public class CPDisplayLayoutPersistenceTest {
 	}
 
 	@Test
+	public void testCountByG_C_C() throws Exception {
+		_persistence.countByG_C_C(
+			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
+			RandomTestUtil.nextLong());
+
+		_persistence.countByG_C_C(0L, 0L, 0L);
+	}
+
+	@Test
 	public void testFindByPrimaryKeyExisting() throws Exception {
 		CPDisplayLayout newCPDisplayLayout = addCPDisplayLayout();
 
@@ -267,10 +281,11 @@ public class CPDisplayLayoutPersistenceTest {
 
 	protected OrderByComparator<CPDisplayLayout> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CPDisplayLayout", "uuid", true, "CPDisplayLayoutId", true,
-			"groupId", true, "companyId", true, "userId", true, "userName",
-			true, "createDate", true, "modifiedDate", true, "classNameId", true,
-			"classPK", true, "layoutUuid", true);
+			"CPDisplayLayout", "mvccVersion", true, "uuid", true,
+			"CPDisplayLayoutId", true, "groupId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "classNameId", true, "classPK", true,
+			"layoutUuid", true);
 	}
 
 	@Test
@@ -552,6 +567,11 @@ public class CPDisplayLayoutPersistenceTest {
 				new Class<?>[] {String.class}, "groupId"));
 
 		Assert.assertEquals(
+			Long.valueOf(cpDisplayLayout.getGroupId()),
+			ReflectionTestUtil.<Long>invoke(
+				cpDisplayLayout, "getColumnOriginalValue",
+				new Class<?>[] {String.class}, "groupId"));
+		Assert.assertEquals(
 			Long.valueOf(cpDisplayLayout.getClassNameId()),
 			ReflectionTestUtil.<Long>invoke(
 				cpDisplayLayout, "getColumnOriginalValue",
@@ -567,6 +587,8 @@ public class CPDisplayLayoutPersistenceTest {
 		long pk = RandomTestUtil.nextLong();
 
 		CPDisplayLayout cpDisplayLayout = _persistence.create(pk);
+
+		cpDisplayLayout.setMvccVersion(RandomTestUtil.nextLong());
 
 		cpDisplayLayout.setUuid(RandomTestUtil.randomString());
 

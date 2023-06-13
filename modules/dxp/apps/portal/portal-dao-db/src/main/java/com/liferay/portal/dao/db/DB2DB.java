@@ -60,29 +60,17 @@ public class DB2DB extends BaseDB {
 
 	@Override
 	public String getPopulateSQL(String databaseName, String sqlContent) {
-		StringBundler sb = new StringBundler(4);
-
-		sb.append("connect to ");
-		sb.append(databaseName);
-		sb.append(";\n");
-		sb.append(sqlContent);
-
-		return sb.toString();
+		return StringBundler.concat(
+			"connect to ", databaseName, ";\n", sqlContent);
 	}
 
 	@Override
 	public String getRecreateSQL(String databaseName) {
-		StringBundler sb = new StringBundler(7);
-
-		sb.append("drop database ");
-		sb.append(databaseName);
-		sb.append(";\n");
-		sb.append("create database ");
-		sb.append(databaseName);
-		sb.append(" pagesize 32768 temporary tablespace managed by automatic ");
-		sb.append("storage;\n");
-
-		return sb.toString();
+		return StringBundler.concat(
+			"drop database ", databaseName, ";\n", "create database ",
+			databaseName,
+			" pagesize 32768 temporary tablespace managed by automatic ",
+			"storage;\n");
 	}
 
 	@Override
@@ -96,12 +84,12 @@ public class DB2DB extends BaseDB {
 	}
 
 	@Override
-	public void runSQL(Connection con, String[] templates)
+	public void runSQL(Connection connection, String[] templates)
 		throws IOException, SQLException {
 
-		super.runSQL(con, templates);
+		super.runSQL(connection, templates);
 
-		reorgTables(con, templates);
+		reorgTables(connection, templates);
 	}
 
 	@Override
@@ -134,23 +122,22 @@ public class DB2DB extends BaseDB {
 		return _DB2;
 	}
 
-	protected boolean isRequiresReorgTable(Connection con, String tableName)
+	protected boolean isRequiresReorgTable(
+			Connection connection, String tableName)
 		throws SQLException {
 
 		boolean reorgTableRequired = false;
 
-		StringBundler sb = new StringBundler(4);
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				StringBundler.concat(
+					"select num_reorg_rec_alters from table(",
+					"sysproc.admin_get_tab_info(current_schema, '",
+					StringUtil.toUpperCase(tableName),
+					"')) where reorg_pending = 'Y'"));
+			ResultSet resultSet = preparedStatement.executeQuery()) {
 
-		sb.append("select num_reorg_rec_alters from table(");
-		sb.append("sysproc.admin_get_tab_info(current_schema, '");
-		sb.append(StringUtil.toUpperCase(tableName));
-		sb.append("')) where reorg_pending = 'Y'");
-
-		try (PreparedStatement ps = con.prepareStatement(sb.toString());
-			ResultSet rs = ps.executeQuery()) {
-
-			if (rs.next()) {
-				int numReorgRecAlters = rs.getInt(1);
+			if (resultSet.next()) {
+				int numReorgRecAlters = resultSet.getInt(1);
 
 				if (numReorgRecAlters >= 1) {
 					reorgTableRequired = true;
@@ -161,14 +148,14 @@ public class DB2DB extends BaseDB {
 		return reorgTableRequired;
 	}
 
-	protected void reorgTable(Connection con, String tableName)
+	protected void reorgTable(Connection connection, String tableName)
 		throws SQLException {
 
-		if (!isRequiresReorgTable(con, tableName)) {
+		if (!isRequiresReorgTable(connection, tableName)) {
 			return;
 		}
 
-		try (CallableStatement callableStatement = con.prepareCall(
+		try (CallableStatement callableStatement = connection.prepareCall(
 				"call sysproc.admin_cmd(?)")) {
 
 			callableStatement.setString(1, "reorg table " + tableName);
@@ -177,7 +164,7 @@ public class DB2DB extends BaseDB {
 		}
 	}
 
-	protected void reorgTables(Connection con, String[] templates)
+	protected void reorgTables(Connection connection, String[] templates)
 		throws SQLException {
 
 		Set<String> tableNames = new HashSet<>();
@@ -200,7 +187,7 @@ public class DB2DB extends BaseDB {
 		}
 
 		for (String tableName : tableNames) {
-			reorgTable(con, tableName);
+			reorgTable(connection, tableName);
 		}
 	}
 

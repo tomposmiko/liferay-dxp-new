@@ -16,21 +16,22 @@ package com.liferay.portal.dao.init;
 
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.dao.jdbc.util.DynamicDataSource;
 import com.liferay.portal.db.partition.DBPartitionUtil;
 import com.liferay.portal.events.StartupHelperUtil;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataSourceFactoryUtil;
+import com.liferay.portal.kernel.dependency.manager.DependencyManagerSync;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ReleaseConstants;
+import com.liferay.portal.kernel.module.util.ServiceLatch;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.version.Version;
 import com.liferay.portal.spring.hibernate.DialectDetector;
 import com.liferay.portal.upgrade.PortalUpgradeProcess;
 import com.liferay.portal.util.PropsUtil;
@@ -53,21 +54,23 @@ public class DBInitUtil {
 		return _dataSource;
 	}
 
+	public static DataSource getReadDataSource() {
+		return _readDataSource;
+	}
+
+	public static DataSource getWriteDataSource() {
+		return _writeDataSource;
+	}
+
 	public static void init() throws Exception {
 		_readDataSource = _initDataSource("jdbc.read.");
 
 		_writeDataSource = _initDataSource("jdbc.write.");
 
-		if ((_readDataSource != null) && (_writeDataSource != null)) {
-			_dataSource = new DynamicDataSource(
-				_readDataSource, _writeDataSource);
-		}
-		else {
-			_dataSource = _initDataSource("jdbc.default.");
-		}
+		_dataSource = _writeDataSource;
 
-		if (_dataSource == null) {
-			throw new IllegalStateException("Failed to init data source");
+		if ((_readDataSource == null) && (_writeDataSource == null)) {
+			_dataSource = _initDataSource("jdbc.default.");
 		}
 
 		try (Connection connection = _dataSource.getConnection()) {
@@ -80,41 +83,41 @@ public class DBInitUtil {
 	private static void _addReleaseInfo(Connection connection)
 		throws Exception {
 
-		try (PreparedStatement ps = connection.prepareStatement(
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				StringBundler.concat(
 					"insert into Release_ (releaseId, createDate, ",
 					"modifiedDate, servletContextName, schemaVersion, ",
 					"buildNumber, verified, testString) values (",
 					ReleaseConstants.DEFAULT_ID, ", ?, ?, ?, ?, ?, ?, ?)"))) {
 
-			Date now = new Date(System.currentTimeMillis());
+			Date date = new Date(System.currentTimeMillis());
 
-			ps.setDate(1, now);
-			ps.setDate(2, now);
+			preparedStatement.setDate(1, date);
+			preparedStatement.setDate(2, date);
 
-			ps.setString(3, ReleaseConstants.DEFAULT_SERVLET_CONTEXT_NAME);
+			preparedStatement.setString(
+				3, ReleaseConstants.DEFAULT_SERVLET_CONTEXT_NAME);
 
-			Version latestSchemaVersion =
-				PortalUpgradeProcess.getLatestSchemaVersion();
+			preparedStatement.setString(
+				4,
+				String.valueOf(PortalUpgradeProcess.getLatestSchemaVersion()));
 
-			ps.setString(4, latestSchemaVersion.toString());
+			preparedStatement.setInt(5, ReleaseInfo.getBuildNumber());
+			preparedStatement.setBoolean(6, false);
+			preparedStatement.setString(7, ReleaseConstants.TEST_STRING);
 
-			ps.setInt(5, ReleaseInfo.getBuildNumber());
-			ps.setBoolean(6, false);
-			ps.setString(7, ReleaseConstants.TEST_STRING);
-
-			ps.executeUpdate();
+			preparedStatement.executeUpdate();
 		}
 	}
 
 	private static boolean _checkDefaultRelease(Connection connection) {
-		try (PreparedStatement ps = connection.prepareStatement(
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"select mvccVersion, schemaVersion, buildNumber, state_ from " +
 					"Release_ where releaseId = " +
 						ReleaseConstants.DEFAULT_ID);
-			ResultSet rs = ps.executeQuery()) {
+			ResultSet resultSet = preparedStatement.executeQuery()) {
 
-			if (!rs.next()) {
+			if (!resultSet.next()) {
 				_addReleaseInfo(connection);
 
 				StartupHelperUtil.setDbNew(true);
@@ -149,21 +152,36 @@ public class DBInitUtil {
 		_addReleaseInfo(connection);
 
 		StartupHelperUtil.setDbNew(true);
+
+		ServiceLatch serviceLatch = SystemBundleUtil.newServiceLatch();
+
+		serviceLatch.waitFor(
+			DependencyManagerSync.class,
+			dependencyManagerSync -> dependencyManagerSync.registerSyncCallable(
+				() -> {
+					StartupHelperUtil.setDbNew(false);
+
+					return null;
+				}));
+
+		serviceLatch.openOn(
+			() -> {
+			});
 	}
 
 	private static boolean _hasDefaultReleaseWithTestString(
 			Connection connection, String testString)
 		throws Exception {
 
-		try (PreparedStatement ps = connection.prepareStatement(
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"select count(*) from Release_ where releaseId = ? and " +
 					"testString = ?")) {
 
-			ps.setLong(1, ReleaseConstants.DEFAULT_ID);
-			ps.setString(2, testString);
+			preparedStatement.setLong(1, ReleaseConstants.DEFAULT_ID);
+			preparedStatement.setString(2, testString);
 
-			try (ResultSet rs = ps.executeQuery()) {
-				if (rs.next() && (rs.getInt(1) > 0)) {
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				if (resultSet.next() && (resultSet.getInt(1) > 0)) {
 					return true;
 				}
 			}

@@ -10,9 +10,7 @@
 </thead>
 
 <tbody>
-
 <!--NAVIGATION-->
-
 <tr>
 	<td>NAVIGATION_SCOPE</td>
 	<td>//ul[contains(@class,'nav')]//a[contains(.,'Scope')]</td>

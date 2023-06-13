@@ -84,8 +84,7 @@ public class DepotAdminMembershipsDisplayContextTest {
 				new DepotAdminMembershipsDisplayContext(
 					Mockito.mock(ItemSelector.class),
 					_getLiferayPortletRequest(
-						new ThemeDisplayBuilder(
-						).withPermissionChecker(
+						new ThemeDisplayBuilder().withPermissionChecker(
 							getPermissionCheckerWithCompanyAdmin()
 						).build()),
 					null);
@@ -113,8 +112,7 @@ public class DepotAdminMembershipsDisplayContextTest {
 				new DepotAdminMembershipsDisplayContext(
 					Mockito.mock(ItemSelector.class),
 					_getLiferayPortletRequest(
-						new ThemeDisplayBuilder(
-						).withPermissionChecker(
+						new ThemeDisplayBuilder().withPermissionChecker(
 							getPermissionCheckerWithNoCompanyAdminAndAssignMember()
 						).build()),
 					null);
@@ -142,8 +140,7 @@ public class DepotAdminMembershipsDisplayContextTest {
 				new DepotAdminMembershipsDisplayContext(
 					Mockito.mock(ItemSelector.class),
 					_getLiferayPortletRequest(
-						new ThemeDisplayBuilder(
-						).withPermissionChecker(
+						new ThemeDisplayBuilder().withPermissionChecker(
 							getPermissionCheckerWithNoCompanyAdminAndNoAssignMember()
 						).build()),
 					null);
@@ -169,8 +166,7 @@ public class DepotAdminMembershipsDisplayContextTest {
 				new DepotAdminMembershipsDisplayContext(
 					Mockito.mock(ItemSelector.class),
 					_getLiferayPortletRequest(
-						new ThemeDisplayBuilder(
-						).build()),
+						new ThemeDisplayBuilder().build()),
 					null);
 
 		List<Group> depots = depotAdminMembershipsDisplayContext.getDepotGroups(
@@ -196,8 +192,7 @@ public class DepotAdminMembershipsDisplayContextTest {
 				new DepotAdminMembershipsDisplayContext(
 					Mockito.mock(ItemSelector.class),
 					_getLiferayPortletRequest(
-						new ThemeDisplayBuilder(
-						).withPermissionChecker(
+						new ThemeDisplayBuilder().withPermissionChecker(
 							getPermissionCheckerWithCompanyAdmin()
 						).build()),
 					null);
@@ -219,8 +214,7 @@ public class DepotAdminMembershipsDisplayContextTest {
 				new DepotAdminMembershipsDisplayContext(
 					Mockito.mock(ItemSelector.class),
 					_getLiferayPortletRequest(
-						new ThemeDisplayBuilder(
-						).withPermissionChecker(
+						new ThemeDisplayBuilder().withPermissionChecker(
 							getPermissionCheckerWithCompanyAdmin()
 						).build()),
 					null);
@@ -339,10 +333,6 @@ public class DepotAdminMembershipsDisplayContextTest {
 
 	private static class ThemeDisplayBuilder {
 
-		public ThemeDisplayBuilder() {
-			_themeDisplay = new ThemeDisplay();
-		}
-
 		public ThemeDisplay build() {
 			return _themeDisplay;
 		}
@@ -355,7 +345,7 @@ public class DepotAdminMembershipsDisplayContextTest {
 			return this;
 		}
 
-		private final ThemeDisplay _themeDisplay;
+		private final ThemeDisplay _themeDisplay = new ThemeDisplay();
 
 	}
 

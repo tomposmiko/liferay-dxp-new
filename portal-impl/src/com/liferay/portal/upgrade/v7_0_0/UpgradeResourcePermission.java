@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
+import com.liferay.portal.upgrade.v7_0_0.util.ResourcePermissionTable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,18 +37,9 @@ import java.util.List;
  */
 public class UpgradeResourcePermission extends UpgradeProcess {
 
-	protected void createIndex() throws Exception {
-		try (LoggingTimer loggingTimer = new LoggingTimer()) {
-			runSQLTemplateString(
-				"create index IX_D5F1E2A2 on ResourcePermission " +
-					"(name[$COLUMN_LENGTH:255$])",
-				false);
-		}
-	}
-
 	@Override
 	protected void doUpgrade() throws Exception {
-		createIndex();
+		updateIndexes(ResourcePermissionTable.class);
 
 		upgradeResourcePermissions();
 	}
@@ -61,23 +53,27 @@ public class UpgradeResourcePermission extends UpgradeProcess {
 				"update ResourcePermission set viewActionId = [$TRUE$] where " +
 					"MOD(actionIds, 2) = 1");
 
-			try (PreparedStatement ps1 = connection.prepareStatement(
-					"select distinct name from ResourcePermission");
-				ResultSet rs1 = ps1.executeQuery();
-				PreparedStatement ps2 = connection.prepareStatement(
-					"select distinct primKey from ResourcePermission where " +
-						"name = ?")) {
+			try (PreparedStatement preparedStatement1 =
+					connection.prepareStatement(
+						"select distinct name from ResourcePermission");
+				ResultSet resultSet1 = preparedStatement1.executeQuery();
+				PreparedStatement preparedStatement2 =
+					connection.prepareStatement(
+						"select distinct primKey from ResourcePermission " +
+							"where name = ?")) {
 
-				while (rs1.next()) {
+				while (resultSet1.next()) {
 					List<String> primKeys = new ArrayList<>();
 
-					String name = rs1.getString("name");
+					String name = resultSet1.getString("name");
 
-					ps2.setString(1, name);
+					preparedStatement2.setString(1, name);
 
-					try (ResultSet rs2 = ps2.executeQuery()) {
-						while (rs2.next()) {
-							String primKey = rs2.getString("primKey");
+					try (ResultSet resultSet2 =
+							preparedStatement2.executeQuery()) {
+
+						while (resultSet2.next()) {
+							String primKey = resultSet2.getString("primKey");
 
 							if ((GetterUtil.getLong(primKey) <= 0) &&
 								!primKey.contains(
@@ -129,18 +125,18 @@ public class UpgradeResourcePermission extends UpgradeProcess {
 	private void _updatePrimKeyIds(String sql, String name, String[] primKeys)
 		throws Exception {
 
-		try (PreparedStatement ps = connection.prepareStatement(
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				SQLTransformer.transform(sql))) {
 
-			ps.setString(1, name);
+			preparedStatement.setString(1, name);
 
 			for (int i = 0; i < primKeys.length; i++) {
 				String primKey = primKeys[i];
 
-				ps.setString(i + 2, primKey);
+				preparedStatement.setString(i + 2, primKey);
 			}
 
-			ps.executeUpdate();
+			preparedStatement.executeUpdate();
 		}
 	}
 

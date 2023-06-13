@@ -11,16 +11,16 @@ definition {
 	}
 
 	tearDown {
-		Page.tearDownCP();
+		PagesAdmin.tearDownCP();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewPublisherSubscriber {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Test Publisher Subscriber Page");
+		PagesAdmin.addPublicPage(pageName = "Test Publisher Subscriber Page");
 
 		Navigator.gotoPage(pageName = "Test Publisher Subscriber Page");
 

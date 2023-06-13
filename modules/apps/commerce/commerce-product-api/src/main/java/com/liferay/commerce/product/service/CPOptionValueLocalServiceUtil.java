@@ -71,13 +71,24 @@ public class CPOptionValueLocalServiceUtil {
 	}
 
 	public static CPOptionValue addCPOptionValue(
-			long cpOptionId, Map<java.util.Locale, String> nameMap,
-			double priority, String key, String externalReferenceCode,
+			String externalReferenceCode, long cpOptionId,
+			Map<java.util.Locale, String> nameMap, double priority, String key,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addCPOptionValue(
-			cpOptionId, nameMap, priority, key, externalReferenceCode,
+			externalReferenceCode, cpOptionId, nameMap, priority, key,
+			serviceContext);
+	}
+
+	public static CPOptionValue addOrUpdateCPOptionValue(
+			String externalReferenceCode, long cpOptionId,
+			Map<java.util.Locale, String> nameMap, double priority, String key,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addOrUpdateCPOptionValue(
+			externalReferenceCode, cpOptionId, nameMap, priority, key,
 			serviceContext);
 	}
 
@@ -237,17 +248,23 @@ public class CPOptionValueLocalServiceUtil {
 	}
 
 	public static CPOptionValue fetchByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
+		String externalReferenceCode, long companyId) {
 
 		return getService().fetchByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	public static CPOptionValue fetchCPOptionValue(long CPOptionValueId) {
 		return getService().fetchCPOptionValue(CPOptionValueId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option value with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option value's external reference code
+	 * @return the matching cp option value, or <code>null</code> if a matching cp option value could not be found
+	 */
 	public static CPOptionValue fetchCPOptionValueByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
 
@@ -255,6 +272,9 @@ public class CPOptionValueLocalServiceUtil {
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPOptionValueByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static CPOptionValue fetchCPOptionValueByReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -302,7 +322,14 @@ public class CPOptionValueLocalServiceUtil {
 		return getService().getCPOptionValue(cpOptionId, key);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option value with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option value's external reference code
+	 * @return the matching cp option value
+	 * @throws PortalException if a matching cp option value could not be found
+	 */
 	public static CPOptionValue getCPOptionValueByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
 		throws PortalException {
@@ -407,6 +434,20 @@ public class CPOptionValueLocalServiceUtil {
 		return getService().search(searchContext);
 	}
 
+	/**
+	 * @param companyId
+	 * @param groupId
+	 * @param cpOptionId
+	 * @param keywords
+	 * @param start
+	 * @param end
+	 * @param sort
+	 * @return
+	 * @throws PortalException
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #searchCPOptionValues(long, long, String, int, int, Sort[])}
+	 */
+	@Deprecated
 	public static com.liferay.portal.kernel.search.BaseModelSearchResult
 		<CPOptionValue> searchCPOptionValues(
 				long companyId, long groupId, long cpOptionId, String keywords,
@@ -415,6 +456,24 @@ public class CPOptionValueLocalServiceUtil {
 
 		return getService().searchCPOptionValues(
 			companyId, groupId, cpOptionId, keywords, start, end, sort);
+	}
+
+	public static com.liferay.portal.kernel.search.BaseModelSearchResult
+		<CPOptionValue> searchCPOptionValues(
+				long companyId, long cpOptionId, String keywords, int start,
+				int end, com.liferay.portal.kernel.search.Sort[] sorts)
+			throws PortalException {
+
+		return getService().searchCPOptionValues(
+			companyId, cpOptionId, keywords, start, end, sorts);
+	}
+
+	public static int searchCPOptionValuesCount(
+			long companyId, long cpOptionId, String keywords)
+		throws PortalException {
+
+		return getService().searchCPOptionValuesCount(
+			companyId, cpOptionId, keywords);
 	}
 
 	/**
@@ -441,17 +500,6 @@ public class CPOptionValueLocalServiceUtil {
 
 		return getService().updateCPOptionValue(
 			cpOptionValueId, nameMap, priority, key, serviceContext);
-	}
-
-	public static CPOptionValue upsertCPOptionValue(
-			long cpOptionId, Map<java.util.Locale, String> nameMap,
-			double priority, String key, String externalReferenceCode,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		return getService().upsertCPOptionValue(
-			cpOptionId, nameMap, priority, key, externalReferenceCode,
-			serviceContext);
 	}
 
 	public static CPOptionValueLocalService getService() {

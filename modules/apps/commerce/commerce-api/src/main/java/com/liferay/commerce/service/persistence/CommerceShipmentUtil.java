@@ -125,8 +125,8 @@ public class CommerceShipmentUtil {
 	 * @param groupId the group ID
 	 * @return the matching commerce shipments
 	 */
-	public static List<CommerceShipment> findByGroupIds(long groupId) {
-		return getPersistence().findByGroupIds(groupId);
+	public static List<CommerceShipment> findByGroupId(long groupId) {
+		return getPersistence().findByGroupId(groupId);
 	}
 
 	/**
@@ -141,10 +141,10 @@ public class CommerceShipmentUtil {
 	 * @param end the upper bound of the range of commerce shipments (not inclusive)
 	 * @return the range of matching commerce shipments
 	 */
-	public static List<CommerceShipment> findByGroupIds(
+	public static List<CommerceShipment> findByGroupId(
 		long groupId, int start, int end) {
 
-		return getPersistence().findByGroupIds(groupId, start, end);
+		return getPersistence().findByGroupId(groupId, start, end);
 	}
 
 	/**
@@ -160,11 +160,11 @@ public class CommerceShipmentUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching commerce shipments
 	 */
-	public static List<CommerceShipment> findByGroupIds(
+	public static List<CommerceShipment> findByGroupId(
 		long groupId, int start, int end,
 		OrderByComparator<CommerceShipment> orderByComparator) {
 
-		return getPersistence().findByGroupIds(
+		return getPersistence().findByGroupId(
 			groupId, start, end, orderByComparator);
 	}
 
@@ -182,12 +182,12 @@ public class CommerceShipmentUtil {
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching commerce shipments
 	 */
-	public static List<CommerceShipment> findByGroupIds(
+	public static List<CommerceShipment> findByGroupId(
 		long groupId, int start, int end,
 		OrderByComparator<CommerceShipment> orderByComparator,
 		boolean useFinderCache) {
 
-		return getPersistence().findByGroupIds(
+		return getPersistence().findByGroupId(
 			groupId, start, end, orderByComparator, useFinderCache);
 	}
 
@@ -199,12 +199,11 @@ public class CommerceShipmentUtil {
 	 * @return the first matching commerce shipment
 	 * @throws NoSuchShipmentException if a matching commerce shipment could not be found
 	 */
-	public static CommerceShipment findByGroupIds_First(
+	public static CommerceShipment findByGroupId_First(
 			long groupId, OrderByComparator<CommerceShipment> orderByComparator)
 		throws com.liferay.commerce.exception.NoSuchShipmentException {
 
-		return getPersistence().findByGroupIds_First(
-			groupId, orderByComparator);
+		return getPersistence().findByGroupId_First(groupId, orderByComparator);
 	}
 
 	/**
@@ -214,10 +213,10 @@ public class CommerceShipmentUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching commerce shipment, or <code>null</code> if a matching commerce shipment could not be found
 	 */
-	public static CommerceShipment fetchByGroupIds_First(
+	public static CommerceShipment fetchByGroupId_First(
 		long groupId, OrderByComparator<CommerceShipment> orderByComparator) {
 
-		return getPersistence().fetchByGroupIds_First(
+		return getPersistence().fetchByGroupId_First(
 			groupId, orderByComparator);
 	}
 
@@ -229,11 +228,11 @@ public class CommerceShipmentUtil {
 	 * @return the last matching commerce shipment
 	 * @throws NoSuchShipmentException if a matching commerce shipment could not be found
 	 */
-	public static CommerceShipment findByGroupIds_Last(
+	public static CommerceShipment findByGroupId_Last(
 			long groupId, OrderByComparator<CommerceShipment> orderByComparator)
 		throws com.liferay.commerce.exception.NoSuchShipmentException {
 
-		return getPersistence().findByGroupIds_Last(groupId, orderByComparator);
+		return getPersistence().findByGroupId_Last(groupId, orderByComparator);
 	}
 
 	/**
@@ -243,11 +242,10 @@ public class CommerceShipmentUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching commerce shipment, or <code>null</code> if a matching commerce shipment could not be found
 	 */
-	public static CommerceShipment fetchByGroupIds_Last(
+	public static CommerceShipment fetchByGroupId_Last(
 		long groupId, OrderByComparator<CommerceShipment> orderByComparator) {
 
-		return getPersistence().fetchByGroupIds_Last(
-			groupId, orderByComparator);
+		return getPersistence().fetchByGroupId_Last(groupId, orderByComparator);
 	}
 
 	/**
@@ -259,12 +257,12 @@ public class CommerceShipmentUtil {
 	 * @return the previous, current, and next commerce shipment
 	 * @throws NoSuchShipmentException if a commerce shipment with the primary key could not be found
 	 */
-	public static CommerceShipment[] findByGroupIds_PrevAndNext(
+	public static CommerceShipment[] findByGroupId_PrevAndNext(
 			long commerceShipmentId, long groupId,
 			OrderByComparator<CommerceShipment> orderByComparator)
 		throws com.liferay.commerce.exception.NoSuchShipmentException {
 
-		return getPersistence().findByGroupIds_PrevAndNext(
+		return getPersistence().findByGroupId_PrevAndNext(
 			commerceShipmentId, groupId, orderByComparator);
 	}
 
@@ -278,8 +276,8 @@ public class CommerceShipmentUtil {
 	 * @param groupIds the group IDs
 	 * @return the matching commerce shipments
 	 */
-	public static List<CommerceShipment> findByGroupIds(long[] groupIds) {
-		return getPersistence().findByGroupIds(groupIds);
+	public static List<CommerceShipment> findByGroupId(long[] groupIds) {
+		return getPersistence().findByGroupId(groupIds);
 	}
 
 	/**
@@ -294,10 +292,10 @@ public class CommerceShipmentUtil {
 	 * @param end the upper bound of the range of commerce shipments (not inclusive)
 	 * @return the range of matching commerce shipments
 	 */
-	public static List<CommerceShipment> findByGroupIds(
+	public static List<CommerceShipment> findByGroupId(
 		long[] groupIds, int start, int end) {
 
-		return getPersistence().findByGroupIds(groupIds, start, end);
+		return getPersistence().findByGroupId(groupIds, start, end);
 	}
 
 	/**
@@ -313,11 +311,11 @@ public class CommerceShipmentUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching commerce shipments
 	 */
-	public static List<CommerceShipment> findByGroupIds(
+	public static List<CommerceShipment> findByGroupId(
 		long[] groupIds, int start, int end,
 		OrderByComparator<CommerceShipment> orderByComparator) {
 
-		return getPersistence().findByGroupIds(
+		return getPersistence().findByGroupId(
 			groupIds, start, end, orderByComparator);
 	}
 
@@ -328,19 +326,19 @@ public class CommerceShipmentUtil {
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceShipmentModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param start the lower bound of the range of commerce shipments
 	 * @param end the upper bound of the range of commerce shipments (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching commerce shipments
 	 */
-	public static List<CommerceShipment> findByGroupIds(
+	public static List<CommerceShipment> findByGroupId(
 		long[] groupIds, int start, int end,
 		OrderByComparator<CommerceShipment> orderByComparator,
 		boolean useFinderCache) {
 
-		return getPersistence().findByGroupIds(
+		return getPersistence().findByGroupId(
 			groupIds, start, end, orderByComparator, useFinderCache);
 	}
 
@@ -349,8 +347,8 @@ public class CommerceShipmentUtil {
 	 *
 	 * @param groupId the group ID
 	 */
-	public static void removeByGroupIds(long groupId) {
-		getPersistence().removeByGroupIds(groupId);
+	public static void removeByGroupId(long groupId) {
+		getPersistence().removeByGroupId(groupId);
 	}
 
 	/**
@@ -359,8 +357,8 @@ public class CommerceShipmentUtil {
 	 * @param groupId the group ID
 	 * @return the number of matching commerce shipments
 	 */
-	public static int countByGroupIds(long groupId) {
-		return getPersistence().countByGroupIds(groupId);
+	public static int countByGroupId(long groupId) {
+		return getPersistence().countByGroupId(groupId);
 	}
 
 	/**
@@ -369,8 +367,8 @@ public class CommerceShipmentUtil {
 	 * @param groupIds the group IDs
 	 * @return the number of matching commerce shipments
 	 */
-	public static int countByGroupIds(long[] groupIds) {
-		return getPersistence().countByGroupIds(groupIds);
+	public static int countByGroupId(long[] groupIds) {
+		return getPersistence().countByGroupId(groupIds);
 	}
 
 	/**
@@ -606,7 +604,7 @@ public class CommerceShipmentUtil {
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceShipmentModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param commerceAddressId the commerce address ID
 	 * @param start the lower bound of the range of commerce shipments
 	 * @param end the upper bound of the range of commerce shipments (not inclusive)
@@ -884,7 +882,7 @@ public class CommerceShipmentUtil {
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceShipmentModelImpl</code>.
 	 * </p>
 	 *
-	 * @param groupIds the group IDs
+	 * @param groupId the group ID
 	 * @param status the status
 	 * @param start the lower bound of the range of commerce shipments
 	 * @param end the upper bound of the range of commerce shipments (not inclusive)

@@ -24,12 +24,15 @@ String assetTagName = ParamUtil.getString(request, "tag");
 
 boolean useAssetEntryQuery = (assetCategoryId > 0) || Validator.isNotNull(assetTagName);
 
-PortletURL portletURL = renderResponse.createRenderURL();
-
-portletURL.setParameter("mvcRenderCommandName", "/blogs/view");
+PortletURL portletURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCRenderCommandName(
+	"/blogs/view"
+).buildPortletURL();
 %>
 
 <liferay-ui:success key='<%= portletDisplay.getId() + "requestProcessed" %>' message="your-request-completed-successfully" />
+<liferay-ui:success key="blogsEntryPublished" message="the-blog-entry-was-published-successfully" />
 
 <portlet:actionURL name="/blogs/edit_entry" var="restoreTrashEntriesURL">
 	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />

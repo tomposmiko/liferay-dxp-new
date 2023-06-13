@@ -26,7 +26,6 @@ import com.liferay.headless.admin.workflow.client.serdes.v1_0.WorkflowInstanceSe
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,13 +43,13 @@ public interface WorkflowInstanceResource {
 	}
 
 	public Page<WorkflowInstance> getWorkflowInstancesPage(
-			String[] assetClassNames, Long[] assetPrimaryKeys,
-			Boolean completed, Pagination pagination)
+			String assetClassName, Long assetPrimaryKey, Boolean completed,
+			Pagination pagination)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse getWorkflowInstancesPageHttpResponse(
-			String[] assetClassNames, Long[] assetPrimaryKeys,
-			Boolean completed, Pagination pagination)
+			String assetClassName, Long assetPrimaryKey, Boolean completed,
+			Pagination pagination)
 		throws Exception;
 
 	public WorkflowInstance postWorkflowInstanceSubmit(
@@ -93,40 +92,8 @@ public interface WorkflowInstanceResource {
 			return this;
 		}
 
-		public Builder bearerToken(String token) {
-			return header("Authorization", "Bearer " + token);
-		}
-
 		public WorkflowInstanceResource build() {
 			return new WorkflowInstanceResourceImpl(this);
-		}
-
-		public Builder contextPath(String contextPath) {
-			_contextPath = contextPath;
-
-			return this;
-		}
-
-		public Builder endpoint(String address, String scheme) {
-			String[] addressParts = address.split(":");
-
-			String host = addressParts[0];
-
-			int port = 443;
-
-			if (addressParts.length > 1) {
-				String portString = addressParts[1];
-
-				try {
-					port = Integer.parseInt(portString);
-				}
-				catch (NumberFormatException numberFormatException) {
-					throw new IllegalArgumentException(
-						"Unable to parse port from " + portString);
-				}
-			}
-
-			return endpoint(host, port, scheme);
 		}
 
 		public Builder endpoint(String host, int port, String scheme) {
@@ -174,7 +141,6 @@ public interface WorkflowInstanceResource {
 		private Builder() {
 		}
 
-		private String _contextPath = "";
 		private Map<String, String> _headers = new LinkedHashMap<>();
 		private String _host = "localhost";
 		private Locale _locale;
@@ -190,13 +156,13 @@ public interface WorkflowInstanceResource {
 		implements WorkflowInstanceResource {
 
 		public Page<WorkflowInstance> getWorkflowInstancesPage(
-				String[] assetClassNames, Long[] assetPrimaryKeys,
-				Boolean completed, Pagination pagination)
+				String assetClassName, Long assetPrimaryKey, Boolean completed,
+				Pagination pagination)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				getWorkflowInstancesPageHttpResponse(
-					assetClassNames, assetPrimaryKeys, completed, pagination);
+					assetClassName, assetPrimaryKey, completed, pagination);
 
 			String content = httpResponse.getContent();
 
@@ -212,29 +178,7 @@ public interface WorkflowInstanceResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -258,8 +202,8 @@ public interface WorkflowInstanceResource {
 		}
 
 		public HttpInvoker.HttpResponse getWorkflowInstancesPageHttpResponse(
-				String[] assetClassNames, Long[] assetPrimaryKeys,
-				Boolean completed, Pagination pagination)
+				String assetClassName, Long assetPrimaryKey, Boolean completed,
+				Pagination pagination)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -283,19 +227,14 @@ public interface WorkflowInstanceResource {
 
 			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
 
-			if (assetClassNames != null) {
-				for (int i = 0; i < assetClassNames.length; i++) {
-					httpInvoker.parameter(
-						"assetClassNames", String.valueOf(assetClassNames[i]));
-				}
+			if (assetClassName != null) {
+				httpInvoker.parameter(
+					"assetClassName", String.valueOf(assetClassName));
 			}
 
-			if (assetPrimaryKeys != null) {
-				for (int i = 0; i < assetPrimaryKeys.length; i++) {
-					httpInvoker.parameter(
-						"assetPrimaryKeys",
-						String.valueOf(assetPrimaryKeys[i]));
-				}
+			if (assetPrimaryKey != null) {
+				httpInvoker.parameter(
+					"assetPrimaryKey", String.valueOf(assetPrimaryKey));
 			}
 
 			if (completed != null) {
@@ -311,7 +250,7 @@ public interface WorkflowInstanceResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-admin-workflow/v1.0/workflow-instances");
 
 			httpInvoker.userNameAndPassword(
@@ -341,29 +280,7 @@ public interface WorkflowInstanceResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -416,7 +333,7 @@ public interface WorkflowInstanceResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-admin-workflow/v1.0/workflow-instances/submit");
 
 			httpInvoker.userNameAndPassword(
@@ -445,29 +362,7 @@ public interface WorkflowInstanceResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -517,7 +412,7 @@ public interface WorkflowInstanceResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-admin-workflow/v1.0/workflow-instances/{workflowInstanceId}");
 
 			httpInvoker.path("workflowInstanceId", workflowInstanceId);
@@ -548,29 +443,7 @@ public interface WorkflowInstanceResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -620,7 +493,7 @@ public interface WorkflowInstanceResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-admin-workflow/v1.0/workflow-instances/{workflowInstanceId}");
 
 			httpInvoker.path("workflowInstanceId", workflowInstanceId);
@@ -653,29 +526,7 @@ public interface WorkflowInstanceResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -728,7 +579,7 @@ public interface WorkflowInstanceResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-admin-workflow/v1.0/workflow-instances/{workflowInstanceId}/change-transition");
 
 			httpInvoker.path("workflowInstanceId", workflowInstanceId);

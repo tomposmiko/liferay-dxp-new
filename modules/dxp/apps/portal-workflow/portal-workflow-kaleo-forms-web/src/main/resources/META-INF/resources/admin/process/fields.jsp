@@ -163,7 +163,7 @@ JSONArray availableDefinitionsJSONArray = JSONFactoryUtil.createJSONArray();
 <aui:script>
 	Liferay.on(
 		'<portlet:namespace />chooseDefinition',
-		function (event) {
+		(event) => {
 			var A = AUI();
 
 			var ddmStructureId = event.ddmStructureId;
@@ -192,23 +192,44 @@ JSONArray availableDefinitionsJSONArray = JSONFactoryUtil.createJSONArray();
 		['aui-base']
 	);
 
-	Liferay.provide(
-		window,
-		'<portlet:namespace />editStructure',
-		function (title, uri) {
-			var A = AUI();
+	<portlet:namespace />editStructure = (title, uri) => {
+		let closeRedirectURL;
+		let redirectOnClose = false;
 
-			var WIN = A.config.win;
+		Liferay.Util.openModal({
+			iframeBodyCssClass: '',
+			onClose: () => {
+				if (redirectOnClose) {
+					Liferay.Util.navigate(closeRedirectURL);
+				}
+			},
+			onOpen: ({iframeWindow}) => {
+				const closeRedirectElement = iframeWindow.document.getElementById(
+					'_<%= DDMPortletKeys.DYNAMIC_DATA_MAPPING %>_closeRedirect'
+				);
 
-			Liferay.Util.openWindow({
-				id: A.guid(),
-				refreshWindow: WIN,
-				title: title,
-				uri: uri,
-			});
-		},
-		['liferay-util']
-	);
+				if (closeRedirectElement) {
+					closeRedirectURL = closeRedirectElement.value;
+				}
+
+				const saveButton = iframeWindow.document.querySelector(
+					'.btn-primary'
+				);
+
+				if (saveButton) {
+					const onClick = () => {
+						redirectOnClose = true;
+
+						saveButton.removeEventListener('click', onClick);
+					};
+
+					saveButton.addEventListener('click', onClick);
+				}
+			},
+			title: title,
+			url: uri,
+		});
+	};
 </aui:script>
 
 <aui:script use="liferay-kaleo-forms-components">
@@ -229,7 +250,7 @@ JSONArray availableDefinitionsJSONArray = JSONFactoryUtil.createJSONArray();
 
 	A.one('#p_p_id<portlet:namespace />').delegate(
 		'click',
-		function (event) {
+		(event) => {
 			var definitionId = event.target.attr('data-definition-id');
 
 			kaleoDefinitionPreview.select(definitionId);

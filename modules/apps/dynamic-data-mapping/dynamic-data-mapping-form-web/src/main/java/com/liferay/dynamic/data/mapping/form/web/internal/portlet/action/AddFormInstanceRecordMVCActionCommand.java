@@ -20,11 +20,13 @@ import com.liferay.dynamic.data.mapping.exception.FormInstanceNotPublishedExcept
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
 import com.liferay.dynamic.data.mapping.form.web.internal.constants.DDMFormWebKeys;
 import com.liferay.dynamic.data.mapping.form.web.internal.instance.lifecycle.AddDefaultSharedFormLayoutPortalInstanceLifecycleListener;
+import com.liferay.dynamic.data.mapping.form.web.internal.portlet.action.helper.AddFormInstanceRecordMVCCommandHelper;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceSettings;
+import com.liferay.dynamic.data.mapping.model.DDMFormSuccessPageSettings;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalService;
@@ -37,6 +39,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -95,6 +98,9 @@ public class AddFormInstanceRecordMVCActionCommand
 		DDMFormInstance ddmFormInstance =
 			_ddmFormInstanceService.getFormInstance(formInstanceId);
 
+		_addFormInstanceMVCCommandHelper.validateExpirationStatus(
+			ddmFormInstance, actionRequest);
+
 		_validatePublishStatus(actionRequest, ddmFormInstance);
 
 		validateCaptcha(actionRequest, ddmFormInstance);
@@ -129,22 +135,31 @@ public class AddFormInstanceRecordMVCActionCommand
 		DDMFormInstanceSettings formInstanceSettings =
 			ddmFormInstance.getSettingsModel();
 
-		String ddmFormInstanceSettingsRedirectURL =
-			formInstanceSettings.redirectURL();
+		String redirectURL = ParamUtil.getString(
+			actionRequest, "redirect", formInstanceSettings.redirectURL());
 
-		if (Validator.isNotNull(ddmFormInstanceSettingsRedirectURL)) {
-			hideDefaultSuccessMessage(actionRequest);
+		if (Validator.isNotNull(redirectURL)) {
+			portletSession.setAttribute(
+				DDMFormWebKeys.DYNAMIC_DATA_MAPPING_FORM_INSTANCE_ID,
+				formInstanceId);
+			portletSession.setAttribute(DDMFormWebKeys.GROUP_ID, groupId);
+
+			sendRedirect(actionRequest, actionResponse, redirectURL);
 		}
+		else {
+			DDMFormSuccessPageSettings ddmFormSuccessPageSettings =
+				ddmForm.getDDMFormSuccessPageSettings();
 
-		portletSession.setAttribute(
-			DDMFormWebKeys.DYNAMIC_DATA_MAPPING_FORM_INSTANCE_ID,
-			formInstanceId);
-		portletSession.setAttribute(DDMFormWebKeys.GROUP_ID, groupId);
+			if (ddmFormSuccessPageSettings.isEnabled()) {
+				String portletId = _portal.getPortletId(actionRequest);
 
-		sendRedirect(
-			actionRequest, actionResponse,
-			ParamUtil.getString(
-				actionRequest, "redirect", ddmFormInstanceSettingsRedirectURL));
+				SessionMessages.add(
+					actionRequest,
+					portletId.concat(
+						SessionMessages.
+							KEY_SUFFIX_HIDE_DEFAULT_SUCCESS_MESSAGE));
+			}
+		}
 	}
 
 	protected DDMForm getDDMForm(DDMFormInstance ddmFormInstance)
@@ -236,9 +251,7 @@ public class AddFormInstanceRecordMVCActionCommand
 
 		String formLayoutURL =
 			_addDefaultSharedFormLayoutPortalInstanceLifecycleListener.
-				getFormLayoutURL(
-					themeDisplay,
-					ddmFormInstanceSettings.requireAuthentication());
+				getFormLayoutURL(themeDisplay);
 
 		if (StringUtil.startsWith(currentURL, formLayoutURL) &&
 			!ddmFormInstanceSettings.published()) {

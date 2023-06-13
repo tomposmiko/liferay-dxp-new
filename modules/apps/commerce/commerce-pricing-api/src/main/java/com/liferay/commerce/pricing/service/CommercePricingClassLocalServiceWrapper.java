@@ -27,6 +27,10 @@ public class CommercePricingClassLocalServiceWrapper
 	implements CommercePricingClassLocalService,
 			   ServiceWrapper<CommercePricingClassLocalService> {
 
+	public CommercePricingClassLocalServiceWrapper() {
+		this(null);
+	}
+
 	public CommercePricingClassLocalServiceWrapper(
 		CommercePricingClassLocalService commercePricingClassLocalService) {
 
@@ -68,15 +72,30 @@ public class CommercePricingClassLocalServiceWrapper
 	@Override
 	public com.liferay.commerce.pricing.model.CommercePricingClass
 			addCommercePricingClass(
-				long userId, java.util.Map<java.util.Locale, String> titleMap,
+				String externalReferenceCode, long userId,
+				java.util.Map<java.util.Locale, String> titleMap,
 				java.util.Map<java.util.Locale, String> descriptionMap,
-				String externalReferenceCode,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commercePricingClassLocalService.addCommercePricingClass(
-			userId, titleMap, descriptionMap, externalReferenceCode,
+			externalReferenceCode, userId, titleMap, descriptionMap,
 			serviceContext);
+	}
+
+	@Override
+	public com.liferay.commerce.pricing.model.CommercePricingClass
+			addOrUpdateCommercePricingClass(
+				String externalReferenceCode, long commercePricingClassId,
+				long userId, java.util.Map<java.util.Locale, String> titleMap,
+				java.util.Map<java.util.Locale, String> descriptionMap,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _commercePricingClassLocalService.
+			addOrUpdateCommercePricingClass(
+				externalReferenceCode, commercePricingClassId, userId, titleMap,
+				descriptionMap, serviceContext);
 	}
 
 	/**
@@ -274,10 +293,10 @@ public class CommercePricingClassLocalServiceWrapper
 	@Override
 	public com.liferay.commerce.pricing.model.CommercePricingClass
 		fetchByExternalReferenceCode(
-			long companyId, String externalReferenceCode) {
+			String externalReferenceCode, long companyId) {
 
 		return _commercePricingClassLocalService.fetchByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	@Override
@@ -288,7 +307,13 @@ public class CommercePricingClassLocalServiceWrapper
 			commercePricingClassId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce pricing class with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce pricing class's external reference code
+	 * @return the matching commerce pricing class, or <code>null</code> if a matching commerce pricing class could not be found
+	 */
 	@Override
 	public com.liferay.commerce.pricing.model.CommercePricingClass
 		fetchCommercePricingClassByExternalReferenceCode(
@@ -299,6 +324,9 @@ public class CommercePricingClassLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommercePricingClassByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.pricing.model.CommercePricingClass
@@ -355,7 +383,14 @@ public class CommercePricingClassLocalServiceWrapper
 			getCommercePricingClassByCPDefinition(cpDefinitionId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce pricing class with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce pricing class's external reference code
+	 * @return the matching commerce pricing class
+	 * @throws PortalException if a matching commerce pricing class could not be found
+	 */
 	@Override
 	public com.liferay.commerce.pricing.model.CommercePricingClass
 			getCommercePricingClassByExternalReferenceCode(
@@ -492,6 +527,16 @@ public class CommercePricingClassLocalServiceWrapper
 	}
 
 	@Override
+	public java.util.List
+		<com.liferay.commerce.pricing.model.CommercePricingClass>
+			searchByCPDefinitionId(
+				long cpDefinitionId, String title, int start, int end) {
+
+		return _commercePricingClassLocalService.searchByCPDefinitionId(
+			cpDefinitionId, title, start, end);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.search.BaseModelSearchResult
 		<com.liferay.commerce.pricing.model.CommercePricingClass>
 				searchCommercePricingClasses(
@@ -501,17 +546,6 @@ public class CommercePricingClassLocalServiceWrapper
 
 		return _commercePricingClassLocalService.searchCommercePricingClasses(
 			companyId, keywords, start, end, sort);
-	}
-
-	@Override
-	public java.util.List
-		<com.liferay.commerce.pricing.model.CommercePricingClass>
-			searchCommercePricingClassesByCPDefinitionId(
-				long cpDefinitionId, String title, int start, int end) {
-
-		return _commercePricingClassLocalService.
-			searchCommercePricingClassesByCPDefinitionId(
-				cpDefinitionId, title, start, end);
 	}
 
 	/**
@@ -551,27 +585,12 @@ public class CommercePricingClassLocalServiceWrapper
 	@Override
 	public com.liferay.commerce.pricing.model.CommercePricingClass
 			updateCommercePricingClassExternalReferenceCode(
-				long commercePricingClassId, String externalReferenceCode)
+				String externalReferenceCode, long commercePricingClassId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commercePricingClassLocalService.
 			updateCommercePricingClassExternalReferenceCode(
-				commercePricingClassId, externalReferenceCode);
-	}
-
-	@Override
-	public com.liferay.commerce.pricing.model.CommercePricingClass
-			upsertCommercePricingClass(
-				long commercePricingClassId, long userId,
-				java.util.Map<java.util.Locale, String> titleMap,
-				java.util.Map<java.util.Locale, String> descriptionMap,
-				String externalReferenceCode,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _commercePricingClassLocalService.upsertCommercePricingClass(
-			commercePricingClassId, userId, titleMap, descriptionMap,
-			externalReferenceCode, serviceContext);
+				externalReferenceCode, commercePricingClassId);
 	}
 
 	@Override

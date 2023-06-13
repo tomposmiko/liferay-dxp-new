@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -291,57 +292,79 @@ public class UserGroupRoleModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<UserGroupRole, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, UserGroupRole>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<UserGroupRole, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<UserGroupRole, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			UserGroupRole.class.getClassLoader(), UserGroupRole.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", UserGroupRole::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", UserGroupRole::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"userGroupRoleId", UserGroupRole::getUserGroupRoleId);
-		attributeGetterFunctions.put("companyId", UserGroupRole::getCompanyId);
-		attributeGetterFunctions.put("userId", UserGroupRole::getUserId);
-		attributeGetterFunctions.put("groupId", UserGroupRole::getGroupId);
-		attributeGetterFunctions.put("roleId", UserGroupRole::getRoleId);
+		try {
+			Constructor<UserGroupRole> constructor =
+				(Constructor<UserGroupRole>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<UserGroupRole, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<UserGroupRole, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<UserGroupRole, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<UserGroupRole, Object>>();
 		Map<String, BiConsumer<UserGroupRole, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<UserGroupRole, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", UserGroupRole::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<UserGroupRole, Long>)UserGroupRole::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", UserGroupRole::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<UserGroupRole, Long>)UserGroupRole::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"userGroupRoleId", UserGroupRole::getUserGroupRoleId);
 		attributeSetterBiConsumers.put(
 			"userGroupRoleId",
 			(BiConsumer<UserGroupRole, Long>)UserGroupRole::setUserGroupRoleId);
+		attributeGetterFunctions.put("companyId", UserGroupRole::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<UserGroupRole, Long>)UserGroupRole::setCompanyId);
+		attributeGetterFunctions.put("userId", UserGroupRole::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<UserGroupRole, Long>)UserGroupRole::setUserId);
+		attributeGetterFunctions.put("groupId", UserGroupRole::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<UserGroupRole, Long>)UserGroupRole::setGroupId);
+		attributeGetterFunctions.put("roleId", UserGroupRole::getRoleId);
 		attributeSetterBiConsumers.put(
 			"roleId",
 			(BiConsumer<UserGroupRole, Long>)UserGroupRole::setRoleId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -564,6 +587,28 @@ public class UserGroupRoleModelImpl
 	}
 
 	@Override
+	public UserGroupRole cloneWithOriginalValues() {
+		UserGroupRoleImpl userGroupRoleImpl = new UserGroupRoleImpl();
+
+		userGroupRoleImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		userGroupRoleImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		userGroupRoleImpl.setUserGroupRoleId(
+			this.<Long>getColumnOriginalValue("userGroupRoleId"));
+		userGroupRoleImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		userGroupRoleImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		userGroupRoleImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		userGroupRoleImpl.setRoleId(
+			this.<Long>getColumnOriginalValue("roleId"));
+
+		return userGroupRoleImpl;
+	}
+
+	@Override
 	public int compareTo(UserGroupRole userGroupRole) {
 		long primaryKey = userGroupRole.getPrimaryKey();
 
@@ -735,9 +780,7 @@ public class UserGroupRoleModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, UserGroupRole>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					UserGroupRole.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

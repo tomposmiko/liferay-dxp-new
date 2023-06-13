@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -226,85 +227,107 @@ public class AssetAutoTaggerEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, AssetAutoTaggerEntry>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AssetAutoTaggerEntry.class.getClassLoader(),
+			AssetAutoTaggerEntry.class, ModelWrapper.class);
+
+		try {
+			Constructor<AssetAutoTaggerEntry> constructor =
+				(Constructor<AssetAutoTaggerEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<AssetAutoTaggerEntry, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AssetAutoTaggerEntry, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<AssetAutoTaggerEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<AssetAutoTaggerEntry, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", AssetAutoTaggerEntry::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", AssetAutoTaggerEntry::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"assetAutoTaggerEntryId",
-			AssetAutoTaggerEntry::getAssetAutoTaggerEntryId);
-		attributeGetterFunctions.put(
-			"groupId", AssetAutoTaggerEntry::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", AssetAutoTaggerEntry::getCompanyId);
-		attributeGetterFunctions.put(
-			"createDate", AssetAutoTaggerEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", AssetAutoTaggerEntry::getModifiedDate);
-		attributeGetterFunctions.put(
-			"assetEntryId", AssetAutoTaggerEntry::getAssetEntryId);
-		attributeGetterFunctions.put(
-			"assetTagId", AssetAutoTaggerEntry::getAssetTagId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<AssetAutoTaggerEntry, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<AssetAutoTaggerEntry, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<AssetAutoTaggerEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", AssetAutoTaggerEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AssetAutoTaggerEntry, Long>)
 				AssetAutoTaggerEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", AssetAutoTaggerEntry::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<AssetAutoTaggerEntry, Long>)
 				AssetAutoTaggerEntry::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"assetAutoTaggerEntryId",
+			AssetAutoTaggerEntry::getAssetAutoTaggerEntryId);
 		attributeSetterBiConsumers.put(
 			"assetAutoTaggerEntryId",
 			(BiConsumer<AssetAutoTaggerEntry, Long>)
 				AssetAutoTaggerEntry::setAssetAutoTaggerEntryId);
+		attributeGetterFunctions.put(
+			"groupId", AssetAutoTaggerEntry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<AssetAutoTaggerEntry, Long>)
 				AssetAutoTaggerEntry::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", AssetAutoTaggerEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AssetAutoTaggerEntry, Long>)
 				AssetAutoTaggerEntry::setCompanyId);
+		attributeGetterFunctions.put(
+			"createDate", AssetAutoTaggerEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<AssetAutoTaggerEntry, Date>)
 				AssetAutoTaggerEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", AssetAutoTaggerEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<AssetAutoTaggerEntry, Date>)
 				AssetAutoTaggerEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"assetEntryId", AssetAutoTaggerEntry::getAssetEntryId);
 		attributeSetterBiConsumers.put(
 			"assetEntryId",
 			(BiConsumer<AssetAutoTaggerEntry, Long>)
 				AssetAutoTaggerEntry::setAssetEntryId);
+		attributeGetterFunctions.put(
+			"assetTagId", AssetAutoTaggerEntry::getAssetTagId);
 		attributeSetterBiConsumers.put(
 			"assetTagId",
 			(BiConsumer<AssetAutoTaggerEntry, Long>)
 				AssetAutoTaggerEntry::setAssetTagId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -536,6 +559,33 @@ public class AssetAutoTaggerEntryModelImpl
 	}
 
 	@Override
+	public AssetAutoTaggerEntry cloneWithOriginalValues() {
+		AssetAutoTaggerEntryImpl assetAutoTaggerEntryImpl =
+			new AssetAutoTaggerEntryImpl();
+
+		assetAutoTaggerEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		assetAutoTaggerEntryImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		assetAutoTaggerEntryImpl.setAssetAutoTaggerEntryId(
+			this.<Long>getColumnOriginalValue("assetAutoTaggerEntryId"));
+		assetAutoTaggerEntryImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		assetAutoTaggerEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		assetAutoTaggerEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		assetAutoTaggerEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		assetAutoTaggerEntryImpl.setAssetEntryId(
+			this.<Long>getColumnOriginalValue("assetEntryId"));
+		assetAutoTaggerEntryImpl.setAssetTagId(
+			this.<Long>getColumnOriginalValue("assetTagId"));
+
+		return assetAutoTaggerEntryImpl;
+	}
+
+	@Override
 	public int compareTo(AssetAutoTaggerEntry assetAutoTaggerEntry) {
 		int value = 0;
 
@@ -733,9 +783,7 @@ public class AssetAutoTaggerEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AssetAutoTaggerEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AssetAutoTaggerEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

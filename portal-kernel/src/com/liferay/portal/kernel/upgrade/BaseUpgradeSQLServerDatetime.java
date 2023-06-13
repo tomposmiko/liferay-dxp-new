@@ -29,8 +29,11 @@ import java.sql.Types;
 import java.util.Map;
 
 /**
- * @author José Ángel Jiménez
+ * @author     José Ángel Jiménez
+ * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+ *             BaseSQLServerDatetimeUpgradeProcess}
  */
+@Deprecated
 public class BaseUpgradeSQLServerDatetime extends UpgradeProcess {
 
 	public BaseUpgradeSQLServerDatetime(Class<?>[] tableClasses) {

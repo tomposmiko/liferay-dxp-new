@@ -18,8 +18,6 @@
 
 <%
 DLSelectRestrictedFileEntryTypesDisplayContext selectRestrictedFileEntryTypesDisplayContext = new DLSelectRestrictedFileEntryTypesDisplayContext(request, renderRequest, renderResponse);
-
-String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "selectFileEntryType");
 %>
 
 <clay:navigation-bar
@@ -36,7 +34,7 @@ String eventName = ParamUtil.getString(request, "eventName", liferayPortletRespo
 	%>'
 />
 
-<aui:form action="<%= selectRestrictedFileEntryTypesDisplayContext.getFormActionURL() %>" cssClass="container-fluid-1280" method="post" name="selectFileEntryTypeFm">
+<aui:form action="<%= selectRestrictedFileEntryTypesDisplayContext.getFormActionURL() %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="selectFileEntryTypeFm">
 	<liferay-ui:search-container
 		searchContainer="<%= selectRestrictedFileEntryTypesDisplayContext.getSearchContainer() %>"
 	>
@@ -80,10 +78,3 @@ String eventName = ParamUtil.getString(request, "eventName", liferayPortletRespo
 		/>
 	</liferay-ui:search-container>
 </aui:form>
-
-<aui:script>
-	Liferay.Util.selectEntityHandler(
-		'#<portlet:namespace />selectFileEntryTypeFm',
-		'<%= HtmlUtil.escapeJS(eventName) %>'
-	);
-</aui:script>

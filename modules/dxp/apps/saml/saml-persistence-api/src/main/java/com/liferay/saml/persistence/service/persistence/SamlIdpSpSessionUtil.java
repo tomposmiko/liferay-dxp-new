@@ -126,8 +126,8 @@ public class SamlIdpSpSessionUtil {
 	 * @param createDate the create date
 	 * @return the matching saml idp sp sessions
 	 */
-	public static List<SamlIdpSpSession> findByCreateDate(Date createDate) {
-		return getPersistence().findByCreateDate(createDate);
+	public static List<SamlIdpSpSession> findByLtCreateDate(Date createDate) {
+		return getPersistence().findByLtCreateDate(createDate);
 	}
 
 	/**
@@ -142,10 +142,10 @@ public class SamlIdpSpSessionUtil {
 	 * @param end the upper bound of the range of saml idp sp sessions (not inclusive)
 	 * @return the range of matching saml idp sp sessions
 	 */
-	public static List<SamlIdpSpSession> findByCreateDate(
+	public static List<SamlIdpSpSession> findByLtCreateDate(
 		Date createDate, int start, int end) {
 
-		return getPersistence().findByCreateDate(createDate, start, end);
+		return getPersistence().findByLtCreateDate(createDate, start, end);
 	}
 
 	/**
@@ -161,11 +161,11 @@ public class SamlIdpSpSessionUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching saml idp sp sessions
 	 */
-	public static List<SamlIdpSpSession> findByCreateDate(
+	public static List<SamlIdpSpSession> findByLtCreateDate(
 		Date createDate, int start, int end,
 		OrderByComparator<SamlIdpSpSession> orderByComparator) {
 
-		return getPersistence().findByCreateDate(
+		return getPersistence().findByLtCreateDate(
 			createDate, start, end, orderByComparator);
 	}
 
@@ -183,12 +183,12 @@ public class SamlIdpSpSessionUtil {
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching saml idp sp sessions
 	 */
-	public static List<SamlIdpSpSession> findByCreateDate(
+	public static List<SamlIdpSpSession> findByLtCreateDate(
 		Date createDate, int start, int end,
 		OrderByComparator<SamlIdpSpSession> orderByComparator,
 		boolean useFinderCache) {
 
-		return getPersistence().findByCreateDate(
+		return getPersistence().findByLtCreateDate(
 			createDate, start, end, orderByComparator, useFinderCache);
 	}
 
@@ -200,13 +200,13 @@ public class SamlIdpSpSessionUtil {
 	 * @return the first matching saml idp sp session
 	 * @throws NoSuchIdpSpSessionException if a matching saml idp sp session could not be found
 	 */
-	public static SamlIdpSpSession findByCreateDate_First(
+	public static SamlIdpSpSession findByLtCreateDate_First(
 			Date createDate,
 			OrderByComparator<SamlIdpSpSession> orderByComparator)
 		throws com.liferay.saml.persistence.exception.
 			NoSuchIdpSpSessionException {
 
-		return getPersistence().findByCreateDate_First(
+		return getPersistence().findByLtCreateDate_First(
 			createDate, orderByComparator);
 	}
 
@@ -217,11 +217,11 @@ public class SamlIdpSpSessionUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching saml idp sp session, or <code>null</code> if a matching saml idp sp session could not be found
 	 */
-	public static SamlIdpSpSession fetchByCreateDate_First(
+	public static SamlIdpSpSession fetchByLtCreateDate_First(
 		Date createDate,
 		OrderByComparator<SamlIdpSpSession> orderByComparator) {
 
-		return getPersistence().fetchByCreateDate_First(
+		return getPersistence().fetchByLtCreateDate_First(
 			createDate, orderByComparator);
 	}
 
@@ -233,13 +233,13 @@ public class SamlIdpSpSessionUtil {
 	 * @return the last matching saml idp sp session
 	 * @throws NoSuchIdpSpSessionException if a matching saml idp sp session could not be found
 	 */
-	public static SamlIdpSpSession findByCreateDate_Last(
+	public static SamlIdpSpSession findByLtCreateDate_Last(
 			Date createDate,
 			OrderByComparator<SamlIdpSpSession> orderByComparator)
 		throws com.liferay.saml.persistence.exception.
 			NoSuchIdpSpSessionException {
 
-		return getPersistence().findByCreateDate_Last(
+		return getPersistence().findByLtCreateDate_Last(
 			createDate, orderByComparator);
 	}
 
@@ -250,11 +250,11 @@ public class SamlIdpSpSessionUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching saml idp sp session, or <code>null</code> if a matching saml idp sp session could not be found
 	 */
-	public static SamlIdpSpSession fetchByCreateDate_Last(
+	public static SamlIdpSpSession fetchByLtCreateDate_Last(
 		Date createDate,
 		OrderByComparator<SamlIdpSpSession> orderByComparator) {
 
-		return getPersistence().fetchByCreateDate_Last(
+		return getPersistence().fetchByLtCreateDate_Last(
 			createDate, orderByComparator);
 	}
 
@@ -267,13 +267,13 @@ public class SamlIdpSpSessionUtil {
 	 * @return the previous, current, and next saml idp sp session
 	 * @throws NoSuchIdpSpSessionException if a saml idp sp session with the primary key could not be found
 	 */
-	public static SamlIdpSpSession[] findByCreateDate_PrevAndNext(
+	public static SamlIdpSpSession[] findByLtCreateDate_PrevAndNext(
 			long samlIdpSpSessionId, Date createDate,
 			OrderByComparator<SamlIdpSpSession> orderByComparator)
 		throws com.liferay.saml.persistence.exception.
 			NoSuchIdpSpSessionException {
 
-		return getPersistence().findByCreateDate_PrevAndNext(
+		return getPersistence().findByLtCreateDate_PrevAndNext(
 			samlIdpSpSessionId, createDate, orderByComparator);
 	}
 
@@ -282,8 +282,8 @@ public class SamlIdpSpSessionUtil {
 	 *
 	 * @param createDate the create date
 	 */
-	public static void removeByCreateDate(Date createDate) {
-		getPersistence().removeByCreateDate(createDate);
+	public static void removeByLtCreateDate(Date createDate) {
+		getPersistence().removeByLtCreateDate(createDate);
 	}
 
 	/**
@@ -292,8 +292,8 @@ public class SamlIdpSpSessionUtil {
 	 * @param createDate the create date
 	 * @return the number of matching saml idp sp sessions
 	 */
-	public static int countByCreateDate(Date createDate) {
-		return getPersistence().countByCreateDate(createDate);
+	public static int countByLtCreateDate(Date createDate) {
+		return getPersistence().countByLtCreateDate(createDate);
 	}
 
 	/**
@@ -473,83 +473,6 @@ public class SamlIdpSpSessionUtil {
 	 */
 	public static int countBySamlIdpSsoSessionId(long samlIdpSsoSessionId) {
 		return getPersistence().countBySamlIdpSsoSessionId(samlIdpSsoSessionId);
-	}
-
-	/**
-	 * Returns the saml idp sp session where samlIdpSsoSessionId = &#63; and samlSpEntityId = &#63; or throws a <code>NoSuchIdpSpSessionException</code> if it could not be found.
-	 *
-	 * @param samlIdpSsoSessionId the saml idp sso session ID
-	 * @param samlSpEntityId the saml sp entity ID
-	 * @return the matching saml idp sp session
-	 * @throws NoSuchIdpSpSessionException if a matching saml idp sp session could not be found
-	 */
-	public static SamlIdpSpSession findBySISSI_SSEI(
-			long samlIdpSsoSessionId, String samlSpEntityId)
-		throws com.liferay.saml.persistence.exception.
-			NoSuchIdpSpSessionException {
-
-		return getPersistence().findBySISSI_SSEI(
-			samlIdpSsoSessionId, samlSpEntityId);
-	}
-
-	/**
-	 * Returns the saml idp sp session where samlIdpSsoSessionId = &#63; and samlSpEntityId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param samlIdpSsoSessionId the saml idp sso session ID
-	 * @param samlSpEntityId the saml sp entity ID
-	 * @return the matching saml idp sp session, or <code>null</code> if a matching saml idp sp session could not be found
-	 */
-	public static SamlIdpSpSession fetchBySISSI_SSEI(
-		long samlIdpSsoSessionId, String samlSpEntityId) {
-
-		return getPersistence().fetchBySISSI_SSEI(
-			samlIdpSsoSessionId, samlSpEntityId);
-	}
-
-	/**
-	 * Returns the saml idp sp session where samlIdpSsoSessionId = &#63; and samlSpEntityId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param samlIdpSsoSessionId the saml idp sso session ID
-	 * @param samlSpEntityId the saml sp entity ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching saml idp sp session, or <code>null</code> if a matching saml idp sp session could not be found
-	 */
-	public static SamlIdpSpSession fetchBySISSI_SSEI(
-		long samlIdpSsoSessionId, String samlSpEntityId,
-		boolean useFinderCache) {
-
-		return getPersistence().fetchBySISSI_SSEI(
-			samlIdpSsoSessionId, samlSpEntityId, useFinderCache);
-	}
-
-	/**
-	 * Removes the saml idp sp session where samlIdpSsoSessionId = &#63; and samlSpEntityId = &#63; from the database.
-	 *
-	 * @param samlIdpSsoSessionId the saml idp sso session ID
-	 * @param samlSpEntityId the saml sp entity ID
-	 * @return the saml idp sp session that was removed
-	 */
-	public static SamlIdpSpSession removeBySISSI_SSEI(
-			long samlIdpSsoSessionId, String samlSpEntityId)
-		throws com.liferay.saml.persistence.exception.
-			NoSuchIdpSpSessionException {
-
-		return getPersistence().removeBySISSI_SSEI(
-			samlIdpSsoSessionId, samlSpEntityId);
-	}
-
-	/**
-	 * Returns the number of saml idp sp sessions where samlIdpSsoSessionId = &#63; and samlSpEntityId = &#63;.
-	 *
-	 * @param samlIdpSsoSessionId the saml idp sso session ID
-	 * @param samlSpEntityId the saml sp entity ID
-	 * @return the number of matching saml idp sp sessions
-	 */
-	public static int countBySISSI_SSEI(
-		long samlIdpSsoSessionId, String samlSpEntityId) {
-
-		return getPersistence().countBySISSI_SSEI(
-			samlIdpSsoSessionId, samlSpEntityId);
 	}
 
 	/**

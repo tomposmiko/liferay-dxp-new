@@ -45,7 +45,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("PageSectionDefinition")
+@GraphQLName(
+	description = "Represents a definition of a Page section.",
+	value = "PageSectionDefinition"
+)
 @JsonFilter("Liferay.Vulcan")
 @XmlRootElement(name = "PageSectionDefinition")
 public class PageSectionDefinition implements Serializable {
@@ -88,7 +91,7 @@ public class PageSectionDefinition implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String backgroundColor;
 
-	@Schema
+	@Schema(description = "The background fragment image of the page section.")
 	@Valid
 	public FragmentImage getBackgroundFragmentImage() {
 		return backgroundFragmentImage;
@@ -117,7 +120,9 @@ public class PageSectionDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The background fragment image of the page section."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected FragmentImage backgroundFragmentImage;
 
@@ -157,7 +162,7 @@ public class PageSectionDefinition implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected BackgroundImage backgroundImage;
 
-	@Schema
+	@Schema(description = "The fragment link of the page section.")
 	@Valid
 	public FragmentLink getFragmentLink() {
 		return fragmentLink;
@@ -182,11 +187,11 @@ public class PageSectionDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The fragment link of the page section.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected FragmentLink fragmentLink;
 
-	@Schema
+	@Schema(description = "The fragment style of the page section.")
 	@Valid
 	public FragmentStyle getFragmentStyle() {
 		return fragmentStyle;
@@ -211,11 +216,11 @@ public class PageSectionDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The fragment style of the page section.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected FragmentStyle fragmentStyle;
 
-	@Schema
+	@Schema(description = "A list of fragment viewports of the page section.")
 	@Valid
 	public FragmentViewport[] getFragmentViewports() {
 		return fragmentViewports;
@@ -241,43 +246,13 @@ public class PageSectionDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A list of fragment viewports of the page section."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected FragmentViewport[] fragmentViewports;
 
-	@Schema(
-		description = "A flag that indicates whether the page section is indexed or not."
-	)
-	public Boolean getIndexed() {
-		return indexed;
-	}
-
-	public void setIndexed(Boolean indexed) {
-		this.indexed = indexed;
-	}
-
-	@JsonIgnore
-	public void setIndexed(
-		UnsafeSupplier<Boolean, Exception> indexedUnsafeSupplier) {
-
-		try {
-			indexed = indexedUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField(
-		description = "A flag that indicates whether the page section is indexed or not."
-	)
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Boolean indexed;
-
-	@Schema
+	@Schema(description = "the page section's layout.")
 	@Valid
 	public Layout getLayout() {
 		return layout;
@@ -302,7 +277,7 @@ public class PageSectionDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "the page section's layout.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Layout layout;
 
@@ -406,16 +381,6 @@ public class PageSectionDefinition implements Serializable {
 			}
 
 			sb.append("]");
-		}
-
-		if (indexed != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"indexed\": ");
-
-			sb.append(indexed);
 		}
 
 		if (layout != null) {

@@ -20,8 +20,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -29,8 +27,6 @@ import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.service.WikiNodeService;
 import com.liferay.wiki.service.WikiNodeServiceUtil;
 import com.liferay.wiki.service.persistence.WikiNodePersistence;
-import com.liferay.wiki.service.persistence.WikiPageFinder;
-import com.liferay.wiki.service.persistence.WikiPagePersistence;
 
 import java.lang.reflect.Field;
 
@@ -146,32 +142,5 @@ public abstract class WikiNodeServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.GroupLocalService
-		groupLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.GroupService groupService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserService userService;
-
-	@Reference
-	protected WikiPagePersistence wikiPagePersistence;
-
-	@Reference
-	protected WikiPageFinder wikiPageFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		WikiNodeServiceBaseImpl.class);
 
 }

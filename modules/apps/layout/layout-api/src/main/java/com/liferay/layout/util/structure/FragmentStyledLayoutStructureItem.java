@@ -14,10 +14,14 @@
 
 package com.liferay.layout.util.structure;
 
+import com.liferay.fragment.model.FragmentEntryLink;
+import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.layout.util.constants.LayoutDataItemTypeConstants;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.util.Objects;
 
@@ -71,8 +75,6 @@ public class FragmentStyledLayoutStructureItem
 		return jsonObject.put(
 			"fragmentEntryLinkId", String.valueOf(_fragmentEntryLinkId)
 		).put(
-			"indexed", _indexed
-		).put(
 			"styles", stylesJSONObject
 		);
 	}
@@ -87,25 +89,33 @@ public class FragmentStyledLayoutStructureItem
 		return HashUtil.hash(0, getItemId());
 	}
 
-	public boolean isIndexed() {
-		return _indexed;
-	}
-
 	public void setFragmentEntryLinkId(long fragmentEntryLinkId) {
 		_fragmentEntryLinkId = fragmentEntryLinkId;
-	}
 
-	public void setIndexed(boolean indexed) {
-		_indexed = indexed;
+		FragmentEntryLink fragmentEntryLink =
+			FragmentEntryLinkLocalServiceUtil.fetchFragmentEntryLink(
+				fragmentEntryLinkId);
+
+		if (fragmentEntryLink != null) {
+			try {
+				JSONObject editablesJSONObject =
+					JSONFactoryUtil.createJSONObject(
+						fragmentEntryLink.getEditableValues());
+
+				_fragmentConfigurationJSONObject =
+					editablesJSONObject.getJSONObject(
+						"com.liferay.fragment.entry.processor.freemarker." +
+							"FreeMarkerFragmentEntryProcessor");
+			}
+			catch (Exception exception) {
+				_log.error("Unable to parse editable values", exception);
+			}
+		}
 	}
 
 	@Override
 	public void updateItemConfig(JSONObject itemConfigJSONObject) {
 		super.updateItemConfig(itemConfigJSONObject);
-
-		if (itemConfigJSONObject.has("indexed")) {
-			setIndexed(itemConfigJSONObject.getBoolean("indexed"));
-		}
 
 		if (itemConfigJSONObject.has("fragmentEntryLinkId")) {
 			setFragmentEntryLinkId(
@@ -113,7 +123,10 @@ public class FragmentStyledLayoutStructureItem
 		}
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		FragmentStyledLayoutStructureItem.class);
+
+	private JSONObject _fragmentConfigurationJSONObject;
 	private long _fragmentEntryLinkId;
-	private boolean _indexed = true;
 
 }

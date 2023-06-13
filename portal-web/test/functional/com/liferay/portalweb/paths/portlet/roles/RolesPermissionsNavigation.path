@@ -17,7 +17,7 @@
 </tr>
 <tr>
 	<td>PERMISSIONS_NAVITEM_COLLAPSED</td>
-	<td>//div[contains(@class,'lfr-permission-navigation')]//li[contains(@class,'permission-navigation-section')]/a[contains(.,'${key_navItem}') and contains(@class,'collapsed')]</td>
+	<td>//div[contains(@class,'lfr-permission-navigation')]//*[contains(@class,'permission-navigation-section')]/a[contains(.,'${key_navItem}') and contains(@class,'collapsed')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -40,9 +40,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CONTROL_PANEL-->
-
 <tr>
 	<td>CONTROL_PANEL_GENERAL_PERMISSIONS</td>
 	<td>//a[contains(.,'Control Panel') and contains(@class,'permission-navigation-item-header')]/following-sibling::div//li[contains(@class,'permission-navigation-item')]/a[contains(.,'General Permissions')]</td>
@@ -53,9 +51,29 @@
 	<td></td>
 	<td></td>
 </tr>
-
+<!--CONTROL_PANEL_CUSTOM_OBJECT-->
+<tr>
+	<td>CONTROL_PANEL_CUSTOM_OBJECTS_PERMISSIONS</td>
+	<td>//a[contains(.,'Control Panel') and contains(@class,'permission-navigation-item-header')]/following-sibling::div//li[contains(@class,'permission-navigation-item')]/a[contains(.,'Custom Objects')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--CONTROL_PANEL_OBJECTS-->
+<tr>
+	<td>CONTROL_PANEL_OBJECTS_PERMISSIONS</td>
+	<td>//a[contains(.,'Control Panel') and contains(@class,'permission-navigation-item-header')]/following-sibling::div//li[contains(@class,'permission-navigation-item')]/a[contains(.,'Objects')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
 <!--CONTROL_PANEL_USERS-->
-
 <tr>
 	<td>CONTROL_PANEL_USERS_USERS_AND_ORGANIZATIONS</td>
 	<td>//a[contains(.,'Users') and contains(@class,'permission-navigation-item-header')]/following-sibling::*//li[contains(@class,'permission-navigation-item')]/a[contains(.,'Users and Organizations')]</td>
@@ -76,9 +94,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CONTROL_PANEL_SITES-->
-
 <tr>
 	<td>CONTROL_PANEL_SITES_SITES</td>
 	<td>//a[contains(.,'Sites') and contains(@class,'permission-navigation-item-header')]/following-sibling::*//li[contains(@class,'permission-navigation-item')]/a[contains(.,'Sites')]</td>
@@ -89,9 +105,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--SITE_ADMIN_PAGES-->
-
 <tr>
 	<td>SITE_ADMIN_PAGES_SITE_PAGES</td>
 	<td>//a[contains(.,'Build') and contains(@class,'permission-navigation-item-header')]/following-sibling::*//li[contains(@class,'permission-navigation-item')]/a[contains(.,'Pages')]</td>
@@ -102,9 +116,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--SITE_ADMIN_CONTENT-->
-
 <tr>
 	<td>SITE_ADMIN_CONTENT_WEB_CONTENT</td>
 	<td>//a[contains(.,'Content') and contains(@class,'permission-navigation-item-header')]/following-sibling::*//li[contains(@class,'permission-navigation-item')]/a[contains(.,'Web Content')]</td>
@@ -155,17 +167,13 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--SITE_ADMIN_BUILDER-->
-
 <tr>
 	<td>SITE_ADMIN_BUILDER_COLLECTIONS</td>
 	<td>//a[contains(.,'Builder') and contains(@class,'permission-navigation-item-header')]/following-sibling::*//li[contains(@class,'permission-navigation-item')]/a[contains(.,'Collections')]</td>
 	<td></td>
 </tr>
-
 <!--SITE_ADMIN_CATEGORIZATION-->
-
 <tr>
 	<td>SITE_ADMIN_CATEGORIES</td>
 	<td>//a[contains(@class,'permission-navigation-item-header')]/following-sibling::*//li[contains(@class,'permission-navigation-item')]/a[contains(.,'Categories')]</td>
@@ -176,9 +184,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--SITE_ADMIN_MEMBERS-->
-
 <tr>
 	<td>SITE_ADMIN_MEMBERS_SITE_MEMBERSHIPS</td>
 	<td>//a[contains(.,'Members') and contains(@class,'permission-navigation-item-header')]/following-sibling::*//li[contains(@class,'permission-navigation-item')]/a[contains(.,'Site Memberships')]</td>
@@ -194,9 +200,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--SITE_ADMIN_CONFIGURATION-->
-
 <tr>
 	<td>SITE_ADMIN_CONFIGURATION_REDIRECTION</td>
 	<td>//a[contains(.,'Configuration') and contains(@class,'permission-navigation-item-header')]/following-sibling::*//li[contains(@class,'permission-navigation-item')]/a[contains(.,'Redirection')]</td>
@@ -212,9 +216,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--SITE_ADMIN_APPLICATIONS-->
-
 <tr>
 	<td>SITE_ADMIN_APPLICATIONS_ASSET_PUBLISHER</td>
 	<td>//a[contains(.,'Applications') and contains(@class,'permission-navigation-item-header')]/following-sibling::*//li[contains(@class,'permission-navigation-item')]/a[contains(.,'Asset Publisher')]</td>
@@ -275,9 +277,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--USER_MY_ACCOUNT-->
-
 <tr>
 	<td>USER_MY_ACCOUNT_MY_WORKFLOW_TASKS</td>
 	<td>//a[contains(.,'User')and contains(@class,'permission-navigation-item-header')]/following-sibling::*//li[contains(@class,'permission-navigation-item')]/a[contains(.,'My Workflow Tasks')]</td>

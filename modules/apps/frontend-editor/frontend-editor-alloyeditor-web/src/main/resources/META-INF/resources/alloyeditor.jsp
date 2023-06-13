@@ -66,6 +66,10 @@ if (editorOptions != null) {
 </c:if>
 
 <script data-senna-track="temporary" type="text/javascript">
+	CKEDITOR.ADDITIONAL_RESOURCE_PARAMS = {
+		languageId: themeDisplay.getLanguageId(),
+	};
+
 	CKEDITOR.disableAutoInline = true;
 
 	CKEDITOR.dtd.$removeEmpty.i = 0;
@@ -203,7 +207,7 @@ name = HtmlUtil.escapeJS(name);
 		if (editorConfig.extraPlugins) {
 			editorConfig.extraPlugins = A.Array.filter(
 				editorConfig.extraPlugins.split(','),
-				function (item) {
+				(item) => {
 					return item !== 'ae_embed';
 				}
 			).join(',');
@@ -285,7 +289,7 @@ name = HtmlUtil.escapeJS(name);
 
 	var ignoreClass = ['ddm-options-target'];
 
-	var preventImageDragoverHandler = windowNode.on('dragover', function (event) {
+	var preventImageDragoverHandler = windowNode.on('dragover', (event) => {
 		var validDropTarget = event.target.getDOMNode().isContentEditable;
 
 		if (!validDropTarget) {
@@ -293,9 +297,9 @@ name = HtmlUtil.escapeJS(name);
 		}
 	});
 
-	var preventImageDropHandler = windowNode.on('drop', function (event) {
+	var preventImageDropHandler = windowNode.on('drop', (event) => {
 		var node = event.target.getDOMNode();
-		var ignoreNode = node.className.split(' ').filter(function (value) {
+		var ignoreNode = node.className.split(' ').filter((value) => {
 			return ignoreClass.includes(value);
 		});
 		var validDropTarget = ignoreNode.length > 0 ? true : node.isContentEditable;

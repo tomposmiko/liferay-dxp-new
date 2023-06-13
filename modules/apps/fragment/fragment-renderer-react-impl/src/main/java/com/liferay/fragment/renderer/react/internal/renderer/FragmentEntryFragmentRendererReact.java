@@ -113,6 +113,7 @@ public class FragmentEntryFragmentRendererReact implements FragmentRenderer {
 			printWriter.write(
 				_renderFragmentEntry(
 					fragmentEntryLink,
+					fragmentRendererContext.getFragmentElementId(),
 					HashMapBuilder.<String, Object>put(
 						"configuration", configurationJSONObject
 					).build(),
@@ -157,23 +158,14 @@ public class FragmentEntryFragmentRendererReact implements FragmentRenderer {
 	}
 
 	private String _renderFragmentEntry(
-			FragmentEntryLink fragmentEntryLink, Map<String, Object> data,
-			HttpServletRequest httpServletRequest)
+			FragmentEntryLink fragmentEntryLink, String fragmentElementId,
+			Map<String, Object> data, HttpServletRequest httpServletRequest)
 		throws IOException {
 
 		StringBundler sb = new StringBundler(9);
 
 		sb.append("<div id=\"");
-
-		StringBundler fragmentIdSB = new StringBundler(4);
-
-		fragmentIdSB.append("fragment-");
-		fragmentIdSB.append(fragmentEntryLink.getFragmentEntryId());
-		fragmentIdSB.append("-");
-		fragmentIdSB.append(fragmentEntryLink.getNamespace());
-
-		sb.append(fragmentIdSB.toString());
-
+		sb.append(fragmentElementId);
 		sb.append("\" >");
 		sb.append(fragmentEntryLink.getHtml());
 

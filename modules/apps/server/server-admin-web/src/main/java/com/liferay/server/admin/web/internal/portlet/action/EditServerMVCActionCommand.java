@@ -18,6 +18,7 @@ import com.liferay.document.library.kernel.util.DLPreviewableProcessor;
 import com.liferay.mail.kernel.model.Account;
 import com.liferay.mail.kernel.service.MailService;
 import com.liferay.petra.log4j.Log4JUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.convert.ConvertException;
@@ -97,8 +98,6 @@ import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnsyncPrintWriterPool;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.xuggler.XugglerInstallException;
-import com.liferay.portal.kernel.xuggler.XugglerUtil;
 import com.liferay.portal.util.MaintenanceUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.ShutdownUtil;
@@ -113,10 +112,9 @@ import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletSession;
-import javax.portlet.PortletURL;
 import javax.portlet.WindowState;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -194,16 +192,6 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 		}
 		else if (cmd.equals("gc")) {
 			gc();
-		}
-		else if (cmd.equals("installXuggler")) {
-			try {
-				installXuggler(actionRequest, actionResponse);
-			}
-			catch (XugglerInstallException xugglerInstallException) {
-				SessionErrors.add(
-					actionRequest, XugglerInstallException.class.getName(),
-					xugglerInstallException);
-			}
 		}
 		else if (cmd.equals("runScript")) {
 			runScript(actionRequest, actionResponse);
@@ -308,11 +296,8 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 					Layout layout = _layoutLocalService.getLayout(
 						layoutRevision.getPlid());
 
-					if (!layout.isTypePortlet()) {
-						return;
-					}
-
-					if (_containsPortlet(
+					if (!layout.isTypePortlet() ||
+						_containsPortlet(
 							layout, portletPreferences.getPortletId())) {
 
 						return;
@@ -460,12 +445,13 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 			LiferayActionResponse liferayActionResponse =
 				(LiferayActionResponse)actionResponse;
 
-			PortletURL portletURL = liferayActionResponse.createRenderURL();
-
-			portletURL.setParameter("mvcRenderCommandName", path);
-			portletURL.setWindowState(WindowState.MAXIMIZED);
-
-			return portletURL.toString();
+			return PortletURLBuilder.createRenderURL(
+				liferayActionResponse
+			).setMVCRenderCommandName(
+				path
+			).setWindowState(
+				WindowState.MAXIMIZED
+			).buildString();
 		}
 
 		PortletSession portletSession = actionRequest.getPortletSession();
@@ -485,15 +471,6 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 		Runtime runtime = Runtime.getRuntime();
 
 		runtime.gc();
-	}
-
-	protected void installXuggler(
-			ActionRequest actionRequest, ActionResponse actionResponse)
-		throws Exception {
-
-		String jarName = ParamUtil.getString(actionRequest, "jarName");
-
-		XugglerUtil.installNativeLibraries(jarName);
 	}
 
 	protected void runScript(
@@ -585,15 +562,11 @@ public class EditServerMVCActionCommand extends BaseMVCActionCommand {
 			actionRequest, "imageMagickEnabled");
 		String imageMagickPath = ParamUtil.getString(
 			actionRequest, "imageMagickPath");
-		boolean xugglerEnabled = ParamUtil.getBoolean(
-			actionRequest, "xugglerEnabled");
 
 		portletPreferences.setValue(
 			PropsKeys.IMAGEMAGICK_ENABLED, String.valueOf(imageMagickEnabled));
 		portletPreferences.setValue(
 			PropsKeys.IMAGEMAGICK_GLOBAL_SEARCH_PATH, imageMagickPath);
-		portletPreferences.setValue(
-			PropsKeys.XUGGLER_ENABLED, String.valueOf(xugglerEnabled));
 
 		Enumeration<String> enumeration = actionRequest.getParameterNames();
 

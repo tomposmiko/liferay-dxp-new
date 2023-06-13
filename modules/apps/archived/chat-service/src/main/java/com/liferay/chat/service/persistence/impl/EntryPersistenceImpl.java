@@ -24,7 +24,6 @@ import com.liferay.chat.service.persistence.EntryUtil;
 import com.liferay.chat.service.persistence.impl.constants.ChatPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -35,10 +34,9 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -49,17 +47,13 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -75,7 +69,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = EntryPersistence.class)
+@Component(service = {EntryPersistence.class, BasePersistence.class})
 public class EntryPersistenceImpl
 	extends BasePersistenceImpl<Entry> implements EntryPersistence {
 
@@ -191,8 +185,7 @@ public class EntryPersistenceImpl
 		List<Entry> list = null;
 
 		if (useFinderCache) {
-			list = (List<Entry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
@@ -548,7 +541,7 @@ public class EntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {createDate};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -683,8 +676,7 @@ public class EntryPersistenceImpl
 		List<Entry> list = null;
 
 		if (useFinderCache) {
-			list = (List<Entry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
@@ -1040,7 +1032,7 @@ public class EntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {fromUserId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1172,8 +1164,7 @@ public class EntryPersistenceImpl
 		List<Entry> list = null;
 
 		if (useFinderCache) {
-			list = (List<Entry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
@@ -1528,7 +1519,7 @@ public class EntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {toUserId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1669,8 +1660,7 @@ public class EntryPersistenceImpl
 		List<Entry> list = null;
 
 		if (useFinderCache) {
-			list = (List<Entry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
@@ -2058,7 +2048,7 @@ public class EntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {createDate, fromUserId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2206,8 +2196,7 @@ public class EntryPersistenceImpl
 		List<Entry> list = null;
 
 		if (useFinderCache) {
-			list = (List<Entry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
@@ -2591,7 +2580,7 @@ public class EntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {createDate, toUserId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2739,8 +2728,7 @@ public class EntryPersistenceImpl
 		List<Entry> list = null;
 
 		if (useFinderCache) {
-			list = (List<Entry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
@@ -3124,7 +3112,7 @@ public class EntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {fromUserId, toUserId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3280,8 +3268,7 @@ public class EntryPersistenceImpl
 		List<Entry> list = null;
 
 		if (useFinderCache) {
-			list = (List<Entry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
@@ -3693,7 +3680,7 @@ public class EntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {createDate, fromUserId, toUserId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -3857,8 +3844,7 @@ public class EntryPersistenceImpl
 		List<Entry> list = null;
 
 		if (useFinderCache) {
-			list = (List<Entry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Entry entry : list) {
@@ -4295,7 +4281,7 @@ public class EntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {fromUserId, toUserId, content};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -4418,9 +4404,7 @@ public class EntryPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(EntryImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(EntryImpl.class);
 	}
 
 	/**
@@ -4444,9 +4428,7 @@ public class EntryPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(EntryImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(EntryImpl.class, primaryKey);
@@ -4731,8 +4713,7 @@ public class EntryPersistenceImpl
 		List<Entry> list = null;
 
 		if (useFinderCache) {
-			list = (List<Entry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+			list = (List<Entry>)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -4802,7 +4783,7 @@ public class EntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -4852,30 +4833,23 @@ public class EntryPersistenceImpl
 	 * Initializes the entry persistence.
 	 */
 	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class, new EntryModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", Entry.class.getName()));
-
+	public void activate() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByCreateDate = _createFinderPath(
+		_finderPathWithPaginationFindByCreateDate = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCreateDate",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -4883,17 +4857,17 @@ public class EntryPersistenceImpl
 			},
 			new String[] {"createDate"}, true);
 
-		_finderPathWithoutPaginationFindByCreateDate = _createFinderPath(
+		_finderPathWithoutPaginationFindByCreateDate = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCreateDate",
 			new String[] {Long.class.getName()}, new String[] {"createDate"},
 			true);
 
-		_finderPathCountByCreateDate = _createFinderPath(
+		_finderPathCountByCreateDate = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCreateDate",
 			new String[] {Long.class.getName()}, new String[] {"createDate"},
 			false);
 
-		_finderPathWithPaginationFindByFromUserId = _createFinderPath(
+		_finderPathWithPaginationFindByFromUserId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByFromUserId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -4901,17 +4875,17 @@ public class EntryPersistenceImpl
 			},
 			new String[] {"fromUserId"}, true);
 
-		_finderPathWithoutPaginationFindByFromUserId = _createFinderPath(
+		_finderPathWithoutPaginationFindByFromUserId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByFromUserId",
 			new String[] {Long.class.getName()}, new String[] {"fromUserId"},
 			true);
 
-		_finderPathCountByFromUserId = _createFinderPath(
+		_finderPathCountByFromUserId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByFromUserId",
 			new String[] {Long.class.getName()}, new String[] {"fromUserId"},
 			false);
 
-		_finderPathWithPaginationFindByToUserId = _createFinderPath(
+		_finderPathWithPaginationFindByToUserId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByToUserId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -4919,17 +4893,17 @@ public class EntryPersistenceImpl
 			},
 			new String[] {"toUserId"}, true);
 
-		_finderPathWithoutPaginationFindByToUserId = _createFinderPath(
+		_finderPathWithoutPaginationFindByToUserId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByToUserId",
 			new String[] {Long.class.getName()}, new String[] {"toUserId"},
 			true);
 
-		_finderPathCountByToUserId = _createFinderPath(
+		_finderPathCountByToUserId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByToUserId",
 			new String[] {Long.class.getName()}, new String[] {"toUserId"},
 			false);
 
-		_finderPathWithPaginationFindByC_F = _createFinderPath(
+		_finderPathWithPaginationFindByC_F = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_F",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -4938,17 +4912,17 @@ public class EntryPersistenceImpl
 			},
 			new String[] {"createDate", "fromUserId"}, true);
 
-		_finderPathWithoutPaginationFindByC_F = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_F = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_F",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"createDate", "fromUserId"}, true);
 
-		_finderPathCountByC_F = _createFinderPath(
+		_finderPathCountByC_F = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_F",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"createDate", "fromUserId"}, false);
 
-		_finderPathWithPaginationFindByC_T = _createFinderPath(
+		_finderPathWithPaginationFindByC_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -4957,17 +4931,17 @@ public class EntryPersistenceImpl
 			},
 			new String[] {"createDate", "toUserId"}, true);
 
-		_finderPathWithoutPaginationFindByC_T = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_T",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"createDate", "toUserId"}, true);
 
-		_finderPathCountByC_T = _createFinderPath(
+		_finderPathCountByC_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_T",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"createDate", "toUserId"}, false);
 
-		_finderPathWithPaginationFindByF_T = _createFinderPath(
+		_finderPathWithPaginationFindByF_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByF_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -4976,17 +4950,17 @@ public class EntryPersistenceImpl
 			},
 			new String[] {"fromUserId", "toUserId"}, true);
 
-		_finderPathWithoutPaginationFindByF_T = _createFinderPath(
+		_finderPathWithoutPaginationFindByF_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByF_T",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"fromUserId", "toUserId"}, true);
 
-		_finderPathCountByF_T = _createFinderPath(
+		_finderPathCountByF_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByF_T",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"fromUserId", "toUserId"}, false);
 
-		_finderPathWithPaginationFindByC_F_T = _createFinderPath(
+		_finderPathWithPaginationFindByC_F_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_F_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -4995,21 +4969,21 @@ public class EntryPersistenceImpl
 			},
 			new String[] {"createDate", "fromUserId", "toUserId"}, true);
 
-		_finderPathWithoutPaginationFindByC_F_T = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_F_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_F_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			},
 			new String[] {"createDate", "fromUserId", "toUserId"}, true);
 
-		_finderPathCountByC_F_T = _createFinderPath(
+		_finderPathCountByC_F_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_F_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			},
 			new String[] {"createDate", "fromUserId", "toUserId"}, false);
 
-		_finderPathWithPaginationFindByF_T_C = _createFinderPath(
+		_finderPathWithPaginationFindByF_T_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByF_T_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5018,7 +4992,7 @@ public class EntryPersistenceImpl
 			},
 			new String[] {"fromUserId", "toUserId", "content"}, true);
 
-		_finderPathWithoutPaginationFindByF_T_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByF_T_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByF_T_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5026,7 +5000,7 @@ public class EntryPersistenceImpl
 			},
 			new String[] {"fromUserId", "toUserId", "content"}, true);
 
-		_finderPathCountByF_T_C = _createFinderPath(
+		_finderPathCountByF_T_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByF_T_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5042,14 +5016,6 @@ public class EntryPersistenceImpl
 		_setEntryUtilPersistence(null);
 
 		entityCache.removeCache(EntryImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setEntryUtilPersistence(EntryPersistence entryPersistence) {
@@ -5091,8 +5057,6 @@ public class EntryPersistenceImpl
 		super.setSessionFactory(sessionFactory);
 	}
 
-	private BundleContext _bundleContext;
-
 	@Reference
 	protected EntityCache entityCache;
 
@@ -5122,119 +5086,12 @@ public class EntryPersistenceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		EntryPersistenceImpl.class);
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class EntryModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			EntryModelImpl entryModelImpl = (EntryModelImpl)baseModel;
-
-			long columnBitmask = entryModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(entryModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |= entryModelImpl.getColumnBitmask(
-						columnName);
-				}
-
-				if (finderPath.isBaseModelResult() &&
-					(EntryPersistenceImpl.
-						FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION ==
-							finderPath.getCacheName())) {
-
-					finderPathColumnBitmask |= _ORDER_BY_COLUMNS_BITMASK;
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(entryModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			EntryModelImpl entryModelImpl, String[] columnNames,
-			boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] = entryModelImpl.getColumnOriginalValue(
-						columnName);
-				}
-				else {
-					arguments[i] = entryModelImpl.getColumnValue(columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-		private static final long _ORDER_BY_COLUMNS_BITMASK;
-
-		static {
-			long orderByColumnsBitmask = 0;
-
-			orderByColumnsBitmask |= EntryModelImpl.getColumnBitmask(
-				"createDate");
-
-			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
-		}
-
-	}
+	@Reference
+	private EntryModelArgumentsResolver _entryModelArgumentsResolver;
 
 }

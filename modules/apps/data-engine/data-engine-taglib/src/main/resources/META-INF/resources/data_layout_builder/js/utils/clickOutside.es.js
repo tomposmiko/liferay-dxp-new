@@ -12,14 +12,12 @@
  * details.
  */
 
-import dom from 'metal-dom';
-
-export default (target, ...elements) => {
+export default function clickOutside(target, ...elements) {
 	return !elements.some((element) => {
 		if (typeof element === 'string') {
-			return !!dom.closest(target, element);
+			return !!target.closest(element);
 		}
 
-		return element && dom.contains(element, target);
+		return element && element.contains(target);
 	});
-};
+}

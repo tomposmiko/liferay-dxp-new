@@ -45,8 +45,9 @@ const SelectLayout = ({
 	multiSelection,
 	namespace,
 	nodes,
+	selectedLayoutIds,
 }) => {
-	const [filterQuery, setFilterQuery] = useState();
+	const [filter, setFilter] = useState();
 
 	const handleSelectionChange = (selectedNodeIds) => {
 		if (!selectedNodeIds.size) {
@@ -63,7 +64,9 @@ const SelectLayout = ({
 					layoutId: node.layoutId,
 					name: node.value,
 					privateLayout: node.privateLayout,
-					value: node.url,
+					returnType: node.returnType,
+					title: node.name,
+					value: node.payload,
 				});
 			}
 		});
@@ -103,13 +106,12 @@ const SelectLayout = ({
 								disabled={empty}
 								name={`${namespace}filterKeywords`}
 								onInput={(event) => {
-									setFilterQuery(
-										event.target.value.toLowerCase()
-									);
+									setFilter(event.target.value.toLowerCase());
 								}}
 								placeholder={Liferay.Language.get('search-for')}
 								type="text"
 							/>
+
 							<ClayInput.GroupInsetItem after tag="span">
 								<ClayButtonWithIcon
 									className="navbar-breakpoint-d-none"
@@ -117,6 +119,7 @@ const SelectLayout = ({
 									displayType="unstyled"
 									symbol="times"
 								/>
+
 								<ClayButtonWithIcon
 									className="navbar-breakpoint-d-block"
 									disabled={empty}
@@ -128,6 +131,7 @@ const SelectLayout = ({
 					</ClayInput.Group>
 				</ClayManagementToolbar.Search>
 			</ClayManagementToolbar>
+
 			<ClayLayout.ContainerFluid
 				className="layouts-selector"
 				id={`${namespace}selectLayoutFm`}
@@ -142,7 +146,8 @@ const SelectLayout = ({
 						>
 							<Treeview
 								NodeComponent={Treeview.Card}
-								filterQuery={filterQuery}
+								filter={filter}
+								initialSelectedNodeIds={selectedLayoutIds}
 								multiSelection={multiSelection}
 								nodes={nodes}
 								onSelectedNodesChange={handleSelectionChange}

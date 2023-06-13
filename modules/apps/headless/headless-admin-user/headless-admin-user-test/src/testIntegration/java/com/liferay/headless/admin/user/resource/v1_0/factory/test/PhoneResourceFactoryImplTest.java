@@ -73,11 +73,9 @@ public class PhoneResourceFactoryImplTest {
 
 	@Test
 	public void testCheckPermissionsWithCompanyAdminUser() throws Exception {
-		PhoneResource.Builder phoneResourceBuilder =
-			_phoneResourceFactory.create();
-
 		_testCheckPermissions(
-			phoneResourceBuilder.user(
+			PhoneResource.builder(
+			).user(
 				_companyAdminUser
 			).build());
 	}
@@ -87,11 +85,9 @@ public class PhoneResourceFactoryImplTest {
 		User user = UserTestUtil.addUser();
 
 		try {
-			PhoneResource.Builder phoneResourceBuilder =
-				_phoneResourceFactory.create();
-
 			_testCheckPermissions(
-				phoneResourceBuilder.checkPermissions(
+				PhoneResource.builder(
+				).checkPermissions(
 					false
 				).user(
 					user
@@ -107,11 +103,9 @@ public class PhoneResourceFactoryImplTest {
 		User user = UserTestUtil.addUser();
 
 		try {
-			PhoneResource.Builder phoneResourceBuilder =
-				_phoneResourceFactory.create();
-
 			_testCheckPermissions(
-				phoneResourceBuilder.checkPermissions(
+				PhoneResource.builder(
+				).checkPermissions(
 					true
 				).user(
 					user
@@ -124,10 +118,8 @@ public class PhoneResourceFactoryImplTest {
 
 	@Test
 	public void testTransaction() throws Throwable {
-		PhoneResource.Builder phoneResourceBuilder =
-			_phoneResourceFactory.create();
-
-		PhoneResource phoneResource = phoneResourceBuilder.user(
+		PhoneResource phoneResource = PhoneResource.builder(
+		).user(
 			_companyAdminUser
 		).build();
 
@@ -239,9 +231,6 @@ public class PhoneResourceFactoryImplTest {
 
 	@Inject
 	private PhoneLocalService _phoneLocalService;
-
-	@Inject
-	private PhoneResource.Factory _phoneResourceFactory;
 
 	@Inject
 	private UserLocalService _userLocalService;

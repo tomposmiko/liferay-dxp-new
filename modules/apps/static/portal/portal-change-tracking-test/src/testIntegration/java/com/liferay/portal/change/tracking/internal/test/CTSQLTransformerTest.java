@@ -21,7 +21,6 @@ import com.liferay.change.tracking.model.CTPreferences;
 import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTEntryLocalService;
 import com.liferay.change.tracking.service.CTPreferencesLocalService;
-import com.liferay.counter.kernel.service.CounterLocalService;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.string.StringBundler;
@@ -40,9 +39,9 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.test.log.CaptureAppender;
-import com.liferay.portal.test.log.Log4JLoggerTestUtil;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LogEntry;
+import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -52,9 +51,6 @@ import java.sql.ResultSet;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.spi.LoggingEvent;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -95,29 +91,29 @@ public class CTSQLTransformerTest {
 				"create table MainTable (mainTableId LONG not null, ",
 				"ctCollectionId LONG not null, companyId LONG, groupId LONG, ",
 				"name VARCHAR(20), primary key (mainTableId, ",
-				"ctCollectionId))"));
+				"ctCollectionId));"));
 
-		_db.runSQL("insert into MainTable values (1, 0, 2, 3, 'mt1 v1')");
-		_db.runSQL("insert into MainTable values (2, 0, 2, 3, 'mt2 v1')");
-		_db.runSQL("insert into MainTable values (3, 0, 2, 3, 'mt3 v1')");
-		_db.runSQL("insert into MainTable values (4, 0, 2, 3, 'mt4 v1')");
-		_db.runSQL("insert into MainTable values (5, 0, 2, 4, 'mt5 v1')");
+		_db.runSQL("insert into MainTable values (1, 0, 2, 3, 'mt1 v1');");
+		_db.runSQL("insert into MainTable values (2, 0, 2, 3, 'mt2 v1');");
+		_db.runSQL("insert into MainTable values (3, 0, 2, 3, 'mt3 v1');");
+		_db.runSQL("insert into MainTable values (4, 0, 2, 3, 'mt4 v1');");
+		_db.runSQL("insert into MainTable values (5, 0, 2, 4, 'mt5 v1');");
 
 		_db.runSQL(
 			"insert into MainTable values (6, " + _getCTCollectionId(1) +
-				" , 2, 3, 'mt6 add')");
+				" , 2, 3, 'mt6 add');");
 
 		_db.runSQL(
 			"insert into MainTable values (1, " + _getCTCollectionId(2) +
-				" , 2, 3, 'mt1 modify')");
+				" , 2, 3, 'mt1 modify');");
 
 		_db.runSQL(
 			"insert into MainTable values (1, " + _getCTCollectionId(3) +
-				" , 2, 4, 'mt1 moved')");
+				" , 2, 4, 'mt1 moved');");
 
 		_db.runSQL(
 			"insert into MainTable values (7, " + _getCTCollectionId(5) +
-				" , 2, 3, 'mt7 add')");
+				" , 2, 3, 'mt7 add');");
 
 		CTModelRegistry.registerCTModel(
 			new CTModelRegistration(
@@ -135,29 +131,29 @@ public class CTSQLTransformerTest {
 				"create table ReferenceTable (referenceTableId LONG not null, ",
 				"ctCollectionId LONG not null, mainTableId LONG, name ",
 				"VARCHAR(20), primary key (referenceTableId, ",
-				"ctCollectionId))"));
+				"ctCollectionId));"));
 
-		_db.runSQL("insert into ReferenceTable values (1, 0, 1, 'rt1 v1')");
-		_db.runSQL("insert into ReferenceTable values (2, 0, 1, 'rt2 v1')");
-		_db.runSQL("insert into ReferenceTable values (3, 0, 2, 'rt3 v1')");
-		_db.runSQL("insert into ReferenceTable values (4, 0, 2, 'rt4 v1')");
-		_db.runSQL("insert into ReferenceTable values (5, 0, 2, 'rt5 v1')");
+		_db.runSQL("insert into ReferenceTable values (1, 0, 1, 'rt1 v1');");
+		_db.runSQL("insert into ReferenceTable values (2, 0, 1, 'rt2 v1');");
+		_db.runSQL("insert into ReferenceTable values (3, 0, 2, 'rt3 v1');");
+		_db.runSQL("insert into ReferenceTable values (4, 0, 2, 'rt4 v1');");
+		_db.runSQL("insert into ReferenceTable values (5, 0, 2, 'rt5 v1');");
 
 		_db.runSQL(
 			"insert into ReferenceTable values (6, " + _getCTCollectionId(1) +
-				" , 1, 'rt6 add')");
+				" , 1, 'rt6 add');");
 
 		_db.runSQL(
 			"insert into ReferenceTable values (1, " + _getCTCollectionId(2) +
-				" , 1, 'rt1 modify')");
+				" , 1, 'rt1 modify');");
 
 		_db.runSQL(
 			"insert into ReferenceTable values (1, " + _getCTCollectionId(3) +
-				" , 2, 'rt1 moved')");
+				" , 2, 'rt1 moved');");
 
 		_db.runSQL(
 			"insert into ReferenceTable values (1, " + _getCTCollectionId(5) +
-				" , 2, 'rt1 modify2')");
+				" , 2, 'rt1 modify2');");
 	}
 
 	@AfterClass
@@ -168,24 +164,22 @@ public class CTSQLTransformerTest {
 
 		_ctPreferencesLocalService.deleteCTPreferences(ctPreferences);
 
-		_db.runSQL("drop table MainTable");
+		_db.runSQL("drop table MainTable;");
 
 		CTModelRegistry.unregisterCTModel("MainTable");
 
-		_db.runSQL("drop table ReferenceTable");
+		_db.runSQL("drop table ReferenceTable;");
 
 		CTModelRegistry.unregisterCTModel("ReferenceTable");
 
-		try (CaptureAppender captureAppender1 =
-				Log4JLoggerTestUtil.configureLog4JLogger(
-					"com.liferay.change.tracking.service.impl." +
-						"CTCollectionLocalServiceImpl",
-					Level.WARN);
-			CaptureAppender captureAppender2 =
-				Log4JLoggerTestUtil.configureLog4JLogger(
-					"com.liferay.change.tracking.internal.search." +
-						"CTSearchEventListener",
-					Level.WARN)) {
+		try (LogCapture logCapture1 = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.change.tracking.service.impl." +
+					"CTCollectionLocalServiceImpl",
+				LoggerTestUtil.WARN);
+			LogCapture logCapture2 = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.change.tracking.internal.search." +
+					"CTSearchEventListener",
+				LoggerTestUtil.WARN)) {
 
 			for (CTCollection ctCollection : _ctCollections) {
 				_ctCollectionLocalService.deleteCTCollection(ctCollection);
@@ -961,7 +955,7 @@ public class CTSQLTransformerTest {
 
 		_db.runSQL(
 			"insert into MainTable values (1, " + ctCollectionId7 +
-				" , 2, 3, 'temp')");
+				" , 2, 3, 'temp');");
 
 		_assertQuery(
 			"select * from MainTable where mainTableId = 1 and " +
@@ -1020,16 +1014,9 @@ public class CTSQLTransformerTest {
 		}
 
 		if (ctCollection == null) {
-			long ctCollectionId = _counterLocalService.increment();
-
-			ctCollection = _ctCollectionLocalService.createCTCollection(
-				ctCollectionId);
-
-			ctCollection.setName(String.valueOf(ctCollectionId));
-			ctCollection.setStatus(WorkflowConstants.STATUS_DRAFT);
-
-			ctCollection = _ctCollectionLocalService.updateCTCollection(
-				ctCollection);
+			ctCollection = _ctCollectionLocalService.addCTCollection(
+				TestPropsValues.getCompanyId(), TestPropsValues.getUserId(),
+				CTSQLTransformerTest.class.getName(), null);
 
 			_ctCollections.add(ctCollection);
 		}
@@ -1118,21 +1105,21 @@ public class CTSQLTransformerTest {
 		PrincipalThreadLocal.setName(userId);
 
 		try (Connection connection = DataAccess.getConnection();
-			PreparedStatement ps = connection.prepareStatement(
+			PreparedStatement preparedStatement = connection.prepareStatement(
 				_getSQL(inputSQLFile, expectedOutputSQLFile, ctCollectionId))) {
 
-			preparedStatementUnsafeConsumer.accept(ps);
+			preparedStatementUnsafeConsumer.accept(preparedStatement);
 
-			try (ResultSet rs = ps.executeQuery()) {
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
 				for (UnsafeConsumer<ResultSet, Exception> unsafeConsumer :
 						resultSetUnsafeConsumers) {
 
-					Assert.assertTrue(rs.next());
+					Assert.assertTrue(resultSet.next());
 
-					unsafeConsumer.accept(rs);
+					unsafeConsumer.accept(resultSet);
 				}
 
-				Assert.assertFalse(rs.next());
+				Assert.assertFalse(resultSet.next());
 			}
 		}
 		finally {
@@ -1147,10 +1134,11 @@ public class CTSQLTransformerTest {
 		throws Exception {
 
 		try (Connection connection = DataAccess.getConnection();
-			PreparedStatement ps = connection.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery()) {
+			PreparedStatement preparedStatement = connection.prepareStatement(
+				sql);
+			ResultSet resultSet = preparedStatement.executeQuery()) {
 
-			unsafeConsumer.accept(rs);
+			unsafeConsumer.accept(resultSet);
 		}
 	}
 
@@ -1180,12 +1168,12 @@ public class CTSQLTransformerTest {
 		PrincipalThreadLocal.setName(userId);
 
 		try (Connection connection = DataAccess.getConnection();
-			PreparedStatement ps = connection.prepareStatement(
+			PreparedStatement preparedStatement = connection.prepareStatement(
 				_getSQL(inputSQLFile, expectedOutputSQLFile, ctCollectionId))) {
 
-			preparedStatementUnsafeConsumer.accept(ps);
+			preparedStatementUnsafeConsumer.accept(preparedStatement);
 
-			Assert.assertEquals(1, ps.executeUpdate());
+			Assert.assertEquals(1, preparedStatement.executeUpdate());
 		}
 		finally {
 			CompanyThreadLocal.setCompanyId(originalCompanyId);
@@ -1222,24 +1210,22 @@ public class CTSQLTransformerTest {
 					_classNameLocalService.getClassNameId(ReferenceTable.class))
 			).build());
 
-		try (CaptureAppender captureAppender =
-				Log4JLoggerTestUtil.configureLog4JLogger(
-					"com.liferay.portal.change.tracking.internal." +
-						"CTSQLTransformerImpl",
-					Level.WARN)) {
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"com.liferay.portal.change.tracking.internal." +
+					"CTSQLTransformerImpl",
+				LoggerTestUtil.WARN)) {
 
 			String newSQL = _ctSQLTransformer.transform(inputSQL);
 
 			Assert.assertEquals(expectedOutputSQL, newSQL);
 
-			List<LoggingEvent> loggingEvents =
-				captureAppender.getLoggingEvents();
+			List<LogEntry> logEntries = logCapture.getLogEntries();
 
 			if (expectedOutputSQLFile.endsWith("_ct.sql")) {
-				Assert.assertFalse(newSQL, loggingEvents.isEmpty());
+				Assert.assertFalse(newSQL, logEntries.isEmpty());
 			}
 			else {
-				Assert.assertTrue(newSQL, loggingEvents.isEmpty());
+				Assert.assertTrue(newSQL, logEntries.isEmpty());
 			}
 
 			return newSQL;
@@ -1254,9 +1240,6 @@ public class CTSQLTransformerTest {
 
 	@Inject
 	private static ClassNameLocalService _classNameLocalService;
-
-	@Inject
-	private static CounterLocalService _counterLocalService;
 
 	@Inject
 	private static CTCollectionLocalService _ctCollectionLocalService;

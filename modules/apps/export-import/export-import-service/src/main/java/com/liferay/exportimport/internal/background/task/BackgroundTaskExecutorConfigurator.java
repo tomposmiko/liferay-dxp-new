@@ -15,9 +15,8 @@
 package com.liferay.exportimport.internal.background.task;
 
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 
-import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,59 +34,33 @@ public class BackgroundTaskExecutorConfigurator {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		BackgroundTaskExecutor layoutExportBackgroundTaskExecutor =
-			new LayoutExportBackgroundTaskExecutor();
+		registerBackgroundTaskExecutor(
+			bundleContext, new LayoutExportBackgroundTaskExecutor());
 
 		registerBackgroundTaskExecutor(
-			bundleContext, layoutExportBackgroundTaskExecutor);
-
-		BackgroundTaskExecutor layoutImportBackgroundTaskExecutor =
-			new LayoutImportBackgroundTaskExecutor();
+			bundleContext, new LayoutImportBackgroundTaskExecutor());
 
 		registerBackgroundTaskExecutor(
-			bundleContext, layoutImportBackgroundTaskExecutor);
-
-		BackgroundTaskExecutor layoutRemoteStagingBackgroundTaskExecutor =
-			new LayoutRemoteStagingBackgroundTaskExecutor();
+			bundleContext, new LayoutRemoteStagingBackgroundTaskExecutor());
 
 		registerBackgroundTaskExecutor(
-			bundleContext, layoutRemoteStagingBackgroundTaskExecutor);
-
-		BackgroundTaskExecutor layoutSetPrototypeImportBackgroundTaskExecutor =
-			new LayoutSetPrototypeImportBackgroundTaskExecutor();
+			bundleContext,
+			new LayoutSetPrototypeImportBackgroundTaskExecutor());
 
 		registerBackgroundTaskExecutor(
-			bundleContext, layoutSetPrototypeImportBackgroundTaskExecutor);
-
-		BackgroundTaskExecutor layoutStagingBackgroundTaskExecutor =
-			new LayoutStagingBackgroundTaskExecutor();
+			bundleContext, new LayoutStagingBackgroundTaskExecutor());
 
 		registerBackgroundTaskExecutor(
-			bundleContext, layoutStagingBackgroundTaskExecutor);
-
-		BackgroundTaskExecutor portletExportBackgroundTaskExecutor =
-			new PortletExportBackgroundTaskExecutor();
+			bundleContext, new PortletExportBackgroundTaskExecutor());
 
 		registerBackgroundTaskExecutor(
-			bundleContext, portletExportBackgroundTaskExecutor);
-
-		BackgroundTaskExecutor portletImportBackgroundTaskExecutor =
-			new PortletImportBackgroundTaskExecutor();
+			bundleContext, new PortletImportBackgroundTaskExecutor());
 
 		registerBackgroundTaskExecutor(
-			bundleContext, portletImportBackgroundTaskExecutor);
-
-		BackgroundTaskExecutor portletRemoteStagingBackgroundTaskExecutor =
-			new PortletRemoteStagingBackgroundTaskExecutor();
+			bundleContext, new PortletRemoteStagingBackgroundTaskExecutor());
 
 		registerBackgroundTaskExecutor(
-			bundleContext, portletRemoteStagingBackgroundTaskExecutor);
-
-		BackgroundTaskExecutor portletStagingBackgroundTaskExecutor =
-			new PortletStagingBackgroundTaskExecutor();
-
-		registerBackgroundTaskExecutor(
-			bundleContext, portletStagingBackgroundTaskExecutor);
+			bundleContext, new PortletStagingBackgroundTaskExecutor());
 	}
 
 	@Deactivate
@@ -103,16 +76,14 @@ public class BackgroundTaskExecutorConfigurator {
 		BundleContext bundleContext,
 		BackgroundTaskExecutor backgroundTaskExecutor) {
 
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
 		Class<?> clazz = backgroundTaskExecutor.getClass();
-
-		properties.put("background.task.executor.class.name", clazz.getName());
 
 		ServiceRegistration<BackgroundTaskExecutor> serviceRegistration =
 			bundleContext.registerService(
 				BackgroundTaskExecutor.class, backgroundTaskExecutor,
-				properties);
+				HashMapDictionaryBuilder.<String, Object>put(
+					"background.task.executor.class.name", clazz.getName()
+				).build());
 
 		_serviceRegistrations.add(serviceRegistration);
 	}

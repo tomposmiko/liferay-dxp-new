@@ -184,14 +184,23 @@ public class PortalInstances {
 	public static long[] getCompanyIdsBySQL() throws SQLException {
 		List<Long> companyIds = new ArrayList<>();
 
-		try (Connection con = DataAccess.getConnection();
-			PreparedStatement ps = con.prepareStatement(_GET_COMPANY_IDS);
-			ResultSet rs = ps.executeQuery()) {
+		long defaultCompanyId = getDefaultCompanyIdBySQL();
 
-			while (rs.next()) {
-				long companyId = rs.getLong("companyId");
+		if (defaultCompanyId != 0) {
+			companyIds.add(defaultCompanyId);
+		}
 
-				companyIds.add(companyId);
+		try (Connection connection = DataAccess.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(
+				_GET_COMPANY_IDS);
+			ResultSet resultSet = preparedStatement.executeQuery()) {
+
+			while (resultSet.next()) {
+				long companyId = resultSet.getLong("companyId");
+
+				if (companyId != defaultCompanyId) {
+					companyIds.add(companyId);
+				}
 			}
 		}
 
@@ -200,6 +209,21 @@ public class PortalInstances {
 
 	public static long getDefaultCompanyId() {
 		return _companyIds[0];
+	}
+
+	public static long getDefaultCompanyIdBySQL() throws SQLException {
+		try (Connection connection = DataAccess.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(
+				"select companyId from Company where webId = '" +
+					PropsValues.COMPANY_DEFAULT_WEB_ID + "'");
+			ResultSet resultSet = preparedStatement.executeQuery()) {
+
+			if (resultSet.next()) {
+				return resultSet.getLong(1);
+			}
+		}
+
+		return 0;
 	}
 
 	public static String[] getWebIds() {
@@ -212,21 +236,19 @@ public class PortalInstances {
 		}
 
 		try {
-			List<Company> companies = CompanyLocalServiceUtil.getCompanies(
-				false);
+			List<String> webIdsList = new ArrayList<>();
 
-			List<String> webIdsList = new ArrayList<>(companies.size());
+			CompanyLocalServiceUtil.forEachCompany(
+				company -> {
+					String webId = company.getWebId();
 
-			for (Company company : companies) {
-				String webId = company.getWebId();
-
-				if (webId.equals(PropsValues.COMPANY_DEFAULT_WEB_ID)) {
-					webIdsList.add(0, webId);
-				}
-				else {
-					webIdsList.add(webId);
-				}
-			}
+					if (webId.equals(PropsValues.COMPANY_DEFAULT_WEB_ID)) {
+						webIdsList.add(0, webId);
+					}
+					else {
+						webIdsList.add(webId);
+					}
+				});
 
 			_webIds = webIdsList.toArray(new String[0]);
 		}

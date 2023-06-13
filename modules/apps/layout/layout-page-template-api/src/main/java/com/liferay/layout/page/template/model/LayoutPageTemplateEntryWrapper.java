@@ -236,6 +236,11 @@ public class LayoutPageTemplateEntryWrapper
 		}
 	}
 
+	@Override
+	public LayoutPageTemplateEntry cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
 	/**
 	 * Returns the fully qualified class name of this layout page template entry.
 	 *

@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -356,122 +357,144 @@ public class DLFileShortcutModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<DLFileShortcut, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, DLFileShortcut>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<DLFileShortcut, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<DLFileShortcut, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DLFileShortcut.class.getClassLoader(), DLFileShortcut.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", DLFileShortcut::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", DLFileShortcut::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", DLFileShortcut::getUuid);
-		attributeGetterFunctions.put(
-			"fileShortcutId", DLFileShortcut::getFileShortcutId);
-		attributeGetterFunctions.put("groupId", DLFileShortcut::getGroupId);
-		attributeGetterFunctions.put("companyId", DLFileShortcut::getCompanyId);
-		attributeGetterFunctions.put("userId", DLFileShortcut::getUserId);
-		attributeGetterFunctions.put("userName", DLFileShortcut::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", DLFileShortcut::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", DLFileShortcut::getModifiedDate);
-		attributeGetterFunctions.put(
-			"repositoryId", DLFileShortcut::getRepositoryId);
-		attributeGetterFunctions.put("folderId", DLFileShortcut::getFolderId);
-		attributeGetterFunctions.put(
-			"toFileEntryId", DLFileShortcut::getToFileEntryId);
-		attributeGetterFunctions.put("treePath", DLFileShortcut::getTreePath);
-		attributeGetterFunctions.put("active", DLFileShortcut::getActive);
-		attributeGetterFunctions.put(
-			"lastPublishDate", DLFileShortcut::getLastPublishDate);
-		attributeGetterFunctions.put("status", DLFileShortcut::getStatus);
-		attributeGetterFunctions.put(
-			"statusByUserId", DLFileShortcut::getStatusByUserId);
-		attributeGetterFunctions.put(
-			"statusByUserName", DLFileShortcut::getStatusByUserName);
-		attributeGetterFunctions.put(
-			"statusDate", DLFileShortcut::getStatusDate);
+		try {
+			Constructor<DLFileShortcut> constructor =
+				(Constructor<DLFileShortcut>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<DLFileShortcut, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<DLFileShortcut, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<DLFileShortcut, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DLFileShortcut, Object>>();
 		Map<String, BiConsumer<DLFileShortcut, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<DLFileShortcut, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", DLFileShortcut::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DLFileShortcut, Long>)DLFileShortcut::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", DLFileShortcut::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<DLFileShortcut, Long>)
 				DLFileShortcut::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", DLFileShortcut::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<DLFileShortcut, String>)DLFileShortcut::setUuid);
+		attributeGetterFunctions.put(
+			"fileShortcutId", DLFileShortcut::getFileShortcutId);
 		attributeSetterBiConsumers.put(
 			"fileShortcutId",
 			(BiConsumer<DLFileShortcut, Long>)
 				DLFileShortcut::setFileShortcutId);
+		attributeGetterFunctions.put("groupId", DLFileShortcut::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<DLFileShortcut, Long>)DLFileShortcut::setGroupId);
+		attributeGetterFunctions.put("companyId", DLFileShortcut::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DLFileShortcut, Long>)DLFileShortcut::setCompanyId);
+		attributeGetterFunctions.put("userId", DLFileShortcut::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<DLFileShortcut, Long>)DLFileShortcut::setUserId);
+		attributeGetterFunctions.put("userName", DLFileShortcut::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<DLFileShortcut, String>)DLFileShortcut::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", DLFileShortcut::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<DLFileShortcut, Date>)DLFileShortcut::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", DLFileShortcut::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<DLFileShortcut, Date>)DLFileShortcut::setModifiedDate);
+		attributeGetterFunctions.put(
+			"repositoryId", DLFileShortcut::getRepositoryId);
 		attributeSetterBiConsumers.put(
 			"repositoryId",
 			(BiConsumer<DLFileShortcut, Long>)DLFileShortcut::setRepositoryId);
+		attributeGetterFunctions.put("folderId", DLFileShortcut::getFolderId);
 		attributeSetterBiConsumers.put(
 			"folderId",
 			(BiConsumer<DLFileShortcut, Long>)DLFileShortcut::setFolderId);
+		attributeGetterFunctions.put(
+			"toFileEntryId", DLFileShortcut::getToFileEntryId);
 		attributeSetterBiConsumers.put(
 			"toFileEntryId",
 			(BiConsumer<DLFileShortcut, Long>)DLFileShortcut::setToFileEntryId);
+		attributeGetterFunctions.put("treePath", DLFileShortcut::getTreePath);
 		attributeSetterBiConsumers.put(
 			"treePath",
 			(BiConsumer<DLFileShortcut, String>)DLFileShortcut::setTreePath);
+		attributeGetterFunctions.put("active", DLFileShortcut::getActive);
 		attributeSetterBiConsumers.put(
 			"active",
 			(BiConsumer<DLFileShortcut, Boolean>)DLFileShortcut::setActive);
+		attributeGetterFunctions.put(
+			"lastPublishDate", DLFileShortcut::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<DLFileShortcut, Date>)
 				DLFileShortcut::setLastPublishDate);
+		attributeGetterFunctions.put("status", DLFileShortcut::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<DLFileShortcut, Integer>)DLFileShortcut::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", DLFileShortcut::getStatusByUserId);
 		attributeSetterBiConsumers.put(
 			"statusByUserId",
 			(BiConsumer<DLFileShortcut, Long>)
 				DLFileShortcut::setStatusByUserId);
+		attributeGetterFunctions.put(
+			"statusByUserName", DLFileShortcut::getStatusByUserName);
 		attributeSetterBiConsumers.put(
 			"statusByUserName",
 			(BiConsumer<DLFileShortcut, String>)
 				DLFileShortcut::setStatusByUserName);
+		attributeGetterFunctions.put(
+			"statusDate", DLFileShortcut::getStatusDate);
 		attributeSetterBiConsumers.put(
 			"statusDate",
 			(BiConsumer<DLFileShortcut, Date>)DLFileShortcut::setStatusDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -1222,6 +1245,54 @@ public class DLFileShortcutModelImpl
 	}
 
 	@Override
+	public DLFileShortcut cloneWithOriginalValues() {
+		DLFileShortcutImpl dlFileShortcutImpl = new DLFileShortcutImpl();
+
+		dlFileShortcutImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		dlFileShortcutImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		dlFileShortcutImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		dlFileShortcutImpl.setFileShortcutId(
+			this.<Long>getColumnOriginalValue("fileShortcutId"));
+		dlFileShortcutImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		dlFileShortcutImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		dlFileShortcutImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		dlFileShortcutImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		dlFileShortcutImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		dlFileShortcutImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		dlFileShortcutImpl.setRepositoryId(
+			this.<Long>getColumnOriginalValue("repositoryId"));
+		dlFileShortcutImpl.setFolderId(
+			this.<Long>getColumnOriginalValue("folderId"));
+		dlFileShortcutImpl.setToFileEntryId(
+			this.<Long>getColumnOriginalValue("toFileEntryId"));
+		dlFileShortcutImpl.setTreePath(
+			this.<String>getColumnOriginalValue("treePath"));
+		dlFileShortcutImpl.setActive(
+			this.<Boolean>getColumnOriginalValue("active_"));
+		dlFileShortcutImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+		dlFileShortcutImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
+		dlFileShortcutImpl.setStatusByUserId(
+			this.<Long>getColumnOriginalValue("statusByUserId"));
+		dlFileShortcutImpl.setStatusByUserName(
+			this.<String>getColumnOriginalValue("statusByUserName"));
+		dlFileShortcutImpl.setStatusDate(
+			this.<Date>getColumnOriginalValue("statusDate"));
+
+		return dlFileShortcutImpl;
+	}
+
+	@Override
 	public int compareTo(DLFileShortcut dlFileShortcut) {
 		long primaryKey = dlFileShortcut.getPrimaryKey();
 
@@ -1474,9 +1545,7 @@ public class DLFileShortcutModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DLFileShortcut>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DLFileShortcut.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

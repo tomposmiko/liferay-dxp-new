@@ -59,8 +59,6 @@ public class ModifiedSearchFacet extends BaseJSPSearchFacet {
 
 		facetConfiguration.setClassName(getFacetClassName());
 
-		JSONObject jsonObject = JSONUtil.put("frequencyThreshold", 0);
-
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 		for (int i = 0; i < _LABELS.length; i++) {
@@ -72,9 +70,12 @@ public class ModifiedSearchFacet extends BaseJSPSearchFacet {
 				));
 		}
 
-		jsonObject.put("ranges", jsonArray);
-
-		facetConfiguration.setDataJSONObject(jsonObject);
+		facetConfiguration.setDataJSONObject(
+			JSONUtil.put(
+				"frequencyThreshold", 0
+			).put(
+				"ranges", jsonArray
+			));
 		facetConfiguration.setFieldName(getFieldName());
 		facetConfiguration.setLabel(getLabel());
 		facetConfiguration.setOrder(getOrder());
@@ -116,12 +117,6 @@ public class ModifiedSearchFacet extends BaseJSPSearchFacet {
 
 	@Override
 	public JSONObject getJSONData(ActionRequest actionRequest) {
-		int frequencyThreshold = ParamUtil.getInteger(
-			actionRequest, getClassName() + "frequencyThreshold", 1);
-
-		JSONObject jsonObject = JSONUtil.put(
-			"frequencyThreshold", frequencyThreshold);
-
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
 		String[] rangesIndexes = StringUtil.split(
@@ -129,22 +124,25 @@ public class ModifiedSearchFacet extends BaseJSPSearchFacet {
 				actionRequest, getClassName() + "rangesIndexes"));
 
 		for (String rangesIndex : rangesIndexes) {
-			String label = ParamUtil.getString(
-				actionRequest, getClassName() + "label_" + rangesIndex);
-			String range = ParamUtil.getString(
-				actionRequest, getClassName() + "range_" + rangesIndex);
-
 			jsonArray.put(
 				JSONUtil.put(
-					"label", label
+					"label",
+					ParamUtil.getString(
+						actionRequest, getClassName() + "label_" + rangesIndex)
 				).put(
-					"range", range
+					"range",
+					ParamUtil.getString(
+						actionRequest, getClassName() + "range_" + rangesIndex)
 				));
 		}
 
-		jsonObject.put("ranges", jsonArray);
-
-		return jsonObject;
+		return JSONUtil.put(
+			"frequencyThreshold",
+			ParamUtil.getInteger(
+				actionRequest, getClassName() + "frequencyThreshold", 1)
+		).put(
+			"ranges", jsonArray
+		);
 	}
 
 	@Override

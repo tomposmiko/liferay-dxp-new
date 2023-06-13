@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -309,89 +310,111 @@ public class LayoutSEOSiteModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<LayoutSEOSite, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, LayoutSEOSite>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<LayoutSEOSite, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<LayoutSEOSite, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			LayoutSEOSite.class.getClassLoader(), LayoutSEOSite.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", LayoutSEOSite::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", LayoutSEOSite::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", LayoutSEOSite::getUuid);
-		attributeGetterFunctions.put(
-			"layoutSEOSiteId", LayoutSEOSite::getLayoutSEOSiteId);
-		attributeGetterFunctions.put("groupId", LayoutSEOSite::getGroupId);
-		attributeGetterFunctions.put("companyId", LayoutSEOSite::getCompanyId);
-		attributeGetterFunctions.put("userId", LayoutSEOSite::getUserId);
-		attributeGetterFunctions.put("userName", LayoutSEOSite::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", LayoutSEOSite::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", LayoutSEOSite::getModifiedDate);
-		attributeGetterFunctions.put(
-			"openGraphEnabled", LayoutSEOSite::getOpenGraphEnabled);
-		attributeGetterFunctions.put(
-			"openGraphImageAlt", LayoutSEOSite::getOpenGraphImageAlt);
-		attributeGetterFunctions.put(
-			"openGraphImageFileEntryId",
-			LayoutSEOSite::getOpenGraphImageFileEntryId);
+		try {
+			Constructor<LayoutSEOSite> constructor =
+				(Constructor<LayoutSEOSite>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<LayoutSEOSite, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<LayoutSEOSite, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<LayoutSEOSite, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<LayoutSEOSite, Object>>();
 		Map<String, BiConsumer<LayoutSEOSite, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<LayoutSEOSite, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", LayoutSEOSite::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<LayoutSEOSite, Long>)LayoutSEOSite::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", LayoutSEOSite::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<LayoutSEOSite, Long>)LayoutSEOSite::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", LayoutSEOSite::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<LayoutSEOSite, String>)LayoutSEOSite::setUuid);
+		attributeGetterFunctions.put(
+			"layoutSEOSiteId", LayoutSEOSite::getLayoutSEOSiteId);
 		attributeSetterBiConsumers.put(
 			"layoutSEOSiteId",
 			(BiConsumer<LayoutSEOSite, Long>)LayoutSEOSite::setLayoutSEOSiteId);
+		attributeGetterFunctions.put("groupId", LayoutSEOSite::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<LayoutSEOSite, Long>)LayoutSEOSite::setGroupId);
+		attributeGetterFunctions.put("companyId", LayoutSEOSite::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<LayoutSEOSite, Long>)LayoutSEOSite::setCompanyId);
+		attributeGetterFunctions.put("userId", LayoutSEOSite::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<LayoutSEOSite, Long>)LayoutSEOSite::setUserId);
+		attributeGetterFunctions.put("userName", LayoutSEOSite::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<LayoutSEOSite, String>)LayoutSEOSite::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", LayoutSEOSite::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<LayoutSEOSite, Date>)LayoutSEOSite::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", LayoutSEOSite::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<LayoutSEOSite, Date>)LayoutSEOSite::setModifiedDate);
+		attributeGetterFunctions.put(
+			"openGraphEnabled", LayoutSEOSite::getOpenGraphEnabled);
 		attributeSetterBiConsumers.put(
 			"openGraphEnabled",
 			(BiConsumer<LayoutSEOSite, Boolean>)
 				LayoutSEOSite::setOpenGraphEnabled);
+		attributeGetterFunctions.put(
+			"openGraphImageAlt", LayoutSEOSite::getOpenGraphImageAlt);
 		attributeSetterBiConsumers.put(
 			"openGraphImageAlt",
 			(BiConsumer<LayoutSEOSite, String>)
 				LayoutSEOSite::setOpenGraphImageAlt);
+		attributeGetterFunctions.put(
+			"openGraphImageFileEntryId",
+			LayoutSEOSite::getOpenGraphImageFileEntryId);
 		attributeSetterBiConsumers.put(
 			"openGraphImageFileEntryId",
 			(BiConsumer<LayoutSEOSite, Long>)
 				LayoutSEOSite::setOpenGraphImageFileEntryId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -913,6 +936,39 @@ public class LayoutSEOSiteModelImpl
 	}
 
 	@Override
+	public LayoutSEOSite cloneWithOriginalValues() {
+		LayoutSEOSiteImpl layoutSEOSiteImpl = new LayoutSEOSiteImpl();
+
+		layoutSEOSiteImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		layoutSEOSiteImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		layoutSEOSiteImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		layoutSEOSiteImpl.setLayoutSEOSiteId(
+			this.<Long>getColumnOriginalValue("layoutSEOSiteId"));
+		layoutSEOSiteImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		layoutSEOSiteImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		layoutSEOSiteImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		layoutSEOSiteImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		layoutSEOSiteImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		layoutSEOSiteImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		layoutSEOSiteImpl.setOpenGraphEnabled(
+			this.<Boolean>getColumnOriginalValue("openGraphEnabled"));
+		layoutSEOSiteImpl.setOpenGraphImageAlt(
+			this.<String>getColumnOriginalValue("openGraphImageAlt"));
+		layoutSEOSiteImpl.setOpenGraphImageFileEntryId(
+			this.<Long>getColumnOriginalValue("openGraphImageFileEntryId"));
+
+		return layoutSEOSiteImpl;
+	}
+
+	@Override
 	public int compareTo(LayoutSEOSite layoutSEOSite) {
 		long primaryKey = layoutSEOSite.getPrimaryKey();
 
@@ -1131,9 +1187,7 @@ public class LayoutSEOSiteModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, LayoutSEOSite>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					LayoutSEOSite.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

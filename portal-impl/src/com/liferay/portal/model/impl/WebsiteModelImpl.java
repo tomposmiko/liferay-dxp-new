@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -328,71 +329,92 @@ public class WebsiteModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Website, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Website>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Website, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Website, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Website.class.getClassLoader(), Website.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", Website::getMvccVersion);
-		attributeGetterFunctions.put("uuid", Website::getUuid);
-		attributeGetterFunctions.put("websiteId", Website::getWebsiteId);
-		attributeGetterFunctions.put("companyId", Website::getCompanyId);
-		attributeGetterFunctions.put("userId", Website::getUserId);
-		attributeGetterFunctions.put("userName", Website::getUserName);
-		attributeGetterFunctions.put("createDate", Website::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", Website::getModifiedDate);
-		attributeGetterFunctions.put("classNameId", Website::getClassNameId);
-		attributeGetterFunctions.put("classPK", Website::getClassPK);
-		attributeGetterFunctions.put("url", Website::getUrl);
-		attributeGetterFunctions.put("typeId", Website::getTypeId);
-		attributeGetterFunctions.put("primary", Website::getPrimary);
-		attributeGetterFunctions.put(
-			"lastPublishDate", Website::getLastPublishDate);
+		try {
+			Constructor<Website> constructor =
+				(Constructor<Website>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Website, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Website, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Website, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Website, Object>>();
 		Map<String, BiConsumer<Website, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Website, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", Website::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion", (BiConsumer<Website, Long>)Website::setMvccVersion);
+		attributeGetterFunctions.put("uuid", Website::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<Website, String>)Website::setUuid);
+		attributeGetterFunctions.put("websiteId", Website::getWebsiteId);
 		attributeSetterBiConsumers.put(
 			"websiteId", (BiConsumer<Website, Long>)Website::setWebsiteId);
+		attributeGetterFunctions.put("companyId", Website::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<Website, Long>)Website::setCompanyId);
+		attributeGetterFunctions.put("userId", Website::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<Website, Long>)Website::setUserId);
+		attributeGetterFunctions.put("userName", Website::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<Website, String>)Website::setUserName);
+		attributeGetterFunctions.put("createDate", Website::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<Website, Date>)Website::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", Website::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<Website, Date>)Website::setModifiedDate);
+		attributeGetterFunctions.put("classNameId", Website::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId", (BiConsumer<Website, Long>)Website::setClassNameId);
+		attributeGetterFunctions.put("classPK", Website::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK", (BiConsumer<Website, Long>)Website::setClassPK);
+		attributeGetterFunctions.put("url", Website::getUrl);
 		attributeSetterBiConsumers.put(
 			"url", (BiConsumer<Website, String>)Website::setUrl);
+		attributeGetterFunctions.put("typeId", Website::getTypeId);
 		attributeSetterBiConsumers.put(
 			"typeId", (BiConsumer<Website, Long>)Website::setTypeId);
+		attributeGetterFunctions.put("primary", Website::getPrimary);
 		attributeSetterBiConsumers.put(
 			"primary", (BiConsumer<Website, Boolean>)Website::setPrimary);
+		attributeGetterFunctions.put(
+			"lastPublishDate", Website::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<Website, Date>)Website::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -811,6 +833,37 @@ public class WebsiteModelImpl
 	}
 
 	@Override
+	public Website cloneWithOriginalValues() {
+		WebsiteImpl websiteImpl = new WebsiteImpl();
+
+		websiteImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		websiteImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		websiteImpl.setWebsiteId(
+			this.<Long>getColumnOriginalValue("websiteId"));
+		websiteImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		websiteImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		websiteImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		websiteImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		websiteImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		websiteImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		websiteImpl.setClassPK(this.<Long>getColumnOriginalValue("classPK"));
+		websiteImpl.setUrl(this.<String>getColumnOriginalValue("url"));
+		websiteImpl.setTypeId(this.<Long>getColumnOriginalValue("typeId"));
+		websiteImpl.setPrimary(
+			this.<Boolean>getColumnOriginalValue("primary_"));
+		websiteImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+
+		return websiteImpl;
+	}
+
+	@Override
 	public int compareTo(Website website) {
 		int value = 0;
 
@@ -1034,9 +1087,7 @@ public class WebsiteModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Website>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Website.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

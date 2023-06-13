@@ -19,10 +19,13 @@
 <%
 long groupId = ParamUtil.getLong(request, "groupId", themeDisplay.getScopeGroupId());
 
-PortletURL portletURL = currentURLObj;
-
-portletURL.setParameter("mvcRenderCommandName", "publishPortlet");
-portletURL.setParameter("tabs3", "current-and-previous");
+PortletURL portletURL = PortletURLBuilder.create(
+	currentURLObj
+).setMVCRenderCommandName(
+	"/export_import/publish_portlet"
+).setParameter(
+	"tabs3", "current-and-previous"
+).buildPortletURL();
 
 String orderByCol = ParamUtil.getString(request, "orderByCol");
 String orderByType = ParamUtil.getString(request, "orderByType");
@@ -39,7 +42,7 @@ else {
 
 <clay:container-fluid>
 	<liferay-ui:search-container
-		emptyResultsMessage="no-publication-processes-were-found"
+		emptyResultsMessage="no-publish-processes-were-found"
 		iteratorURL="<%= portletURL %>"
 		orderByCol="<%= orderByCol %>"
 		orderByComparator="<%= BackgroundTaskComparatorFactoryUtil.getBackgroundTaskOrderByComparator(orderByCol, orderByType) %>"
@@ -56,7 +59,7 @@ else {
 			modelVar="backgroundTask"
 		>
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="user"
 			>
 				<liferay-ui:user-display
@@ -68,20 +71,20 @@ else {
 			</liferay-ui:search-container-column-text>
 
 			<liferay-ui:search-container-column-jsp
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="status"
 				path="/publish_process_message.jsp"
 			/>
 
 			<liferay-ui:search-container-column-date
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="create-date"
 				orderable="<%= true %>"
 				value="<%= backgroundTask.getCreateDate() %>"
 			/>
 
 			<liferay-ui:search-container-column-date
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="completion-date"
 				orderable="<%= true %>"
 				value="<%= backgroundTask.getCompletionDate() %>"
@@ -100,7 +103,7 @@ else {
 						Date completionDate = backgroundTask.getCompletionDate();
 						%>
 
-						<liferay-portlet:actionURL name="deleteBackgroundTask" portletName="<%= PortletKeys.EXPORT_IMPORT %>" var="deleteBackgroundTaskURL">
+						<liferay-portlet:actionURL name="/export_import/delete_portlet_background_task" portletName="<%= PortletKeys.EXPORT_IMPORT %>" var="deleteBackgroundTaskURL">
 							<portlet:param name="redirect" value="<%= portletURL.toString() %>" />
 							<portlet:param name="backgroundTaskId" value="<%= String.valueOf(backgroundTask.getBackgroundTaskId()) %>" />
 						</liferay-portlet:actionURL>
@@ -121,12 +124,12 @@ else {
 	</liferay-ui:search-container>
 
 	<%
-	int incompleteBackgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(StagingUtil.getStagingAndLiveGroupIds(groupId), selPortlet.getPortletId(), BackgroundTaskExecutorNames.PORTLET_STAGING_BACKGROUND_TASK_EXECUTOR, false);
+	int incompleteBackgroundTaskCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(StagingUtil.getStagingAndLiveGroupIds(groupId), selPortlet.getPortletId(), BackgroundTaskExecutorNames.PORTLET_STAGING_BACKGROUND_TASK_EXECUTOR, false);
 	%>
 
 	<div class="hide incomplete-process-message">
 		<liferay-util:include page="/incomplete_processes_message.jsp" servletContext="<%= application %>">
-			<liferay-util:param name="incompleteBackgroundTasksCount" value="<%= String.valueOf(incompleteBackgroundTasksCount) %>" />
+			<liferay-util:param name="incompleteBackgroundTaskCount" value="<%= String.valueOf(incompleteBackgroundTaskCount) %>" />
 		</liferay-util:include>
 	</div>
 </clay:container-fluid>

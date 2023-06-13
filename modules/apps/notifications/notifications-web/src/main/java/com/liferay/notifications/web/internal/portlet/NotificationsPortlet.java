@@ -25,7 +25,6 @@ import com.liferay.portal.kernel.notifications.UserNotificationDefinition;
 import com.liferay.portal.kernel.notifications.UserNotificationDeliveryType;
 import com.liferay.portal.kernel.notifications.UserNotificationManagerUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.UserNotificationDeliveryLocalService;
 import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
@@ -37,8 +36,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.subscription.model.Subscription;
 import com.liferay.subscription.service.SubscriptionLocalService;
-
-import java.util.ResourceBundle;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -309,7 +306,7 @@ public class NotificationsPortlet extends MVCPortlet {
 		}
 
 		_addSuccessMessage(
-			actionRequest, "your-configuration-was-saved-sucessfully");
+			actionRequest, "your-configuration-was-saved-successfully");
 
 		_sendRedirect(actionRequest, actionResponse);
 	}
@@ -349,12 +346,9 @@ public class NotificationsPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		ResourceBundle resourceBundle =
-			_resourceBundleLoader.loadResourceBundle(themeDisplay.getLocale());
-
 		SessionMessages.add(
 			actionRequest, "requestProcessed",
-			LanguageUtil.get(resourceBundle, message));
+			LanguageUtil.get(themeDisplay.getLocale(), message));
 	}
 
 	private void _deleteSubscription(long userId, long subscriptionId)
@@ -441,9 +435,6 @@ public class NotificationsPortlet extends MVCPortlet {
 
 	@Reference
 	private Portal _portal;
-
-	@Reference(target = "(bundle.symbolic.name=com.liferay.notifications.web)")
-	private ResourceBundleLoader _resourceBundleLoader;
 
 	@Reference
 	private SubscriptionLocalService _subscriptionLocalService;

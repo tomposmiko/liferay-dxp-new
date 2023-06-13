@@ -63,7 +63,7 @@ public class CollectionConfig implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(CollectionConfig.class, json);
 	}
 
-	@Schema
+	@Schema(description = "The page collection's reference.")
 	@Valid
 	public Object getCollectionReference() {
 		return collectionReference;
@@ -88,12 +88,14 @@ public class CollectionConfig implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The page collection's reference.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	@NotNull
 	protected Object collectionReference;
 
-	@Schema
+	@Schema(
+		description = "The page collection's type (Collection, CollectionProvider)."
+	)
 	@Valid
 	public CollectionType getCollectionType() {
 		return collectionType;
@@ -128,7 +130,9 @@ public class CollectionConfig implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The page collection's type (Collection, CollectionProvider)."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	@NotNull
 	protected CollectionType collectionType;

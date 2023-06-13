@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.servlet.filters.secure.NonceUtil;
 import com.liferay.portal.util.PortalInstances;
@@ -104,11 +105,8 @@ public class HttpAuthManagerImpl implements HttpAuthManager {
 		HttpAuthorizationHeader httpAuthorizationHeader =
 			HttpAuthManagerUtil.parse(httpServletRequest);
 
-		if (httpAuthorizationHeader == null) {
-			return 0;
-		}
-
-		if (!StringUtil.equalsIgnoreCase(
+		if ((httpAuthorizationHeader == null) ||
+			!StringUtil.equalsIgnoreCase(
 				httpAuthorizationHeader.getScheme(),
 				HttpAuthorizationHeader.SCHEME_BASIC)) {
 
@@ -125,11 +123,8 @@ public class HttpAuthManagerImpl implements HttpAuthManager {
 		HttpAuthorizationHeader httpAuthorizationHeader =
 			HttpAuthManagerUtil.parse(httpServletRequest);
 
-		if (httpAuthorizationHeader == null) {
-			return 0;
-		}
-
-		if (!StringUtil.equalsIgnoreCase(
+		if ((httpAuthorizationHeader == null) ||
+			!StringUtil.equalsIgnoreCase(
 				httpAuthorizationHeader.getScheme(),
 				HttpAuthorizationHeader.SCHEME_DIGEST)) {
 
@@ -168,8 +163,9 @@ public class HttpAuthManagerImpl implements HttpAuthManager {
 
 			return getDigestUserId(httpServletRequest, httpAuthorizationHeader);
 		}
-
-		throw new UnsupportedOperationException("Scheme " + scheme);
+		else {
+			throw new UnsupportedOperationException("Scheme " + scheme);
+		}
 	}
 
 	@Override
@@ -209,8 +205,9 @@ public class HttpAuthManagerImpl implements HttpAuthManager {
 			return parseDigest(
 				httpServletRequest, authorization, authorizationParts);
 		}
-
-		throw new UnsupportedOperationException("Scheme " + scheme);
+		else {
+			throw new UnsupportedOperationException("Scheme " + scheme);
+		}
 	}
 
 	protected void generateBasicChallenge(
@@ -320,11 +317,9 @@ public class HttpAuthManagerImpl implements HttpAuthManager {
 				requestURI, StringPool.QUESTION, queryString);
 		}
 
-		if (!realm.equals(Portal.PORTAL_REALM) || !uri.equals(requestURI)) {
-			return userId;
-		}
+		if (!realm.equals(Portal.PORTAL_REALM) || !uri.equals(requestURI) ||
+			!NonceUtil.verify(nonce)) {
 
-		if (!NonceUtil.verify(nonce)) {
 			return userId;
 		}
 
@@ -383,9 +378,9 @@ public class HttpAuthManagerImpl implements HttpAuthManager {
 			authorization, CharPool.COMMA, CharPool.NEW_LINE);
 
 		UnicodeProperties authorizationUnicodeProperties =
-			new UnicodeProperties();
-
-		authorizationUnicodeProperties.fastLoad(authorization);
+			UnicodePropertiesBuilder.fastLoad(
+				authorization
+			).build();
 
 		for (Map.Entry<String, String> authorizationProperty :
 				authorizationUnicodeProperties.entrySet()) {

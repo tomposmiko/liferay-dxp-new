@@ -41,7 +41,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface OpenIdConnectConfiguration {
 
 	@Meta.AD(
-		deflt = "false", description = "enabled-help", name = "enabled",
+		deflt = "false", description = "enabled-help[openid]", name = "enabled",
 		required = false
 	)
 	public boolean enabled();

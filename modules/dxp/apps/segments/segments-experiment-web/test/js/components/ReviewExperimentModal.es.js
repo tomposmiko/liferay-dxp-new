@@ -62,16 +62,16 @@ const variants = [
 ];
 const onRun = jest.fn();
 
-const assetsPath = 'path';
+const imagesPath = 'path';
 
 const experiment = {
 	confidenceLevel: 0,
 	description: '',
 	editable: true,
 	goal: {
-		label: 'click',
-		target: 'click',
-		value: '#element',
+		label: 'Click',
+		target: 'element',
+		value: 'click',
 	},
 	name: 'Experiment name',
 	segmentsEntryName: 'Experience Segment',
@@ -110,7 +110,7 @@ const renderReviewExperimentModal = ({
 				APIService: {
 					getEstimatedTime: getEstimatedTimeMock,
 				},
-				assetsPath,
+				imagesPath,
 			}}
 		>
 			<StateContext.Provider

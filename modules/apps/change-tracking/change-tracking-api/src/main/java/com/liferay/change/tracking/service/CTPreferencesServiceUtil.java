@@ -37,11 +37,18 @@ public class CTPreferencesServiceUtil {
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.change.tracking.service.impl.CTPreferencesServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
 	public static CTPreferences checkoutCTCollection(
-			long companyId, long ctCollectionId, long userId)
+			long companyId, long userId, long ctCollectionId)
 		throws PortalException {
 
 		return getService().checkoutCTCollection(
-			companyId, ctCollectionId, userId);
+			companyId, userId, ctCollectionId);
+	}
+
+	public static CTPreferences enablePublications(
+			long companyId, boolean enable)
+		throws PortalException {
+
+		return getService().enablePublications(companyId, enable);
 	}
 
 	/**

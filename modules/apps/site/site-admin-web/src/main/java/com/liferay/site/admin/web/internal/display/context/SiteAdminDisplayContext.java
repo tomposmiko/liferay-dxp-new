@@ -15,6 +15,7 @@
 package com.liferay.site.admin.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -96,9 +97,11 @@ public class SiteAdminDisplayContext {
 		breadcrumbEntry.setTitle(
 			LanguageUtil.get(_httpServletRequest, "sites"));
 
-		PortletURL mainURL = _liferayPortletResponse.createRenderURL();
-
-		mainURL.setParameter("mvcPath", "/view.jsp");
+		PortletURL mainURL = PortletURLBuilder.createRenderURL(
+			_liferayPortletResponse
+		).setMVCPath(
+			"/view.jsp"
+		).buildPortletURL();
 
 		breadcrumbEntry.setURL(mainURL.toString());
 
@@ -182,15 +185,10 @@ public class SiteAdminDisplayContext {
 
 		SiteChecker siteChecker = new SiteChecker(_liferayPortletResponse);
 
-		StringBundler sb = new StringBundler(5);
-
-		sb.append("^(?!.*");
-		sb.append(_liferayPortletResponse.getNamespace());
-		sb.append("redirect).*(groupId=");
-		sb.append(getGroupId());
-		sb.append(")");
-
-		siteChecker.setRememberCheckBoxStateURLRegex(sb.toString());
+		siteChecker.setRememberCheckBoxStateURLRegex(
+			StringBundler.concat(
+				"^(?!.*", _liferayPortletResponse.getNamespace(),
+				"redirect).*(groupId=", getGroupId(), ")"));
 
 		groupSearch.setRowChecker(siteChecker);
 
@@ -227,12 +225,13 @@ public class SiteAdminDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
-		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
-
-		portletURL.setParameter("groupId", String.valueOf(getGroupId()));
-		portletURL.setParameter("displayStyle", getDisplayStyle());
-
-		return portletURL;
+		return PortletURLBuilder.createRenderURL(
+			_liferayPortletResponse
+		).setParameter(
+			"displayStyle", getDisplayStyle()
+		).setParameter(
+			"groupId", getGroupId()
+		).buildPortletURL();
 	}
 
 	public int getUserGroupsCount(Group group) {

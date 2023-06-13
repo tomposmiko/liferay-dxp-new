@@ -23,9 +23,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -56,6 +54,10 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface WikiNodeResource {
 
+	public static Builder builder() {
+		return FactoryHolder.factory.create();
+	}
+
 	public Page<WikiNode> getSiteWikiNodesPage(
 			Long siteId, String search,
 			com.liferay.portal.vulcan.aggregation.Aggregation aggregation,
@@ -69,6 +71,28 @@ public interface WikiNodeResource {
 			Long siteId, String callbackURL, Object object)
 		throws Exception;
 
+	public void deleteSiteWikiNodeByExternalReferenceCode(
+			Long siteId, String externalReferenceCode)
+		throws Exception;
+
+	public WikiNode getSiteWikiNodeByExternalReferenceCode(
+			Long siteId, String externalReferenceCode)
+		throws Exception;
+
+	public WikiNode putSiteWikiNodeByExternalReferenceCode(
+			Long siteId, String externalReferenceCode, WikiNode wikiNode)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getSiteWikiNodePermissionsPage(Long siteId, String roleNames)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			putSiteWikiNodePermissionsPage(
+				Long siteId,
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
+		throws Exception;
+
 	public void deleteWikiNode(Long wikiNodeId) throws Exception;
 
 	public Response deleteWikiNodeBatch(String callbackURL, Object object)
@@ -80,6 +104,16 @@ public interface WikiNodeResource {
 		throws Exception;
 
 	public Response putWikiNodeBatch(String callbackURL, Object object)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getWikiNodePermissionsPage(Long wikiNodeId, String roleNames)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			putWikiNodePermissionsPage(
+				Long wikiNodeId,
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
 
 	public void putWikiNodeSubscribe(Long wikiNodeId) throws Exception;
@@ -123,12 +157,6 @@ public interface WikiNodeResource {
 
 	public void setRoleLocalService(RoleLocalService roleLocalService);
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider);
-
-	public void setVulcanBatchEngineImportTaskResource(
-		VulcanBatchEngineImportTaskResource
-			vulcanBatchEngineImportTaskResource);
-
 	public default Filter toFilter(String filterString) {
 		return toFilter(
 			filterString, Collections.<String, List<String>>emptyMap());
@@ -140,8 +168,10 @@ public interface WikiNodeResource {
 		return null;
 	}
 
-	public default Sort[] toSorts(String sortsString) {
-		return new Sort[0];
+	public static class FactoryHolder {
+
+		public static volatile Factory factory;
+
 	}
 
 	@ProviderType

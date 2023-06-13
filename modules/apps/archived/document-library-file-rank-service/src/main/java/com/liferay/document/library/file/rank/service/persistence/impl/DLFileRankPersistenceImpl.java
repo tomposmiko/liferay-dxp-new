@@ -24,7 +24,6 @@ import com.liferay.document.library.file.rank.service.persistence.DLFileRankUtil
 import com.liferay.document.library.file.rank.service.persistence.impl.constants.DLPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -35,13 +34,12 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -57,16 +55,12 @@ import java.lang.reflect.InvocationHandler;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -82,7 +76,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = DLFileRankPersistence.class)
+@Component(service = {DLFileRankPersistence.class, BasePersistence.class})
 public class DLFileRankPersistenceImpl
 	extends BasePersistenceImpl<DLFileRank> implements DLFileRankPersistence {
 
@@ -196,7 +190,7 @@ public class DLFileRankPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<DLFileRank>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLFileRank dlFileRank : list) {
@@ -551,7 +545,7 @@ public class DLFileRankPersistenceImpl
 
 		Object[] finderArgs = new Object[] {userId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -690,7 +684,7 @@ public class DLFileRankPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<DLFileRank>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLFileRank dlFileRank : list) {
@@ -1048,7 +1042,7 @@ public class DLFileRankPersistenceImpl
 
 		Object[] finderArgs = new Object[] {fileEntryId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1190,7 +1184,7 @@ public class DLFileRankPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<DLFileRank>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLFileRank dlFileRank : list) {
@@ -1576,7 +1570,7 @@ public class DLFileRankPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, userId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1733,7 +1727,7 @@ public class DLFileRankPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<DLFileRank>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLFileRank dlFileRank : list) {
@@ -2144,7 +2138,7 @@ public class DLFileRankPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, userId, active};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -2279,8 +2273,7 @@ public class DLFileRankPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_U_F, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_U_F, finderArgs);
 		}
 
 		if (result instanceof DLFileRank) {
@@ -2403,7 +2396,7 @@ public class DLFileRankPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, userId, fileEntryId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -2527,9 +2520,7 @@ public class DLFileRankPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(DLFileRankImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(DLFileRankImpl.class);
 	}
 
 	/**
@@ -2553,9 +2544,7 @@ public class DLFileRankPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(DLFileRankImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(DLFileRankImpl.class, primaryKey);
@@ -2570,10 +2559,9 @@ public class DLFileRankPersistenceImpl
 			dlFileRankModelImpl.getFileEntryId()
 		};
 
+		finderCache.putResult(_finderPathCountByC_U_F, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathCountByC_U_F, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByC_U_F, args, dlFileRankModelImpl, false);
+			_finderPathFetchByC_U_F, args, dlFileRankModelImpl);
 	}
 
 	/**
@@ -2880,7 +2868,7 @@ public class DLFileRankPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<DLFileRank>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2950,7 +2938,7 @@ public class DLFileRankPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -3005,30 +2993,23 @@ public class DLFileRankPersistenceImpl
 	 * Initializes the document library file rank persistence.
 	 */
 	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class, new DLFileRankModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", DLFileRank.class.getName()));
-
+	public void activate() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByUserId = _createFinderPath(
+		_finderPathWithPaginationFindByUserId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -3036,16 +3017,16 @@ public class DLFileRankPersistenceImpl
 			},
 			new String[] {"userId"}, true);
 
-		_finderPathWithoutPaginationFindByUserId = _createFinderPath(
+		_finderPathWithoutPaginationFindByUserId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
 			new String[] {Long.class.getName()}, new String[] {"userId"}, true);
 
-		_finderPathCountByUserId = _createFinderPath(
+		_finderPathCountByUserId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
 			new String[] {Long.class.getName()}, new String[] {"userId"},
 			false);
 
-		_finderPathWithPaginationFindByFileEntryId = _createFinderPath(
+		_finderPathWithPaginationFindByFileEntryId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByFileEntryId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -3053,17 +3034,17 @@ public class DLFileRankPersistenceImpl
 			},
 			new String[] {"fileEntryId"}, true);
 
-		_finderPathWithoutPaginationFindByFileEntryId = _createFinderPath(
+		_finderPathWithoutPaginationFindByFileEntryId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByFileEntryId",
 			new String[] {Long.class.getName()}, new String[] {"fileEntryId"},
 			true);
 
-		_finderPathCountByFileEntryId = _createFinderPath(
+		_finderPathCountByFileEntryId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByFileEntryId",
 			new String[] {Long.class.getName()}, new String[] {"fileEntryId"},
 			false);
 
-		_finderPathWithPaginationFindByG_U = _createFinderPath(
+		_finderPathWithPaginationFindByG_U = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -3072,17 +3053,17 @@ public class DLFileRankPersistenceImpl
 			},
 			new String[] {"groupId", "userId"}, true);
 
-		_finderPathWithoutPaginationFindByG_U = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_U = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"groupId", "userId"}, true);
 
-		_finderPathCountByG_U = _createFinderPath(
+		_finderPathCountByG_U = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"groupId", "userId"}, false);
 
-		_finderPathWithPaginationFindByG_U_A = _createFinderPath(
+		_finderPathWithPaginationFindByG_U_A = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_A",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -3091,7 +3072,7 @@ public class DLFileRankPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "active_"}, true);
 
-		_finderPathWithoutPaginationFindByG_U_A = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_U_A = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_A",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -3099,7 +3080,7 @@ public class DLFileRankPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "active_"}, true);
 
-		_finderPathCountByG_U_A = _createFinderPath(
+		_finderPathCountByG_U_A = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_A",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -3107,14 +3088,14 @@ public class DLFileRankPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "active_"}, false);
 
-		_finderPathFetchByC_U_F = _createFinderPath(
+		_finderPathFetchByC_U_F = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_U_F",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			},
 			new String[] {"companyId", "userId", "fileEntryId"}, true);
 
-		_finderPathCountByC_U_F = _createFinderPath(
+		_finderPathCountByC_U_F = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_U_F",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
@@ -3129,14 +3110,6 @@ public class DLFileRankPersistenceImpl
 		_setDLFileRankUtilPersistence(null);
 
 		entityCache.removeCache(DLFileRankImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setDLFileRankUtilPersistence(
@@ -3180,8 +3153,6 @@ public class DLFileRankPersistenceImpl
 		super.setSessionFactory(sessionFactory);
 	}
 
-	private BundleContext _bundleContext;
-
 	@Reference
 	protected EntityCache entityCache;
 
@@ -3214,121 +3185,12 @@ public class DLFileRankPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"active"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class DLFileRankModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			DLFileRankModelImpl dlFileRankModelImpl =
-				(DLFileRankModelImpl)baseModel;
-
-			long columnBitmask = dlFileRankModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(dlFileRankModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						dlFileRankModelImpl.getColumnBitmask(columnName);
-				}
-
-				if (finderPath.isBaseModelResult() &&
-					(DLFileRankPersistenceImpl.
-						FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION ==
-							finderPath.getCacheName())) {
-
-					finderPathColumnBitmask |= _ORDER_BY_COLUMNS_BITMASK;
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(dlFileRankModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			DLFileRankModelImpl dlFileRankModelImpl, String[] columnNames,
-			boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] = dlFileRankModelImpl.getColumnOriginalValue(
-						columnName);
-				}
-				else {
-					arguments[i] = dlFileRankModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-		private static final long _ORDER_BY_COLUMNS_BITMASK;
-
-		static {
-			long orderByColumnsBitmask = 0;
-
-			orderByColumnsBitmask |= DLFileRankModelImpl.getColumnBitmask(
-				"createDate");
-
-			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
-		}
-
-	}
+	@Reference
+	private DLFileRankModelArgumentsResolver _dlFileRankModelArgumentsResolver;
 
 }

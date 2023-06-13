@@ -18,8 +18,6 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.freemarker.FreeMarkerUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -119,13 +117,13 @@ public class PropertiesDocBuilder {
 					context, writer);
 			}
 			catch (Exception exception) {
-				_log.error(exception);
+				exception.printStackTrace();
 			}
 
 			writer.flush();
 		}
 		catch (IOException ioException) {
-			_log.error(ioException);
+			ioException.printStackTrace();
 		}
 	}
 
@@ -365,18 +363,12 @@ public class PropertiesDocBuilder {
 					propertiesSections.add(propertiesSection);
 				}
 				else {
-					StringBundler sb = new StringBundler(8);
-
-					sb.append("Properties section should consist of 3 or ");
-					sb.append("more lines:");
-					sb.append(StringPool.NEW_LINE);
-					sb.append("##");
-					sb.append(StringPool.NEW_LINE);
-					sb.append("## Comments");
-					sb.append(StringPool.NEW_LINE);
-					sb.append("##");
-
-					System.out.println(sb.toString());
+					System.out.println(
+						StringBundler.concat(
+							"Properties section should consist of 3 or more ",
+							"lines:", StringPool.NEW_LINE, "##",
+							StringPool.NEW_LINE, "## Comments",
+							StringPool.NEW_LINE, "##"));
 
 					return null;
 				}
@@ -400,9 +392,6 @@ public class PropertiesDocBuilder {
 		PropertiesDocBuilder.INDENT + PropertiesDocBuilder.INDENT;
 
 	protected static final String INDENT = StringPool.FOUR_SPACES;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		PropertiesDocBuilder.class);
 
 	private static final FileImpl _fileImpl = FileImpl.getInstance();
 

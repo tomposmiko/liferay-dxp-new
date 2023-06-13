@@ -14,6 +14,7 @@
 
 package com.liferay.dynamic.data.lists.service;
 
+import com.liferay.dynamic.data.lists.model.DDLRecord;
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
 /**
@@ -25,6 +26,10 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
  */
 public class DDLRecordServiceWrapper
 	implements DDLRecordService, ServiceWrapper<DDLRecordService> {
+
+	public DDLRecordServiceWrapper() {
+		this(null);
+	}
 
 	public DDLRecordServiceWrapper(DDLRecordService ddlRecordService) {
 		_ddlRecordService = ddlRecordService;
@@ -46,7 +51,7 @@ public class DDLRecordServiceWrapper
 	 * @throws PortalException if a portal exception occurred
 	 */
 	@Override
-	public com.liferay.dynamic.data.lists.model.DDLRecord addRecord(
+	public DDLRecord addRecord(
 			long groupId, long recordSetId, int displayIndex,
 			com.liferay.dynamic.data.mapping.storage.DDMFormValues
 				ddmFormValues,
@@ -88,8 +93,7 @@ public class DDLRecordServiceWrapper
 	 * @throws PortalException if a portal exception occurred
 	 */
 	@Override
-	public com.liferay.dynamic.data.lists.model.DDLRecord getRecord(
-			long recordId)
+	public DDLRecord getRecord(long recordId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ddlRecordService.getRecord(recordId);
@@ -103,8 +107,7 @@ public class DDLRecordServiceWrapper
 	 * @throws PortalException if a portal exception occurred
 	 */
 	@Override
-	public java.util.List<com.liferay.dynamic.data.lists.model.DDLRecord>
-			getRecords(long recordSetId)
+	public java.util.List<DDLRecord> getRecords(long recordSetId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _ddlRecordService.getRecords(recordSetId);
@@ -144,7 +147,7 @@ public class DDLRecordServiceWrapper
 	 * @throws PortalException if a portal exception occurred
 	 */
 	@Override
-	public com.liferay.dynamic.data.lists.model.DDLRecord updateRecord(
+	public DDLRecord updateRecord(
 			long recordId, boolean majorVersion, int displayIndex,
 			com.liferay.dynamic.data.mapping.storage.DDMFormValues
 				ddmFormValues,

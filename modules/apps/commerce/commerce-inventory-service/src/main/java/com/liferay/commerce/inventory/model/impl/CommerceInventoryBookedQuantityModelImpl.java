@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -312,9 +313,40 @@ public class CommerceInventoryBookedQuantityModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CommerceInventoryBookedQuantity>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceInventoryBookedQuantity.class.getClassLoader(),
+			CommerceInventoryBookedQuantity.class, ModelWrapper.class);
+
+		try {
+			Constructor<CommerceInventoryBookedQuantity> constructor =
+				(Constructor<CommerceInventoryBookedQuantity>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map
 		<String, Function<CommerceInventoryBookedQuantity, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommerceInventoryBookedQuantity, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceInventoryBookedQuantity, Object>>
@@ -322,93 +354,84 @@ public class CommerceInventoryBookedQuantityModelImpl
 				new LinkedHashMap
 					<String,
 					 Function<CommerceInventoryBookedQuantity, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", CommerceInventoryBookedQuantity::getMvccVersion);
-		attributeGetterFunctions.put(
-			"commerceInventoryBookedQuantityId",
-			CommerceInventoryBookedQuantity::
-				getCommerceInventoryBookedQuantityId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceInventoryBookedQuantity::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceInventoryBookedQuantity::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceInventoryBookedQuantity::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceInventoryBookedQuantity::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceInventoryBookedQuantity::getModifiedDate);
-		attributeGetterFunctions.put(
-			"sku", CommerceInventoryBookedQuantity::getSku);
-		attributeGetterFunctions.put(
-			"quantity", CommerceInventoryBookedQuantity::getQuantity);
-		attributeGetterFunctions.put(
-			"expirationDate",
-			CommerceInventoryBookedQuantity::getExpirationDate);
-		attributeGetterFunctions.put(
-			"bookedNote", CommerceInventoryBookedQuantity::getBookedNote);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CommerceInventoryBookedQuantity, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceInventoryBookedQuantity, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceInventoryBookedQuantity, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CommerceInventoryBookedQuantity::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<CommerceInventoryBookedQuantity, Long>)
 				CommerceInventoryBookedQuantity::setMvccVersion);
+		attributeGetterFunctions.put(
+			"commerceInventoryBookedQuantityId",
+			CommerceInventoryBookedQuantity::
+				getCommerceInventoryBookedQuantityId);
 		attributeSetterBiConsumers.put(
 			"commerceInventoryBookedQuantityId",
 			(BiConsumer<CommerceInventoryBookedQuantity, Long>)
 				CommerceInventoryBookedQuantity::
 					setCommerceInventoryBookedQuantityId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceInventoryBookedQuantity::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceInventoryBookedQuantity, Long>)
 				CommerceInventoryBookedQuantity::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceInventoryBookedQuantity::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceInventoryBookedQuantity, Long>)
 				CommerceInventoryBookedQuantity::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceInventoryBookedQuantity::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceInventoryBookedQuantity, String>)
 				CommerceInventoryBookedQuantity::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceInventoryBookedQuantity::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceInventoryBookedQuantity, Date>)
 				CommerceInventoryBookedQuantity::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceInventoryBookedQuantity::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceInventoryBookedQuantity, Date>)
 				CommerceInventoryBookedQuantity::setModifiedDate);
+		attributeGetterFunctions.put(
+			"sku", CommerceInventoryBookedQuantity::getSku);
 		attributeSetterBiConsumers.put(
 			"sku",
 			(BiConsumer<CommerceInventoryBookedQuantity, String>)
 				CommerceInventoryBookedQuantity::setSku);
+		attributeGetterFunctions.put(
+			"quantity", CommerceInventoryBookedQuantity::getQuantity);
 		attributeSetterBiConsumers.put(
 			"quantity",
 			(BiConsumer<CommerceInventoryBookedQuantity, Integer>)
 				CommerceInventoryBookedQuantity::setQuantity);
+		attributeGetterFunctions.put(
+			"expirationDate",
+			CommerceInventoryBookedQuantity::getExpirationDate);
 		attributeSetterBiConsumers.put(
 			"expirationDate",
 			(BiConsumer<CommerceInventoryBookedQuantity, Date>)
 				CommerceInventoryBookedQuantity::setExpirationDate);
+		attributeGetterFunctions.put(
+			"bookedNote", CommerceInventoryBookedQuantity::getBookedNote);
 		attributeSetterBiConsumers.put(
 			"bookedNote",
 			(BiConsumer<CommerceInventoryBookedQuantity, String>)
 				CommerceInventoryBookedQuantity::setBookedNote);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -725,6 +748,39 @@ public class CommerceInventoryBookedQuantityModelImpl
 	}
 
 	@Override
+	public CommerceInventoryBookedQuantity cloneWithOriginalValues() {
+		CommerceInventoryBookedQuantityImpl
+			commerceInventoryBookedQuantityImpl =
+				new CommerceInventoryBookedQuantityImpl();
+
+		commerceInventoryBookedQuantityImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		commerceInventoryBookedQuantityImpl.
+			setCommerceInventoryBookedQuantityId(
+				this.<Long>getColumnOriginalValue("CIBookedQuantityId"));
+		commerceInventoryBookedQuantityImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commerceInventoryBookedQuantityImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commerceInventoryBookedQuantityImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commerceInventoryBookedQuantityImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commerceInventoryBookedQuantityImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commerceInventoryBookedQuantityImpl.setSku(
+			this.<String>getColumnOriginalValue("sku"));
+		commerceInventoryBookedQuantityImpl.setQuantity(
+			this.<Integer>getColumnOriginalValue("quantity"));
+		commerceInventoryBookedQuantityImpl.setExpirationDate(
+			this.<Date>getColumnOriginalValue("expirationDate"));
+		commerceInventoryBookedQuantityImpl.setBookedNote(
+			this.<String>getColumnOriginalValue("bookedNote"));
+
+		return commerceInventoryBookedQuantityImpl;
+	}
+
+	@Override
 	public int compareTo(
 		CommerceInventoryBookedQuantity commerceInventoryBookedQuantity) {
 
@@ -966,9 +1022,7 @@ public class CommerceInventoryBookedQuantityModelImpl
 		private static final Function
 			<InvocationHandler, CommerceInventoryBookedQuantity>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						CommerceInventoryBookedQuantity.class,
-						ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 

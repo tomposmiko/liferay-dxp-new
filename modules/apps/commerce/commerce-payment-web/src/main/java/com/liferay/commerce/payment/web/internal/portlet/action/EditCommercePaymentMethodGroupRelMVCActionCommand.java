@@ -21,6 +21,7 @@ import com.liferay.commerce.payment.service.CommercePaymentMethodGroupRelService
 import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -41,7 +42,6 @@ import java.util.Map;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -121,28 +121,38 @@ public class EditCommercePaymentMethodGroupRelMVCActionCommand
 		ActionRequest actionRequest, long commercePaymentMethodGroupRelId,
 		String mvcRenderCommandName) {
 
-		PortletURL portletURL = _portal.getControlPanelPortletURL(
-			actionRequest, CPPortletKeys.COMMERCE_CHANNELS,
-			PortletRequest.RENDER_PHASE);
+		return PortletURLBuilder.create(
+			_portal.getControlPanelPortletURL(
+				actionRequest, CPPortletKeys.COMMERCE_CHANNELS,
+				PortletRequest.RENDER_PHASE)
+		).setMVCRenderCommandName(
+			mvcRenderCommandName
+		).setRedirect(
+			() -> {
+				String redirect = ParamUtil.getString(
+					actionRequest, "redirect");
 
-		portletURL.setParameter("mvcRenderCommandName", mvcRenderCommandName);
-		portletURL.setParameter(
-			"commercePaymentMethodGroupRelId",
-			String.valueOf(commercePaymentMethodGroupRelId));
+				if (Validator.isNotNull(redirect)) {
+					return redirect;
+				}
 
-		String redirect = ParamUtil.getString(actionRequest, "redirect");
+				return null;
+			}
+		).setParameter(
+			"commercePaymentMethodGroupRelId", commercePaymentMethodGroupRelId
+		).setParameter(
+			"engineKey",
+			() -> {
+				String engineKey = ParamUtil.getString(
+					actionRequest, "engineKey");
 
-		if (Validator.isNotNull(redirect)) {
-			portletURL.setParameter("redirect", redirect);
-		}
+				if (Validator.isNotNull(engineKey)) {
+					return engineKey;
+				}
 
-		String engineKey = ParamUtil.getString(actionRequest, "engineKey");
-
-		if (Validator.isNotNull(engineKey)) {
-			portletURL.setParameter("engineKey", engineKey);
-		}
-
-		return portletURL.toString();
+				return null;
+			}
+		).buildString();
 	}
 
 	protected CommercePaymentMethodGroupRel updateCommercePaymentMethodGroupRel(
@@ -179,7 +189,6 @@ public class EditCommercePaymentMethodGroupRelMVCActionCommand
 			commercePaymentMethodGroupRel =
 				_commercePaymentMethodGroupRelService.
 					addCommercePaymentMethodGroupRel(
-						_portal.getUserId(actionRequest),
 						commerceChannel.getGroupId(), nameMap, descriptionMap,
 						imageFile, commercePaymentMethodEngineKey, priority,
 						active);

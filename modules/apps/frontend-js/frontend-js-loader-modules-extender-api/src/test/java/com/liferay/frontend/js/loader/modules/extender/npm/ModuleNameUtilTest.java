@@ -14,14 +14,10 @@
 
 package com.liferay.frontend.js.loader.modules.extender.npm;
 
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.FileImpl;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -30,16 +26,8 @@ import org.junit.Test;
 public class ModuleNameUtilTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
-
-	@Before
-	public void setUp() {
-		FileUtil fileUtil = new FileUtil();
-
-		fileUtil.setFile(new FileImpl());
-	}
 
 	@Test
 	public void testGetDependencyPath() {

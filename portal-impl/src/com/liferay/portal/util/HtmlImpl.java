@@ -27,9 +27,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.htmlparser.jericho.Renderer;
 import net.htmlparser.jericho.Source;
-import net.htmlparser.jericho.TextExtractor;
 
 /**
  * Provides the implementation of the HTML utility interface for escaping,
@@ -537,7 +535,7 @@ public class HtmlImpl implements Html {
 			return xPath;
 		}
 
-		StringBuilder sb = new StringBuilder(xPath.length());
+		StringBundler sb = new StringBundler(xPath.length());
 
 		for (int i = 0; i < xPath.length(); i++) {
 			char c = xPath.charAt(i);
@@ -605,9 +603,7 @@ public class HtmlImpl implements Html {
 
 		Source source = new Source(html);
 
-		TextExtractor textExtractor = source.getTextExtractor();
-
-		return textExtractor.toString();
+		return String.valueOf(source.getTextExtractor());
 	}
 
 	@Override
@@ -691,9 +687,7 @@ public class HtmlImpl implements Html {
 
 		Source source = new Source(html);
 
-		Renderer renderer = source.getRenderer();
-
-		return renderer.toString();
+		return String.valueOf(source.getRenderer());
 	}
 
 	/**
@@ -756,7 +750,7 @@ public class HtmlImpl implements Html {
 
 		text = stripComments(text);
 
-		StringBuilder sb = new StringBuilder(text.length());
+		StringBundler sb = new StringBundler(text.length());
 
 		int x = 0;
 		int y = text.indexOf("<");

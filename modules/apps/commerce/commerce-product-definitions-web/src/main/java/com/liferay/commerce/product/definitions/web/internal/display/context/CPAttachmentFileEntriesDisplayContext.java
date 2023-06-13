@@ -35,6 +35,7 @@ import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion;
 import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -52,9 +53,9 @@ import java.util.Map;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-import javax.portlet.RenderURL;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.PageContext;
 
 /**
  * @author Marco Leo
@@ -146,20 +147,20 @@ public class CPAttachmentFileEntriesDisplayContext
 				cpRequestHelper.getPermissionChecker(), getCPDefinition(),
 				ActionKeys.UPDATE)) {
 
-			RenderURL portletURL = liferayPortletResponse.createRenderURL();
-
-			portletURL.setParameter(
-				"mvcRenderCommandName",
-				"/cp_definitions/edit_cp_attachment_file_entry");
-			portletURL.setParameter(
-				"cpDefinitionId", String.valueOf(getCPDefinitionId()));
-			portletURL.setParameter("type", String.valueOf(type));
-
-			portletURL.setWindowState(LiferayWindowState.POP_UP);
-
-			creationMenu = creationMenu.addDropdownItem(
+			creationMenu.addDropdownItem(
 				dropdownItem -> {
-					dropdownItem.setHref(portletURL.toString());
+					dropdownItem.setHref(
+						PortletURLBuilder.createRenderURL(
+							liferayPortletResponse
+						).setMVCRenderCommandName(
+							"/cp_definitions/edit_cp_attachment_file_entry"
+						).setParameter(
+							"cpDefinitionId", getCPDefinitionId()
+						).setParameter(
+							"type", type
+						).setWindowState(
+							LiferayWindowState.POP_UP
+						).buildString());
 					dropdownItem.setLabel(_getTypeLabel(type));
 					dropdownItem.setTarget("sidePanel");
 				});
@@ -181,7 +182,7 @@ public class CPAttachmentFileEntriesDisplayContext
 		CPAttachmentFileEntry cpAttachmentFileEntry =
 			getCPAttachmentFileEntry();
 
-		FileEntry fileEntry = cpAttachmentFileEntry.getFileEntry();
+		FileEntry fileEntry = cpAttachmentFileEntry.fetchFileEntry();
 
 		if (fileEntry == null) {
 			return StringPool.BLANK;
@@ -219,14 +220,13 @@ public class CPAttachmentFileEntriesDisplayContext
 
 	@Override
 	public PortletURL getPortletURL() throws PortalException {
-		PortletURL portletURL = super.getPortletURL();
-
-		portletURL.setParameter(
-			"mvcRenderCommandName", "/cp_definitions/edit_cp_definition");
-		portletURL.setParameter(
-			"screenNavigationCategoryKey", getScreenNavigationCategoryKey());
-
-		return portletURL;
+		return PortletURLBuilder.create(
+			super.getPortletURL()
+		).setMVCRenderCommandName(
+			"/cp_definitions/edit_cp_definition"
+		).setParameter(
+			"screenNavigationCategoryKey", getScreenNavigationCategoryKey()
+		).buildPortletURL();
 	}
 
 	@Override
@@ -275,7 +275,8 @@ public class CPAttachmentFileEntriesDisplayContext
 	}
 
 	public String renderOptions(
-			RenderRequest renderRequest, RenderResponse renderResponse)
+			PageContext pageContext, RenderRequest renderRequest,
+			RenderResponse renderResponse)
 		throws PortalException {
 
 		CPAttachmentFileEntry cpAttachmentFileEntry =
@@ -288,7 +289,8 @@ public class CPAttachmentFileEntriesDisplayContext
 		}
 
 		return _ddmHelper.renderCPAttachmentFileEntryOptions(
-			getCPDefinitionId(), json, renderRequest, renderResponse,
+			getCPDefinitionId(), json, pageContext, renderRequest,
+			renderResponse,
 			_cpInstanceHelper.getCPDefinitionOptionRelsMap(
 				getCPDefinitionId(), true, false));
 	}

@@ -30,7 +30,6 @@ import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
 import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
-import com.liferay.portal.vulcan.internal.configuration.util.ConfigurationUtil;
 import com.liferay.portal.vulcan.internal.jaxrs.container.request.filter.CTContainerRequestFilter;
 import com.liferay.portal.vulcan.internal.jaxrs.container.request.filter.ContextContainerRequestFilter;
 import com.liferay.portal.vulcan.internal.jaxrs.container.request.filter.LogContainerRequestFilter;
@@ -71,7 +70,6 @@ import com.liferay.portal.vulcan.internal.jaxrs.writer.interceptor.NestedFieldsW
 import com.liferay.portal.vulcan.internal.jaxrs.writer.interceptor.PageEntityExtensionWriterInterceptor;
 import com.liferay.portal.vulcan.internal.param.converter.provider.DateParamConverterProvider;
 
-import javax.ws.rs.Priorities;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
@@ -143,11 +141,11 @@ public class VulcanFeature implements Feature {
 		featureContext.register(new CompanyContextProvider(_portal));
 		featureContext.register(
 			new ContextContainerRequestFilter(
-				ConfigurationUtil.getConfigurations(_configurationAdmin),
-				_expressionConvert, _filterParserProvider, _groupLocalService,
-				_language, _portal, _resourceActionLocalService,
-				_resourcePermissionLocalService, _roleLocalService,
-				_getScopeChecker(), _vulcanBatchEngineImportTaskResource));
+				_configurationAdmin, _expressionConvert, _filterParserProvider,
+				_groupLocalService, _language, _portal,
+				_resourceActionLocalService, _resourcePermissionLocalService,
+				_roleLocalService, _getScopeChecker(),
+				_vulcanBatchEngineImportTaskResource));
 		featureContext.register(
 			new FilterContextProvider(
 				_expressionConvert, _filterParserProvider, _language, _portal));
@@ -158,8 +156,7 @@ public class VulcanFeature implements Feature {
 		_nestedFieldsWriterInterceptor = new NestedFieldsWriterInterceptor(
 			_bundleContext);
 
-		featureContext.register(
-			_nestedFieldsWriterInterceptor, Priorities.USER - 10);
+		featureContext.register(_nestedFieldsWriterInterceptor);
 
 		featureContext.register(
 			new SiteParamConverterProvider(

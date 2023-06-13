@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.portlet.PortletURLFactory;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -45,7 +44,6 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -62,7 +60,7 @@ import org.osgi.service.component.annotations.Reference;
 		"auth.token.ignore.mvc.action=true",
 		"javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY,
 		"javax.portlet.name=" + DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
-		"mvc.command.name=/document_library/create_in_office365"
+		"mvc.command.name=/document_library/create_in_one_drive"
 	},
 	service = MVCActionCommand.class
 )
@@ -102,11 +100,6 @@ public class CreateInOneDriveMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	protected PortletURLFactory portletURLFactory;
 
-	@Reference(
-		target = "(bundle.symbolic.name=com.liferay.document.library.opener.onedrive.web)"
-	)
-	protected ResourceBundleLoader resourceBundleLoader;
-
 	@Reference
 	protected UniqueFileEntryTitleProvider uniqueFileEntryTitleProvider;
 
@@ -115,19 +108,21 @@ public class CreateInOneDriveMVCActionCommand extends BaseMVCActionCommand {
 			String title, ServiceContext serviceContext)
 		throws PortalException {
 
-		String uniqueTitle = uniqueFileEntryTitleProvider.provide(
-			serviceContext.getScopeGroupId(), folderId, title);
-
 		String mimeTypeExtension =
 			DLOpenerOneDriveMimeTypes.getMimeTypeExtension(mimeType);
+
+		String uniqueTitle = uniqueFileEntryTitleProvider.provide(
+			serviceContext.getScopeGroupId(), folderId, mimeTypeExtension,
+			title);
 
 		String sourceFileName = uniqueTitle + mimeTypeExtension;
 
 		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
 
 		FileEntry fileEntry = dlAppService.addFileEntry(
-			repositoryId, folderId, sourceFileName, mimeType, uniqueTitle,
-			StringPool.BLANK, StringPool.BLANK, new byte[0], serviceContext);
+			null, repositoryId, folderId, sourceFileName, mimeType, uniqueTitle,
+			StringPool.BLANK, StringPool.BLANK, new byte[0], null, null,
+			serviceContext);
 
 		dlAppService.checkOutFileEntry(
 			fileEntry.getFileEntryId(), serviceContext);
@@ -193,16 +188,13 @@ public class CreateInOneDriveMVCActionCommand extends BaseMVCActionCommand {
 
 		liferayPortletURL.setParameter(
 			ActionRequest.ACTION_NAME,
-			"/document_library/create_in_office365_and_redirect");
+			"/document_library/create_in_one_drive_and_redirect");
 
 		return liferayPortletURL.toString();
 	}
 
 	private String _translate(Locale locale, String key) {
-		ResourceBundle resourceBundle = resourceBundleLoader.loadResourceBundle(
-			locale);
-
-		return language.get(resourceBundle, key);
+		return language.get(locale, key);
 	}
 
 	private final TransactionConfig _transactionConfig =

@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -85,7 +86,8 @@ public class OAuth2ApplicationModelImpl
 		{"clientSecret", Types.VARCHAR}, {"description", Types.VARCHAR},
 		{"features", Types.VARCHAR}, {"homePageURL", Types.VARCHAR},
 		{"iconFileEntryId", Types.BIGINT}, {"name", Types.VARCHAR},
-		{"privacyPolicyURL", Types.VARCHAR}, {"redirectURIs", Types.VARCHAR}
+		{"privacyPolicyURL", Types.VARCHAR}, {"redirectURIs", Types.VARCHAR},
+		{"rememberDevice", Types.BOOLEAN}, {"trustedApplication", Types.BOOLEAN}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -112,10 +114,12 @@ public class OAuth2ApplicationModelImpl
 		TABLE_COLUMNS_MAP.put("name", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("privacyPolicyURL", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("redirectURIs", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("rememberDevice", Types.BOOLEAN);
+		TABLE_COLUMNS_MAP.put("trustedApplication", Types.BOOLEAN);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table OAuth2Application (oAuth2ApplicationId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,oA2AScopeAliasesId LONG,allowedGrantTypes VARCHAR(75) null,clientCredentialUserId LONG,clientCredentialUserName VARCHAR(75) null,clientId VARCHAR(75) null,clientProfile INTEGER,clientSecret VARCHAR(75) null,description STRING null,features STRING null,homePageURL STRING null,iconFileEntryId LONG,name VARCHAR(75) null,privacyPolicyURL STRING null,redirectURIs STRING null)";
+		"create table OAuth2Application (oAuth2ApplicationId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,oA2AScopeAliasesId LONG,allowedGrantTypes VARCHAR(75) null,clientCredentialUserId LONG,clientCredentialUserName VARCHAR(75) null,clientId VARCHAR(75) null,clientProfile INTEGER,clientSecret VARCHAR(75) null,description STRING null,features STRING null,homePageURL STRING null,iconFileEntryId LONG,name VARCHAR(75) null,privacyPolicyURL STRING null,redirectURIs STRING null,rememberDevice BOOLEAN,trustedApplication BOOLEAN)";
 
 	public static final String TABLE_SQL_DROP = "drop table OAuth2Application";
 
@@ -201,6 +205,8 @@ public class OAuth2ApplicationModelImpl
 		model.setName(soapModel.getName());
 		model.setPrivacyPolicyURL(soapModel.getPrivacyPolicyURL());
 		model.setRedirectURIs(soapModel.getRedirectURIs());
+		model.setRememberDevice(soapModel.isRememberDevice());
+		model.setTrustedApplication(soapModel.isTrustedApplication());
 
 		return model;
 	}
@@ -315,148 +321,182 @@ public class OAuth2ApplicationModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, OAuth2Application>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			OAuth2Application.class.getClassLoader(), OAuth2Application.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<OAuth2Application> constructor =
+				(Constructor<OAuth2Application>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<OAuth2Application, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<OAuth2Application, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<OAuth2Application, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<OAuth2Application, Object>>();
-
-		attributeGetterFunctions.put(
-			"oAuth2ApplicationId", OAuth2Application::getOAuth2ApplicationId);
-		attributeGetterFunctions.put(
-			"companyId", OAuth2Application::getCompanyId);
-		attributeGetterFunctions.put("userId", OAuth2Application::getUserId);
-		attributeGetterFunctions.put(
-			"userName", OAuth2Application::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", OAuth2Application::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", OAuth2Application::getModifiedDate);
-		attributeGetterFunctions.put(
-			"oAuth2ApplicationScopeAliasesId",
-			OAuth2Application::getOAuth2ApplicationScopeAliasesId);
-		attributeGetterFunctions.put(
-			"allowedGrantTypes", OAuth2Application::getAllowedGrantTypes);
-		attributeGetterFunctions.put(
-			"clientCredentialUserId",
-			OAuth2Application::getClientCredentialUserId);
-		attributeGetterFunctions.put(
-			"clientCredentialUserName",
-			OAuth2Application::getClientCredentialUserName);
-		attributeGetterFunctions.put(
-			"clientId", OAuth2Application::getClientId);
-		attributeGetterFunctions.put(
-			"clientProfile", OAuth2Application::getClientProfile);
-		attributeGetterFunctions.put(
-			"clientSecret", OAuth2Application::getClientSecret);
-		attributeGetterFunctions.put(
-			"description", OAuth2Application::getDescription);
-		attributeGetterFunctions.put(
-			"features", OAuth2Application::getFeatures);
-		attributeGetterFunctions.put(
-			"homePageURL", OAuth2Application::getHomePageURL);
-		attributeGetterFunctions.put(
-			"iconFileEntryId", OAuth2Application::getIconFileEntryId);
-		attributeGetterFunctions.put("name", OAuth2Application::getName);
-		attributeGetterFunctions.put(
-			"privacyPolicyURL", OAuth2Application::getPrivacyPolicyURL);
-		attributeGetterFunctions.put(
-			"redirectURIs", OAuth2Application::getRedirectURIs);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<OAuth2Application, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<OAuth2Application, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<OAuth2Application, ?>>();
 
+		attributeGetterFunctions.put(
+			"oAuth2ApplicationId", OAuth2Application::getOAuth2ApplicationId);
 		attributeSetterBiConsumers.put(
 			"oAuth2ApplicationId",
 			(BiConsumer<OAuth2Application, Long>)
 				OAuth2Application::setOAuth2ApplicationId);
+		attributeGetterFunctions.put(
+			"companyId", OAuth2Application::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<OAuth2Application, Long>)
 				OAuth2Application::setCompanyId);
+		attributeGetterFunctions.put("userId", OAuth2Application::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<OAuth2Application, Long>)OAuth2Application::setUserId);
+		attributeGetterFunctions.put(
+			"userName", OAuth2Application::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<OAuth2Application, String>)
 				OAuth2Application::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", OAuth2Application::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<OAuth2Application, Date>)
 				OAuth2Application::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", OAuth2Application::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<OAuth2Application, Date>)
 				OAuth2Application::setModifiedDate);
+		attributeGetterFunctions.put(
+			"oAuth2ApplicationScopeAliasesId",
+			OAuth2Application::getOAuth2ApplicationScopeAliasesId);
 		attributeSetterBiConsumers.put(
 			"oAuth2ApplicationScopeAliasesId",
 			(BiConsumer<OAuth2Application, Long>)
 				OAuth2Application::setOAuth2ApplicationScopeAliasesId);
+		attributeGetterFunctions.put(
+			"allowedGrantTypes", OAuth2Application::getAllowedGrantTypes);
 		attributeSetterBiConsumers.put(
 			"allowedGrantTypes",
 			(BiConsumer<OAuth2Application, String>)
 				OAuth2Application::setAllowedGrantTypes);
+		attributeGetterFunctions.put(
+			"clientCredentialUserId",
+			OAuth2Application::getClientCredentialUserId);
 		attributeSetterBiConsumers.put(
 			"clientCredentialUserId",
 			(BiConsumer<OAuth2Application, Long>)
 				OAuth2Application::setClientCredentialUserId);
+		attributeGetterFunctions.put(
+			"clientCredentialUserName",
+			OAuth2Application::getClientCredentialUserName);
 		attributeSetterBiConsumers.put(
 			"clientCredentialUserName",
 			(BiConsumer<OAuth2Application, String>)
 				OAuth2Application::setClientCredentialUserName);
+		attributeGetterFunctions.put(
+			"clientId", OAuth2Application::getClientId);
 		attributeSetterBiConsumers.put(
 			"clientId",
 			(BiConsumer<OAuth2Application, String>)
 				OAuth2Application::setClientId);
+		attributeGetterFunctions.put(
+			"clientProfile", OAuth2Application::getClientProfile);
 		attributeSetterBiConsumers.put(
 			"clientProfile",
 			(BiConsumer<OAuth2Application, Integer>)
 				OAuth2Application::setClientProfile);
+		attributeGetterFunctions.put(
+			"clientSecret", OAuth2Application::getClientSecret);
 		attributeSetterBiConsumers.put(
 			"clientSecret",
 			(BiConsumer<OAuth2Application, String>)
 				OAuth2Application::setClientSecret);
+		attributeGetterFunctions.put(
+			"description", OAuth2Application::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<OAuth2Application, String>)
 				OAuth2Application::setDescription);
+		attributeGetterFunctions.put(
+			"features", OAuth2Application::getFeatures);
 		attributeSetterBiConsumers.put(
 			"features",
 			(BiConsumer<OAuth2Application, String>)
 				OAuth2Application::setFeatures);
+		attributeGetterFunctions.put(
+			"homePageURL", OAuth2Application::getHomePageURL);
 		attributeSetterBiConsumers.put(
 			"homePageURL",
 			(BiConsumer<OAuth2Application, String>)
 				OAuth2Application::setHomePageURL);
+		attributeGetterFunctions.put(
+			"iconFileEntryId", OAuth2Application::getIconFileEntryId);
 		attributeSetterBiConsumers.put(
 			"iconFileEntryId",
 			(BiConsumer<OAuth2Application, Long>)
 				OAuth2Application::setIconFileEntryId);
+		attributeGetterFunctions.put("name", OAuth2Application::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<OAuth2Application, String>)OAuth2Application::setName);
+		attributeGetterFunctions.put(
+			"privacyPolicyURL", OAuth2Application::getPrivacyPolicyURL);
 		attributeSetterBiConsumers.put(
 			"privacyPolicyURL",
 			(BiConsumer<OAuth2Application, String>)
 				OAuth2Application::setPrivacyPolicyURL);
+		attributeGetterFunctions.put(
+			"redirectURIs", OAuth2Application::getRedirectURIs);
 		attributeSetterBiConsumers.put(
 			"redirectURIs",
 			(BiConsumer<OAuth2Application, String>)
 				OAuth2Application::setRedirectURIs);
+		attributeGetterFunctions.put(
+			"rememberDevice", OAuth2Application::getRememberDevice);
+		attributeSetterBiConsumers.put(
+			"rememberDevice",
+			(BiConsumer<OAuth2Application, Boolean>)
+				OAuth2Application::setRememberDevice);
+		attributeGetterFunctions.put(
+			"trustedApplication", OAuth2Application::getTrustedApplication);
+		attributeSetterBiConsumers.put(
+			"trustedApplication",
+			(BiConsumer<OAuth2Application, Boolean>)
+				OAuth2Application::setTrustedApplication);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -876,6 +916,48 @@ public class OAuth2ApplicationModelImpl
 		_redirectURIs = redirectURIs;
 	}
 
+	@JSON
+	@Override
+	public boolean getRememberDevice() {
+		return _rememberDevice;
+	}
+
+	@JSON
+	@Override
+	public boolean isRememberDevice() {
+		return _rememberDevice;
+	}
+
+	@Override
+	public void setRememberDevice(boolean rememberDevice) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_rememberDevice = rememberDevice;
+	}
+
+	@JSON
+	@Override
+	public boolean getTrustedApplication() {
+		return _trustedApplication;
+	}
+
+	@JSON
+	@Override
+	public boolean isTrustedApplication() {
+		return _trustedApplication;
+	}
+
+	@Override
+	public void setTrustedApplication(boolean trustedApplication) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_trustedApplication = trustedApplication;
+	}
+
 	public long getColumnBitmask() {
 		if (_columnBitmask > 0) {
 			return _columnBitmask;
@@ -956,8 +1038,63 @@ public class OAuth2ApplicationModelImpl
 		oAuth2ApplicationImpl.setName(getName());
 		oAuth2ApplicationImpl.setPrivacyPolicyURL(getPrivacyPolicyURL());
 		oAuth2ApplicationImpl.setRedirectURIs(getRedirectURIs());
+		oAuth2ApplicationImpl.setRememberDevice(isRememberDevice());
+		oAuth2ApplicationImpl.setTrustedApplication(isTrustedApplication());
 
 		oAuth2ApplicationImpl.resetOriginalValues();
+
+		return oAuth2ApplicationImpl;
+	}
+
+	@Override
+	public OAuth2Application cloneWithOriginalValues() {
+		OAuth2ApplicationImpl oAuth2ApplicationImpl =
+			new OAuth2ApplicationImpl();
+
+		oAuth2ApplicationImpl.setOAuth2ApplicationId(
+			this.<Long>getColumnOriginalValue("oAuth2ApplicationId"));
+		oAuth2ApplicationImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		oAuth2ApplicationImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		oAuth2ApplicationImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		oAuth2ApplicationImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		oAuth2ApplicationImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		oAuth2ApplicationImpl.setOAuth2ApplicationScopeAliasesId(
+			this.<Long>getColumnOriginalValue("oA2AScopeAliasesId"));
+		oAuth2ApplicationImpl.setAllowedGrantTypes(
+			this.<String>getColumnOriginalValue("allowedGrantTypes"));
+		oAuth2ApplicationImpl.setClientCredentialUserId(
+			this.<Long>getColumnOriginalValue("clientCredentialUserId"));
+		oAuth2ApplicationImpl.setClientCredentialUserName(
+			this.<String>getColumnOriginalValue("clientCredentialUserName"));
+		oAuth2ApplicationImpl.setClientId(
+			this.<String>getColumnOriginalValue("clientId"));
+		oAuth2ApplicationImpl.setClientProfile(
+			this.<Integer>getColumnOriginalValue("clientProfile"));
+		oAuth2ApplicationImpl.setClientSecret(
+			this.<String>getColumnOriginalValue("clientSecret"));
+		oAuth2ApplicationImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		oAuth2ApplicationImpl.setFeatures(
+			this.<String>getColumnOriginalValue("features"));
+		oAuth2ApplicationImpl.setHomePageURL(
+			this.<String>getColumnOriginalValue("homePageURL"));
+		oAuth2ApplicationImpl.setIconFileEntryId(
+			this.<Long>getColumnOriginalValue("iconFileEntryId"));
+		oAuth2ApplicationImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		oAuth2ApplicationImpl.setPrivacyPolicyURL(
+			this.<String>getColumnOriginalValue("privacyPolicyURL"));
+		oAuth2ApplicationImpl.setRedirectURIs(
+			this.<String>getColumnOriginalValue("redirectURIs"));
+		oAuth2ApplicationImpl.setRememberDevice(
+			this.<Boolean>getColumnOriginalValue("rememberDevice"));
+		oAuth2ApplicationImpl.setTrustedApplication(
+			this.<Boolean>getColumnOriginalValue("trustedApplication"));
 
 		return oAuth2ApplicationImpl;
 	}
@@ -1164,6 +1301,10 @@ public class OAuth2ApplicationModelImpl
 			oAuth2ApplicationCacheModel.redirectURIs = null;
 		}
 
+		oAuth2ApplicationCacheModel.rememberDevice = isRememberDevice();
+
+		oAuth2ApplicationCacheModel.trustedApplication = isTrustedApplication();
+
 		return oAuth2ApplicationCacheModel;
 	}
 
@@ -1251,9 +1392,7 @@ public class OAuth2ApplicationModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, OAuth2Application>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					OAuth2Application.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1278,6 +1417,8 @@ public class OAuth2ApplicationModelImpl
 	private String _name;
 	private String _privacyPolicyURL;
 	private String _redirectURIs;
+	private boolean _rememberDevice;
+	private boolean _trustedApplication;
 
 	public <T> T getColumnValue(String columnName) {
 		columnName = _attributeNames.getOrDefault(columnName, columnName);
@@ -1331,6 +1472,8 @@ public class OAuth2ApplicationModelImpl
 		_columnOriginalValues.put("name", _name);
 		_columnOriginalValues.put("privacyPolicyURL", _privacyPolicyURL);
 		_columnOriginalValues.put("redirectURIs", _redirectURIs);
+		_columnOriginalValues.put("rememberDevice", _rememberDevice);
+		_columnOriginalValues.put("trustedApplication", _trustedApplication);
 	}
 
 	private static final Map<String, String> _attributeNames;
@@ -1394,6 +1537,10 @@ public class OAuth2ApplicationModelImpl
 		columnBitmasks.put("privacyPolicyURL", 262144L);
 
 		columnBitmasks.put("redirectURIs", 524288L);
+
+		columnBitmasks.put("rememberDevice", 1048576L);
+
+		columnBitmasks.put("trustedApplication", 2097152L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

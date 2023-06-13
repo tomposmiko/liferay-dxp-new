@@ -116,6 +116,18 @@ public class TranslationEntryLocalServiceUtil {
 		return getService().deletePersistedModel(persistedModel);
 	}
 
+	public static void deleteTranslationEntries(long classNameId, long classPK)
+		throws PortalException {
+
+		getService().deleteTranslationEntries(classNameId, classPK);
+	}
+
+	public static void deleteTranslationEntries(String className, long classPK)
+		throws PortalException {
+
+		getService().deleteTranslationEntries(className, classPK);
+	}
+
 	/**
 	 * Deletes the translation entry with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
@@ -367,6 +379,13 @@ public class TranslationEntryLocalServiceUtil {
 	 */
 	public static int getTranslationEntriesCount() {
 		return getService().getTranslationEntriesCount();
+	}
+
+	public static int getTranslationEntriesCount(
+		String className, long classPK, int[] statuses, boolean exclude) {
+
+		return getService().getTranslationEntriesCount(
+			className, classPK, statuses, exclude);
 	}
 
 	/**

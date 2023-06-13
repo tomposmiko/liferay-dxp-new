@@ -22,8 +22,6 @@ import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.mobile.device.rules.model.MDRRule;
 import com.liferay.mobile.device.rules.service.MDRRuleLocalService;
 import com.liferay.mobile.device.rules.service.MDRRuleLocalServiceUtil;
-import com.liferay.mobile.device.rules.service.persistence.MDRRuleGroupFinder;
-import com.liferay.mobile.device.rules.service.persistence.MDRRuleGroupPersistence;
 import com.liferay.mobile.device.rules.service.persistence.MDRRulePersistence;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
@@ -40,8 +38,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -389,6 +385,7 @@ public abstract class MDRRuleLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -405,6 +402,7 @@ public abstract class MDRRuleLocalServiceBaseImpl
 		return mdrRuleLocalService.deleteMDRRule((MDRRule)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<MDRRule> getBasePersistence() {
 		return mdrRulePersistence;
 	}
@@ -595,18 +593,5 @@ public abstract class MDRRuleLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@Reference
-	protected MDRRuleGroupPersistence mdrRuleGroupPersistence;
-
-	@Reference
-	protected MDRRuleGroupFinder mdrRuleGroupFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MDRRuleLocalServiceBaseImpl.class);
 
 }

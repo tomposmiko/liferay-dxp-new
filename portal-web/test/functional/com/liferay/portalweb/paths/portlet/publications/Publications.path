@@ -16,23 +16,13 @@
 	<td></td>
 </tr>
 <tr>
-	<td>PUBLICATIONS_INDICATOR_BUTTON</td>
-	<td>//button[contains(@class,'dropdown-toggle change-tracking-indicator-button')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>PUBLICATIONS_INDICATOR_TITLE</td>
-	<td>//span[contains(@class,'change-tracking-indicator-title') and contains(.,'${key_publicationName}')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>COLUMN_VALUE_IN_PRODUCTION</td>
-	<td>//td[contains(@class,'publications-diff-td')][1]//td[contains(.,'${key_columnName}')]//following-sibling::td[contains(.,'${key_columnValueInProduction}')]</td>
+	<td>//td[contains(@class,'publications-key-td') and contains(.,'${key_columnName}')]//following-sibling::td[contains(.,'${key_columnValueInProduction}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>COLUMN_VALUE_IN_PUBLICATION</td>
-	<td>//td[contains(@class,'publications-diff-td')][2]//td[contains(.,'${key_columnName}')]//following-sibling::td[contains(.,'${key_columnValueInPublication}')]</td>
+	<td>//td[contains(@class,'publications-key-td') and contains(.,'${key_columnName}')]//following-sibling::td[contains(.,'${key_columnValueInPublication}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -41,13 +31,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>CONFLICTING_CHANGES_DIFF_IFRAME</td>
-	<td>//iframe[contains(@title,'view_diff')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>CONFLICTING_CHANGES_DIFF_IFRAME_TITLE</td>
-	<td>//div[contains(@class,'modal-header')]/*[@class='modal-title' and contains(.,'${key_iframeTitle}')]</td>
+	<td>//div[contains(@class,'modal-header')]/div[@class='modal-title' and contains(.,'${key_iframeTitle}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -66,8 +51,28 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CURRENT_DIFF_DISPLAY_ICON</td>
+	<td>//span[contains(@class, 'inline-item inline-item-after')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CURRENT_DIFF_DISPLAY_ITEM</td>
+	<td>//button[contains(@class,'dropdown-toggle') and contains(.,'${key_displayItem}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DELETE_THE_ENTERED_TIME_BUTTON</td>
 	<td>//button[contains(@aria-label,'Delete the entered time')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DIFF_ADDED_VALUE</td>
+	<td>//td[contains(@class,'publications-key-td') and contains(.,'${key_columnName}')]//following-sibling::td//span[contains(@class,'diff-html-added')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DIFF_REMOVED_VALUE</td>
+	<td>//td[contains(@class,'publications-key-td') and contains(.,'${key_columnName}')]//following-sibling::td//span[contains(@class,'diff-html-removed')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -81,38 +86,43 @@
 	<td></td>
 </tr>
 <tr>
+	<td>KEYWORD_TEXTFIELD</td>
+	<td>//*[@class='form-control-inset']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LIST_OUT_OF_DATE_STATUS</td>
+	<td>//a[contains(.,'${key_publicationName}')]//span/span[contains(.,'Out of Date')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>LIST_PUBLICATION_ELLIPSIS</td>
-	<td>//*[@data-qa-id='row'][contains(.,'${key_publicationName}')]//*[contains(@class,'lexicon-icon lexicon-icon-ellipsis-v')]</td>
+	<td>//li[@data-qa-id='row'][contains(.,'${key_publicationName}')]//*[contains(@class,'lexicon-icon lexicon-icon-ellipsis-v')] | //tr[contains(.,'${key_publicationName}')]//following-sibling::div//*[contains(@class,'lexicon-icon lexicon-icon-ellipsis-v')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>LIST_PUBLISHED_STATUS</td>
-	<td>//a[contains(.,'${key_publicationName}')]//following-sibling::div/span[contains(.,'Published')]</td>
+	<td>//p[contains(.,'${key_publicationName}')]//following-sibling::p/span[contains(.,'Published')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>LIST_REVERT_BUTTON</td>
-	<td>//div[contains(.,'${key_publicationName}')]//following-sibling::div/a[contains(.,'Revert')]</td>
+	<td>//div[contains(.,'${key_publicationName}')]//following-sibling::div//a[contains(.,'Revert')]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>MANGE_PUBLICATIONS_PAGE_TITLE</td>
+	<td>LIST_REVERT_DISABLED</td>
+	<td>//div[contains(.,'${key_publicationName}')]//following-sibling::div//a[contains(@class, 'disabled btn') and contains(.,'Revert')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MANAGE_PUBLICATIONS_PAGE_TITLE</td>
 	<td>//span[contains(@data-qa-id,'headerTitle')]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>MANGE_PUBLICATIONS_NAVBAR_TITLE</td>
+	<td>MANAGE_PUBLICATIONS_NAVBAR_TITLE</td>
 	<td>//li[contains(@class,'nav-item')]/a[contains(.,'${key_navBarTitle}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>NEEDS_MANUAL_RESOLUTION_HEADER_COLLAPSED</td>
-	<td>//button[contains(@class,'collapse-icon') and contains(.,'Needs Manual Resolution')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>NEEDS_MANUAL_RESOLUTION_HEADER_EXPANDED</td>
-	<td>//button[contains(@class,'collapse-icon') and contains(@aria-expanded,'true') and contains(.,'Needs Manual Resolution')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -136,13 +146,33 @@
 	<td></td>
 </tr>
 <tr>
-	<td>PUBLICATION_NAME_IN_ONGOING</td>
-	<td>//div[contains(@class,'publication-name') and contains(.,'${key_publicationName}')]</td>
+	<td>PUBLICATION_ORDER_IN_HISTORY</td>
+	<td>//ul[contains(@class,'publications-table')]//li[${resultOrder}]/div/p/a</td>
 	<td></td>
 </tr>
 <tr>
-	<td>PUBLICATION_ORDER_IN_HISTORY</td>
-	<td>//dl//dd[${resultOrder}]//div[contains(.,'${key_publicationName}')]</td>
+	<td>PUBLICATION_ROLE_BUTTON</td>
+	<td>//button[strong[contains(.,'${key_publicationRole}')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PUBLICATIONS_ELLIPSIS</td>
+	<td>//div[contains(@class,'control-menu-icon')]//span[*[contains(@class,'lexicon-icon-ellipsis-v')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PUBLICATIONS_INDICATOR_BUTTON</td>
+	<td>//button[contains(@class,'dropdown-toggle change-tracking-indicator-button')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PUBLICATIONS_INDICATOR_TITLE</td>
+	<td>//button[contains(@class,'change-tracking-indicator-title')] and contains(.,'${key_publicationName}')</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PUBLICATIONS_TOGGLE_SWITCH</td>
+	<td>//input[contains(@id,'enablePublications')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -202,7 +232,7 @@
 </tr>
 <tr>
 	<td>SELECT_PUBLICATION_NAME</td>
-	<td>//a[contains(.,'${key_publicationName}')]</td>
+	<td>//p[contains(.,'${key_publicationName}') and contains(@class, 'list-group-title')]</td>
 	<td></td>
 </tr>
 </tbody>

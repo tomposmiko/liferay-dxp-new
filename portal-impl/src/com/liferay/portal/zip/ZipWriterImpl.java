@@ -20,8 +20,6 @@ import com.liferay.petra.memory.DeleteFileFinalizeAction;
 import com.liferay.petra.memory.FinalizeManager;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
@@ -32,8 +30,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-
-import java.lang.reflect.Field;
 
 import java.net.URI;
 
@@ -113,7 +109,11 @@ public class ZipWriterImpl implements ZipWriter {
 
 			Path path = fileSystem.getPath(name);
 
-			_createDirectories(fileSystem, path.getParent());
+			Path parentPath = path.getParent();
+
+			if (parentPath != null) {
+				Files.createDirectories(parentPath);
+			}
 
 			Files.write(
 				path, bytes, StandardOpenOption.CREATE,
@@ -140,7 +140,11 @@ public class ZipWriterImpl implements ZipWriter {
 
 			Path path = fileSystem.getPath(name);
 
-			_createDirectories(fileSystem, path.getParent());
+			Path parentPath = path.getParent();
+
+			if (parentPath != null) {
+				Files.createDirectories(parentPath);
+			}
 
 			Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
 		}
@@ -199,71 +203,6 @@ public class ZipWriterImpl implements ZipWriter {
 	public void umount() {
 	}
 
-	private void _createDirectories(FileSystem fileSystem, Path parentPath)
-		throws IOException {
-
-		if ((parentPath == null) || Files.exists(parentPath)) {
-			return;
-		}
-
-		Files.createDirectories(parentPath);
-
-		boolean needUTF8 = false;
-
-		String pathString = parentPath.toString();
-
-		for (int i = 0; i < pathString.length(); i++) {
-			if (pathString.charAt(i) > 128) {
-				needUTF8 = true;
-
-				break;
-			}
-		}
-
-		if (!needUTF8) {
-			return;
-		}
-
-		try {
-			Class<?> fileSystemClass = fileSystem.getClass();
-
-			Field inodesField = fileSystemClass.getDeclaredField("inodes");
-
-			inodesField.setAccessible(true);
-
-			Map<?, ?> inodes = (Map<?, ?>)inodesField.get(fileSystem);
-
-			for (Object inode : inodes.keySet()) {
-				try {
-					Class<?> inodeClass = inode.getClass();
-
-					Field flagField = inodeClass.getDeclaredField("flag");
-
-					flagField.setAccessible(true);
-
-					int flag = flagField.getInt(inode);
-
-					if ((flag & 2048) == 0) {
-						flagField.setInt(inode, flag | 2048);
-					}
-				}
-				catch (NoSuchFieldException noSuchFieldException) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(noSuchFieldException);
-					}
-				}
-			}
-		}
-		catch (ReflectiveOperationException reflectiveOperationException) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Unable to force UTF-8 encoding for directory " +
-						parentPath,
-					reflectiveOperationException);
-			}
-		}
-	}
-
 	private void _writeExportEntries() {
 		try (FileSystem fileSystem = FileSystems.newFileSystem(
 				_uri, Collections.emptyMap())) {
@@ -278,7 +217,11 @@ public class ZipWriterImpl implements ZipWriter {
 
 				Path path = fileSystem.getPath(entry.getKey());
 
-				_createDirectories(fileSystem, path.getParent());
+				Path parentPath = path.getParent();
+
+				if (parentPath != null) {
+					Files.createDirectories(parentPath);
+				}
 
 				Files.write(
 					path, entry.getValue(), StandardOpenOption.CREATE,
@@ -293,8 +236,6 @@ public class ZipWriterImpl implements ZipWriter {
 			throw new UncheckedIOException(ioException);
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(ZipWriterImpl.class);
 
 	private List<Map.Entry<String, byte[]>> _exportEntries;
 	private long _exportEntriesBytes;

@@ -16,16 +16,15 @@ package com.liferay.search.experiences.internal.blueprint.parameter;
 
 import com.liferay.search.experiences.blueprint.parameter.SXPParameter;
 
-import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Petteri Karttunen
  */
 public class SXPParameterData {
 
-	public SXPParameterData(
-		String keywords, Map<String, SXPParameter> sxpParameters) {
-
+	public SXPParameterData(String keywords, Set<SXPParameter> sxpParameters) {
 		_keywords = keywords;
 		_sxpParameters = sxpParameters;
 	}
@@ -35,14 +34,24 @@ public class SXPParameterData {
 	}
 
 	public SXPParameter getSXPParameterByName(String name) {
-		return _sxpParameters.get(name);
+		if (name == null) {
+			return null;
+		}
+
+		for (SXPParameter sxpParameter : _sxpParameters) {
+			if (Objects.equals(sxpParameter.getName(), name)) {
+				return sxpParameter;
+			}
+		}
+
+		return null;
 	}
 
-	public Map<String, SXPParameter> getSXPParameters() {
+	public Set<SXPParameter> getSXPParameters() {
 		return _sxpParameters;
 	}
 
 	private final String _keywords;
-	private final Map<String, SXPParameter> _sxpParameters;
+	private final Set<SXPParameter> _sxpParameters;
 
 }

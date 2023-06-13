@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -322,72 +323,94 @@ public class AssetTagModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<AssetTag, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, AssetTag>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<AssetTag, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<AssetTag, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AssetTag.class.getClassLoader(), AssetTag.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", AssetTag::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", AssetTag::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", AssetTag::getUuid);
-		attributeGetterFunctions.put("tagId", AssetTag::getTagId);
-		attributeGetterFunctions.put("groupId", AssetTag::getGroupId);
-		attributeGetterFunctions.put("companyId", AssetTag::getCompanyId);
-		attributeGetterFunctions.put("userId", AssetTag::getUserId);
-		attributeGetterFunctions.put("userName", AssetTag::getUserName);
-		attributeGetterFunctions.put("createDate", AssetTag::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", AssetTag::getModifiedDate);
-		attributeGetterFunctions.put("name", AssetTag::getName);
-		attributeGetterFunctions.put("assetCount", AssetTag::getAssetCount);
-		attributeGetterFunctions.put(
-			"lastPublishDate", AssetTag::getLastPublishDate);
+		try {
+			Constructor<AssetTag> constructor =
+				(Constructor<AssetTag>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<AssetTag, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<AssetTag, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<AssetTag, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AssetTag, Object>>();
 		Map<String, BiConsumer<AssetTag, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<AssetTag, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", AssetTag::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AssetTag, Long>)AssetTag::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", AssetTag::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<AssetTag, Long>)AssetTag::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", AssetTag::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<AssetTag, String>)AssetTag::setUuid);
+		attributeGetterFunctions.put("tagId", AssetTag::getTagId);
 		attributeSetterBiConsumers.put(
 			"tagId", (BiConsumer<AssetTag, Long>)AssetTag::setTagId);
+		attributeGetterFunctions.put("groupId", AssetTag::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<AssetTag, Long>)AssetTag::setGroupId);
+		attributeGetterFunctions.put("companyId", AssetTag::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<AssetTag, Long>)AssetTag::setCompanyId);
+		attributeGetterFunctions.put("userId", AssetTag::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<AssetTag, Long>)AssetTag::setUserId);
+		attributeGetterFunctions.put("userName", AssetTag::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<AssetTag, String>)AssetTag::setUserName);
+		attributeGetterFunctions.put("createDate", AssetTag::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<AssetTag, Date>)AssetTag::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", AssetTag::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<AssetTag, Date>)AssetTag::setModifiedDate);
+		attributeGetterFunctions.put("name", AssetTag::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<AssetTag, String>)AssetTag::setName);
+		attributeGetterFunctions.put("assetCount", AssetTag::getAssetCount);
 		attributeSetterBiConsumers.put(
 			"assetCount",
 			(BiConsumer<AssetTag, Integer>)AssetTag::setAssetCount);
+		attributeGetterFunctions.put(
+			"lastPublishDate", AssetTag::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<AssetTag, Date>)AssetTag::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -743,6 +766,35 @@ public class AssetTagModelImpl
 	}
 
 	@Override
+	public AssetTag cloneWithOriginalValues() {
+		AssetTagImpl assetTagImpl = new AssetTagImpl();
+
+		assetTagImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		assetTagImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		assetTagImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		assetTagImpl.setTagId(this.<Long>getColumnOriginalValue("tagId"));
+		assetTagImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		assetTagImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		assetTagImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		assetTagImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		assetTagImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		assetTagImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		assetTagImpl.setName(this.<String>getColumnOriginalValue("name"));
+		assetTagImpl.setAssetCount(
+			this.<Integer>getColumnOriginalValue("assetCount"));
+		assetTagImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+
+		return assetTagImpl;
+	}
+
+	@Override
 	public int compareTo(AssetTag assetTag) {
 		int value = 0;
 
@@ -964,9 +1016,7 @@ public class AssetTagModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AssetTag>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AssetTag.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

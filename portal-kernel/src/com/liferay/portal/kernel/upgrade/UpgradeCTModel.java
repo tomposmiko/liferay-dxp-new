@@ -22,8 +22,11 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 
 /**
- * @author Preston Crary
+ * @author     Preston Crary
+ * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+ *             CTModelUpgradeProcess}
  */
+@Deprecated
 public class UpgradeCTModel extends UpgradeProcess {
 
 	public UpgradeCTModel(String... tableNames) {
@@ -57,13 +60,13 @@ public class UpgradeCTModel extends UpgradeProcess {
 		String normalizedTableName = dbInspector.normalizeName(
 			tableName, databaseMetaData);
 
-		try (ResultSet rs = databaseMetaData.getColumns(
+		try (ResultSet resultSet = databaseMetaData.getColumns(
 				dbInspector.getCatalog(), dbInspector.getSchema(),
 				normalizedTableName,
 				dbInspector.normalizeName(
 					"ctCollectionId", databaseMetaData))) {
 
-			if (rs.next()) {
+			if (resultSet.next()) {
 				return;
 			}
 		}
@@ -71,17 +74,17 @@ public class UpgradeCTModel extends UpgradeProcess {
 		String primaryKeyColumnName1 = null;
 		String primaryKeyColumnName2 = null;
 
-		try (ResultSet rs = databaseMetaData.getPrimaryKeys(
+		try (ResultSet resultSet = databaseMetaData.getPrimaryKeys(
 				dbInspector.getCatalog(), dbInspector.getSchema(),
 				normalizedTableName)) {
 
-			if (rs.next()) {
-				primaryKeyColumnName1 = rs.getString("COLUMN_NAME");
+			if (resultSet.next()) {
+				primaryKeyColumnName1 = resultSet.getString("COLUMN_NAME");
 
-				if (rs.next()) {
-					primaryKeyColumnName2 = rs.getString("COLUMN_NAME");
+				if (resultSet.next()) {
+					primaryKeyColumnName2 = resultSet.getString("COLUMN_NAME");
 
-					if (rs.next()) {
+					if (resultSet.next()) {
 						throw new UpgradeException(
 							"Too many primary key columns to upgrade " +
 								normalizedTableName);

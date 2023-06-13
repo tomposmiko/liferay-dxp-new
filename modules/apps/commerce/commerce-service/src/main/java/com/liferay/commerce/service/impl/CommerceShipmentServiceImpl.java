@@ -15,13 +15,15 @@
 package com.liferay.commerce.service.impl;
 
 import com.liferay.commerce.constants.CommerceActionKeys;
+import com.liferay.commerce.constants.CommerceConstants;
 import com.liferay.commerce.model.CommerceShipment;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.commerce.service.base.CommerceShipmentServiceBaseImpl;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermissionFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
@@ -42,8 +44,8 @@ public class CommerceShipmentServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.addCommerceShipment(
@@ -57,8 +59,8 @@ public class CommerceShipmentServiceImpl
 			long commerceOrderId, ServiceContext serviceContext)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.addCommerceShipment(
@@ -84,8 +86,8 @@ public class CommerceShipmentServiceImpl
 		CommerceShipment commerceShipment =
 			commerceShipmentPersistence.findByPrimaryKey(commerceShipmentId);
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		commerceShipmentLocalService.deleteCommerceShipment(
@@ -96,8 +98,8 @@ public class CommerceShipmentServiceImpl
 	public CommerceShipment getCommerceShipment(long commerceShipmentId)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.getCommerceShipment(
@@ -110,12 +112,12 @@ public class CommerceShipmentServiceImpl
 			OrderByComparator<CommerceShipment> orderByComparator)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
-		List<CommerceChannel> commerceChannels =
-			_commerceChannelService.searchCommerceChannels(companyId);
+		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
+			companyId);
 
 		Stream<CommerceChannel> stream = commerceChannels.stream();
 
@@ -133,12 +135,12 @@ public class CommerceShipmentServiceImpl
 			OrderByComparator<CommerceShipment> orderByComparator)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
-		List<CommerceChannel> commerceChannels =
-			_commerceChannelService.searchCommerceChannels(companyId);
+		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
+			companyId);
 
 		if (commerceChannels.isEmpty()) {
 			return Collections.emptyList();
@@ -160,12 +162,12 @@ public class CommerceShipmentServiceImpl
 			OrderByComparator<CommerceShipment> orderByComparator)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
-		List<CommerceChannel> commerceChannels =
-			_commerceChannelService.searchCommerceChannels(companyId);
+		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
+			companyId);
 
 		Stream<CommerceChannel> stream = commerceChannels.stream();
 
@@ -185,8 +187,8 @@ public class CommerceShipmentServiceImpl
 			boolean excludeShipmentStatus, int start, int end)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.getCommerceShipments(
@@ -206,12 +208,12 @@ public class CommerceShipmentServiceImpl
 	public int getCommerceShipmentsCount(long companyId)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
-		List<CommerceChannel> commerceChannels =
-			_commerceChannelService.searchCommerceChannels(companyId);
+		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
+			companyId);
 
 		if (commerceChannels.isEmpty()) {
 			return 0;
@@ -231,12 +233,12 @@ public class CommerceShipmentServiceImpl
 	public int getCommerceShipmentsCount(long companyId, int status)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
-		List<CommerceChannel> commerceChannels =
-			_commerceChannelService.searchCommerceChannels(companyId);
+		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
+			companyId);
 
 		Stream<CommerceChannel> stream = commerceChannels.stream();
 
@@ -252,12 +254,12 @@ public class CommerceShipmentServiceImpl
 	public int getCommerceShipmentsCount(long companyId, long commerceAddressId)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
-		List<CommerceChannel> commerceChannels =
-			_commerceChannelService.searchCommerceChannels(companyId);
+		List<CommerceChannel> commerceChannels = _commerceChannelService.search(
+			companyId);
 
 		Stream<CommerceChannel> stream = commerceChannels.stream();
 
@@ -276,8 +278,8 @@ public class CommerceShipmentServiceImpl
 			boolean excludeShipmentStatus)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.getCommerceShipmentsCount(
@@ -295,29 +297,47 @@ public class CommerceShipmentServiceImpl
 	public CommerceShipment reprocessCommerceShipment(long commerceShipmentId)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.reprocessCommerceShipment(
 			commerceShipmentId);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 * #updateAddress(long, String, String, String, String, String, String,
+	 * String, long, long, String, ServiceContext)}
+	 */
+	@Deprecated
 	@Override
 	public CommerceShipment updateAddress(
 			long commerceShipmentId, String name, String description,
 			String street1, String street2, String street3, String city,
-			String zip, long commerceRegionId, long commerceCountryId,
-			String phoneNumber)
+			String zip, long regionId, long countryId, String phoneNumber)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		return updateAddress(
+			commerceShipmentId, name, description, street1, street2, street3,
+			city, zip, regionId, countryId, phoneNumber, null);
+	}
+
+	@Override
+	public CommerceShipment updateAddress(
+			long commerceShipmentId, String name, String description,
+			String street1, String street2, String street3, String city,
+			String zip, long regionId, long countryId, String phoneNumber,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.updateAddress(
 			commerceShipmentId, name, description, street1, street2, street3,
-			city, zip, commerceRegionId, commerceCountryId, phoneNumber);
+			city, zip, regionId, countryId, phoneNumber, serviceContext);
 	}
 
 	@Override
@@ -325,8 +345,8 @@ public class CommerceShipmentServiceImpl
 			long commerceShipmentId, String carrier, String trackingNumber)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.updateCarrierDetails(
@@ -342,8 +362,8 @@ public class CommerceShipmentServiceImpl
 			int expectedDateHour, int expectedDateMinute)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.updateCommerceShipment(
@@ -358,22 +378,22 @@ public class CommerceShipmentServiceImpl
 	public CommerceShipment updateCommerceShipment(
 			long commerceShipmentId, String name, String description,
 			String street1, String street2, String street3, String city,
-			String zip, long commerceRegionId, long commerceCountryId,
-			String phoneNumber, String carrier, String trackingNumber,
-			int status, int shippingDateMonth, int shippingDateDay,
-			int shippingDateYear, int shippingDateHour, int shippingDateMinute,
-			int expectedDateMonth, int expectedDateDay, int expectedDateYear,
-			int expectedDateHour, int expectedDateMinute)
+			String zip, long regionId, long countryId, String phoneNumber,
+			String carrier, String trackingNumber, int status,
+			int shippingDateMonth, int shippingDateDay, int shippingDateYear,
+			int shippingDateHour, int shippingDateMinute, int expectedDateMonth,
+			int expectedDateDay, int expectedDateYear, int expectedDateHour,
+			int expectedDateMinute)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.updateCommerceShipment(
 			commerceShipmentId, name, description, street1, street2, street3,
-			city, zip, commerceRegionId, commerceCountryId, phoneNumber,
-			carrier, trackingNumber, status, shippingDateMonth, shippingDateDay,
+			city, zip, regionId, countryId, phoneNumber, carrier,
+			trackingNumber, status, shippingDateMonth, shippingDateDay,
 			shippingDateYear, shippingDateHour, shippingDateMinute,
 			expectedDateMonth, expectedDateDay, expectedDateYear,
 			expectedDateHour, expectedDateMinute);
@@ -385,8 +405,8 @@ public class CommerceShipmentServiceImpl
 			int expectedDateYear, int expectedDateHour, int expectedDateMinute)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.updateExpectedDate(
@@ -400,8 +420,8 @@ public class CommerceShipmentServiceImpl
 			int shippingDateYear, int shippingDateHour, int shippingDateMinute)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.updateShippingDate(
@@ -413,13 +433,19 @@ public class CommerceShipmentServiceImpl
 	public CommerceShipment updateStatus(long commerceShipmentId, int status)
 		throws PortalException {
 
-		PortalPermissionUtil.check(
-			getPermissionChecker(),
+		_portletResourcePermission.contains(
+			getPermissionChecker(), null,
 			CommerceActionKeys.MANAGE_COMMERCE_SHIPMENTS);
 
 		return commerceShipmentLocalService.updateStatus(
 			commerceShipmentId, status);
 	}
+
+	private static volatile PortletResourcePermission
+		_portletResourcePermission =
+			PortletResourcePermissionFactory.getInstance(
+				CommerceShipmentServiceImpl.class, "_portletResourcePermission",
+				CommerceConstants.RESOURCE_NAME_COMMERCE_SHIPMENT);
 
 	@ServiceReference(type = CommerceChannelService.class)
 	private CommerceChannelService _commerceChannelService;

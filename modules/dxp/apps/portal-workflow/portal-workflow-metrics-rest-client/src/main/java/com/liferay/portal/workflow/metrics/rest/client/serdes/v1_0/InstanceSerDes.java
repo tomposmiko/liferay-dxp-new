@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -60,7 +61,17 @@ public class InstanceSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+		if (instance.getActive() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"active\": ");
+
+			sb.append(instance.getActive());
+		}
 
 		if (instance.getAssetTitle() != null) {
 			if (sb.length() > 1) {
@@ -360,7 +371,14 @@ public class InstanceSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+		if (instance.getActive() == null) {
+			map.put("active", null);
+		}
+		else {
+			map.put("active", String.valueOf(instance.getActive()));
+		}
 
 		if (instance.getAssetTitle() == null) {
 			map.put("assetTitle", null);
@@ -532,7 +550,12 @@ public class InstanceSerDes {
 			Instance instance, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "assetTitle")) {
+			if (Objects.equals(jsonParserFieldName, "active")) {
+				if (jsonParserFieldValue != null) {
+					instance.setActive((Boolean)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "assetTitle")) {
 				if (jsonParserFieldValue != null) {
 					instance.setAssetTitle((String)jsonParserFieldValue);
 				}
@@ -558,18 +581,14 @@ public class InstanceSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "assignees")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Assignee[] assigneesArray =
-						new Assignee[jsonParserFieldValues.length];
-
-					for (int i = 0; i < assigneesArray.length; i++) {
-						assigneesArray[i] = AssigneeSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					instance.setAssignees(assigneesArray);
+					instance.setAssignees(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AssigneeSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Assignee[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "className")) {
@@ -636,18 +655,14 @@ public class InstanceSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "slaResults")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					SLAResult[] slaResultsArray =
-						new SLAResult[jsonParserFieldValues.length];
-
-					for (int i = 0; i < slaResultsArray.length; i++) {
-						slaResultsArray[i] = SLAResultSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					instance.setSlaResults(slaResultsArray);
+					instance.setSlaResults(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> SLAResultSerDes.toDTO((String)object)
+						).toArray(
+							size -> new SLAResult[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "slaStatus")) {
@@ -665,18 +680,14 @@ public class InstanceSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "transitions")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Transition[] transitionsArray =
-						new Transition[jsonParserFieldValues.length];
-
-					for (int i = 0; i < transitionsArray.length; i++) {
-						transitionsArray[i] = TransitionSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					instance.setTransitions(transitionsArray);
+					instance.setTransitions(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> TransitionSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Transition[size]
+						));
 				}
 			}
 		}

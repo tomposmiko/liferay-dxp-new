@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.Digester;
@@ -40,9 +41,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.util.ant.ExpandTask;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -59,6 +57,9 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,6 +68,8 @@ import java.util.Properties;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException;
 import org.apache.commons.io.FileUtils;
@@ -84,10 +87,6 @@ import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.txt.UniversalEncodingDetector;
 import org.apache.tika.sax.BodyContentHandler;
 import org.apache.tika.sax.WriteOutContentHandler;
-import org.apache.tools.ant.DirectoryScanner;
-
-import org.mozilla.intl.chardet.nsDetector;
-import org.mozilla.intl.chardet.nsPSMDetector;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -116,13 +115,8 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			return fileNameWithParentheticalSuffix;
 		}
 
-		StringBundler sb = new StringBundler(3);
-
-		sb.append(fileNameWithParentheticalSuffix);
-		sb.append(StringPool.PERIOD);
-		sb.append(extension);
-
-		return sb.toString();
+		return StringBundler.concat(
+			fileNameWithParentheticalSuffix, StringPool.PERIOD, extension);
 	}
 
 	@Override
@@ -206,6 +200,10 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 				oldContent = read(source);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
+
 				return;
 			}
 
@@ -215,6 +213,9 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 				newContent = read(destination);
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 
 			if ((oldContent == null) || !oldContent.equals(newContent)) {
@@ -330,6 +331,9 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 				exists = file.exists();
 			}
 			catch (SecurityException securityException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(securityException, securityException);
+				}
 
 				// We may have the permission to delete a specific file without
 				// having the permission to check if the file exists
@@ -432,21 +436,21 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			}
 
 			if (forkProcess) {
-				Registry registry = RegistryUtil.getRegistry();
-
-				ProcessChannel<String> processChannel = registry.callService(
-					ProcessExecutor.class,
-					processExecutor -> {
-						try {
-							return processExecutor.execute(
-								PortalClassPathUtil.getPortalProcessConfig(),
-								new ExtractTextProcessCallable(
-									getBytes(tikaInputStream)));
-						}
-						catch (Exception exception) {
-							return ReflectionUtil.throwException(exception);
-						}
-					});
+				ProcessChannel<String> processChannel =
+					SystemBundleUtil.callService(
+						ProcessExecutor.class,
+						processExecutor -> {
+							try {
+								return processExecutor.execute(
+									PortalClassPathUtil.
+										getPortalProcessConfig(),
+									new ExtractTextProcessCallable(
+										getBytes(tikaInputStream)));
+							}
+							catch (Exception exception) {
+								return ReflectionUtil.throwException(exception);
+							}
+						});
 
 				Future<String> future =
 					processChannel.getProcessNoticeableFuture();
@@ -502,43 +506,6 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 		}
 
 		return text;
-	}
-
-	@Override
-	public String[] find(String directory, String includes, String excludes) {
-		if (directory.length() > 0) {
-			directory = replaceSeparator(directory);
-
-			if (directory.charAt(directory.length() - 1) == CharPool.SLASH) {
-				directory = directory.substring(0, directory.length() - 1);
-			}
-		}
-
-		if (!exists(directory)) {
-			if (_log.isWarnEnabled()) {
-				_log.warn("Directory " + directory + " does not exist");
-			}
-
-			return new String[0];
-		}
-
-		DirectoryScanner directoryScanner = new DirectoryScanner();
-
-		directoryScanner.setBasedir(directory);
-		directoryScanner.setExcludes(StringUtil.split(excludes));
-		directoryScanner.setIncludes(StringUtil.split(includes));
-
-		directoryScanner.scan();
-
-		String[] includedFiles = directoryScanner.getIncludedFiles();
-
-		for (int i = 0; i < includedFiles.length; i++) {
-			includedFiles[i] = StringBundler.concat(
-				directory, StringPool.SLASH,
-				replaceSeparator(includedFiles[i]));
-		}
-
-		return includedFiles;
 	}
 
 	@Override
@@ -643,33 +610,6 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 	}
 
 	@Override
-	public boolean isAscii(File file) throws IOException {
-		boolean ascii = true;
-
-		nsDetector detector = new nsDetector(nsPSMDetector.ALL);
-
-		try (InputStream inputStream = new FileInputStream(file)) {
-			byte[] buffer = new byte[1024];
-
-			int len = 0;
-
-			while ((len = inputStream.read(buffer, 0, buffer.length)) != -1) {
-				if (ascii) {
-					ascii = detector.isAscii(buffer, len);
-
-					if (!ascii) {
-						break;
-					}
-				}
-			}
-
-			detector.DataEnd();
-		}
-
-		return ascii;
-	}
-
-	@Override
 	public boolean isSameContent(File file, byte[] bytes, int length) {
 		try (FileInputStream fileInputStream = new FileInputStream(file)) {
 			FileChannel fileChannel = fileInputStream.getChannel();
@@ -704,6 +644,10 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			return true;
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return false;
 		}
 	}
@@ -802,6 +746,10 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			}
 		}
 		catch (IOException ioException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(ioException, ioException);
+			}
+
 			return false;
 		}
 
@@ -920,6 +868,9 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			}
 		}
 		catch (IOException ioException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(ioException, ioException);
+			}
 		}
 
 		return list;
@@ -931,6 +882,10 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			return toList(new FileReader(fileName));
 		}
 		catch (IOException ioException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(ioException, ioException);
+			}
+
 			return new ArrayList<>();
 		}
 	}
@@ -943,6 +898,9 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			properties.load(fileInputStream);
 		}
 		catch (IOException ioException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(ioException, ioException);
+			}
 		}
 
 		return properties;
@@ -954,6 +912,10 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			return toProperties(new FileInputStream(fileName));
 		}
 		catch (IOException ioException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(ioException, ioException);
+			}
+
 			return new Properties();
 		}
 	}
@@ -970,7 +932,31 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 
 	@Override
 	public void unzip(File source, File destination) {
-		ExpandTask.expand(source, destination);
+		Path destinationPath = destination.toPath();
+
+		try (InputStream inputStream = new FileInputStream(source);
+			ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
+
+			ZipEntry entry = null;
+
+			while ((entry = zipInputStream.getNextEntry()) != null) {
+				Path path = destinationPath.resolve(entry.getName());
+
+				if (entry.isDirectory()) {
+					Files.createDirectories(path);
+				}
+				else {
+					Files.createDirectories(path.getParent());
+
+					Files.copy(
+						zipInputStream, path,
+						StandardCopyOption.REPLACE_EXISTING);
+				}
+			}
+		}
+		catch (IOException ioException) {
+			ReflectionUtil.throwException(ioException);
+		}
 	}
 
 	@Override
@@ -1113,6 +1099,9 @@ public class FileImpl implements com.liferay.portal.kernel.util.File {
 			mkdirs(parentFile);
 		}
 		catch (SecurityException securityException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(securityException, securityException);
+			}
 
 			// We may have the permission to write a specific file without
 			// having the permission to check if the parent file exists

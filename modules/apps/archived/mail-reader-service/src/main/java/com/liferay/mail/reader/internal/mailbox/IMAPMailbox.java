@@ -232,15 +232,12 @@ public class IMAPMailbox extends BaseMailbox {
 
 			for (InternetAddress internetAddress : internetAddresses) {
 				if (!Validator.isEmailAddress(internetAddress.getAddress())) {
-					StringBundler sb = new StringBundler(4);
-
-					sb.append(internetAddress.getPersonal());
-					sb.append(StringPool.LESS_THAN);
-					sb.append(internetAddress.getAddress());
-					sb.append(StringPool.GREATER_THAN);
-
 					throw new MailException(
-						MailException.MESSAGE_INVALID_ADDRESS, sb.toString());
+						MailException.MESSAGE_INVALID_ADDRESS,
+						StringBundler.concat(
+							internetAddress.getPersonal(), StringPool.LESS_THAN,
+							internetAddress.getAddress(),
+							StringPool.GREATER_THAN));
 				}
 			}
 		}
@@ -271,17 +268,6 @@ public class IMAPMailbox extends BaseMailbox {
 			String subject, String body, List<MailFile> mailFiles)
 		throws PortalException {
 
-		Account account = AccountLocalServiceUtil.getAccount(accountId);
-
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(user.getFullName());
-		sb.append(" <");
-		sb.append(account.getAddress());
-		sb.append(StringPool.GREATER_THAN);
-
-		String sender = sb.toString();
-
 		Address[] toAddresses = parseAddresses(to);
 		Address[] ccAddresses = parseAddresses(cc);
 		Address[] bccAddresses = parseAddresses(bcc);
@@ -291,6 +277,12 @@ public class IMAPMailbox extends BaseMailbox {
 
 			throw new MailException(MailException.MESSAGE_HAS_NO_RECIPIENTS);
 		}
+
+		Account account = AccountLocalServiceUtil.getAccount(accountId);
+
+		String sender = StringBundler.concat(
+			user.getFullName(), " <", account.getAddress(),
+			StringPool.GREATER_THAN);
 
 		Message message = null;
 
@@ -326,8 +318,6 @@ public class IMAPMailbox extends BaseMailbox {
 	public void sendMessage(long accountId, long messageId)
 		throws PortalException {
 
-		Account account = AccountLocalServiceUtil.getAccount(accountId);
-
 		Message message = MessageLocalServiceUtil.getMessage(messageId);
 
 		Address[] toAddresses = parseAddresses(message.getTo());
@@ -339,6 +329,8 @@ public class IMAPMailbox extends BaseMailbox {
 
 			throw new MailException(MailException.MESSAGE_HAS_NO_RECIPIENTS);
 		}
+
+		Account account = AccountLocalServiceUtil.getAccount(accountId);
 
 		List<Attachment> attachments =
 			AttachmentLocalServiceUtil.getAttachments(messageId);
@@ -435,17 +427,21 @@ public class IMAPMailbox extends BaseMailbox {
 			long folderId, int pageNumber, int messagesPerPage)
 		throws PortalException {
 
-		long[] remoteMessageUIds = _imapAccessor.getMessageUIDs(
+		long[] remoteMessageUIDs = _imapAccessor.getMessageUIDs(
 			folderId, pageNumber, messagesPerPage);
 
 		List<Long> missingRemoteMessageIdsList = new ArrayList<>();
 
-		for (long remoteMessageUId : remoteMessageUIds) {
+		for (long remoteMessageUID : remoteMessageUIDs) {
 			try {
-				MessageLocalServiceUtil.getMessage(folderId, remoteMessageUId);
+				MessageLocalServiceUtil.getMessage(folderId, remoteMessageUID);
 			}
 			catch (NoSuchMessageException noSuchMessageException) {
-				missingRemoteMessageIdsList.add(remoteMessageUId);
+				if (_log.isDebugEnabled()) {
+					_log.debug(noSuchMessageException, noSuchMessageException);
+				}
+
+				missingRemoteMessageIdsList.add(remoteMessageUID);
 			}
 		}
 
@@ -493,6 +489,10 @@ public class IMAPMailbox extends BaseMailbox {
 					account.getAccountId(), jxFolder.getFullName());
 			}
 			catch (NoSuchFolderException noSuchFolderException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(noSuchFolderException, noSuchFolderException);
+				}
+
 				FolderLocalServiceUtil.addFolder(
 					user.getUserId(), account.getAccountId(),
 					jxFolder.getFullName(), jxFolder.getName(), 0);

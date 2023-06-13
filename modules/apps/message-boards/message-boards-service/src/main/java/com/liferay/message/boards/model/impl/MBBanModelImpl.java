@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -300,66 +301,87 @@ public class MBBanModelImpl extends BaseModelImpl<MBBan> implements MBBanModel {
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<MBBan, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, MBBan>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<MBBan, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<MBBan, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			MBBan.class.getClassLoader(), MBBan.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", MBBan::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", MBBan::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", MBBan::getUuid);
-		attributeGetterFunctions.put("banId", MBBan::getBanId);
-		attributeGetterFunctions.put("groupId", MBBan::getGroupId);
-		attributeGetterFunctions.put("companyId", MBBan::getCompanyId);
-		attributeGetterFunctions.put("userId", MBBan::getUserId);
-		attributeGetterFunctions.put("userName", MBBan::getUserName);
-		attributeGetterFunctions.put("createDate", MBBan::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", MBBan::getModifiedDate);
-		attributeGetterFunctions.put("banUserId", MBBan::getBanUserId);
-		attributeGetterFunctions.put(
-			"lastPublishDate", MBBan::getLastPublishDate);
+		try {
+			Constructor<MBBan> constructor =
+				(Constructor<MBBan>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<MBBan, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<MBBan, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<MBBan, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<MBBan, Object>>();
 		Map<String, BiConsumer<MBBan, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<MBBan, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", MBBan::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion", (BiConsumer<MBBan, Long>)MBBan::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", MBBan::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<MBBan, Long>)MBBan::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", MBBan::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<MBBan, String>)MBBan::setUuid);
+		attributeGetterFunctions.put("banId", MBBan::getBanId);
 		attributeSetterBiConsumers.put(
 			"banId", (BiConsumer<MBBan, Long>)MBBan::setBanId);
+		attributeGetterFunctions.put("groupId", MBBan::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<MBBan, Long>)MBBan::setGroupId);
+		attributeGetterFunctions.put("companyId", MBBan::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<MBBan, Long>)MBBan::setCompanyId);
+		attributeGetterFunctions.put("userId", MBBan::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<MBBan, Long>)MBBan::setUserId);
+		attributeGetterFunctions.put("userName", MBBan::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<MBBan, String>)MBBan::setUserName);
+		attributeGetterFunctions.put("createDate", MBBan::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<MBBan, Date>)MBBan::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", MBBan::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate", (BiConsumer<MBBan, Date>)MBBan::setModifiedDate);
+		attributeGetterFunctions.put("banUserId", MBBan::getBanUserId);
 		attributeSetterBiConsumers.put(
 			"banUserId", (BiConsumer<MBBan, Long>)MBBan::setBanUserId);
+		attributeGetterFunctions.put(
+			"lastPublishDate", MBBan::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<MBBan, Date>)MBBan::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -720,6 +742,31 @@ public class MBBanModelImpl extends BaseModelImpl<MBBan> implements MBBanModel {
 	}
 
 	@Override
+	public MBBan cloneWithOriginalValues() {
+		MBBanImpl mbBanImpl = new MBBanImpl();
+
+		mbBanImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		mbBanImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		mbBanImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		mbBanImpl.setBanId(this.<Long>getColumnOriginalValue("banId"));
+		mbBanImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		mbBanImpl.setCompanyId(this.<Long>getColumnOriginalValue("companyId"));
+		mbBanImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		mbBanImpl.setUserName(this.<String>getColumnOriginalValue("userName"));
+		mbBanImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		mbBanImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		mbBanImpl.setBanUserId(this.<Long>getColumnOriginalValue("banUserId"));
+		mbBanImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+
+		return mbBanImpl;
+	}
+
+	@Override
 	public int compareTo(MBBan mbBan) {
 		long primaryKey = mbBan.getPrimaryKey();
 
@@ -933,9 +980,7 @@ public class MBBanModelImpl extends BaseModelImpl<MBBan> implements MBBanModel {
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, MBBan>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					MBBan.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

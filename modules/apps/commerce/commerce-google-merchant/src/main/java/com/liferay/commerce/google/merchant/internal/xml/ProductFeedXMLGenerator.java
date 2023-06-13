@@ -104,7 +104,7 @@ public class ProductFeedXMLGenerator {
 
 		int total = _countCPCatalogEntriesByChannel(commerceChannel);
 
-		final IntervalActionProcessor<Void> intervalActionProcessor =
+		IntervalActionProcessor<Void> intervalActionProcessor =
 			new IntervalActionProcessor<>(total);
 
 		intervalActionProcessor.setPerformIntervalActionMethod(
@@ -115,9 +115,7 @@ public class ProductFeedXMLGenerator {
 				/* TODO: To be implemented in COMMERCE-2690.
 
 				for (CPCatalogEntry cpCatalogEntry : cpCatalogEntries) {
-
-					// TODO COMMERCE-2690 add XML for a product here
-
+					//TODO COMMERCE-2690 add XML for a product here
 				}
 				*/
 

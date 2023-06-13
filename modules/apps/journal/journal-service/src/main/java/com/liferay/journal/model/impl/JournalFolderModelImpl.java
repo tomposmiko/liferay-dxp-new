@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -340,117 +341,139 @@ public class JournalFolderModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<JournalFolder, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, JournalFolder>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<JournalFolder, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<JournalFolder, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			JournalFolder.class.getClassLoader(), JournalFolder.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", JournalFolder::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", JournalFolder::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", JournalFolder::getUuid);
-		attributeGetterFunctions.put("folderId", JournalFolder::getFolderId);
-		attributeGetterFunctions.put("groupId", JournalFolder::getGroupId);
-		attributeGetterFunctions.put("companyId", JournalFolder::getCompanyId);
-		attributeGetterFunctions.put("userId", JournalFolder::getUserId);
-		attributeGetterFunctions.put("userName", JournalFolder::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", JournalFolder::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", JournalFolder::getModifiedDate);
-		attributeGetterFunctions.put(
-			"parentFolderId", JournalFolder::getParentFolderId);
-		attributeGetterFunctions.put("treePath", JournalFolder::getTreePath);
-		attributeGetterFunctions.put("name", JournalFolder::getName);
-		attributeGetterFunctions.put(
-			"description", JournalFolder::getDescription);
-		attributeGetterFunctions.put(
-			"restrictionType", JournalFolder::getRestrictionType);
-		attributeGetterFunctions.put(
-			"lastPublishDate", JournalFolder::getLastPublishDate);
-		attributeGetterFunctions.put("status", JournalFolder::getStatus);
-		attributeGetterFunctions.put(
-			"statusByUserId", JournalFolder::getStatusByUserId);
-		attributeGetterFunctions.put(
-			"statusByUserName", JournalFolder::getStatusByUserName);
-		attributeGetterFunctions.put(
-			"statusDate", JournalFolder::getStatusDate);
+		try {
+			Constructor<JournalFolder> constructor =
+				(Constructor<JournalFolder>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<JournalFolder, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<JournalFolder, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<JournalFolder, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<JournalFolder, Object>>();
 		Map<String, BiConsumer<JournalFolder, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<JournalFolder, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", JournalFolder::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<JournalFolder, Long>)JournalFolder::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", JournalFolder::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<JournalFolder, Long>)JournalFolder::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", JournalFolder::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<JournalFolder, String>)JournalFolder::setUuid);
+		attributeGetterFunctions.put("folderId", JournalFolder::getFolderId);
 		attributeSetterBiConsumers.put(
 			"folderId",
 			(BiConsumer<JournalFolder, Long>)JournalFolder::setFolderId);
+		attributeGetterFunctions.put("groupId", JournalFolder::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<JournalFolder, Long>)JournalFolder::setGroupId);
+		attributeGetterFunctions.put("companyId", JournalFolder::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<JournalFolder, Long>)JournalFolder::setCompanyId);
+		attributeGetterFunctions.put("userId", JournalFolder::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<JournalFolder, Long>)JournalFolder::setUserId);
+		attributeGetterFunctions.put("userName", JournalFolder::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<JournalFolder, String>)JournalFolder::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", JournalFolder::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<JournalFolder, Date>)JournalFolder::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", JournalFolder::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<JournalFolder, Date>)JournalFolder::setModifiedDate);
+		attributeGetterFunctions.put(
+			"parentFolderId", JournalFolder::getParentFolderId);
 		attributeSetterBiConsumers.put(
 			"parentFolderId",
 			(BiConsumer<JournalFolder, Long>)JournalFolder::setParentFolderId);
+		attributeGetterFunctions.put("treePath", JournalFolder::getTreePath);
 		attributeSetterBiConsumers.put(
 			"treePath",
 			(BiConsumer<JournalFolder, String>)JournalFolder::setTreePath);
+		attributeGetterFunctions.put("name", JournalFolder::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<JournalFolder, String>)JournalFolder::setName);
+		attributeGetterFunctions.put(
+			"description", JournalFolder::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<JournalFolder, String>)JournalFolder::setDescription);
+		attributeGetterFunctions.put(
+			"restrictionType", JournalFolder::getRestrictionType);
 		attributeSetterBiConsumers.put(
 			"restrictionType",
 			(BiConsumer<JournalFolder, Integer>)
 				JournalFolder::setRestrictionType);
+		attributeGetterFunctions.put(
+			"lastPublishDate", JournalFolder::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<JournalFolder, Date>)JournalFolder::setLastPublishDate);
+		attributeGetterFunctions.put("status", JournalFolder::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<JournalFolder, Integer>)JournalFolder::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", JournalFolder::getStatusByUserId);
 		attributeSetterBiConsumers.put(
 			"statusByUserId",
 			(BiConsumer<JournalFolder, Long>)JournalFolder::setStatusByUserId);
+		attributeGetterFunctions.put(
+			"statusByUserName", JournalFolder::getStatusByUserName);
 		attributeSetterBiConsumers.put(
 			"statusByUserName",
 			(BiConsumer<JournalFolder, String>)
 				JournalFolder::setStatusByUserName);
+		attributeGetterFunctions.put(
+			"statusDate", JournalFolder::getStatusDate);
 		attributeSetterBiConsumers.put(
 			"statusDate",
 			(BiConsumer<JournalFolder, Date>)JournalFolder::setStatusDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -1229,6 +1252,52 @@ public class JournalFolderModelImpl
 	}
 
 	@Override
+	public JournalFolder cloneWithOriginalValues() {
+		JournalFolderImpl journalFolderImpl = new JournalFolderImpl();
+
+		journalFolderImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		journalFolderImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		journalFolderImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		journalFolderImpl.setFolderId(
+			this.<Long>getColumnOriginalValue("folderId"));
+		journalFolderImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		journalFolderImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		journalFolderImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		journalFolderImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		journalFolderImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		journalFolderImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		journalFolderImpl.setParentFolderId(
+			this.<Long>getColumnOriginalValue("parentFolderId"));
+		journalFolderImpl.setTreePath(
+			this.<String>getColumnOriginalValue("treePath"));
+		journalFolderImpl.setName(this.<String>getColumnOriginalValue("name"));
+		journalFolderImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		journalFolderImpl.setRestrictionType(
+			this.<Integer>getColumnOriginalValue("restrictionType"));
+		journalFolderImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+		journalFolderImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
+		journalFolderImpl.setStatusByUserId(
+			this.<Long>getColumnOriginalValue("statusByUserId"));
+		journalFolderImpl.setStatusByUserName(
+			this.<String>getColumnOriginalValue("statusByUserName"));
+		journalFolderImpl.setStatusDate(
+			this.<Date>getColumnOriginalValue("statusDate"));
+
+		return journalFolderImpl;
+	}
+
+	@Override
 	public int compareTo(JournalFolder journalFolder) {
 		int value = 0;
 
@@ -1504,9 +1573,7 @@ public class JournalFolderModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, JournalFolder>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					JournalFolder.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

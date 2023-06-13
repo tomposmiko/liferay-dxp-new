@@ -19,9 +19,8 @@ import getCN from 'classnames';
 import {PropTypes} from 'prop-types';
 import React, {useContext, useEffect, useState} from 'react';
 
-import sxpElementSchema from '../../schemas/sxpQueryElementSchema';
 import {DEFAULT_SXP_ELEMENT_ICON} from '../utils/data';
-import getSXPElementTitleAndDescription from '../utils/sxp_element/get_sxp_element_title_and_description';
+import {getLocalizedText} from '../utils/language';
 import ThemeContext from './ThemeContext';
 import JSONInput from './sxp_element/JSONInput';
 
@@ -34,9 +33,8 @@ function JSONSXPElement({
 	isSubmitting,
 	onDeleteSXPElement,
 	prefixedId,
-	readOnly,
-	setFieldTouched = () => {},
-	setFieldValue = () => {},
+	setFieldTouched,
+	setFieldValue,
 	touched = {},
 	uiConfigurationValues = {},
 }) {
@@ -45,10 +43,8 @@ function JSONSXPElement({
 	const [active, setActive] = useState(false);
 	const [collapse, setCollapse] = useState(collapseAll);
 
-	const [title, description] = getSXPElementTitleAndDescription(
-		sxpElement,
-		locale
-	);
+	const description = getLocalizedText(sxpElement.description_i18n, locale);
+	const title = getLocalizedText(sxpElement.title_i18n, locale);
 
 	useEffect(() => {
 		setCollapse(collapseAll);
@@ -90,34 +86,32 @@ function JSONSXPElement({
 						)}
 					</ClayList.ItemField>
 
-					{onDeleteSXPElement && (
-						<ClayDropDown
-							active={active}
-							alignmentPosition={3}
-							onActiveChange={setActive}
-							trigger={
-								<ClayList.ItemField>
-									<ClayButton
-										aria-label={Liferay.Language.get(
-											'dropdown'
-										)}
-										className="component-action"
-										displayType="unstyled"
-									>
-										<ClayIcon symbol="ellipsis-v" />
-									</ClayButton>
-								</ClayList.ItemField>
-							}
-						>
-							<ClayDropDown.ItemList>
-								<ClayDropDown.Item
-									onClick={() => onDeleteSXPElement(id)}
+					<ClayDropDown
+						active={active}
+						alignmentPosition={3}
+						onActiveChange={setActive}
+						trigger={
+							<ClayList.ItemField>
+								<ClayButton
+									aria-label={Liferay.Language.get(
+										'dropdown'
+									)}
+									className="component-action"
+									displayType="unstyled"
 								>
-									{Liferay.Language.get('remove')}
-								</ClayDropDown.Item>
-							</ClayDropDown.ItemList>
-						</ClayDropDown>
-					)}
+									<ClayIcon symbol="ellipsis-v" />
+								</ClayButton>
+							</ClayList.ItemField>
+						}
+					>
+						<ClayDropDown.ItemList>
+							<ClayDropDown.Item
+								onClick={() => onDeleteSXPElement(id)}
+							>
+								{Liferay.Language.get('remove')}
+							</ClayDropDown.Item>
+						</ClayDropDown.ItemList>
+					</ClayDropDown>
 
 					<ClayList.ItemField>
 						<ClayButton
@@ -149,10 +143,8 @@ function JSONSXPElement({
 					})}
 				>
 					<JSONInput
-						autocompleteSchema={sxpElementSchema}
 						disabled={isSubmitting}
 						name={_inputName(index)}
-						readOnly={readOnly}
 						setFieldTouched={setFieldTouched}
 						setFieldValue={setFieldValue}
 						value={
@@ -184,7 +176,6 @@ JSONSXPElement.propTypes = {
 	isSubmitting: PropTypes.bool,
 	onDeleteSXPElement: PropTypes.func,
 	prefixedId: PropTypes.string,
-	readOnly: PropTypes.bool,
 	setFieldTouched: PropTypes.func,
 	setFieldValue: PropTypes.func,
 	sxpElement: PropTypes.object,

@@ -24,9 +24,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -56,6 +54,10 @@ import org.osgi.annotation.versioning.ProviderType;
 @Generated("")
 @ProviderType
 public interface MessageBoardMessageResource {
+
+	public static Builder builder() {
+		return FactoryHolder.factory.create();
+	}
 
 	public void deleteMessageBoardMessage(Long messageBoardMessageId)
 		throws Exception;
@@ -92,6 +94,17 @@ public interface MessageBoardMessageResource {
 
 	public Rating putMessageBoardMessageMyRating(
 			Long messageBoardMessageId, Rating rating)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getMessageBoardMessagePermissionsPage(
+				Long messageBoardMessageId, String roleNames)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			putMessageBoardMessagePermissionsPage(
+				Long messageBoardMessageId,
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
 
 	public void putMessageBoardMessageSubscribe(Long messageBoardMessageId)
@@ -134,8 +147,34 @@ public interface MessageBoardMessageResource {
 			Filter filter, Pagination pagination, Sort[] sorts)
 		throws Exception;
 
+	public void deleteSiteMessageBoardMessageByExternalReferenceCode(
+			Long siteId, String externalReferenceCode)
+		throws Exception;
+
+	public MessageBoardMessage
+			getSiteMessageBoardMessageByExternalReferenceCode(
+				Long siteId, String externalReferenceCode)
+		throws Exception;
+
+	public MessageBoardMessage
+			putSiteMessageBoardMessageByExternalReferenceCode(
+				Long siteId, String externalReferenceCode,
+				MessageBoardMessage messageBoardMessage)
+		throws Exception;
+
 	public MessageBoardMessage getSiteMessageBoardMessageByFriendlyUrlPath(
 			Long siteId, String friendlyUrlPath)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getSiteMessageBoardMessagePermissionsPage(
+				Long siteId, String roleNames)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			putSiteMessageBoardMessagePermissionsPage(
+				Long siteId,
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(
@@ -175,12 +214,6 @@ public interface MessageBoardMessageResource {
 
 	public void setRoleLocalService(RoleLocalService roleLocalService);
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider);
-
-	public void setVulcanBatchEngineImportTaskResource(
-		VulcanBatchEngineImportTaskResource
-			vulcanBatchEngineImportTaskResource);
-
 	public default Filter toFilter(String filterString) {
 		return toFilter(
 			filterString, Collections.<String, List<String>>emptyMap());
@@ -192,8 +225,10 @@ public interface MessageBoardMessageResource {
 		return null;
 	}
 
-	public default Sort[] toSorts(String sortsString) {
-		return new Sort[0];
+	public static class FactoryHolder {
+
+		public static volatile Factory factory;
+
 	}
 
 	@ProviderType

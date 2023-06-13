@@ -14,8 +14,8 @@
 
 package com.liferay.commerce.checkout.web.internal.util;
 
-import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.service.CommerceAccountLocalService;
+import com.liferay.commerce.checkout.helper.CommerceCheckoutStepHttpHelper;
 import com.liferay.commerce.checkout.web.internal.display.context.BillingAddressCheckoutStepDisplayContext;
 import com.liferay.commerce.constants.CommerceAddressConstants;
 import com.liferay.commerce.constants.CommerceCheckoutWebKeys;
@@ -74,8 +74,13 @@ public class BillingAddressCommerceCheckoutStep
 			HttpServletResponse httpServletResponse)
 		throws Exception {
 
-		return _commerceCheckoutStepHelper.
-			isActiveBillingAddressCommerceCheckoutStep(httpServletRequest);
+		CommerceOrder commerceOrder =
+			(CommerceOrder)httpServletRequest.getAttribute(
+				CommerceCheckoutWebKeys.COMMERCE_ORDER);
+
+		return _commerceCheckoutStepHttpHelper.
+			isActiveBillingAddressCommerceCheckoutStep(
+				httpServletRequest, commerceOrder);
 	}
 
 	@Override
@@ -122,7 +127,6 @@ public class BillingAddressCommerceCheckoutStep
 		BillingAddressCheckoutStepDisplayContext
 			billingAddressCheckoutStepDisplayContext =
 				new BillingAddressCheckoutStepDisplayContext(
-					_commerceAccountModelResourcePermission,
 					commerceAddressService, httpServletRequest);
 
 		CommerceOrder commerceOrder =
@@ -131,7 +135,7 @@ public class BillingAddressCommerceCheckoutStep
 		if (!commerceOrder.isOpen()) {
 			httpServletRequest.setAttribute(
 				CommerceCheckoutWebKeys.COMMERCE_CHECKOUT_STEP_ORDER_DETAIL_URL,
-				_commerceCheckoutStepHelper.getOrderDetailURL(
+				_commerceCheckoutStepHttpHelper.getOrderDetailURL(
 					httpServletRequest, commerceOrder));
 
 			jspRenderer.renderJSP(
@@ -185,13 +189,7 @@ public class BillingAddressCommerceCheckoutStep
 	@Reference
 	protected JSPRenderer jspRenderer;
 
-	@Reference(
-		target = "(model.class.name=com.liferay.commerce.account.model.CommerceAccount)"
-	)
-	private ModelResourcePermission<CommerceAccount>
-		_commerceAccountModelResourcePermission;
-
 	@Reference
-	private CommerceCheckoutStepHelper _commerceCheckoutStepHelper;
+	private CommerceCheckoutStepHttpHelper _commerceCheckoutStepHttpHelper;
 
 }

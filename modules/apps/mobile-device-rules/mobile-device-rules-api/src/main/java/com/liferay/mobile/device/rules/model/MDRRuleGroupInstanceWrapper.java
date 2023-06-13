@@ -151,6 +151,11 @@ public class MDRRuleGroupInstanceWrapper
 	}
 
 	@Override
+	public MDRRuleGroupInstance cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
+	@Override
 	public java.util.List<MDRAction> getActions() {
 		return model.getActions();
 	}

@@ -51,7 +51,7 @@ public class
 				"fieldName", mustSetValidDefaultLocaleForProperty.getFieldName()
 			).put(
 				"property", mustSetValidDefaultLocaleForProperty.getProperty()
-			).toString(),
+			).toJSONString(),
 			Response.Status.BAD_REQUEST,
 			mustSetValidDefaultLocaleForProperty.getMessage(),
 			"MustSetValidDefaultLocaleForProperty");

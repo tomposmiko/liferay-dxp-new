@@ -24,7 +24,6 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.dynamic.data.mapping.util.DDMFormValuesToFieldsConverter;
-import com.liferay.dynamic.data.mapping.util.DDMUtil;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.exception.ArticleContentSizeException;
 import com.liferay.journal.model.JournalArticle;
@@ -33,13 +32,13 @@ import com.liferay.journal.service.JournalContentSearchLocalService;
 import com.liferay.journal.util.JournalConverter;
 import com.liferay.journal.util.JournalHelper;
 import com.liferay.journal.web.internal.asset.model.JournalArticleAssetRenderer;
-import com.liferay.journal.web.internal.configuration.JournalDDMEditorConfiguration;
 import com.liferay.journal.web.internal.util.JournalUtil;
 import com.liferay.layout.model.LayoutClassedModelUsage;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -58,7 +57,6 @@ import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.Http;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -82,20 +80,16 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
  */
 @Component(
-	configurationPid = "com.liferay.journal.web.internal.configuration.JournalDDMEditorConfiguration",
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + JournalPortletKeys.JOURNAL,
@@ -105,13 +99,6 @@ import org.osgi.service.component.annotations.Reference;
 	service = MVCActionCommand.class
 )
 public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
-
-	@Activate
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-		_journalDDMEditorConfiguration = ConfigurableUtil.createConfigurable(
-			JournalDDMEditorConfiguration.class, properties);
-	}
 
 	@Override
 	protected void doProcessAction(
@@ -154,6 +141,7 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 		long folderId = ParamUtil.getLong(uploadPortletRequest, "folderId");
 		String articleId = ParamUtil.getString(
 			uploadPortletRequest, "articleId");
+
 		Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "titleMapAsXML");
 
@@ -168,19 +156,11 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			JournalArticle.class.getName(), uploadPortletRequest);
 
-		Fields fields = null;
+		DDMFormValues ddmFormValues = _ddmFormValuesFactory.create(
+			actionRequest, ddmStructure.getDDMForm());
 
-		if (_journalDDMEditorConfiguration.useDataEngineEditor()) {
-			DDMFormValues ddmFormValues = _ddmFormValuesFactory.create(
-				actionRequest, ddmStructure.getDDMForm());
-
-			fields = _ddmFormValuesToFieldsConverter.convert(
-				ddmStructure, ddmFormValues);
-		}
-		else {
-			fields = DDMUtil.getFields(
-				ddmStructure.getStructureId(), serviceContext);
-		}
+		Fields fields = _ddmFormValuesToFieldsConverter.convert(
+			ddmStructure, ddmFormValues);
 
 		String content = _journalConverter.getContent(
 			ddmStructure, fields, groupId);
@@ -331,7 +311,7 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 				uploadPortletRequest, "autoArticleId");
 
 			article = _journalArticleService.addArticle(
-				groupId, folderId, classNameId, classPK, articleId,
+				null, groupId, folderId, classNameId, classPK, articleId,
 				autoArticleId, titleMap, descriptionMap, friendlyURLMap,
 				content, ddmStructureKey, ddmTemplateKey, layoutUuid,
 				displayDateMonth, displayDateDay, displayDateYear,
@@ -467,41 +447,44 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 			String redirect)
 		throws Exception {
 
-		String portletResource = ParamUtil.getString(
-			actionRequest, "portletResource");
+		return PortletURLBuilder.create(
+			PortletURLFactoryUtil.create(
+				actionRequest, JournalPortletKeys.JOURNAL,
+				PortletRequest.RENDER_PHASE)
+		).setMVCPath(
+			"/edit_article.jsp"
+		).setRedirect(
+			redirect
+		).setPortletResource(
+			ParamUtil.getString(actionRequest, "portletResource")
+		).setParameter(
+			"articleId", article.getArticleId()
+		).setParameter(
+			"folderId", article.getFolderId()
+		).setParameter(
+			"groupId", article.getGroupId()
+		).setParameter(
+			"languageId",
+			() -> {
+				String languageId = ParamUtil.getString(
+					actionRequest, "languageId");
 
-		String referringPortletResource = ParamUtil.getString(
-			actionRequest, "referringPortletResource");
+				if (Validator.isNotNull(languageId)) {
+					return languageId;
+				}
 
-		String languageId = _getValidLanguageId(
-			ParamUtil.getString(actionRequest, "languageId"));
-
-		PortletURL portletURL = PortletURLFactoryUtil.create(
-			actionRequest, JournalPortletKeys.JOURNAL,
-			PortletRequest.RENDER_PHASE);
-
-		portletURL.setParameter("mvcPath", "/edit_article.jsp");
-		portletURL.setParameter("redirect", redirect);
-		portletURL.setParameter("portletResource", portletResource);
-		portletURL.setParameter(
-			"referringPortletResource", referringPortletResource);
-		portletURL.setParameter(
-			"resourcePrimKey", String.valueOf(article.getResourcePrimKey()));
-		portletURL.setParameter(
-			"groupId", String.valueOf(article.getGroupId()));
-		portletURL.setParameter(
-			"folderId", String.valueOf(article.getFolderId()));
-		portletURL.setParameter("articleId", article.getArticleId());
-		portletURL.setParameter(
-			"version", String.valueOf(article.getVersion()));
-
-		if (Validator.isNotNull(languageId)) {
-			portletURL.setParameter("languageId", languageId);
-		}
-
-		portletURL.setWindowState(actionRequest.getWindowState());
-
-		return portletURL.toString();
+				return null;
+			}
+		).setParameter(
+			"referringPortletResource",
+			ParamUtil.getString(actionRequest, "referringPortletResource")
+		).setParameter(
+			"resourcePrimKey", article.getResourcePrimKey()
+		).setParameter(
+			"version", article.getVersion()
+		).setWindowState(
+			actionRequest.getWindowState()
+		).buildString();
 	}
 
 	protected void sendEditArticleRedirect(
@@ -628,20 +611,6 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 		return StringUtil.merge(messages, "<br />");
 	}
 
-	private String _getValidLanguageId(String languageId) {
-		if (Validator.isNull(languageId)) {
-			return null;
-		}
-
-		Locale locale = LocaleUtil.fromLanguageId(languageId, true, false);
-
-		if (locale == null) {
-			return null;
-		}
-
-		return languageId;
-	}
-
 	private void _updateLayoutClassedModelUsage(
 		long groupId, long classNameId, long classPK, String portletResource,
 		long plid, ServiceContext serviceContext) {
@@ -691,11 +660,11 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private JournalConverter _journalConverter;
 
-	private volatile JournalDDMEditorConfiguration
-		_journalDDMEditorConfiguration;
-
 	@Reference
 	private JournalHelper _journalHelper;
+
+	@Reference
+	private JSONFactory _jsonFactory;
 
 	@Reference
 	private LayoutClassedModelUsageLocalService

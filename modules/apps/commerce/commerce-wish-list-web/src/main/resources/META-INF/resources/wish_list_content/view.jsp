@@ -31,7 +31,7 @@ long commerceWishListId = commerceWishListDisplayContext.getCommerceWishListId()
 	</c:when>
 	<c:otherwise>
 		<c:if test="<%= !commerceWishList.isGuestWishList() %>">
-			<div class="container-fluid-1280">
+			<div class="container-fluid container-fluid-max-xl">
 				<h3 class="d-inline"><%= HtmlUtil.escape(commerceWishList.getName()) %></h3>
 
 				<portlet:renderURL var="editCommerceWishListURL">
@@ -46,7 +46,7 @@ long commerceWishListId = commerceWishListDisplayContext.getCommerceWishListId()
 
 		<portlet:actionURL name="/commerce_wish_list_content/edit_commerce_wish_list_item" var="editCommerceWishListItemActionURL" />
 
-		<div class="container-fluid-1280">
+		<div class="container-fluid container-fluid-max-xl">
 			<aui:form action="<%= editCommerceWishListItemActionURL %>" method="post" name="fm">
 				<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.DELETE %>" />
 				<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
@@ -68,11 +68,11 @@ long commerceWishListId = commerceWishListDisplayContext.getCommerceWishListId()
 
 						<liferay-ui:search-container-column-image
 							name="product"
-							src="<%= cpDefinition.getDefaultImageThumbnailSrc() %>"
+							src="<%= cpDefinition.getDefaultImageThumbnailSrc(commerceWishListDisplayContext.getCommerceAccountId()) %>"
 						/>
 
 						<liferay-ui:search-container-column-text
-							cssClass="table-cell-content"
+							cssClass="table-cell-expand"
 							name="description"
 						>
 							<a class="font-weight-bold" href="<%= commerceWishListDisplayContext.getCPDefinitionURL(cpDefinition.getCPDefinitionId(), themeDisplay) %>">

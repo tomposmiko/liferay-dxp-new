@@ -22,9 +22,7 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.StagedModelPermissionLogic;
-import com.liferay.portal.kernel.util.HashMapDictionary;
-
-import java.util.Dictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -41,11 +39,6 @@ public class MDRRuleGroupInstanceModelResourcePermissionRegistrar {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-		properties.put(
-			"model.class.name", MDRRuleGroupInstance.class.getName());
-
 		_serviceRegistration = bundleContext.registerService(
 			(Class<ModelResourcePermission<MDRRuleGroupInstance>>)
 				(Class<?>)ModelResourcePermission.class,
@@ -58,7 +51,9 @@ public class MDRRuleGroupInstanceModelResourcePermissionRegistrar {
 					new StagedModelPermissionLogic<>(
 						_stagingPermission, MDRPortletKeys.MOBILE_DEVICE_RULES,
 						MDRRuleGroupInstance::getRuleGroupInstanceId))),
-			properties);
+			HashMapDictionaryBuilder.<String, Object>put(
+				"model.class.name", MDRRuleGroupInstance.class.getName()
+			).build());
 	}
 
 	@Deactivate

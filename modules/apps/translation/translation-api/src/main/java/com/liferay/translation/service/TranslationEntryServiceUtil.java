@@ -59,6 +59,13 @@ public class TranslationEntryServiceUtil {
 			serviceContext);
 	}
 
+	public static TranslationEntry deleteTranslationEntry(
+			long translationEntryId)
+		throws PortalException {
+
+		return getService().deleteTranslationEntry(translationEntryId);
+	}
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *

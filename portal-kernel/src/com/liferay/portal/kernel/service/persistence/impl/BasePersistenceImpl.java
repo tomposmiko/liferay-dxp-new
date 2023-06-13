@@ -32,8 +32,10 @@ import com.liferay.petra.sql.dsl.spi.expression.DSLFunction;
 import com.liferay.petra.sql.dsl.spi.expression.DSLFunctionType;
 import com.liferay.petra.sql.dsl.spi.expression.TableStar;
 import com.liferay.petra.sql.dsl.spi.query.Select;
+import com.liferay.petra.sql.dsl.spi.query.SetOperation;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -43,6 +45,7 @@ import com.liferay.portal.kernel.dao.orm.Dialect;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
+import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.dao.orm.ORMException;
 import com.liferay.portal.kernel.dao.orm.OrderFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Projection;
@@ -85,6 +88,7 @@ import java.sql.Connection;
 import java.sql.Timestamp;
 import java.sql.Types;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -168,20 +172,70 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	@Override
 	@SuppressWarnings("unchecked")
 	public <R> R dslQuery(DSLQuery dslQuery) {
+		DefaultASTNodeListener defaultASTNodeListener =
+			new DefaultASTNodeListener();
+
+		StringBundler sb = new StringBundler();
+
+		dslQuery.toSQL(sb::append, defaultASTNodeListener);
+
+		Select select = null;
+
+		ASTNode astNode = dslQuery;
+
+		while (astNode instanceof BaseASTNode) {
+			if (astNode instanceof Select) {
+				select = (Select)astNode;
+
+				break;
+			}
+
+			BaseASTNode baseASTNode = (BaseASTNode)astNode;
+
+			if (baseASTNode instanceof SetOperation) {
+				SetOperation setOperation = (SetOperation)astNode;
+
+				astNode = setOperation.getLeftDSLQuery();
+			}
+			else {
+				astNode = baseASTNode.getChild();
+			}
+		}
+
+		if (select == null) {
+			throw new IllegalArgumentException(
+				"No Select found for " + dslQuery);
+		}
+
+		String[] tableNames = defaultASTNodeListener.getTableNames();
+
+		ProjectionType projectionType = _getProjectionType(
+			tableNames, select.getExpressions());
+
+		FinderCache finderCache = getFinderCache();
+
+		FinderPath finderPath = new FinderPath(
+			FinderPath.encodeDSLQueryCacheName(tableNames), "dslQuery",
+			sb.getStrings(), new String[0],
+			projectionType == ProjectionType.MODELS);
+
+		Object[] arguments = _getArguments(defaultASTNodeListener);
+
+		Object cacheResult = finderCache.getResult(finderPath, arguments);
+
+		boolean productionMode = CTCollectionThreadLocal.isProductionMode();
+
+		if ((cacheResult != null) && productionMode) {
+			return (R)cacheResult;
+		}
+
 		Session session = null;
 
 		try {
 			session = openSession();
 
-			DefaultASTNodeListener defaultASTNodeListener =
-				new DefaultASTNodeListener();
-
-			String sql = dslQuery.toSQL(defaultASTNodeListener);
-
-			String[] tableNames = defaultASTNodeListener.getTableNames();
-
 			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(
-				sql, true, tableNames);
+				sb.toString(), true, tableNames);
 
 			List<Object> scalarValues =
 				defaultASTNodeListener.getScalarValues();
@@ -193,30 +247,6 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 					queryPos.add(value);
 				}
 			}
-
-			Select select = null;
-
-			ASTNode astNode = dslQuery;
-
-			while (astNode instanceof BaseASTNode) {
-				if (astNode instanceof Select) {
-					select = (Select)astNode;
-
-					break;
-				}
-
-				BaseASTNode baseASTNode = (BaseASTNode)astNode;
-
-				astNode = baseASTNode.getChild();
-			}
-
-			if (select == null) {
-				throw new IllegalArgumentException(
-					"No Select found for " + dslQuery);
-			}
-
-			ProjectionType projectionType = _getProjectionType(
-				tableNames, select.getExpressions());
 
 			if (projectionType == ProjectionType.COUNT) {
 				sqlQuery.addScalar(COUNT_COLUMN_NAME, Type.LONG);
@@ -244,19 +274,29 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 				}
 			}
 
+			Object result = null;
+
 			if (projectionType == ProjectionType.COUNT) {
 				List<?> results = sqlQuery.list();
 
 				if (results.isEmpty()) {
-					return (R)(Long)0L;
+					result = 0L;
 				}
-
-				return (R)results.get(0);
+				else {
+					result = results.get(0);
+				}
+			}
+			else {
+				result = QueryUtil.list(
+					sqlQuery, getDialect(), defaultASTNodeListener.getStart(),
+					defaultASTNodeListener.getEnd());
 			}
 
-			return (R)QueryUtil.list(
-				sqlQuery, getDialect(), defaultASTNodeListener.getStart(),
-				defaultASTNodeListener.getEnd());
+			if (productionMode) {
+				finderCache.putResult(finderPath, arguments, result);
+			}
+
+			return (R)result;
 		}
 		catch (Exception exception) {
 			throw processException(exception);
@@ -548,6 +588,7 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 		return _dataSource;
 	}
 
+	@Override
 	public DB getDB() {
 		if (_db == null) {
 			_db = DBManagerUtil.getDB(_dialect, _dataSource);
@@ -594,8 +635,8 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	}
 
 	@Override
-	public void registerListener(ModelListener<T> listener) {
-		ModelListenerRegistrationUtil.register(listener);
+	public void registerListener(ModelListener<T> modelListener) {
+		ModelListenerRegistrationUtil.register(modelListener);
 	}
 
 	@Override
@@ -616,16 +657,20 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 			model = modelWrapper.getWrappedModel();
 		}
 
-		ModelListener<T>[] listeners = getListeners();
+		ModelListener<T>[] modelListeners = getListeners();
 
-		for (ModelListener<T> listener : listeners) {
-			listener.onBeforeRemove(model);
+		for (ModelListener<T> modelListener : modelListeners) {
+			modelListener.onBeforeRemove(model);
 		}
 
-		model = removeImpl(model);
+		T removedModel = removeImpl(model);
 
-		for (ModelListener<T> listener : listeners) {
-			listener.onAfterRemove(model);
+		if (removedModel != null) {
+			model = removedModel;
+		}
+
+		for (ModelListener<T> modelListener : modelListeners) {
+			modelListener.onAfterRemove(model);
 		}
 
 		return model;
@@ -672,18 +717,18 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	}
 
 	@Override
-	public void unregisterListener(ModelListener<T> listener) {
-		ModelListenerRegistrationUtil.unregister(listener);
+	public void unregisterListener(ModelListener<T> modelListener) {
+		ModelListenerRegistrationUtil.unregister(modelListener);
 	}
 
 	@Override
 	public T update(T model) {
-		Class<?> clazz = model.getModelClass();
-
 		if (ReadOnlyTransactionThreadLocal.isReadOnly()) {
 			throw new IllegalStateException(
 				"Update called with read only transaction");
 		}
+
+		Class<?> clazz = model.getModelClass();
 
 		while (model instanceof ModelWrapper) {
 			ModelWrapper<T> modelWrapper = (ModelWrapper<T>)model;
@@ -716,25 +761,31 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 			}
 		}
 
-		ModelListener<T>[] listeners = getListeners();
+		T oldModel = null;
 
-		for (ModelListener<T> listener : listeners) {
+		if (!isNew) {
+			oldModel = model.cloneWithOriginalValues();
+		}
+
+		ModelListener<T>[] modelListeners = getListeners();
+
+		for (ModelListener<T> modelListener : modelListeners) {
 			if (isNew) {
-				listener.onBeforeCreate(model);
+				modelListener.onBeforeCreate(model);
 			}
 			else {
-				listener.onBeforeUpdate(model);
+				modelListener.onBeforeUpdate(oldModel, model);
 			}
 		}
 
 		model = updateImpl(model);
 
-		for (ModelListener<T> listener : listeners) {
+		for (ModelListener<T> modelListener : modelListeners) {
 			if (isNew) {
-				listener.onAfterCreate(model);
+				modelListener.onAfterCreate(model);
 			}
 			else {
-				listener.onAfterUpdate(model);
+				modelListener.onAfterUpdate(oldModel, model);
 			}
 		}
 
@@ -850,6 +901,10 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	}
 
 	protected EntityCache getEntityCache() {
+		throw new UnsupportedOperationException();
+	}
+
+	protected FinderCache getFinderCache() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -983,6 +1038,33 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	@Deprecated
 	protected boolean finderCacheEnabled = true;
 
+	private Object[] _getArguments(
+		DefaultASTNodeListener defaultASTNodeListener) {
+
+		List<Object> arguments = new ArrayList<>();
+
+		for (Object object : defaultASTNodeListener.getScalarValues()) {
+			if (object instanceof Date) {
+				Date date = (Date)object;
+
+				arguments.add(date.getTime());
+			}
+			else {
+				arguments.add(object);
+			}
+		}
+
+		int start = defaultASTNodeListener.getStart();
+		int end = defaultASTNodeListener.getEnd();
+
+		if ((start != QueryUtil.ALL_POS) || (end != QueryUtil.ALL_POS)) {
+			arguments.add(start);
+			arguments.add(end);
+		}
+
+		return arguments.toArray(new Object[0]);
+	}
+
 	private ProjectionType _getProjectionType(
 		String[] tableNames, Collection<? extends Expression<?>> expressions) {
 
@@ -1114,6 +1196,11 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 		@Override
 		public Object clone() {
 			return this;
+		}
+
+		@Override
+		public NullModel cloneWithOriginalValues() {
+			throw new UnsupportedOperationException();
 		}
 
 		@Override

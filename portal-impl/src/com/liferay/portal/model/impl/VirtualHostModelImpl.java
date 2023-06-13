@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -241,64 +242,86 @@ public class VirtualHostModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<VirtualHost, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, VirtualHost>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<VirtualHost, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<VirtualHost, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			VirtualHost.class.getClassLoader(), VirtualHost.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", VirtualHost::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", VirtualHost::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"virtualHostId", VirtualHost::getVirtualHostId);
-		attributeGetterFunctions.put("companyId", VirtualHost::getCompanyId);
-		attributeGetterFunctions.put(
-			"layoutSetId", VirtualHost::getLayoutSetId);
-		attributeGetterFunctions.put("hostname", VirtualHost::getHostname);
-		attributeGetterFunctions.put(
-			"defaultVirtualHost", VirtualHost::getDefaultVirtualHost);
-		attributeGetterFunctions.put("languageId", VirtualHost::getLanguageId);
+		try {
+			Constructor<VirtualHost> constructor =
+				(Constructor<VirtualHost>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<VirtualHost, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<VirtualHost, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<VirtualHost, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<VirtualHost, Object>>();
 		Map<String, BiConsumer<VirtualHost, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<VirtualHost, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", VirtualHost::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<VirtualHost, Long>)VirtualHost::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", VirtualHost::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<VirtualHost, Long>)VirtualHost::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"virtualHostId", VirtualHost::getVirtualHostId);
 		attributeSetterBiConsumers.put(
 			"virtualHostId",
 			(BiConsumer<VirtualHost, Long>)VirtualHost::setVirtualHostId);
+		attributeGetterFunctions.put("companyId", VirtualHost::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<VirtualHost, Long>)VirtualHost::setCompanyId);
+		attributeGetterFunctions.put(
+			"layoutSetId", VirtualHost::getLayoutSetId);
 		attributeSetterBiConsumers.put(
 			"layoutSetId",
 			(BiConsumer<VirtualHost, Long>)VirtualHost::setLayoutSetId);
+		attributeGetterFunctions.put("hostname", VirtualHost::getHostname);
 		attributeSetterBiConsumers.put(
 			"hostname",
 			(BiConsumer<VirtualHost, String>)VirtualHost::setHostname);
+		attributeGetterFunctions.put(
+			"defaultVirtualHost", VirtualHost::getDefaultVirtualHost);
 		attributeSetterBiConsumers.put(
 			"defaultVirtualHost",
 			(BiConsumer<VirtualHost, Boolean>)
 				VirtualHost::setDefaultVirtualHost);
+		attributeGetterFunctions.put("languageId", VirtualHost::getLanguageId);
 		attributeSetterBiConsumers.put(
 			"languageId",
 			(BiConsumer<VirtualHost, String>)VirtualHost::setLanguageId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -540,6 +563,30 @@ public class VirtualHostModelImpl
 	}
 
 	@Override
+	public VirtualHost cloneWithOriginalValues() {
+		VirtualHostImpl virtualHostImpl = new VirtualHostImpl();
+
+		virtualHostImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		virtualHostImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		virtualHostImpl.setVirtualHostId(
+			this.<Long>getColumnOriginalValue("virtualHostId"));
+		virtualHostImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		virtualHostImpl.setLayoutSetId(
+			this.<Long>getColumnOriginalValue("layoutSetId"));
+		virtualHostImpl.setHostname(
+			this.<String>getColumnOriginalValue("hostname"));
+		virtualHostImpl.setDefaultVirtualHost(
+			this.<Boolean>getColumnOriginalValue("defaultVirtualHost"));
+		virtualHostImpl.setLanguageId(
+			this.<String>getColumnOriginalValue("languageId"));
+
+		return virtualHostImpl;
+	}
+
+	@Override
 	public int compareTo(VirtualHost virtualHost) {
 		int value = 0;
 
@@ -733,9 +780,7 @@ public class VirtualHostModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, VirtualHost>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					VirtualHost.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

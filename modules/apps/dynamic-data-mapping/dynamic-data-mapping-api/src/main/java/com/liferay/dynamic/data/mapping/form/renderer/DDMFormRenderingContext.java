@@ -16,6 +16,7 @@ package com.liferay.dynamic.data.mapping.form.renderer;
 
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -30,6 +31,8 @@ import javax.servlet.http.HttpServletResponse;
 public class DDMFormRenderingContext {
 
 	public DDMFormRenderingContext() {
+		setContainerId(_getDefaultContainerId());
+		setEditOnlyInDefaultLanguage(false);
 		setReturnFullContext(true);
 	}
 
@@ -89,6 +92,10 @@ public class DDMFormRenderingContext {
 		return _submitLabel;
 	}
 
+	public boolean isEditOnlyInDefaultLanguage() {
+		return MapUtil.getBoolean(_properties, "editOnlyInDefaultLanguage");
+	}
+
 	public boolean isReadOnly() {
 		return _readOnly;
 	}
@@ -113,6 +120,10 @@ public class DDMFormRenderingContext {
 		return _showSubmitButton;
 	}
 
+	public boolean isSubmittable() {
+		return _submittable;
+	}
+
 	public boolean isViewMode() {
 		return MapUtil.getBoolean(_properties, "viewMode");
 	}
@@ -135,6 +146,12 @@ public class DDMFormRenderingContext {
 
 	public void setDDMStructureLayoutId(long ddmStructureLayoutId) {
 		_ddmStructureLayoutId = ddmStructureLayoutId;
+	}
+
+	public void setEditOnlyInDefaultLanguage(
+		boolean editOnlyInDefaultLanguage) {
+
+		_properties.put("editOnlyInDefaultLanguage", editOnlyInDefaultLanguage);
 	}
 
 	public void setGroupId(long groupId) {
@@ -193,8 +210,16 @@ public class DDMFormRenderingContext {
 		_submitLabel = submitLabel;
 	}
 
+	public void setSubmittable(boolean submittable) {
+		_submittable = submittable;
+	}
+
 	public void setViewMode(boolean viewMode) {
 		_properties.put("viewMode", viewMode);
+	}
+
+	private String _getDefaultContainerId() {
+		return "ddmForm".concat(StringUtil.randomString());
 	}
 
 	private String _cancelLabel;
@@ -214,5 +239,6 @@ public class DDMFormRenderingContext {
 	private boolean _showRequiredFieldsWarning = true;
 	private boolean _showSubmitButton = true;
 	private String _submitLabel;
+	private boolean _submittable = true;
 
 }

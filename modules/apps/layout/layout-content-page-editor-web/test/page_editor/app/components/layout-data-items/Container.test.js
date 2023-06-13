@@ -19,12 +19,22 @@ import React from 'react';
 import Container from '../../../../../src/main/resources/META-INF/resources/page_editor/app/components/layout-data-items/Container';
 import {LAYOUT_DATA_ITEM_TYPES} from '../../../../../src/main/resources/META-INF/resources/page_editor/app/config/constants/layoutDataItemTypes';
 import {VIEWPORT_SIZES} from '../../../../../src/main/resources/META-INF/resources/page_editor/app/config/constants/viewportSizes';
-import {StoreAPIContextProvider} from '../../../../../src/main/resources/META-INF/resources/page_editor/app/store';
+import {StoreAPIContextProvider} from '../../../../../src/main/resources/META-INF/resources/page_editor/app/contexts/StoreContext';
 
 jest.mock(
 	'../../../../../src/main/resources/META-INF/resources/page_editor/app/config',
 	() => ({
 		config: {
+			commonStyles: [
+				{
+					styles: [
+						{
+							defaultValue: 'left',
+							name: 'textAlign',
+						},
+					],
+				},
+			],
 			frontendTokens: {},
 		},
 	})
@@ -58,14 +68,14 @@ describe('Container', () => {
 	afterEach(cleanup);
 
 	it('wraps the container inside a link if configuration is specified', async () => {
-		const link = renderContainer({
+		const {getByRole} = renderContainer({
 			link: {
 				href: 'https://sandro.vero.victor.com',
 				target: '_blank',
 			},
-		}).getByRole('link');
+		});
 
-		await waitForElement(() => link);
+		const link = await waitForElement(() => getByRole('link'));
 
 		expect(link.href).toBe('https://sandro.vero.victor.com/');
 		expect(link.target).toBe('_blank');

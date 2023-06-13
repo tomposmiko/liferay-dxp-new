@@ -35,6 +35,7 @@ public class CPInstanceSoap implements Serializable {
 	public static CPInstanceSoap toSoapModel(CPInstance model) {
 		CPInstanceSoap soapModel = new CPInstanceSoap();
 
+		soapModel.setMvccVersion(model.getMvccVersion());
 		soapModel.setUuid(model.getUuid());
 		soapModel.setExternalReferenceCode(model.getExternalReferenceCode());
 		soapModel.setCPInstanceId(model.getCPInstanceId());
@@ -80,6 +81,11 @@ public class CPInstanceSoap implements Serializable {
 		soapModel.setDeliveryMaxSubscriptionCycles(
 			model.getDeliveryMaxSubscriptionCycles());
 		soapModel.setUnspsc(model.getUnspsc());
+		soapModel.setDiscontinued(model.isDiscontinued());
+		soapModel.setDiscontinuedDate(model.getDiscontinuedDate());
+		soapModel.setReplacementCPInstanceUuid(
+			model.getReplacementCPInstanceUuid());
+		soapModel.setReplacementCProductId(model.getReplacementCProductId());
 		soapModel.setStatus(model.getStatus());
 		soapModel.setStatusByUserId(model.getStatusByUserId());
 		soapModel.setStatusByUserName(model.getStatusByUserName());
@@ -135,6 +141,14 @@ public class CPInstanceSoap implements Serializable {
 
 	public void setPrimaryKey(long pk) {
 		setCPInstanceId(pk);
+	}
+
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	public void setMvccVersion(long mvccVersion) {
+		_mvccVersion = mvccVersion;
 	}
 
 	public String getUuid() {
@@ -467,6 +481,42 @@ public class CPInstanceSoap implements Serializable {
 		_unspsc = unspsc;
 	}
 
+	public boolean getDiscontinued() {
+		return _discontinued;
+	}
+
+	public boolean isDiscontinued() {
+		return _discontinued;
+	}
+
+	public void setDiscontinued(boolean discontinued) {
+		_discontinued = discontinued;
+	}
+
+	public Date getDiscontinuedDate() {
+		return _discontinuedDate;
+	}
+
+	public void setDiscontinuedDate(Date discontinuedDate) {
+		_discontinuedDate = discontinuedDate;
+	}
+
+	public String getReplacementCPInstanceUuid() {
+		return _replacementCPInstanceUuid;
+	}
+
+	public void setReplacementCPInstanceUuid(String replacementCPInstanceUuid) {
+		_replacementCPInstanceUuid = replacementCPInstanceUuid;
+	}
+
+	public long getReplacementCProductId() {
+		return _replacementCProductId;
+	}
+
+	public void setReplacementCProductId(long replacementCProductId) {
+		_replacementCProductId = replacementCProductId;
+	}
+
 	public int getStatus() {
 		return _status;
 	}
@@ -499,6 +549,7 @@ public class CPInstanceSoap implements Serializable {
 		_statusDate = statusDate;
 	}
 
+	private long _mvccVersion;
 	private String _uuid;
 	private String _externalReferenceCode;
 	private long _CPInstanceId;
@@ -537,6 +588,10 @@ public class CPInstanceSoap implements Serializable {
 	private String _deliverySubscriptionTypeSettings;
 	private long _deliveryMaxSubscriptionCycles;
 	private String _unspsc;
+	private boolean _discontinued;
+	private Date _discontinuedDate;
+	private String _replacementCPInstanceUuid;
+	private long _replacementCProductId;
 	private int _status;
 	private long _statusByUserId;
 	private String _statusByUserName;

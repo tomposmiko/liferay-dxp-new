@@ -15,6 +15,7 @@
 package com.liferay.layout.page.template.service;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.layout.page.template.exception.NoSuchPageTemplateEntryException;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
@@ -28,6 +29,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.LayoutPrototype;
 import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalService;
@@ -35,6 +37,7 @@ import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.change.tracking.CTService;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
+import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -184,6 +187,7 @@ public interface LayoutPageTemplateEntryLocalService
 	 * @throws PortalException
 	 */
 	@Indexable(type = IndexableType.DELETE)
+	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public LayoutPageTemplateEntry deleteLayoutPageTemplateEntry(
 			LayoutPageTemplateEntry layoutPageTemplateEntry)
 		throws PortalException;
@@ -438,6 +442,11 @@ public interface LayoutPageTemplateEntryLocalService
 	public LayoutPageTemplateEntry getLayoutPageTemplateEntry(
 			long layoutPageTemplateEntryId)
 		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public LayoutPageTemplateEntry getLayoutPageTemplateEntry(
+			long groupId, String layoutPageTemplateEntryKey)
+		throws NoSuchPageTemplateEntryException;
 
 	/**
 	 * Returns the layout page template entry matching the UUID and group.

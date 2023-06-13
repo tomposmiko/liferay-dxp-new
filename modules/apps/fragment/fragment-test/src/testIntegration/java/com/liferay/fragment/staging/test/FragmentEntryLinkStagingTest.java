@@ -40,7 +40,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -82,18 +82,15 @@ public class FragmentEntryLinkStagingTest {
 		Map<Locale, String> nameMap = Collections.singletonMap(
 			LocaleUtil.getDefault(), RandomTestUtil.randomString());
 
-		UnicodeProperties typeSettingsUnicodeProperties =
-			new UnicodeProperties();
-
-		typeSettingsUnicodeProperties.put("published", "true");
-
 		_layout = _layoutLocalService.addLayout(
 			TestPropsValues.getUserId(), _liveGroup.getGroupId(), false,
 			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, 0, 0, nameMap, nameMap,
 			Collections.emptyMap(), Collections.emptyMap(),
 			Collections.emptyMap(), LayoutConstants.TYPE_CONTENT,
-			typeSettingsUnicodeProperties.toString(), false, false,
-			Collections.emptyMap(), serviceContext);
+			UnicodePropertiesBuilder.put(
+				"published", "true"
+			).buildString(),
+			false, false, Collections.emptyMap(), 0, serviceContext);
 	}
 
 	@Test

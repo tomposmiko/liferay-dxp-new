@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -40,10 +38,7 @@ import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalServiceUtil;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.CompanyPersistence;
 import com.liferay.portal.kernel.service.persistence.ResourceActionPersistence;
-import com.liferay.portal.kernel.service.persistence.ResourcePermissionFinder;
-import com.liferay.portal.kernel.service.persistence.ResourcePermissionPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -305,6 +300,7 @@ public abstract class ResourceActionLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -323,6 +319,7 @@ public abstract class ResourceActionLocalServiceBaseImpl
 			(ResourceAction)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<ResourceAction> getBasePersistence() {
 		return resourceActionPersistence;
 	}
@@ -442,110 +439,6 @@ public abstract class ResourceActionLocalServiceBaseImpl
 		this.counterLocalService = counterLocalService;
 	}
 
-	/**
-	 * Returns the company local service.
-	 *
-	 * @return the company local service
-	 */
-	public com.liferay.portal.kernel.service.CompanyLocalService
-		getCompanyLocalService() {
-
-		return companyLocalService;
-	}
-
-	/**
-	 * Sets the company local service.
-	 *
-	 * @param companyLocalService the company local service
-	 */
-	public void setCompanyLocalService(
-		com.liferay.portal.kernel.service.CompanyLocalService
-			companyLocalService) {
-
-		this.companyLocalService = companyLocalService;
-	}
-
-	/**
-	 * Returns the company persistence.
-	 *
-	 * @return the company persistence
-	 */
-	public CompanyPersistence getCompanyPersistence() {
-		return companyPersistence;
-	}
-
-	/**
-	 * Sets the company persistence.
-	 *
-	 * @param companyPersistence the company persistence
-	 */
-	public void setCompanyPersistence(CompanyPersistence companyPersistence) {
-		this.companyPersistence = companyPersistence;
-	}
-
-	/**
-	 * Returns the resource permission local service.
-	 *
-	 * @return the resource permission local service
-	 */
-	public com.liferay.portal.kernel.service.ResourcePermissionLocalService
-		getResourcePermissionLocalService() {
-
-		return resourcePermissionLocalService;
-	}
-
-	/**
-	 * Sets the resource permission local service.
-	 *
-	 * @param resourcePermissionLocalService the resource permission local service
-	 */
-	public void setResourcePermissionLocalService(
-		com.liferay.portal.kernel.service.ResourcePermissionLocalService
-			resourcePermissionLocalService) {
-
-		this.resourcePermissionLocalService = resourcePermissionLocalService;
-	}
-
-	/**
-	 * Returns the resource permission persistence.
-	 *
-	 * @return the resource permission persistence
-	 */
-	public ResourcePermissionPersistence getResourcePermissionPersistence() {
-		return resourcePermissionPersistence;
-	}
-
-	/**
-	 * Sets the resource permission persistence.
-	 *
-	 * @param resourcePermissionPersistence the resource permission persistence
-	 */
-	public void setResourcePermissionPersistence(
-		ResourcePermissionPersistence resourcePermissionPersistence) {
-
-		this.resourcePermissionPersistence = resourcePermissionPersistence;
-	}
-
-	/**
-	 * Returns the resource permission finder.
-	 *
-	 * @return the resource permission finder
-	 */
-	public ResourcePermissionFinder getResourcePermissionFinder() {
-		return resourcePermissionFinder;
-	}
-
-	/**
-	 * Sets the resource permission finder.
-	 *
-	 * @param resourcePermissionFinder the resource permission finder
-	 */
-	public void setResourcePermissionFinder(
-		ResourcePermissionFinder resourcePermissionFinder) {
-
-		this.resourcePermissionFinder = resourcePermissionFinder;
-	}
-
 	public void afterPropertiesSet() {
 		persistedModelLocalServiceRegistry.register(
 			"com.liferay.portal.kernel.model.ResourceAction",
@@ -630,30 +523,6 @@ public abstract class ResourceActionLocalServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.CompanyLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.CompanyLocalService
-		companyLocalService;
-
-	@BeanReference(type = CompanyPersistence.class)
-	protected CompanyPersistence companyPersistence;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.ResourcePermissionLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ResourcePermissionLocalService
-		resourcePermissionLocalService;
-
-	@BeanReference(type = ResourcePermissionPersistence.class)
-	protected ResourcePermissionPersistence resourcePermissionPersistence;
-
-	@BeanReference(type = ResourcePermissionFinder.class)
-	protected ResourcePermissionFinder resourcePermissionFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ResourceActionLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

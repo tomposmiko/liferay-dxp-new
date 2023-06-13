@@ -16,7 +16,6 @@ AUI.add(
 	'liferay-scheduler-event-recorder',
 	(A) => {
 		var AArray = A.Array;
-		var AObject = A.Object;
 		var Lang = A.Lang;
 
 		var CalendarWorkflow = Liferay.CalendarWorkflow;
@@ -478,78 +477,6 @@ AUI.add(
 						!!schedulerEvent
 					);
 
-					var idPopoverBB = popoverBB._node.getAttribute('id');
-
-					var focusableElements;
-					var keysPressed = {};
-
-					var setFocusableElemeents = () => {
-						if (!focusableElements) {
-							focusableElements = [
-								...document
-									.getElementById(idPopoverBB)
-									.querySelectorAll(
-										'a[href], button, input:not([type="hidden"]), textarea, select, details, [tabindex]:not([tabindex="-1"])'
-									),
-							].filter(
-								(element) =>
-									!element.hasAttribute('disabled') &&
-									!element.getAttribute('aria-hidden') &&
-									!element.classList.contains('hide')
-							);
-						}
-					};
-
-					popoverBB.delegate(
-						'keydown',
-						(event) => {
-							keysPressed[event.keyCode] = true;
-
-							setFocusableElemeents();
-
-							var lastIndexElem = focusableElements.length - 1;
-							var isTabPressed =
-								event.keyCode === A.Event.KeyMap.TAB ||
-								keysPressed[A.Event.KeyMap.TAB];
-							var isShiftPressed =
-								event.keyCode === A.Event.KeyMap.SHIFT ||
-								keysPressed[A.Event.KeyMap.SHIFT];
-							var isForwardNavigation =
-								isTabPressed && !isShiftPressed;
-							var isBackwardNavigation =
-								isTabPressed && isShiftPressed;
-
-							if (isForwardNavigation) {
-								var isLastFocusableElement =
-									focusableElements &&
-									focusableElements[lastIndexElem] ===
-										event.target._node;
-								if (isLastFocusableElement) {
-									focusableElements[0].focus();
-									event.preventDefault();
-								}
-							}
-							else if (isBackwardNavigation) {
-								var isFirstFocusableElement =
-									focusableElements &&
-									focusableElements[0] === event.target._node;
-								if (isFirstFocusableElement) {
-									focusableElements[lastIndexElem].focus();
-									event.preventDefault();
-								}
-							}
-						},
-						'#' + idPopoverBB
-					);
-
-					popoverBB.delegate(
-						'keyup',
-						(event) => {
-							delete keysPressed[event.keyCode];
-						},
-						'#' + idPopoverBB
-					);
-
 					var calendarContainer = instance.get('calendarContainer');
 
 					var defaultCalendar = calendarContainer.get(
@@ -581,12 +508,12 @@ AUI.add(
 
 					var portletNamespace = instance.get('portletNamespace');
 
-					var eventRecorderCalendar = A.one(
-						'#' + portletNamespace + 'eventRecorderCalendar'
+					var eventRecorderCalendar = document.querySelector(
+						`#${portletNamespace}eventRecorderCalendar`
 					);
 
 					if (eventRecorderCalendar) {
-						eventRecorderCalendar.val(calendarId.toString());
+						eventRecorderCalendar.value = calendarId.toString();
 					}
 
 					instance._syncInvitees();
@@ -659,21 +586,21 @@ AUI.add(
 						return Liferay.Util.escapeHTML(item.name);
 					});
 
-					contentNode = A.one(contentNode);
+					contentNode = document.querySelector(contentNode);
 
-					var messageNode = contentNode.one(
+					var messageNode = contentNode.querySelector(
 						'.calendar-portlet-invitees'
 					);
 
 					var messageHTML = '&mdash;';
 
 					if (values.length > 0) {
-						contentNode.show();
+						contentNode.style.display = '';
 
 						messageHTML = values.join(STR_COMMA_SPACE);
 					}
 
-					messageNode.html(messageHTML);
+					messageNode.innerHTML = messageHTML;
 				},
 
 				getTemplateData() {
@@ -702,7 +629,8 @@ AUI.add(
 						arguments
 					);
 
-					return A.merge(templateData, {
+					return {
+						...templateData,
 						acceptLinkEnabled: instance._hasWorkflowStatusPermission(
 							schedulerEvent,
 							CalendarWorkflow.STATUS_APPROVED
@@ -712,7 +640,7 @@ AUI.add(
 							'availableCalendars'
 						),
 						calendar,
-						calendarIds: AObject.keys(
+						calendarIds: Object.keys(
 							calendarContainer.get('availableCalendars')
 						),
 						declineLinkEnabled: instance._hasWorkflowStatusPermission(
@@ -733,7 +661,7 @@ AUI.add(
 						startTime: templateData.startDate,
 						status: schedulerEvent.get('status'),
 						workflowStatus: CalendarWorkflow,
-					});
+					};
 				},
 
 				getUpdatedSchedulerEvent(optAttrMap) {
@@ -761,7 +689,7 @@ AUI.add(
 
 					return SchedulerEventRecorder.superclass.getUpdatedSchedulerEvent.call(
 						instance,
-						A.merge(attrMap, optAttrMap)
+						{...attrMap, ...optAttrMap}
 					);
 				},
 
@@ -818,8 +746,7 @@ AUI.add(
 						[
 							{
 								cssClass: 'close',
-								labelHTML:
-									'<span aria-label="close">&times;</span>',
+								label: '\u00D7',
 								on: {
 									click: A.bind(
 										instance._handleCancelEvent,

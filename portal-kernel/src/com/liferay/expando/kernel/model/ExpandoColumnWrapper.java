@@ -115,6 +115,11 @@ public class ExpandoColumnWrapper
 		}
 	}
 
+	@Override
+	public ExpandoColumn cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
 	/**
 	 * Returns the column ID of this expando column.
 	 *

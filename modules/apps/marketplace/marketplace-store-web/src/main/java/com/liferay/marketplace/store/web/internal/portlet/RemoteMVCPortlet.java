@@ -15,9 +15,11 @@
 package com.liferay.marketplace.store.web.internal.portlet;
 
 import com.liferay.marketplace.store.web.internal.oauth.util.OAuthManager;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.AuthTokenUtil;
@@ -48,7 +50,6 @@ import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
-import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
@@ -106,14 +107,12 @@ public class RemoteMVCPortlet extends MVCPortlet {
 
 		oAuthManager.deleteAccessToken(themeDisplay.getUser());
 
-		LiferayPortletResponse liferayPortletResponse =
-			PortalUtil.getLiferayPortletResponse(actionResponse);
-
-		PortletURL portletURL = liferayPortletResponse.createRenderURL();
-
-		portletURL.setParameter("mvcPath", "/view.jsp");
-
-		actionResponse.sendRedirect(portletURL.toString());
+		actionResponse.sendRedirect(
+			PortletURLBuilder.createRenderURL(
+				PortalUtil.getLiferayPortletResponse(actionResponse)
+			).setMVCPath(
+				"/view.jsp"
+			).buildString());
 	}
 
 	@Override
@@ -134,6 +133,9 @@ public class RemoteMVCPortlet extends MVCPortlet {
 			return;
 		}
 		catch (NoSuchMethodException noSuchMethodException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(noSuchMethodException, noSuchMethodException);
+			}
 		}
 
 		try {
@@ -449,5 +451,8 @@ public class RemoteMVCPortlet extends MVCPortlet {
 	}
 
 	protected OAuthManager oAuthManager;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		RemoteMVCPortlet.class);
 
 }

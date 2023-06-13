@@ -18,7 +18,7 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.mail.kernel.model.MailMessage;
 import com.liferay.petra.mail.MailEngine;
 import com.liferay.petra.reflect.ReflectionUtil;
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.test.ReloadURLClassLoader;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.Time;
@@ -34,12 +34,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import java.net.URL;
-import java.net.URLClassLoader;
-
-import java.security.CodeSource;
-import java.security.ProtectionDomain;
-
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -47,7 +41,6 @@ import javax.mail.internet.InternetAddress;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -89,7 +82,6 @@ public class MailEngineTest {
 		Assert.assertEquals(mailMessages.toString(), 1, mailMessages.size());
 	}
 
-	@Ignore
 	@Test
 	public void testSendMailWithLimit() throws Throwable {
 		MailMessage mailMessage = new MailMessage(
@@ -174,14 +166,8 @@ public class MailEngineTest {
 				PropsKeys.DATA_LIMIT_MAIL_MESSAGE_MAX_PERIOD,
 				String.valueOf(maxMailMessagePeriod));
 
-			ProtectionDomain protectionDomain =
-				MailEngine.class.getProtectionDomain();
-
-			CodeSource codeSource = protectionDomain.getCodeSource();
-
-			ClassLoader classLoader = new URLClassLoader(
-				new URL[] {codeSource.getLocation()},
-				PortalException.class.getClassLoader());
+			ClassLoader classLoader = new ReloadURLClassLoader(
+				MailEngine.class);
 
 			Class<?> clazz = classLoader.loadClass(MailEngine.class.getName());
 

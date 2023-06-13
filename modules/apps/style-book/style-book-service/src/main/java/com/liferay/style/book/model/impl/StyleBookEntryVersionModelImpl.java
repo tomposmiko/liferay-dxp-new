@@ -34,6 +34,7 @@ import com.liferay.style.book.model.StyleBookEntryVersionModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -272,133 +273,155 @@ public class StyleBookEntryVersionModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, StyleBookEntryVersion>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			StyleBookEntryVersion.class.getClassLoader(),
+			StyleBookEntryVersion.class, ModelWrapper.class);
+
+		try {
+			Constructor<StyleBookEntryVersion> constructor =
+				(Constructor<StyleBookEntryVersion>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<StyleBookEntryVersion, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<StyleBookEntryVersion, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<StyleBookEntryVersion, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<StyleBookEntryVersion, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", StyleBookEntryVersion::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", StyleBookEntryVersion::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"styleBookEntryVersionId",
-			StyleBookEntryVersion::getStyleBookEntryVersionId);
-		attributeGetterFunctions.put(
-			"version", StyleBookEntryVersion::getVersion);
-		attributeGetterFunctions.put("uuid", StyleBookEntryVersion::getUuid);
-		attributeGetterFunctions.put(
-			"styleBookEntryId", StyleBookEntryVersion::getStyleBookEntryId);
-		attributeGetterFunctions.put(
-			"groupId", StyleBookEntryVersion::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", StyleBookEntryVersion::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", StyleBookEntryVersion::getUserId);
-		attributeGetterFunctions.put(
-			"userName", StyleBookEntryVersion::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", StyleBookEntryVersion::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", StyleBookEntryVersion::getModifiedDate);
-		attributeGetterFunctions.put(
-			"defaultStyleBookEntry",
-			StyleBookEntryVersion::getDefaultStyleBookEntry);
-		attributeGetterFunctions.put(
-			"frontendTokensValues",
-			StyleBookEntryVersion::getFrontendTokensValues);
-		attributeGetterFunctions.put("name", StyleBookEntryVersion::getName);
-		attributeGetterFunctions.put(
-			"previewFileEntryId", StyleBookEntryVersion::getPreviewFileEntryId);
-		attributeGetterFunctions.put(
-			"styleBookEntryKey", StyleBookEntryVersion::getStyleBookEntryKey);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<StyleBookEntryVersion, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<StyleBookEntryVersion, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<StyleBookEntryVersion, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", StyleBookEntryVersion::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<StyleBookEntryVersion, Long>)
 				StyleBookEntryVersion::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", StyleBookEntryVersion::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<StyleBookEntryVersion, Long>)
 				StyleBookEntryVersion::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"styleBookEntryVersionId",
+			StyleBookEntryVersion::getStyleBookEntryVersionId);
 		attributeSetterBiConsumers.put(
 			"styleBookEntryVersionId",
 			(BiConsumer<StyleBookEntryVersion, Long>)
 				StyleBookEntryVersion::setStyleBookEntryVersionId);
+		attributeGetterFunctions.put(
+			"version", StyleBookEntryVersion::getVersion);
 		attributeSetterBiConsumers.put(
 			"version",
 			(BiConsumer<StyleBookEntryVersion, Integer>)
 				StyleBookEntryVersion::setVersion);
+		attributeGetterFunctions.put("uuid", StyleBookEntryVersion::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<StyleBookEntryVersion, String>)
 				StyleBookEntryVersion::setUuid);
+		attributeGetterFunctions.put(
+			"styleBookEntryId", StyleBookEntryVersion::getStyleBookEntryId);
 		attributeSetterBiConsumers.put(
 			"styleBookEntryId",
 			(BiConsumer<StyleBookEntryVersion, Long>)
 				StyleBookEntryVersion::setStyleBookEntryId);
+		attributeGetterFunctions.put(
+			"groupId", StyleBookEntryVersion::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<StyleBookEntryVersion, Long>)
 				StyleBookEntryVersion::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", StyleBookEntryVersion::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<StyleBookEntryVersion, Long>)
 				StyleBookEntryVersion::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", StyleBookEntryVersion::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<StyleBookEntryVersion, Long>)
 				StyleBookEntryVersion::setUserId);
+		attributeGetterFunctions.put(
+			"userName", StyleBookEntryVersion::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<StyleBookEntryVersion, String>)
 				StyleBookEntryVersion::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", StyleBookEntryVersion::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<StyleBookEntryVersion, Date>)
 				StyleBookEntryVersion::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", StyleBookEntryVersion::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<StyleBookEntryVersion, Date>)
 				StyleBookEntryVersion::setModifiedDate);
+		attributeGetterFunctions.put(
+			"defaultStyleBookEntry",
+			StyleBookEntryVersion::getDefaultStyleBookEntry);
 		attributeSetterBiConsumers.put(
 			"defaultStyleBookEntry",
 			(BiConsumer<StyleBookEntryVersion, Boolean>)
 				StyleBookEntryVersion::setDefaultStyleBookEntry);
+		attributeGetterFunctions.put(
+			"frontendTokensValues",
+			StyleBookEntryVersion::getFrontendTokensValues);
 		attributeSetterBiConsumers.put(
 			"frontendTokensValues",
 			(BiConsumer<StyleBookEntryVersion, String>)
 				StyleBookEntryVersion::setFrontendTokensValues);
+		attributeGetterFunctions.put("name", StyleBookEntryVersion::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<StyleBookEntryVersion, String>)
 				StyleBookEntryVersion::setName);
+		attributeGetterFunctions.put(
+			"previewFileEntryId", StyleBookEntryVersion::getPreviewFileEntryId);
 		attributeSetterBiConsumers.put(
 			"previewFileEntryId",
 			(BiConsumer<StyleBookEntryVersion, Long>)
 				StyleBookEntryVersion::setPreviewFileEntryId);
+		attributeGetterFunctions.put(
+			"styleBookEntryKey", StyleBookEntryVersion::getStyleBookEntryKey);
 		attributeSetterBiConsumers.put(
 			"styleBookEntryKey",
 			(BiConsumer<StyleBookEntryVersion, String>)
 				StyleBookEntryVersion::setStyleBookEntryKey);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -894,6 +917,49 @@ public class StyleBookEntryVersionModelImpl
 	}
 
 	@Override
+	public StyleBookEntryVersion cloneWithOriginalValues() {
+		StyleBookEntryVersionImpl styleBookEntryVersionImpl =
+			new StyleBookEntryVersionImpl();
+
+		styleBookEntryVersionImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		styleBookEntryVersionImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		styleBookEntryVersionImpl.setStyleBookEntryVersionId(
+			this.<Long>getColumnOriginalValue("styleBookEntryVersionId"));
+		styleBookEntryVersionImpl.setVersion(
+			this.<Integer>getColumnOriginalValue("version"));
+		styleBookEntryVersionImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		styleBookEntryVersionImpl.setStyleBookEntryId(
+			this.<Long>getColumnOriginalValue("styleBookEntryId"));
+		styleBookEntryVersionImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		styleBookEntryVersionImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		styleBookEntryVersionImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		styleBookEntryVersionImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		styleBookEntryVersionImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		styleBookEntryVersionImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		styleBookEntryVersionImpl.setDefaultStyleBookEntry(
+			this.<Boolean>getColumnOriginalValue("defaultStyleBookEntry"));
+		styleBookEntryVersionImpl.setFrontendTokensValues(
+			this.<String>getColumnOriginalValue("frontendTokensValues"));
+		styleBookEntryVersionImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		styleBookEntryVersionImpl.setPreviewFileEntryId(
+			this.<Long>getColumnOriginalValue("previewFileEntryId"));
+		styleBookEntryVersionImpl.setStyleBookEntryKey(
+			this.<String>getColumnOriginalValue("styleBookEntryKey"));
+
+		return styleBookEntryVersionImpl;
+	}
+
+	@Override
 	public int compareTo(StyleBookEntryVersion styleBookEntryVersion) {
 		int value = 0;
 
@@ -1153,9 +1219,7 @@ public class StyleBookEntryVersionModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, StyleBookEntryVersion>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					StyleBookEntryVersion.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

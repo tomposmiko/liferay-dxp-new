@@ -34,8 +34,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -396,6 +394,7 @@ public abstract class KaleoProcessLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -414,6 +413,7 @@ public abstract class KaleoProcessLocalServiceBaseImpl
 			(KaleoProcess)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<KaleoProcess> getBasePersistence() {
 		return kaleoProcessPersistence;
 	}
@@ -613,14 +613,6 @@ public abstract class KaleoProcessLocalServiceBaseImpl
 		counterLocalService;
 
 	@Reference
-	protected com.liferay.dynamic.data.lists.service.DDLRecordLocalService
-		ddlRecordLocalService;
-
-	@Reference
-	protected com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService
-		ddlRecordSetLocalService;
-
-	@Reference
 	protected com.liferay.portal.kernel.service.ClassNameLocalService
 		classNameLocalService;
 
@@ -631,17 +623,5 @@ public abstract class KaleoProcessLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	@Reference
-	protected
-		com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService
-			workflowDefinitionLinkLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
-		workflowInstanceLinkLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		KaleoProcessLocalServiceBaseImpl.class);
 
 }

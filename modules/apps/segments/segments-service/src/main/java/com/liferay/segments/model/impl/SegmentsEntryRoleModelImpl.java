@@ -33,6 +33,7 @@ import com.liferay.segments.model.SegmentsEntryRoleModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -227,85 +228,107 @@ public class SegmentsEntryRoleModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, SegmentsEntryRole>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			SegmentsEntryRole.class.getClassLoader(), SegmentsEntryRole.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<SegmentsEntryRole> constructor =
+				(Constructor<SegmentsEntryRole>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<SegmentsEntryRole, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<SegmentsEntryRole, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<SegmentsEntryRole, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<SegmentsEntryRole, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", SegmentsEntryRole::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", SegmentsEntryRole::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"segmentsEntryRoleId", SegmentsEntryRole::getSegmentsEntryRoleId);
-		attributeGetterFunctions.put(
-			"companyId", SegmentsEntryRole::getCompanyId);
-		attributeGetterFunctions.put("userId", SegmentsEntryRole::getUserId);
-		attributeGetterFunctions.put(
-			"userName", SegmentsEntryRole::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", SegmentsEntryRole::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", SegmentsEntryRole::getModifiedDate);
-		attributeGetterFunctions.put(
-			"segmentsEntryId", SegmentsEntryRole::getSegmentsEntryId);
-		attributeGetterFunctions.put("roleId", SegmentsEntryRole::getRoleId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<SegmentsEntryRole, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<SegmentsEntryRole, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<SegmentsEntryRole, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", SegmentsEntryRole::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<SegmentsEntryRole, Long>)
 				SegmentsEntryRole::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", SegmentsEntryRole::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<SegmentsEntryRole, Long>)
 				SegmentsEntryRole::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"segmentsEntryRoleId", SegmentsEntryRole::getSegmentsEntryRoleId);
 		attributeSetterBiConsumers.put(
 			"segmentsEntryRoleId",
 			(BiConsumer<SegmentsEntryRole, Long>)
 				SegmentsEntryRole::setSegmentsEntryRoleId);
+		attributeGetterFunctions.put(
+			"companyId", SegmentsEntryRole::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<SegmentsEntryRole, Long>)
 				SegmentsEntryRole::setCompanyId);
+		attributeGetterFunctions.put("userId", SegmentsEntryRole::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<SegmentsEntryRole, Long>)SegmentsEntryRole::setUserId);
+		attributeGetterFunctions.put(
+			"userName", SegmentsEntryRole::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<SegmentsEntryRole, String>)
 				SegmentsEntryRole::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", SegmentsEntryRole::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<SegmentsEntryRole, Date>)
 				SegmentsEntryRole::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", SegmentsEntryRole::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<SegmentsEntryRole, Date>)
 				SegmentsEntryRole::setModifiedDate);
+		attributeGetterFunctions.put(
+			"segmentsEntryId", SegmentsEntryRole::getSegmentsEntryId);
 		attributeSetterBiConsumers.put(
 			"segmentsEntryId",
 			(BiConsumer<SegmentsEntryRole, Long>)
 				SegmentsEntryRole::setSegmentsEntryId);
+		attributeGetterFunctions.put("roleId", SegmentsEntryRole::getRoleId);
 		attributeSetterBiConsumers.put(
 			"roleId",
 			(BiConsumer<SegmentsEntryRole, Long>)SegmentsEntryRole::setRoleId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -570,6 +593,35 @@ public class SegmentsEntryRoleModelImpl
 	}
 
 	@Override
+	public SegmentsEntryRole cloneWithOriginalValues() {
+		SegmentsEntryRoleImpl segmentsEntryRoleImpl =
+			new SegmentsEntryRoleImpl();
+
+		segmentsEntryRoleImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		segmentsEntryRoleImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		segmentsEntryRoleImpl.setSegmentsEntryRoleId(
+			this.<Long>getColumnOriginalValue("segmentsEntryRoleId"));
+		segmentsEntryRoleImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		segmentsEntryRoleImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		segmentsEntryRoleImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		segmentsEntryRoleImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		segmentsEntryRoleImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		segmentsEntryRoleImpl.setSegmentsEntryId(
+			this.<Long>getColumnOriginalValue("segmentsEntryId"));
+		segmentsEntryRoleImpl.setRoleId(
+			this.<Long>getColumnOriginalValue("roleId"));
+
+		return segmentsEntryRoleImpl;
+	}
+
+	@Override
 	public int compareTo(SegmentsEntryRole segmentsEntryRole) {
 		long primaryKey = segmentsEntryRole.getPrimaryKey();
 
@@ -771,9 +823,7 @@ public class SegmentsEntryRoleModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, SegmentsEntryRole>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					SegmentsEntryRole.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

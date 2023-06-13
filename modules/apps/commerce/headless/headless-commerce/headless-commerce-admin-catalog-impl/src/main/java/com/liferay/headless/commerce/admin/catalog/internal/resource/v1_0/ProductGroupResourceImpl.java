@@ -76,11 +76,11 @@ public class ProductGroupResourceImpl
 
 		CommercePricingClass commercePricingClass =
 			_commercePricingClassService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (commercePricingClass == null) {
 			throw new NoSuchPricingClassException(
-				"Unable to find Product Group with externalReferenceCode: " +
+				"Unable to find product group with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -107,11 +107,11 @@ public class ProductGroupResourceImpl
 
 		CommercePricingClass commercePricingClass =
 			_commercePricingClassService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (commercePricingClass == null) {
 			throw new NoSuchPricingClassException(
-				"Unable to find Product Group with externalReferenceCode: " +
+				"Unable to find product group with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -126,7 +126,7 @@ public class ProductGroupResourceImpl
 
 		return SearchUtil.search(
 			null, booleanQuery -> booleanQuery.getPreBooleanFilter(), filter,
-			CommercePricingClass.class, search, pagination,
+			CommercePricingClass.class.getName(), search, pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
 			new UnsafeConsumer() {
@@ -163,11 +163,11 @@ public class ProductGroupResourceImpl
 
 		CommercePricingClass commercePricingClass =
 			_commercePricingClassService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (commercePricingClass == null) {
 			throw new NoSuchPricingClassException(
-				"Unable to find Product Group with externalReferenceCode: " +
+				"Unable to find product group with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -194,11 +194,10 @@ public class ProductGroupResourceImpl
 		throws Exception {
 
 		CommercePricingClass commercePricingClass =
-			_commercePricingClassService.upsertCommercePricingClass(
-				0L, contextUser.getUserId(),
+			_commercePricingClassService.addOrUpdateCommercePricingClass(
+				productGroup.getExternalReferenceCode(), 0L,
 				LanguageUtils.getLocalizedMap(productGroup.getTitle()),
 				LanguageUtils.getLocalizedMap(productGroup.getDescription()),
-				productGroup.getExternalReferenceCode(),
 				_serviceContextHelper.getServiceContext());
 
 		// Update nested resources
@@ -233,10 +232,11 @@ public class ProductGroupResourceImpl
 
 				if (cProduct == null) {
 					cProduct =
-						_cProductLocalService.fetchCProductByReferenceCode(
-							contextCompany.getCompanyId(),
-							productGroupProduct.
-								getProductExternalReferenceCode());
+						_cProductLocalService.
+							fetchCProductByExternalReferenceCode(
+								contextCompany.getCompanyId(),
+								productGroupProduct.
+									getProductExternalReferenceCode());
 				}
 
 				if (cProduct == null) {
@@ -244,7 +244,7 @@ public class ProductGroupResourceImpl
 						productGroupProduct.getProductExternalReferenceCode();
 
 					throw new NoSuchCProductException(
-						"Unable to find Product with externalReferenceCode: " +
+						"Unable to find product with external reference code " +
 							productExternalReferenceCode);
 				}
 
@@ -279,7 +279,6 @@ public class ProductGroupResourceImpl
 		commercePricingClass =
 			_commercePricingClassService.updateCommercePricingClass(
 				commercePricingClass.getCommercePricingClassId(),
-				commercePricingClass.getUserId(),
 				LanguageUtils.getLocalizedMap(productGroup.getTitle()),
 				LanguageUtils.getLocalizedMap(productGroup.getDescription()),
 				_serviceContextHelper.getServiceContext());

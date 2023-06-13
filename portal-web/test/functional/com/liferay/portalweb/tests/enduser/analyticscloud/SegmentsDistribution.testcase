@@ -1,7 +1,6 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
-	property custom.properties = "jsonws.web.service.paths.excludes=";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
@@ -47,7 +46,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -60,8 +59,19 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8626 | Test Summary: Segment distribution chart can be filtered by date property"
-	@priority = 5
+	@ignore = "true"
+	@priority = "5"
 	test CanDistributionChartFilteredDateProperty {
+		property portal.upstream = "quarantine";
+
+		// It is not possible to check the percentage at the end of the test because of the bug
+		// AC Bug ticket: LRAC-9383
+		// AC Refactor ticket: LRAC-9397
+
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
 		task ("View AC Page as new user") {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "userea@liferay.com",
@@ -77,7 +87,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add a new static segment") {
@@ -87,7 +97,7 @@ definition {
 		}
 
 		task ("Type the segment name") {
-			ACUtils.setItemName(itemName = "Static Segment Test");
+			ACSegments.nameSegment(segmentName = "Static Segment Test");
 		}
 
 		task ("Add new user as member") {
@@ -109,19 +119,26 @@ definition {
 		}
 
 		task ("View Chart Entry") {
+
+			// It is not possible to check the percentage at the end of the test because of the bug
+
 			ACSegments.viewBreakdownChartsEntry(key_entry = "1986-05-31T00:00:00.000Z - 100.0%");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8627 | Test Summary: Segment distribution chart can be filtered by number property"
 	@ignore = "true"
-	@priority = 3
+	@priority = "3"
 	test CanDistributionChartFilteredNumber {
 		property portal.upstream = "quarantine";
 
 		// AC Refactor: Chart fails to appear when filtering with a number property.
 		// AC Refactor ticket: LRAC-9328
 		// AC Bug ticekt: LRAC-9329
+
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
 		task ("View AC Page as new user") {
 			User.logoutAndLoginPG(
@@ -138,7 +155,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add CSV Data Source") {
@@ -160,7 +177,7 @@ definition {
 		}
 
 		task ("Type the segment name") {
-			ACUtils.setItemName(itemName = "Static Segment Test");
+			ACSegments.nameSegment(segmentName = "Static Segment Test");
 		}
 
 		task ("Add new user as member") {
@@ -190,9 +207,18 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8628 | Test Summary: Segment distribution chart can be filtered by text property"
-	@priority = 3
+	@ignore = "true"
+	@priority = "3"
 	test CanDistributionChartFilteredText {
 		property portal.upstream = "quarantine";
+
+		// AC Refactor: Chart fails to appear the right percentage when filtering with a givenName property.
+		// AC Refactor ticket: LRAC-9387
+		// AC Bug ticekt: LRAC-9383
+
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
 		task ("View AC Page as new user") {
 			User.logoutAndLoginPG(
@@ -209,7 +235,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add a new static segment") {
@@ -219,7 +245,7 @@ definition {
 		}
 
 		task ("Type the segment name") {
-			ACUtils.setItemName(itemName = "Static Segment Test");
+			ACSegments.nameSegment(segmentName = "Static Segment Test");
 		}
 
 		task ("Add new user as member") {
@@ -241,12 +267,15 @@ definition {
 		}
 
 		task ("View Chart Entry") {
+
+			// Test will fail here because the percentage is wrong
+
 			ACSegments.viewBreakdownChartsEntry(key_entry = "userfn - 100.0%");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8625 | Test Summary: Search the Segment Profile Distribution"
-	@priority = 3
+	@priority = "3"
 	test CanSearchTheSegmentProfileDistribution {
 		property portal.upstream = "quarantine";
 
@@ -254,14 +283,18 @@ definition {
 		var emailList = "ac@liferay.com,dxp@liferay.com,userea@liferay.com";
 		var nameList = "ac ac,dxp dxp,userfn userln";
 
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
 		task ("Create new users") {
-			for (var userCreate : list ${userList}) {
+			for (var userCreate : list "${userList}") {
 				JSONUser.addUser(
 					jobTitle = "QA",
 					userEmailAddress = "${userCreate}@liferay.com",
-					userFirstName = ${userCreate},
-					userLastName = ${userCreate},
-					userScreenName = ${userCreate});
+					userFirstName = "${userCreate}",
+					userLastName = "${userCreate}",
+					userScreenName = "${userCreate}");
 			}
 		}
 
@@ -269,7 +302,7 @@ definition {
 
 		task ("View AC Page as new user") {
 			ACUtils.navigateToSitePageWithUser(
-				emailList = ${emailList},
+				emailList = "${emailList}",
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -277,7 +310,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add a new static segment") {
@@ -287,11 +320,11 @@ definition {
 		}
 
 		task ("Type the segment name") {
-			ACUtils.setItemName(itemName = "Static Segment Test");
+			ACSegments.nameSegment(segmentName = "Static Segment Test");
 		}
 
 		task ("Add new user as member") {
-			ACSegments.addStaticMultiMember(tableMember = ${nameList});
+			ACSegments.addStaticMultiMember(tableMember = "${nameList}");
 
 			ACSegments.saveSegment();
 		}
@@ -313,7 +346,7 @@ definition {
 		}
 
 		task ("Assert that a right word will be found") {
-			for (var userSearch : list ${userList}) {
+			for (var userSearch : list "${userList}") {
 				ACSegments.searchTheSegmentProfile(searchTerm = "${userSearch} ${userSearch}");
 
 				ACInterests.viewIndividualInterestSpecificOrder(interestTopic = "${userSearch} ${userSearch}");
@@ -328,29 +361,28 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8624 | Test Summary: Order the Segment Profile Distribution"
-	@priority = 3
+	@priority = "3"
 	test OrderSegmentProfileDistribution {
 		var userList = "ac,liferay";
 		var emailList = "ac@liferay.com,liferay@liferay.com";
 		var nameList = "ac ac,liferay liferay";
+
+		task ("Connect Analytics Cloud to DXP") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
 		task ("Create page") {
 			ACUtils.addPage(layoutName = "AC Page");
 		}
 
 		task ("Add two new users") {
-			for (var name : list ${userList}) {
+			for (var name : list "${userList}") {
 				JSONUser.addUser(
 					jobTitle = "QA",
 					userEmailAddress = "${name}@liferay.com",
-					userFirstName = ${name},
-					userLastName = ${name},
-					userScreenName = ${name});
-
-				JSONUser.setFirstPassword(
-					agreeToTermsAndAnswerReminderQuery = "true",
-					requireReset = "false",
-					userEmailAddress = "${name}@liferay.com");
+					userFirstName = "${name}",
+					userLastName = "${name}",
+					userScreenName = "${name}");
 			}
 
 			ACDXPSettings.syncNewContactData();
@@ -358,7 +390,7 @@ definition {
 
 		task ("Login with the users and open the site") {
 			ACUtils.navigateToSitePageWithUser(
-				emailList = ${emailList},
+				emailList = "${emailList}",
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -368,7 +400,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add a new static segment") {
@@ -378,11 +410,11 @@ definition {
 		}
 
 		task ("Type the segment name") {
-			ACUtils.setItemName(itemName = "Static Segment Test");
+			ACSegments.nameSegment(segmentName = "Static Segment Test");
 		}
 
 		task ("Add new user as member") {
-			ACSegments.addStaticMultiMember(tableMember = ${nameList});
+			ACSegments.addStaticMultiMember(tableMember = "${nameList}");
 
 			ACSegments.saveSegment();
 		}

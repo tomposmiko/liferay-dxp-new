@@ -23,9 +23,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -56,6 +54,10 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface TaxonomyVocabularyResource {
 
+	public static Builder builder() {
+		return FactoryHolder.factory.create();
+	}
+
 	public Page<TaxonomyVocabulary> getAssetLibraryTaxonomyVocabulariesPage(
 			Long assetLibraryId, String search, Filter filter,
 			Pagination pagination, Sort[] sorts)
@@ -69,6 +71,17 @@ public interface TaxonomyVocabularyResource {
 			Long assetLibraryId, String callbackURL, Object object)
 		throws Exception;
 
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getAssetLibraryTaxonomyVocabularyPermissionsPage(
+				Long assetLibraryId, String roleNames)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			putAssetLibraryTaxonomyVocabularyPermissionsPage(
+				Long assetLibraryId,
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
+		throws Exception;
+
 	public Page<TaxonomyVocabulary> getSiteTaxonomyVocabulariesPage(
 			Long siteId, String search, Filter filter, Pagination pagination,
 			Sort[] sorts)
@@ -80,6 +93,30 @@ public interface TaxonomyVocabularyResource {
 
 	public Response postSiteTaxonomyVocabularyBatch(
 			Long siteId, String callbackURL, Object object)
+		throws Exception;
+
+	public void deleteSiteTaxonomyVocabularyByExternalReferenceCode(
+			Long siteId, String externalReferenceCode)
+		throws Exception;
+
+	public TaxonomyVocabulary getSiteTaxonomyVocabularyByExternalReferenceCode(
+			Long siteId, String externalReferenceCode)
+		throws Exception;
+
+	public TaxonomyVocabulary putSiteTaxonomyVocabularyByExternalReferenceCode(
+			Long siteId, String externalReferenceCode,
+			TaxonomyVocabulary taxonomyVocabulary)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getSiteTaxonomyVocabularyPermissionsPage(
+				Long siteId, String roleNames)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			putSiteTaxonomyVocabularyPermissionsPage(
+				Long siteId,
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
 
 	public void deleteTaxonomyVocabulary(Long taxonomyVocabularyId)
@@ -102,6 +139,17 @@ public interface TaxonomyVocabularyResource {
 
 	public Response putTaxonomyVocabularyBatch(
 			String callbackURL, Object object)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			getTaxonomyVocabularyPermissionsPage(
+				Long taxonomyVocabularyId, String roleNames)
+		throws Exception;
+
+	public Page<com.liferay.portal.vulcan.permission.Permission>
+			putTaxonomyVocabularyPermissionsPage(
+				Long taxonomyVocabularyId,
+				com.liferay.portal.vulcan.permission.Permission[] permissions)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(
@@ -141,12 +189,6 @@ public interface TaxonomyVocabularyResource {
 
 	public void setRoleLocalService(RoleLocalService roleLocalService);
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider);
-
-	public void setVulcanBatchEngineImportTaskResource(
-		VulcanBatchEngineImportTaskResource
-			vulcanBatchEngineImportTaskResource);
-
 	public default Filter toFilter(String filterString) {
 		return toFilter(
 			filterString, Collections.<String, List<String>>emptyMap());
@@ -158,8 +200,10 @@ public interface TaxonomyVocabularyResource {
 		return null;
 	}
 
-	public default Sort[] toSorts(String sortsString) {
-		return new Sort[0];
+	public static class FactoryHolder {
+
+		public static volatile Factory factory;
+
 	}
 
 	@ProviderType

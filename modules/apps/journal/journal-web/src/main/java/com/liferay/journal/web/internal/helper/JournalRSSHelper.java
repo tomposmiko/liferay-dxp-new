@@ -30,6 +30,7 @@ import com.liferay.journal.service.JournalFeedLocalService;
 import com.liferay.journal.util.JournalContent;
 import com.liferay.journal.util.comparator.ArticleDisplayDateComparator;
 import com.liferay.journal.util.comparator.ArticleModifiedDateComparator;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -80,7 +81,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletURL;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.portlet.ResourceURL;
@@ -118,8 +118,8 @@ public class JournalRSSHelper {
 
 		Date displayDateGT = null;
 		Date displayDateLT = new Date();
-		int status = WorkflowConstants.STATUS_APPROVED;
 		Date reviewDate = null;
+		int status = WorkflowConstants.STATUS_APPROVED;
 		boolean andOperator = true;
 		int start = 0;
 		int end = feed.getDelta();
@@ -141,7 +141,7 @@ public class JournalRSSHelper {
 			companyId, groupId, folderIds,
 			JournalArticleConstants.CLASS_NAME_ID_DEFAULT, articleId, version,
 			title, description, content, ddmStructureKey, ddmTemplateKey,
-			displayDateGT, displayDateLT, status, reviewDate, andOperator,
+			displayDateGT, displayDateLT, reviewDate, status, andOperator,
 			start, end, orderByComparator);
 	}
 
@@ -362,6 +362,9 @@ public class JournalRSSHelper {
 				feed = _journalFeedLocalService.getFeed(id);
 			}
 			catch (NoSuchFeedException noSuchFeedException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(noSuchFeedException, noSuchFeedException);
+				}
 
 				// Backward compatibility with old URLs
 
@@ -467,7 +470,7 @@ public class JournalRSSHelper {
 		feedURL.setCacheability(ResourceURL.FULL);
 		feedURL.setParameter("groupId", String.valueOf(feed.getGroupId()));
 		feedURL.setParameter("feedId", String.valueOf(feed.getFeedId()));
-		feedURL.setResourceID("rss");
+		feedURL.setResourceID("/journal/rss");
 
 		selfSyndLink.setHref(feedURL.toString());
 
@@ -511,13 +514,14 @@ public class JournalRSSHelper {
 		long plid = _portal.getPlidFromFriendlyURL(
 			feed.getCompanyId(), feed.getTargetLayoutFriendlyUrl());
 
-		PortletURL entryURL = PortletURLFactoryUtil.create(
-			resourceRequest, portletId, plid, PortletRequest.RENDER_PHASE);
-
-		entryURL.setParameter("groupId", String.valueOf(article.getGroupId()));
-		entryURL.setParameter("articleId", article.getArticleId());
-
-		return entryURL.toString();
+		return PortletURLBuilder.create(
+			PortletURLFactoryUtil.create(
+				resourceRequest, portletId, plid, PortletRequest.RENDER_PHASE)
+		).setParameter(
+			"articleId", article.getArticleId()
+		).setParameter(
+			"groupId", article.getGroupId()
+		).buildString();
 	}
 
 	protected Object[] getImageProperties(String url) {

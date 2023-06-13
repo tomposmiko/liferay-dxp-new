@@ -3,15 +3,13 @@
 <#list blogsEntryModels as blogsEntryModel>
 	${dataFactory.toInsertSQL(blogsEntryModel)}
 
-	<#assign friendlyURLEntryModel = dataFactory.newFriendlyURLEntryModel(blogsEntryModel) />
+	<#assign friendlyURLEntryModel = dataFactory.newFriendlyURLEntryModel(blogsEntryModel.groupId, dataFactory.blogsEntryClassNameId, blogsEntryModel.entryId) />
 
 	${dataFactory.toInsertSQL(friendlyURLEntryModel)}
 
-	${dataFactory.toInsertSQL(dataFactory.newFriendlyURLEntryLocalizationModel(friendlyURLEntryModel, blogsEntryModel))}
+	${dataFactory.toInsertSQL(dataFactory.newFriendlyURLEntryLocalizationModel(friendlyURLEntryModel, blogsEntryModel.urlTitle))}
 
 	${dataFactory.toInsertSQL(dataFactory.newFriendlyURLEntryMapping(friendlyURLEntryModel))}
-
-	${dataFactory.toInsertSQL(dataFactory.newMBDiscussionAssetEntryModel(blogsEntryModel))}
 
 	<@insertAssetEntry
 		_categoryAndTag=true

@@ -28,11 +28,11 @@ import com.liferay.document.library.preview.exception.DLPreviewGenerationInProce
 import com.liferay.document.library.preview.exception.DLPreviewSizeException;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.document.library.web.internal.constants.DLWebKeys;
-import com.liferay.document.library.web.internal.display.context.logic.DLPortletInstanceSettingsHelper;
-import com.liferay.document.library.web.internal.display.context.logic.FileEntryDisplayContextHelper;
-import com.liferay.document.library.web.internal.display.context.logic.FileVersionDisplayContextHelper;
+import com.liferay.document.library.web.internal.display.context.helper.DLPortletInstanceSettingsHelper;
+import com.liferay.document.library.web.internal.display.context.helper.DLRequestHelper;
+import com.liferay.document.library.web.internal.display.context.helper.FileEntryDisplayContextHelper;
+import com.liferay.document.library.web.internal.display.context.helper.FileVersionDisplayContextHelper;
 import com.liferay.document.library.web.internal.display.context.logic.UIItemsBuilder;
-import com.liferay.document.library.web.internal.display.context.util.DLRequestHelper;
 import com.liferay.document.library.web.internal.display.context.util.JSPRenderer;
 import com.liferay.document.library.web.internal.helper.DLTrashHelper;
 import com.liferay.dynamic.data.mapping.exception.StorageException;
@@ -201,9 +201,9 @@ public class DefaultDLViewFileVersionDisplayContext
 	public List<ToolbarItem> getToolbarItems() throws PortalException {
 		List<ToolbarItem> toolbarItems = new ArrayList<>();
 
-		_uiItemsBuilder.addDownloadToolbarItem(toolbarItems);
+		_uiItemsBuilder.addCollectDigitalSignatureToolbarItem(toolbarItems);
 
-		_uiItemsBuilder.addOpenInMsOfficeToolbarItem(toolbarItems);
+		_uiItemsBuilder.addDownloadToolbarItem(toolbarItems);
 
 		_uiItemsBuilder.addEditToolbarItem(toolbarItems);
 
@@ -329,6 +329,7 @@ public class DefaultDLViewFileVersionDisplayContext
 		VersioningStrategy versioningStrategy, DLURLHelper dlURLHelper) {
 
 		try {
+			_httpServletRequest = httpServletRequest;
 			_fileVersion = fileVersion;
 			_dlMimeTypeDisplayContext = dlMimeTypeDisplayContext;
 			_resourceBundle = resourceBundle;
@@ -386,15 +387,17 @@ public class DefaultDLViewFileVersionDisplayContext
 
 			_uiItemsBuilder.addViewOriginalFileMenuItem(menuItems);
 
-			_uiItemsBuilder.addOpenInMsOfficeMenuItem(menuItems);
-
 			_uiItemsBuilder.addEditMenuItem(menuItems);
+
+			_uiItemsBuilder.addEditImageItem(menuItems);
 
 			_uiItemsBuilder.addCheckoutMenuItem(menuItems);
 
 			_uiItemsBuilder.addCancelCheckoutMenuItem(menuItems);
 
 			_uiItemsBuilder.addCheckinMenuItem(menuItems);
+
+			_uiItemsBuilder.addCollectDigitalSignatureMenuItem(menuItems);
 
 			_uiItemsBuilder.addMoveMenuItem(menuItems);
 
@@ -489,6 +492,7 @@ public class DefaultDLViewFileVersionDisplayContext
 	private final FileVersion _fileVersion;
 	private final FileVersionDisplayContextHelper
 		_fileVersionDisplayContextHelper;
+	private HttpServletRequest _httpServletRequest;
 	private final ResourceBundle _resourceBundle;
 	private final StorageEngine _storageEngine;
 	private final UIItemsBuilder _uiItemsBuilder;

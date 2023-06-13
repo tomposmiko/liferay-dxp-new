@@ -11,13 +11,13 @@
 
 <tbody>
 <tr>
-	<td>ARTICLE_ID</td>
-	<td>//table[contains(@data-searchcontainerid,'articleVersions')]//td[contains(@class,'lfr-id-column')]</td>
+	<td>ANY_TEXT_INPUT</td>
+	<td>xpath=(//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::input[not(contains(@type,'hidden'))])[${index}]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>AUDIO_BUTTON</td>
-	<td>//a[contains(@title,'Audio')]</td>
+	<td>ARTICLE_ID</td>
+	<td>//table[contains(@data-searchcontainerid,'articleVersions')]//td[contains(@class,'lfr-id-column')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -26,18 +26,46 @@
 	<td></td>
 </tr>
 <tr>
+	<td>COLOR_PICKER</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']/following-sibling::div[contains(@class,'color-picker')]//button[contains(@class,'clay-color-btn')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CONTENT_CONTAINER</td>
-	<td>//div[contains(@class,'container-view')]</td>
+	<td>//div[contains(@class,'contextual-sidebar-content')]//div[contains(@class,'container-view')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>DATE_INPUT</td>
-	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'form-group')]//input[@type='text']</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'date-picker')]//input[@type='text']</td>
 	<td></td>
 </tr>
-
+<tr>
+	<td>ENTRY_LIST_AUTHOR</td>
+	<td>//li[contains(.,'${key_entryTitle}')]//span[contains(.,'${key_entryAuthor}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>HELP_TEXT</td>
+	<td>//div[contains(@class,'form-group')]//span[contains(@class,'form-text') and contains(text(),'${value1}')] | //div[contains(@data-field-name,'${key_fieldName}')]//p[@class='liferay-ddm-form-field-tip'] | //div[contains(@data-field-name,'${key_fieldName}')]//span[contains(@class, 'form-text')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FIELD_REQUIRED_ALERT</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']/following-sibling::span[contains(@class,'form-feedback-group')]//div[contains(@class,'form-feedback-item')] | //legend[normalize-space(text())='${key_fieldFieldLabel}']/following-sibling::span[contains(@class,'form-feedback-group')]//div[contains(@class,'form-feedback-item')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>GRID_OPTION</td>
+	<td>//legend[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div//tbody/tr[${key_row}]/td[${key_column}]//input</td>
+	<td></td>
+</tr>
+<tr>
+	<td>IMAGE_PICKER_PREVIEW</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'image-picker-preview')]//img[contains(@src,'${key_image}')]</td>
+	<td></td>
+</tr>
 <!--SIDEBAR-->
-
 <tr>
 	<td>DEFAULT_LANGUAGE</td>
 	<td>//div[contains(@class,'article-default-language')]//p[normalize-space()='Default Language: ${defaultLanguage}']</td>
@@ -54,13 +82,18 @@
 	<td></td>
 </tr>
 <tr>
-	<td>PREVIEW_TEMPLATE</td>
-	<td>//button[contains(@id,'previewWithTemplate')]</td>
+	<td>FEATURED_IMAGE_URL_INPUT</td>
+	<td>//div[contains(@class,'input-String-wrapper')]/input[contains(@id,'URL')]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>FEATURED_IMAGE_URL_INPUT</td>
-	<td>//div[contains(@class,'input-String-wrapper')]/input[contains(@id,'URL')]</td>
+	<td>IMAGE_DESCRIPTION</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']/following-sibling::div[contains(@class,'form-group')]//input[contains(@name,'description')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECT_BUTTON_2</td>
+	<td>xpath=(//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'form')]//button[normalize-space()='Select'])[2]</td>
 	<td></td>
 </tr>
 <tr>
@@ -69,13 +102,13 @@
 	<td></td>
 </tr>
 <tr>
-	<td>SELECT_STRUCTURE</td>
-	<td>//button[contains(.,'Select')]/span</td>
+	<td>SELECT_FEATURED_IMAGE_INPUT</td>
+	<td>//div[contains(@id,'smallFileContainer')]//input[contains(@id,'smallFile')]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>SELECT_TEMPLATE</td>
-	<td>//button[contains(@id,'selectDDMTemplate')]</td>
+	<td>SELECT_FIELD_TRIGGER</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'select-field')]//div[contains(@class,'select-field-trigger')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -89,13 +122,23 @@
 	<td></td>
 </tr>
 <tr>
-	<td>SELECTED_TEMPLATE</td>
-	<td>//input[contains(@id,'TemplateName')]</td>
+	<td>SELECTION_OPTION</td>
+	<td>//legend[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div//input//following-sibling::span[normalize-space()='${key_optionValue}']//preceding-sibling::input</td>
 	<td></td>
 </tr>
 <tr>
-	<td>TEXT_INPUT_FIELD</td>
-	<td>//div[label[normalize-space(text())='${key_fieldLabel}']]//input[@type='text']</td>
+	<td>SOURCE_BUTTON</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div//a[contains(@class,'cke_button') and contains(@class,'source')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TEXT_INPUT</td>
+	<td>//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::input</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TEXT_INPUT_2</td>
+	<td>//div[@class="ddm-field"][2]//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::input</td>
 	<td></td>
 </tr>
 <tr>
@@ -128,9 +171,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--VIEW_HISTORY-->
-
 <tr>
 	<td>VIEW_HISTORY_VERSION_CHECKBOX</td>
 	<td>//tr[contains(.,'${key_webContentTitle}')]/td//input</td>
@@ -151,50 +192,21 @@
 	<td></td>
 	<td></td>
 </tr>
-
-<!--DISPLAY_PAGE-->
-
+<!--REPEATED FIELD ON WEB CONTENT-->
 <tr>
-	<td>DISPLAY_PAGE_SELECT</td>
-	<td>//select[contains(@id,'displayPageType')]</td>
+	<td>REPEATED_FIELD</td>
+	<td>xpath=(//div[contains(@class,'ddm-field')][contains(@data-field-name,'${key_fieldName}')][not(contains(@class,'container'))])[${key_index}]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>DISPLAY_PAGE_DEFAULT_SELECTION</td>
-	<td>//input[contains(@id,'defaultDisplayPageNameInput')]</td>
+	<td>REPEATED_DATE_FIELD</td>
+	<td>xpath=(//label[normalize-space(text())='${key_fieldFieldLabel}']//following-sibling::div[contains(@class,'date-picker')]//input[@type='text'])[${index}]</td>
 	<td></td>
 </tr>
+<!--REPEATED FIELD BY INDEX-->
 <tr>
-	<td>DISPLAY_PAGE_SPECIFIC_SELECTION</td>
-	<td>//input[contains(@id,'specificDisplayPageNameInput')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DISPLAY_PAGE_CHOOSE_BUTTON</td>
-	<td>//button[contains(@id,'chooseSpecificDisplayPage')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DISPLAY_PAGE_SELECT_PAGE_IFRAME</td>
-	<td>//iframe[contains(@id,'selectDisplayPage')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-
-<!--IMAGE_FIELD-->
-
-<tr>
-	<td>IMAGE_FIELD_CLEAR</td>
-	<td>//div[contains(@id, JournalPortlet_Image)]//div[contains(@class, 'button-holder')]//span[contains(text(), 'Clear')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>IMAGE_FIELD_SELECT</td>
-	<td>//div[contains(@id, JournalPortlet_Image)]//div[contains(@class, 'button-holder')]//span[contains(text(), 'Select')]</td>
+	<td>REPEATED_FIELD_BY_INDEX</td>
+	<td>xpath=//div[contains(@class,'ddm-field') and contains(@data-field-name,'${key_fieldReference}')][${key_index}]</td>
 	<td></td>
 </tr>
 </tbody>

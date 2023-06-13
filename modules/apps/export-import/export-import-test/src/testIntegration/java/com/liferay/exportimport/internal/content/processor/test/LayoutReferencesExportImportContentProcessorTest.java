@@ -23,7 +23,6 @@ import com.liferay.exportimport.test.util.TestUserIdStrategy;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.layout.test.util.LayoutFriendlyURLRandomizerBumper;
 import com.liferay.layout.test.util.LayoutTestUtil;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -47,18 +46,12 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceTracker;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.TreeMap;
 
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,28 +69,6 @@ public class LayoutReferencesExportImportContentProcessorTest {
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
-
-	@BeforeClass
-	public static void setUpClass() {
-		Registry registry = RegistryUtil.getRegistry();
-
-		StringBundler sb = new StringBundler(3);
-
-		sb.append("(&(content.processor.type=LayoutReferences)(objectClass=");
-		sb.append(ExportImportContentProcessor.class.getName());
-		sb.append("))");
-
-		_serviceTracker = registry.trackServices(
-			registry.getFilter(sb.toString()));
-
-		_serviceTracker.open();
-	}
-
-	@Before
-	public void setUp() {
-		_layoutReferencesExportImportContentProcessor =
-			_serviceTracker.getService();
-	}
 
 	@Test
 	public void testExportDefaultGroupCompanyHostImportDefaultGroupCompanyHost()
@@ -554,41 +525,6 @@ public class LayoutReferencesExportImportContentProcessorTest {
 				exportLayout.getFriendlyURL(), exportGroup, importGroup));
 	}
 
-	@Test
-	public void testRelativePublicDefaultPageURLWithLocale() throws Exception {
-		Group exportGroup = GroupTestUtil.addGroup();
-
-		GroupTestUtil.addLayoutSetVirtualHost(exportGroup, false);
-
-		Group importGroup = GroupTestUtil.addGroup();
-
-		GroupTestUtil.addLayoutSetVirtualHost(importGroup, false);
-
-		Locale siteDefaultLocale = _portal.getSiteDefaultLocale(exportGroup);
-
-		String url = StringPool.SLASH + siteDefaultLocale.getLanguage();
-
-		Assert.assertEquals(
-			url, _exportAndImportLayoutURL(url, exportGroup, importGroup));
-	}
-
-	@Test
-	public void testValidateContentRelativePublicDefaultPageURLWithLocale()
-		throws Exception {
-
-		Group group = GroupTestUtil.addGroup();
-
-		GroupTestUtil.addLayoutSetVirtualHost(group, false);
-
-		Locale siteDefaultLocale = _portal.getSiteDefaultLocale(group);
-
-		_layoutReferencesExportImportContentProcessor.validateContentReferences(
-			group.getGroupId(),
-			StringBundler.concat(
-				_CONTENT_PREFIX, StringPool.SLASH,
-				siteDefaultLocale.getLanguage(), _CONTENT_POSTFIX));
-	}
-
 	private String _exportAndImportLayoutURL(
 			String url, Group exportGroup, Group importGroup)
 		throws Exception {
@@ -784,16 +720,13 @@ public class LayoutReferencesExportImportContentProcessorTest {
 		NumericStringRandomizerBumper.INSTANCE,
 		UniqueStringRandomizerBumper.INSTANCE);
 
-	private static ServiceTracker
-		<ExportImportContentProcessor<String>,
-		 ExportImportContentProcessor<String>> _serviceTracker;
-
 	@Inject
 	private CompanyLocalService _companyLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;
 
+	@Inject(filter = "content.processor.type=LayoutReferences")
 	private ExportImportContentProcessor<String>
 		_layoutReferencesExportImportContentProcessor;
 

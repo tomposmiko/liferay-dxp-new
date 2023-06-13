@@ -49,11 +49,9 @@ public class AdminUtil {
 
 		String password = PortalUtil.getUserPassword(httpServletRequest);
 
-		if (userId != PortalUtil.getUserId(httpServletRequest)) {
-			password = StringPool.BLANK;
-		}
+		if ((userId != PortalUtil.getUserId(httpServletRequest)) ||
+			(password == null)) {
 
-		if (password == null) {
 			password = StringPool.BLANK;
 		}
 
@@ -126,7 +124,6 @@ public class AdminUtil {
 		long[] roleIds = null;
 		List<UserGroupRole> userGroupRoles = null;
 		long[] userGroupIds = null;
-		ServiceContext serviceContext = new ServiceContext();
 
 		return UserServiceUtil.updateUser(
 			userId, password, StringPool.BLANK, StringPool.BLANK,
@@ -138,7 +135,7 @@ public class AdminUtil {
 			contact.isMale(), birthdayMonth, birthdayDay, birthdayYear, smsSn,
 			facebookSn, jabberSn, skypeSn, twitterSn, contact.getJobTitle(),
 			groupIds, organizationIds, roleIds, userGroupRoles, userGroupIds,
-			serviceContext);
+			new ServiceContext());
 	}
 
 	public static User updateUser(
@@ -168,7 +165,6 @@ public class AdminUtil {
 		long[] roleIds = null;
 		List<UserGroupRole> userGroupRoles = null;
 		long[] userGroupIds = null;
-		ServiceContext serviceContext = new ServiceContext();
 
 		return UserServiceUtil.updateUser(
 			userId, password, StringPool.BLANK, StringPool.BLANK,
@@ -180,7 +176,7 @@ public class AdminUtil {
 			birthdayMonth, birthdayDay, birthdayYear, smsSn, facebookSn,
 			jabberSn, skypeSn, twitterSn, contact.getJobTitle(), groupIds,
 			organizationIds, roleIds, userGroupRoles, userGroupIds,
-			serviceContext);
+			new ServiceContext());
 	}
 
 }

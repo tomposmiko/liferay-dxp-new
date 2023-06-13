@@ -45,7 +45,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("DisplayPageTemplate")
+@GraphQLName(
+	description = "Represents a Display Page template.",
+	value = "DisplayPageTemplate"
+)
 @JsonFilter("Liferay.Vulcan")
 @XmlRootElement(name = "DisplayPageTemplate")
 public class DisplayPageTemplate implements Serializable {
@@ -59,7 +62,7 @@ public class DisplayPageTemplate implements Serializable {
 			DisplayPageTemplate.class, json);
 	}
 
-	@Schema
+	@Schema(description = "The display page template's content subtype.")
 	@Valid
 	public ContentSubtype getContentSubtype() {
 		return contentSubtype;
@@ -85,11 +88,11 @@ public class DisplayPageTemplate implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The display page template's content subtype.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ContentSubtype contentSubtype;
 
-	@Schema
+	@Schema(description = "The type of content.")
 	@Valid
 	public ContentType getContentType() {
 		return contentType;
@@ -114,11 +117,43 @@ public class DisplayPageTemplate implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The type of content.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ContentType contentType;
 
-	@Schema
+	@Schema(
+		description = "Specifies if the page template should be the default for the given content type/subtype."
+	)
+	public Boolean getDefaultTemplate() {
+		return defaultTemplate;
+	}
+
+	public void setDefaultTemplate(Boolean defaultTemplate) {
+		this.defaultTemplate = defaultTemplate;
+	}
+
+	@JsonIgnore
+	public void setDefaultTemplate(
+		UnsafeSupplier<Boolean, Exception> defaultTemplateUnsafeSupplier) {
+
+		try {
+			defaultTemplate = defaultTemplateUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(
+		description = "Specifies if the page template should be the default for the given content type/subtype."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Boolean defaultTemplate;
+
+	@Schema(description = "The display page template's key.")
 	public String getKey() {
 		return key;
 	}
@@ -140,11 +175,11 @@ public class DisplayPageTemplate implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The display page template's key.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String key;
 
-	@Schema
+	@Schema(description = "The display page template's name.")
 	public String getName() {
 		return name;
 	}
@@ -166,7 +201,7 @@ public class DisplayPageTemplate implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The display page template's name.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
@@ -215,6 +250,16 @@ public class DisplayPageTemplate implements Serializable {
 			sb.append("\"contentType\": ");
 
 			sb.append(String.valueOf(contentType));
+		}
+
+		if (defaultTemplate != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"defaultTemplate\": ");
+
+			sb.append(defaultTemplate);
 		}
 
 		if (key != null) {

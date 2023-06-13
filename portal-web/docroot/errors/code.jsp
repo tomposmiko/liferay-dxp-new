@@ -112,5 +112,5 @@ String xRequestWith = request.getHeader(HttpHeaders.X_REQUESTED_WITH);
 </c:choose>
 
 <%!
-private static Log _log = LogFactoryUtil.getLog("portal_web.docroot.errors.code_jsp");
+private static final Log _log = LogFactoryUtil.getLog("portal_web.docroot.errors.code_jsp");
 %>

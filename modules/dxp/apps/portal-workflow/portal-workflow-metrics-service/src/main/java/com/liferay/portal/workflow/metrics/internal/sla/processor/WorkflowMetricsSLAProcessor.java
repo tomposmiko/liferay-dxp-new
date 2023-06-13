@@ -65,7 +65,7 @@ public class WorkflowMetricsSLAProcessor {
 			elapsedTime = workflowMetricsSLAInstanceResult.getElapsedTime();
 
 			lastCheckLocalDateTime =
-				workflowMetricsSLAInstanceResult.getLastCheckLocalDateTime();
+				workflowMetricsSLAInstanceResult.getModifiedLocalDateTime();
 			workflowMetricsSLAStatus =
 				workflowMetricsSLAInstanceResult.getWorkflowMetricsSLAStatus();
 
@@ -183,11 +183,9 @@ public class WorkflowMetricsSLAProcessor {
 		LocalDateTime createDateLocalDateTime = LocalDateTime.parse(
 			document.getDate("createDate"), _dateTimeFormatter);
 
-		if (createDateLocalDateTime.isAfter(overdueLocalDateTime)) {
-			return false;
-		}
+		if (createDateLocalDateTime.isAfter(overdueLocalDateTime) ||
+			Validator.isNull(document.getDate("completionDate"))) {
 
-		if (Validator.isNull(document.getDate("completionDate"))) {
 			return false;
 		}
 
@@ -276,7 +274,7 @@ public class WorkflowMetricsSLAProcessor {
 
 					setElapsedTime(elapsedTime);
 					setInstanceId(instanceId);
-					setLastCheckLocalDateTime(nowLocalDateTime);
+					setModifiedLocalDateTime(nowLocalDateTime);
 					setOnTime(
 						elapsedTime <=
 							workflowMetricsSLADefinitionVersion.getDuration());
@@ -442,9 +440,9 @@ public class WorkflowMetricsSLAProcessor {
 				setInstanceCompletionLocalDateTime(
 					instanceCompletionLocalDateTime);
 				setInstanceId(workflowMetricsSLAInstanceResult.getInstanceId());
-				setLastCheckLocalDateTime(
+				setModifiedLocalDateTime(
 					workflowMetricsSLAInstanceResult.
-						getLastCheckLocalDateTime());
+						getModifiedLocalDateTime());
 				setNodeId(document.getLong("nodeId"));
 				setOnTime(
 					WorkflowMetricsSLAProcessor.this.isOnTime(
@@ -454,8 +452,8 @@ public class WorkflowMetricsSLAProcessor {
 				setProcessId(workflowMetricsSLAInstanceResult.getProcessId());
 				setSLADefinitionId(
 					workflowMetricsSLAInstanceResult.getSLADefinitionId());
-				setTaskId(document.getLong("taskId"));
 				setTaskName(document.getString("name"));
+				setTaskId(document.getLong("taskId"));
 				setWorkflowMetricsSLAStatus(
 					_getWorkflowMetricsSLAStatus(
 						document, workflowMetricsSLAInstanceResult));

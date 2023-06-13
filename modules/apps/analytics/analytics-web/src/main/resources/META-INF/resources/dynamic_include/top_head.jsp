@@ -38,7 +38,7 @@
 		a.src = u;
 		a.onload = c;
 		m.parentNode.insertBefore(a, m);
-	})('https://analytics-js-cdn.liferay.com', function () {
+	})('https://analytics-js-cdn.liferay.com', () => {
 		var config = <%= (String)request.getAttribute(AnalyticsWebKeys.ANALYTICS_CLIENT_CONFIG) %>;
 
 		var dxpMiddleware = function (request) {
@@ -63,7 +63,7 @@
 		Analytics.send('pageViewed', 'Page');
 
 		<c:if test="<%= GetterUtil.getBoolean(PropsUtil.get(PropsKeys.JAVASCRIPT_SINGLE_PAGE_APPLICATION_ENABLED)) %>">
-			Liferay.on('endNavigate', function (event) {
+			Liferay.on('endNavigate', (event) => {
 				Analytics.dispose();
 
 				var groupId = themeDisplay.getScopeGroupIdOrLiveGroupId();

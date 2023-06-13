@@ -13,8 +13,9 @@ import ClayAlert from '@clayui/alert';
 import PropTypes from 'prop-types';
 import React, {useCallback, useContext, useState} from 'react';
 
+import {ChartStateContext} from '../context/ChartStateContext';
 import ConnectionContext from '../context/ConnectionContext';
-import {StoreContext} from '../context/StoreContext';
+import {StoreStateContext} from '../context/StoreContext';
 import APIService from '../utils/APIService';
 import Detail from './Detail';
 import Main from './Main';
@@ -24,18 +25,14 @@ const noop = () => {};
 export default function Navigation({
 	author,
 	canonicalURL,
-	endpoints,
-	languageTag,
-	namespace,
 	onSelectedLanguageClick = noop,
-	page,
 	pagePublishDate,
 	pageTitle,
 	timeSpanOptions,
 	viewURLs,
 }) {
-	const [{historicalWarning, publishedToday, warning}] = useContext(
-		StoreContext
+	const {endpoints, namespace, page, publishedToday, warning} = useContext(
+		StoreStateContext
 	);
 
 	const {validAnalyticsConnection} = useContext(ConnectionContext);
@@ -46,43 +43,81 @@ export default function Navigation({
 
 	const [trafficSourceName, setTrafficSourceName] = useState('');
 
-	const api = APIService({
-		endpoints,
-		namespace,
-		page,
-	});
-
-	const {getHistoricalReads, getHistoricalViews, getTrafficSources} = api;
+	const {timeSpanKey, timeSpanOffset} = useContext(ChartStateContext);
 
 	const handleCurrentPage = useCallback((currentPage) => {
 		setCurrentPage({view: currentPage.view});
 	}, []);
 
+	const handleHistoricalReads = useCallback(() => {
+		return APIService.getHistoricalReads(
+			endpoints.analyticsReportsHistoricalReadsURL,
+			{namespace, plid: page.plid, timeSpanKey, timeSpanOffset}
+		).then((response) => response);
+	}, [
+		endpoints.analyticsReportsHistoricalReadsURL,
+		namespace,
+		page.plid,
+		timeSpanKey,
+		timeSpanOffset,
+	]);
+
+	const handleHistoricalViews = useCallback(() => {
+		return APIService.getHistoricalReads(
+			endpoints.analyticsReportsHistoricalViewsURL,
+			{namespace, plid: page.plid, timeSpanKey, timeSpanOffset}
+		).then((response) => response);
+	}, [
+		endpoints.analyticsReportsHistoricalViewsURL,
+		namespace,
+		page.plid,
+		timeSpanKey,
+		timeSpanOffset,
+	]);
+
 	const handleTotalReads = useCallback(() => {
-		return api
-			.getTotalReads()
-			.then((response) => response.analyticsReportsTotalReads);
-	}, [api]);
+		return APIService.getTotalReads(
+			endpoints.analyticsReportsTotalReadsURL,
+			{namespace, plid: page.plid}
+		).then(({analyticsReportsTotalReads}) => analyticsReportsTotalReads);
+	}, [endpoints.analyticsReportsTotalReadsURL, namespace, page.plid]);
 
 	const handleTotalViews = useCallback(() => {
-		return api
-			.getTotalViews()
-			.then((response) => response.analyticsReportsTotalViews);
-	}, [api]);
+		return APIService.getTotalReads(
+			endpoints.analyticsReportsTotalViewsURL,
+			{namespace, plid: page.plid}
+		).then(({analyticsReportsTotalViews}) => analyticsReportsTotalViews);
+	}, [endpoints.analyticsReportsTotalViewsURL, namespace, page.plid]);
 
-	const handleTrafficSourceClick = (trafficSources, trafficSourceName) => {
-		setTrafficSources(trafficSources);
-		setTrafficSourceName(trafficSourceName);
+	const handleTrafficSources = useCallback(() => {
+		return APIService.getTrafficSources(
+			endpoints.analyticsReportsTrafficSourcesURL,
+			{namespace, plid: page.plid, timeSpanKey, timeSpanOffset}
+		).then(({trafficSources}) => trafficSources);
+	}, [
+		endpoints.analyticsReportsTrafficSourcesURL,
+		namespace,
+		page.plid,
+		timeSpanKey,
+		timeSpanOffset,
+	]);
 
-		const trafficSource = trafficSources.find((trafficSource) => {
-			return trafficSource.name === trafficSourceName;
-		});
+	const updateTrafficSourcesAndCurrentPage = useCallback(
+		(trafficSources, trafficSourceName) => {
+			setTrafficSources(trafficSources);
+			setTrafficSourceName(trafficSourceName);
 
-		setCurrentPage({
-			data: trafficSource,
-			view: trafficSource.name,
-		});
-	};
+			const trafficSource = trafficSources.find((trafficSource) => {
+				return trafficSource.name === trafficSourceName;
+			});
+
+			setCurrentPage({
+				data: trafficSource,
+				view: trafficSource.name,
+			});
+		},
+		[]
+	);
 
 	const handleTrafficSourceName = (trafficSourceName) =>
 		setTrafficSourceName(trafficSourceName);
@@ -106,52 +141,61 @@ export default function Navigation({
 	return (
 		<>
 			{!validAnalyticsConnection && (
-				<ClayAlert displayType="danger" variant="stripe">
+				<ClayAlert
+					className="mb-3"
+					displayType="danger"
+					variant="stripe"
+				>
 					{Liferay.Language.get('an-unexpected-error-occurred')}
 				</ClayAlert>
 			)}
 
-			{validAnalyticsConnection && (historicalWarning || warning) && (
-				<ClayAlert displayType="warning" variant="stripe">
+			{validAnalyticsConnection && warning && (
+				<ClayAlert
+					className="mb-3"
+					displayType="warning"
+					variant="stripe"
+				>
 					{Liferay.Language.get(
 						'some-data-is-temporarily-unavailable'
 					)}
 				</ClayAlert>
 			)}
 
-			{validAnalyticsConnection &&
-				publishedToday &&
-				!historicalWarning &&
-				!warning && (
-					<ClayAlert
-						displayType="info"
-						title={Liferay.Language.get('no-data-is-available-yet')}
-						variant="stripe"
-					>
-						{Liferay.Language.get(
-							'content-has-just-been-published'
-						)}
-					</ClayAlert>
-				)}
+			{validAnalyticsConnection && publishedToday && !warning && (
+				<ClayAlert
+					className="mb-3"
+					displayType="info"
+					title={Liferay.Language.get('no-data-is-available-yet')}
+					variant="stripe"
+				>
+					{Liferay.Language.get('content-has-just-been-published')}
+				</ClayAlert>
+			)}
 
 			{currentPage.view === 'main' && (
 				<div>
 					<Main
 						author={author}
 						canonicalURL={canonicalURL}
-						chartDataProviders={[
-							getHistoricalViews,
-							getHistoricalReads,
-						]}
-						languageTag={languageTag}
+						chartDataProviders={
+							endpoints.analyticsReportsHistoricalReadsURL
+								? [handleHistoricalViews, handleHistoricalReads]
+								: [handleHistoricalViews]
+						}
 						onSelectedLanguageClick={onSelectedLanguageClick}
-						onTrafficSourceClick={handleTrafficSourceClick}
+						onTrafficSourceClick={
+							updateTrafficSourcesAndCurrentPage
+						}
 						pagePublishDate={pagePublishDate}
 						pageTitle={pageTitle}
 						timeSpanOptions={timeSpanOptions}
-						totalReadsDataProvider={handleTotalReads}
+						totalReadsDataProvider={
+							endpoints.analyticsReportsTotalReadsURL &&
+							handleTotalReads
+						}
 						totalViewsDataProvider={handleTotalViews}
-						trafficSourcesDataProvider={getTrafficSources}
+						trafficSourcesDataProvider={handleTrafficSources}
 						viewURLs={viewURLs}
 					/>
 				</div>
@@ -160,11 +204,14 @@ export default function Navigation({
 			{currentPage.view !== 'main' && (
 				<Detail
 					currentPage={currentPage}
-					languageTag={languageTag}
+					handleDetailPeriodChange={
+						updateTrafficSourcesAndCurrentPage
+					}
 					onCurrentPageChange={handleCurrentPage}
 					onTrafficSourceNameChange={handleTrafficSourceName}
 					timeSpanOptions={timeSpanOptions}
 					trafficShareDataProvider={handleTrafficShare}
+					trafficSourcesDataProvider={handleTrafficSources}
 					trafficVolumeDataProvider={handleTrafficVolume}
 				/>
 			)}
@@ -172,18 +219,10 @@ export default function Navigation({
 	);
 }
 
-Navigation.proptypes = {
+Navigation.propTypes = {
 	author: PropTypes.object.isRequired,
 	canonicalURL: PropTypes.string.isRequired,
-	endpoints: PropTypes.object.isRequired,
-	languageTag: PropTypes.string.isRequired,
-	namespace: PropTypes.string.isRequired,
 	onSelectedLanguageClick: PropTypes.func.isRequired,
-	page: PropTypes.objectOf(
-		PropTypes.shape({
-			plid: PropTypes.number.isRequired,
-		})
-	).isRequired,
 	pagePublishDate: PropTypes.string.isRequired,
 	pageTitle: PropTypes.string.isRequired,
 	timeSpanOptions: PropTypes.arrayOf(
@@ -196,6 +235,7 @@ Navigation.proptypes = {
 		PropTypes.shape({
 			default: PropTypes.bool.isRequired,
 			languageId: PropTypes.string.isRequired,
+			languageLabel: PropTypes.string.isRequired,
 			selected: PropTypes.bool.isRequired,
 			viewURL: PropTypes.string.isRequired,
 		})

@@ -38,6 +38,7 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
+import java.util.Collections;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -78,7 +79,7 @@ public class AccountGroupResourceImpl
 
 		if (commerceAccountGroup == null) {
 			throw new NoSuchAccountGroupException(
-				"Unable to find AccountGroup with externalReferenceCode: " +
+				"Unable to find account group with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -109,7 +110,7 @@ public class AccountGroupResourceImpl
 
 		if (commerceAccountGroup == null) {
 			throw new NoSuchAccountGroupException(
-				"Unable to find AccountGroup with externalReferenceCode: " +
+				"Unable to find account group with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -125,8 +126,10 @@ public class AccountGroupResourceImpl
 		throws Exception {
 
 		return SearchUtil.search(
+			Collections.emptyMap(),
 			booleanQuery -> booleanQuery.getPreBooleanFilter(), filter,
-			CommerceAccountGroup.class, StringPool.BLANK, pagination,
+			com.liferay.account.model.AccountGroup.class.getName(),
+			StringPool.BLANK, pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
 			new UnsafeConsumer() {
@@ -138,10 +141,10 @@ public class AccountGroupResourceImpl
 				}
 
 			},
+			sorts,
 			document -> _toAccountGroup(
 				_commerceAccountGroupService.getCommerceAccountGroup(
-					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))),
-			sorts);
+					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
 	}
 
 	@Override
@@ -175,7 +178,7 @@ public class AccountGroupResourceImpl
 
 		if (commerceAccountGroup == null) {
 			throw new NoSuchAccountGroupException(
-				"Unable to find AccountGroup with externalReferenceCode: " +
+				"Unable to find account group with external reference code " +
 					externalReferenceCode);
 		}
 

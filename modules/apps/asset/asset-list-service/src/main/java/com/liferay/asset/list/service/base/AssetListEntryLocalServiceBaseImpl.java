@@ -17,10 +17,7 @@ package com.liferay.asset.list.service.base;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
 import com.liferay.asset.list.service.AssetListEntryLocalServiceUtil;
-import com.liferay.asset.list.service.persistence.AssetListEntryAssetEntryRelFinder;
-import com.liferay.asset.list.service.persistence.AssetListEntryAssetEntryRelPersistence;
 import com.liferay.asset.list.service.persistence.AssetListEntryPersistence;
-import com.liferay.asset.list.service.persistence.AssetListEntrySegmentsEntryRelPersistence;
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
@@ -42,8 +39,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -403,6 +398,7 @@ public abstract class AssetListEntryLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -421,6 +417,7 @@ public abstract class AssetListEntryLocalServiceBaseImpl
 			(AssetListEntry)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<AssetListEntry> getBasePersistence() {
 		return assetListEntryPersistence;
 	}
@@ -627,28 +624,5 @@ public abstract class AssetListEntryLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@Reference
-	protected AssetListEntryAssetEntryRelPersistence
-		assetListEntryAssetEntryRelPersistence;
-
-	@Reference
-	protected AssetListEntryAssetEntryRelFinder
-		assetListEntryAssetEntryRelFinder;
-
-	@Reference
-	protected AssetListEntrySegmentsEntryRelPersistence
-		assetListEntrySegmentsEntryRelPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AssetListEntryLocalServiceBaseImpl.class);
 
 }

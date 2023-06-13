@@ -21,6 +21,7 @@ import com.liferay.asset.kernel.model.ClassTypeReader;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.frontend.taglib.clay.servlet.taglib.soy.BaseVerticalCard;
 import com.liferay.item.selector.criteria.InfoListItemSelectorReturnType;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -35,7 +36,6 @@ import com.liferay.portal.kernel.util.Validator;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -60,53 +60,39 @@ public class CollectionsVerticalCard extends BaseVerticalCard {
 	}
 
 	@Override
-	public String getAspectRatioCssClasses() {
-		return "aspect-ratio-item-center-middle " +
-			"aspect-ratio-item-vertical-fluid";
+	public String getCssClass() {
+		return "select-collection-action-option card-interactive " +
+			"card-interactive-secondary";
 	}
 
 	@Override
-	public Map<String, String> getData() {
+	public Map<String, String> getDynamicAttributes() {
 		Map<String, String> data = new HashMap<>();
 
 		try {
-			PortletURL selectLayoutMasterLayoutURL =
-				_renderResponse.createRenderURL();
-
-			selectLayoutMasterLayoutURL.setParameter(
-				"mvcPath", "/select_layout_master_layout.jsp");
-
-			String redirect = ParamUtil.getString(
-				_httpServletRequest, "redirect");
-
-			selectLayoutMasterLayoutURL.setParameter("redirect", redirect);
-
-			selectLayoutMasterLayoutURL.setParameter(
-				"backURL", themeDisplay.getURLCurrent());
-			selectLayoutMasterLayoutURL.setParameter(
-				"groupId", String.valueOf(_groupId));
-
-			long selPlid = ParamUtil.getLong(_httpServletRequest, "selPlid");
-
-			selectLayoutMasterLayoutURL.setParameter(
-				"selPlid", String.valueOf(selPlid));
-
-			boolean privateLayout = ParamUtil.getBoolean(
-				_httpServletRequest, "privateLayout");
-
-			selectLayoutMasterLayoutURL.setParameter(
-				"privateLayout", String.valueOf(privateLayout));
-
-			selectLayoutMasterLayoutURL.setParameter(
-				"collectionPK",
-				String.valueOf(_assetListEntry.getAssetListEntryId()));
-			selectLayoutMasterLayoutURL.setParameter(
-				"collectionType",
-				InfoListItemSelectorReturnType.class.getName());
-
 			data.put(
-				"select-layout-master-layout-url",
-				selectLayoutMasterLayoutURL.toString());
+				"data-select-layout-master-layout-url",
+				PortletURLBuilder.createRenderURL(
+					_renderResponse
+				).setMVCPath(
+					"/select_layout_master_layout.jsp"
+				).setRedirect(
+					ParamUtil.getString(_httpServletRequest, "redirect")
+				).setBackURL(
+					themeDisplay.getURLCurrent()
+				).setParameter(
+					"collectionPK", _assetListEntry.getAssetListEntryId()
+				).setParameter(
+					"collectionType",
+					InfoListItemSelectorReturnType.class.getName()
+				).setParameter(
+					"groupId", _groupId
+				).setParameter(
+					"privateLayout",
+					ParamUtil.getBoolean(_httpServletRequest, "privateLayout")
+				).setParameter(
+					"selPlid", ParamUtil.getLong(_httpServletRequest, "selPlid")
+				).buildString());
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
@@ -114,13 +100,10 @@ public class CollectionsVerticalCard extends BaseVerticalCard {
 			}
 		}
 
-		return data;
-	}
+		data.put("role", "button");
+		data.put("tabIndex", "0");
 
-	@Override
-	public String getElementClasses() {
-		return "select-collection-action-option card-interactive " +
-			"card-interactive-secondary";
+		return data;
 	}
 
 	@Override
@@ -160,6 +143,11 @@ public class CollectionsVerticalCard extends BaseVerticalCard {
 		catch (PortalException portalException) {
 			return ReflectionUtil.throwException(portalException);
 		}
+	}
+
+	@Override
+	public Boolean isFlushHorizontal() {
+		return true;
 	}
 
 	private String _getAssetEntrySubtypeSubtypeLabel() {

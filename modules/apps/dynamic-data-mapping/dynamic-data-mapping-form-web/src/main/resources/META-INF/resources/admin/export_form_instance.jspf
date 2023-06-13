@@ -76,7 +76,7 @@ boolean csvExportDisabled = StringUtil.equals("disabled", csvExport);
 	Liferay.provide(
 		window,
 		'<portlet:namespace />exportFormInstance',
-		function (url) {
+		(url) => {
 			var A = AUI();
 
 			var form = A.Node.create('<form />');

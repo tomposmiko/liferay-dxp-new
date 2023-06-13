@@ -172,6 +172,11 @@ public class DispatchTriggerWrapper
 		}
 	}
 
+	@Override
+	public DispatchTrigger cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
 	/**
 	 * Returns the active of this dispatch trigger.
 	 *
@@ -304,6 +309,11 @@ public class DispatchTriggerWrapper
 	@Override
 	public String getName() {
 		return model.getName();
+	}
+
+	@Override
+	public Date getNextFireDate() {
+		return model.getNextFireDate();
 	}
 
 	/**

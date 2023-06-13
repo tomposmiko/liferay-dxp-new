@@ -86,7 +86,8 @@ AssetEntryResult assetEntryResult = (AssetEntryResult)request.getAttribute("view
 				<p class="h4 list-group-title text-truncate">
 					<span class="asset-anchor lfr-asset-anchor" id="<%= assetEntry.getEntryId() %>"></span>
 
-					<aui:a href="<%= assetPublisherHelper.getAssetViewURL(liferayPortletRequest, liferayPortletResponse, assetRenderer, assetEntry, assetPublisherDisplayContext.isAssetLinkBehaviorViewInPortlet()) %>"> <%= HtmlUtil.escape(assetEntry.getTitle(locale)) %>
+					<aui:a href='<%= HttpUtil.addParameter(assetPublisherHelper.getAssetViewURL(liferayPortletRequest, liferayPortletResponse, assetRenderer, assetEntry, assetPublisherDisplayContext.isAssetLinkBehaviorViewInPortlet()), liferayPortletResponse.getNamespace() + "viewSingleAsset", true) %>'>
+						<%= HtmlUtil.escape(assetEntry.getTitle(locale)) %>
 					</aui:a>
 				</p>
 
@@ -141,5 +142,5 @@ AssetEntryResult assetEntryResult = (AssetEntryResult)request.getAttribute("view
 </ul>
 
 <%!
-private static Log _log = LogFactoryUtil.getLog("com_liferay_asset_publisher_web.view_asset_entries_title_list_jsp");
+private static final Log _log = LogFactoryUtil.getLog("com_liferay_asset_publisher_web.view_asset_entries_title_list_jsp");
 %>

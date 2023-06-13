@@ -43,6 +43,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import java.io.InputStream;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -85,6 +86,11 @@ public class ExtRepositoryFileEntryAdapter
 
 		return extRepositoryAdapter.getContentStream(
 			(ExtRepositoryFileVersionAdapter)fileVersion);
+	}
+
+	@Override
+	public Date getExpirationDate() {
+		return null;
 	}
 
 	@Override
@@ -304,6 +310,11 @@ public class ExtRepositoryFileEntryAdapter
 	}
 
 	@Override
+	public Date getReviewDate() {
+		return null;
+	}
+
+	@Override
 	public StagedModelType getStagedModelType() {
 		return new StagedModelType(DLFileEntryConstants.getClassName());
 	}
@@ -325,6 +336,10 @@ public class ExtRepositoryFileEntryAdapter
 			return fileVersion.getVersion();
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return null;
 		}
 	}

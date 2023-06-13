@@ -428,7 +428,8 @@ public class ModifiableServletContextAdapter
 			catch (Exception exception) {
 				_log.error(
 					"Bundle " + _bundle + " is unable to load listener " +
-						eventListenerClass);
+						eventListenerClass,
+					exception);
 			}
 		}
 
@@ -545,7 +546,8 @@ public class ModifiableServletContextAdapter
 			catch (Exception exception) {
 				_log.error(
 					"Bundle " + _bundle + " is unable to load filter " +
-						filterClassName);
+						filterClassName,
+					exception);
 			}
 		}
 
@@ -609,7 +611,8 @@ public class ModifiableServletContextAdapter
 			catch (Exception exception) {
 				_log.error(
 					"Bundle " + _bundle + " is unable to load servlet " +
-						servletClassName);
+						servletClassName,
+					exception);
 			}
 		}
 
@@ -718,6 +721,9 @@ public class ModifiableServletContextAdapter
 			methods.put(hashCodeMethod, hashCodeHandlerMethod);
 		}
 		catch (NoSuchMethodException noSuchMethodException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(noSuchMethodException, noSuchMethodException);
+			}
 		}
 
 		return Collections.unmodifiableMap(methods);

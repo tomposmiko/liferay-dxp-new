@@ -45,6 +45,7 @@ import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.ThemeLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -53,6 +54,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -60,9 +62,11 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -70,6 +74,8 @@ import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import org.hamcrest.CoreMatchers;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -109,6 +115,48 @@ public class FragmentEntryProcessorFreemarkerTest {
 	}
 
 	@Test
+	public void testAddFragmentEntryWithFreemarkerVariable() throws Exception {
+		FragmentEntry fragmentEntry = _addFragmentEntry(
+			"fragment_entry_with_freemarker_variable.html", null);
+
+		Assert.assertNotNull(fragmentEntry);
+	}
+
+	@Test(expected = FragmentEntryContentException.class)
+	public void testAddFragmentEntryWithInvalidFreemarkerVariable()
+		throws Exception {
+
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				"freemarker.runtime", LoggerTestUtil.ERROR)) {
+
+			ServiceContext serviceContext =
+				ServiceContextTestUtil.getServiceContext(
+					_group.getGroupId(), TestPropsValues.getUserId());
+
+			serviceContext.setRequest(_getMockHttpServletRequest());
+
+			FragmentCollection fragmentCollection =
+				_fragmentCollectionService.addFragmentCollection(
+					_group.getGroupId(), "Fragment Collection",
+					StringPool.BLANK, serviceContext);
+
+			FragmentEntry draftFragmentEntry =
+				_fragmentEntryService.addFragmentEntry(
+					_group.getGroupId(),
+					fragmentCollection.getFragmentCollectionId(),
+					"fragment-entry", "Fragment Entry", null,
+					_readFileToString(
+						"fragment_entry_with_invalid_freemarker_variable.html"),
+					null, false, null, null, 0, 0,
+					WorkflowConstants.STATUS_DRAFT, serviceContext);
+
+			ServiceContextThreadLocal.pushServiceContext(serviceContext);
+
+			_fragmentEntryService.publishDraft(draftFragmentEntry);
+		}
+	}
+
+	@Test
 	public void testProcessFragmentEntryLinkHTML() throws Exception {
 		FragmentEntry fragmentEntry = _addFragmentEntry(
 			"fragment_entry.html", null);
@@ -129,7 +177,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 				fragmentEntryLink, defaultFragmentEntryProcessorContext));
 
 		String expectedProcessedHTML = _getProcessedHTML(
-			_getFileAsString("expected_processed_fragment_entry.html"));
+			_readFileToString("expected_processed_fragment_entry.html"));
 
 		Assert.assertEquals(expectedProcessedHTML, actualProcessedHTML);
 	}
@@ -147,7 +195,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 		fragmentEntryLink.setHtml(fragmentEntry.getHtml());
 		fragmentEntryLink.setConfiguration(fragmentEntry.getConfiguration());
 		fragmentEntryLink.setEditableValues(
-			_getJsonFileAsString(
+			_readJSONFileToString(
 				"fragment_entry_link_editable_values_with_configuration.json"));
 
 		DefaultFragmentEntryProcessorContext
@@ -161,7 +209,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 				fragmentEntryLink, defaultFragmentEntryProcessorContext));
 
 		String expectedProcessedHTML = _getProcessedHTML(
-			_getFileAsString(
+			_readFileToString(
 				"expected_processed_fragment_entry_with_configuration.html"));
 
 		Assert.assertEquals(expectedProcessedHTML, actualProcessedHTML);
@@ -222,7 +270,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 		fragmentEntryLink.setHtml(fragmentEntry.getHtml());
 		fragmentEntryLink.setConfiguration(fragmentEntry.getConfiguration());
 		fragmentEntryLink.setEditableValues(
-			_getJsonFileAsString(
+			_readJSONFileToString(
 				"fragment_entry_link_editable_values_with_configuration_" +
 					"collectionselector_dynamic_collection.json",
 				editableValuesValues));
@@ -238,7 +286,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 				fragmentEntryLink, defaultFragmentEntryProcessorContext));
 
 		String expectedProcessedHTML = _getProcessedHTML(
-			_getFileAsString(
+			_readFileToString(
 				"expected_processed_fragment_entry_with_configuration_" +
 					"collectionselector_dynamic_collection.html",
 				HashMapBuilder.put(
@@ -255,13 +303,13 @@ public class FragmentEntryProcessorFreemarkerTest {
 		String fileName = RandomTestUtil.randomString() + ".jpg";
 
 		FileEntry fileEntry = _dlAppLocalService.addFileEntry(
-			TestPropsValues.getUserId(), _group.getGroupId(),
+			null, TestPropsValues.getUserId(), _group.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, fileName,
 			ContentTypes.IMAGE_JPEG,
 			FileUtil.getBytes(
 				FragmentEntryProcessorFreemarkerTest.class,
 				"dependencies/image.jpg"),
-			new ServiceContext());
+			null, null, new ServiceContext());
 
 		FragmentEntry fragmentEntry = _addFragmentEntry(
 			"fragment_entry_with_configuration_itemselector_file_entry.html",
@@ -283,7 +331,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 		fragmentEntryLink.setHtml(fragmentEntry.getHtml());
 		fragmentEntryLink.setConfiguration(fragmentEntry.getConfiguration());
 		fragmentEntryLink.setEditableValues(
-			_getJsonFileAsString(
+			_readJSONFileToString(
 				"fragment_entry_link_editable_values_with_configuration_" +
 					"itemselector.json"));
 
@@ -298,7 +346,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 				fragmentEntryLink, defaultFragmentEntryProcessorContext));
 
 		String expectedProcessedHTML = _getProcessedHTML(
-			_getFileAsString(
+			_readFileToString(
 				"expected_processed_fragment_entry_with_configuration_" +
 					"itemselector_file_entry.html",
 				HashMapBuilder.put(
@@ -361,7 +409,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 		fragmentEntryLink.setHtml(fragmentEntry.getHtml());
 		fragmentEntryLink.setConfiguration(fragmentEntry.getConfiguration());
 		fragmentEntryLink.setEditableValues(
-			_getJsonFileAsString(
+			_readJSONFileToString(
 				"fragment_entry_link_editable_values_with_configuration_" +
 					"itemselector.json"));
 
@@ -376,7 +424,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 				fragmentEntryLink, defaultFragmentEntryProcessorContext));
 
 		String expectedProcessedHTML = _getProcessedHTML(
-			_getFileAsString(
+			_readFileToString(
 				"expected_processed_fragment_entry_with_configuration_" +
 					"itemselector_journal_article.html",
 				HashMapBuilder.put(
@@ -396,6 +444,62 @@ public class FragmentEntryProcessorFreemarkerTest {
 				).build()));
 
 		Assert.assertEquals(expectedProcessedHTML, actualProcessedHTML);
+	}
+
+	@Test
+	public void testProcessFragmentEntryLinkHTMLWithConfigurationLocalizable()
+		throws Exception {
+
+		FragmentEntry fragmentEntry = _addFragmentEntry(
+			"fragment_entry_with_configuration_localizable.html",
+			"configuration_localizable.json");
+
+		FragmentEntryLink fragmentEntryLink =
+			_fragmentEntryLinkLocalService.createFragmentEntryLink(0);
+
+		fragmentEntryLink.setHtml(fragmentEntry.getHtml());
+		fragmentEntryLink.setConfiguration(fragmentEntry.getConfiguration());
+		fragmentEntryLink.setEditableValues(
+			_readJSONFileToString(
+				"fragment_entry_link_editable_values_with_configuration_" +
+					"localizable.json"));
+
+		DefaultFragmentEntryProcessorContext
+			defaultFragmentEntryProcessorContext =
+				new DefaultFragmentEntryProcessorContext(
+					_getMockHttpServletRequest(), new MockHttpServletResponse(),
+					Constants.VIEW, LocaleUtil.fromLanguageId("en_US"));
+
+		String actualProcessedHTML = _getProcessedHTML(
+			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
+				fragmentEntryLink, defaultFragmentEntryProcessorContext));
+
+		Assert.assertThat(
+			actualProcessedHTML, CoreMatchers.containsString("Style - dark"));
+
+		defaultFragmentEntryProcessorContext =
+			new DefaultFragmentEntryProcessorContext(
+				_getMockHttpServletRequest(), new MockHttpServletResponse(),
+				Constants.VIEW, LocaleUtil.fromLanguageId("es_ES"));
+
+		actualProcessedHTML = _getProcessedHTML(
+			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
+				fragmentEntryLink, defaultFragmentEntryProcessorContext));
+
+		Assert.assertThat(
+			actualProcessedHTML, CoreMatchers.containsString("Style - light"));
+
+		defaultFragmentEntryProcessorContext =
+			new DefaultFragmentEntryProcessorContext(
+				_getMockHttpServletRequest(), new MockHttpServletResponse(),
+				Constants.VIEW, LocaleUtil.fromLanguageId("fr_FR"));
+
+		actualProcessedHTML = _getProcessedHTML(
+			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
+				fragmentEntryLink, defaultFragmentEntryProcessorContext));
+
+		Assert.assertThat(
+			actualProcessedHTML, CoreMatchers.containsString("Style - dark"));
 	}
 
 	@Test
@@ -453,7 +557,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 		String configuration = null;
 
 		if (configurationFile != null) {
-			configuration = _getFileAsString(configurationFile);
+			configuration = _readFileToString(configurationFile);
 
 			configuration = StringUtil.replace(
 				configuration, "${", "}", values);
@@ -462,39 +566,8 @@ public class FragmentEntryProcessorFreemarkerTest {
 		return _fragmentEntryService.addFragmentEntry(
 			_group.getGroupId(), fragmentCollection.getFragmentCollectionId(),
 			"fragment-entry", "Fragment Entry", null,
-			_getFileAsString(htmlFile), null, configuration, 0, 0,
+			_readFileToString(htmlFile), null, false, configuration, null, 0, 0,
 			WorkflowConstants.STATUS_APPROVED, serviceContext);
-	}
-
-	private String _getFileAsString(String fileName) throws Exception {
-		return _getFileAsString(fileName, null);
-	}
-
-	private String _getFileAsString(String fileName, Map<String, String> values)
-		throws Exception {
-
-		Class<?> clazz = getClass();
-
-		String template = StringUtil.read(
-			clazz.getClassLoader(),
-			"com/liferay/fragment/entry/processor/freemarker/test" +
-				"/dependencies/" + fileName);
-
-		return StringUtil.replace(template, "${", "}", values);
-	}
-
-	private String _getJsonFileAsString(String jsonFileName) throws Exception {
-		return _getJsonFileAsString(jsonFileName, null);
-	}
-
-	private String _getJsonFileAsString(
-			String jsonFileName, Map<String, String> values)
-		throws Exception {
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			_getFileAsString(jsonFileName, values));
-
-		return jsonObject.toString();
 	}
 
 	private MockHttpServletRequest _getMockHttpServletRequest()
@@ -551,27 +624,64 @@ public class FragmentEntryProcessorFreemarkerTest {
 	}
 
 	private String _getTypeSettings(long groupId, long classNameId) {
-		UnicodeProperties unicodeProperties = new UnicodeProperties(true);
-
-		unicodeProperties.put("anyAssetType", String.valueOf(classNameId));
-		unicodeProperties.put(
-			"anyClassTypeDLFileEntryAssetRendererFactory", "true");
-		unicodeProperties.put(
-			"anyClassTypeJournalArticleAssetRendererFactory", "true");
-		unicodeProperties.put("classNameIds", String.valueOf(classNameId));
-		unicodeProperties.put("groupIds", String.valueOf(groupId));
-		unicodeProperties.put("orderByColumn1", "modifiedDate");
-		unicodeProperties.put("orderByColumn2", "title");
-		unicodeProperties.put("orderByType1", "DESC");
-		unicodeProperties.put("orderByType2", "ASC");
-		unicodeProperties.put(
-			"subtypeFieldsFilterEnabledDLFileEntryAssetRendererFactory",
-			"false");
-		unicodeProperties.put(
+		return UnicodePropertiesBuilder.create(
+			true
+		).put(
+			"anyAssetType", String.valueOf(classNameId)
+		).put(
+			"anyClassTypeDLFileEntryAssetRendererFactory", "true"
+		).put(
+			"anyClassTypeJournalArticleAssetRendererFactory", "true"
+		).put(
+			"classNameIds", String.valueOf(classNameId)
+		).put(
+			"groupIds", String.valueOf(groupId)
+		).put(
+			"orderByColumn1", "modifiedDate"
+		).put(
+			"orderByColumn2", "title"
+		).put(
+			"orderByType1", "DESC"
+		).put(
+			"orderByType2", "ASC"
+		).put(
+			"subtypeFieldsFilterEnabledDLFileEntryAssetRendererFactory", "false"
+		).put(
 			"subtypeFieldsFilterEnabledJournalArticleAssetRendererFactory",
-			"false");
+			"false"
+		).buildString();
+	}
 
-		return unicodeProperties.toString();
+	private String _readFileToString(String fileName) throws Exception {
+		return _readFileToString(fileName, null);
+	}
+
+	private String _readFileToString(
+			String fileName, Map<String, String> values)
+		throws Exception {
+
+		Class<?> clazz = getClass();
+
+		String template = StringUtil.read(
+			clazz.getClassLoader(),
+			"com/liferay/fragment/entry/processor/freemarker/test" +
+				"/dependencies/" + fileName);
+
+		return StringUtil.replace(template, "${", "}", values);
+	}
+
+	private String _readJSONFileToString(String jsonFileName) throws Exception {
+		return _readJSONFileToString(jsonFileName, null);
+	}
+
+	private String _readJSONFileToString(
+			String jsonFileName, Map<String, String> values)
+		throws Exception {
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+			_readFileToString(jsonFileName, values));
+
+		return jsonObject.toString();
 	}
 
 	@Inject

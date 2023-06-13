@@ -35,6 +35,7 @@ import com.liferay.social.kernel.model.SocialActivityLimitModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -265,93 +266,115 @@ public class SocialActivityLimitModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, SocialActivityLimit>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			SocialActivityLimit.class.getClassLoader(),
+			SocialActivityLimit.class, ModelWrapper.class);
+
+		try {
+			Constructor<SocialActivityLimit> constructor =
+				(Constructor<SocialActivityLimit>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<SocialActivityLimit, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<SocialActivityLimit, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<SocialActivityLimit, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<SocialActivityLimit, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", SocialActivityLimit::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", SocialActivityLimit::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"activityLimitId", SocialActivityLimit::getActivityLimitId);
-		attributeGetterFunctions.put(
-			"groupId", SocialActivityLimit::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", SocialActivityLimit::getCompanyId);
-		attributeGetterFunctions.put("userId", SocialActivityLimit::getUserId);
-		attributeGetterFunctions.put(
-			"classNameId", SocialActivityLimit::getClassNameId);
-		attributeGetterFunctions.put(
-			"classPK", SocialActivityLimit::getClassPK);
-		attributeGetterFunctions.put(
-			"activityType", SocialActivityLimit::getActivityType);
-		attributeGetterFunctions.put(
-			"activityCounterName", SocialActivityLimit::getActivityCounterName);
-		attributeGetterFunctions.put("value", SocialActivityLimit::getValue);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<SocialActivityLimit, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<SocialActivityLimit, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<SocialActivityLimit, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", SocialActivityLimit::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<SocialActivityLimit, Long>)
 				SocialActivityLimit::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", SocialActivityLimit::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<SocialActivityLimit, Long>)
 				SocialActivityLimit::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"activityLimitId", SocialActivityLimit::getActivityLimitId);
 		attributeSetterBiConsumers.put(
 			"activityLimitId",
 			(BiConsumer<SocialActivityLimit, Long>)
 				SocialActivityLimit::setActivityLimitId);
+		attributeGetterFunctions.put(
+			"groupId", SocialActivityLimit::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<SocialActivityLimit, Long>)
 				SocialActivityLimit::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", SocialActivityLimit::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<SocialActivityLimit, Long>)
 				SocialActivityLimit::setCompanyId);
+		attributeGetterFunctions.put("userId", SocialActivityLimit::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<SocialActivityLimit, Long>)
 				SocialActivityLimit::setUserId);
+		attributeGetterFunctions.put(
+			"classNameId", SocialActivityLimit::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<SocialActivityLimit, Long>)
 				SocialActivityLimit::setClassNameId);
+		attributeGetterFunctions.put(
+			"classPK", SocialActivityLimit::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<SocialActivityLimit, Long>)
 				SocialActivityLimit::setClassPK);
+		attributeGetterFunctions.put(
+			"activityType", SocialActivityLimit::getActivityType);
 		attributeSetterBiConsumers.put(
 			"activityType",
 			(BiConsumer<SocialActivityLimit, Integer>)
 				SocialActivityLimit::setActivityType);
+		attributeGetterFunctions.put(
+			"activityCounterName", SocialActivityLimit::getActivityCounterName);
 		attributeSetterBiConsumers.put(
 			"activityCounterName",
 			(BiConsumer<SocialActivityLimit, String>)
 				SocialActivityLimit::setActivityCounterName);
+		attributeGetterFunctions.put("value", SocialActivityLimit::getValue);
 		attributeSetterBiConsumers.put(
 			"value",
 			(BiConsumer<SocialActivityLimit, String>)
 				SocialActivityLimit::setValue);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -689,6 +712,37 @@ public class SocialActivityLimitModelImpl
 	}
 
 	@Override
+	public SocialActivityLimit cloneWithOriginalValues() {
+		SocialActivityLimitImpl socialActivityLimitImpl =
+			new SocialActivityLimitImpl();
+
+		socialActivityLimitImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		socialActivityLimitImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		socialActivityLimitImpl.setActivityLimitId(
+			this.<Long>getColumnOriginalValue("activityLimitId"));
+		socialActivityLimitImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		socialActivityLimitImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		socialActivityLimitImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		socialActivityLimitImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		socialActivityLimitImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		socialActivityLimitImpl.setActivityType(
+			this.<Integer>getColumnOriginalValue("activityType"));
+		socialActivityLimitImpl.setActivityCounterName(
+			this.<String>getColumnOriginalValue("activityCounterName"));
+		socialActivityLimitImpl.setValue(
+			this.<String>getColumnOriginalValue("value"));
+
+		return socialActivityLimitImpl;
+	}
+
+	@Override
 	public int compareTo(SocialActivityLimit socialActivityLimit) {
 		long primaryKey = socialActivityLimit.getPrimaryKey();
 
@@ -885,9 +939,7 @@ public class SocialActivityLimitModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, SocialActivityLimit>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					SocialActivityLimit.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

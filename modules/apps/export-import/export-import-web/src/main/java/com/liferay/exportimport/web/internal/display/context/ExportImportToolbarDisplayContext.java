@@ -23,11 +23,13 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -55,6 +57,7 @@ public class ExportImportToolbarDisplayContext {
 		LiferayPortletResponse liferayPortletResponse) {
 
 		_httpServletRequest = httpServletRequest;
+
 		_liferayPortletResponse = liferayPortletResponse;
 
 		Portlet portlet = liferayPortletResponse.getPortlet();
@@ -66,8 +69,7 @@ public class ExportImportToolbarDisplayContext {
 	public List<DropdownItem> getActionDropdownItems() {
 		return DropdownItemListBuilder.add(
 			dropdownItem -> {
-				dropdownItem.setHref(
-					"javascript:" + _portletNamespace + "deleteEntries();");
+				dropdownItem.putData("action", "deleteEntries");
 				dropdownItem.setLabel(
 					LanguageUtil.get(_httpServletRequest, "delete"));
 			}
@@ -87,7 +89,9 @@ public class ExportImportToolbarDisplayContext {
 				String label;
 				String mvcPath;
 
-				if (mvcRenderCommandName.equals("exportLayoutsView")) {
+				if (mvcRenderCommandName.equals(
+						"/export_import/view_export_layouts")) {
+
 					cmd = Constants.EXPORT;
 					label = "custom-export";
 					mvcPath = "/export/new_export/export_layouts.jsp";
@@ -193,45 +197,48 @@ public class ExportImportToolbarDisplayContext {
 	}
 
 	public String getSortingOrder() {
-		return ParamUtil.getString(_httpServletRequest, "orderByType", "asc");
+		if (Validator.isNotNull(_orderByType)) {
+			return _orderByType;
+		}
+
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_httpServletRequest, ExportImportPortletKeys.EXPORT_IMPORT, "asc");
+
+		return _orderByType;
 	}
 
 	public String getSortingURL() {
-		PortletURL sortingURL = getRenderURL();
-
-		sortingURL.setParameter(
-			"groupId",
-			String.valueOf(ParamUtil.getLong(_httpServletRequest, "groupId")));
-		sortingURL.setParameter(
-			"privateLayout",
-			String.valueOf(
-				ParamUtil.getBoolean(_httpServletRequest, "privateLayout")));
-		sortingURL.setParameter(
+		return PortletURLBuilder.create(
+			getRenderURL()
+		).setNavigation(
+			ParamUtil.getString(_httpServletRequest, "navigation", "all")
+		).setParameter(
 			"displayStyle",
 			ParamUtil.getString(
-				_httpServletRequest, "displayStyle", "descriptive"));
-		sortingURL.setParameter(
-			"orderByCol",
-			ParamUtil.getString(_httpServletRequest, "orderByCol"));
+				_httpServletRequest, "displayStyle", "descriptive")
+		).setParameter(
+			"groupId", ParamUtil.getLong(_httpServletRequest, "groupId")
+		).setParameter(
+			"orderByCol", ParamUtil.getString(_httpServletRequest, "orderByCol")
+		).setParameter(
+			"orderByType",
+			() -> {
+				String orderByType = ParamUtil.getString(
+					_httpServletRequest, "orderByType");
 
-		String orderByType = ParamUtil.getString(
-			_httpServletRequest, "orderByType");
+				if (orderByType.equals("asc")) {
+					return "desc";
+				}
 
-		if (orderByType.equals("asc")) {
-			sortingURL.setParameter("orderByType", "desc");
-		}
-		else {
-			sortingURL.setParameter("orderByType", "asc");
-		}
-
-		sortingURL.setParameter(
-			"navigation",
-			ParamUtil.getString(_httpServletRequest, "navigation", "all"));
-		sortingURL.setParameter(
+				return "asc";
+			}
+		).setParameter(
+			"privateLayout",
+			ParamUtil.getBoolean(_httpServletRequest, "privateLayout")
+		).setParameter(
 			"searchContainerId",
-			ParamUtil.getString(_httpServletRequest, "searchContainerId"));
-
-		return sortingURL.toString();
+			ParamUtil.getString(_httpServletRequest, "searchContainerId")
+		).buildString();
 	}
 
 	public List<ViewTypeItem> getViewTypeItems() {
@@ -423,6 +430,7 @@ public class ExportImportToolbarDisplayContext {
 
 	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
+	private String _orderByType;
 	private final String _portletNamespace;
 
 }

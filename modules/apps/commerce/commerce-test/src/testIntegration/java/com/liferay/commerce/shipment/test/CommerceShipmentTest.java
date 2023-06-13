@@ -54,26 +54,21 @@ import com.liferay.commerce.tax.model.CommerceTaxMethod;
 import com.liferay.commerce.test.util.CommerceInventoryTestUtil;
 import com.liferay.commerce.test.util.CommerceTaxTestUtil;
 import com.liferay.commerce.test.util.CommerceTestUtil;
-import com.liferay.commerce.test.util.TestCommerceContext;
+import com.liferay.commerce.test.util.context.TestCommerceContext;
 import com.liferay.commerce.util.CommerceShippingHelper;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
-import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.settings.ModifiableSettings;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.test.rule.DataGuard;
-import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
-import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -100,7 +95,6 @@ import org.junit.runner.RunWith;
 /**
  * @author Riccardo Alberti
  */
-@DataGuard(scope = DataGuard.Scope.METHOD)
 @RunWith(Arquillian.class)
 public class CommerceShipmentTest {
 
@@ -112,25 +106,20 @@ public class CommerceShipmentTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_company = CompanyTestUtil.addCompany();
+		_group = GroupTestUtil.addGroup();
 
-		_user = UserTestUtil.addUser(_company);
+		_user = UserTestUtil.addUser();
 
 		PermissionThreadLocal.setPermissionChecker(
 			PermissionCheckerFactoryUtil.create(_user));
 
 		PrincipalThreadLocal.setName(_user.getUserId());
 
-		_group = GroupTestUtil.addGroup(
-			_company.getCompanyId(), _user.getUserId(), 0);
-
 		_commerceCurrency = CommerceCurrencyTestUtil.addCommerceCurrency(
-			_company.getCompanyId());
+			_group.getCompanyId());
 
 		_commerceChannel = CommerceTestUtil.addCommerceChannel(
 			_group.getGroupId(), _commerceCurrency.getCode());
-
-		_commerceOrders = new ArrayList<>();
 	}
 
 	@After
@@ -797,7 +786,7 @@ public class CommerceShipmentTest {
 		Settings settings = SettingsFactoryUtil.getSettings(
 			new GroupServiceSettingsLocator(
 				_commerceChannel.getGroupId(),
-				CommerceConstants.TAX_SERVICE_NAME));
+				CommerceConstants.SERVICE_NAME_COMMERCE_TAX));
 
 		ModifiableSettings modifiableSettings =
 			settings.getModifiableSettings();
@@ -1016,6 +1005,8 @@ public class CommerceShipmentTest {
 		return CPTestUtil.addCPInstanceWithRandomSku(groupId);
 	}
 
+	private static User _user;
+
 	private CommerceChannel _commerceChannel;
 
 	@Inject
@@ -1041,7 +1032,7 @@ public class CommerceShipmentTest {
 	@Inject
 	private CommerceOrderPriceCalculation _commerceOrderPriceCalculation;
 
-	private List<CommerceOrder> _commerceOrders;
+	private final List<CommerceOrder> _commerceOrders = new ArrayList<>();
 
 	@Inject
 	private CommercePriceListLocalService _commercePriceListLocalService;
@@ -1052,12 +1043,6 @@ public class CommerceShipmentTest {
 	@Inject
 	private CommerceShippingHelper _commerceShippingHelper;
 
-	@DeleteAfterTestRun
-	private Company _company;
-
-	@Inject
-	private CompanyLocalService _companyLocalService;
-
 	@Inject
 	private CPDefinitionLocalService _cpDefinitionLocalService;
 
@@ -1065,9 +1050,6 @@ public class CommerceShipmentTest {
 	private CPInstanceLocalService _cpInstanceLocalService;
 
 	private Group _group;
-
-	@DeleteAfterTestRun
-	private User _user;
 
 	@Inject
 	private UserLocalService _userLocalService;

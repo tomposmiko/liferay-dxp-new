@@ -14,6 +14,7 @@
 
 package com.liferay.item.selector.taglib.internal.display.context;
 
+import com.liferay.document.library.constants.DLContentTypes;
 import com.liferay.document.library.kernel.util.ImageProcessorUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -37,9 +38,6 @@ import javax.servlet.http.HttpServletRequest;
  * @author Adolfo Pérez
  */
 public class RepositoryEntryBrowserDisplayContext {
-
-	public static final String VIDEO_EXTERNAL_SHORTCUT =
-		"application/vnd+liferay.video.external.shortcut+html";
 
 	public RepositoryEntryBrowserDisplayContext(
 		HttpServletRequest httpServletRequest) {
@@ -81,12 +79,32 @@ public class RepositoryEntryBrowserDisplayContext {
 				PropsValues.DL_FILE_ENTRY_PREVIEW_VIDEO_MIME_TYPES,
 				fileVersion.getMimeType()) ||
 			Objects.equals(
-				VIDEO_EXTERNAL_SHORTCUT, fileVersion.getMimeType())) {
+				DLContentTypes.VIDEO_EXTERNAL_SHORTCUT,
+				fileVersion.getMimeType())) {
 
 			return "video";
 		}
 
 		return StringPool.BLANK;
+	}
+
+	public boolean isPreviewable(FileVersion fileVersion) {
+		if (fileVersion == null) {
+			return false;
+		}
+
+		if (ArrayUtil.contains(
+				PropsValues.DL_FILE_ENTRY_PREVIEW_VIDEO_MIME_TYPES,
+				fileVersion.getMimeType()) ||
+			ImageProcessorUtil.isImageSupported(fileVersion.getMimeType()) ||
+			Objects.equals(
+				DLContentTypes.VIDEO_EXTERNAL_SHORTCUT,
+				fileVersion.getMimeType())) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	public boolean isSearchEverywhere() {

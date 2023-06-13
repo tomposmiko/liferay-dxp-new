@@ -27,6 +27,10 @@ public class CommercePriceModifierLocalServiceWrapper
 	implements CommercePriceModifierLocalService,
 			   ServiceWrapper<CommercePriceModifierLocalService> {
 
+	public CommercePriceModifierLocalServiceWrapper() {
+		this(null);
+	}
+
 	public CommercePriceModifierLocalServiceWrapper(
 		CommercePriceModifierLocalService commercePriceModifierLocalService) {
 
@@ -101,25 +105,57 @@ public class CommercePriceModifierLocalServiceWrapper
 	@Override
 	public com.liferay.commerce.pricing.model.CommercePriceModifier
 			addCommercePriceModifier(
-				long groupId, String title, String target,
-				long commercePriceListId, String modifierType,
+				String externalReferenceCode, long groupId, String title,
+				String target, long commercePriceListId, String modifierType,
 				java.math.BigDecimal modifierAmount, double priority,
 				boolean active, int displayDateMonth, int displayDateDay,
 				int displayDateYear, int displayDateHour, int displayDateMinute,
 				int expirationDateMonth, int expirationDateDay,
 				int expirationDateYear, int expirationDateHour,
-				int expirationDateMinute, String externalReferenceCode,
-				boolean neverExpire,
+				int expirationDateMinute, boolean neverExpire,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commercePriceModifierLocalService.addCommercePriceModifier(
-			groupId, title, target, commercePriceListId, modifierType,
-			modifierAmount, priority, active, displayDateMonth, displayDateDay,
-			displayDateYear, displayDateHour, displayDateMinute,
+			externalReferenceCode, groupId, title, target, commercePriceListId,
+			modifierType, modifierAmount, priority, active, displayDateMonth,
+			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
 			expirationDateMonth, expirationDateDay, expirationDateYear,
-			expirationDateHour, expirationDateMinute, externalReferenceCode,
-			neverExpire, serviceContext);
+			expirationDateHour, expirationDateMinute, neverExpire,
+			serviceContext);
+	}
+
+	@Override
+	public com.liferay.commerce.pricing.model.CommercePriceModifier
+			addOrUpdateCommercePriceModifier(
+				String externalReferenceCode, long userId,
+				long commercePriceModifierId, long groupId, String title,
+				String target, long commercePriceListId, String modifierType,
+				java.math.BigDecimal modifierAmount, double priority,
+				boolean active, int displayDateMonth, int displayDateDay,
+				int displayDateYear, int displayDateHour, int displayDateMinute,
+				int expirationDateMonth, int expirationDateDay,
+				int expirationDateYear, int expirationDateHour,
+				int expirationDateMinute, boolean neverExpire,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _commercePriceModifierLocalService.
+			addOrUpdateCommercePriceModifier(
+				externalReferenceCode, userId, commercePriceModifierId, groupId,
+				title, target, commercePriceListId, modifierType,
+				modifierAmount, priority, active, displayDateMonth,
+				displayDateDay, displayDateYear, displayDateHour,
+				displayDateMinute, expirationDateMonth, expirationDateDay,
+				expirationDateYear, expirationDateHour, expirationDateMinute,
+				neverExpire, serviceContext);
+	}
+
+	@Override
+	public void checkCommercePriceModifiers()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_commercePriceModifierLocalService.checkCommercePriceModifiers();
 	}
 
 	/**
@@ -327,10 +363,10 @@ public class CommercePriceModifierLocalServiceWrapper
 	@Override
 	public com.liferay.commerce.pricing.model.CommercePriceModifier
 		fetchByExternalReferenceCode(
-			long companyId, String externalReferenceCode) {
+			String externalReferenceCode, long companyId) {
 
 		return _commercePriceModifierLocalService.fetchByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	@Override
@@ -341,7 +377,13 @@ public class CommercePriceModifierLocalServiceWrapper
 			commercePriceModifierId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce price modifier with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce price modifier's external reference code
+	 * @return the matching commerce price modifier, or <code>null</code> if a matching commerce price modifier could not be found
+	 */
 	@Override
 	public com.liferay.commerce.pricing.model.CommercePriceModifier
 		fetchCommercePriceModifierByExternalReferenceCode(
@@ -352,6 +394,9 @@ public class CommercePriceModifierLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommercePriceModifierByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.pricing.model.CommercePriceModifier
@@ -401,7 +446,14 @@ public class CommercePriceModifierLocalServiceWrapper
 			commercePriceModifierId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce price modifier with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce price modifier's external reference code
+	 * @return the matching commerce price modifier
+	 * @throws PortalException if a matching commerce price modifier could not be found
+	 */
 	@Override
 	public com.liferay.commerce.pricing.model.CommercePriceModifier
 			getCommercePriceModifierByExternalReferenceCode(
@@ -644,30 +696,6 @@ public class CommercePriceModifierLocalServiceWrapper
 		return _commercePriceModifierLocalService.updateStatus(
 			userId, commercePriceModifierId, status, serviceContext,
 			workflowContext);
-	}
-
-	@Override
-	public com.liferay.commerce.pricing.model.CommercePriceModifier
-			upsertCommercePriceModifier(
-				long userId, long commercePriceModifierId, long groupId,
-				String title, String target, long commercePriceListId,
-				String modifierType, java.math.BigDecimal modifierAmount,
-				double priority, boolean active, int displayDateMonth,
-				int displayDateDay, int displayDateYear, int displayDateHour,
-				int displayDateMinute, int expirationDateMonth,
-				int expirationDateDay, int expirationDateYear,
-				int expirationDateHour, int expirationDateMinute,
-				String externalReferenceCode, boolean neverExpire,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _commercePriceModifierLocalService.upsertCommercePriceModifier(
-			userId, commercePriceModifierId, groupId, title, target,
-			commercePriceListId, modifierType, modifierAmount, priority, active,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, expirationDateMonth, expirationDateDay,
-			expirationDateYear, expirationDateHour, expirationDateMinute,
-			externalReferenceCode, neverExpire, serviceContext);
 	}
 
 	@Override

@@ -43,7 +43,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("RowViewportDefinition")
+@GraphQLName(
+	description = "The definition of the row vieport.",
+	value = "RowViewportDefinition"
+)
 @JsonFilter("Liferay.Vulcan")
 @XmlRootElement(name = "RowViewportDefinition")
 public class RowViewportDefinition implements Serializable {
@@ -57,7 +60,7 @@ public class RowViewportDefinition implements Serializable {
 			RowViewportDefinition.class, json);
 	}
 
-	@Schema
+	@Schema(description = "The number of modules per row.")
 	public Integer getModulesPerRow() {
 		return modulesPerRow;
 	}
@@ -81,11 +84,13 @@ public class RowViewportDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The number of modules per row.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer modulesPerRow;
 
-	@Schema
+	@Schema(
+		description = "A flag that indicates whether the row viewport has reverse order."
+	)
 	public Boolean getReverseOrder() {
 		return reverseOrder;
 	}
@@ -109,11 +114,13 @@ public class RowViewportDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether the row viewport has reverse order."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean reverseOrder;
 
-	@Schema
+	@Schema(description = "The vertical aligment property of the row viewport.")
 	public String getVerticalAlignment() {
 		return verticalAlignment;
 	}
@@ -137,7 +144,9 @@ public class RowViewportDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The vertical aligment property of the row viewport."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String verticalAlignment;
 

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -59,7 +60,7 @@ public class NavigationMenuItemSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (navigationMenuItem.getAvailableLanguages() != null) {
 			if (sb.length() > 1) {
@@ -156,6 +157,16 @@ public class NavigationMenuItemSerDes {
 			sb.append("\"");
 		}
 
+		if (navigationMenuItem.getLink_i18n() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"link_i18n\": ");
+
+			sb.append(_toJSON(navigationMenuItem.getLink_i18n()));
+		}
+
 		if (navigationMenuItem.getName() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -214,6 +225,20 @@ public class NavigationMenuItemSerDes {
 			sb.append("\"parentNavigationMenuId\": ");
 
 			sb.append(navigationMenuItem.getParentNavigationMenuId());
+		}
+
+		if (navigationMenuItem.getSitePageURL() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"sitePageURL\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(navigationMenuItem.getSitePageURL()));
+
+			sb.append("\"");
 		}
 
 		if (navigationMenuItem.getType() != null) {
@@ -276,7 +301,7 @@ public class NavigationMenuItemSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (navigationMenuItem.getAvailableLanguages() == null) {
 			map.put("availableLanguages", null);
@@ -328,6 +353,14 @@ public class NavigationMenuItemSerDes {
 			map.put("link", String.valueOf(navigationMenuItem.getLink()));
 		}
 
+		if (navigationMenuItem.getLink_i18n() == null) {
+			map.put("link_i18n", null);
+		}
+		else {
+			map.put(
+				"link_i18n", String.valueOf(navigationMenuItem.getLink_i18n()));
+		}
+
 		if (navigationMenuItem.getName() == null) {
 			map.put("name", null);
 		}
@@ -359,6 +392,15 @@ public class NavigationMenuItemSerDes {
 			map.put(
 				"parentNavigationMenuId",
 				String.valueOf(navigationMenuItem.getParentNavigationMenuId()));
+		}
+
+		if (navigationMenuItem.getSitePageURL() == null) {
+			map.put("sitePageURL", null);
+		}
+		else {
+			map.put(
+				"sitePageURL",
+				String.valueOf(navigationMenuItem.getSitePageURL()));
 		}
 
 		if (navigationMenuItem.getType() == null) {
@@ -440,6 +482,13 @@ public class NavigationMenuItemSerDes {
 					navigationMenuItem.setLink((String)jsonParserFieldValue);
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "link_i18n")) {
+				if (jsonParserFieldValue != null) {
+					navigationMenuItem.setLink_i18n(
+						(Map)NavigationMenuItemSerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "name")) {
 				if (jsonParserFieldValue != null) {
 					navigationMenuItem.setName((String)jsonParserFieldValue);
@@ -456,20 +505,15 @@ public class NavigationMenuItemSerDes {
 						jsonParserFieldName, "navigationMenuItems")) {
 
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					NavigationMenuItem[] navigationMenuItemsArray =
-						new NavigationMenuItem[jsonParserFieldValues.length];
-
-					for (int i = 0; i < navigationMenuItemsArray.length; i++) {
-						navigationMenuItemsArray[i] =
-							NavigationMenuItemSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
 					navigationMenuItem.setNavigationMenuItems(
-						navigationMenuItemsArray);
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> NavigationMenuItemSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new NavigationMenuItem[size]
+						));
 				}
 			}
 			else if (Objects.equals(
@@ -478,6 +522,12 @@ public class NavigationMenuItemSerDes {
 				if (jsonParserFieldValue != null) {
 					navigationMenuItem.setParentNavigationMenuId(
 						Long.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "sitePageURL")) {
+				if (jsonParserFieldValue != null) {
+					navigationMenuItem.setSitePageURL(
+						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "type")) {

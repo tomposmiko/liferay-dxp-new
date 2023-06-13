@@ -129,6 +129,10 @@ components:
                 dataDefinitionId:
                     format: int64
                     type: integer
+                dataLayoutFields:
+                    additionalProperties:
+                        type: object
+                    type: object
                 dataLayoutKey:
                     type: string
                 dataLayoutPages:
@@ -272,6 +276,9 @@ components:
                 id:
                     format: int64
                     type: integer
+                status:
+                    readOnly: true
+                    type: integer
         DataRecordCollection:
             description:
                 https://www.schema.org/DataRecordCollection
@@ -322,7 +329,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.data.engine.rest.client', and version '2.0.43'."
+        'com.liferay.data.engine.rest.client', and version '3.0.11'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -434,6 +441,33 @@ paths:
                   schema:
                       format: int64
                       type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/DataDefinition"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/DataDefinition"
+            tags: ["DataDefinition"]
+        patch:
+            operationId: patchDataDefinition
+            parameters:
+                - in: path
+                  name: dataDefinitionId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/DataDefinition"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/DataDefinition"
             responses:
                 200:
                     content:

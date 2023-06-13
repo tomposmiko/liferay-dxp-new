@@ -14,6 +14,7 @@
 
 package com.liferay.site.memberships.web.internal.display.context;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -24,7 +25,6 @@ import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -130,8 +130,7 @@ public class OrganizationsDisplayContext {
 
 		organizationSearch.setEmptyResultsMessage(
 			LanguageUtil.format(
-				ResourceBundleUtil.getBundle(
-					themeDisplay.getLocale(), getClass()),
+				themeDisplay.getLocale(),
 				"no-organization-was-found-that-is-a-member-of-this-x",
 				StringUtil.toLowerCase(
 					GroupUtil.getGroupTypeLabel(
@@ -177,42 +176,66 @@ public class OrganizationsDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/view.jsp"
+		).setRedirect(
+			() -> {
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)_httpServletRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
 
-		PortletURL portletURL = _renderResponse.createRenderURL();
+				return themeDisplay.getURLCurrent();
+			}
+		).setKeywords(
+			() -> {
+				String keywords = getKeywords();
 
-		portletURL.setParameter("mvcPath", "/view.jsp");
-		portletURL.setParameter("tabs1", "organizations");
-		portletURL.setParameter("redirect", themeDisplay.getURLCurrent());
-		portletURL.setParameter("groupId", String.valueOf(getGroupId()));
+				if (Validator.isNotNull(keywords)) {
+					return keywords;
+				}
 
-		String displayStyle = getDisplayStyle();
+				return null;
+			}
+		).setTabs1(
+			"organizations"
+		).setParameter(
+			"displayStyle",
+			() -> {
+				String displayStyle = getDisplayStyle();
 
-		if (Validator.isNotNull(displayStyle)) {
-			portletURL.setParameter("displayStyle", displayStyle);
-		}
+				if (Validator.isNotNull(displayStyle)) {
+					return displayStyle;
+				}
 
-		String keywords = getKeywords();
+				return null;
+			}
+		).setParameter(
+			"groupId", getGroupId()
+		).setParameter(
+			"orderByCol",
+			() -> {
+				String orderByCol = getOrderByCol();
 
-		if (Validator.isNotNull(keywords)) {
-			portletURL.setParameter("keywords", keywords);
-		}
+				if (Validator.isNotNull(orderByCol)) {
+					return orderByCol;
+				}
 
-		String orderByCol = getOrderByCol();
+				return null;
+			}
+		).setParameter(
+			"orderByType",
+			() -> {
+				String orderByType = getOrderByType();
 
-		if (Validator.isNotNull(orderByCol)) {
-			portletURL.setParameter("orderByCol", orderByCol);
-		}
+				if (Validator.isNotNull(orderByType)) {
+					return orderByType;
+				}
 
-		String orderByType = getOrderByType();
-
-		if (Validator.isNotNull(orderByType)) {
-			portletURL.setParameter("orderByType", orderByType);
-		}
-
-		return portletURL;
+				return null;
+			}
+		).buildPortletURL();
 	}
 
 	private String _displayStyle;

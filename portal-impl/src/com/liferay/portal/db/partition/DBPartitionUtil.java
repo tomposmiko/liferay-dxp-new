@@ -14,23 +14,31 @@
 
 package com.liferay.portal.db.partition;
 
+import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.dao.jdbc.util.ConnectionWrapper;
 import com.liferay.portal.dao.jdbc.util.DataSourceWrapper;
+import com.liferay.portal.dao.jdbc.util.StatementWrapper;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBInspector;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.dao.jdbc.CurrentConnectionUtil;
+import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.hibernate.DialectDetector;
+import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsValues;
 
 import java.sql.Connection;
@@ -64,8 +72,7 @@ public class DBPartitionUtil {
 			InfrastructureUtil.getDataSource());
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
-				"create schema if not exists " + _getSchemaName(companyId) +
-					" character set utf8")) {
+				_getCreateSchemaSQL(companyId))) {
 
 			preparedStatement.executeUpdate();
 
@@ -99,6 +106,31 @@ public class DBPartitionUtil {
 		return true;
 	}
 
+	public static void forEachCompanyId(
+			UnsafeConsumer<Long, Exception> unsafeConsumer)
+		throws Exception {
+
+		if (!_DATABASE_PARTITION_ENABLED) {
+			unsafeConsumer.accept(null);
+
+			return;
+		}
+
+		if (CompanyThreadLocal.isLocked()) {
+			unsafeConsumer.accept(CompanyThreadLocal.getCompanyId());
+
+			return;
+		}
+
+		for (long companyId : PortalInstances.getCompanyIdsBySQL()) {
+			try (SafeCloseable safeCloseable = CompanyThreadLocal.lock(
+					companyId)) {
+
+				unsafeConsumer.accept(companyId);
+			}
+		}
+	}
+
 	public static boolean removeDBPartition(long companyId)
 		throws PortalException {
 
@@ -117,7 +149,7 @@ public class DBPartitionUtil {
 			DatabaseMetaData databaseMetaData = connection.getMetaData();
 
 			try (ResultSet resultSet = databaseMetaData.getTables(
-					dbInspector.getCatalog(), dbInspector.getSchema(), null,
+					_defaultSchemaName, dbInspector.getSchema(), null,
 					new String[] {"TABLE"});
 				Statement statement = connection.createStatement()) {
 
@@ -167,13 +199,14 @@ public class DBPartitionUtil {
 		throws SQLException {
 
 		if (_DATABASE_PARTITION_ENABLED) {
-			try (PreparedStatement ps = connection.prepareStatement(
-					"select companyId from Company where webId = '" +
-						PropsValues.COMPANY_DEFAULT_WEB_ID + "'");
-				ResultSet rs = ps.executeQuery()) {
+			try (PreparedStatement preparedStatement =
+					connection.prepareStatement(
+						"select companyId from Company where webId = '" +
+							PropsValues.COMPANY_DEFAULT_WEB_ID + "'");
+				ResultSet resultSet = preparedStatement.executeQuery()) {
 
-				if (rs.next()) {
-					_defaultCompanyId = rs.getLong(1);
+				if (resultSet.next()) {
+					_defaultCompanyId = resultSet.getLong(1);
 				}
 			}
 		}
@@ -241,7 +274,7 @@ public class DBPartitionUtil {
 				connection.setCatalog(
 					_getSchemaName(CompanyThreadLocal.getCompanyId()));
 
-				return super.createStatement();
+				return _wrapStatement(super.createStatement());
 			}
 
 			@Override
@@ -252,8 +285,8 @@ public class DBPartitionUtil {
 				connection.setCatalog(
 					_getSchemaName(CompanyThreadLocal.getCompanyId()));
 
-				return super.createStatement(
-					resultSetType, resultSetConcurrency);
+				return _wrapStatement(
+					super.createStatement(resultSetType, resultSetConcurrency));
 			}
 
 			@Override
@@ -265,8 +298,10 @@ public class DBPartitionUtil {
 				connection.setCatalog(
 					_getSchemaName(CompanyThreadLocal.getCompanyId()));
 
-				return super.createStatement(
-					resultSetType, resultSetConcurrency, resultSetHoldability);
+				return _wrapStatement(
+					super.createStatement(
+						resultSetType, resultSetConcurrency,
+						resultSetHoldability));
 			}
 
 			@Override
@@ -346,6 +381,12 @@ public class DBPartitionUtil {
 		};
 	}
 
+	private static String _getCreateSchemaSQL(long companyId) {
+		return StringBundler.concat(
+			"create schema if not exists ", _getSchemaName(companyId),
+			" character set ", _getSessionCharsetEncoding());
+	}
+
 	private static String _getCreateTableSQL(long companyId, String tableName) {
 		return StringBundler.concat(
 			"create table if not exists ", _getSchemaName(companyId),
@@ -382,6 +423,30 @@ public class DBPartitionUtil {
 		return _DATABASE_PARTITION_SCHEMA_NAME_PREFIX + companyId;
 	}
 
+	private static String _getSessionCharsetEncoding() {
+		Connection connection = CurrentConnectionUtil.getConnection(
+			InfrastructureUtil.getDataSource());
+
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				"select variable_value from " +
+					"performance_schema.session_variables where " +
+						"variable_name = 'character_set_client'");
+			ResultSet resultSet = preparedStatement.executeQuery()) {
+
+			if (resultSet.next()) {
+				return resultSet.getString("variable_value");
+			}
+
+			return "utf8";
+		}
+		catch (Exception exception) {
+			_log.error(
+				"Unable to get session character set encoding", exception);
+
+			return "utf8";
+		}
+	}
+
 	private static boolean _isControlTable(
 			DBInspector dbInspector, String tableName)
 		throws Exception {
@@ -391,6 +456,26 @@ public class DBPartitionUtil {
 			!dbInspector.hasColumn(tableName, "companyId")) {
 
 			return true;
+		}
+
+		return false;
+	}
+
+	private static boolean _isSkip(String tableName) throws SQLException {
+		try (Connection connection = DataAccess.getConnection()) {
+			DBInspector dbInspector = new DBInspector(connection);
+
+			if (_isControlTable(dbInspector, tableName) &&
+				!(CompanyThreadLocal.getCompanyId() == _defaultCompanyId)) {
+
+				return true;
+			}
+		}
+		catch (Exception exception) {
+			throw new SQLException(
+				"Unable to check if the table " + tableName +
+					" is a control table",
+				exception);
 		}
 
 		return false;
@@ -451,6 +536,61 @@ public class DBPartitionUtil {
 		statement.executeUpdate(_getCreateViewSQL(companyId, tableName));
 	}
 
+	private static Statement _wrapStatement(Statement statement) {
+		return new StatementWrapper(statement) {
+
+			@Override
+			public int executeUpdate(String sql) throws SQLException {
+				String lowerCaseSQL = StringUtil.toLowerCase(sql);
+
+				String[] query = sql.split(StringPool.SPACE);
+
+				if ((StringUtil.startsWith(lowerCaseSQL, "alter table") &&
+					 _isSkip(query[2])) ||
+					((StringUtil.startsWith(lowerCaseSQL, "create index") ||
+					  StringUtil.startsWith(lowerCaseSQL, "drop index")) &&
+					 _isSkip(query[4])) ||
+					(StringUtil.startsWith(
+						lowerCaseSQL, "create unique index") &&
+					 _isSkip(query[5]))) {
+
+					return 0;
+				}
+
+				int returnValue = super.executeUpdate(sql);
+
+				if (!StringUtil.startsWith(lowerCaseSQL, "alter table")) {
+					return returnValue;
+				}
+
+				try (Connection connection = DataAccess.getConnection()) {
+					DBInspector dbInspector = new DBInspector(connection);
+					String tableName = query[2];
+
+					if (!_isControlTable(dbInspector, tableName)) {
+						return returnValue;
+					}
+
+					long[] companyIds = PortalInstances.getCompanyIdsBySQL();
+
+					for (long companyId : companyIds) {
+						if (companyId == _defaultCompanyId) {
+							continue;
+						}
+
+						super.execute(_getCreateViewSQL(companyId, tableName));
+					}
+
+					return returnValue;
+				}
+				catch (Exception exception) {
+					throw new SQLException(exception);
+				}
+			}
+
+		};
+	}
+
 	private static final boolean _DATABASE_PARTITION_ENABLED =
 		GetterUtil.getBoolean(PropsUtil.get("database.partition.enabled"));
 
@@ -458,6 +598,9 @@ public class DBPartitionUtil {
 		GetterUtil.get(
 			PropsUtil.get("database.partition.schema.name.prefix"),
 			"lpartition_");
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DBPartitionUtil.class);
 
 	private static final Set<String> _controlTableNames = new HashSet<>(
 		Arrays.asList("Company", "VirtualHost"));

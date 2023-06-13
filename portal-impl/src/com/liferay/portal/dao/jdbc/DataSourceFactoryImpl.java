@@ -32,8 +32,8 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jndi.JNDIUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.util.JavaDetector;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ServerDetector;
@@ -44,11 +44,6 @@ import com.liferay.portal.spring.hibernate.DialectDetector;
 import com.liferay.portal.util.JarUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceReference;
-import com.liferay.registry.ServiceTracker;
-import com.liferay.registry.ServiceTrackerCustomizer;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -91,6 +86,12 @@ import org.apache.commons.dbcp.BasicDataSourceFactory;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.jmx.ConnectionPool;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
+
 /**
  * @author Brian Wing Shun Chan
  * @author Shuyang Zhou
@@ -99,6 +100,10 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 
 	@Override
 	public void destroyDataSource(DataSource dataSource) throws Exception {
+		if (_serviceRegistration != null) {
+			_serviceRegistration.unregister();
+		}
+
 		while (dataSource instanceof DataSourceWrapper) {
 			DataSourceWrapper dataSourceWrapper = (DataSourceWrapper)dataSource;
 
@@ -153,6 +158,9 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 					Class.forName("com.mysql.cj.protocol.ExportControlled"));
 			}
 			catch (ClassNotFoundException classNotFoundException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(classNotFoundException, classNotFoundException);
+				}
 			}
 		}
 
@@ -161,8 +169,9 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 
 			ClassLoader classLoader = currentThread.getContextClassLoader();
 
-			currentThread.setContextClassLoader(
-				PortalClassLoaderUtil.getClassLoader());
+			Class<?> clazz = classLoader.getClass();
+
+			currentThread.setContextClassLoader(clazz.getClassLoader());
 
 			try {
 				Properties jndiEnvironmentProperties = PropsUtil.getProperties(
@@ -332,7 +341,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
-						"Property " + key + " is an invalid C3PO property");
+						"Property " + key + " is an invalid C3PO property",
+						exception);
 				}
 			}
 		}
@@ -414,7 +424,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
-						"Property " + key + " is an invalid HikariCP property");
+						"Property " + key + " is an invalid HikariCP property",
+						exception);
 				}
 			}
 		}
@@ -462,7 +473,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 					_log.warn(
 						StringBundler.concat(
 							"Property ", key, " is an invalid Tomcat JDBC ",
-							"property"));
+							"property"),
+						exception);
 				}
 			}
 		}
@@ -475,11 +487,12 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 			new org.apache.tomcat.jdbc.pool.DataSource(poolProperties);
 
 		if (poolProperties.isJmxEnabled()) {
-			Registry registry = RegistryUtil.getRegistry();
+			BundleContext bundleContext = SystemBundleUtil.getBundleContext();
 
-			_serviceTracker = registry.trackServices(
-				MBeanServer.class,
-				new MBeanServerServiceTrackerCustomizer(dataSource, poolName));
+			_serviceTracker = new ServiceTracker<>(
+				bundleContext, MBeanServer.class,
+				new MBeanServerServiceTrackerCustomizer(
+					bundleContext, dataSource, poolName));
 
 			_serviceTracker.open();
 		}
@@ -568,10 +581,10 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 	protected void registerConnectionPoolMetrics(
 		ConnectionPoolMetrics connectionPoolMetrics) {
 
-		Registry registry = RegistryUtil.getRegistry();
+		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
 
-		registry.registerService(
-			ConnectionPoolMetrics.class, connectionPoolMetrics);
+		_serviceRegistration = bundleContext.registerService(
+			ConnectionPoolMetrics.class, connectionPoolMetrics, null);
 	}
 
 	protected void testDatabaseClass(String driverClassName) throws Exception {
@@ -605,14 +618,14 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 			try {
 				JarUtil.downloadAndInstallJar(
 					new URL(url),
-					Paths.get(PropsValues.LIFERAY_LIB_GLOBAL_DIR, name),
+					Paths.get(PropsValues.LIFERAY_LIB_PORTAL_DIR, name),
 					(URLClassLoader)classLoader);
 			}
 			catch (Exception exception) {
 				_log.error(
 					StringBundler.concat(
 						"Unable to download and install ", name, " to ",
-						PropsValues.LIFERAY_LIB_GLOBAL_DIR, " from ", url),
+						PropsValues.LIFERAY_LIB_PORTAL_DIR, " from ", url),
 					exception);
 
 				throw classNotFoundException;
@@ -729,16 +742,19 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 	private static final Log _log = LogFactoryUtil.getLog(
 		DataSourceFactoryImpl.class);
 
+	private ServiceRegistration<?> _serviceRegistration;
 	private ServiceTracker<MBeanServer, MBeanServer> _serviceTracker;
 
 	private static class MBeanServerServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<MBeanServer, MBeanServer> {
 
 		public MBeanServerServiceTrackerCustomizer(
+				BundleContext bundleContext,
 				org.apache.tomcat.jdbc.pool.DataSource dataSource,
 				String poolName)
 			throws MalformedObjectNameException {
 
+			_bundleContext = bundleContext;
 			_dataSource = dataSource;
 
 			_objectName = new ObjectName(
@@ -749,9 +765,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 		public MBeanServer addingService(
 			ServiceReference<MBeanServer> serviceReference) {
 
-			Registry registry = RegistryUtil.getRegistry();
-
-			MBeanServer mBeanServer = registry.getService(serviceReference);
+			MBeanServer mBeanServer = _bundleContext.getService(
+				serviceReference);
 
 			try {
 				org.apache.tomcat.jdbc.pool.ConnectionPool jdbcConnectionPool =
@@ -780,9 +795,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 			ServiceReference<MBeanServer> serviceReference,
 			MBeanServer mBeanServer) {
 
-			Registry registry = RegistryUtil.getRegistry();
-
-			registry.ungetService(serviceReference);
+			_bundleContext.ungetService(serviceReference);
 
 			try {
 				mBeanServer.unregisterMBean(_objectName);
@@ -792,6 +805,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 			}
 		}
 
+		private final BundleContext _bundleContext;
 		private final org.apache.tomcat.jdbc.pool.DataSource _dataSource;
 		private final ObjectName _objectName;
 

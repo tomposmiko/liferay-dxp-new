@@ -62,16 +62,33 @@ public class CommerceChannelLocalServiceUtil {
 	}
 
 	public static CommerceChannel addCommerceChannel(
-			long siteGroupId, String name, String type,
+			String externalReferenceCode, long siteGroupId, String name,
+			String type,
 			com.liferay.portal.kernel.util.UnicodeProperties
 				typeSettingsUnicodeProperties,
-			String commerceCurrencyCode, String externalReferenceCode,
+			String commerceCurrencyCode,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addCommerceChannel(
-			siteGroupId, name, type, typeSettingsUnicodeProperties,
-			commerceCurrencyCode, externalReferenceCode, serviceContext);
+			externalReferenceCode, siteGroupId, name, type,
+			typeSettingsUnicodeProperties, commerceCurrencyCode,
+			serviceContext);
+	}
+
+	public static CommerceChannel addOrUpdateCommerceChannel(
+			long userId, String externalReferenceCode, long siteGroupId,
+			String name, String type,
+			com.liferay.portal.kernel.util.UnicodeProperties
+				typeSettingsUnicodeProperties,
+			String commerceCurrencyCode,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addOrUpdateCommerceChannel(
+			userId, externalReferenceCode, siteGroupId, name, type,
+			typeSettingsUnicodeProperties, commerceCurrencyCode,
+			serviceContext);
 	}
 
 	/**
@@ -233,17 +250,23 @@ public class CommerceChannelLocalServiceUtil {
 	}
 
 	public static CommerceChannel fetchByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
+		String externalReferenceCode, long companyId) {
 
 		return getService().fetchByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	public static CommerceChannel fetchCommerceChannel(long commerceChannelId) {
 		return getService().fetchCommerceChannel(commerceChannelId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce channel with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce channel's external reference code
+	 * @return the matching commerce channel, or <code>null</code> if a matching commerce channel could not be found
+	 */
 	public static CommerceChannel fetchCommerceChannelByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
 
@@ -251,6 +274,9 @@ public class CommerceChannelLocalServiceUtil {
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceChannelByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static CommerceChannel fetchCommerceChannelByReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -291,7 +317,14 @@ public class CommerceChannelLocalServiceUtil {
 		return getService().getCommerceChannel(commerceChannelId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce channel with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce channel's external reference code
+	 * @return the matching commerce channel
+	 * @throws PortalException if a matching commerce channel could not be found
+	 */
 	public static CommerceChannel getCommerceChannelByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
 		throws PortalException {
@@ -347,14 +380,6 @@ public class CommerceChannelLocalServiceUtil {
 		return getService().getCommerceChannels(companyId);
 	}
 
-	public static List<CommerceChannel> getCommerceChannels(
-			long companyId, String keywords, int start, int end)
-		throws PortalException {
-
-		return getService().getCommerceChannels(
-			companyId, keywords, start, end);
-	}
-
 	/**
 	 * Returns the number of commerce channels.
 	 *
@@ -362,12 +387,6 @@ public class CommerceChannelLocalServiceUtil {
 	 */
 	public static int getCommerceChannelsCount() {
 		return getService().getCommerceChannelsCount();
-	}
-
-	public static int getCommerceChannelsCount(long companyId, String keywords)
-		throws PortalException {
-
-		return getService().getCommerceChannelsCount(companyId, keywords);
 	}
 
 	public static
@@ -395,19 +414,18 @@ public class CommerceChannelLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
-	public static List<CommerceChannel> searchCommerceChannels(long companyId)
+	public static List<CommerceChannel> search(long companyId)
 		throws PortalException {
 
-		return getService().searchCommerceChannels(companyId);
+		return getService().search(companyId);
 	}
 
-	public static List<CommerceChannel> searchCommerceChannels(
+	public static List<CommerceChannel> search(
 			long companyId, String keywords, int start, int end,
 			com.liferay.portal.kernel.search.Sort sort)
 		throws PortalException {
 
-		return getService().searchCommerceChannels(
-			companyId, keywords, start, end, sort);
+		return getService().search(companyId, keywords, start, end, sort);
 	}
 
 	public static int searchCommerceChannelsCount(
@@ -460,11 +478,11 @@ public class CommerceChannelLocalServiceUtil {
 	}
 
 	public static CommerceChannel updateCommerceChannelExternalReferenceCode(
-			long commerceChannelId, String externalReferenceCode)
+			String externalReferenceCode, long commerceChannelId)
 		throws PortalException {
 
 		return getService().updateCommerceChannelExternalReferenceCode(
-			commerceChannelId, externalReferenceCode);
+			externalReferenceCode, commerceChannelId);
 	}
 
 	public static CommerceChannelLocalService getService() {

@@ -36,8 +36,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.SearchEngine;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -47,7 +45,6 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.filter.ComplexQueryPart;
 import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
 import com.liferay.portal.search.query.MatchQuery;
@@ -69,7 +66,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -90,8 +86,6 @@ public class IndexerClausesComplexQueryPartTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Assume.assumeTrue(!isSearchEngine("Solr"));
-
 		BlogsEntrySearchFixture blogsEntrySearchFixture =
 			new BlogsEntrySearchFixture(blogsEntryLocalService);
 
@@ -266,7 +260,7 @@ public class IndexerClausesComplexQueryPartTest {
 
 	protected MBMessage addMessage(String title) throws Exception {
 		return mbMessageLocalService.addMessage(
-			_user.getUserId(), RandomTestUtil.randomString(),
+			null, _user.getUserId(), RandomTestUtil.randomString(),
 			_group.getGroupId(), MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID,
 			0L, MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID, title,
 			RandomTestUtil.randomString(), MBMessageConstants.DEFAULT_FORMAT,
@@ -308,25 +302,6 @@ public class IndexerClausesComplexQueryPartTest {
 		).query(
 			query
 		).build();
-	}
-
-	protected boolean isSearchEngine(String engine) {
-		SearchEngine searchEngine = _searchEngineHelper.getSearchEngine(
-			_searchEngineHelper.getDefaultSearchEngineId());
-
-		String vendor = searchEngine.getVendor();
-
-		if (engine.equals("Elasticsearch7")) {
-			String version = _searchEngineInformation.getClientVersionString();
-
-			if (vendor.equals("Elasticsearch") && version.startsWith("7")) {
-				return true;
-			}
-
-			return false;
-		}
-
-		return vendor.equals(engine);
 	}
 
 	protected Consumer<SearchRequestBuilder> must() {
@@ -405,12 +380,6 @@ public class IndexerClausesComplexQueryPartTest {
 
 	private static final String _TITLE_EN_US = StringBundler.concat(
 		Field.TITLE, StringPool.UNDERLINE, LocaleUtil.US);
-
-	@Inject
-	private static SearchEngineHelper _searchEngineHelper;
-
-	@Inject
-	private static SearchEngineInformation _searchEngineInformation;
 
 	@DeleteAfterTestRun
 	private List<BlogsEntry> _blogsEntries;

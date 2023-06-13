@@ -90,11 +90,8 @@ DispatchTriggerDisplayContext dispatchTriggerDisplayContext = (DispatchTriggerDi
 			var form = window.document['<portlet:namespace />fm'];
 
 			form.setAttribute('method', 'post');
-			form['<portlet:namespace /><%= Constants.CMD %>'].value =
-				'<%= Constants.DELETE %>';
-			form[
-				'<portlet:namespace />deleteDispatchTriggerIds'
-			].value = Liferay.Util.listCheckedExcept(
+			form['<%= Constants.CMD %>'].value = '<%= Constants.DELETE %>';
+			form['deleteDispatchTriggerIds'].value = Liferay.Util.listCheckedExcept(
 				form,
 				'<portlet:namespace />allRowIds'
 			);

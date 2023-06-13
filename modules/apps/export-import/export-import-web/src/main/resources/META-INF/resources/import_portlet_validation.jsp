@@ -20,7 +20,7 @@
 String redirect = ParamUtil.getString(request, "redirect");
 %>
 
-<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="exportImport" var="importPortletURL">
+<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/export_import/export_import" var="importPortletURL">
 	<portlet:param name="p_p_isolated" value="<%= Boolean.TRUE.toString() %>" />
 	<portlet:param name="redirect" value="<%= redirect %>" />
 	<portlet:param name="portletResource" value="<%= portletResource %>" />
@@ -52,31 +52,31 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 	<aui:script use="liferay-upload">
 		var liferayUpload = new Liferay.Upload({
-			boundingBox: '#<portlet:namespace />fileUpload',
+			'boundingBox': '#<portlet:namespace />fileUpload',
 
 			<%
 			DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance(locale);
 			%>
 
-			decimalSeparator: '<%= decimalFormatSymbols.getDecimalSeparator() %>',
+			'decimalSeparator': '<%= decimalFormatSymbols.getDecimalSeparator() %>',
 
-			deleteFile:
-				'<liferay-portlet:actionURL doAsUserId="<%= user.getUserId() %>" name="exportImport"><portlet:param name="mvcRenderCommandName" value="exportImport" /><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE_TEMP %>" /><portlet:param name="redirect" value="<%= redirect %>" /><portlet:param name="portletResource" value="<%= portletResource %>" /></liferay-portlet:actionURL>&ticketKey=<%= ticket.getKey() %><liferay-ui:input-permissions-params modelName="<%= Group.class.getName() %>" />',
+			'deleteFile':
+				'<liferay-portlet:actionURL doAsUserId="<%= user.getUserId() %>" name="/export_import/export_import"><portlet:param name="mvcRenderCommandName" value="/export_import/export_import" /><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE_TEMP %>" /><portlet:param name="redirect" value="<%= redirect %>" /><portlet:param name="portletResource" value="<%= portletResource %>" /></liferay-portlet:actionURL>&ticketKey=<%= ticket.getKey() %><liferay-ui:input-permissions-params modelName="<%= Group.class.getName() %>" />',
 
 			<%
 			DLConfiguration dlConfiguration = ConfigurationProviderUtil.getSystemConfiguration(DLConfiguration.class);
 			%>
 
-			fileDescription:
+			'fileDescription':
 				'<%= StringUtil.merge(dlConfiguration.fileExtensions()) %>',
 
-			maxFileSize:
+			'maxFileSize':
 				'<%= UploadServletRequestConfigurationHelperUtil.getMaxSize() %> B',
-			metadataContainer: '#<portlet:namespace />commonFileMetadataContainer',
-			metadataExplanationContainer:
+			'metadataContainer': '#<portlet:namespace />commonFileMetadataContainer',
+			'metadataExplanationContainer':
 				'#<portlet:namespace />metadataExplanationContainer',
-			multipleFiles: false,
-			namespace: '<portlet:namespace />',
+			'multipleFiles': false,
+			'namespace': '<portlet:namespace />',
 			'strings.dropFileText':
 				'<liferay-ui:message key="drop-a-lar-file-here-to-import" />',
 			'strings.fileCannotBeSavedText':
@@ -85,7 +85,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 				'<liferay-ui:message key="this-file-was-previously-uploaded-but-not-actually-imported" />',
 			'strings.uploadsCompleteText':
 				'<liferay-ui:message key="the-file-is-ready-to-be-imported" />',
-			tempFileURL: {
+			'tempFileURL': {
 				method: Liferay.Service.bind('/layout/get-temp-file-names'),
 				params: {
 					folderName:
@@ -93,15 +93,15 @@ String redirect = ParamUtil.getString(request, "redirect");
 					groupId: <%= scopeGroupId %>,
 				},
 			},
-			uploadFile:
-				'<liferay-portlet:actionURL doAsUserId="<%= user.getUserId() %>" name="exportImport"><portlet:param name="mvcRenderCommandName" value="exportImport" /><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD_TEMP %>" /><portlet:param name="redirect" value="<%= redirect %>" /><portlet:param name="plid" value="<%= String.valueOf(plid) %>" /> <portlet:param name="groupId" value="<%= String.valueOf(themeDisplay.getScopeGroupId()) %>" /><portlet:param name="portletResource" value="<%= portletResource %>" /></liferay-portlet:actionURL>&ticketKey=<%= ticket.getKey() %><liferay-ui:input-permissions-params modelName="<%= Group.class.getName() %>" />',
+			'uploadFile':
+				'<liferay-portlet:actionURL doAsUserId="<%= user.getUserId() %>" name="/export_import/export_import"><portlet:param name="mvcRenderCommandName" value="/export_import/export_import" /><portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD_TEMP %>" /><portlet:param name="redirect" value="<%= redirect %>" /><portlet:param name="plid" value="<%= String.valueOf(plid) %>" /> <portlet:param name="groupId" value="<%= String.valueOf(themeDisplay.getScopeGroupId()) %>" /><portlet:param name="portletResource" value="<%= portletResource %>" /></liferay-portlet:actionURL>&ticketKey=<%= ticket.getKey() %><liferay-ui:input-permissions-params modelName="<%= Group.class.getName() %>" />',
 		});
 
-		liferayUpload._uploader.on('alluploadscomplete', function (event) {
+		liferayUpload._uploader.on('alluploadscomplete', (event) => {
 			toggleContinueButton();
 		});
 
-		Liferay.on('tempFileRemoved', function (event) {
+		Liferay.on('tempFileRemoved', (event) => {
 			toggleContinueButton();
 		});
 
@@ -123,7 +123,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 	</aui:script>
 </aui:form>
 
-<aui:script require="metal-dom/src/all/dom as dom">
+<aui:script require="frontend-js-web/liferay/util/run_scripts_in_element.es as runScriptsInElement">
 	var continueButton = document.getElementById(
 		'<portlet:namespace />continueButton'
 	);
@@ -134,17 +134,17 @@ String redirect = ParamUtil.getString(request, "redirect");
 	if (continueButton && exportImportOptions) {
 		var form = document.<portlet:namespace />fm1;
 
-		continueButton.addEventListener('click', function (event) {
+		continueButton.addEventListener('click', (event) => {
 			event.preventDefault();
 
 			Liferay.Util.fetch(form.action)
-				.then(function (response) {
+				.then((response) => {
 					return response.text();
 				})
-				.then(function (response) {
+				.then((response) => {
 					exportImportOptions.innerHTML = response;
 
-					dom.globalEval.runScriptsInElement(exportImportOptions);
+					runScriptsInElement.default(exportImportOptions);
 				});
 		});
 	}

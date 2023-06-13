@@ -19,6 +19,7 @@ import com.liferay.asset.kernel.model.BaseJSPAssetRenderer;
 import com.liferay.bookmarks.constants.BookmarksPortletKeys;
 import com.liferay.bookmarks.constants.BookmarksWebKeys;
 import com.liferay.bookmarks.model.BookmarksEntry;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -138,18 +139,20 @@ public class BookmarksEntryAssetRenderer
 			group = themeDisplay.getScopeGroup();
 		}
 
-		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-			liferayPortletRequest, group, BookmarksPortletKeys.BOOKMARKS_ADMIN,
-			0, 0, PortletRequest.RENDER_PHASE);
-
-		portletURL.setParameter(
-			"mvcRenderCommandName", "/bookmarks/edit_entry");
-		portletURL.setParameter(
-			"folderId", String.valueOf(_entry.getFolderId()));
-		portletURL.setParameter("entryId", String.valueOf(_entry.getEntryId()));
-		portletURL.setParameter("showFolderSelector", Boolean.TRUE.toString());
-
-		return portletURL;
+		return PortletURLBuilder.create(
+			PortalUtil.getControlPanelPortletURL(
+				liferayPortletRequest, group,
+				BookmarksPortletKeys.BOOKMARKS_ADMIN, 0, 0,
+				PortletRequest.RENDER_PHASE)
+		).setMVCRenderCommandName(
+			"/bookmarks/edit_entry"
+		).setParameter(
+			"entryId", _entry.getEntryId()
+		).setParameter(
+			"folderId", _entry.getFolderId()
+		).setParameter(
+			"showFolderSelector", true
+		).buildPortletURL();
 	}
 
 	@Override
@@ -169,15 +172,6 @@ public class BookmarksEntryAssetRenderer
 
 		return getURLViewInContext(
 			liferayPortletRequest, noSuchEntryRedirect, "/bookmarks/find_entry",
-			"entryId", _entry.getEntryId());
-	}
-
-	@Override
-	public String getURLViewInContext(
-		ThemeDisplay themeDisplay, String noSuchEntryRedirect) {
-
-		return getURLViewInContext(
-			themeDisplay, noSuchEntryRedirect, "/bookmarks/find_entry",
 			"entryId", _entry.getEntryId());
 	}
 

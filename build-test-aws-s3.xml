@@ -64,7 +64,7 @@
 		<if>
 			<contains string="${bucket.objects}" substring="1.0" />
 			<then>
-				<echo>Document is in bucket.</echo>
+				<echo message="Document is in bucket." />
 			</then>
 			<else>
 				<fail>Document is not in bucket.</fail>
@@ -84,7 +84,7 @@
 		<if>
 			<equals arg1="${bucket.objects}" arg2="" />
 			<then>
-				<echo>The bucket is empty.</echo>
+				<echo message="The bucket is empty." />
 			</then>
 			<else>
 				<fail>The bucket is not empty.</fail>

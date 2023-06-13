@@ -40,8 +40,6 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.util.PropsValues;
@@ -50,15 +48,11 @@ import java.io.Serializable;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.mockito.Matchers;
 
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
@@ -92,9 +86,8 @@ public class DDMImplTest extends BaseDDMTestCase {
 		setUpDDMFormValuesJSONSerializer();
 		setUpDDMStructureLocalServiceUtil();
 		setUpJSONFactoryUtil();
-		setUpHtmlUtil();
 		setUpLanguageUtil();
-		setUpPortalUtil();
+		setUpLocaleUtil();
 		setUpPropsValues();
 		setUpSAXReaderUtil();
 	}
@@ -762,6 +755,7 @@ public class DDMImplTest extends BaseDDMTestCase {
 			ProxyFactory.newDummyInstance(ServiceTrackerMap.class));
 	}
 
+	@Override
 	protected void setUpDDMFormValuesJSONSerializer() throws Exception {
 		java.lang.reflect.Field field = ReflectionUtil.getDeclaredField(
 			DDMFormValuesJSONSerializer.class, "_jsonFactory");
@@ -774,22 +768,6 @@ public class DDMImplTest extends BaseDDMTestCase {
 		field.set(
 			_ddmFormValuesSerializer,
 			ProxyFactory.newDummyInstance(ServiceTrackerMap.class));
-	}
-
-	protected void setUpPortalUtil() {
-		PortalUtil portalUtil = new PortalUtil();
-
-		Portal portal = mock(Portal.class);
-
-		ResourceBundle resourceBundle = mock(ResourceBundle.class);
-
-		when(
-			portal.getResourceBundle(Matchers.any(Locale.class))
-		).thenReturn(
-			resourceBundle
-		);
-
-		portalUtil.setPortal(portal);
 	}
 
 	protected void testValues(

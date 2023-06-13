@@ -84,7 +84,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
-		"mvc.command.name=/content_layout/duplicate_item"
+		"mvc.command.name=/layout_content_page_editor/duplicate_item"
 	},
 	service = MVCActionCommand.class
 )
@@ -203,17 +203,22 @@ public class DuplicateItemMVCActionCommand
 					}
 				});
 
-		JSONObject jsonObject = JSONUtil.put(
+		return JSONUtil.put(
 			"duplicatedFragmentEntryLinks",
 			_getDuplicatedFragmentEntryLinksJSONArray(
-				actionRequest, actionResponse, duplicatedFragmentEntryLinkIds));
+				actionRequest, actionResponse, duplicatedFragmentEntryLinkIds)
+		).put(
+			"duplicatedItemId",
+			() -> {
+				if (!duplicatedLayoutStructureItemIds.isEmpty()) {
+					return duplicatedLayoutStructureItemIds.get(0);
+				}
 
-		if (!duplicatedLayoutStructureItemIds.isEmpty()) {
-			jsonObject.put(
-				"duplicatedItemId", duplicatedLayoutStructureItemIds.get(0));
-		}
-
-		return jsonObject.put("layoutData", layoutDataJSONObject);
+				return null;
+			}
+		).put(
+			"layoutData", layoutDataJSONObject
+		);
 	}
 
 	private void _copyPortletPermissions(

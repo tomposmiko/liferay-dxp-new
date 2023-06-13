@@ -1,16 +1,15 @@
 {
 	"dependencies": {
-		"@clayui/button": "3.83.0",
-		"@clayui/color-picker": "3.31.0",
-		"@clayui/drop-down": "3.58.0",
-		"@clayui/form": "3.89.0",
-		"@clayui/icon": "3.56.0",
-		"@clayui/loading-indicator": "3.60.0",
-		"@clayui/popover": "3.5.0",
-		"classnames": "2.2.6",
+		"@clayui/alert": "3.40.0",
+		"@clayui/button": "3.40.0",
+		"@clayui/color-picker": "3.41.0",
+		"@clayui/drop-down": "3.41.0",
+		"@clayui/form": "3.40.0",
+		"@clayui/icon": "3.40.0",
+		"@clayui/loading-indicator": "3.40.0",
+		"@clayui/popover": "3.40.0",
+		"classnames": "2.3.1",
 		"frontend-js-web": "*",
-		"metal-dom": "2.16.8",
-		"metal-position": "2.1.2",
 		"metal-state": "2.16.8",
 		"prop-types": "15.7.2",
 		"react": "16.12.0"
@@ -19,7 +18,8 @@
 	"scripts": {
 		"build": "liferay-npm-scripts build",
 		"checkFormat": "liferay-npm-scripts check",
-		"format": "liferay-npm-scripts fix"
+		"format": "liferay-npm-scripts fix",
+		"test": "liferay-npm-scripts test"
 	},
-	"version": "1.0.42"
+	"version": "2.0.24"
 }

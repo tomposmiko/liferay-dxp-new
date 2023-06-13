@@ -18,7 +18,7 @@ import com.liferay.portal.cache.multiple.internal.constants.PortalCacheDestinati
 import com.liferay.portal.kernel.messaging.Destination;
 import com.liferay.portal.kernel.messaging.DestinationConfiguration;
 import com.liferay.portal.kernel.messaging.DestinationFactory;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 
 import java.util.Dictionary;
 
@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Tina Tian
  */
 @Component(
-	configurationPid = "com.liferay.portal.cache.multiple.configuration.PortalCacheClusterConfiguration",
+	configurationPid = "com.liferay.portal.cache.cluster.configuration.PortalCacheClusterConfiguration",
 	enabled = false, immediate = true,
 	service = ClusterLinkMessagingConfigurator.class
 )
@@ -51,9 +51,10 @@ public class ClusterLinkMessagingConfigurator {
 		Destination destination = _destinationFactory.createDestination(
 			destinationConfiguration);
 
-		Dictionary<String, Object> dictionary = new HashMapDictionary<>();
-
-		dictionary.put("destination.name", destination.getName());
+		Dictionary<String, Object> dictionary =
+			HashMapDictionaryBuilder.<String, Object>put(
+				"destination.name", destination.getName()
+			).build();
 
 		_serviceRegistration = bundleContext.registerService(
 			Destination.class, destination, dictionary);

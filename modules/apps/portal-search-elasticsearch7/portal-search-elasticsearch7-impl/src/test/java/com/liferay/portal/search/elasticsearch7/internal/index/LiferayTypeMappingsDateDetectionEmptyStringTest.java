@@ -17,10 +17,8 @@ package com.liferay.portal.search.elasticsearch7.internal.index;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexName;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.PropsImpl;
 
 import java.util.Date;
 import java.util.Map;
@@ -38,14 +36,11 @@ import org.junit.rules.TestName;
 public class LiferayTypeMappingsDateDetectionEmptyStringTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws Exception {
-		PropsUtil.setProps(new PropsImpl());
-
 		Class<?> clazz = getClass();
 
 		_liferayIndexFixture = new LiferayIndexFixture(
@@ -56,15 +51,15 @@ public class LiferayTypeMappingsDateDetectionEmptyStringTest {
 
 	@Test
 	public void testEmptyStringInSecondDocument() throws Exception {
-		final String field1 = randomField();
-		final String field2 = randomField();
-		final String field3 = randomField();
-		final String field4 = randomField();
-		final String field5 = randomField();
-		final String field6 = randomField();
-		final String field7 = randomField();
-		final String field8 = randomField();
-		final String field9 = randomField();
+		String field1 = randomField();
+		String field2 = randomField();
+		String field3 = randomField();
+		String field4 = randomField();
+		String field5 = randomField();
+		String field6 = randomField();
+		String field7 = randomField();
+		String field8 = randomField();
+		String field9 = randomField();
 
 		index(
 			HashMapBuilder.<String, Object>put(

@@ -29,20 +29,16 @@ import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.upgrade.util.AlterColumnNameUpgradeColumnImpl;
 import com.liferay.portal.kernel.upgrade.util.UpgradeColumn;
 import com.liferay.portal.kernel.upgrade.util.UpgradeTable;
 import com.liferay.portal.kernel.upgrade.util.UpgradeTableFactoryUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceReference;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +48,7 @@ import java.io.Reader;
 import java.lang.reflect.Field;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -71,6 +68,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.sql.DataSource;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 
 /**
  * @author Brian Wing Shun Chan
@@ -97,18 +99,28 @@ public abstract class UpgradeProcess
 
 		String message = "Completed upgrade process ";
 
-		try (Connection con = getConnection()) {
-			connection = con;
+		try (Connection connection = getConnection()) {
+			this.connection = connection;
 
 			if (isSkipUpgradeProcess()) {
 				return;
 			}
 
-			if (_log.isInfoEnabled()) {
-				_log.info("Upgrading " + ClassUtil.getClassName(this));
-			}
+			process(
+				companyId -> {
+					if (_log.isInfoEnabled()) {
+						String info =
+							"Upgrading " + ClassUtil.getClassName(this);
 
-			doUpgrade();
+						if (Validator.isNotNull(companyId)) {
+							info += "#" + companyId;
+						}
+
+						_log.info(info);
+					}
+
+					doUpgrade();
+				});
 		}
 		catch (Throwable throwable) {
 			message = "Failed upgrade process ";
@@ -116,7 +128,7 @@ public abstract class UpgradeProcess
 			throw new UpgradeException(throwable);
 		}
 		finally {
-			connection = null;
+			this.connection = null;
 
 			if (_log.isInfoEnabled()) {
 				_log.info(
@@ -179,16 +191,9 @@ public abstract class UpgradeProcess
 
 		@Override
 		public String getSQL(String tableName) {
-			StringBundler sb = new StringBundler(6);
-
-			sb.append("alter_column_name ");
-			sb.append(tableName);
-			sb.append(StringPool.SPACE);
-			sb.append(_oldColumnName);
-			sb.append(StringPool.SPACE);
-			sb.append(_newColumn);
-
-			return sb.toString();
+			return StringBundler.concat(
+				"alter_column_name ", tableName, StringPool.SPACE,
+				_oldColumnName, StringPool.SPACE, _newColumn);
 		}
 
 		@Override
@@ -199,13 +204,6 @@ public abstract class UpgradeProcess
 		@Override
 		public boolean shouldDropIndex(Collection<String> columnNames) {
 			return Alterable.containsIgnoreCase(columnNames, _oldColumnName);
-		}
-
-		public AlterColumnNameUpgradeColumnImpl
-			toAlterColumnNameUpgradeColumnImpl() {
-
-			return new AlterColumnNameUpgradeColumnImpl(
-				_newColumnName, _oldColumnName);
 		}
 
 		private final String _newColumn;
@@ -223,16 +221,9 @@ public abstract class UpgradeProcess
 
 		@Override
 		public String getSQL(String tableName) {
-			StringBundler sb = new StringBundler(6);
-
-			sb.append("alter_column_type ");
-			sb.append(tableName);
-			sb.append(StringPool.SPACE);
-			sb.append(_columnName);
-			sb.append(StringPool.SPACE);
-			sb.append(_newType);
-
-			return sb.toString();
+			return StringBundler.concat(
+				"alter_column_type ", tableName, StringPool.SPACE, _columnName,
+				StringPool.SPACE, _newType);
 		}
 
 		@Override
@@ -270,16 +261,10 @@ public abstract class UpgradeProcess
 
 		@Override
 		public String getSQL(String tableName) {
-			StringBundler sb = new StringBundler(6);
-
-			sb.append("alter table ");
-			sb.append(tableName);
-			sb.append(" add ");
-			sb.append(_columnName);
-			sb.append(StringPool.SPACE);
-			sb.append(_columnType);
-
-			return StringUtil.trim(sb.toString());
+			return StringUtil.trim(
+				StringBundler.concat(
+					"alter table ", tableName, " add ", _columnName,
+					StringPool.SPACE, _columnType));
 		}
 
 		@Override
@@ -305,14 +290,8 @@ public abstract class UpgradeProcess
 
 		@Override
 		public String getSQL(String tableName) {
-			StringBundler sb = new StringBundler(4);
-
-			sb.append("alter table ");
-			sb.append(tableName);
-			sb.append(" drop column ");
-			sb.append(_columnName);
-
-			return sb.toString();
+			return StringBundler.concat(
+				"alter table ", tableName, " drop column ", _columnName);
 		}
 
 		@Override
@@ -332,17 +311,28 @@ public abstract class UpgradeProcess
 	protected void alter(Class<?> tableClass, Alterable... alterables)
 		throws Exception {
 
-		int alterableIndex = 0;
-
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			DatabaseMetaData databaseMetaData = connection.getMetaData();
 			DB db = DBManagerUtil.getDB();
-
+			DBInspector dbInspector = new DBInspector(connection);
 			String tableName = getTableName(tableClass);
 
-			try (ResultSet resultSet1 = db.getIndexResultSet(
-					connection, tableName);
-				ResultSet resultSet2 = db.getPrimaryKeysResultSet(
-					connection, tableName)) {
+			ResultSet resultSet1 = null;
+
+			if (db.getDBType() == DBType.ORACLE) {
+				resultSet1 = databaseMetaData.getIndexInfo(
+					dbInspector.getCatalog(), dbInspector.getSchema(),
+					dbInspector.normalizeName(tableName), false, true);
+			}
+			else {
+				resultSet1 = databaseMetaData.getIndexInfo(
+					dbInspector.getCatalog(), dbInspector.getSchema(),
+					dbInspector.normalizeName(tableName), false, false);
+			}
+
+			try (ResultSet resultSet2 = databaseMetaData.getPrimaryKeys(
+					dbInspector.getCatalog(), dbInspector.getSchema(),
+					tableName)) {
 
 				Set<String> primaryKeyNames = new HashSet<>();
 
@@ -394,8 +384,6 @@ public abstract class UpgradeProcess
 
 					runSQL(alterable.getSQL(tableName));
 
-					alterableIndex++;
-
 					List<String> indexSQLs = getIndexSQLs(
 						tableClass, tableName);
 
@@ -430,10 +418,7 @@ public abstract class UpgradeProcess
 				upgradeTable(
 					tableName, (Object[][])tableColumnsField.get(null),
 					(String)tableSQLCreateField.get(null),
-					(String[])tableSQLAddIndexesField.get(null),
-					getUpgradeColumns(
-						ArrayUtil.subset(
-							alterables, alterableIndex, alterables.length)));
+					(String[])tableSQLAddIndexesField.get(null));
 
 				if (_log.isWarnEnabled()) {
 					_log.warn(
@@ -441,23 +426,46 @@ public abstract class UpgradeProcess
 							tableName);
 				}
 			}
+			finally {
+				if (resultSet1 != null) {
+					resultSet1.close();
+				}
+			}
 		}
 	}
 
 	protected abstract void doUpgrade() throws Exception;
 
+	protected void ensureTableExists(
+			DatabaseMetaData databaseMetaData, DBInspector dbInspector,
+			String tableName)
+		throws SQLException {
+
+		try (ResultSet resultSet = databaseMetaData.getTables(
+				dbInspector.getCatalog(), dbInspector.getSchema(), tableName,
+				null)) {
+
+			if (!resultSet.next()) {
+				throw new SQLException(
+					StringBundler.concat(
+						"Table with name '", tableName, "' does not exist in ",
+						dbInspector.getSchema()));
+			}
+		}
+	}
+
 	protected Connection getConnection() throws Exception {
-		Registry registry = RegistryUtil.getRegistry();
+		Bundle bundle = FrameworkUtil.getBundle(getClass());
 
-		String symbolicName = registry.getSymbolicName(
-			getClass().getClassLoader());
+		if (bundle != null) {
+			BundleContext bundleContext = bundle.getBundleContext();
 
-		if (symbolicName != null) {
 			Collection<ServiceReference<DataSource>> serviceReferences =
-				registry.getServiceReferences(
+				bundleContext.getServiceReferences(
 					DataSource.class,
 					StringBundler.concat(
-						"(origin.bundle.symbolic.name=", symbolicName, ")"));
+						"(origin.bundle.symbolic.name=",
+						bundle.getSymbolicName(), ")"));
 
 			Iterator<ServiceReference<DataSource>> iterator =
 				serviceReferences.iterator();
@@ -465,7 +473,8 @@ public abstract class UpgradeProcess
 			if (iterator.hasNext()) {
 				ServiceReference<DataSource> serviceReference = iterator.next();
 
-				DataSource dataSource = registry.getService(serviceReference);
+				DataSource dataSource = bundleContext.getService(
+					serviceReference);
 
 				try {
 					if (dataSource != null) {
@@ -473,7 +482,7 @@ public abstract class UpgradeProcess
 					}
 				}
 				finally {
-					registry.ungetService(serviceReference);
+					bundleContext.ungetService(serviceReference);
 				}
 			}
 		}
@@ -593,22 +602,6 @@ public abstract class UpgradeProcess
 		return (String)tableNameField.get(null);
 	}
 
-	protected UpgradeColumn[] getUpgradeColumns(Alterable[] alterables) {
-		UpgradeColumn[] upgradeColumns = new UpgradeColumn[0];
-
-		for (Alterable alterable : alterables) {
-			if (alterable instanceof AlterColumnName) {
-				AlterColumnName alterColumnName = (AlterColumnName)alterable;
-
-				upgradeColumns = ArrayUtil.append(
-					upgradeColumns,
-					alterColumnName.toAlterColumnNameUpgradeColumnImpl());
-			}
-		}
-
-		return upgradeColumns;
-	}
-
 	protected long increment() {
 		return CounterLocalServiceUtil.increment();
 	}
@@ -661,12 +654,6 @@ public abstract class UpgradeProcess
 		String normalizedTableName = dbInspector.normalizeName(
 			tableName, connection.getMetaData());
 
-		if (!dbInspector.hasTable(normalizedTableName)) {
-			throw new SQLException(
-				StringBundler.concat(
-					"Table ", normalizedTableName, " does not exist"));
-		}
-
 		if ((db.getDBType() == DBType.SQLSERVER) ||
 			(db.getDBType() == DBType.SYBASE)) {
 
@@ -678,39 +665,29 @@ public abstract class UpgradeProcess
 							StringBundler.concat(
 								"select name from sys.key_constraints where ",
 								"type = 'PK' and ",
-								"OBJECT_NAME(parent_object_id) = ?"))) {
+								"OBJECT_NAME(parent_object_id) = '",
+								normalizedTableName, "'"));
+					ResultSet resultSet = preparedStatement.executeQuery()) {
 
-					preparedStatement.setString(1, normalizedTableName);
-
-					try (ResultSet resultSet =
-							preparedStatement.executeQuery()) {
-
-						if (resultSet.next()) {
-							primaryKeyConstraintName = resultSet.getString(
-								"name");
-						}
+					if (resultSet.next()) {
+						primaryKeyConstraintName = resultSet.getString("name");
 					}
 				}
 			}
 			else {
 				try (PreparedStatement preparedStatement =
-						connection.prepareStatement("sp_helpconstraint ?")) {
+						connection.prepareStatement(
+							"sp_helpconstraint " + normalizedTableName);
+					ResultSet resultSet = preparedStatement.executeQuery()) {
 
-					preparedStatement.setString(1, normalizedTableName);
+					while (resultSet.next()) {
+						String definition = resultSet.getString("definition");
 
-					try (ResultSet resultSet =
-							preparedStatement.executeQuery()) {
+						if (definition.startsWith("PRIMARY KEY INDEX")) {
+							primaryKeyConstraintName = resultSet.getString(
+								"name");
 
-						while (resultSet.next()) {
-							String definition = resultSet.getString(
-								"definition");
-
-							if (definition.startsWith("PRIMARY KEY INDEX")) {
-								primaryKeyConstraintName = resultSet.getString(
-									"name");
-
-								break;
-							}
+							break;
 						}
 					}
 				}
@@ -722,26 +699,31 @@ public abstract class UpgradeProcess
 						normalizedTableName);
 			}
 
-			if (dbInspector.hasIndex(
-					normalizedTableName, primaryKeyConstraintName)) {
-
-				runSQL(
-					StringBundler.concat(
-						"alter table ", normalizedTableName,
-						" drop constraint ", primaryKeyConstraintName));
-			}
-			else {
-				throw new SQLException(
-					StringBundler.concat(
-						"Primary key with name ", primaryKeyConstraintName,
-						" does not exist"));
-			}
+			runSQL(
+				StringBundler.concat(
+					"alter table ", normalizedTableName, " drop constraint ",
+					primaryKeyConstraintName));
 		}
 		else {
 			runSQL(
 				StringBundler.concat(
 					"alter table ", normalizedTableName, " drop primary key"));
 		}
+	}
+
+	protected void updateIndexes(Class<?> tableClass) throws Exception {
+		DB db = DBManagerUtil.getDB();
+
+		Field tableSQLCreateField = tableClass.getField("TABLE_SQL_CREATE");
+		Field tableSQLAddIndexesField = tableClass.getField(
+			"TABLE_SQL_ADD_INDEXES");
+
+		db.updateIndexes(
+			connection, (String)tableSQLCreateField.get(null),
+			StringUtil.merge(
+				(String[])tableSQLAddIndexesField.get(null),
+				System.lineSeparator()),
+			true);
 	}
 
 	protected void upgradeTable(String tableName, Object[][] tableColumns)
@@ -815,17 +797,18 @@ public abstract class UpgradeProcess
 			"journalstructure", "journaltemplate", "layout", "layoutbranch",
 			"layoutfriendlyurl", "layoutprototype", "layoutrevision",
 			"layoutset", "layoutsetbranch", "layoutsetprototype", "listtype",
-			"lock_", "mbban", "mbcategory", "mbdiscussion", "mbmailinglist",
-			"mbmessage", "mbstatsuser", "mbthread", "mbthreadflag", "mdraction",
-			"mdrrule", "mdrrulegroup", "mdrulegroupinstance",
-			"membershiprequest", "organization_", "orggrouprole", "orglabor",
-			"passwordpolicy", "passwordpolicyrel", "passwordtracker", "phone",
-			"pluginsetting", "pollschoice", "pollsquestion", "pollsvote",
-			"portalpreferences", "portlet", "portletitem", "portletpreferences",
-			"ratingsentry", "ratingsstats", "recentlayoutbranch",
-			"recentlayoutrevision", "recentlayoutsetbranch", "region",
-			"release_", "repository", "repositoryentry", "resourceaction",
-			"resourceblock", "resourceblockpermission", "resourcepermission",
+			"lock_", "marketplace_app", "mbban", "mbcategory", "mbdiscussion",
+			"mbmailinglist", "mbmessage", "mbstatsuser", "mbthread",
+			"mbthreadflag", "mdraction", "mdrrule", "mdrrulegroup",
+			"mdrrulegroupinstance", "membershiprequest", "organization_",
+			"orggrouprole", "orglabor", "passwordpolicy", "passwordpolicyrel",
+			"passwordtracker", "phone", "pluginsetting", "pollschoice",
+			"pollsquestion", "pollsvote", "portalpreferences", "portlet",
+			"portletitem", "portletpreferences", "ratingsentry", "ratingsstats",
+			"recentlayoutbranch", "recentlayoutrevision",
+			"recentlayoutsetbranch", "region", "release_", "repository",
+			"repositoryentry", "resourceaction", "resourceblock",
+			"resourceblockpermission", "resourcepermission",
 			"resourcetypepermission", "role_", "servicecomponent",
 			"socialactivity", "socialactivityachievement",
 			"socialactivitycounter", "socialactivitylimit", "socialactivityset",

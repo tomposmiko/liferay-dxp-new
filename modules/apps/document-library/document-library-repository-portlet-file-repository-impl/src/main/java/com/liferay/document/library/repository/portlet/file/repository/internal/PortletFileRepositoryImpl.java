@@ -168,8 +168,9 @@ public class PortletFileRepositoryImpl implements PortletFileRepository {
 					repository.getRepositoryId());
 
 			return localRepository.addFileEntry(
-				userId, folderId, fileName, mimeType, fileName,
-				StringPool.BLANK, StringPool.BLANK, file, serviceContext);
+				null, userId, folderId, fileName, mimeType, fileName,
+				StringPool.BLANK, StringPool.BLANK, file, null, null,
+				serviceContext);
 		}
 		finally {
 			DLAppHelperThreadLocal.setEnabled(dlAppHelperEnabled);
@@ -326,17 +327,21 @@ public class PortletFileRepositoryImpl implements PortletFileRepository {
 				_repositoryProvider.getFileEntryLocalRepository(fileEntryId);
 
 			if (_isAttachment(localRepository.getFileEntry(fileEntryId))) {
-				try {
-					SystemEventHierarchyEntryThreadLocal.push(FileEntry.class);
+				_run(
+					FileEntry.class,
+					() -> {
+						localRepository.deleteFileEntry(fileEntryId);
 
-					localRepository.deleteFileEntry(fileEntryId);
-				}
-				finally {
-					SystemEventHierarchyEntryThreadLocal.pop(FileEntry.class);
-				}
+						return null;
+					});
 			}
 			else {
-				localRepository.deleteFileEntry(fileEntryId);
+				_run(
+					() -> {
+						localRepository.deleteFileEntry(fileEntryId);
+
+						return null;
+					});
 			}
 		}
 		catch (NoSuchFileEntryException noSuchFileEntryException) {
@@ -588,7 +593,7 @@ public class PortletFileRepositoryImpl implements PortletFileRepository {
 			fileName = _trash.getOriginalTitle(fileEntry.getTitle());
 		}
 
-		sb.append(URLCodec.encodeURL(HtmlUtil.unescape(fileName), true));
+		sb.append(URLCodec.encodeURL(HtmlUtil.unescape(fileName)));
 
 		sb.append(StringPool.SLASH);
 		sb.append(URLCodec.encodeURL(fileEntry.getUuid()));
@@ -654,6 +659,10 @@ public class PortletFileRepositoryImpl implements PortletFileRepository {
 					fileName, String.valueOf(i));
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
+
 				break;
 			}
 		}

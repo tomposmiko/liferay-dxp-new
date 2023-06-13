@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -60,17 +61,7 @@ public class SXPBlueprintSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
-
-		if (sxpBlueprint.getActions() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"actions\": ");
-
-			sb.append(_toJSON(sxpBlueprint.getActions()));
-		}
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (sxpBlueprint.getConfiguration() != null) {
 			if (sb.length() > 1) {
@@ -144,20 +135,6 @@ public class SXPBlueprintSerDes {
 			sb.append("]");
 		}
 
-		if (sxpBlueprint.getExternalReferenceCode() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"externalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(sxpBlueprint.getExternalReferenceCode()));
-
-			sb.append("\"");
-		}
-
 		if (sxpBlueprint.getId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -179,20 +156,6 @@ public class SXPBlueprintSerDes {
 
 			sb.append(
 				liferayToJSONDateFormat.format(sxpBlueprint.getModifiedDate()));
-
-			sb.append("\"");
-		}
-
-		if (sxpBlueprint.getSchemaVersion() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"schemaVersion\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(sxpBlueprint.getSchemaVersion()));
 
 			sb.append("\"");
 		}
@@ -235,20 +198,6 @@ public class SXPBlueprintSerDes {
 			sb.append("\"");
 		}
 
-		if (sxpBlueprint.getVersion() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"version\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(sxpBlueprint.getVersion()));
-
-			sb.append("\"");
-		}
-
 		sb.append("}");
 
 		return sb.toString();
@@ -269,14 +218,7 @@ public class SXPBlueprintSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
-
-		if (sxpBlueprint.getActions() == null) {
-			map.put("actions", null);
-		}
-		else {
-			map.put("actions", String.valueOf(sxpBlueprint.getActions()));
-		}
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (sxpBlueprint.getConfiguration() == null) {
 			map.put("configuration", null);
@@ -322,15 +264,6 @@ public class SXPBlueprintSerDes {
 				String.valueOf(sxpBlueprint.getElementInstances()));
 		}
 
-		if (sxpBlueprint.getExternalReferenceCode() == null) {
-			map.put("externalReferenceCode", null);
-		}
-		else {
-			map.put(
-				"externalReferenceCode",
-				String.valueOf(sxpBlueprint.getExternalReferenceCode()));
-		}
-
 		if (sxpBlueprint.getId() == null) {
 			map.put("id", null);
 		}
@@ -345,15 +278,6 @@ public class SXPBlueprintSerDes {
 			map.put(
 				"modifiedDate",
 				liferayToJSONDateFormat.format(sxpBlueprint.getModifiedDate()));
-		}
-
-		if (sxpBlueprint.getSchemaVersion() == null) {
-			map.put("schemaVersion", null);
-		}
-		else {
-			map.put(
-				"schemaVersion",
-				String.valueOf(sxpBlueprint.getSchemaVersion()));
 		}
 
 		if (sxpBlueprint.getTitle() == null) {
@@ -377,13 +301,6 @@ public class SXPBlueprintSerDes {
 			map.put("userName", String.valueOf(sxpBlueprint.getUserName()));
 		}
 
-		if (sxpBlueprint.getVersion() == null) {
-			map.put("version", null);
-		}
-		else {
-			map.put("version", String.valueOf(sxpBlueprint.getVersion()));
-		}
-
 		return map;
 	}
 
@@ -405,14 +322,7 @@ public class SXPBlueprintSerDes {
 			SXPBlueprint sxpBlueprint, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "actions")) {
-				if (jsonParserFieldValue != null) {
-					sxpBlueprint.setActions(
-						(Map)SXPBlueprintSerDes.toMap(
-							(String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "configuration")) {
+			if (Objects.equals(jsonParserFieldName, "configuration")) {
 				if (jsonParserFieldValue != null) {
 					sxpBlueprint.setConfiguration(
 						ConfigurationSerDes.toDTO(
@@ -439,26 +349,15 @@ public class SXPBlueprintSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "elementInstances")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					ElementInstance[] elementInstancesArray =
-						new ElementInstance[jsonParserFieldValues.length];
-
-					for (int i = 0; i < elementInstancesArray.length; i++) {
-						elementInstancesArray[i] = ElementInstanceSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					sxpBlueprint.setElementInstances(elementInstancesArray);
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "externalReferenceCode")) {
-
-				if (jsonParserFieldValue != null) {
-					sxpBlueprint.setExternalReferenceCode(
-						(String)jsonParserFieldValue);
+					sxpBlueprint.setElementInstances(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> ElementInstanceSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new ElementInstance[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
@@ -471,11 +370,6 @@ public class SXPBlueprintSerDes {
 				if (jsonParserFieldValue != null) {
 					sxpBlueprint.setModifiedDate(
 						toDate((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "schemaVersion")) {
-				if (jsonParserFieldValue != null) {
-					sxpBlueprint.setSchemaVersion((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "title")) {
@@ -493,11 +387,6 @@ public class SXPBlueprintSerDes {
 			else if (Objects.equals(jsonParserFieldName, "userName")) {
 				if (jsonParserFieldValue != null) {
 					sxpBlueprint.setUserName((String)jsonParserFieldValue);
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "version")) {
-				if (jsonParserFieldValue != null) {
-					sxpBlueprint.setVersion((String)jsonParserFieldValue);
 				}
 			}
 		}

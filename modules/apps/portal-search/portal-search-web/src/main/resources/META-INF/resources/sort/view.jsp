@@ -24,7 +24,6 @@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
 <%@ page import="com.liferay.portal.kernel.util.HashMapBuilder" %><%@
-page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.search.web.internal.sort.configuration.SortPortletInstanceConfiguration" %><%@
 page import="com.liferay.portal.search.web.internal.sort.display.context.SortDisplayContext" %><%@
@@ -51,7 +50,7 @@ SortPortletInstanceConfiguration sortPortletInstanceConfiguration = sortDisplayC
 		</div>
 	</c:when>
 	<c:otherwise>
-		<aui:form action="#" method="post" name="fm">
+		<aui:form method="post" name="fm">
 			<aui:input cssClass="sort-parameter-name" name="sort-parameter-name" type="hidden" value="<%= sortDisplayContext.getParameterName() %>" />
 
 			<liferay-ddm:template-renderer
@@ -75,7 +74,7 @@ SortPortletInstanceConfiguration sortPortletInstanceConfiguration = sortDisplayC
 						for (SortTermDisplayContext sortTermDisplayContext : sortDisplayContext.getSortTermDisplayContexts()) {
 						%>
 
-							<aui:option label="<%= HtmlUtil.escapeAttribute(sortTermDisplayContext.getLabel()) %>" selected="<%= sortTermDisplayContext.isSelected() %>" value="<%= HtmlUtil.escapeAttribute(sortTermDisplayContext.getField()) %>" />
+							<aui:option label="<%= sortTermDisplayContext.getLabel() %>" selected="<%= sortTermDisplayContext.isSelected() %>" value="<%= sortTermDisplayContext.getField() %>" />
 
 						<%
 						}
@@ -89,8 +88,8 @@ SortPortletInstanceConfiguration sortPortletInstanceConfiguration = sortDisplayC
 </c:choose>
 
 <aui:script use="liferay-search-sort-util">
-	AUI().ready('aui-base', 'node', 'event', function (A) {
-		A.one('#<portlet:namespace />sortSelection').on('change', function () {
+	AUI().ready('aui-base', 'node', 'event', (A) => {
+		A.one('#<portlet:namespace />sortSelection').on('change', () => {
 			var selections = [];
 
 			var sortSelect = A.one('#<portlet:namespace />sortSelection').get(

@@ -20,6 +20,7 @@ import com.liferay.commerce.product.content.search.web.internal.display.context.
 import com.liferay.commerce.product.content.search.web.internal.portlet.CPSearchResultsPortlet;
 import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CPDefinitionService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portletdisplaytemplate.BasePortletDisplayTemplateHandler;
@@ -27,7 +28,6 @@ import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.template.TemplateVariableGroup;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portlet.display.template.constants.PortletDisplayTemplateConstants;
 
 import java.util.List;
@@ -117,9 +117,8 @@ public class CPSearchResultsPortletDisplayTemplateHandler
 
 	@Override
 	protected String getTemplatesConfigPath() {
-		return "com/liferay/commerce/product/content/search/web/internal" +
-			"/portlet/template/dependencies/search-results" +
-				"/portlet-display-templates.xml";
+		return "com/liferay/commerce/product/content/search/web/portlet" +
+			"/template/dependencies/portlet-display-templates.xml";
 	}
 
 	@Reference

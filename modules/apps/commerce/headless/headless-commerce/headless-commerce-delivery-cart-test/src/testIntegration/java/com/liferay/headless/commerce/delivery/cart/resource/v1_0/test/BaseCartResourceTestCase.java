@@ -49,27 +49,25 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -186,6 +184,7 @@ public abstract class BaseCartResourceTestCase {
 		cart.setAuthor(regex);
 		cart.setCouponCode(regex);
 		cart.setCurrencyCode(regex);
+		cart.setOrderTypeExternalReferenceCode(regex);
 		cart.setOrderUUID(regex);
 		cart.setPaymentMethod(regex);
 		cart.setPaymentMethodLabel(regex);
@@ -206,6 +205,7 @@ public abstract class BaseCartResourceTestCase {
 		Assert.assertEquals(regex, cart.getAuthor());
 		Assert.assertEquals(regex, cart.getCouponCode());
 		Assert.assertEquals(regex, cart.getCurrencyCode());
+		Assert.assertEquals(regex, cart.getOrderTypeExternalReferenceCode());
 		Assert.assertEquals(regex, cart.getOrderUUID());
 		Assert.assertEquals(regex, cart.getPaymentMethod());
 		Assert.assertEquals(regex, cart.getPaymentMethodLabel());
@@ -238,7 +238,7 @@ public abstract class BaseCartResourceTestCase {
 
 	@Test
 	public void testGraphQLDeleteCart() throws Exception {
-		Cart cart = testGraphQLDeleteCart_addCart();
+		Cart cart = testGraphQLCart_addCart();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -251,6 +251,7 @@ public abstract class BaseCartResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteCart"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -264,10 +265,6 @@ public abstract class BaseCartResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected Cart testGraphQLDeleteCart_addCart() throws Exception {
-		return testGraphQLCart_addCart();
 	}
 
 	@Test
@@ -287,7 +284,7 @@ public abstract class BaseCartResourceTestCase {
 
 	@Test
 	public void testGraphQLGetCart() throws Exception {
-		Cart cart = testGraphQLGetCart_addCart();
+		Cart cart = testGraphQLCart_addCart();
 
 		Assert.assertTrue(
 			equals(
@@ -326,10 +323,6 @@ public abstract class BaseCartResourceTestCase {
 				"Object/code"));
 	}
 
-	protected Cart testGraphQLGetCart_addCart() throws Exception {
-		return testGraphQLCart_addCart();
-	}
-
 	@Test
 	public void testPatchCart() throws Exception {
 		Cart postCart = testPatchCart_addCart();
@@ -342,7 +335,7 @@ public abstract class BaseCartResourceTestCase {
 
 		Cart expectedPatchCart = postCart.clone();
 
-		BeanTestUtil.copyProperties(randomPatchCart, expectedPatchCart);
+		_beanUtilsBean.copyProperties(expectedPatchCart, randomPatchCart);
 
 		Cart getCart = cartResource.getCart(patchCart.getId());
 
@@ -408,80 +401,82 @@ public abstract class BaseCartResourceTestCase {
 	}
 
 	@Test
+	public void testGetCartPaymentURL() throws Exception {
+		Assert.assertTrue(false);
+	}
+
+	@Test
 	public void testGetChannelCartsPage() throws Exception {
+		Long accountId = testGetChannelCartsPage_getAccountId();
+		Long irrelevantAccountId =
+			testGetChannelCartsPage_getIrrelevantAccountId();
 		Long channelId = testGetChannelCartsPage_getChannelId();
 		Long irrelevantChannelId =
 			testGetChannelCartsPage_getIrrelevantChannelId();
 
 		Page<Cart> page = cartResource.getChannelCartsPage(
-			channelId, Pagination.of(1, 10));
+			accountId, channelId, Pagination.of(1, 10));
 
 		Assert.assertEquals(0, page.getTotalCount());
 
-		if (irrelevantChannelId != null) {
+		if ((irrelevantAccountId != null) && (irrelevantChannelId != null)) {
 			Cart irrelevantCart = testGetChannelCartsPage_addCart(
-				irrelevantChannelId, randomIrrelevantCart());
+				irrelevantAccountId, irrelevantChannelId,
+				randomIrrelevantCart());
 
 			page = cartResource.getChannelCartsPage(
-				irrelevantChannelId, Pagination.of(1, 2));
+				irrelevantAccountId, irrelevantChannelId, Pagination.of(1, 2));
 
 			Assert.assertEquals(1, page.getTotalCount());
 
 			assertEquals(
 				Arrays.asList(irrelevantCart), (List<Cart>)page.getItems());
-			assertValid(
-				page,
-				testGetChannelCartsPage_getExpectedActions(
-					irrelevantChannelId));
+			assertValid(page);
 		}
 
-		Cart cart1 = testGetChannelCartsPage_addCart(channelId, randomCart());
+		Cart cart1 = testGetChannelCartsPage_addCart(
+			accountId, channelId, randomCart());
 
-		Cart cart2 = testGetChannelCartsPage_addCart(channelId, randomCart());
+		Cart cart2 = testGetChannelCartsPage_addCart(
+			accountId, channelId, randomCart());
 
 		page = cartResource.getChannelCartsPage(
-			channelId, Pagination.of(1, 10));
+			accountId, channelId, Pagination.of(1, 10));
 
 		Assert.assertEquals(2, page.getTotalCount());
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(cart1, cart2), (List<Cart>)page.getItems());
-		assertValid(
-			page, testGetChannelCartsPage_getExpectedActions(channelId));
+		assertValid(page);
 
 		cartResource.deleteCart(cart1.getId());
 
 		cartResource.deleteCart(cart2.getId());
 	}
 
-	protected Map<String, Map<String, String>>
-			testGetChannelCartsPage_getExpectedActions(Long channelId)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
-	}
-
 	@Test
 	public void testGetChannelCartsPageWithPagination() throws Exception {
+		Long accountId = testGetChannelCartsPage_getAccountId();
 		Long channelId = testGetChannelCartsPage_getChannelId();
 
-		Cart cart1 = testGetChannelCartsPage_addCart(channelId, randomCart());
+		Cart cart1 = testGetChannelCartsPage_addCart(
+			accountId, channelId, randomCart());
 
-		Cart cart2 = testGetChannelCartsPage_addCart(channelId, randomCart());
+		Cart cart2 = testGetChannelCartsPage_addCart(
+			accountId, channelId, randomCart());
 
-		Cart cart3 = testGetChannelCartsPage_addCart(channelId, randomCart());
+		Cart cart3 = testGetChannelCartsPage_addCart(
+			accountId, channelId, randomCart());
 
 		Page<Cart> page1 = cartResource.getChannelCartsPage(
-			channelId, Pagination.of(1, 2));
+			accountId, channelId, Pagination.of(1, 2));
 
 		List<Cart> carts1 = (List<Cart>)page1.getItems();
 
 		Assert.assertEquals(carts1.toString(), 2, carts1.size());
 
 		Page<Cart> page2 = cartResource.getChannelCartsPage(
-			channelId, Pagination.of(2, 2));
+			accountId, channelId, Pagination.of(2, 2));
 
 		Assert.assertEquals(3, page2.getTotalCount());
 
@@ -490,16 +485,29 @@ public abstract class BaseCartResourceTestCase {
 		Assert.assertEquals(carts2.toString(), 1, carts2.size());
 
 		Page<Cart> page3 = cartResource.getChannelCartsPage(
-			channelId, Pagination.of(1, 3));
+			accountId, channelId, Pagination.of(1, 3));
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(cart1, cart2, cart3), (List<Cart>)page3.getItems());
 	}
 
-	protected Cart testGetChannelCartsPage_addCart(Long channelId, Cart cart)
+	protected Cart testGetChannelCartsPage_addCart(
+			Long accountId, Long channelId, Cart cart)
 		throws Exception {
 
-		return cartResource.postChannelCart(channelId, cart);
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long testGetChannelCartsPage_getAccountId() throws Exception {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected Long testGetChannelCartsPage_getIrrelevantAccountId()
+		throws Exception {
+
+		return null;
 	}
 
 	protected Long testGetChannelCartsPage_getChannelId() throws Exception {
@@ -731,6 +739,25 @@ public abstract class BaseCartResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"orderTypeExternalReferenceCode",
+					additionalAssertFieldName)) {
+
+				if (cart.getOrderTypeExternalReferenceCode() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("orderTypeId", additionalAssertFieldName)) {
+				if (cart.getOrderTypeId() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("orderUUID", additionalAssertFieldName)) {
 				if (cart.getOrderUUID() == null) {
 					valid = false;
@@ -888,12 +915,6 @@ public abstract class BaseCartResourceTestCase {
 	}
 
 	protected void assertValid(Page<Cart> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<Cart> page, Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<Cart> carts = page.getItems();
@@ -908,20 +929,6 @@ public abstract class BaseCartResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1160,6 +1167,30 @@ public abstract class BaseCartResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"orderTypeExternalReferenceCode",
+					additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						cart1.getOrderTypeExternalReferenceCode(),
+						cart2.getOrderTypeExternalReferenceCode())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("orderTypeId", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						cart1.getOrderTypeId(), cart2.getOrderTypeId())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("orderUUID", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						cart1.getOrderUUID(), cart2.getOrderUUID())) {
@@ -1382,16 +1413,14 @@ public abstract class BaseCartResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1408,10 +1437,6 @@ public abstract class BaseCartResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1421,18 +1446,18 @@ public abstract class BaseCartResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1625,6 +1650,19 @@ public abstract class BaseCartResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("orderTypeExternalReferenceCode")) {
+			sb.append("'");
+			sb.append(String.valueOf(cart.getOrderTypeExternalReferenceCode()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("orderTypeId")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("orderUUID")) {
 			sb.append("'");
 			sb.append(String.valueOf(cart.getOrderUUID()));
@@ -1650,9 +1688,8 @@ public abstract class BaseCartResourceTestCase {
 		}
 
 		if (entityFieldName.equals("paymentStatus")) {
-			sb.append(String.valueOf(cart.getPaymentStatus()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("paymentStatusInfo")) {
@@ -1795,6 +1832,9 @@ public abstract class BaseCartResourceTestCase {
 				id = RandomTestUtil.randomLong();
 				lastPriceUpdateDate = RandomTestUtil.nextDate();
 				modifiedDate = RandomTestUtil.nextDate();
+				orderTypeExternalReferenceCode = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				orderTypeId = RandomTestUtil.randomLong();
 				orderUUID = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				paymentMethod = StringUtil.toLowerCase(
@@ -1834,115 +1874,6 @@ public abstract class BaseCartResourceTestCase {
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
-
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
 
 	protected class GraphQLField {
 
@@ -2018,6 +1949,18 @@ public abstract class BaseCartResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseCartResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

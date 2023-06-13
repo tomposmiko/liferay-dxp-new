@@ -90,8 +90,6 @@ public class DDMFormInstanceRecordXLSWriter
 			for (Map<String, String> ddmFormFieldsValue :
 					ddmFormFieldsValueList) {
 
-				rowCellStyle.setQuotePrefixed(true);
-
 				createRow(
 					rowIndex++, rowCellStyle, ddmFormFieldsValue.values(),
 					sheet);
@@ -141,17 +139,11 @@ public class DDMFormInstanceRecordXLSWriter
 				value = value.substring(0, _CELL_MAX_LENGTH - 1);
 
 				if (_log.isWarnEnabled()) {
-					StringBundler sb = new StringBundler(7);
-
-					sb.append("Cell ");
-					sb.append(rowIndex);
-					sb.append(",");
-					sb.append(cellIndex);
-					sb.append(" value trimmed to ");
-					sb.append(_CELL_MAX_LENGTH);
-					sb.append(" characters");
-
-					_log.warn(sb.toString());
+					_log.warn(
+						StringBundler.concat(
+							"Cell ", rowIndex, ",", cellIndex,
+							" value trimmed to ", _CELL_MAX_LENGTH,
+							" characters"));
 				}
 			}
 

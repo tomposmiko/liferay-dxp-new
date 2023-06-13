@@ -34,7 +34,7 @@ import com.liferay.portal.workflow.portlet.tab.WorkflowPortletTab;
 import com.liferay.portal.workflow.web.internal.configuration.WorkflowInstanceWebConfiguration;
 import com.liferay.portal.workflow.web.internal.display.context.MyWorkflowInstanceViewDisplayContext;
 import com.liferay.portal.workflow.web.internal.display.context.WorkflowInstanceViewDisplayContext;
-import com.liferay.portal.workflow.web.internal.request.prepocessor.WorkflowPreprocessorHelper;
+import com.liferay.portal.workflow.web.internal.request.preprocessor.helper.WorkflowPreprocessorHelper;
 
 import java.util.Map;
 import java.util.Objects;
@@ -49,6 +49,7 @@ import javax.servlet.ServletContext;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -57,7 +58,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.workflow.web.internal.configuration.WorkflowInstanceWebConfiguration",
-	immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = "portal.workflow.tabs.name=" + WorkflowWebKeys.WORKFLOW_TAB_INSTANCE,
 	service = WorkflowPortletTab.class
 )

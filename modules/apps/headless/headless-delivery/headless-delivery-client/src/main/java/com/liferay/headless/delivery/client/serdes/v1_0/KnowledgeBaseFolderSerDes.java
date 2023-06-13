@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -60,7 +61,7 @@ public class KnowledgeBaseFolderSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (knowledgeBaseFolder.getActions() != null) {
 			if (sb.length() > 1) {
@@ -147,6 +148,20 @@ public class KnowledgeBaseFolderSerDes {
 			sb.append("\"");
 
 			sb.append(_escape(knowledgeBaseFolder.getDescription()));
+
+			sb.append("\"");
+		}
+
+		if (knowledgeBaseFolder.getExternalReferenceCode() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"externalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(knowledgeBaseFolder.getExternalReferenceCode()));
 
 			sb.append("\"");
 		}
@@ -263,7 +278,7 @@ public class KnowledgeBaseFolderSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (knowledgeBaseFolder.getActions() == null) {
 			map.put("actions", null);
@@ -317,6 +332,15 @@ public class KnowledgeBaseFolderSerDes {
 			map.put(
 				"description",
 				String.valueOf(knowledgeBaseFolder.getDescription()));
+		}
+
+		if (knowledgeBaseFolder.getExternalReferenceCode() == null) {
+			map.put("externalReferenceCode", null);
+		}
+		else {
+			map.put(
+				"externalReferenceCode",
+				String.valueOf(knowledgeBaseFolder.getExternalReferenceCode()));
 		}
 
 		if (knowledgeBaseFolder.getId() == null) {
@@ -425,18 +449,14 @@ public class KnowledgeBaseFolderSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "customFields")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					CustomField[] customFieldsArray =
-						new CustomField[jsonParserFieldValues.length];
-
-					for (int i = 0; i < customFieldsArray.length; i++) {
-						customFieldsArray[i] = CustomFieldSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					knowledgeBaseFolder.setCustomFields(customFieldsArray);
+					knowledgeBaseFolder.setCustomFields(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomFieldSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CustomField[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
@@ -454,6 +474,14 @@ public class KnowledgeBaseFolderSerDes {
 			else if (Objects.equals(jsonParserFieldName, "description")) {
 				if (jsonParserFieldValue != null) {
 					knowledgeBaseFolder.setDescription(
+						(String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "externalReferenceCode")) {
+
+				if (jsonParserFieldValue != null) {
+					knowledgeBaseFolder.setExternalReferenceCode(
 						(String)jsonParserFieldValue);
 				}
 			}

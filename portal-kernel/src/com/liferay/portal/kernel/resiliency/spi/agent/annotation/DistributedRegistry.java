@@ -129,18 +129,19 @@ public class DistributedRegistry {
 
 			return _prefixDirections.remove(name, direction);
 		}
+		else {
+			if (direction == null) {
+				direction = _exactDirections.remove(name);
 
-		if (direction == null) {
-			direction = _exactDirections.remove(name);
+				if (direction != null) {
+					return true;
+				}
 
-			if (direction != null) {
-				return true;
+				return false;
 			}
 
-			return false;
+			return _exactDirections.remove(name, direction);
 		}
-
-		return _exactDirections.remove(name, direction);
 	}
 
 	protected static void processDistributed(Class<?> clazz, boolean register) {

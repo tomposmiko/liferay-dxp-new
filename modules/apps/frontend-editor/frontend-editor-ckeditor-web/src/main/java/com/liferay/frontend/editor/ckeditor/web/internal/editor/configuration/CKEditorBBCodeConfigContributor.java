@@ -54,7 +54,7 @@ public class CKEditorBBCodeConfigContributor
 			"enterMode", 2
 		).put(
 			"extraPlugins",
-			"a11yhelpbtn,bbcode,itemselector,sourcearea,wikilink"
+			"a11yhelpbtn,bbcode,filebrowser,itemselector,sourcearea"
 		).put(
 			"fontSize_defaultLabel", "14"
 		).put(
@@ -72,9 +72,9 @@ public class CKEditorBBCodeConfigContributor
 			"newThreadURL", MBThreadConstants.NEW_THREAD_URL
 		).put(
 			"removePlugins",
-			"bidi,codemirror,div,elementspath,flash,forms,indentblock," +
-				"keystrokes,link,maximize,newpage,pagebreak,preview," +
-					"print,save,showblocks,templates,video"
+			"bidi,codemirror,div,elementspath,forms,indentblock,keystrokes," +
+				"maximize,newpage,pagebreak,preview,print,save," +
+					"showblocks,templates,video"
 		).put(
 			"smiley_descriptions",
 			toJSONArray(BBCodeTranslatorUtil.getEmoticonDescriptions())

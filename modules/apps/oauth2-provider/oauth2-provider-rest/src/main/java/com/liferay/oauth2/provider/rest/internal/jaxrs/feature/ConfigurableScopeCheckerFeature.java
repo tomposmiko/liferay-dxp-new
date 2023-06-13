@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -164,16 +164,12 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 	protected Dictionary<String, Object> buildProperties(
 		Configuration configuration) {
 
-		HashMapDictionary<String, Object> properties =
-			new HashMapDictionary<>();
-
-		properties.putAll(
+		return HashMapDictionaryBuilder.<String, Object>putAll(
 			(Map<String, Object>)configuration.getProperty(
-				"osgi.jaxrs.application.serviceProperties"));
-
-		properties.put(Constants.SERVICE_RANKING, Integer.MIN_VALUE);
-
-		return properties;
+				"osgi.jaxrs.application.serviceProperties")
+		).put(
+			Constants.SERVICE_RANKING, Integer.MIN_VALUE
+		).build();
 	}
 
 	@Deactivate
@@ -322,11 +318,9 @@ public class ConfigurableScopeCheckerFeature implements Feature {
 		}
 
 		protected boolean requiresNoScope(String[] scopes) {
-			if (ArrayUtil.isEmpty(scopes)) {
-				return true;
-			}
+			if (ArrayUtil.isEmpty(scopes) ||
+				((scopes.length == 1) && Validator.isNull(scopes[0]))) {
 
-			if ((scopes.length == 1) && Validator.isNull(scopes[0])) {
 				return true;
 			}
 

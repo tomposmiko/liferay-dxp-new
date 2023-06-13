@@ -19,6 +19,7 @@ import com.liferay.commerce.account.model.CommerceAccountGroup;
 import com.liferay.commerce.account.service.CommerceAccountGroupLocalService;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.service.CommerceCurrencyLocalService;
+import com.liferay.commerce.price.list.constants.CommercePriceListConstants;
 import com.liferay.commerce.price.list.model.CommercePriceList;
 import com.liferay.commerce.price.list.model.CommercePriceListCommerceAccountGroupRel;
 import com.liferay.commerce.price.list.service.CommercePriceListCommerceAccountGroupRelLocalService;
@@ -70,18 +71,18 @@ public class CommercePriceListsImporter {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		String currencyCode = jsonObject.getString("CurrencyCode");
+		String currencyCode = jsonObject.getString("currencyCode");
 
 		if (Validator.isNull(currencyCode)) {
 
-			// We should throw that they must have currencyCode
+			// TODO Throw an exception
 
 			return;
 		}
 
 		long parentPriceListId = 0;
 
-		String parentPriceListName = jsonObject.getString("ParentPriceList");
+		String parentPriceListName = jsonObject.getString("parentPriceList");
 
 		if (!Validator.isBlank(parentPriceListName)) {
 			String externalReferenceCode = FriendlyURLNormalizerUtil.normalize(
@@ -95,11 +96,11 @@ public class CommercePriceListsImporter {
 			parentPriceListId = parentPriceList.getParentCommercePriceListId();
 		}
 
-		String name = jsonObject.getString("Name");
+		String name = jsonObject.getString("name");
 
 		if (Validator.isBlank(name)) {
 
-			// We should throw that the must have name
+			// TODO Throw an exception
 
 			return;
 		}
@@ -110,17 +111,17 @@ public class CommercePriceListsImporter {
 			user.getTimeZone());
 
 		int displayDateMonth = displayCalendar.get(
-			jsonObject.getInt("DisplayDateMonth", Calendar.MONTH));
+			jsonObject.getInt("displayDateMonth", Calendar.MONTH));
 		int displayDateDay = displayCalendar.get(
-			jsonObject.getInt("DisplayDateDayOfMonth", Calendar.DAY_OF_MONTH));
+			jsonObject.getInt("displayDateDayOfMonth", Calendar.DAY_OF_MONTH));
 		int displayDateYear = displayCalendar.get(
-			jsonObject.getInt("DisplayDateYear", Calendar.YEAR));
+			jsonObject.getInt("displayDateYear", Calendar.YEAR));
 		int displayDateHour = displayCalendar.get(
-			jsonObject.getInt("DisplayDateHour", Calendar.HOUR));
+			jsonObject.getInt("displayDateHour", Calendar.HOUR));
 		int displayDateMinute = displayCalendar.get(
-			jsonObject.getInt("DisplayDateMinute", Calendar.MINUTE));
+			jsonObject.getInt("displayDateMinute", Calendar.MINUTE));
 		int displayDateAmPm = displayCalendar.get(
-			jsonObject.getInt("DisplayDateAmPm", Calendar.AM_PM));
+			jsonObject.getInt("displayDateAmPm", Calendar.AM_PM));
 
 		if (displayDateAmPm == Calendar.PM) {
 			displayDateHour += 12;
@@ -132,18 +133,18 @@ public class CommercePriceListsImporter {
 		expirationCalendar.add(Calendar.MONTH, 1);
 
 		int expirationDateMonth = expirationCalendar.get(
-			jsonObject.getInt("ExpirationDateMonth", Calendar.MONTH));
+			jsonObject.getInt("expirationDateMonth", Calendar.MONTH));
 		int expirationDateDay = expirationCalendar.get(
 			jsonObject.getInt(
-				"ExpirationDateDayOfMonth", Calendar.DAY_OF_MONTH));
+				"expirationDateDayOfMonth", Calendar.DAY_OF_MONTH));
 		int expirationDateYear = expirationCalendar.get(
-			jsonObject.getInt("ExpirationDateYear", Calendar.YEAR));
+			jsonObject.getInt("expirationDateYear", Calendar.YEAR));
 		int expirationDateHour = expirationCalendar.get(
-			jsonObject.getInt("ExpirationDateHour", Calendar.HOUR));
+			jsonObject.getInt("expirationDateHour", Calendar.HOUR));
 		int expirationDateMinute = expirationCalendar.get(
-			jsonObject.getInt("ExpirationDateMinute", Calendar.MINUTE));
+			jsonObject.getInt("expirationDateMinute", Calendar.MINUTE));
 		int expirationDateAmPm = expirationCalendar.get(
-			jsonObject.getInt("ExpirationDateAmPm", Calendar.AM_PM));
+			jsonObject.getInt("expirationDateAmPm", Calendar.AM_PM));
 
 		if (expirationDateAmPm == Calendar.PM) {
 			expirationDateHour += 12;
@@ -152,11 +153,11 @@ public class CommercePriceListsImporter {
 		// Add Commerce Price List
 
 		JSONArray accountGroupsJSONArray = jsonObject.getJSONArray(
-			"AccountGroups");
+			"accountGroups");
 
 		if (accountGroupsJSONArray != null) {
-			int priority = jsonObject.getInt("Priority");
-			boolean neverExpire = jsonObject.getBoolean("NeverExpire", true);
+			int priority = jsonObject.getInt("priority");
+			boolean neverExpire = jsonObject.getBoolean("neverExpire", true);
 
 			CommerceCurrency commerceCurrency =
 				_commerceCurrencyLocalService.getCommerceCurrency(
@@ -166,14 +167,15 @@ public class CommercePriceListsImporter {
 				name);
 
 			CommercePriceList commercePriceList =
-				_commercePriceListLocalService.upsertCommercePriceList(
-					catalogGroupId, user.getUserId(), 0,
-					commerceCurrency.getCommerceCurrencyId(), parentPriceListId,
-					name, priority, displayDateMonth, displayDateDay,
-					displayDateYear, displayDateHour, displayDateMinute,
-					expirationDateMonth, expirationDateDay, expirationDateYear,
-					expirationDateHour, expirationDateMinute,
-					externalReferenceCode, neverExpire, serviceContext);
+				_commercePriceListLocalService.addOrUpdateCommercePriceList(
+					externalReferenceCode, catalogGroupId, user.getUserId(), 0,
+					commerceCurrency.getCommerceCurrencyId(), true,
+					CommercePriceListConstants.TYPE_PRICE_LIST,
+					parentPriceListId, false, name, priority, displayDateMonth,
+					displayDateDay, displayDateYear, displayDateHour,
+					displayDateMinute, expirationDateMonth, expirationDateDay,
+					expirationDateYear, expirationDateHour,
+					expirationDateMinute, neverExpire, serviceContext);
 
 			for (int i = 0; i < accountGroupsJSONArray.length(); i++) {
 				try {
@@ -183,7 +185,7 @@ public class CommercePriceListsImporter {
 
 					CommerceAccountGroup commerceAccountGroup =
 						_commerceAccountGroupLocalService.
-							fetchCommerceAccountGroupByReferenceCode(
+							fetchByExternalReferenceCode(
 								serviceContext.getCompanyId(),
 								accountGroupExternalReferenceCode);
 
@@ -202,6 +204,7 @@ public class CommercePriceListsImporter {
 					if (commercePriceListCommerceAccountGroupRel == null) {
 						_commercePriceListCommerceAccountGroupRelLocalService.
 							addCommercePriceListCommerceAccountGroupRel(
+								serviceContext.getUserId(),
 								commercePriceList.getCommercePriceListId(),
 								commerceAccountGroup.
 									getCommerceAccountGroupId(),

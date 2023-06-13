@@ -22,7 +22,7 @@
 </tr>
 <tr>
 	<td>EMPTY_SEARCH_CONTAINER</td>
-	<td>//div[contains (@class,'taglib-empty-result-message-header')]</td>
+	<td>//div[contains (@class,'empty-result-message-header')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -32,12 +32,12 @@
 </tr>
 <tr>
 	<td>ENTRY_NAME</td>
-	<td>//div[@class='data-set-display-wrapper' or @class='searchcontainer-content']//a[text()='${key_entryName}']</td>
+	<td>//div[@class='data-set-wrapper' or @class='searchcontainer-content']//a[text()='${key_entryName}']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ENTRY_NAME_N</td>
-	<td>xpath=(//div[@class='data-set-display-wrapper' or @class='searchcontainer-content']//a)[${key_rowNumber}]</td>
+	<td>xpath=(//div[@class='data-set-wrapper' or @class='searchcontainer-content']//a)[${key_rowNumber}]</td>
 	<td></td>
 </tr>
 <tr>
@@ -66,6 +66,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SORT_FIELD</td>
+	<td>//button[@class='btn-sorting inline-item text-nowrap text-truncate-inline btn btn-sm btn-unstyled' and contains(text(), '${key_sortFieldName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ORGANIZATIONS_TABLE_CHECKBOX</td>
 	<td>//tr[@data-name="${key_orgName}"]//input[@type="checkbox"]</td>
 	<td></td>
@@ -83,6 +88,16 @@
 <tr>
 	<td>ANY_ENTRY_NAME</td>
 	<td>//a[contains(.,'${key_entry}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANY_ENTRY_NAME_WITHOUT_CONTAINS</td>
+	<td>//a[(text()='${key_entry}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DATA_SET_ENTRY_NAME</td>
+	<td>//div[@class='data-set-content-wrapper']//a[text()='${key_entryName}']</td>
 	<td></td>
 </tr>
 </tbody>

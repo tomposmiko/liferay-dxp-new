@@ -16,13 +16,12 @@ package com.liferay.portlet;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.model.PortletConstants;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.security.xml.SecureXMLFactoryProviderUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.security.xml.SecureXMLFactoryProviderImpl;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.tools.ToolDependencies;
-import com.liferay.portal.util.HtmlImpl;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -54,10 +53,6 @@ public class PortletPreferencesFactoryImplUnitTest {
 
 	@Before
 	public void setUp() {
-		HtmlUtil htmlUtil = new HtmlUtil();
-
-		htmlUtil.setHtml(new HtmlImpl());
-
 		SecureXMLFactoryProviderUtil secureXMLFactoryProviderUtil =
 			new SecureXMLFactoryProviderUtil();
 
@@ -209,7 +204,7 @@ public class PortletPreferencesFactoryImplUnitTest {
 
 	@Test
 	public void testEmptyPortletPreferences() {
-		String expectedXML = _getPortletPreferencesXML(null, null);
+		String expectedXML = PortletConstants.DEFAULT_PREFERENCES;
 
 		PortletPreferencesImpl portletPreferencesImpl =
 			new PortletPreferencesImpl();

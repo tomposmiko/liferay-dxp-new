@@ -14,6 +14,7 @@
 
 package com.liferay.headless.admin.user.client.serdes.v1_0;
 
+import com.liferay.headless.admin.user.client.dto.v1_0.AccountBrief;
 import com.liferay.headless.admin.user.client.dto.v1_0.CustomField;
 import com.liferay.headless.admin.user.client.dto.v1_0.OrganizationBrief;
 import com.liferay.headless.admin.user.client.dto.v1_0.RoleBrief;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -63,7 +65,27 @@ public class UserAccountSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+		if (userAccount.getAccountBriefs() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"accountBriefs\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < userAccount.getAccountBriefs().length; i++) {
+				sb.append(String.valueOf(userAccount.getAccountBriefs()[i]));
+
+				if ((i + 1) < userAccount.getAccountBriefs().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
 
 		if (userAccount.getActions() != null) {
 			if (sb.length() > 1) {
@@ -196,6 +218,20 @@ public class UserAccountSerDes {
 			sb.append("\"");
 		}
 
+		if (userAccount.getExternalReferenceCode() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"externalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(userAccount.getExternalReferenceCode()));
+
+			sb.append("\"");
+		}
+
 		if (userAccount.getFamilyName() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -312,6 +348,21 @@ public class UserAccountSerDes {
 			}
 
 			sb.append("]");
+		}
+
+		if (userAccount.getLastLoginDate() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"lastLoginDate\": ");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(userAccount.getLastLoginDate()));
+
+			sb.append("\"");
 		}
 
 		if (userAccount.getName() != null) {
@@ -436,7 +487,16 @@ public class UserAccountSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+		if (userAccount.getAccountBriefs() == null) {
+			map.put("accountBriefs", null);
+		}
+		else {
+			map.put(
+				"accountBriefs",
+				String.valueOf(userAccount.getAccountBriefs()));
+		}
 
 		if (userAccount.getActions() == null) {
 			map.put("actions", null);
@@ -514,6 +574,15 @@ public class UserAccountSerDes {
 				"emailAddress", String.valueOf(userAccount.getEmailAddress()));
 		}
 
+		if (userAccount.getExternalReferenceCode() == null) {
+			map.put("externalReferenceCode", null);
+		}
+		else {
+			map.put(
+				"externalReferenceCode",
+				String.valueOf(userAccount.getExternalReferenceCode()));
+		}
+
 		if (userAccount.getFamilyName() == null) {
 			map.put("familyName", null);
 		}
@@ -572,6 +641,15 @@ public class UserAccountSerDes {
 		}
 		else {
 			map.put("keywords", String.valueOf(userAccount.getKeywords()));
+		}
+
+		if (userAccount.getLastLoginDate() == null) {
+			map.put("lastLoginDate", null);
+		}
+		else {
+			map.put(
+				"lastLoginDate",
+				liferayToJSONDateFormat.format(userAccount.getLastLoginDate()));
 		}
 
 		if (userAccount.getName() == null) {
@@ -641,7 +719,19 @@ public class UserAccountSerDes {
 			UserAccount userAccount, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "actions")) {
+			if (Objects.equals(jsonParserFieldName, "accountBriefs")) {
+				if (jsonParserFieldValue != null) {
+					userAccount.setAccountBriefs(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AccountBriefSerDes.toDTO((String)object)
+						).toArray(
+							size -> new AccountBrief[size]
+						));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "actions")) {
 				if (jsonParserFieldValue != null) {
 					userAccount.setActions(
 						(Map)UserAccountSerDes.toMap(
@@ -666,18 +756,14 @@ public class UserAccountSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "customFields")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					CustomField[] customFieldsArray =
-						new CustomField[jsonParserFieldValues.length];
-
-					for (int i = 0; i < customFieldsArray.length; i++) {
-						customFieldsArray[i] = CustomFieldSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					userAccount.setCustomFields(customFieldsArray);
+					userAccount.setCustomFields(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomFieldSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CustomField[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dashboardURL")) {
@@ -700,6 +786,14 @@ public class UserAccountSerDes {
 			else if (Objects.equals(jsonParserFieldName, "emailAddress")) {
 				if (jsonParserFieldValue != null) {
 					userAccount.setEmailAddress((String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "externalReferenceCode")) {
+
+				if (jsonParserFieldValue != null) {
+					userAccount.setExternalReferenceCode(
+						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "familyName")) {
@@ -746,6 +840,12 @@ public class UserAccountSerDes {
 						toStrings((Object[])jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "lastLoginDate")) {
+				if (jsonParserFieldValue != null) {
+					userAccount.setLastLoginDate(
+						toDate((String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "name")) {
 				if (jsonParserFieldValue != null) {
 					userAccount.setName((String)jsonParserFieldValue);
@@ -755,19 +855,15 @@ public class UserAccountSerDes {
 						jsonParserFieldName, "organizationBriefs")) {
 
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					OrganizationBrief[] organizationBriefsArray =
-						new OrganizationBrief[jsonParserFieldValues.length];
-
-					for (int i = 0; i < organizationBriefsArray.length; i++) {
-						organizationBriefsArray[i] =
-							OrganizationBriefSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
-					userAccount.setOrganizationBriefs(organizationBriefsArray);
+					userAccount.setOrganizationBriefs(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> OrganizationBriefSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new OrganizationBrief[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "profileURL")) {
@@ -777,34 +873,26 @@ public class UserAccountSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "roleBriefs")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					RoleBrief[] roleBriefsArray =
-						new RoleBrief[jsonParserFieldValues.length];
-
-					for (int i = 0; i < roleBriefsArray.length; i++) {
-						roleBriefsArray[i] = RoleBriefSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					userAccount.setRoleBriefs(roleBriefsArray);
+					userAccount.setRoleBriefs(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> RoleBriefSerDes.toDTO((String)object)
+						).toArray(
+							size -> new RoleBrief[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "siteBriefs")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					SiteBrief[] siteBriefsArray =
-						new SiteBrief[jsonParserFieldValues.length];
-
-					for (int i = 0; i < siteBriefsArray.length; i++) {
-						siteBriefsArray[i] = SiteBriefSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					userAccount.setSiteBriefs(siteBriefsArray);
+					userAccount.setSiteBriefs(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> SiteBriefSerDes.toDTO((String)object)
+						).toArray(
+							size -> new SiteBrief[size]
+						));
 				}
 			}
 			else if (Objects.equals(

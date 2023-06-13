@@ -43,6 +43,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -352,112 +353,134 @@ public class MBThreadModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<MBThread, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, MBThread>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<MBThread, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<MBThread, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			MBThread.class.getClassLoader(), MBThread.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", MBThread::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", MBThread::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", MBThread::getUuid);
-		attributeGetterFunctions.put("threadId", MBThread::getThreadId);
-		attributeGetterFunctions.put("groupId", MBThread::getGroupId);
-		attributeGetterFunctions.put("companyId", MBThread::getCompanyId);
-		attributeGetterFunctions.put("userId", MBThread::getUserId);
-		attributeGetterFunctions.put("userName", MBThread::getUserName);
-		attributeGetterFunctions.put("createDate", MBThread::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", MBThread::getModifiedDate);
-		attributeGetterFunctions.put("categoryId", MBThread::getCategoryId);
-		attributeGetterFunctions.put(
-			"rootMessageId", MBThread::getRootMessageId);
-		attributeGetterFunctions.put(
-			"rootMessageUserId", MBThread::getRootMessageUserId);
-		attributeGetterFunctions.put("title", MBThread::getTitle);
-		attributeGetterFunctions.put(
-			"lastPostByUserId", MBThread::getLastPostByUserId);
-		attributeGetterFunctions.put("lastPostDate", MBThread::getLastPostDate);
-		attributeGetterFunctions.put("priority", MBThread::getPriority);
-		attributeGetterFunctions.put("question", MBThread::getQuestion);
-		attributeGetterFunctions.put(
-			"lastPublishDate", MBThread::getLastPublishDate);
-		attributeGetterFunctions.put("status", MBThread::getStatus);
-		attributeGetterFunctions.put(
-			"statusByUserId", MBThread::getStatusByUserId);
-		attributeGetterFunctions.put(
-			"statusByUserName", MBThread::getStatusByUserName);
-		attributeGetterFunctions.put("statusDate", MBThread::getStatusDate);
+		try {
+			Constructor<MBThread> constructor =
+				(Constructor<MBThread>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<MBThread, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<MBThread, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<MBThread, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<MBThread, Object>>();
 		Map<String, BiConsumer<MBThread, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<MBThread, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", MBThread::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<MBThread, Long>)MBThread::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", MBThread::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<MBThread, Long>)MBThread::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", MBThread::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<MBThread, String>)MBThread::setUuid);
+		attributeGetterFunctions.put("threadId", MBThread::getThreadId);
 		attributeSetterBiConsumers.put(
 			"threadId", (BiConsumer<MBThread, Long>)MBThread::setThreadId);
+		attributeGetterFunctions.put("groupId", MBThread::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<MBThread, Long>)MBThread::setGroupId);
+		attributeGetterFunctions.put("companyId", MBThread::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<MBThread, Long>)MBThread::setCompanyId);
+		attributeGetterFunctions.put("userId", MBThread::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<MBThread, Long>)MBThread::setUserId);
+		attributeGetterFunctions.put("userName", MBThread::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<MBThread, String>)MBThread::setUserName);
+		attributeGetterFunctions.put("createDate", MBThread::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<MBThread, Date>)MBThread::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", MBThread::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<MBThread, Date>)MBThread::setModifiedDate);
+		attributeGetterFunctions.put("categoryId", MBThread::getCategoryId);
 		attributeSetterBiConsumers.put(
 			"categoryId", (BiConsumer<MBThread, Long>)MBThread::setCategoryId);
+		attributeGetterFunctions.put(
+			"rootMessageId", MBThread::getRootMessageId);
 		attributeSetterBiConsumers.put(
 			"rootMessageId",
 			(BiConsumer<MBThread, Long>)MBThread::setRootMessageId);
+		attributeGetterFunctions.put(
+			"rootMessageUserId", MBThread::getRootMessageUserId);
 		attributeSetterBiConsumers.put(
 			"rootMessageUserId",
 			(BiConsumer<MBThread, Long>)MBThread::setRootMessageUserId);
+		attributeGetterFunctions.put("title", MBThread::getTitle);
 		attributeSetterBiConsumers.put(
 			"title", (BiConsumer<MBThread, String>)MBThread::setTitle);
+		attributeGetterFunctions.put(
+			"lastPostByUserId", MBThread::getLastPostByUserId);
 		attributeSetterBiConsumers.put(
 			"lastPostByUserId",
 			(BiConsumer<MBThread, Long>)MBThread::setLastPostByUserId);
+		attributeGetterFunctions.put("lastPostDate", MBThread::getLastPostDate);
 		attributeSetterBiConsumers.put(
 			"lastPostDate",
 			(BiConsumer<MBThread, Date>)MBThread::setLastPostDate);
+		attributeGetterFunctions.put("priority", MBThread::getPriority);
 		attributeSetterBiConsumers.put(
 			"priority", (BiConsumer<MBThread, Double>)MBThread::setPriority);
+		attributeGetterFunctions.put("question", MBThread::getQuestion);
 		attributeSetterBiConsumers.put(
 			"question", (BiConsumer<MBThread, Boolean>)MBThread::setQuestion);
+		attributeGetterFunctions.put(
+			"lastPublishDate", MBThread::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<MBThread, Date>)MBThread::setLastPublishDate);
+		attributeGetterFunctions.put("status", MBThread::getStatus);
 		attributeSetterBiConsumers.put(
 			"status", (BiConsumer<MBThread, Integer>)MBThread::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", MBThread::getStatusByUserId);
 		attributeSetterBiConsumers.put(
 			"statusByUserId",
 			(BiConsumer<MBThread, Long>)MBThread::setStatusByUserId);
+		attributeGetterFunctions.put(
+			"statusByUserName", MBThread::getStatusByUserName);
 		attributeSetterBiConsumers.put(
 			"statusByUserName",
 			(BiConsumer<MBThread, String>)MBThread::setStatusByUserName);
+		attributeGetterFunctions.put("statusDate", MBThread::getStatusDate);
 		attributeSetterBiConsumers.put(
 			"statusDate", (BiConsumer<MBThread, Date>)MBThread::setStatusDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -1323,6 +1346,54 @@ public class MBThreadModelImpl
 	}
 
 	@Override
+	public MBThread cloneWithOriginalValues() {
+		MBThreadImpl mbThreadImpl = new MBThreadImpl();
+
+		mbThreadImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		mbThreadImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		mbThreadImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		mbThreadImpl.setThreadId(this.<Long>getColumnOriginalValue("threadId"));
+		mbThreadImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		mbThreadImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		mbThreadImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		mbThreadImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		mbThreadImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		mbThreadImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		mbThreadImpl.setCategoryId(
+			this.<Long>getColumnOriginalValue("categoryId"));
+		mbThreadImpl.setRootMessageId(
+			this.<Long>getColumnOriginalValue("rootMessageId"));
+		mbThreadImpl.setRootMessageUserId(
+			this.<Long>getColumnOriginalValue("rootMessageUserId"));
+		mbThreadImpl.setTitle(this.<String>getColumnOriginalValue("title"));
+		mbThreadImpl.setLastPostByUserId(
+			this.<Long>getColumnOriginalValue("lastPostByUserId"));
+		mbThreadImpl.setLastPostDate(
+			this.<Date>getColumnOriginalValue("lastPostDate"));
+		mbThreadImpl.setPriority(
+			this.<Double>getColumnOriginalValue("priority"));
+		mbThreadImpl.setQuestion(
+			this.<Boolean>getColumnOriginalValue("question"));
+		mbThreadImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+		mbThreadImpl.setStatus(this.<Integer>getColumnOriginalValue("status"));
+		mbThreadImpl.setStatusByUserId(
+			this.<Long>getColumnOriginalValue("statusByUserId"));
+		mbThreadImpl.setStatusByUserName(
+			this.<String>getColumnOriginalValue("statusByUserName"));
+		mbThreadImpl.setStatusDate(
+			this.<Date>getColumnOriginalValue("statusDate"));
+
+		return mbThreadImpl;
+	}
+
+	@Override
 	public int compareTo(MBThread mbThread) {
 		int value = 0;
 
@@ -1603,9 +1674,7 @@ public class MBThreadModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, MBThread>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					MBThread.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

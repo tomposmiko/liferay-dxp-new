@@ -423,33 +423,12 @@ public class LDAPAuth implements Authenticator {
 
 			if (!ldapAuthResult.isAuthenticated()) {
 				if (_log.isDebugEnabled()) {
-					StringBundler sb = new StringBundler(10);
-
-					sb.append("Unable to authenticate with ");
-					sb.append(fullUserDN);
-					sb.append(" on LDAP server ");
-					sb.append(ldapServerId);
-					sb.append(", company ");
-					sb.append(companyId);
-					sb.append(", and LDAP context ");
-					sb.append(safeLdapContext);
-					sb.append(": ");
-					sb.append(errorMessage);
-
-					_log.debug(sb.toString());
-				}
-
-				return FAILURE;
-			}
-
-			if (user == null) {
-				if (_log.isDebugEnabled()) {
 					_log.debug(
 						StringBundler.concat(
-							"Rejecting authenticated user ", fullUserDN,
-							" because of failed import from LDAP server ",
-							ldapServerId, ", company ", companyId,
-							", and LDAP context ", safeLdapContext));
+							"Unable to authenticate with ", fullUserDN,
+							" on LDAP server ", ldapServerId, ", company ",
+							companyId, ", and LDAP context ", safeLdapContext,
+							": ", errorMessage));
 				}
 
 				return FAILURE;
@@ -682,15 +661,11 @@ public class LDAPAuth implements Authenticator {
 	}
 
 	protected String getKey(Map<String, Object> env) {
-		StringBundler sb = new StringBundler(5);
-
-		sb.append(MapUtil.getString(env, Context.PROVIDER_URL));
-		sb.append(StringPool.POUND);
-		sb.append(MapUtil.getString(env, Context.SECURITY_PRINCIPAL));
-		sb.append(StringPool.POUND);
-		sb.append(MapUtil.getString(env, Context.SECURITY_CREDENTIALS));
-
-		return sb.toString();
+		return StringBundler.concat(
+			MapUtil.getString(env, Context.PROVIDER_URL), StringPool.POUND,
+			MapUtil.getString(env, Context.SECURITY_PRINCIPAL),
+			StringPool.POUND,
+			MapUtil.getString(env, Context.SECURITY_CREDENTIALS));
 	}
 
 	protected long getPreferredLDAPServer(

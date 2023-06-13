@@ -106,6 +106,15 @@ public abstract class BaseClientTestCase {
 		return invocationBuilder.header("Authorization", "Bearer " + token);
 	}
 
+	protected String generateCodeChallenge(String codeVerifier) {
+		return StringUtil.removeChar(
+			StringUtil.replace(
+				DigesterUtil.digestBase64(Digester.SHA_256, codeVerifier),
+				new char[] {CharPool.PLUS, CharPool.SLASH},
+				new char[] {CharPool.MINUS, CharPool.UNDERLINE}),
+			CharPool.EQUAL);
+	}
+
 	protected Cookie getAuthenticatedCookie(
 		String login, String password, String hostname) {
 
@@ -150,12 +159,22 @@ public abstract class BaseClientTestCase {
 		getAuthenticatedInvocationBuilderFunction(
 			String login, String password, String hostname) {
 
+		return getAuthenticatedInvocationBuilderFunction(
+			login, password, hostname, Function.identity());
+	}
+
+	protected Function<WebTarget, Invocation.Builder>
+		getAuthenticatedInvocationBuilderFunction(
+			String login, String password, String hostname,
+			Function<Invocation.Builder, Invocation.Builder>
+				invocationBuilderFunction) {
+
 		Cookie authenticatedCookie = getAuthenticatedCookie(
 			login, password, hostname);
 
 		return webtarget -> {
 			Invocation.Builder invocationBuilder = getInvocationBuilder(
-				hostname, webtarget);
+				hostname, webtarget, invocationBuilderFunction);
 
 			return invocationBuilder.accept(
 				"text/html"
@@ -207,17 +226,7 @@ public abstract class BaseClientTestCase {
 		return (clientId, invocationBuilder) -> {
 			String codeVerifier = RandomTestUtil.randomString();
 
-			String base64Digest = DigesterUtil.digestBase64(
-				Digester.SHA_256, codeVerifier);
-
-			String base64UrlDigest = StringUtil.replace(
-				base64Digest, new char[] {CharPool.PLUS, CharPool.SLASH},
-				new char[] {CharPool.MINUS, CharPool.UNDERLINE});
-
-			base64UrlDigest = StringUtil.removeChar(
-				base64UrlDigest, CharPool.EQUAL);
-
-			final String codeChallenge = base64UrlDigest;
+			String codeChallenge = generateCodeChallenge(codeVerifier);
 
 			String authorizationCode = parseAuthorizationCodeString(
 				getCodeResponse(
@@ -287,6 +296,24 @@ public abstract class BaseClientTestCase {
 		getCodeFunction(
 			Function<WebTarget, WebTarget> authorizeRequestFunction) {
 
+		return getCodeFunction(authorizeRequestFunction, null, false);
+	}
+
+	protected Function<Function<WebTarget, Invocation.Builder>, Response>
+		getCodeFunction(
+			Function<WebTarget, WebTarget> authorizeRequestFunction,
+			boolean skipAuthorization) {
+
+		return getCodeFunction(
+			authorizeRequestFunction, null, skipAuthorization);
+	}
+
+	protected Function<Function<WebTarget, Invocation.Builder>, Response>
+		getCodeFunction(
+			Function<WebTarget, WebTarget> authorizeRequestFunction,
+			MultivaluedMap<String, String> extraParameters,
+			boolean skipAuthorization) {
+
 		return invocationBuilderFunction -> {
 			Invocation.Builder invocationBuilder =
 				invocationBuilderFunction.apply(
@@ -303,7 +330,7 @@ public abstract class BaseClientTestCase {
 			Map<String, String[]> parameterMap = HttpUtil.getParameterMap(
 				uri.getQuery());
 
-			if (parameterMap.containsKey("error")) {
+			if (parameterMap.containsKey("error") || skipAuthorization) {
 				return response;
 			}
 
@@ -323,6 +350,10 @@ public abstract class BaseClientTestCase {
 					key.substring("oauth2_".length()), entry.getValue()[0]);
 			}
 
+			if (extraParameters != null) {
+				formData.putAll(extraParameters);
+			}
+
 			invocationBuilder = invocationBuilderFunction.apply(
 				getAuthorizeDecisionWebTarget());
 
@@ -335,9 +366,21 @@ public abstract class BaseClientTestCase {
 		Function<Function<WebTarget, Invocation.Builder>, Response>
 			authorizationResponseFunction) {
 
+		return getCodeResponse(
+			login, password, hostname, authorizationResponseFunction,
+			Function.identity());
+	}
+
+	protected Response getCodeResponse(
+		String login, String password, String hostname,
+		Function<Function<WebTarget, Invocation.Builder>, Response>
+			authorizationResponseFunction,
+		Function<Invocation.Builder, Invocation.Builder>
+			invocationBuilderFunction) {
+
 		return authorizationResponseFunction.apply(
 			getAuthenticatedInvocationBuilderFunction(
-				login, password, hostname));
+				login, password, hostname, invocationBuilderFunction));
 	}
 
 	protected BiFunction<String, Invocation.Builder, Response>
@@ -385,13 +428,21 @@ public abstract class BaseClientTestCase {
 	protected Invocation.Builder getInvocationBuilder(
 		String hostname, WebTarget webTarget) {
 
+		return getInvocationBuilder(hostname, webTarget, Function.identity());
+	}
+
+	protected Invocation.Builder getInvocationBuilder(
+		String hostname, WebTarget webTarget,
+		Function<Invocation.Builder, Invocation.Builder>
+			invocationBuilderFunction) {
+
 		Invocation.Builder invocationBuilder = webTarget.request();
 
 		if (hostname != null) {
 			invocationBuilder = invocationBuilder.header("Host", hostname);
 		}
 
-		return invocationBuilder;
+		return invocationBuilderFunction.apply(invocationBuilder);
 	}
 
 	protected WebTarget getJsonWebTarget(String... paths) {

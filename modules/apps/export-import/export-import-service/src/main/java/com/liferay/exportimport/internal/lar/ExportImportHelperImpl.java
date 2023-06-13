@@ -15,7 +15,6 @@
 package com.liferay.exportimport.internal.lar;
 
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
-import com.liferay.exportimport.configuration.ExportImportServiceConfiguration;
 import com.liferay.exportimport.constants.ExportImportBackgroundTaskContextMapConstants;
 import com.liferay.exportimport.kernel.lar.DefaultConfigurationPortletDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportHelper;
@@ -34,8 +33,6 @@ import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.exportimport.kernel.lar.UserIdStrategy;
 import com.liferay.exportimport.portlet.data.handler.provider.PortletDataHandlerProvider;
 import com.liferay.exportimport.portlet.data.handler.util.ExportImportGroupedModelUtil;
-import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessor;
-import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessorRegistryUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -101,6 +98,7 @@ import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
 import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.portal.model.impl.LayoutImpl;
+import com.liferay.staging.configuration.StagingConfiguration;
 
 import java.io.File;
 import java.io.InputStream;
@@ -135,7 +133,7 @@ import org.xml.sax.XMLReader;
  * @author Máté Thurzó
  */
 @Component(
-	configurationPid = "com.liferay.exportimport.configuration.ExportImportServiceConfiguration",
+	configurationPid = "com.liferay.staging.configuration.StagingConfiguration",
 	immediate = true, service = ExportImportHelper.class
 )
 public class ExportImportHelperImpl implements ExportImportHelper {
@@ -410,7 +408,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 	@Override
 	public long getLayoutModelDeletionCount(
-			final PortletDataContext portletDataContext, boolean privateLayout)
+			PortletDataContext portletDataContext, boolean privateLayout)
 		throws PortalException {
 
 		ActionableDynamicQuery actionableDynamicQuery =
@@ -563,8 +561,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 	@Override
 	public long getModelDeletionCount(
-			final PortletDataContext portletDataContext,
-			final StagedModelType stagedModelType)
+			PortletDataContext portletDataContext,
+			StagedModelType stagedModelType)
 		throws PortalException {
 
 		ActionableDynamicQuery actionableDynamicQuery =
@@ -738,35 +736,6 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	}
 
 	@Override
-	public boolean isPublishDisplayedContent(
-		PortletDataContext portletDataContext, Portlet portlet) {
-
-		try {
-			if (!ExportImportThreadLocal.isLayoutStagingInProcess()) {
-				return true;
-			}
-
-			if (_exportImportServiceConfiguration.publishDisplayedContent()) {
-				return true;
-			}
-
-			ExportImportPortletPreferencesProcessor
-				exportImportPortletPreferencesProcessor =
-					ExportImportPortletPreferencesProcessorRegistryUtil.
-						getExportImportPortletPreferencesProcessor(
-							portlet.getRootPortletId());
-
-			return exportImportPortletPreferencesProcessor.
-				isPublishDisplayedContent();
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-
-			return true;
-		}
-	}
-
-	@Override
 	public boolean isReferenceWithinExportScope(
 		PortletDataContext portletDataContext, StagedModel stagedModel) {
 
@@ -831,8 +800,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
-					"Unable to process manifest for the process summary " +
-						"screen");
+					"Unable to process manifest for the process summary screen",
+					exception);
 			}
 		}
 		finally {
@@ -1044,8 +1013,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
-		_exportImportServiceConfiguration = ConfigurableUtil.createConfigurable(
-			ExportImportServiceConfiguration.class, properties);
+		_stagingConfiguration = ConfigurableUtil.createConfigurable(
+			StagingConfiguration.class, properties);
 	}
 
 	protected void addCreateDateProperty(
@@ -1274,9 +1243,9 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		long companyId = CompanyThreadLocal.getCompanyId();
 
 		try {
-			_exportImportServiceConfiguration =
+			_stagingConfiguration =
 				_configurationProvider.getCompanyConfiguration(
-					ExportImportServiceConfiguration.class, companyId);
+					StagingConfiguration.class, companyId);
 		}
 		catch (ConfigurationException configurationException) {
 			if (_log.isWarnEnabled()) {
@@ -1285,10 +1254,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		}
 
 		if (!ExportImportThreadLocal.isStagingInProcess() ||
-			(_exportImportServiceConfiguration.
-				stagingDeleteTempLarOnFailure() &&
-			 _exportImportServiceConfiguration.
-				 stagingDeleteTempLarOnSuccess())) {
+			(_stagingConfiguration.stagingDeleteTempLAROnFailure() &&
+			 _stagingConfiguration.stagingDeleteTempLAROnSuccess())) {
 
 			return ZipWriterFactoryUtil.getZipWriter();
 		}
@@ -1412,8 +1379,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
 				className);
 
-		if ((stagedModelDataHandler == null) ||
-			!stagedModelDataHandler.validateReference(
+		if (!stagedModelDataHandler.validateReference(
 				portletDataContext, element)) {
 
 			MissingReference missingReference = new MissingReference(element);
@@ -1517,14 +1483,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	}
 
 	private String _getZipWriterFileName(String id) {
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(id);
-		sb.append(StringPool.DASH);
-		sb.append(Time.getTimestamp());
-		sb.append(".lar");
-
-		return sb.toString();
+		return StringBundler.concat(
+			id, StringPool.DASH, Time.getTimestamp(), ".lar");
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -1534,7 +1494,6 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	private ConfigurationProvider _configurationProvider;
 
 	private DLFileEntryLocalService _dlFileEntryLocalService;
-	private ExportImportServiceConfiguration _exportImportServiceConfiguration;
 	private GroupLocalService _groupLocalService;
 	private LayoutLocalService _layoutLocalService;
 	private LayoutRevisionLocalService _layoutRevisionLocalService;
@@ -1547,6 +1506,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	private PortletDataHandlerProvider _portletDataHandlerProvider;
 
 	private PortletLocalService _portletLocalService;
+	private volatile StagingConfiguration _stagingConfiguration;
 	private SystemEventLocalService _systemEventLocalService;
 	private UserLocalService _userLocalService;
 
@@ -1583,6 +1543,10 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 						_group.getCompanyId(), portletId);
 				}
 				catch (Exception exception) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(exception, exception);
+					}
+
 					return;
 				}
 

@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -334,129 +335,151 @@ public class ExportImportConfigurationModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, ExportImportConfiguration>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ExportImportConfiguration.class.getClassLoader(),
+			ExportImportConfiguration.class, ModelWrapper.class);
+
+		try {
+			Constructor<ExportImportConfiguration> constructor =
+				(Constructor<ExportImportConfiguration>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map
 		<String, Function<ExportImportConfiguration, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<ExportImportConfiguration, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<ExportImportConfiguration, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<ExportImportConfiguration, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", ExportImportConfiguration::getMvccVersion);
-		attributeGetterFunctions.put(
-			"exportImportConfigurationId",
-			ExportImportConfiguration::getExportImportConfigurationId);
-		attributeGetterFunctions.put(
-			"groupId", ExportImportConfiguration::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", ExportImportConfiguration::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", ExportImportConfiguration::getUserId);
-		attributeGetterFunctions.put(
-			"userName", ExportImportConfiguration::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", ExportImportConfiguration::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", ExportImportConfiguration::getModifiedDate);
-		attributeGetterFunctions.put(
-			"name", ExportImportConfiguration::getName);
-		attributeGetterFunctions.put(
-			"description", ExportImportConfiguration::getDescription);
-		attributeGetterFunctions.put(
-			"type", ExportImportConfiguration::getType);
-		attributeGetterFunctions.put(
-			"settings", ExportImportConfiguration::getSettings);
-		attributeGetterFunctions.put(
-			"status", ExportImportConfiguration::getStatus);
-		attributeGetterFunctions.put(
-			"statusByUserId", ExportImportConfiguration::getStatusByUserId);
-		attributeGetterFunctions.put(
-			"statusByUserName", ExportImportConfiguration::getStatusByUserName);
-		attributeGetterFunctions.put(
-			"statusDate", ExportImportConfiguration::getStatusDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<ExportImportConfiguration, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<ExportImportConfiguration, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<ExportImportConfiguration, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", ExportImportConfiguration::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<ExportImportConfiguration, Long>)
 				ExportImportConfiguration::setMvccVersion);
+		attributeGetterFunctions.put(
+			"exportImportConfigurationId",
+			ExportImportConfiguration::getExportImportConfigurationId);
 		attributeSetterBiConsumers.put(
 			"exportImportConfigurationId",
 			(BiConsumer<ExportImportConfiguration, Long>)
 				ExportImportConfiguration::setExportImportConfigurationId);
+		attributeGetterFunctions.put(
+			"groupId", ExportImportConfiguration::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<ExportImportConfiguration, Long>)
 				ExportImportConfiguration::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", ExportImportConfiguration::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<ExportImportConfiguration, Long>)
 				ExportImportConfiguration::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", ExportImportConfiguration::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<ExportImportConfiguration, Long>)
 				ExportImportConfiguration::setUserId);
+		attributeGetterFunctions.put(
+			"userName", ExportImportConfiguration::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<ExportImportConfiguration, String>)
 				ExportImportConfiguration::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", ExportImportConfiguration::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<ExportImportConfiguration, Date>)
 				ExportImportConfiguration::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", ExportImportConfiguration::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<ExportImportConfiguration, Date>)
 				ExportImportConfiguration::setModifiedDate);
+		attributeGetterFunctions.put(
+			"name", ExportImportConfiguration::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<ExportImportConfiguration, String>)
 				ExportImportConfiguration::setName);
+		attributeGetterFunctions.put(
+			"description", ExportImportConfiguration::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<ExportImportConfiguration, String>)
 				ExportImportConfiguration::setDescription);
+		attributeGetterFunctions.put(
+			"type", ExportImportConfiguration::getType);
 		attributeSetterBiConsumers.put(
 			"type",
 			(BiConsumer<ExportImportConfiguration, Integer>)
 				ExportImportConfiguration::setType);
+		attributeGetterFunctions.put(
+			"settings", ExportImportConfiguration::getSettings);
 		attributeSetterBiConsumers.put(
 			"settings",
 			(BiConsumer<ExportImportConfiguration, String>)
 				ExportImportConfiguration::setSettings);
+		attributeGetterFunctions.put(
+			"status", ExportImportConfiguration::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<ExportImportConfiguration, Integer>)
 				ExportImportConfiguration::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", ExportImportConfiguration::getStatusByUserId);
 		attributeSetterBiConsumers.put(
 			"statusByUserId",
 			(BiConsumer<ExportImportConfiguration, Long>)
 				ExportImportConfiguration::setStatusByUserId);
+		attributeGetterFunctions.put(
+			"statusByUserName", ExportImportConfiguration::getStatusByUserName);
 		attributeSetterBiConsumers.put(
 			"statusByUserName",
 			(BiConsumer<ExportImportConfiguration, String>)
 				ExportImportConfiguration::setStatusByUserName);
+		attributeGetterFunctions.put(
+			"statusDate", ExportImportConfiguration::getStatusDate);
 		attributeSetterBiConsumers.put(
 			"statusDate",
 			(BiConsumer<ExportImportConfiguration, Date>)
 				ExportImportConfiguration::setStatusDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -1113,6 +1136,47 @@ public class ExportImportConfigurationModelImpl
 	}
 
 	@Override
+	public ExportImportConfiguration cloneWithOriginalValues() {
+		ExportImportConfigurationImpl exportImportConfigurationImpl =
+			new ExportImportConfigurationImpl();
+
+		exportImportConfigurationImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		exportImportConfigurationImpl.setExportImportConfigurationId(
+			this.<Long>getColumnOriginalValue("exportImportConfigurationId"));
+		exportImportConfigurationImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		exportImportConfigurationImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		exportImportConfigurationImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		exportImportConfigurationImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		exportImportConfigurationImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		exportImportConfigurationImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		exportImportConfigurationImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		exportImportConfigurationImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		exportImportConfigurationImpl.setType(
+			this.<Integer>getColumnOriginalValue("type_"));
+		exportImportConfigurationImpl.setSettings(
+			this.<String>getColumnOriginalValue("settings_"));
+		exportImportConfigurationImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
+		exportImportConfigurationImpl.setStatusByUserId(
+			this.<Long>getColumnOriginalValue("statusByUserId"));
+		exportImportConfigurationImpl.setStatusByUserName(
+			this.<String>getColumnOriginalValue("statusByUserName"));
+		exportImportConfigurationImpl.setStatusDate(
+			this.<Date>getColumnOriginalValue("statusDate"));
+
+		return exportImportConfigurationImpl;
+	}
+
+	@Override
 	public int compareTo(ExportImportConfiguration exportImportConfiguration) {
 		int value = 0;
 
@@ -1367,8 +1431,7 @@ public class ExportImportConfigurationModelImpl
 		private static final Function
 			<InvocationHandler, ExportImportConfiguration>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						ExportImportConfiguration.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 

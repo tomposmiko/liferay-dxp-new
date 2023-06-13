@@ -59,8 +59,9 @@ public abstract class BaseMultiDestinationProxyBean {
 		else if (proxyResponse.hasError()) {
 			throw proxyResponse.getException();
 		}
-
-		return proxyResponse.getResult();
+		else {
+			return proxyResponse.getResult();
+		}
 	}
 
 	protected Message buildMessage(ProxyRequest proxyRequest) {

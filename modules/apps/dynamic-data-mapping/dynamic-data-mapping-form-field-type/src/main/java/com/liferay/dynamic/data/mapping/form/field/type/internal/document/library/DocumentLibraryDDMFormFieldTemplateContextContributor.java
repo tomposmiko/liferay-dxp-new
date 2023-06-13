@@ -20,11 +20,15 @@ import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.dynamic.data.mapping.constants.DDMFormConstants;
 import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
+import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.form.item.selector.criterion.DDMUserPersonalFolderItemSelectorCriterion;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.item.selector.ItemSelector;
+import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
+import com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -61,18 +65,20 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
@@ -84,7 +90,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Pedro Queiroz
  */
 @Component(
-	immediate = true, property = "ddm.form.field.type.name=document_library",
+	immediate = true,
+	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.DOCUMENT_LIBRARY,
 	service = {
 		DDMFormFieldTemplateContextContributor.class,
 		DocumentLibraryDDMFormFieldTemplateContextContributor.class
@@ -111,6 +118,11 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 			"maximumSubmissionLimitReached",
 			GetterUtil.getBoolean(
 				ddmFormField.getProperty("maximumSubmissionLimitReached"))
+		).put(
+			"message",
+			_getMessage(
+				ddmFormFieldRenderingContext.getLocale(),
+				ddmFormFieldRenderingContext.getValue())
 		).put(
 			"value",
 			() -> {
@@ -324,7 +336,9 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 				valueJSONObject.getLong("groupId"));
 		}
 		catch (PortalException portalException) {
-			_log.error("Unable to retrieve file entry ", portalException);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to retrieve file entry ", portalException);
+			}
 
 			return null;
 		}
@@ -373,21 +387,13 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(9);
-
-		sb.append(themeDisplay.getPathContext());
-
-		sb.append("/documents/");
-		sb.append(fileEntry.getRepositoryId());
-		sb.append(StringPool.SLASH);
-		sb.append(fileEntry.getFolderId());
-		sb.append(StringPool.SLASH);
-		sb.append(
-			URLCodec.encodeURL(_html.unescape(fileEntry.getTitle()), true));
-		sb.append(StringPool.SLASH);
-		sb.append(fileEntry.getUuid());
-
-		return _html.escape(sb.toString());
+		return _html.escape(
+			StringBundler.concat(
+				themeDisplay.getPathContext(), "/documents/",
+				fileEntry.getRepositoryId(), StringPool.SLASH,
+				fileEntry.getFolderId(), StringPool.SLASH,
+				URLCodec.encodeURL(_html.unescape(fileEntry.getTitle()), true),
+				StringPool.SLASH, fileEntry.getUuid()));
 	}
 
 	private String _getGuestUploadURL(
@@ -397,27 +403,24 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
 			RequestBackedPortletURLFactoryUtil.create(httpServletRequest);
 
-		PortletURL portletURL = requestBackedPortletURLFactory.createActionURL(
-			GetterUtil.getString(
-				_portal.getPortletId(httpServletRequest),
-				DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM));
-
-		portletURL.setParameter(
-			ActionRequest.ACTION_NAME,
-			"/dynamic_data_mapping_form/upload_file_entry");
-		portletURL.setParameter(
+		return PortletURLBuilder.create(
+			requestBackedPortletURLFactory.createActionURL(
+				GetterUtil.getString(
+					_portal.getPortletId(httpServletRequest),
+					DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM))
+		).setActionName(
+			"/dynamic_data_mapping_form/upload_file_entry"
+		).setParameter(
+			"folderId", folderId
+		).setParameter(
 			"formInstanceId",
 			ParamUtil.getString(
 				httpServletRequest, "formInstanceId",
 				String.valueOf(
-					ddmFormFieldRenderingContext.getDDMFormInstanceId())));
-		portletURL.setParameter(
-			"groupId",
-			String.valueOf(
-				ddmFormFieldRenderingContext.getProperty("groupId")));
-		portletURL.setParameter("folderId", String.valueOf(folderId));
-
-		return portletURL.toString();
+					ddmFormFieldRenderingContext.getDDMFormInstanceId()))
+		).setParameter(
+			"groupId", ddmFormFieldRenderingContext.getProperty("groupId")
+		).buildString();
 	}
 
 	private String _getItemSelectorURL(
@@ -437,6 +440,8 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 			group = themeDisplay.getScopeGroup();
 		}
 
+		List<ItemSelectorCriterion> itemSelectorCriteria = new ArrayList<>();
+
 		DDMUserPersonalFolderItemSelectorCriterion
 			ddmUserPersonalFolderItemSelectorCriterion =
 				new DDMUserPersonalFolderItemSelectorCriterion(
@@ -448,17 +453,60 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 		ddmUserPersonalFolderItemSelectorCriterion.setRepositoryId(
 			repositoryId);
 
-		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
-			RequestBackedPortletURLFactoryUtil.create(
-				ddmFormFieldRenderingContext.getHttpServletRequest());
+		itemSelectorCriteria.add(ddmUserPersonalFolderItemSelectorCriterion);
+
+		String portletNamespace =
+			ddmFormFieldRenderingContext.getPortletNamespace();
+
+		if (!StringUtil.startsWith(
+				portletNamespace,
+				_portal.getPortletNamespace(
+					DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM))) {
+
+			FileItemSelectorCriterion fileItemSelectorCriterion =
+				new FileItemSelectorCriterion();
+
+			fileItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+				new FileEntryItemSelectorReturnType());
+
+			itemSelectorCriteria.add(fileItemSelectorCriterion);
+		}
 
 		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
-			requestBackedPortletURLFactory, group, groupId,
-			ddmFormFieldRenderingContext.getPortletNamespace() +
-				"selectDocumentLibrary",
-			ddmUserPersonalFolderItemSelectorCriterion);
+			RequestBackedPortletURLFactoryUtil.create(
+				ddmFormFieldRenderingContext.getHttpServletRequest()),
+			group, groupId, portletNamespace + "selectDocumentLibrary",
+			itemSelectorCriteria.toArray(new ItemSelectorCriterion[0]));
 
 		return itemSelectorURL.toString();
+	}
+
+	private String _getMessage(Locale defaultLocale, String value) {
+		if (Validator.isNull(value)) {
+			return StringPool.BLANK;
+		}
+
+		JSONObject valueJSONObject = _getValueJSONObject(value);
+
+		if ((valueJSONObject == null) || (valueJSONObject.length() <= 0)) {
+			return StringPool.BLANK;
+		}
+
+		FileEntry fileEntry = _getFileEntry(valueJSONObject);
+
+		if (fileEntry == null) {
+			return LanguageUtil.get(
+				getResourceBundle(defaultLocale),
+				"the-selected-document-was-deleted");
+		}
+
+		if (fileEntry.isInTrash()) {
+			return LanguageUtil.get(
+				getResourceBundle(defaultLocale),
+				"the-selected-document-was-moved-to-the-recycle-bin");
+		}
+
+		return StringPool.BLANK;
 	}
 
 	private long _getPrivateUserFolderId(

@@ -25,7 +25,7 @@ CommerceShipmentDisplayContext commerceShipmentDisplayContext = (CommerceShipmen
 <commerce-ui:modal-content
 	title='<%= LanguageUtil.get(request, "create-new-shipment") %>'
 >
-	<aui:form action="<%= editCommerceShipmentActionURL %>" cssClass="container-fluid-1280" method="post" name="form">
+	<aui:form action="<%= editCommerceShipmentActionURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="form">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.ADD %>" />
 
 		<aui:select id="commerceChannelGroupId" label="channel" name="commerceChannelGroupId" required="<%= true %>" showEmptyOption="<%= true %>">
@@ -75,19 +75,19 @@ CommerceShipmentDisplayContext commerceShipmentDisplayContext = (CommerceShipmen
 					'/accountAddresses/',
 				{
 					headers: new Headers({
-						Accept: 'application/json',
+						'Accept': 'application/json',
 						'Content-Type': 'application/json',
 					}),
 					method: 'GET',
 				}
 			)
-				.then(function (response) {
+				.then((response) => {
 					return response.json();
 				})
-				.then(function (response) {
+				.then((response) => {
 					var select = A.one('#<portlet:namespace />commerceAddressId');
 
-					response.items.forEach(function (item) {
+					response.items.forEach((item) => {
 						var option = A.Node.create(
 							'<option id="<portlet:namespace />commerceAddressId-' +
 								item.id +
@@ -113,7 +113,7 @@ CommerceShipmentDisplayContext commerceShipmentDisplayContext = (CommerceShipmen
 	);
 
 	if (commerceAccount) {
-		commerceAccount.addEventListener('change', function () {
+		commerceAccount.addEventListener('change', () => {
 			if (commerceAccount.value) {
 				<portlet:namespace />updateAddressField(commerceAccount.value);
 			}

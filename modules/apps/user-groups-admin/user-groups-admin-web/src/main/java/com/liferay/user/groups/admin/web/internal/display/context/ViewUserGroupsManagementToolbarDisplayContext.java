@@ -20,7 +20,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
-import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -66,10 +66,7 @@ public class ViewUserGroupsManagementToolbarDisplayContext {
 		return DropdownItemListBuilder.add(
 			() -> _hasAddUserGroupPermission(),
 			dropdownItem -> {
-				dropdownItem.setHref(
-					StringBundler.concat(
-						"javascript:", _renderResponse.getNamespace(),
-						"deleteUserGroups()"));
+				dropdownItem.putData("action", "deleteUserGroups");
 				dropdownItem.setIcon("trash");
 				dropdownItem.setLabel(
 					LanguageUtil.get(_httpServletRequest, "delete"));
@@ -79,11 +76,11 @@ public class ViewUserGroupsManagementToolbarDisplayContext {
 	}
 
 	public String getClearResultsURL() {
-		PortletURL clearResultsURL = getPortletURL();
-
-		clearResultsURL.setParameter("keywords", StringPool.BLANK);
-
-		return clearResultsURL.toString();
+		return PortletURLBuilder.create(
+			getPortletURL()
+		).setKeywords(
+			StringPool.BLANK
+		).buildString();
 	}
 
 	public CreationMenu getCreationMenu() throws PortalException {
@@ -144,26 +141,37 @@ public class ViewUserGroupsManagementToolbarDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
+		PortletURL portletURL = PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/view.jsp"
+		).setKeywords(
+			() -> {
+				if (Validator.isNotNull(getKeywords())) {
+					return getKeywords();
+				}
 
-		portletURL.setParameter("mvcPath", "/view.jsp");
+				return null;
+			}
+		).setParameter(
+			"displayStyle", _displayStyle
+		).setParameter(
+			"orderByCol", getOrderByCol()
+		).setParameter(
+			"orderByType", getOrderByType()
+		).setParameter(
+			"viewUserGroupsRedirect",
+			() -> {
+				String viewUserGroupsRedirect = ParamUtil.getString(
+					_httpServletRequest, "viewUserGroupsRedirect");
 
-		String viewUserGroupsRedirect = ParamUtil.getString(
-			_httpServletRequest, "viewUserGroupsRedirect");
+				if (Validator.isNotNull(viewUserGroupsRedirect)) {
+					return viewUserGroupsRedirect;
+				}
 
-		if (Validator.isNotNull(viewUserGroupsRedirect)) {
-			portletURL.setParameter(
-				"viewUserGroupsRedirect", viewUserGroupsRedirect);
-		}
-
-		portletURL.setParameter("displayStyle", _displayStyle);
-
-		if (Validator.isNotNull(getKeywords())) {
-			portletURL.setParameter("keywords", getKeywords());
-		}
-
-		portletURL.setParameter("orderByCol", getOrderByCol());
-		portletURL.setParameter("orderByType", getOrderByType());
+				return null;
+			}
+		).buildPortletURL();
 
 		if (_userGroupSearch != null) {
 			portletURL.setParameter(
@@ -225,13 +233,12 @@ public class ViewUserGroupsManagementToolbarDisplayContext {
 	}
 
 	public String getSortingURL() {
-		PortletURL sortingURL = getPortletURL();
-
-		sortingURL.setParameter(
+		return PortletURLBuilder.create(
+			getPortletURL()
+		).setParameter(
 			"orderByType",
-			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc");
-
-		return sortingURL.toString();
+			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc"
+		).buildString();
 	}
 
 	public List<ViewTypeItem> getViewTypeItems() {

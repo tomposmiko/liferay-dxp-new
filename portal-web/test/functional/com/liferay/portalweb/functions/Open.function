@@ -23,11 +23,11 @@ definition {
 	function openInTheNewTab {
 		WaitForSPARefresh();
 
-		selenium.executeJavaScript("sessionStorage.clear(); window.open();");
+		var javascript = '''
+window.open("${locator1}","_blank");
+		''';
 
-		SelectWindow.selectPopUp(locator1 = "null");
-
-		selenium.open();
+		selenium.runScript("${javascript}");
 	}
 
 	function openNoError {

@@ -133,9 +133,9 @@ public class EditCommercePriceModifierMVCActionCommand
 		double priority = ParamUtil.getDouble(actionRequest, "priority");
 		boolean active = ParamUtil.getBoolean(actionRequest, "active");
 
-		Date now = new Date();
+		Date date = new Date();
 
-		Calendar calendar = CalendarFactoryUtil.getCalendar(now.getTime());
+		Calendar calendar = CalendarFactoryUtil.getCalendar(date.getTime());
 
 		int displayDateMonth = ParamUtil.getInteger(
 			actionRequest, "displayDateMonth", calendar.get(Calendar.MONTH));
@@ -193,12 +193,11 @@ public class EditCommercePriceModifierMVCActionCommand
 		}
 
 		return _commercePriceModifierService.addCommercePriceModifier(
-			_portal.getUserId(actionRequest), 0, title, target,
-			commercePriceListId, modifierType, modifierAmount, priority, active,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, expirationDateMonth, expirationDateDay,
-			expirationDateYear, expirationDateHour, expirationDateMinute,
-			neverExpire, serviceContext);
+			0, title, target, commercePriceListId, modifierType, modifierAmount,
+			priority, active, displayDateMonth, displayDateDay, displayDateYear,
+			displayDateHour, displayDateMinute, expirationDateMonth,
+			expirationDateDay, expirationDateYear, expirationDateHour,
+			expirationDateMinute, neverExpire, serviceContext);
 	}
 
 	@Reference

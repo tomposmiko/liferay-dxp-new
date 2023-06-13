@@ -20,11 +20,9 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.VirtualHostLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -45,7 +43,6 @@ import com.liferay.portal.util.PropsValues;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
-import java.util.Map;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -91,16 +88,6 @@ public class PortalImplAlternateURLTest {
 		TestPropsUtil.set(
 			PropsKeys.LOCALE_PREPEND_FRIENDLY_URL_STYLE,
 			GetterUtil.getString(_defaultPrependStyle));
-	}
-
-	@Test
-	public void testAlternateURLsMatchSiteAvailableLocalesFromSitemap()
-		throws Exception {
-
-		_testAlternateURLsForSitemapFromGuestGroup(
-			"localhost",
-			Arrays.asList(LocaleUtil.US, LocaleUtil.SPAIN, LocaleUtil.GERMANY),
-			LocaleUtil.US);
 	}
 
 	@Test
@@ -190,37 +177,21 @@ public class PortalImplAlternateURLTest {
 	private String _generateAssetPublisherContentURL(
 		String portalDomain, String languageId, String groupFriendlyURL) {
 
-		StringBundler sb = new StringBundler(11);
-
-		sb.append("http://");
-		sb.append(portalDomain);
-		sb.append(languageId);
-		sb.append(PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING);
-		sb.append(Portal.FRIENDLY_URL_SEPARATOR);
-		sb.append("asset_publisher");
-		sb.append(groupFriendlyURL);
-		sb.append(StringPool.FORWARD_SLASH);
-		sb.append(StringPool.CONTENT);
-		sb.append(StringPool.FORWARD_SLASH);
-		sb.append("content-title");
-
-		return sb.toString();
+		return StringBundler.concat(
+			"http://", portalDomain, languageId,
+			PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING,
+			Portal.FRIENDLY_URL_SEPARATOR, "asset_publisher", groupFriendlyURL,
+			"/content/content-title");
 	}
 
 	private String _generateURL(
 		String portalDomain, String languageId, String groupFriendlyURL,
 		String layoutFriendlyURL) {
 
-		StringBundler sb = new StringBundler(6);
-
-		sb.append("http://");
-		sb.append(portalDomain);
-		sb.append(languageId);
-		sb.append(PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING);
-		sb.append(groupFriendlyURL);
-		sb.append(layoutFriendlyURL);
-
-		return sb.toString();
+		return StringBundler.concat(
+			"http://", portalDomain, languageId,
+			PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING,
+			groupFriendlyURL, layoutFriendlyURL);
 	}
 
 	private ThemeDisplay _getThemeDisplay(Group group, String portalURL)
@@ -323,41 +294,6 @@ public class PortalImplAlternateURLTest {
 				canonicalAssetPublisherContentURL,
 				_getThemeDisplay(_group, canonicalAssetPublisherContentURL),
 				alternateLocale, layout));
-	}
-
-	private void _testAlternateURLsForSitemapFromGuestGroup(
-			String portalDomain, Collection<Locale> groupAvailableLocales,
-			Locale groupDefaultLocale)
-		throws Exception {
-
-		_group = GroupTestUtil.addGroup();
-
-		_group = GroupTestUtil.updateDisplaySettings(
-			_group.getGroupId(), groupAvailableLocales, groupDefaultLocale);
-
-		Layout layout = LayoutTestUtil.addLayout(
-			_group.getGroupId(), "welcome", false);
-
-		String canonicalURL = _generateURL(
-			portalDomain, StringPool.BLANK, _group.getFriendlyURL(),
-			layout.getFriendlyURL());
-
-		Map<Locale, String> alternateURLs = _portal.getAlternateURLs(
-			canonicalURL,
-			_getThemeDisplay(
-				GroupLocalServiceUtil.getGroup(
-					_group.getCompanyId(), GroupConstants.GUEST),
-				canonicalURL),
-			layout);
-
-		Assert.assertEquals(
-			alternateURLs.toString(), groupAvailableLocales.size(),
-			alternateURLs.size());
-
-		for (Locale locale : groupAvailableLocales) {
-			Assert.assertTrue(
-				alternateURLs.toString(), alternateURLs.containsKey(locale));
-		}
 	}
 
 	private void _testAlternateURLWithVirtualHosts(

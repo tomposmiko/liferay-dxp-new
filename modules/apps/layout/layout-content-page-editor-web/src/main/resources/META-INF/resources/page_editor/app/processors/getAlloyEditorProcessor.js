@@ -15,6 +15,7 @@
 import {debounce, openSelectionModal} from 'frontend-js-web';
 
 import {config} from '../config/index';
+import isNullOrUndefined from '../utils/isNullOrUndefined';
 
 const KEY_ENTER = 13;
 const KEY_SPACE = 32;
@@ -31,7 +32,7 @@ const defaultGetEditorWrapper = (element) => {
 };
 
 const defaultRender = (element, value) => {
-	if (value) {
+	if (!isNullOrUndefined(value)) {
 		element.innerHTML = value;
 	}
 };
@@ -97,7 +98,7 @@ export default function getAlloyEditorProcessor(
 				) => {
 					openSelectionModal({
 						onSelect: changeLinkCallback,
-						selectEventName: editor.title + 'selectItem',
+						selectEventName: editorName + 'selectItem',
 						title: Liferay.Language.get('select-item'),
 						url,
 					});
@@ -118,50 +119,12 @@ export default function getAlloyEditorProcessor(
 					editorName
 				),
 
-				title: editorName,
+				title: '',
 			});
 
 			const nativeEditor = _editor.get('nativeEditor');
 
-			const onBlurEditor = () => {
-				if (_callbacks.changeCallback) {
-					_callbacks
-						.changeCallback(nativeEditor.getData())
-						.then(() => {
-							if (_callbacks.destroyCallback) {
-								_callbacks.destroyCallback();
-							}
-						})
-						.catch(() => {
-							if (_callbacks.destroyCallback) {
-								_callbacks.destroyCallback();
-							}
-						});
-				}
-				else if (_callbacks.destroyCallback) {
-					requestAnimationFrame(() => _callbacks.destroyCallback());
-				}
-			};
-
-			// For the cases where we open the selector we need to make sure that
-			// the editor is destroyed. Since we cannot rely on the blur event for these cases
-			// (it is ignored) we have to setup an additional listener.
-
-			const onClickOutside = (event) => {
-				if (
-					!event.target.closest(`[name="${editorName}"]`) &&
-					(event.target.closest('.page-editor__toolbar') ||
-						event.target.closest('.page-editor__topper__content'))
-				) {
-					onBlurEditor();
-				}
-			};
-
 			_eventHandlers = [
-				{
-					removeListener: () =>
-						document.removeEventListener('click', onClickOutside),
-				},
 				nativeEditor.on('key', (event) => {
 					if (
 						(event.data.keyCode === KEY_ENTER ||
@@ -173,16 +136,28 @@ export default function getAlloyEditorProcessor(
 						event.cancel();
 					}
 				}),
+
 				nativeEditor.on('blur', () => {
 					if (_editor._mainUI.state.hidden) {
-						onBlurEditor();
-					}
-					else {
-
-						// Ignoring the blur event, because we don't want to destroy the editor
-						// when opening a selector (image or link).
-
-						document.addEventListener('click', onClickOutside);
+						if (_callbacks.changeCallback) {
+							_callbacks
+								.changeCallback(nativeEditor.getData())
+								.then(() => {
+									if (_callbacks.destroyCallback) {
+										_callbacks.destroyCallback();
+									}
+								})
+								.catch(() => {
+									if (_callbacks.destroyCallback) {
+										_callbacks.destroyCallback();
+									}
+								});
+						}
+						else if (_callbacks.destroyCallback) {
+							requestAnimationFrame(() =>
+								_callbacks.destroyCallback()
+							);
+						}
 					}
 				}),
 

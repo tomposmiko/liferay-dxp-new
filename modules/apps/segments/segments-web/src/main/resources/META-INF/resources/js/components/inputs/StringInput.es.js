@@ -13,15 +13,16 @@
  */
 
 import {ClaySelectWithOption} from '@clayui/form';
+import classNames from 'classnames';
 import propTypes from 'prop-types';
 import React from 'react';
 
-import {unescapeSingleQuotes} from '../../utils/odata.es';
 class StringInput extends React.Component {
 	static propTypes = {
 		disabled: propTypes.bool,
 		onChange: propTypes.func.isRequired,
 		options: propTypes.array,
+		renderEmptyValueErrors: propTypes.bool,
 		value: propTypes.oneOfType([propTypes.string, propTypes.number]),
 	};
 
@@ -29,43 +30,29 @@ class StringInput extends React.Component {
 		options: [],
 	};
 
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			value: props.value,
-		};
-	}
-
-	componentDidMount() {
-		this.setState({
-			value: unescapeSingleQuotes(this.props.value),
-		});
-	}
-
 	_handleChange = (event) => {
-		this.setState({
-			value: event.target.value,
-		});
-
 		this.props.onChange({value: event.target.value});
 	};
 
 	render() {
-		const {disabled, options, value} = this.props;
+		const {disabled, options, renderEmptyValueErrors, value} = this.props;
 
 		return options.length === 0 ? (
 			<input
-				className="criterion-input form-control"
+				className={classNames('criterion-input form-control', {
+					'criterion-input--error': !value && renderEmptyValueErrors,
+				})}
 				data-testid="simple-string"
 				disabled={disabled}
 				onChange={this._handleChange}
 				type="text"
-				value={this.state.value}
+				value={value}
 			/>
 		) : (
 			<ClaySelectWithOption
-				className="criterion-input form-control"
+				className={classNames('criterion-input form-control', {
+					'criterion-input--error': !value,
+				})}
 				data-testid="options-string"
 				disabled={disabled}
 				onChange={this._handleChange}

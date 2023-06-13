@@ -23,20 +23,29 @@ String backURL = ParamUtil.getString(request, "backURL", redirect);
 
 Role role = (Role)request.getAttribute("edit_role_permissions.jsp-role");
 
-PortletURL permissionsAllURL = liferayPortletResponse.createRenderURL();
-
-permissionsAllURL.setParameter("mvcPath", "/edit_role_permissions.jsp");
-permissionsAllURL.setParameter(Constants.CMD, Constants.VIEW);
-permissionsAllURL.setParameter("tabs1", "define-permissions");
-permissionsAllURL.setParameter("tabs2", "roles");
-permissionsAllURL.setParameter("backURL", backURL);
-permissionsAllURL.setParameter("roleId", String.valueOf(role.getRoleId()));
+PortletURL permissionsAllURL = PortletURLBuilder.createRenderURL(
+	liferayPortletResponse
+).setMVCPath(
+	"/edit_role_permissions.jsp"
+).setCMD(
+	Constants.VIEW
+).setBackURL(
+	backURL
+).setTabs1(
+	roleDisplayContext.getEditRolePermissionsTabs1()
+).setTabs2(
+	"roles"
+).setParameter(
+	"accountRoleGroupScope", roleDisplayContext.isAccountRoleGroupScope()
+).setParameter(
+	"roleId", role.getRoleId()
+).buildPortletURL();
 
 List<String> headerNames = new ArrayList<String>();
 
 headerNames.add("permissions");
 
-if (role.getType() == RoleConstants.TYPE_REGULAR) {
+if (roleDisplayContext.isAllowGroupScope()) {
 	headerNames.add("sites-and-asset-libraries");
 }
 
@@ -50,6 +59,10 @@ List<PermissionDisplay> permissionDisplays = new ArrayList<PermissionDisplay>(pe
 
 for (int i = 0; i < permissions.size(); i++) {
 	Permission permission = permissions.get(i);
+
+	if (!roleDisplayContext.isValidPermission(role, permission)) {
+		continue;
+	}
 
 	Resource resource = new ResourceImpl();
 
@@ -112,6 +125,8 @@ List<com.liferay.portal.kernel.dao.search.ResultRow> resultRows = searchContaine
 for (int i = 0; i < results.size(); i++) {
 	PermissionDisplay permissionDisplay = results.get(i);
 
+	Permission permission = permissionDisplay.getPermission();
+
 	Resource resource = permissionDisplay.getResource();
 
 	String curResource = resource.getName();
@@ -119,14 +134,16 @@ for (int i = 0; i < results.size(); i++) {
 	String curPortletName = permissionDisplay.getPortletName();
 	String curPortletLabel = permissionDisplay.getPortletLabel();
 	String curModelLabel = permissionDisplay.getModelLabel();
+
 	String actionId = permissionDisplay.getActionId();
-	String actionLabel = permissionDisplay.getActionLabel();
+
+	ResultRow row = new ResultRow(new Object[] {permission, role}, actionId, i);
 
 	List<Group> groups = Collections.emptyList();
 
 	int scope;
 
-	if (role.getType() == RoleConstants.TYPE_REGULAR) {
+	if (roleDisplayContext.isAllowGroupScope()) {
 		RolePermissions rolePermissions = new RolePermissions(curResource, ResourceConstants.SCOPE_GROUP, actionId, role.getRoleId());
 
 		groups = GroupLocalServiceUtil.search(
@@ -147,22 +164,6 @@ for (int i = 0; i < results.size(); i++) {
 		scope = ResourceConstants.SCOPE_GROUP_TEMPLATE;
 	}
 
-	Permission permission = permissionDisplay.getPermission();
-
-	String[] primKeys = {permission.getPrimKey()};
-
-	if (scope == ResourceConstants.SCOPE_GROUP) {
-		primKeys = new String[groups.size()];
-
-		for (int j = 0; j < groups.size(); j++) {
-			Group group = groups.get(j);
-
-			primKeys[j] = String.valueOf(group.getGroupId());
-		}
-	}
-
-	ResultRow row = new ResultRow(new Object[] {permission, role, primKeys}, actionId, i);
-
 	boolean selected = ResourcePermissionLocalServiceUtil.hasScopeResourcePermission(company.getCompanyId(), curResource, scope, role.getRoleId(), actionId);
 
 	if (!selected) {
@@ -177,16 +178,27 @@ for (int i = 0; i < results.size(); i++) {
 	editPermissionsResourceURL.setParameter("roleId", String.valueOf(role.getRoleId()));
 	editPermissionsResourceURL.setParameter("redirect", permissionsAllURL.toString());
 	editPermissionsResourceURL.setParameter("portletResource", curPortletName);
+	editPermissionsResourceURL.setParameter("accountRoleGroupScope", String.valueOf(roleDisplayContext.isAccountRoleGroupScope()));
 
-	PortletURL editPermissionsURL = liferayPortletResponse.createRenderURL();
-
-	editPermissionsURL.setParameter("mvcPath", "/edit_role_permissions.jsp");
-	editPermissionsURL.setParameter(Constants.CMD, Constants.EDIT);
-	editPermissionsURL.setParameter("tabs1", "define-permissions");
-	editPermissionsURL.setParameter("tabs2", "roles");
-	editPermissionsURL.setParameter("roleId", String.valueOf(role.getRoleId()));
-	editPermissionsURL.setParameter("redirect", permissionsAllURL.toString());
-	editPermissionsURL.setParameter("portletResource", curPortletName);
+	PortletURL editPermissionsURL = PortletURLBuilder.createRenderURL(
+		liferayPortletResponse
+	).setMVCPath(
+		"/edit_role_permissions.jsp"
+	).setCMD(
+		Constants.EDIT
+	).setRedirect(
+		permissionsAllURL
+	).setPortletResource(
+		curPortletName
+	).setTabs1(
+		roleDisplayContext.getEditRolePermissionsTabs1()
+	).setTabs2(
+		"roles"
+	).setParameter(
+		"accountRoleGroupScope", roleDisplayContext.isAccountRoleGroupScope()
+	).setParameter(
+		"roleId", role.getRoleId()
+	).buildPortletURL();
 
 	StringBundler sb = new StringBundler(17);
 
@@ -209,13 +221,13 @@ for (int i = 0; i < results.size(); i++) {
 	}
 
 	sb.append("</a>: <strong>");
-	sb.append(actionLabel);
+	sb.append(permissionDisplay.getActionLabel());
 	sb.append("</strong>");
 
 	row.addText(sb.toString());
 
 	if (scope == ResourceConstants.SCOPE_COMPANY) {
-		row.addText(LanguageUtil.get(request, _isShowScope(request, role, curResource, curPortletName) ? "all-sites-and-asset-libraries" : StringPool.BLANK));
+		row.addText(LanguageUtil.get(request, _isShowScope(request, role, curResource, curPortletName, roleDisplayContext) ? "all-sites-and-asset-libraries" : StringPool.BLANK));
 	}
 	else if (scope == ResourceConstants.SCOPE_GROUP_TEMPLATE) {
 	}

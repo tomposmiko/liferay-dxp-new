@@ -14,8 +14,9 @@
 
 package com.liferay.learn.taglib.servlet.taglib;
 
-import com.liferay.learn.LearnMessage;
-import com.liferay.learn.LearnMessageUtil;
+import com.liferay.learn.taglib.internal.web.cache.JSONObjectWebCacheItem;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.taglib.util.IncludeTag;
@@ -42,23 +43,53 @@ public class MessageTag extends IncludeTag {
 
 	@Override
 	public int processEndTag() throws Exception {
-		LearnMessage learnMessage = LearnMessageUtil.getLearnMessage(
-			_key,
-			LanguageUtil.getLanguageId(
-				(HttpServletRequest)pageContext.getRequest()),
-			_resource);
+		JSONObject jsonObject = JSONObjectWebCacheItem.get(_resource);
 
-		String html = learnMessage.getHTML();
+		if (jsonObject.length() == 0) {
+			return EVAL_PAGE;
+		}
 
-		if (Validator.isNotNull(html)) {
-			if (Validator.isNotNull(_var)) {
-				pageContext.setAttribute(_var, html);
+		JSONObject keyJSONObject = jsonObject.getJSONObject(_key);
+
+		if (keyJSONObject == null) {
+			return EVAL_PAGE;
+		}
+
+		HttpServletRequest httpServletRequest =
+			(HttpServletRequest)pageContext.getRequest();
+
+		String languageId = LanguageUtil.getLanguageId(httpServletRequest);
+
+		JSONObject languageIdJSONObject = keyJSONObject.getJSONObject(
+			languageId);
+
+		if (languageIdJSONObject == null) {
+			if (languageId.equals("en_US")) {
+				return EVAL_PAGE;
 			}
-			else {
-				JspWriter jspWriter = pageContext.getOut();
 
-				jspWriter.write(html);
+			languageIdJSONObject = keyJSONObject.getJSONObject("en_US");
+
+			if (languageIdJSONObject == null) {
+				return EVAL_PAGE;
 			}
+		}
+
+		StringBundler sb = new StringBundler(5);
+
+		sb.append("<a href=\"");
+		sb.append(languageIdJSONObject.getString("url"));
+		sb.append("\" target=\"_blank\">");
+		sb.append(languageIdJSONObject.getString("message"));
+		sb.append("</a>");
+
+		if (Validator.isNotNull(_var)) {
+			pageContext.setAttribute(_var, sb.toString());
+		}
+		else {
+			JspWriter jspWriter = pageContext.getOut();
+
+			jspWriter.write(sb.toString());
 		}
 
 		return EVAL_PAGE;

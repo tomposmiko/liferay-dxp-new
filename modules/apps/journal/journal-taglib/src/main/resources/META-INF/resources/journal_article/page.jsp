@@ -19,26 +19,19 @@
 <liferay-util:dynamic-include key="com.liferay.journal.taglib#/journal_article/page.jsp#pre" />
 
 <%
-JournalArticle article = (JournalArticle)request.getAttribute("liferay-journal:journal-article:article");
 JournalArticleDisplay articleDisplay = (JournalArticleDisplay)request.getAttribute("liferay-journal:journal-article:articleDisplay");
-boolean dataAnalyticsTrackingEnabled = GetterUtil.getBoolean(request.getAttribute("liferay-journal:journal-article:dataAnalyticsTrackingEnabled"));
-String viewMode = ParamUtil.getString(PortalUtil.getOriginalServletRequest(request), "p_l_mode", Constants.VIEW);
+boolean dataAnalyticsTrackEnabled = GetterUtil.getBoolean(request.getAttribute("liferay-journal:journal-article:dataAnalyticsTrackEnabled"));
 String wrapperCssClass = (String)request.getAttribute("liferay-journal:journal-article:wrapperCssClass");
 %>
 
 <c:choose>
-	<c:when test="<%= (article != null) && article.isExpired() && !viewMode.equals(Constants.PREVIEW) %>">
-		<div class="alert alert-warning">
-			<liferay-ui:message arguments="<%= HtmlUtil.escape(article.getTitle(locale)) %>" key="x-is-expired" />
-		</div>
-	</c:when>
 	<c:when test="<%= articleDisplay == null %>">
 		<div class="alert alert-warning">
-			<liferay-ui:message key="article-is-not-displayable" />
+			<liferay-ui:message key="article-is-expired-or-not-displayable" />
 		</div>
 	</c:when>
 	<c:otherwise>
-		<div class="journal-content-article <%= Validator.isNotNull(wrapperCssClass) ? wrapperCssClass : StringPool.BLANK %>" <%= dataAnalyticsTrackingEnabled ? String.format("data-analytics-asset-id=\"%s\" data-analytics-asset-title=\"%s\" data-analytics-asset-type=\"web-content\"", articleDisplay.getArticleId(), HtmlUtil.escapeAttribute(articleDisplay.getTitle())) : "" %>>
+		<div class="journal-content-article <%= Validator.isNotNull(wrapperCssClass) ? wrapperCssClass : StringPool.BLANK %>" <%= dataAnalyticsTrackEnabled ? String.format("data-analytics-asset-id=\"%s\" data-analytics-asset-title=\"%s\" data-analytics-asset-type=\"web-content\"", articleDisplay.getArticleId(), HtmlUtil.escapeAttribute(articleDisplay.getTitle())) : "" %>>
 			<c:if test='<%= GetterUtil.getBoolean((String)request.getAttribute("liferay-journal:journal-article:showTitle")) %>'>
 				<%= HtmlUtil.escape(articleDisplay.getTitle()) %>
 			</c:if>

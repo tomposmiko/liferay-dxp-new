@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -243,70 +244,92 @@ public class DDMStorageLinkModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<DDMStorageLink, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, DDMStorageLink>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<DDMStorageLink, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<DDMStorageLink, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DDMStorageLink.class.getClassLoader(), DDMStorageLink.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", DDMStorageLink::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", DDMStorageLink::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", DDMStorageLink::getUuid);
-		attributeGetterFunctions.put(
-			"storageLinkId", DDMStorageLink::getStorageLinkId);
-		attributeGetterFunctions.put("companyId", DDMStorageLink::getCompanyId);
-		attributeGetterFunctions.put(
-			"classNameId", DDMStorageLink::getClassNameId);
-		attributeGetterFunctions.put("classPK", DDMStorageLink::getClassPK);
-		attributeGetterFunctions.put(
-			"structureId", DDMStorageLink::getStructureId);
-		attributeGetterFunctions.put(
-			"structureVersionId", DDMStorageLink::getStructureVersionId);
+		try {
+			Constructor<DDMStorageLink> constructor =
+				(Constructor<DDMStorageLink>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<DDMStorageLink, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<DDMStorageLink, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<DDMStorageLink, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DDMStorageLink, Object>>();
 		Map<String, BiConsumer<DDMStorageLink, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<DDMStorageLink, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", DDMStorageLink::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DDMStorageLink, Long>)DDMStorageLink::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", DDMStorageLink::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<DDMStorageLink, Long>)
 				DDMStorageLink::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", DDMStorageLink::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<DDMStorageLink, String>)DDMStorageLink::setUuid);
+		attributeGetterFunctions.put(
+			"storageLinkId", DDMStorageLink::getStorageLinkId);
 		attributeSetterBiConsumers.put(
 			"storageLinkId",
 			(BiConsumer<DDMStorageLink, Long>)DDMStorageLink::setStorageLinkId);
+		attributeGetterFunctions.put("companyId", DDMStorageLink::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DDMStorageLink, Long>)DDMStorageLink::setCompanyId);
+		attributeGetterFunctions.put(
+			"classNameId", DDMStorageLink::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<DDMStorageLink, Long>)DDMStorageLink::setClassNameId);
+		attributeGetterFunctions.put("classPK", DDMStorageLink::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<DDMStorageLink, Long>)DDMStorageLink::setClassPK);
+		attributeGetterFunctions.put(
+			"structureId", DDMStorageLink::getStructureId);
 		attributeSetterBiConsumers.put(
 			"structureId",
 			(BiConsumer<DDMStorageLink, Long>)DDMStorageLink::setStructureId);
+		attributeGetterFunctions.put(
+			"structureVersionId", DDMStorageLink::getStructureVersionId);
 		attributeSetterBiConsumers.put(
 			"structureVersionId",
 			(BiConsumer<DDMStorageLink, Long>)
 				DDMStorageLink::setStructureVersionId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -582,6 +605,32 @@ public class DDMStorageLinkModelImpl
 	}
 
 	@Override
+	public DDMStorageLink cloneWithOriginalValues() {
+		DDMStorageLinkImpl ddmStorageLinkImpl = new DDMStorageLinkImpl();
+
+		ddmStorageLinkImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		ddmStorageLinkImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		ddmStorageLinkImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		ddmStorageLinkImpl.setStorageLinkId(
+			this.<Long>getColumnOriginalValue("storageLinkId"));
+		ddmStorageLinkImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		ddmStorageLinkImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		ddmStorageLinkImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		ddmStorageLinkImpl.setStructureId(
+			this.<Long>getColumnOriginalValue("structureId"));
+		ddmStorageLinkImpl.setStructureVersionId(
+			this.<Long>getColumnOriginalValue("structureVersionId"));
+
+		return ddmStorageLinkImpl;
+	}
+
+	@Override
 	public int compareTo(DDMStorageLink ddmStorageLink) {
 		long primaryKey = ddmStorageLink.getPrimaryKey();
 
@@ -763,9 +812,7 @@ public class DDMStorageLinkModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DDMStorageLink>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DDMStorageLink.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

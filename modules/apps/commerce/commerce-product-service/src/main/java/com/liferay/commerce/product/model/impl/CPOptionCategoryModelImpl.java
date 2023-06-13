@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -83,18 +84,20 @@ public class CPOptionCategoryModelImpl
 	public static final String TABLE_NAME = "CPOptionCategory";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"uuid_", Types.VARCHAR}, {"CPOptionCategoryId", Types.BIGINT},
-		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
-		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
-		{"modifiedDate", Types.TIMESTAMP}, {"title", Types.VARCHAR},
-		{"description", Types.VARCHAR}, {"priority", Types.DOUBLE},
-		{"key_", Types.VARCHAR}, {"lastPublishDate", Types.TIMESTAMP}
+		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
+		{"CPOptionCategoryId", Types.BIGINT}, {"companyId", Types.BIGINT},
+		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
+		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
+		{"title", Types.VARCHAR}, {"description", Types.VARCHAR},
+		{"priority", Types.DOUBLE}, {"key_", Types.VARCHAR},
+		{"lastPublishDate", Types.TIMESTAMP}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("CPOptionCategoryId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -110,7 +113,7 @@ public class CPOptionCategoryModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CPOptionCategory (uuid_ VARCHAR(75) null,CPOptionCategoryId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title STRING null,description STRING null,priority DOUBLE,key_ VARCHAR(75) null,lastPublishDate DATE null)";
+		"create table CPOptionCategory (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,CPOptionCategoryId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title STRING null,description STRING null,priority DOUBLE,key_ VARCHAR(75) null,lastPublishDate DATE null)";
 
 	public static final String TABLE_SQL_DROP = "drop table CPOptionCategory";
 
@@ -191,6 +194,7 @@ public class CPOptionCategoryModelImpl
 
 		CPOptionCategory model = new CPOptionCategoryImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setUuid(soapModel.getUuid());
 		model.setCPOptionCategoryId(soapModel.getCPOptionCategoryId());
 		model.setCompanyId(soapModel.getCompanyId());
@@ -321,91 +325,134 @@ public class CPOptionCategoryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CPOptionCategory>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CPOptionCategory.class.getClassLoader(), CPOptionCategory.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<CPOptionCategory> constructor =
+				(Constructor<CPOptionCategory>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<CPOptionCategory, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CPOptionCategory, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CPOptionCategory, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<CPOptionCategory, Object>>();
-
-		attributeGetterFunctions.put("uuid", CPOptionCategory::getUuid);
-		attributeGetterFunctions.put(
-			"CPOptionCategoryId", CPOptionCategory::getCPOptionCategoryId);
-		attributeGetterFunctions.put(
-			"companyId", CPOptionCategory::getCompanyId);
-		attributeGetterFunctions.put("userId", CPOptionCategory::getUserId);
-		attributeGetterFunctions.put("userName", CPOptionCategory::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CPOptionCategory::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CPOptionCategory::getModifiedDate);
-		attributeGetterFunctions.put("title", CPOptionCategory::getTitle);
-		attributeGetterFunctions.put(
-			"description", CPOptionCategory::getDescription);
-		attributeGetterFunctions.put("priority", CPOptionCategory::getPriority);
-		attributeGetterFunctions.put("key", CPOptionCategory::getKey);
-		attributeGetterFunctions.put(
-			"lastPublishDate", CPOptionCategory::getLastPublishDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CPOptionCategory, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CPOptionCategory, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<CPOptionCategory, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CPOptionCategory::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CPOptionCategory, Long>)
+				CPOptionCategory::setMvccVersion);
+		attributeGetterFunctions.put("uuid", CPOptionCategory::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CPOptionCategory, String>)CPOptionCategory::setUuid);
+		attributeGetterFunctions.put(
+			"CPOptionCategoryId", CPOptionCategory::getCPOptionCategoryId);
 		attributeSetterBiConsumers.put(
 			"CPOptionCategoryId",
 			(BiConsumer<CPOptionCategory, Long>)
 				CPOptionCategory::setCPOptionCategoryId);
+		attributeGetterFunctions.put(
+			"companyId", CPOptionCategory::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CPOptionCategory, Long>)CPOptionCategory::setCompanyId);
+		attributeGetterFunctions.put("userId", CPOptionCategory::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CPOptionCategory, Long>)CPOptionCategory::setUserId);
+		attributeGetterFunctions.put("userName", CPOptionCategory::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CPOptionCategory, String>)
 				CPOptionCategory::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CPOptionCategory::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CPOptionCategory, Date>)
 				CPOptionCategory::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CPOptionCategory::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CPOptionCategory, Date>)
 				CPOptionCategory::setModifiedDate);
+		attributeGetterFunctions.put("title", CPOptionCategory::getTitle);
 		attributeSetterBiConsumers.put(
 			"title",
 			(BiConsumer<CPOptionCategory, String>)CPOptionCategory::setTitle);
+		attributeGetterFunctions.put(
+			"description", CPOptionCategory::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<CPOptionCategory, String>)
 				CPOptionCategory::setDescription);
+		attributeGetterFunctions.put("priority", CPOptionCategory::getPriority);
 		attributeSetterBiConsumers.put(
 			"priority",
 			(BiConsumer<CPOptionCategory, Double>)
 				CPOptionCategory::setPriority);
+		attributeGetterFunctions.put("key", CPOptionCategory::getKey);
 		attributeSetterBiConsumers.put(
 			"key",
 			(BiConsumer<CPOptionCategory, String>)CPOptionCategory::setKey);
+		attributeGetterFunctions.put(
+			"lastPublishDate", CPOptionCategory::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<CPOptionCategory, Date>)
 				CPOptionCategory::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@JSON
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@JSON
@@ -994,6 +1041,7 @@ public class CPOptionCategoryModelImpl
 	public Object clone() {
 		CPOptionCategoryImpl cpOptionCategoryImpl = new CPOptionCategoryImpl();
 
+		cpOptionCategoryImpl.setMvccVersion(getMvccVersion());
 		cpOptionCategoryImpl.setUuid(getUuid());
 		cpOptionCategoryImpl.setCPOptionCategoryId(getCPOptionCategoryId());
 		cpOptionCategoryImpl.setCompanyId(getCompanyId());
@@ -1008,6 +1056,40 @@ public class CPOptionCategoryModelImpl
 		cpOptionCategoryImpl.setLastPublishDate(getLastPublishDate());
 
 		cpOptionCategoryImpl.resetOriginalValues();
+
+		return cpOptionCategoryImpl;
+	}
+
+	@Override
+	public CPOptionCategory cloneWithOriginalValues() {
+		CPOptionCategoryImpl cpOptionCategoryImpl = new CPOptionCategoryImpl();
+
+		cpOptionCategoryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		cpOptionCategoryImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		cpOptionCategoryImpl.setCPOptionCategoryId(
+			this.<Long>getColumnOriginalValue("CPOptionCategoryId"));
+		cpOptionCategoryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		cpOptionCategoryImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		cpOptionCategoryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		cpOptionCategoryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		cpOptionCategoryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		cpOptionCategoryImpl.setTitle(
+			this.<String>getColumnOriginalValue("title"));
+		cpOptionCategoryImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		cpOptionCategoryImpl.setPriority(
+			this.<Double>getColumnOriginalValue("priority"));
+		cpOptionCategoryImpl.setKey(
+			this.<String>getColumnOriginalValue("key_"));
+		cpOptionCategoryImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
 
 		return cpOptionCategoryImpl;
 	}
@@ -1097,6 +1179,8 @@ public class CPOptionCategoryModelImpl
 	public CacheModel<CPOptionCategory> toCacheModel() {
 		CPOptionCategoryCacheModel cpOptionCategoryCacheModel =
 			new CPOptionCategoryCacheModel();
+
+		cpOptionCategoryCacheModel.mvccVersion = getMvccVersion();
 
 		cpOptionCategoryCacheModel.uuid = getUuid();
 
@@ -1261,12 +1345,11 @@ public class CPOptionCategoryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CPOptionCategory>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CPOptionCategory.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private String _uuid;
 	private long _CPOptionCategoryId;
 	private long _companyId;
@@ -1312,6 +1395,7 @@ public class CPOptionCategoryModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put("CPOptionCategoryId", _CPOptionCategoryId);
 		_columnOriginalValues.put("companyId", _companyId);
@@ -1348,29 +1432,31 @@ public class CPOptionCategoryModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("uuid_", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("CPOptionCategoryId", 2L);
+		columnBitmasks.put("uuid_", 2L);
 
-		columnBitmasks.put("companyId", 4L);
+		columnBitmasks.put("CPOptionCategoryId", 4L);
 
-		columnBitmasks.put("userId", 8L);
+		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("userName", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("createDate", 32L);
+		columnBitmasks.put("userName", 32L);
 
-		columnBitmasks.put("modifiedDate", 64L);
+		columnBitmasks.put("createDate", 64L);
 
-		columnBitmasks.put("title", 128L);
+		columnBitmasks.put("modifiedDate", 128L);
 
-		columnBitmasks.put("description", 256L);
+		columnBitmasks.put("title", 256L);
 
-		columnBitmasks.put("priority", 512L);
+		columnBitmasks.put("description", 512L);
 
-		columnBitmasks.put("key_", 1024L);
+		columnBitmasks.put("priority", 1024L);
 
-		columnBitmasks.put("lastPublishDate", 2048L);
+		columnBitmasks.put("key_", 2048L);
+
+		columnBitmasks.put("lastPublishDate", 4096L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

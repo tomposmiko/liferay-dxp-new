@@ -103,7 +103,7 @@ renderResponse.setTitle(cpDefinition.getName(themeDisplay.getLanguageId()));
 </liferay-frontend:management-bar>
 
 <div id="<portlet:namespace />cpDefinitionGroupedEntriesContainer">
-	<div class="closed container-fluid-1280 sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
+	<div class="closed sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
 		<c:if test="<%= cpDefinitionGroupedEntriesDisplayContext.isShowInfoPanel() %>">
 			<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/cp_definitions/cp_definition_grouped_entry_info_panel" var="sidebarPanelURL" />
 
@@ -116,7 +116,7 @@ renderResponse.setTitle(cpDefinition.getName(themeDisplay.getLanguageId()));
 		</c:if>
 
 		<div class="sidenav-content">
-			<aui:form action="<%= portletURL %>" cssClass="container-fluid-1280" method="post" name="fm">
+			<aui:form action="<%= portletURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
 				<aui:input name="<%= Constants.CMD %>" type="hidden" />
 				<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 				<aui:input name="deleteCPDefinitionGroupedEntryIds" type="hidden" />
@@ -129,17 +129,20 @@ renderResponse.setTitle(cpDefinition.getName(themeDisplay.getLanguageId()));
 					>
 						<liferay-ui:search-container-row
 							className="com.liferay.commerce.product.type.grouped.model.CPDefinitionGroupedEntry"
-							cssClass="entry-display-style"
 							keyProperty="CPDefinitionGroupedEntryId"
 							modelVar="cpDefinitionGroupedEntry"
 						>
 
 							<%
-							PortletURL rowURL = renderResponse.createRenderURL();
-
-							rowURL.setParameter("mvcRenderCommandName", "/cp_definitions/edit_cp_definition_grouped_entry");
-							rowURL.setParameter("cpDefinitionId", String.valueOf(cpDefinitionGroupedEntry.getCPDefinitionId()));
-							rowURL.setParameter("cpDefinitionGroupedEntryId", String.valueOf(cpDefinitionGroupedEntry.getCPDefinitionGroupedEntryId()));
+							PortletURL rowURL = PortletURLBuilder.createRenderURL(
+								renderResponse
+							).setMVCRenderCommandName(
+								"/cp_definitions/edit_cp_definition_grouped_entry"
+							).setParameter(
+								"cpDefinitionGroupedEntryId", cpDefinitionGroupedEntry.getCPDefinitionGroupedEntryId()
+							).setParameter(
+								"cpDefinitionId", cpDefinitionGroupedEntry.getCPDefinitionId()
+							).buildPortletURL();
 
 							CProduct cProduct = cpDefinitionGroupedEntry.getEntryCProduct();
 
@@ -147,19 +150,19 @@ renderResponse.setTitle(cpDefinition.getName(themeDisplay.getLanguageId()));
 							%>
 
 							<liferay-ui:search-container-column-text
-								cssClass="important table-cell-content"
+								cssClass="important table-cell-expand"
 								href="<%= rowURL %>"
 								name="name"
 								value="<%= HtmlUtil.escape(cProductCPDefinition.getName(themeDisplay.getLanguageId())) %>"
 							/>
 
 							<liferay-ui:search-container-column-text
-								cssClass="table-cell-content"
+								cssClass="table-cell-expand"
 								property="quantity"
 							/>
 
 							<liferay-ui:search-container-column-text
-								cssClass="table-cell-content"
+								cssClass="table-cell-expand"
 								property="priority"
 							/>
 
@@ -187,7 +190,11 @@ renderResponse.setTitle(cpDefinition.getName(themeDisplay.getLanguageId()));
 				'<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-entries" />'
 			)
 		) {
-			var form = window.document['<portlet:namespace />fm'];
+			const form = document.getElementById('<portlet:namespace />fm');
+
+			if (!form) {
+				return;
+			}
 
 			form.setAttribute('method', 'post');
 			form['<portlet:namespace /><%= Constants.CMD %>'].value =
@@ -207,39 +214,43 @@ renderResponse.setTitle(cpDefinition.getName(themeDisplay.getLanguageId()));
 	}
 </aui:script>
 
-<aui:script use="liferay-item-selector-dialog">
-	window.document
-		.querySelector('#<portlet:namespace />addDefinitionGroupedEntry')
-		.addEventListener('click', function (event) {
+<aui:script sandbox="<%= true %>">
+	const addDefinitionGroupedEntryButton = document.getElementById(
+		'<portlet:namespace />addDefinitionGroupedEntry'
+	);
+
+	if (addDefinitionGroupedEntryButton) {
+		addDefinitionGroupedEntryButton.addEventListener('click', (event) => {
 			event.preventDefault();
 
-			var itemSelectorDialog = new A.LiferayItemSelectorDialog({
-				eventName: 'productDefinitionsSelectItem',
-				on: {
-					selectedItemChange: function (event) {
-						var <portlet:namespace />addCPDefinitionIds = [];
+			Liferay.Util.openSelectionModal({
+				multiple: true,
+				onSelect: function (selectedItems) {
+					if (selectedItems && selectedItems.length) {
+						const entryCPDefinitionIds = document.getElementById(
+							'<portlet:namespace />entryCPDefinitionIds'
+						);
 
-						var selectedItems = event.newVal;
-
-						if (selectedItems) {
-							window.document.querySelector(
-								'#<portlet:namespace />entryCPDefinitionIds'
-							).value = selectedItems;
-
-							var addCPDefinitionGroupedEntryFm = window.document.querySelector(
-								'#<portlet:namespace />addCPDefinitionGroupedEntryFm'
+						if (entryCPDefinitionIds) {
+							entryCPDefinitionIds.value = selectedItems.map(
+								(item) => item.value
 							);
+						}
 
+						const addCPDefinitionGroupedEntryFm = document.getElementById(
+							'<portlet:namespace />addCPDefinitionGroupedEntryFm'
+						);
+
+						if (addCPDefinitionGroupedEntryFm) {
 							submitForm(addCPDefinitionGroupedEntryFm);
 						}
-					},
+					}
 				},
 				title:
 					'<liferay-ui:message arguments="<%= cpDefinition.getName(themeDisplay.getLanguageId()) %>" key="add-new-grouped-entry-to-x" />',
 				url:
 					'<%= cpDefinitionGroupedEntriesDisplayContext.getItemSelectorUrl() %>',
 			});
-
-			itemSelectorDialog.open();
 		});
+	}
 </aui:script>

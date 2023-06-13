@@ -23,9 +23,9 @@ import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.util.CopyLayoutThreadLocal;
-import com.liferay.portal.kernel.util.Portal;
 
 import java.util.Date;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -37,13 +37,15 @@ import org.osgi.service.component.annotations.Reference;
 public class LayoutModelListener extends BaseModelListener<Layout> {
 
 	@Override
-	public void onAfterUpdate(Layout layout) throws ModelListenerException {
+	public void onAfterUpdate(Layout originalLayout, Layout layout)
+		throws ModelListenerException {
+
 		if (CopyLayoutThreadLocal.isCopyLayout() ||
 			ExportImportThreadLocal.isImportInProcess() ||
 			!(layout.isTypeAssetDisplay() || layout.isTypeContent()) ||
-			((layout.getClassPK() > 0) &&
-			 (layout.getClassNameId() == _portal.getClassNameId(
-				 Layout.class)))) {
+			layout.isDraftLayout() ||
+			Objects.equals(
+				originalLayout.getModifiedDate(), layout.getModifiedDate())) {
 
 			return;
 		}
@@ -79,8 +81,5 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 	@Reference
 	private LayoutPageTemplateEntryLocalService
 		_layoutPageTemplateEntryLocalService;
-
-	@Reference
-	private Portal _portal;
 
 }

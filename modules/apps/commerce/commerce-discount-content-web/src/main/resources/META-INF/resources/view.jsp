@@ -34,6 +34,17 @@ if (commerceOrder != null) {
 	<liferay-ui:error exception="<%= CommerceDiscountCouponCodeException.class %>" message="please-enter-a-valid-coupon-code" />
 	<liferay-ui:error exception="<%= CommerceDiscountLimitationTimesException.class %>" message="the-inserted-coupon-code-has-reached-its-usage-limit" />
 
+	<liferay-ui:error exception="<%= CommerceDiscountValidatorException.class %>">
+
+		<%
+		CommerceDiscountValidatorException commerceDiscountValidatorException = (CommerceDiscountValidatorException)errorException;
+		%>
+
+		<c:if test="<%= commerceDiscountValidatorException != null %>">
+			<liferay-ui:message key="<%= commerceDiscountValidatorException.getLocalizedMessage() %>" />
+		</c:if>
+	</liferay-ui:error>
+
 	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 
 	<c:choose>
@@ -59,9 +70,7 @@ if (commerceOrder != null) {
 			</div>
 
 			<aui:script use="aui-base">
-				A.one('#<portlet:namespace />couponCodeIconRemove').on('click', function (
-					event
-				) {
+				A.one('#<portlet:namespace />couponCodeIconRemove').on('click', (event) => {
 					event.preventDefault();
 
 					submitForm(document.<portlet:namespace />fm);

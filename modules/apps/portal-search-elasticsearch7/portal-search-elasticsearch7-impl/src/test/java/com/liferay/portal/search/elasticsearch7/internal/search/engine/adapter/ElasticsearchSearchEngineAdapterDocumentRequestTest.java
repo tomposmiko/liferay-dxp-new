@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
@@ -47,7 +46,6 @@ import com.liferay.portal.search.script.Script;
 import com.liferay.portal.search.script.Scripts;
 import com.liferay.portal.search.test.util.indexing.DocumentFixture;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.PropsImpl;
 
 import java.io.IOException;
 
@@ -63,8 +61,8 @@ import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.xcontent.XContentType;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -72,7 +70,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -81,14 +78,11 @@ import org.junit.Test;
 public class ElasticsearchSearchEngineAdapterDocumentRequestTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		PropsUtil.setProps(new PropsImpl());
-
 		_elasticsearchFixture = new ElasticsearchFixture(
 			ElasticsearchSearchEngineAdapterDocumentRequestTest.class);
 
@@ -389,10 +383,8 @@ public class ElasticsearchSearchEngineAdapterDocumentRequestTest {
 
 	@Test
 	public void testExecuteIndexDocumentRequestNoUid() {
-		Document document = new DocumentImpl();
-
 		IndexDocumentResponse indexDocumentResponse = _indexDocumentWithAdapter(
-			null, document);
+			null, new DocumentImpl());
 
 		Assert.assertEquals(
 			RestStatus.CREATED.getStatus(), indexDocumentResponse.getStatus());
@@ -435,10 +427,8 @@ public class ElasticsearchSearchEngineAdapterDocumentRequestTest {
 
 	@Test
 	public void testExecuteIndexDocumentRequestUidInRequest() {
-		Document document = new DocumentImpl();
-
 		IndexDocumentResponse indexDocumentResponse = _indexDocumentWithAdapter(
-			"1", document);
+			"1", new DocumentImpl());
 
 		Assert.assertEquals(
 			RestStatus.CREATED.getStatus(), indexDocumentResponse.getStatus());

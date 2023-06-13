@@ -41,8 +41,7 @@ function Conjunction({
 	const [activeLabel, setActiveLabel] = useState(null);
 	useEffect(() => {
 		const selectedConjunction = supportedConjunctions.find(
-			(conjunction) =>
-				conjunction.name.toLowerCase() === conjunctionName.toLowerCase()
+			(c) => c.name === conjunctionName
 		);
 
 		setActiveLabel(selectedConjunction.label);
@@ -66,6 +65,7 @@ function Conjunction({
 					small
 				>
 					{activeLabel}
+
 					<ClayIcon className="ml-2" symbol="caret-bottom" />
 				</ClayButton>
 			}

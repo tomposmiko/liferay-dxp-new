@@ -29,6 +29,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -55,7 +56,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javax.portlet.PortletURL;
-import javax.portlet.RenderURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -104,21 +104,20 @@ public class CPDefinitionOptionRelDisplayContext
 	}
 
 	public CreationMenu getCreationMenu() throws Exception {
-		RenderURL portletURL = liferayPortletResponse.createRenderURL();
-
-		portletURL.setParameter(
-			"mvcRenderCommandName",
-			"/cp_definitions/edit_cp_definition_option_value_rel");
-		portletURL.setParameter(
-			"cpDefinitionId", String.valueOf(getCPDefinitionId()));
-		portletURL.setParameter(
-			"cpDefinitionOptionRelId",
-			String.valueOf(getCPDefinitionOptionRelId()));
-		portletURL.setWindowState(LiferayWindowState.POP_UP);
-
 		return CreationMenuBuilder.addDropdownItem(
 			dropdownItem -> {
-				dropdownItem.setHref(portletURL.toString());
+				dropdownItem.setHref(
+					PortletURLBuilder.createRenderURL(
+						liferayPortletResponse
+					).setMVCRenderCommandName(
+						"/cp_definitions/edit_cp_definition_option_value_rel"
+					).setParameter(
+						"cpDefinitionId", getCPDefinitionId()
+					).setParameter(
+						"cpDefinitionOptionRelId", getCPDefinitionOptionRelId()
+					).setWindowState(
+						LiferayWindowState.POP_UP
+					).buildString());
 				dropdownItem.setLabel(
 					LanguageUtil.get(
 						cpRequestHelper.getRequest(), "add-value"));
@@ -158,7 +157,7 @@ public class CPDefinitionOptionRelDisplayContext
 		CPOptionConfiguration cpOptionConfiguration =
 			_configurationProvider.getConfiguration(
 				CPOptionConfiguration.class,
-				new SystemSettingsLocator(CPConstants.CP_OPTION_SERVICE_NAME));
+				new SystemSettingsLocator(CPConstants.SERVICE_NAME_CP_OPTION));
 
 		return StringUtil.merge(
 			cpOptionConfiguration.ddmFormFieldTypesAllowed(), StringPool.COMMA);
@@ -173,7 +172,7 @@ public class CPDefinitionOptionRelDisplayContext
 		CPOptionConfiguration cpOptionConfiguration =
 			_configurationProvider.getConfiguration(
 				CPOptionConfiguration.class,
-				new SystemSettingsLocator(CPConstants.CP_OPTION_SERVICE_NAME));
+				new SystemSettingsLocator(CPConstants.SERVICE_NAME_CP_OPTION));
 
 		String[] ddmFormFieldTypesAllowed =
 			cpOptionConfiguration.ddmFormFieldTypesAllowed();
@@ -203,16 +202,15 @@ public class CPDefinitionOptionRelDisplayContext
 
 	@Override
 	public PortletURL getPortletURL() throws PortalException {
-		PortletURL portletURL = super.getPortletURL();
-
-		portletURL.setParameter(
-			"cpDefinitionId", String.valueOf(getCPDefinitionId()));
-		portletURL.setParameter(
-			"mvcRenderCommandName", "/cp_definitions/edit_cp_definition");
-		portletURL.setParameter(
-			"screenNavigationCategoryKey", getScreenNavigationCategoryKey());
-
-		return portletURL;
+		return PortletURLBuilder.create(
+			super.getPortletURL()
+		).setMVCRenderCommandName(
+			"/cp_definitions/edit_cp_definition"
+		).setParameter(
+			"cpDefinitionId", getCPDefinitionId()
+		).setParameter(
+			"screenNavigationCategoryKey", getScreenNavigationCategoryKey()
+		).buildPortletURL();
 	}
 
 	@Override

@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -293,94 +294,116 @@ public class AssetCategoryPropertyModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, AssetCategoryProperty>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AssetCategoryProperty.class.getClassLoader(),
+			AssetCategoryProperty.class, ModelWrapper.class);
+
+		try {
+			Constructor<AssetCategoryProperty> constructor =
+				(Constructor<AssetCategoryProperty>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<AssetCategoryProperty, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AssetCategoryProperty, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<AssetCategoryProperty, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<AssetCategoryProperty, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", AssetCategoryProperty::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", AssetCategoryProperty::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"categoryPropertyId", AssetCategoryProperty::getCategoryPropertyId);
-		attributeGetterFunctions.put(
-			"companyId", AssetCategoryProperty::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", AssetCategoryProperty::getUserId);
-		attributeGetterFunctions.put(
-			"userName", AssetCategoryProperty::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", AssetCategoryProperty::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", AssetCategoryProperty::getModifiedDate);
-		attributeGetterFunctions.put(
-			"categoryId", AssetCategoryProperty::getCategoryId);
-		attributeGetterFunctions.put("key", AssetCategoryProperty::getKey);
-		attributeGetterFunctions.put("value", AssetCategoryProperty::getValue);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<AssetCategoryProperty, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<AssetCategoryProperty, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<AssetCategoryProperty, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", AssetCategoryProperty::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AssetCategoryProperty, Long>)
 				AssetCategoryProperty::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", AssetCategoryProperty::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<AssetCategoryProperty, Long>)
 				AssetCategoryProperty::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"categoryPropertyId", AssetCategoryProperty::getCategoryPropertyId);
 		attributeSetterBiConsumers.put(
 			"categoryPropertyId",
 			(BiConsumer<AssetCategoryProperty, Long>)
 				AssetCategoryProperty::setCategoryPropertyId);
+		attributeGetterFunctions.put(
+			"companyId", AssetCategoryProperty::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AssetCategoryProperty, Long>)
 				AssetCategoryProperty::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", AssetCategoryProperty::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<AssetCategoryProperty, Long>)
 				AssetCategoryProperty::setUserId);
+		attributeGetterFunctions.put(
+			"userName", AssetCategoryProperty::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<AssetCategoryProperty, String>)
 				AssetCategoryProperty::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", AssetCategoryProperty::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<AssetCategoryProperty, Date>)
 				AssetCategoryProperty::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", AssetCategoryProperty::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<AssetCategoryProperty, Date>)
 				AssetCategoryProperty::setModifiedDate);
+		attributeGetterFunctions.put(
+			"categoryId", AssetCategoryProperty::getCategoryId);
 		attributeSetterBiConsumers.put(
 			"categoryId",
 			(BiConsumer<AssetCategoryProperty, Long>)
 				AssetCategoryProperty::setCategoryId);
+		attributeGetterFunctions.put("key", AssetCategoryProperty::getKey);
 		attributeSetterBiConsumers.put(
 			"key",
 			(BiConsumer<AssetCategoryProperty, String>)
 				AssetCategoryProperty::setKey);
+		attributeGetterFunctions.put("value", AssetCategoryProperty::getValue);
 		attributeSetterBiConsumers.put(
 			"value",
 			(BiConsumer<AssetCategoryProperty, String>)
 				AssetCategoryProperty::setValue);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -693,6 +716,37 @@ public class AssetCategoryPropertyModelImpl
 	}
 
 	@Override
+	public AssetCategoryProperty cloneWithOriginalValues() {
+		AssetCategoryPropertyImpl assetCategoryPropertyImpl =
+			new AssetCategoryPropertyImpl();
+
+		assetCategoryPropertyImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		assetCategoryPropertyImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		assetCategoryPropertyImpl.setCategoryPropertyId(
+			this.<Long>getColumnOriginalValue("categoryPropertyId"));
+		assetCategoryPropertyImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		assetCategoryPropertyImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		assetCategoryPropertyImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		assetCategoryPropertyImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		assetCategoryPropertyImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		assetCategoryPropertyImpl.setCategoryId(
+			this.<Long>getColumnOriginalValue("categoryId"));
+		assetCategoryPropertyImpl.setKey(
+			this.<String>getColumnOriginalValue("key_"));
+		assetCategoryPropertyImpl.setValue(
+			this.<String>getColumnOriginalValue("value"));
+
+		return assetCategoryPropertyImpl;
+	}
+
+	@Override
 	public int compareTo(AssetCategoryProperty assetCategoryProperty) {
 		int value = 0;
 
@@ -909,9 +963,7 @@ public class AssetCategoryPropertyModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AssetCategoryProperty>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AssetCategoryProperty.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

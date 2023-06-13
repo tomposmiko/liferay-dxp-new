@@ -15,6 +15,8 @@
 package com.liferay.calendar.search.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.calendar.constants.CalendarActionKeys;
 import com.liferay.calendar.model.Calendar;
 import com.liferay.calendar.model.CalendarBooking;
@@ -22,6 +24,7 @@ import com.liferay.calendar.model.CalendarResource;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
@@ -32,7 +35,6 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
 import com.liferay.portal.test.rule.Inject;
 
@@ -129,10 +131,11 @@ public class CalendarBookingIndexerIndexedFieldsTest
 
 		String keywords = "nev";
 
-		SearchResponse searchResponse = searchOnlyOneSearchResponse(
-			keywords, LocaleUtil.HUNGARY);
+		Document document = searchOnlyOne(keywords, LocaleUtil.HUNGARY);
 
-		FieldValuesAssert.assertFieldValues(map, searchResponse);
+		indexedFieldsFixture.postProcessDocument(document);
+
+		FieldValuesAssert.assertFieldValues(map, document, keywords);
 	}
 
 	protected CalendarBooking addCalendarBooking(
@@ -166,11 +169,17 @@ public class CalendarBookingIndexerIndexedFieldsTest
 		throws Exception {
 
 		map.put(
+			Field.ASSET_ENTRY_ID,
+			String.valueOf(_getAssetEntryId(calendarBooking)));
+		map.put(
 			Field.CLASS_PK, String.valueOf(calendarBooking.getCalendarId()));
 		map.put(Field.ENTRY_CLASS_NAME, calendarBooking.getModelClassName());
 		map.put(
 			Field.ENTRY_CLASS_PK,
 			String.valueOf(calendarBooking.getCalendarBookingId()));
+		map.put(
+			"assetEntryId_sortable",
+			String.valueOf(_getAssetEntryId(calendarBooking)));
 		map.put(
 			"calendarBookingId",
 			String.valueOf(calendarBooking.getCalendarBookingId()));
@@ -243,5 +252,20 @@ public class CalendarBookingIndexerIndexedFieldsTest
 
 	@Inject
 	protected Portal portal;
+
+	private long _getAssetEntryId(CalendarBooking calendarBooking) {
+		AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
+			CalendarBooking.class.getName(),
+			calendarBooking.getCalendarBookingId());
+
+		if (assetEntry == null) {
+			return 0;
+		}
+
+		return assetEntry.getEntryId();
+	}
+
+	@Inject
+	private AssetEntryLocalService _assetEntryLocalService;
 
 }

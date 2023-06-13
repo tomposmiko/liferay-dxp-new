@@ -14,7 +14,6 @@
 
 package com.liferay.headless.admin.user.internal.resource.v1_0.factory;
 
-import com.liferay.headless.admin.user.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.headless.admin.user.resource.v1_0.PostalAddressResource;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
@@ -34,18 +33,14 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -53,7 +48,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +58,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Javier Gamarra
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/headless-admin-user/v1.0/PostalAddress",
-	service = PostalAddressResource.Factory.class
-)
+@Component(immediate = true, service = PostalAddressResource.Factory.class)
 @Generated("")
 public class PostalAddressResourceFactoryImpl
 	implements PostalAddressResource.Factory {
@@ -79,7 +73,9 @@ public class PostalAddressResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return _postalAddressResourceProxyProviderFunction.apply(
+				return (PostalAddressResource)ProxyUtil.newProxyInstance(
+					PostalAddressResource.class.getClassLoader(),
+					new Class<?>[] {PostalAddressResource.class},
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -138,32 +134,14 @@ public class PostalAddressResourceFactoryImpl
 		};
 	}
 
-	private static Function<InvocationHandler, PostalAddressResource>
-		_getProxyProviderFunction() {
+	@Activate
+	protected void activate() {
+		PostalAddressResource.FactoryHolder.factory = this;
+	}
 
-		Class<?> proxyClass = ProxyUtil.getProxyClass(
-			PostalAddressResource.class.getClassLoader(),
-			PostalAddressResource.class);
-
-		try {
-			Constructor<PostalAddressResource> constructor =
-				(Constructor<PostalAddressResource>)proxyClass.getConstructor(
-					InvocationHandler.class);
-
-			return invocationHandler -> {
-				try {
-					return constructor.newInstance(invocationHandler);
-				}
-				catch (ReflectiveOperationException
-							reflectiveOperationException) {
-
-					throw new InternalError(reflectiveOperationException);
-				}
-			};
-		}
-		catch (NoSuchMethodException noSuchMethodException) {
-			throw new InternalError(noSuchMethodException);
-		}
+	@Deactivate
+	protected void deactivate() {
+		PostalAddressResource.FactoryHolder.factory = null;
 	}
 
 	private Object _invoke(
@@ -186,7 +164,7 @@ public class PostalAddressResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		PostalAddressResource postalAddressResource =
@@ -211,7 +189,6 @@ public class PostalAddressResourceFactoryImpl
 		postalAddressResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		postalAddressResource.setRoleLocalService(_roleLocalService);
-		postalAddressResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(postalAddressResource, arguments);
@@ -227,10 +204,6 @@ public class PostalAddressResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
-
-	private static final Function<InvocationHandler, PostalAddressResource>
-		_postalAddressResourceProxyProviderFunction =
-			_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
@@ -253,6 +226,9 @@ public class PostalAddressResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -261,9 +237,6 @@ public class PostalAddressResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

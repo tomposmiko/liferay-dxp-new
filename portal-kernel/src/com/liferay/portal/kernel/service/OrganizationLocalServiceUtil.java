@@ -157,6 +157,16 @@ public class OrganizationLocalServiceUtil {
 		getService().addOrganizationResources(userId, organization);
 	}
 
+	public static com.liferay.portal.kernel.model.User
+			addOrganizationUserByEmailAddress(
+				String emailAddress, long organizationId,
+				ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addOrganizationUserByEmailAddress(
+			emailAddress, organizationId, serviceContext);
+	}
+
 	/**
 	 * Assigns the password policy to the organizations, removing any other
 	 * currently assigned password policies.
@@ -179,6 +189,14 @@ public class OrganizationLocalServiceUtil {
 		long userId, Organization organization) {
 
 		getService().addUserOrganization(userId, organization);
+	}
+
+	public static void addUserOrganizationByEmailAddress(
+			String emailAddress, long organizationId)
+		throws PortalException {
+
+		getService().addUserOrganizationByEmailAddress(
+			emailAddress, organizationId);
 	}
 
 	public static void addUserOrganizations(
@@ -310,6 +328,14 @@ public class OrganizationLocalServiceUtil {
 		getService().deleteUserOrganization(userId, organization);
 	}
 
+	public static void deleteUserOrganizationByEmailAddress(
+			String emailAddress, long organizationId)
+		throws PortalException {
+
+		getService().deleteUserOrganizationByEmailAddress(
+			emailAddress, organizationId);
+	}
+
 	public static void deleteUserOrganizations(
 		long userId, List<Organization> organizations) {
 
@@ -423,7 +449,13 @@ public class OrganizationLocalServiceUtil {
 		return getService().fetchOrganization(companyId, name);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the organization with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the organization's external reference code
+	 * @return the matching organization, or <code>null</code> if a matching organization could not be found
+	 */
 	public static Organization fetchOrganizationByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
 
@@ -431,6 +463,9 @@ public class OrganizationLocalServiceUtil {
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchOrganizationByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static Organization fetchOrganizationByReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -547,7 +582,14 @@ public class OrganizationLocalServiceUtil {
 		return getService().getOrganization(companyId, name);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the organization with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the organization's external reference code
+	 * @return the matching organization
+	 * @throws PortalException if a matching organization could not be found
+	 */
 	public static Organization getOrganizationByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
 		throws PortalException {

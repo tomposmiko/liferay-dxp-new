@@ -22,6 +22,7 @@ import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion;
 import com.liferay.item.selector.criteria.url.criterion.URLItemSelectorCriterion;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.editor.configuration.BaseEditorConfigContributor;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
@@ -35,7 +36,6 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Map;
 
-import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
@@ -62,18 +62,13 @@ public class BlogsContentEditorConfigContributor
 		ThemeDisplay themeDisplay,
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory) {
 
-		StringBundler sb = new StringBundler(7);
-
-		sb.append("a[*](*); ");
-		sb.append(_getAllowedContentText());
-		sb.append(
-			" div[*](*); figcaption; figure; iframe[*](*); img[*](*){*}; ");
-		sb.append(_getAllowedContentLists());
-		sb.append(" p[*](*){text-align}; ");
-		sb.append(_getAllowedContentTable());
-		sb.append(" source[*](*); video[*](*);");
-
-		jsonObject.put("allowedContent", sb.toString());
+		jsonObject.put(
+			"allowedContent",
+			StringBundler.concat(
+				"a[*](*); ", _getAllowedContentText(),
+				" div[*](*); figcaption; figure; iframe[*](*); img[*](*){*}; ",
+				_getAllowedContentLists(), " p[*](*){text-align}; ",
+				_getAllowedContentTable(), " video[*](*);"));
 
 		String namespace = GetterUtil.getString(
 			inputEditorTaglibAttributes.get(
@@ -90,14 +85,14 @@ public class BlogsContentEditorConfigContributor
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
 		if (Validator.isNotNull(portletDisplay.getId())) {
-			PortletURL portletURL =
-				requestBackedPortletURLFactory.createActionURL(
-					portletDisplay.getId());
-
-			portletURL.setParameter(
-				ActionRequest.ACTION_NAME, "/blogs/upload_temp_image");
-
-			jsonObject.put("uploadUrl", portletURL.toString());
+			jsonObject.put(
+				"uploadUrl",
+				PortletURLBuilder.create(
+					requestBackedPortletURLFactory.createActionURL(
+						portletDisplay.getId())
+				).setActionName(
+					"/blogs/upload_temp_image"
+				).buildString());
 		}
 	}
 
@@ -113,8 +108,8 @@ public class BlogsContentEditorConfigContributor
 	}
 
 	private String _getAllowedContentText() {
-		return "b blockquote code em h1 h2 h3 h4 h5 h6 hr i pre s strike " +
-			"strong u;";
+		return "b blockquote cite code em h1 h2 h3 h4 h5 h6 hr i pre s " +
+			"strike strong u;";
 	}
 
 	private void _populateFileBrowserURL(

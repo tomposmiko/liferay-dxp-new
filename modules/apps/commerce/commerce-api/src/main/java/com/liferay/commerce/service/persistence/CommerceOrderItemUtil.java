@@ -122,6 +122,69 @@ public class CommerceOrderItemUtil {
 	}
 
 	/**
+	 * Returns the commerce order item where bookedQuantityId = &#63; or throws a <code>NoSuchOrderItemException</code> if it could not be found.
+	 *
+	 * @param bookedQuantityId the booked quantity ID
+	 * @return the matching commerce order item
+	 * @throws NoSuchOrderItemException if a matching commerce order item could not be found
+	 */
+	public static CommerceOrderItem findByBookedQuantityId(
+			long bookedQuantityId)
+		throws com.liferay.commerce.exception.NoSuchOrderItemException {
+
+		return getPersistence().findByBookedQuantityId(bookedQuantityId);
+	}
+
+	/**
+	 * Returns the commerce order item where bookedQuantityId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param bookedQuantityId the booked quantity ID
+	 * @return the matching commerce order item, or <code>null</code> if a matching commerce order item could not be found
+	 */
+	public static CommerceOrderItem fetchByBookedQuantityId(
+		long bookedQuantityId) {
+
+		return getPersistence().fetchByBookedQuantityId(bookedQuantityId);
+	}
+
+	/**
+	 * Returns the commerce order item where bookedQuantityId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param bookedQuantityId the booked quantity ID
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching commerce order item, or <code>null</code> if a matching commerce order item could not be found
+	 */
+	public static CommerceOrderItem fetchByBookedQuantityId(
+		long bookedQuantityId, boolean useFinderCache) {
+
+		return getPersistence().fetchByBookedQuantityId(
+			bookedQuantityId, useFinderCache);
+	}
+
+	/**
+	 * Removes the commerce order item where bookedQuantityId = &#63; from the database.
+	 *
+	 * @param bookedQuantityId the booked quantity ID
+	 * @return the commerce order item that was removed
+	 */
+	public static CommerceOrderItem removeByBookedQuantityId(
+			long bookedQuantityId)
+		throws com.liferay.commerce.exception.NoSuchOrderItemException {
+
+		return getPersistence().removeByBookedQuantityId(bookedQuantityId);
+	}
+
+	/**
+	 * Returns the number of commerce order items where bookedQuantityId = &#63;.
+	 *
+	 * @param bookedQuantityId the booked quantity ID
+	 * @return the number of matching commerce order items
+	 */
+	public static int countByBookedQuantityId(long bookedQuantityId) {
+		return getPersistence().countByBookedQuantityId(bookedQuantityId);
+	}
+
+	/**
 	 * Returns all the commerce order items where commerceOrderId = &#63;.
 	 *
 	 * @param commerceOrderId the commerce order ID
@@ -298,179 +361,6 @@ public class CommerceOrderItemUtil {
 	}
 
 	/**
-	 * Returns all the commerce order items where CProductId = &#63;.
-	 *
-	 * @param CProductId the c product ID
-	 * @return the matching commerce order items
-	 */
-	public static List<CommerceOrderItem> findByCProductId(long CProductId) {
-		return getPersistence().findByCProductId(CProductId);
-	}
-
-	/**
-	 * Returns a range of all the commerce order items where CProductId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceOrderItemModelImpl</code>.
-	 * </p>
-	 *
-	 * @param CProductId the c product ID
-	 * @param start the lower bound of the range of commerce order items
-	 * @param end the upper bound of the range of commerce order items (not inclusive)
-	 * @return the range of matching commerce order items
-	 */
-	public static List<CommerceOrderItem> findByCProductId(
-		long CProductId, int start, int end) {
-
-		return getPersistence().findByCProductId(CProductId, start, end);
-	}
-
-	/**
-	 * Returns an ordered range of all the commerce order items where CProductId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceOrderItemModelImpl</code>.
-	 * </p>
-	 *
-	 * @param CProductId the c product ID
-	 * @param start the lower bound of the range of commerce order items
-	 * @param end the upper bound of the range of commerce order items (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @return the ordered range of matching commerce order items
-	 */
-	public static List<CommerceOrderItem> findByCProductId(
-		long CProductId, int start, int end,
-		OrderByComparator<CommerceOrderItem> orderByComparator) {
-
-		return getPersistence().findByCProductId(
-			CProductId, start, end, orderByComparator);
-	}
-
-	/**
-	 * Returns an ordered range of all the commerce order items where CProductId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceOrderItemModelImpl</code>.
-	 * </p>
-	 *
-	 * @param CProductId the c product ID
-	 * @param start the lower bound of the range of commerce order items
-	 * @param end the upper bound of the range of commerce order items (not inclusive)
-	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the ordered range of matching commerce order items
-	 */
-	public static List<CommerceOrderItem> findByCProductId(
-		long CProductId, int start, int end,
-		OrderByComparator<CommerceOrderItem> orderByComparator,
-		boolean useFinderCache) {
-
-		return getPersistence().findByCProductId(
-			CProductId, start, end, orderByComparator, useFinderCache);
-	}
-
-	/**
-	 * Returns the first commerce order item in the ordered set where CProductId = &#63;.
-	 *
-	 * @param CProductId the c product ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching commerce order item
-	 * @throws NoSuchOrderItemException if a matching commerce order item could not be found
-	 */
-	public static CommerceOrderItem findByCProductId_First(
-			long CProductId,
-			OrderByComparator<CommerceOrderItem> orderByComparator)
-		throws com.liferay.commerce.exception.NoSuchOrderItemException {
-
-		return getPersistence().findByCProductId_First(
-			CProductId, orderByComparator);
-	}
-
-	/**
-	 * Returns the first commerce order item in the ordered set where CProductId = &#63;.
-	 *
-	 * @param CProductId the c product ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the first matching commerce order item, or <code>null</code> if a matching commerce order item could not be found
-	 */
-	public static CommerceOrderItem fetchByCProductId_First(
-		long CProductId,
-		OrderByComparator<CommerceOrderItem> orderByComparator) {
-
-		return getPersistence().fetchByCProductId_First(
-			CProductId, orderByComparator);
-	}
-
-	/**
-	 * Returns the last commerce order item in the ordered set where CProductId = &#63;.
-	 *
-	 * @param CProductId the c product ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching commerce order item
-	 * @throws NoSuchOrderItemException if a matching commerce order item could not be found
-	 */
-	public static CommerceOrderItem findByCProductId_Last(
-			long CProductId,
-			OrderByComparator<CommerceOrderItem> orderByComparator)
-		throws com.liferay.commerce.exception.NoSuchOrderItemException {
-
-		return getPersistence().findByCProductId_Last(
-			CProductId, orderByComparator);
-	}
-
-	/**
-	 * Returns the last commerce order item in the ordered set where CProductId = &#63;.
-	 *
-	 * @param CProductId the c product ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the last matching commerce order item, or <code>null</code> if a matching commerce order item could not be found
-	 */
-	public static CommerceOrderItem fetchByCProductId_Last(
-		long CProductId,
-		OrderByComparator<CommerceOrderItem> orderByComparator) {
-
-		return getPersistence().fetchByCProductId_Last(
-			CProductId, orderByComparator);
-	}
-
-	/**
-	 * Returns the commerce order items before and after the current commerce order item in the ordered set where CProductId = &#63;.
-	 *
-	 * @param commerceOrderItemId the primary key of the current commerce order item
-	 * @param CProductId the c product ID
-	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
-	 * @return the previous, current, and next commerce order item
-	 * @throws NoSuchOrderItemException if a commerce order item with the primary key could not be found
-	 */
-	public static CommerceOrderItem[] findByCProductId_PrevAndNext(
-			long commerceOrderItemId, long CProductId,
-			OrderByComparator<CommerceOrderItem> orderByComparator)
-		throws com.liferay.commerce.exception.NoSuchOrderItemException {
-
-		return getPersistence().findByCProductId_PrevAndNext(
-			commerceOrderItemId, CProductId, orderByComparator);
-	}
-
-	/**
-	 * Removes all the commerce order items where CProductId = &#63; from the database.
-	 *
-	 * @param CProductId the c product ID
-	 */
-	public static void removeByCProductId(long CProductId) {
-		getPersistence().removeByCProductId(CProductId);
-	}
-
-	/**
-	 * Returns the number of commerce order items where CProductId = &#63;.
-	 *
-	 * @param CProductId the c product ID
-	 * @return the number of matching commerce order items
-	 */
-	public static int countByCProductId(long CProductId) {
-		return getPersistence().countByCProductId(CProductId);
-	}
-
-	/**
 	 * Returns all the commerce order items where CPInstanceId = &#63;.
 	 *
 	 * @param CPInstanceId the cp instance ID
@@ -643,6 +533,179 @@ public class CommerceOrderItemUtil {
 	 */
 	public static int countByCPInstanceId(long CPInstanceId) {
 		return getPersistence().countByCPInstanceId(CPInstanceId);
+	}
+
+	/**
+	 * Returns all the commerce order items where CProductId = &#63;.
+	 *
+	 * @param CProductId the c product ID
+	 * @return the matching commerce order items
+	 */
+	public static List<CommerceOrderItem> findByCProductId(long CProductId) {
+		return getPersistence().findByCProductId(CProductId);
+	}
+
+	/**
+	 * Returns a range of all the commerce order items where CProductId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceOrderItemModelImpl</code>.
+	 * </p>
+	 *
+	 * @param CProductId the c product ID
+	 * @param start the lower bound of the range of commerce order items
+	 * @param end the upper bound of the range of commerce order items (not inclusive)
+	 * @return the range of matching commerce order items
+	 */
+	public static List<CommerceOrderItem> findByCProductId(
+		long CProductId, int start, int end) {
+
+		return getPersistence().findByCProductId(CProductId, start, end);
+	}
+
+	/**
+	 * Returns an ordered range of all the commerce order items where CProductId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceOrderItemModelImpl</code>.
+	 * </p>
+	 *
+	 * @param CProductId the c product ID
+	 * @param start the lower bound of the range of commerce order items
+	 * @param end the upper bound of the range of commerce order items (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching commerce order items
+	 */
+	public static List<CommerceOrderItem> findByCProductId(
+		long CProductId, int start, int end,
+		OrderByComparator<CommerceOrderItem> orderByComparator) {
+
+		return getPersistence().findByCProductId(
+			CProductId, start, end, orderByComparator);
+	}
+
+	/**
+	 * Returns an ordered range of all the commerce order items where CProductId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceOrderItemModelImpl</code>.
+	 * </p>
+	 *
+	 * @param CProductId the c product ID
+	 * @param start the lower bound of the range of commerce order items
+	 * @param end the upper bound of the range of commerce order items (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching commerce order items
+	 */
+	public static List<CommerceOrderItem> findByCProductId(
+		long CProductId, int start, int end,
+		OrderByComparator<CommerceOrderItem> orderByComparator,
+		boolean useFinderCache) {
+
+		return getPersistence().findByCProductId(
+			CProductId, start, end, orderByComparator, useFinderCache);
+	}
+
+	/**
+	 * Returns the first commerce order item in the ordered set where CProductId = &#63;.
+	 *
+	 * @param CProductId the c product ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching commerce order item
+	 * @throws NoSuchOrderItemException if a matching commerce order item could not be found
+	 */
+	public static CommerceOrderItem findByCProductId_First(
+			long CProductId,
+			OrderByComparator<CommerceOrderItem> orderByComparator)
+		throws com.liferay.commerce.exception.NoSuchOrderItemException {
+
+		return getPersistence().findByCProductId_First(
+			CProductId, orderByComparator);
+	}
+
+	/**
+	 * Returns the first commerce order item in the ordered set where CProductId = &#63;.
+	 *
+	 * @param CProductId the c product ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching commerce order item, or <code>null</code> if a matching commerce order item could not be found
+	 */
+	public static CommerceOrderItem fetchByCProductId_First(
+		long CProductId,
+		OrderByComparator<CommerceOrderItem> orderByComparator) {
+
+		return getPersistence().fetchByCProductId_First(
+			CProductId, orderByComparator);
+	}
+
+	/**
+	 * Returns the last commerce order item in the ordered set where CProductId = &#63;.
+	 *
+	 * @param CProductId the c product ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching commerce order item
+	 * @throws NoSuchOrderItemException if a matching commerce order item could not be found
+	 */
+	public static CommerceOrderItem findByCProductId_Last(
+			long CProductId,
+			OrderByComparator<CommerceOrderItem> orderByComparator)
+		throws com.liferay.commerce.exception.NoSuchOrderItemException {
+
+		return getPersistence().findByCProductId_Last(
+			CProductId, orderByComparator);
+	}
+
+	/**
+	 * Returns the last commerce order item in the ordered set where CProductId = &#63;.
+	 *
+	 * @param CProductId the c product ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching commerce order item, or <code>null</code> if a matching commerce order item could not be found
+	 */
+	public static CommerceOrderItem fetchByCProductId_Last(
+		long CProductId,
+		OrderByComparator<CommerceOrderItem> orderByComparator) {
+
+		return getPersistence().fetchByCProductId_Last(
+			CProductId, orderByComparator);
+	}
+
+	/**
+	 * Returns the commerce order items before and after the current commerce order item in the ordered set where CProductId = &#63;.
+	 *
+	 * @param commerceOrderItemId the primary key of the current commerce order item
+	 * @param CProductId the c product ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next commerce order item
+	 * @throws NoSuchOrderItemException if a commerce order item with the primary key could not be found
+	 */
+	public static CommerceOrderItem[] findByCProductId_PrevAndNext(
+			long commerceOrderItemId, long CProductId,
+			OrderByComparator<CommerceOrderItem> orderByComparator)
+		throws com.liferay.commerce.exception.NoSuchOrderItemException {
+
+		return getPersistence().findByCProductId_PrevAndNext(
+			commerceOrderItemId, CProductId, orderByComparator);
+	}
+
+	/**
+	 * Removes all the commerce order items where CProductId = &#63; from the database.
+	 *
+	 * @param CProductId the c product ID
+	 */
+	public static void removeByCProductId(long CProductId) {
+		getPersistence().removeByCProductId(CProductId);
+	}
+
+	/**
+	 * Returns the number of commerce order items where CProductId = &#63;.
+	 *
+	 * @param CProductId the c product ID
+	 * @return the number of matching commerce order items
+	 */
+	public static int countByCProductId(long CProductId) {
+		return getPersistence().countByCProductId(CProductId);
 	}
 
 	/**
@@ -831,79 +894,16 @@ public class CommerceOrderItemUtil {
 	}
 
 	/**
-	 * Returns the commerce order item where bookedQuantityId = &#63; or throws a <code>NoSuchOrderItemException</code> if it could not be found.
-	 *
-	 * @param bookedQuantityId the booked quantity ID
-	 * @return the matching commerce order item
-	 * @throws NoSuchOrderItemException if a matching commerce order item could not be found
-	 */
-	public static CommerceOrderItem findByBookedQuantityId(
-			long bookedQuantityId)
-		throws com.liferay.commerce.exception.NoSuchOrderItemException {
-
-		return getPersistence().findByBookedQuantityId(bookedQuantityId);
-	}
-
-	/**
-	 * Returns the commerce order item where bookedQuantityId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param bookedQuantityId the booked quantity ID
-	 * @return the matching commerce order item, or <code>null</code> if a matching commerce order item could not be found
-	 */
-	public static CommerceOrderItem fetchByBookedQuantityId(
-		long bookedQuantityId) {
-
-		return getPersistence().fetchByBookedQuantityId(bookedQuantityId);
-	}
-
-	/**
-	 * Returns the commerce order item where bookedQuantityId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param bookedQuantityId the booked quantity ID
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching commerce order item, or <code>null</code> if a matching commerce order item could not be found
-	 */
-	public static CommerceOrderItem fetchByBookedQuantityId(
-		long bookedQuantityId, boolean useFinderCache) {
-
-		return getPersistence().fetchByBookedQuantityId(
-			bookedQuantityId, useFinderCache);
-	}
-
-	/**
-	 * Removes the commerce order item where bookedQuantityId = &#63; from the database.
-	 *
-	 * @param bookedQuantityId the booked quantity ID
-	 * @return the commerce order item that was removed
-	 */
-	public static CommerceOrderItem removeByBookedQuantityId(
-			long bookedQuantityId)
-		throws com.liferay.commerce.exception.NoSuchOrderItemException {
-
-		return getPersistence().removeByBookedQuantityId(bookedQuantityId);
-	}
-
-	/**
-	 * Returns the number of commerce order items where bookedQuantityId = &#63;.
-	 *
-	 * @param bookedQuantityId the booked quantity ID
-	 * @return the number of matching commerce order items
-	 */
-	public static int countByBookedQuantityId(long bookedQuantityId) {
-		return getPersistence().countByBookedQuantityId(bookedQuantityId);
-	}
-
-	/**
 	 * Returns all the commerce order items where commerceOrderId = &#63; and CPInstanceId = &#63;.
 	 *
 	 * @param commerceOrderId the commerce order ID
 	 * @param CPInstanceId the cp instance ID
 	 * @return the matching commerce order items
 	 */
-	public static List<CommerceOrderItem> findByC_I(
+	public static List<CommerceOrderItem> findByC_CPI(
 		long commerceOrderId, long CPInstanceId) {
 
-		return getPersistence().findByC_I(commerceOrderId, CPInstanceId);
+		return getPersistence().findByC_CPI(commerceOrderId, CPInstanceId);
 	}
 
 	/**
@@ -919,10 +919,10 @@ public class CommerceOrderItemUtil {
 	 * @param end the upper bound of the range of commerce order items (not inclusive)
 	 * @return the range of matching commerce order items
 	 */
-	public static List<CommerceOrderItem> findByC_I(
+	public static List<CommerceOrderItem> findByC_CPI(
 		long commerceOrderId, long CPInstanceId, int start, int end) {
 
-		return getPersistence().findByC_I(
+		return getPersistence().findByC_CPI(
 			commerceOrderId, CPInstanceId, start, end);
 	}
 
@@ -940,11 +940,11 @@ public class CommerceOrderItemUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching commerce order items
 	 */
-	public static List<CommerceOrderItem> findByC_I(
+	public static List<CommerceOrderItem> findByC_CPI(
 		long commerceOrderId, long CPInstanceId, int start, int end,
 		OrderByComparator<CommerceOrderItem> orderByComparator) {
 
-		return getPersistence().findByC_I(
+		return getPersistence().findByC_CPI(
 			commerceOrderId, CPInstanceId, start, end, orderByComparator);
 	}
 
@@ -963,12 +963,12 @@ public class CommerceOrderItemUtil {
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching commerce order items
 	 */
-	public static List<CommerceOrderItem> findByC_I(
+	public static List<CommerceOrderItem> findByC_CPI(
 		long commerceOrderId, long CPInstanceId, int start, int end,
 		OrderByComparator<CommerceOrderItem> orderByComparator,
 		boolean useFinderCache) {
 
-		return getPersistence().findByC_I(
+		return getPersistence().findByC_CPI(
 			commerceOrderId, CPInstanceId, start, end, orderByComparator,
 			useFinderCache);
 	}
@@ -982,12 +982,12 @@ public class CommerceOrderItemUtil {
 	 * @return the first matching commerce order item
 	 * @throws NoSuchOrderItemException if a matching commerce order item could not be found
 	 */
-	public static CommerceOrderItem findByC_I_First(
+	public static CommerceOrderItem findByC_CPI_First(
 			long commerceOrderId, long CPInstanceId,
 			OrderByComparator<CommerceOrderItem> orderByComparator)
 		throws com.liferay.commerce.exception.NoSuchOrderItemException {
 
-		return getPersistence().findByC_I_First(
+		return getPersistence().findByC_CPI_First(
 			commerceOrderId, CPInstanceId, orderByComparator);
 	}
 
@@ -999,11 +999,11 @@ public class CommerceOrderItemUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching commerce order item, or <code>null</code> if a matching commerce order item could not be found
 	 */
-	public static CommerceOrderItem fetchByC_I_First(
+	public static CommerceOrderItem fetchByC_CPI_First(
 		long commerceOrderId, long CPInstanceId,
 		OrderByComparator<CommerceOrderItem> orderByComparator) {
 
-		return getPersistence().fetchByC_I_First(
+		return getPersistence().fetchByC_CPI_First(
 			commerceOrderId, CPInstanceId, orderByComparator);
 	}
 
@@ -1016,12 +1016,12 @@ public class CommerceOrderItemUtil {
 	 * @return the last matching commerce order item
 	 * @throws NoSuchOrderItemException if a matching commerce order item could not be found
 	 */
-	public static CommerceOrderItem findByC_I_Last(
+	public static CommerceOrderItem findByC_CPI_Last(
 			long commerceOrderId, long CPInstanceId,
 			OrderByComparator<CommerceOrderItem> orderByComparator)
 		throws com.liferay.commerce.exception.NoSuchOrderItemException {
 
-		return getPersistence().findByC_I_Last(
+		return getPersistence().findByC_CPI_Last(
 			commerceOrderId, CPInstanceId, orderByComparator);
 	}
 
@@ -1033,11 +1033,11 @@ public class CommerceOrderItemUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching commerce order item, or <code>null</code> if a matching commerce order item could not be found
 	 */
-	public static CommerceOrderItem fetchByC_I_Last(
+	public static CommerceOrderItem fetchByC_CPI_Last(
 		long commerceOrderId, long CPInstanceId,
 		OrderByComparator<CommerceOrderItem> orderByComparator) {
 
-		return getPersistence().fetchByC_I_Last(
+		return getPersistence().fetchByC_CPI_Last(
 			commerceOrderId, CPInstanceId, orderByComparator);
 	}
 
@@ -1051,12 +1051,12 @@ public class CommerceOrderItemUtil {
 	 * @return the previous, current, and next commerce order item
 	 * @throws NoSuchOrderItemException if a commerce order item with the primary key could not be found
 	 */
-	public static CommerceOrderItem[] findByC_I_PrevAndNext(
+	public static CommerceOrderItem[] findByC_CPI_PrevAndNext(
 			long commerceOrderItemId, long commerceOrderId, long CPInstanceId,
 			OrderByComparator<CommerceOrderItem> orderByComparator)
 		throws com.liferay.commerce.exception.NoSuchOrderItemException {
 
-		return getPersistence().findByC_I_PrevAndNext(
+		return getPersistence().findByC_CPI_PrevAndNext(
 			commerceOrderItemId, commerceOrderId, CPInstanceId,
 			orderByComparator);
 	}
@@ -1067,8 +1067,8 @@ public class CommerceOrderItemUtil {
 	 * @param commerceOrderId the commerce order ID
 	 * @param CPInstanceId the cp instance ID
 	 */
-	public static void removeByC_I(long commerceOrderId, long CPInstanceId) {
-		getPersistence().removeByC_I(commerceOrderId, CPInstanceId);
+	public static void removeByC_CPI(long commerceOrderId, long CPInstanceId) {
+		getPersistence().removeByC_CPI(commerceOrderId, CPInstanceId);
 	}
 
 	/**
@@ -1078,8 +1078,8 @@ public class CommerceOrderItemUtil {
 	 * @param CPInstanceId the cp instance ID
 	 * @return the number of matching commerce order items
 	 */
-	public static int countByC_I(long commerceOrderId, long CPInstanceId) {
-		return getPersistence().countByC_I(commerceOrderId, CPInstanceId);
+	public static int countByC_CPI(long commerceOrderId, long CPInstanceId) {
+		return getPersistence().countByC_CPI(commerceOrderId, CPInstanceId);
 	}
 
 	/**

@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -321,105 +322,127 @@ public class LayoutPageTemplateStructureModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, LayoutPageTemplateStructure>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			LayoutPageTemplateStructure.class.getClassLoader(),
+			LayoutPageTemplateStructure.class, ModelWrapper.class);
+
+		try {
+			Constructor<LayoutPageTemplateStructure> constructor =
+				(Constructor<LayoutPageTemplateStructure>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map
 		<String, Function<LayoutPageTemplateStructure, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<LayoutPageTemplateStructure, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<LayoutPageTemplateStructure, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<LayoutPageTemplateStructure, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", LayoutPageTemplateStructure::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", LayoutPageTemplateStructure::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"uuid", LayoutPageTemplateStructure::getUuid);
-		attributeGetterFunctions.put(
-			"layoutPageTemplateStructureId",
-			LayoutPageTemplateStructure::getLayoutPageTemplateStructureId);
-		attributeGetterFunctions.put(
-			"groupId", LayoutPageTemplateStructure::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", LayoutPageTemplateStructure::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", LayoutPageTemplateStructure::getUserId);
-		attributeGetterFunctions.put(
-			"userName", LayoutPageTemplateStructure::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", LayoutPageTemplateStructure::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", LayoutPageTemplateStructure::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", LayoutPageTemplateStructure::getClassNameId);
-		attributeGetterFunctions.put(
-			"classPK", LayoutPageTemplateStructure::getClassPK);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<LayoutPageTemplateStructure, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<LayoutPageTemplateStructure, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<LayoutPageTemplateStructure, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", LayoutPageTemplateStructure::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<LayoutPageTemplateStructure, Long>)
 				LayoutPageTemplateStructure::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", LayoutPageTemplateStructure::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<LayoutPageTemplateStructure, Long>)
 				LayoutPageTemplateStructure::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"uuid", LayoutPageTemplateStructure::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<LayoutPageTemplateStructure, String>)
 				LayoutPageTemplateStructure::setUuid);
+		attributeGetterFunctions.put(
+			"layoutPageTemplateStructureId",
+			LayoutPageTemplateStructure::getLayoutPageTemplateStructureId);
 		attributeSetterBiConsumers.put(
 			"layoutPageTemplateStructureId",
 			(BiConsumer<LayoutPageTemplateStructure, Long>)
 				LayoutPageTemplateStructure::setLayoutPageTemplateStructureId);
+		attributeGetterFunctions.put(
+			"groupId", LayoutPageTemplateStructure::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<LayoutPageTemplateStructure, Long>)
 				LayoutPageTemplateStructure::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", LayoutPageTemplateStructure::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<LayoutPageTemplateStructure, Long>)
 				LayoutPageTemplateStructure::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", LayoutPageTemplateStructure::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<LayoutPageTemplateStructure, Long>)
 				LayoutPageTemplateStructure::setUserId);
+		attributeGetterFunctions.put(
+			"userName", LayoutPageTemplateStructure::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<LayoutPageTemplateStructure, String>)
 				LayoutPageTemplateStructure::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", LayoutPageTemplateStructure::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<LayoutPageTemplateStructure, Date>)
 				LayoutPageTemplateStructure::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", LayoutPageTemplateStructure::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<LayoutPageTemplateStructure, Date>)
 				LayoutPageTemplateStructure::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", LayoutPageTemplateStructure::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<LayoutPageTemplateStructure, Long>)
 				LayoutPageTemplateStructure::setClassNameId);
+		attributeGetterFunctions.put(
+			"classPK", LayoutPageTemplateStructure::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<LayoutPageTemplateStructure, Long>)
 				LayoutPageTemplateStructure::setClassPK);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -791,6 +814,39 @@ public class LayoutPageTemplateStructureModelImpl
 	}
 
 	@Override
+	public LayoutPageTemplateStructure cloneWithOriginalValues() {
+		LayoutPageTemplateStructureImpl layoutPageTemplateStructureImpl =
+			new LayoutPageTemplateStructureImpl();
+
+		layoutPageTemplateStructureImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		layoutPageTemplateStructureImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		layoutPageTemplateStructureImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		layoutPageTemplateStructureImpl.setLayoutPageTemplateStructureId(
+			this.<Long>getColumnOriginalValue("layoutPageTemplateStructureId"));
+		layoutPageTemplateStructureImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		layoutPageTemplateStructureImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		layoutPageTemplateStructureImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		layoutPageTemplateStructureImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		layoutPageTemplateStructureImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		layoutPageTemplateStructureImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		layoutPageTemplateStructureImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		layoutPageTemplateStructureImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+
+		return layoutPageTemplateStructureImpl;
+	}
+
+	@Override
 	public int compareTo(
 		LayoutPageTemplateStructure layoutPageTemplateStructure) {
 
@@ -1013,8 +1069,7 @@ public class LayoutPageTemplateStructureModelImpl
 		private static final Function
 			<InvocationHandler, LayoutPageTemplateStructure>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						LayoutPageTemplateStructure.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 

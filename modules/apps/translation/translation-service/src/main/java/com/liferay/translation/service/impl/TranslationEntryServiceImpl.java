@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -35,6 +36,7 @@ import com.liferay.translation.constants.TranslationConstants;
 import com.liferay.translation.exception.XLIFFFileException;
 import com.liferay.translation.internal.util.XLIFFLocaleIdUtil;
 import com.liferay.translation.model.TranslationEntry;
+import com.liferay.translation.security.permission.TranslationPermission;
 import com.liferay.translation.service.base.TranslationEntryServiceBaseImpl;
 
 import net.sf.okapi.common.LocaleId;
@@ -108,6 +110,17 @@ public class TranslationEntryServiceImpl
 			serviceContext);
 	}
 
+	@Override
+	public TranslationEntry deleteTranslationEntry(long translationEntryId)
+		throws PortalException {
+
+		_modelResourcePermission.check(
+			getPermissionChecker(), translationEntryId, ActionKeys.DELETE);
+
+		return translationEntryLocalService.deleteTranslationEntry(
+			translationEntryId);
+	}
+
 	private void _checkPermission(
 			long groupId, String languageId,
 			InfoItemReference infoItemReference)
@@ -118,15 +131,16 @@ public class TranslationEntryServiceImpl
 		InfoItemPermissionProvider<JournalArticle> infoItemPermissionProvider =
 			_infoItemServiceTracker.getFirstInfoItemService(
 				InfoItemPermissionProvider.class,
-				JournalArticle.class.getName());
+				infoItemReference.getClassName());
 
 		if (!infoItemPermissionProvider.hasPermission(
 				permissionChecker, infoItemReference, ActionKeys.UPDATE)) {
 
 			String name = TranslationConstants.RESOURCE_NAME + "." + languageId;
 
-			if (!permissionChecker.hasPermission(
-					groupId, name, name, TranslationActionKeys.TRANSLATE)) {
+			if (!_translationPermission.contains(
+					permissionChecker, groupId, languageId,
+					TranslationActionKeys.TRANSLATE)) {
 
 				throw new PrincipalException.MustHavePermission(
 					permissionChecker, name, name,
@@ -141,7 +155,15 @@ public class TranslationEntryServiceImpl
 	@Reference
 	private Language _language;
 
+	@Reference(
+		target = "(model.class.name=com.liferay.translation.model.TranslationEntry)"
+	)
+	private ModelResourcePermission<TranslationEntry> _modelResourcePermission;
+
 	@Reference
 	private SAXReader _saxReader;
+
+	@Reference
+	private TranslationPermission _translationPermission;
 
 }

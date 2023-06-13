@@ -87,7 +87,6 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultMap = 
 
 					<liferay-ui:search-container-row
 						className="com.liferay.commerce.model.CommerceOrderItem"
-						cssClass="entry-display-style"
 						keyProperty="CommerceOrderItemId"
 						modelVar="commerceOrderItem"
 					>
@@ -96,11 +95,19 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultMap = 
 						CPDefinition cpDefinition = commerceOrderItem.getCPDefinition();
 						%>
 
-						<liferay-ui:search-container-column-image
+						<liferay-ui:search-container-column-text
 							cssClass="thumbnail-section"
 							name="image"
-							src="<%= orderSummaryCheckoutStepDisplayContext.getCommerceOrderItemThumbnailSrc(commerceOrderItem) %>"
-						/>
+						>
+							<span class="sticker sticker-xl">
+								<span class="sticker-overlay">
+									<liferay-adaptive-media:img
+										class="sticker-img"
+										fileVersion="<%= orderSummaryCheckoutStepDisplayContext.getCPInstanceImageFileVersion(commerceOrderItem) %>"
+									/>
+								</span>
+							</span>
+						</liferay-ui:search-container-column-text>
 
 						<liferay-ui:search-container-column-text
 							cssClass="autofit-col-expand"
@@ -112,11 +119,9 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultMap = 
 								</div>
 
 								<%
-								List<KeyValuePair> keyValuePairs = orderSummaryCheckoutStepDisplayContext.getKeyValuePairs(commerceOrderItem.getCPDefinitionId(), commerceOrderItem.getJson(), locale);
-
 								StringJoiner stringJoiner = new StringJoiner(StringPool.COMMA);
 
-								for (KeyValuePair keyValuePair : keyValuePairs) {
+								for (KeyValuePair keyValuePair : orderSummaryCheckoutStepDisplayContext.getKeyValuePairs(commerceOrderItem.getCPDefinitionId(), commerceOrderItem.getJson(), locale)) {
 									stringJoiner.add(keyValuePair.getValue());
 								}
 								%>
@@ -406,11 +411,11 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultMap = 
 					<%= HtmlUtil.escape(shippingAddress.getCity()) %> <br />
 
 					<%
-					CommerceCountry commerceCountry = shippingAddress.getCommerceCountry();
+					Country country = shippingAddress.getCountry();
 					%>
 
-					<c:if test="<%= commerceCountry != null %>">
-						<%= HtmlUtil.escape(commerceCountry.getName(locale)) %><br />
+					<c:if test="<%= country != null %>">
+						<%= HtmlUtil.escape(country.getTitle(locale)) %><br />
 					</c:if>
 				</address>
 			</c:if>

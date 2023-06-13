@@ -14,35 +14,32 @@
 
 package com.liferay.journal.web.internal.display.context;
 
+import com.liferay.depot.util.SiteConnectedGroupGroupProviderUtil;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateServiceUtil;
-import com.liferay.dynamic.data.mapping.util.comparator.DDMTemplateNameComparator;
-import com.liferay.dynamic.data.mapping.util.comparator.TemplateIdComparator;
-import com.liferay.dynamic.data.mapping.util.comparator.TemplateModifiedDateComparator;
+import com.liferay.dynamic.data.mapping.util.DDMUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.web.internal.configuration.JournalWebConfiguration;
 import com.liferay.journal.web.internal.servlet.taglib.util.JournalDDMTemplateActionDropdownItemsProvider;
-import com.liferay.journal.web.internal.util.SiteConnectedGroupUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.portlet.PortletURL;
@@ -67,9 +64,6 @@ public class JournalDDMTemplateDisplayContext {
 		_journalWebConfiguration =
 			(JournalWebConfiguration)_httpServletRequest.getAttribute(
 				JournalWebConfiguration.class.getName());
-
-		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
 	}
 
 	public long getClassPK() {
@@ -83,11 +77,7 @@ public class JournalDDMTemplateDisplayContext {
 	}
 
 	public DDMStructure getDDMStructure() {
-		if (_ddmStructure != null) {
-			return _ddmStructure;
-		}
-
-		if (getClassPK() <= 0) {
+		if ((_ddmStructure != null) || (getClassPK() <= 0)) {
 			return _ddmStructure;
 		}
 
@@ -116,6 +106,10 @@ public class JournalDDMTemplateDisplayContext {
 			return _ddmTemplateSearch;
 		}
 
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
 		SearchContainer<DDMTemplate> ddmTemplateSearch = new SearchContainer(
 			_renderRequest, _getPortletURL(), null, "there-are-no-templates");
 
@@ -123,22 +117,19 @@ public class JournalDDMTemplateDisplayContext {
 			ddmTemplateSearch.setEmptyResultsMessage("no-templates-were-found");
 		}
 
-		String orderByCol = getOrderByCol();
-		String orderByType = getOrderByType();
+		ddmTemplateSearch.setOrderByCol(getOrderByCol());
+		ddmTemplateSearch.setOrderByComparator(
+			DDMUtil.getTemplateOrderByComparator(
+				getOrderByCol(), getOrderByType()));
+		ddmTemplateSearch.setOrderByType(getOrderByType());
 
-		ddmTemplateSearch.setOrderByCol(orderByCol);
-		ddmTemplateSearch.setOrderByComparator(_getOrderByComparator());
-		ddmTemplateSearch.setOrderByType(orderByType);
-		ddmTemplateSearch.setRowChecker(
-			new EmptyOnClickRowChecker(_renderResponse));
-
-		long[] groupIds = {_themeDisplay.getScopeGroupId()};
+		long[] groupIds = {themeDisplay.getScopeGroupId()};
 
 		if (_journalWebConfiguration.showAncestorScopesByDefault()) {
 			groupIds =
-				SiteConnectedGroupUtil.
+				SiteConnectedGroupGroupProviderUtil.
 					getCurrentAndAncestorSiteAndDepotGroupIds(
-						_themeDisplay.getScopeGroupId(), true);
+						themeDisplay.getScopeGroupId(), true);
 		}
 
 		List<DDMTemplate> results = null;
@@ -146,7 +137,7 @@ public class JournalDDMTemplateDisplayContext {
 
 		if (Validator.isNotNull(_getKeywords())) {
 			results = DDMTemplateServiceUtil.search(
-				_themeDisplay.getCompanyId(), groupIds,
+				themeDisplay.getCompanyId(), groupIds,
 				new long[] {PortalUtil.getClassNameId(DDMStructure.class)},
 				_getDDMTemplateClassPKs(),
 				PortalUtil.getClassNameId(JournalArticle.class), _getKeywords(),
@@ -156,7 +147,7 @@ public class JournalDDMTemplateDisplayContext {
 				ddmTemplateSearch.getOrderByComparator());
 
 			total = DDMTemplateServiceUtil.searchCount(
-				_themeDisplay.getCompanyId(), groupIds,
+				themeDisplay.getCompanyId(), groupIds,
 				new long[] {PortalUtil.getClassNameId(DDMStructure.class)},
 				_getDDMTemplateClassPKs(),
 				PortalUtil.getClassNameId(JournalArticle.class), _getKeywords(),
@@ -165,26 +156,22 @@ public class JournalDDMTemplateDisplayContext {
 		}
 		else {
 			results = DDMTemplateServiceUtil.getTemplates(
-				_themeDisplay.getCompanyId(), groupIds,
+				themeDisplay.getCompanyId(), groupIds,
 				new long[] {PortalUtil.getClassNameId(DDMStructure.class)},
 				_getDDMTemplateClassPKs(),
 				PortalUtil.getClassNameId(JournalArticle.class),
 				ddmTemplateSearch.getStart(), ddmTemplateSearch.getEnd(),
 				ddmTemplateSearch.getOrderByComparator());
 			total = DDMTemplateServiceUtil.getTemplatesCount(
-				_themeDisplay.getCompanyId(), groupIds,
+				themeDisplay.getCompanyId(), groupIds,
 				new long[] {PortalUtil.getClassNameId(DDMStructure.class)},
 				_getDDMTemplateClassPKs(),
 				PortalUtil.getClassNameId(JournalArticle.class));
 		}
 
-		List<DDMTemplate> sortedResults = new ArrayList<>(results);
-
-		Collections.sort(
-			sortedResults, ddmTemplateSearch.getOrderByComparator());
-
-		ddmTemplateSearch.setResults(sortedResults);
-
+		ddmTemplateSearch.setResults(results);
+		ddmTemplateSearch.setRowChecker(
+			new EmptyOnClickRowChecker(_renderResponse));
 		ddmTemplateSearch.setTotal(total);
 
 		_ddmTemplateSearch = ddmTemplateSearch;
@@ -222,29 +209,27 @@ public class JournalDDMTemplateDisplayContext {
 	}
 
 	public String getOrderByCol() {
-		if (_orderByCol != null) {
+		if (Validator.isNotNull(_orderByCol)) {
 			return _orderByCol;
 		}
 
-		_orderByCol = ParamUtil.getString(
-			_renderRequest, "orderByCol", "modified-date");
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			_httpServletRequest, JournalPortletKeys.JOURNAL,
+			"ddm-template-order-by-col", "modified-date");
 
 		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		if (_orderByType != null) {
+		if (Validator.isNotNull(_orderByType)) {
 			return _orderByType;
 		}
 
-		_orderByType = ParamUtil.getString(
-			_renderRequest, "orderByType", "desc");
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_httpServletRequest, JournalPortletKeys.JOURNAL,
+			"ddm-template-order-by-type", "desc");
 
 		return _orderByType;
-	}
-
-	public String[] getTemplateLanguageTypes() {
-		return _journalWebConfiguration.journalDDMTemplateLanguageTypes();
 	}
 
 	public boolean isSearch() {
@@ -273,57 +258,44 @@ public class JournalDDMTemplateDisplayContext {
 		return _keywords;
 	}
 
-	private OrderByComparator<DDMTemplate> _getOrderByComparator() {
-		OrderByComparator<DDMTemplate> orderByComparator = null;
-
-		boolean orderByAsc = false;
-
-		String orderByType = getOrderByType();
-
-		if (orderByType.equals("asc")) {
-			orderByAsc = true;
-		}
-
-		String orderByCol = getOrderByCol();
-
-		if (orderByCol.equals("id")) {
-			orderByComparator = new TemplateIdComparator(orderByAsc);
-		}
-		else if (orderByCol.equals("modified-date")) {
-			orderByComparator = new TemplateModifiedDateComparator(orderByAsc);
-		}
-		else if (orderByCol.equals("name")) {
-			orderByComparator = new DDMTemplateNameComparator(
-				orderByAsc, _themeDisplay.getLocale());
-		}
-
-		return orderByComparator;
-	}
-
 	private PortletURL _getPortletURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/view_ddm_templates.jsp"
+		).setKeywords(
+			() -> {
+				String keywords = _getKeywords();
 
-		portletURL.setParameter("mvcPath", "/view_ddm_templates.jsp");
+				if (Validator.isNotNull(keywords)) {
+					return keywords;
+				}
 
-		String keywords = _getKeywords();
+				return null;
+			}
+		).setParameter(
+			"orderByCol",
+			() -> {
+				String orderByCol = getOrderByCol();
 
-		if (Validator.isNotNull(keywords)) {
-			portletURL.setParameter("keywords", keywords);
-		}
+				if (Validator.isNotNull(orderByCol)) {
+					return orderByCol;
+				}
 
-		String orderByCol = getOrderByCol();
+				return null;
+			}
+		).setParameter(
+			"orderByType",
+			() -> {
+				String orderByType = getOrderByType();
 
-		if (Validator.isNotNull(orderByCol)) {
-			portletURL.setParameter("orderByCol", orderByCol);
-		}
+				if (Validator.isNotNull(orderByType)) {
+					return orderByType;
+				}
 
-		String orderByType = getOrderByType();
-
-		if (Validator.isNotNull(orderByType)) {
-			portletURL.setParameter("orderByType", orderByType);
-		}
-
-		return portletURL;
+				return null;
+			}
+		).buildPortletURL();
 	}
 
 	private static final String[] _DISPLAY_VIEWS = {"icon", "list"};
@@ -339,6 +311,5 @@ public class JournalDDMTemplateDisplayContext {
 	private String _orderByType;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private final ThemeDisplay _themeDisplay;
 
 }

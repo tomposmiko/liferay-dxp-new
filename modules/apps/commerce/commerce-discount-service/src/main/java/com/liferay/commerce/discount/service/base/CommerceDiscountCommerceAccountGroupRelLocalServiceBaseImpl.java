@@ -22,6 +22,7 @@ import com.liferay.commerce.discount.service.persistence.CommerceDiscountAccount
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountCommerceAccountGroupRelFinder;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountCommerceAccountGroupRelPersistence;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountFinder;
+import com.liferay.commerce.discount.service.persistence.CommerceDiscountOrderTypeRelPersistence;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountPersistence;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountRelFinder;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountRelPersistence;
@@ -42,8 +43,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -354,6 +353,7 @@ public abstract class
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -373,6 +373,7 @@ public abstract class
 				(CommerceDiscountCommerceAccountGroupRel)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<CommerceDiscountCommerceAccountGroupRel>
 		getBasePersistence() {
 
@@ -647,6 +648,56 @@ public abstract class
 
 		this.commerceDiscountCommerceAccountGroupRelFinder =
 			commerceDiscountCommerceAccountGroupRelFinder;
+	}
+
+	/**
+	 * Returns the commerce discount order type rel local service.
+	 *
+	 * @return the commerce discount order type rel local service
+	 */
+	public com.liferay.commerce.discount.service.
+		CommerceDiscountOrderTypeRelLocalService
+			getCommerceDiscountOrderTypeRelLocalService() {
+
+		return commerceDiscountOrderTypeRelLocalService;
+	}
+
+	/**
+	 * Sets the commerce discount order type rel local service.
+	 *
+	 * @param commerceDiscountOrderTypeRelLocalService the commerce discount order type rel local service
+	 */
+	public void setCommerceDiscountOrderTypeRelLocalService(
+		com.liferay.commerce.discount.service.
+			CommerceDiscountOrderTypeRelLocalService
+				commerceDiscountOrderTypeRelLocalService) {
+
+		this.commerceDiscountOrderTypeRelLocalService =
+			commerceDiscountOrderTypeRelLocalService;
+	}
+
+	/**
+	 * Returns the commerce discount order type rel persistence.
+	 *
+	 * @return the commerce discount order type rel persistence
+	 */
+	public CommerceDiscountOrderTypeRelPersistence
+		getCommerceDiscountOrderTypeRelPersistence() {
+
+		return commerceDiscountOrderTypeRelPersistence;
+	}
+
+	/**
+	 * Sets the commerce discount order type rel persistence.
+	 *
+	 * @param commerceDiscountOrderTypeRelPersistence the commerce discount order type rel persistence
+	 */
+	public void setCommerceDiscountOrderTypeRelPersistence(
+		CommerceDiscountOrderTypeRelPersistence
+			commerceDiscountOrderTypeRelPersistence) {
+
+		this.commerceDiscountOrderTypeRelPersistence =
+			commerceDiscountOrderTypeRelPersistence;
 	}
 
 	/**
@@ -1083,6 +1134,17 @@ public abstract class
 		commerceDiscountCommerceAccountGroupRelFinder;
 
 	@BeanReference(
+		type = com.liferay.commerce.discount.service.CommerceDiscountOrderTypeRelLocalService.class
+	)
+	protected com.liferay.commerce.discount.service.
+		CommerceDiscountOrderTypeRelLocalService
+			commerceDiscountOrderTypeRelLocalService;
+
+	@BeanReference(type = CommerceDiscountOrderTypeRelPersistence.class)
+	protected CommerceDiscountOrderTypeRelPersistence
+		commerceDiscountOrderTypeRelPersistence;
+
+	@BeanReference(
 		type = com.liferay.commerce.discount.service.CommerceDiscountRelLocalService.class
 	)
 	protected
@@ -1149,9 +1211,6 @@ public abstract class
 
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommerceDiscountCommerceAccountGroupRelLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

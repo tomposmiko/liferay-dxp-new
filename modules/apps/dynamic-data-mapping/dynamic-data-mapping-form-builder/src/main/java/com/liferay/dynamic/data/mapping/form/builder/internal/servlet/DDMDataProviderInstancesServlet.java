@@ -80,7 +80,7 @@ public class DDMDataProviderInstancesServlet extends BaseDDMFormBuilderServlet {
 		httpServletResponse.setStatus(HttpServletResponse.SC_OK);
 
 		ServletResponseUtil.write(
-			httpServletResponse, dataProviderInstancesJSONArray.toString());
+			httpServletResponse, dataProviderInstancesJSONArray.toJSONString());
 	}
 
 	protected JSONArray getDataProviderInstancesJSONArray(

@@ -142,7 +142,7 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 
 <portlet:actionURL name="/portal_settings_authentication_ldap/edit_ldap_server" var="editLDAPServerURL" />
 
-<aui:form action="<%= editLDAPServerURL %>" cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveEntry(false);" %>'>
+<aui:form action="<%= editLDAPServerURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveEntry(false);" %>'>
 	<liferay-ui:error exception="<%= DuplicateLDAPServerNameException.class %>" message="please-enter-a-unique-ldap-server-name" />
 	<liferay-ui:error exception="<%= LDAPFilterException.class %>" message="please-enter-a-valid-ldap-search-filter" />
 	<liferay-ui:error exception="<%= LDAPServerNameException.class %>" message="please-enter-a-valid-ldap-server-name" />
@@ -290,7 +290,7 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 	function <portlet:namespace />mapValues(fields, fieldValues) {
 		var form = document.<portlet:namespace />fm;
 
-		return fields.reduce(function (prev, item, index) {
+		return fields.reduce((prev, item, index) => {
 			var mappingElement = Liferay.Util.getFormElement(
 				form,
 				fieldValues[index]
@@ -355,7 +355,7 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 
 		Liferay.Util.postForm(form, {
 			data: {
-				<%= Constants.CMD %>:
+				'<%= Constants.CMD %>':
 					'<%= (ldapServerId <= 0) ? Constants.ADD : Constants.UPDATE %>',
 				'ldap--<%= LDAPConstants.USER_MAPPINGS %>--': userMapping,
 				'ldap--<%= LDAPConstants.GROUP_MAPPINGS %>--': groupMapping,
@@ -482,22 +482,22 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 			'ldap--<%= LDAPConstants.SECURITY_CREDENTIAL %>--': credentials,
 			'ldap--<%= LDAPConstants.AUTH_SEARCH_FILTER %>--': searchFilter,
 			'ldap--<%= LDAPConstants.USER_SEARCH_FILTER %>--': importUserSearchFilter,
-			userMappingEmailAddress: userMappingEmailAddress,
-			userMappingFirstName: userMappingFirstName,
-			userMappingFullName: userMappingFullName,
-			userMappingGroup: userMappingGroup,
-			userMappingJobTitle: userMappingJobTitle,
-			userMappingLastName: userMappingLastName,
-			userMappingMiddleName: userMappingMiddleName,
-			userMappingPassword: userMappingPassword,
-			userMappingPortrait: userMappingPortrait,
-			userMappingScreenName: userMappingScreenName,
-			userMappingStatus: userMappingStatus,
-			userMappingUuid: userMappingUuid,
+			'userMappingEmailAddress': userMappingEmailAddress,
+			'userMappingFirstName': userMappingFirstName,
+			'userMappingFullName': userMappingFullName,
+			'userMappingGroup': userMappingGroup,
+			'userMappingJobTitle': userMappingJobTitle,
+			'userMappingLastName': userMappingLastName,
+			'userMappingMiddleName': userMappingMiddleName,
+			'userMappingPassword': userMappingPassword,
+			'userMappingPortrait': userMappingPortrait,
+			'userMappingScreenName': userMappingScreenName,
+			'userMappingStatus': userMappingStatus,
+			'userMappingUuid': userMappingUuid,
 			'ldap--<%= LDAPConstants.GROUP_SEARCH_FILTER %>--': importGroupSearchFilter,
-			groupMappingDescription: groupMappingDescription,
-			groupMappingGroupName: groupMappingGroupName,
-			groupMappingUser: groupMappingUser,
+			'groupMappingDescription': groupMappingDescription,
+			'groupMappingGroupName': groupMappingGroupName,
+			'groupMappingUser': groupMappingUser,
 			'ldap--<%= LDAPConstants.USERS_DN %>--': baseDN,
 			'ldap--<%= LDAPConstants.USER_DEFAULT_OBJECT_CLASSES %>--': exportMappingUserDefaultObjectClass,
 			'ldap--<%= LDAPConstants.GROUPS_DN %>--': baseDN,
@@ -621,17 +621,17 @@ renderResponse.setTitle((ldapServerId == 0) ? LanguageUtil.get(resourceBundle, "
 				body: Liferay.Util.objectToURLSearchParams(data),
 				method: 'POST',
 			})
-				.then(function (response) {
+				.then((response) => {
 					return response.text();
 				})
-				.then(function (text) {
+				.then((text) => {
 					Liferay.Util.openModal({
 						bodyHTML: text,
 						size: 'full-screen',
 						title: '<%= UnicodeLanguageUtil.get(request, "ldap") %>',
 					});
 				})
-				.catch(function (error) {
+				.catch((error) => {
 					Liferay.Util.openToast({
 						message: Liferay.Language.get(
 							'an-unexpected-system-error-occurred'

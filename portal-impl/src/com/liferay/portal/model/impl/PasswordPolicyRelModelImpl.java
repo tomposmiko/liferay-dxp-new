@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -234,63 +235,85 @@ public class PasswordPolicyRelModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, PasswordPolicyRel>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			PasswordPolicyRel.class.getClassLoader(), PasswordPolicyRel.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<PasswordPolicyRel> constructor =
+				(Constructor<PasswordPolicyRel>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<PasswordPolicyRel, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<PasswordPolicyRel, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<PasswordPolicyRel, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<PasswordPolicyRel, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", PasswordPolicyRel::getMvccVersion);
-		attributeGetterFunctions.put(
-			"passwordPolicyRelId", PasswordPolicyRel::getPasswordPolicyRelId);
-		attributeGetterFunctions.put(
-			"companyId", PasswordPolicyRel::getCompanyId);
-		attributeGetterFunctions.put(
-			"passwordPolicyId", PasswordPolicyRel::getPasswordPolicyId);
-		attributeGetterFunctions.put(
-			"classNameId", PasswordPolicyRel::getClassNameId);
-		attributeGetterFunctions.put("classPK", PasswordPolicyRel::getClassPK);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<PasswordPolicyRel, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<PasswordPolicyRel, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<PasswordPolicyRel, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", PasswordPolicyRel::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<PasswordPolicyRel, Long>)
 				PasswordPolicyRel::setMvccVersion);
+		attributeGetterFunctions.put(
+			"passwordPolicyRelId", PasswordPolicyRel::getPasswordPolicyRelId);
 		attributeSetterBiConsumers.put(
 			"passwordPolicyRelId",
 			(BiConsumer<PasswordPolicyRel, Long>)
 				PasswordPolicyRel::setPasswordPolicyRelId);
+		attributeGetterFunctions.put(
+			"companyId", PasswordPolicyRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<PasswordPolicyRel, Long>)
 				PasswordPolicyRel::setCompanyId);
+		attributeGetterFunctions.put(
+			"passwordPolicyId", PasswordPolicyRel::getPasswordPolicyId);
 		attributeSetterBiConsumers.put(
 			"passwordPolicyId",
 			(BiConsumer<PasswordPolicyRel, Long>)
 				PasswordPolicyRel::setPasswordPolicyId);
+		attributeGetterFunctions.put(
+			"classNameId", PasswordPolicyRel::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<PasswordPolicyRel, Long>)
 				PasswordPolicyRel::setClassNameId);
+		attributeGetterFunctions.put("classPK", PasswordPolicyRel::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<PasswordPolicyRel, Long>)PasswordPolicyRel::setClassPK);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -498,6 +521,27 @@ public class PasswordPolicyRelModelImpl
 	}
 
 	@Override
+	public PasswordPolicyRel cloneWithOriginalValues() {
+		PasswordPolicyRelImpl passwordPolicyRelImpl =
+			new PasswordPolicyRelImpl();
+
+		passwordPolicyRelImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		passwordPolicyRelImpl.setPasswordPolicyRelId(
+			this.<Long>getColumnOriginalValue("passwordPolicyRelId"));
+		passwordPolicyRelImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		passwordPolicyRelImpl.setPasswordPolicyId(
+			this.<Long>getColumnOriginalValue("passwordPolicyId"));
+		passwordPolicyRelImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		passwordPolicyRelImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+
+		return passwordPolicyRelImpl;
+	}
+
+	@Override
 	public int compareTo(PasswordPolicyRel passwordPolicyRel) {
 		long primaryKey = passwordPolicyRel.getPrimaryKey();
 
@@ -669,9 +713,7 @@ public class PasswordPolicyRelModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, PasswordPolicyRel>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					PasswordPolicyRel.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

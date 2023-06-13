@@ -39,8 +39,10 @@ import org.osgi.annotation.versioning.ProviderType;
  *
  * @author Brian Wing Shun Chan
  * @see DDMContent
+ * @deprecated
  * @generated
  */
+@Deprecated
 @ProviderType
 public interface DDMContentModel
 	extends BaseModel<DDMContent>, CTModel<DDMContent>, GroupedModel,
@@ -385,5 +387,8 @@ public interface DDMContentModel
 	@Override
 	public void prepareLocalizedFieldsForImport(Locale defaultImportLocale)
 		throws LocaleException;
+
+	@Override
+	public DDMContent cloneWithOriginalValues();
 
 }

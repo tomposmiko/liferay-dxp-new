@@ -15,8 +15,6 @@
 package com.liferay.portal.util;
 
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.MimeTypes;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
@@ -25,7 +23,6 @@ import java.io.InputStream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -35,20 +32,11 @@ import org.junit.Test;
 public class MimeTypesImplTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() {
-		FileUtil fileUtil = new FileUtil();
-
-		fileUtil.setFile(new FileImpl());
-
-		HtmlUtil htmlUtil = new HtmlUtil();
-
-		htmlUtil.setHtml(new HtmlImpl());
-
 		MimeTypesImpl mimeTypesImpl = new MimeTypesImpl();
 
 		mimeTypesImpl.afterPropertiesSet();

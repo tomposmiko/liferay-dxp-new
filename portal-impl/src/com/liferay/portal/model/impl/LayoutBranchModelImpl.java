@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -307,71 +308,93 @@ public class LayoutBranchModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<LayoutBranch, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, LayoutBranch>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<LayoutBranch, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<LayoutBranch, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			LayoutBranch.class.getClassLoader(), LayoutBranch.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", LayoutBranch::getMvccVersion);
-		attributeGetterFunctions.put(
-			"layoutBranchId", LayoutBranch::getLayoutBranchId);
-		attributeGetterFunctions.put("groupId", LayoutBranch::getGroupId);
-		attributeGetterFunctions.put("companyId", LayoutBranch::getCompanyId);
-		attributeGetterFunctions.put("userId", LayoutBranch::getUserId);
-		attributeGetterFunctions.put("userName", LayoutBranch::getUserName);
-		attributeGetterFunctions.put(
-			"layoutSetBranchId", LayoutBranch::getLayoutSetBranchId);
-		attributeGetterFunctions.put("plid", LayoutBranch::getPlid);
-		attributeGetterFunctions.put("name", LayoutBranch::getName);
-		attributeGetterFunctions.put(
-			"description", LayoutBranch::getDescription);
-		attributeGetterFunctions.put("master", LayoutBranch::getMaster);
+		try {
+			Constructor<LayoutBranch> constructor =
+				(Constructor<LayoutBranch>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<LayoutBranch, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<LayoutBranch, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<LayoutBranch, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<LayoutBranch, Object>>();
 		Map<String, BiConsumer<LayoutBranch, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<LayoutBranch, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", LayoutBranch::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<LayoutBranch, Long>)LayoutBranch::setMvccVersion);
+		attributeGetterFunctions.put(
+			"layoutBranchId", LayoutBranch::getLayoutBranchId);
 		attributeSetterBiConsumers.put(
 			"layoutBranchId",
 			(BiConsumer<LayoutBranch, Long>)LayoutBranch::setLayoutBranchId);
+		attributeGetterFunctions.put("groupId", LayoutBranch::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<LayoutBranch, Long>)LayoutBranch::setGroupId);
+		attributeGetterFunctions.put("companyId", LayoutBranch::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<LayoutBranch, Long>)LayoutBranch::setCompanyId);
+		attributeGetterFunctions.put("userId", LayoutBranch::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<LayoutBranch, Long>)LayoutBranch::setUserId);
+		attributeGetterFunctions.put("userName", LayoutBranch::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<LayoutBranch, String>)LayoutBranch::setUserName);
+		attributeGetterFunctions.put(
+			"layoutSetBranchId", LayoutBranch::getLayoutSetBranchId);
 		attributeSetterBiConsumers.put(
 			"layoutSetBranchId",
 			(BiConsumer<LayoutBranch, Long>)LayoutBranch::setLayoutSetBranchId);
+		attributeGetterFunctions.put("plid", LayoutBranch::getPlid);
 		attributeSetterBiConsumers.put(
 			"plid", (BiConsumer<LayoutBranch, Long>)LayoutBranch::setPlid);
+		attributeGetterFunctions.put("name", LayoutBranch::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<LayoutBranch, String>)LayoutBranch::setName);
+		attributeGetterFunctions.put(
+			"description", LayoutBranch::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<LayoutBranch, String>)LayoutBranch::setDescription);
+		attributeGetterFunctions.put("master", LayoutBranch::getMaster);
 		attributeSetterBiConsumers.put(
 			"master",
 			(BiConsumer<LayoutBranch, Boolean>)LayoutBranch::setMaster);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -690,6 +713,33 @@ public class LayoutBranchModelImpl
 	}
 
 	@Override
+	public LayoutBranch cloneWithOriginalValues() {
+		LayoutBranchImpl layoutBranchImpl = new LayoutBranchImpl();
+
+		layoutBranchImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		layoutBranchImpl.setLayoutBranchId(
+			this.<Long>getColumnOriginalValue("layoutBranchId"));
+		layoutBranchImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		layoutBranchImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		layoutBranchImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		layoutBranchImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		layoutBranchImpl.setLayoutSetBranchId(
+			this.<Long>getColumnOriginalValue("layoutSetBranchId"));
+		layoutBranchImpl.setPlid(this.<Long>getColumnOriginalValue("plid"));
+		layoutBranchImpl.setName(this.<String>getColumnOriginalValue("name"));
+		layoutBranchImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		layoutBranchImpl.setMaster(
+			this.<Boolean>getColumnOriginalValue("master"));
+
+		return layoutBranchImpl;
+	}
+
+	@Override
 	public int compareTo(LayoutBranch layoutBranch) {
 		long primaryKey = layoutBranch.getPrimaryKey();
 
@@ -887,9 +937,7 @@ public class LayoutBranchModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, LayoutBranch>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					LayoutBranch.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

@@ -62,14 +62,13 @@ public class ExpandoBridgeIndexerImpl implements ExpandoBridgeIndexer {
 
 	@Override
 	public String encodeFieldName(String columnName, int indexType) {
-		StringBundler sb = new StringBundler(7);
+		StringBundler sb = new StringBundler(6);
 
 		sb.append(FIELD_NAMESPACE);
 		sb.append(StringPool.DOUBLE_UNDERLINE);
 
 		if (indexType == ExpandoColumnConstants.INDEX_TYPE_KEYWORD) {
-			sb.append("keyword");
-			sb.append(StringPool.DOUBLE_UNDERLINE);
+			sb.append("keyword__");
 		}
 
 		sb.append(
@@ -180,9 +179,8 @@ public class ExpandoBridgeIndexerImpl implements ExpandoBridgeIndexer {
 			}
 		}
 		else if (type == ExpandoColumnConstants.NUMBER) {
-			Number number = expandoValue.getNumber();
-
-			document.addKeyword(fieldName, number.toString());
+			document.addKeyword(
+				fieldName, String.valueOf(expandoValue.getNumber()));
 		}
 		else if (type == ExpandoColumnConstants.NUMBER_ARRAY) {
 			if (!defaultValue) {

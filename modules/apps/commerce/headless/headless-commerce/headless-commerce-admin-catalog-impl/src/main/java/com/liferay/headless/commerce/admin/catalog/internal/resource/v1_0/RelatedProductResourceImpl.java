@@ -74,11 +74,11 @@ public class RelatedProductResourceImpl
 		CPDefinition cpDefinition =
 			_cpDefinitionService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
-					contextCompany.getCompanyId(), externalReferenceCode);
+					externalReferenceCode, contextCompany.getCompanyId());
 
 		if (cpDefinition == null) {
 			throw new NoSuchCPDefinitionException(
-				"Unable to find Product with externalReferenceCode: " +
+				"Unable to find product with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -116,11 +116,11 @@ public class RelatedProductResourceImpl
 		CPDefinition cpDefinition =
 			_cpDefinitionService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
-					contextCompany.getCompanyId(), externalReferenceCode);
+					externalReferenceCode, contextCompany.getCompanyId());
 
 		if (cpDefinition == null) {
 			throw new NoSuchCPDefinitionException(
-				"Unable to find Product with externalReferenceCode: " +
+				"Unable to find product with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -148,7 +148,7 @@ public class RelatedProductResourceImpl
 		throws Exception {
 
 		CPDefinitionLink cpDefinitionLink =
-			RelatedProductUtil.upsertCPDefinitionLink(
+			RelatedProductUtil.addOrUpdateCPDefinitionLink(
 				_cpDefinitionLinkService, _cpDefinitionService, relatedProduct,
 				cpDefinition.getCPDefinitionId(),
 				_serviceContextHelper.getServiceContext(

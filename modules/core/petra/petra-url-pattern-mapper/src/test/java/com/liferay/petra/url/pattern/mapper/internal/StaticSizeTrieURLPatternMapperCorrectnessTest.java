@@ -48,6 +48,7 @@ public class StaticSizeTrieURLPatternMapperCorrectnessTest
 			},
 			LiferayUnitTestRule.INSTANCE);
 
+	@Override
 	@Test
 	public void testConstructor() {
 		super.testConstructor();

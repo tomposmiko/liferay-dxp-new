@@ -24,10 +24,10 @@ import com.liferay.portal.search.elasticsearch7.internal.configuration.Elasticse
 import com.liferay.portal.search.elasticsearch7.internal.configuration.ElasticsearchConfigurationWrapper;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionManager;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionNotInitializedException;
+import com.liferay.portal.search.elasticsearch7.internal.helper.SearchLogHelperUtil;
 import com.liferay.portal.search.elasticsearch7.internal.index.contributor.IndexContributorReceiver;
 import com.liferay.portal.search.elasticsearch7.internal.settings.SettingsBuilder;
 import com.liferay.portal.search.elasticsearch7.internal.util.ResourceUtil;
-import com.liferay.portal.search.elasticsearch7.internal.util.SearchLogHelperUtil;
 import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.spi.model.index.contributor.IndexContributor;
 import com.liferay.portal.search.spi.settings.IndexSettingsContributor;
@@ -51,7 +51,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.xcontent.XContentType;
+import org.elasticsearch.common.xcontent.XContentType;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -350,9 +350,7 @@ public class CompanyIndexFactory
 			_elasticsearchConfigurationWrapper.indexNumberOfShards());
 	}
 
-	protected void loadIndexSettingsContributors(
-		final Settings.Builder builder) {
-
+	protected void loadIndexSettingsContributors(Settings.Builder builder) {
 		com.liferay.portal.search.elasticsearch7.settings.IndexSettingsHelper
 			elasticsearchIndexSettingsHelper = (setting, value) -> builder.put(
 				setting, value);

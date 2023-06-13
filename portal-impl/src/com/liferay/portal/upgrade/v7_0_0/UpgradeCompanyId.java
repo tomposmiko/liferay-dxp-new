@@ -15,7 +15,7 @@
 package com.liferay.portal.upgrade.v7_0_0;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.upgrade.BaseUpgradeCompanyId;
+import com.liferay.portal.kernel.upgrade.BaseCompanyIdUpgradeProcess;
 import com.liferay.portal.kernel.util.PortletKeys;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * @author Brian Wing Shun Chan
  */
-public class UpgradeCompanyId extends BaseUpgradeCompanyId {
+public class UpgradeCompanyId extends BaseCompanyIdUpgradeProcess {
 
 	@Override
 	protected TableUpdater[] getTableUpdaters() {
@@ -209,12 +209,13 @@ public class UpgradeCompanyId extends BaseUpgradeCompanyId {
 
 			List<Long> companyIds = new ArrayList<>();
 
-			try (PreparedStatement ps = connection.prepareStatement(
-					"select distinct companyId from " + foreignTableName);
-				ResultSet rs = ps.executeQuery()) {
+			try (PreparedStatement preparedStatement =
+					connection.prepareStatement(
+						"select distinct companyId from " + foreignTableName);
+				ResultSet resultSet = preparedStatement.executeQuery()) {
 
-				while (rs.next()) {
-					long companyId = rs.getLong(1);
+				while (resultSet.next()) {
+					long companyId = resultSet.getLong(1);
 
 					companyIds.add(companyId);
 				}
@@ -224,20 +225,10 @@ public class UpgradeCompanyId extends BaseUpgradeCompanyId {
 				return String.valueOf(companyIds.get(0));
 			}
 
-			StringBundler sb = new StringBundler(10);
-
-			sb.append("select companyId from ");
-			sb.append(foreignTableName);
-			sb.append(" where ");
-			sb.append(foreignTableName);
-			sb.append(".");
-			sb.append(foreignColumnName);
-			sb.append(" = ");
-			sb.append(getTableName());
-			sb.append(".");
-			sb.append(columnName);
-
-			return sb.toString();
+			return StringBundler.concat(
+				"select companyId from ", foreignTableName, " where ",
+				foreignTableName, ".", foreignColumnName, " = ", getTableName(),
+				".", columnName);
 		}
 
 		private String _getUpdateSQL(
@@ -248,14 +239,9 @@ public class UpgradeCompanyId extends BaseUpgradeCompanyId {
 			String selectSQL = _getSelectSQL(
 				foreignTableName, foreignColumnName, columnName);
 
-			StringBundler sb = new StringBundler(4);
-
-			sb.append(getUpdateSQL(selectSQL));
-			sb.append(" where ownerType = ");
-			sb.append(ownerType);
-			sb.append(" and (companyId is null or companyId = 0)");
-
-			return sb.toString();
+			return StringBundler.concat(
+				getUpdateSQL(selectSQL), " where ownerType = ", ownerType,
+				" and (companyId is null or companyId = 0)");
 		}
 
 	}

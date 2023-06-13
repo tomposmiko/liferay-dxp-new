@@ -1,21 +1,10 @@
 #
-# Liferay App Version 4.0.0
+# Liferay App Version 5.0.0
 #
 
-app.artifacts-4.0.0=\
-	com.liferay.portal.search.elasticsearch.monitoring.web-1.0.7.jar
+app.artifacts-5.0.0=\
+	
 
-app.change.log-4.0.0=LPS-119196 LPS-122403 LPS-77699 LPS-99013 LRQA-51488 RELEASE-3100
+app.change.log-5.0.0=LPS-105380 LPS-119196 LPS-121824 LPS-122403 LPS-123178 LPS-125803 LPS-129065 LPS-130116 LPS-132645 LPS-134501 LPS-134639 LPS-135504 LPS-138918 LPS-77699 LPS-99013 LRQA-51488
 
-app.git.id-4.0.0=8b41d25f20b34c8f6a76529aa348361134154520
-
-#
-# Liferay App Version 4.0.1
-#
-
-app.artifacts-4.0.1=\
-	com.liferay.portal.search.elasticsearch.monitoring.web-1.0.21.jar
-
-app.change.log-4.0.1=LPS-105380 LPS-119196 LPS-122403 LPS-134628 LPS-134639 LPE-17313
-
-app.git.id-4.0.1=e41d1f2ad90e02707c80e6f023732f57cdf37cdb
+app.git.id-5.0.0=82c73e565d248e162bb86e36dc2bd2c8d11eec03

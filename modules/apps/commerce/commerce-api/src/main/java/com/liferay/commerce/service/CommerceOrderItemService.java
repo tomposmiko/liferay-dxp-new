@@ -67,8 +67,14 @@ public interface CommerceOrderItemService extends BaseService {
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.commerce.service.impl.CommerceOrderItemServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the commerce order item remote service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link CommerceOrderItemServiceUtil} if injection and service tracking are not available.
 	 */
 	public CommerceOrderItem addCommerceOrderItem(
-			long commerceOrderId, long cpInstanceId, int quantity,
-			int shippedQuantity, String json, CommerceContext commerceContext,
+			long commerceOrderId, long cpInstanceId, String json, int quantity,
+			int shippedQuantity, CommerceContext commerceContext,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	public CommerceOrderItem addOrUpdateCommerceOrderItem(
+			long commerceOrderId, long cpInstanceId, String json, int quantity,
+			int shippedQuantity, CommerceContext commerceContext,
 			ServiceContext serviceContext)
 		throws PortalException;
 
@@ -87,7 +93,7 @@ public interface CommerceOrderItemService extends BaseService {
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceOrderItem fetchByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
+			String externalReferenceCode, long companyId)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -149,21 +155,27 @@ public interface CommerceOrderItemService extends BaseService {
 	 */
 	public String getOSGiServiceIdentifier();
 
+	public CommerceOrderItem importCommerceOrderItem(
+			long commerceOrderId, long cpInstanceId,
+			String cpMeasurementUnitKey, BigDecimal decimalQuantity,
+			int shippedQuantity, ServiceContext serviceContext)
+		throws PortalException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public BaseModelSearchResult<CommerceOrderItem> search(
+	public BaseModelSearchResult<CommerceOrderItem> searchCommerceOrderItems(
 			long commerceOrderId, long parentCommerceOrderItemId,
 			String keywords, int start, int end, Sort sort)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public BaseModelSearchResult<CommerceOrderItem> search(
+	public BaseModelSearchResult<CommerceOrderItem> searchCommerceOrderItems(
 			long commerceOrderId, String keywords, int start, int end,
 			Sort sort)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public BaseModelSearchResult<CommerceOrderItem> search(
-			long commerceOrderId, String sku, String name, boolean andOperator,
+	public BaseModelSearchResult<CommerceOrderItem> searchCommerceOrderItems(
+			long commerceOrderId, String name, String sku, boolean andOperator,
 			int start, int end, Sort sort)
 		throws PortalException;
 
@@ -173,7 +185,12 @@ public interface CommerceOrderItemService extends BaseService {
 		throws PortalException;
 
 	public CommerceOrderItem updateCommerceOrderItem(
-			long commerceOrderItemId, int quantity, String json,
+			long commerceOrderItemId, long cpMeasurementUnitId, int quantity,
+			CommerceContext commerceContext, ServiceContext serviceContext)
+		throws PortalException;
+
+	public CommerceOrderItem updateCommerceOrderItem(
+			long commerceOrderItemId, String json, int quantity,
 			CommerceContext commerceContext, ServiceContext serviceContext)
 		throws PortalException;
 
@@ -182,13 +199,13 @@ public interface CommerceOrderItemService extends BaseService {
 		throws PortalException;
 
 	public CommerceOrderItem updateCommerceOrderItemInfo(
-			long commerceOrderItemId, String deliveryGroup,
-			long shippingAddressId, String printedNote)
+			long commerceOrderItemId, long shippingAddressId,
+			String deliveryGroup, String printedNote)
 		throws PortalException;
 
 	public CommerceOrderItem updateCommerceOrderItemInfo(
-			long commerceOrderItemId, String deliveryGroup,
-			long shippingAddressId, String printedNote,
+			long commerceOrderItemId, long shippingAddressId,
+			String deliveryGroup, String printedNote,
 			int requestedDeliveryDateMonth, int requestedDeliveryDateDay,
 			int requestedDeliveryDateYear)
 		throws PortalException;
@@ -206,29 +223,28 @@ public interface CommerceOrderItemService extends BaseService {
 		throws PortalException;
 
 	public CommerceOrderItem updateCommerceOrderItemPrices(
-			long commerceOrderItemId, BigDecimal unitPrice,
-			BigDecimal promoPrice, BigDecimal discountAmount,
-			BigDecimal finalPrice, BigDecimal discountPercentageLevel1,
+			long commerceOrderItemId, BigDecimal discountAmount,
+			BigDecimal discountPercentageLevel1,
 			BigDecimal discountPercentageLevel2,
 			BigDecimal discountPercentageLevel3,
-			BigDecimal discountPercentageLevel4)
+			BigDecimal discountPercentageLevel4, BigDecimal finalPrice,
+			BigDecimal promoPrice, BigDecimal unitPrice)
 		throws PortalException;
 
 	public CommerceOrderItem updateCommerceOrderItemPrices(
-			long commerceOrderItemId, BigDecimal unitPrice,
-			BigDecimal promoPrice, BigDecimal discountAmount,
-			BigDecimal finalPrice, BigDecimal discountPercentageLevel1,
-			BigDecimal discountPercentageLevel2,
-			BigDecimal discountPercentageLevel3,
-			BigDecimal discountPercentageLevel4,
-			BigDecimal unitPriceWithTaxAmount,
-			BigDecimal promoPriceWithTaxAmount,
+			long commerceOrderItemId, BigDecimal discountAmount,
 			BigDecimal discountAmountWithTaxAmount,
-			BigDecimal finalPriceWithTaxAmount,
+			BigDecimal discountPercentageLevel1,
 			BigDecimal discountPercentageLevel1WithTaxAmount,
+			BigDecimal discountPercentageLevel2,
 			BigDecimal discountPercentageLevel2WithTaxAmount,
+			BigDecimal discountPercentageLevel3,
 			BigDecimal discountPercentageLevel3WithTaxAmount,
-			BigDecimal discountPercentageLevel4WithTaxAmount)
+			BigDecimal discountPercentageLevel4,
+			BigDecimal discountPercentageLevel4WithTaxAmount,
+			BigDecimal finalPrice, BigDecimal finalPriceWithTaxAmount,
+			BigDecimal promoPrice, BigDecimal promoPriceWithTaxAmount,
+			BigDecimal unitPrice, BigDecimal unitPriceWithTaxAmount)
 		throws PortalException;
 
 	/**
@@ -240,17 +256,16 @@ public interface CommerceOrderItemService extends BaseService {
 		throws PortalException;
 
 	public CommerceOrderItem updateCommerceOrderItemUnitPrice(
-			long commerceOrderItemId, BigDecimal unitPrice, int quantity)
+			long commerceOrderItemId, BigDecimal decimalQuantity,
+			BigDecimal unitPrice)
+		throws PortalException;
+
+	public CommerceOrderItem updateCommerceOrderItemUnitPrice(
+			long commerceOrderItemId, int quantity, BigDecimal unitPrice)
 		throws PortalException;
 
 	public CommerceOrderItem updateCustomFields(
 			long commerceOrderItemId, ServiceContext serviceContext)
-		throws PortalException;
-
-	public CommerceOrderItem upsertCommerceOrderItem(
-			long commerceOrderId, long cpInstanceId, int quantity,
-			int shippedQuantity, String json, CommerceContext commerceContext,
-			ServiceContext serviceContext)
 		throws PortalException;
 
 }

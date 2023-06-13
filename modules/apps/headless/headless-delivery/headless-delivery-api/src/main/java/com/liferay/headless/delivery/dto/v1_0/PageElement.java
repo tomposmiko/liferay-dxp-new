@@ -48,7 +48,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("PageElement")
+@GraphQLName(description = "Represents a Page element.", value = "PageElement")
 @JsonFilter("Liferay.Vulcan")
 @XmlRootElement(name = "PageElement")
 public class PageElement implements Serializable {
@@ -61,7 +61,7 @@ public class PageElement implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(PageElement.class, json);
 	}
 
-	@Schema
+	@Schema(description = "The page element's definition.")
 	@Valid
 	public Object getDefinition() {
 		return definition;
@@ -86,11 +86,11 @@ public class PageElement implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The page element's definition.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Object definition;
 
-	@Schema
+	@Schema(description = "A list of the page elements this page element has.")
 	@Valid
 	public PageElement[] getPageElements() {
 		return pageElements;
@@ -115,11 +115,15 @@ public class PageElement implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A list of the page elements this page element has."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected PageElement[] pageElements;
 
-	@Schema
+	@Schema(
+		description = "The page element's type (collection, collection item,, column, drop zone, fragment, fragment drop zone, root, row, section or widget)."
+	)
 	@Valid
 	public Type getType() {
 		return type;
@@ -151,7 +155,9 @@ public class PageElement implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The page element's type (collection, collection item,, column, drop zone, fragment, fragment drop zone, root, row, section or widget)."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Type type;
 

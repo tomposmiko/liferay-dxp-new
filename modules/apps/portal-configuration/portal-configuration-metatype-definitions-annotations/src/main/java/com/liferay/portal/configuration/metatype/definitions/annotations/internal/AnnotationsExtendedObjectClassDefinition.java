@@ -150,6 +150,9 @@ public class AnnotationsExtendedObjectClassDefinition
 				_objectClassDefinition.getID());
 		}
 		catch (ClassNotFoundException classNotFoundException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(classNotFoundException, classNotFoundException);
+			}
 		}
 	}
 
@@ -204,8 +207,17 @@ public class AnnotationsExtendedObjectClassDefinition
 			"generateUI",
 			Boolean.toString(extendedObjectClassDefinition.generateUI())
 		).put(
+			"liferayLearnMessageKey",
+			extendedObjectClassDefinition.liferayLearnMessageKey()
+		).put(
+			"liferayLearnMessageResource",
+			extendedObjectClassDefinition.liferayLearnMessageResource()
+		).put(
 			"name-arguments",
 			StringUtil.merge(extendedObjectClassDefinition.nameArguments())
+		).put(
+			"strictScope",
+			Boolean.toString(extendedObjectClassDefinition.strictScope())
 		).build();
 
 		ExtendedObjectClassDefinition.Scope scope =

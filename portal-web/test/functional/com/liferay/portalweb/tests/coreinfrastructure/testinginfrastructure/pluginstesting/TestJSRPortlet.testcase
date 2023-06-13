@@ -11,16 +11,16 @@ definition {
 	}
 
 	tearDown {
-		Page.tearDownCP();
+		PagesAdmin.tearDownCP();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewJSR {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Test JSR 286 PLT.26.6 Page");
+		PagesAdmin.addPublicPage(pageName = "Test JSR 286 PLT.26.6 Page");
 
 		Navigator.gotoPage(pageName = "Test JSR 286 PLT.26.6 Page");
 

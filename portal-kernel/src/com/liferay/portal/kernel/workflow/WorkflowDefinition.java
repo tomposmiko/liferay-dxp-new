@@ -17,6 +17,7 @@ package com.liferay.portal.kernel.workflow;
 import java.io.InputStream;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +33,10 @@ public interface WorkflowDefinition extends WorkflowModel {
 	}
 
 	public String getContent();
+
+	public default Date getCreateDate() {
+		return null;
+	}
 
 	public default String getDescription() {
 		return "";
@@ -64,6 +69,10 @@ public interface WorkflowDefinition extends WorkflowModel {
 	public default long getWorkflowDefinitionId() {
 		return 0;
 	}
+
+	public List<WorkflowNode> getWorkflowNodes();
+
+	public List<WorkflowTransition> getWorkflowTransitions();
 
 	public boolean isActive();
 

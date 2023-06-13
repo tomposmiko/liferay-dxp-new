@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
 import com.liferay.portal.kernel.settings.SystemSettingsLocator;
@@ -92,7 +93,7 @@ public class CommerceCurrencyLocalServiceImpl
 		if (formatPatternMap.isEmpty()) {
 			formatPatternMap.put(
 				user.getLocale(),
-				CommerceCurrencyConstants.DEFAULT_FORMAT_PATTERN);
+				CommerceCurrencyConstants.DECIMAL_FORMAT_PATTERN);
 		}
 
 		if (Validator.isNull(roundingMode)) {
@@ -264,14 +265,11 @@ public class CommerceCurrencyLocalServiceImpl
 					serviceContext.getLocale(), jsonObject.getString("name")
 				).build();
 
-				StringBundler sb = new StringBundler(3);
-
-				sb.append(symbol);
-				sb.append(StringPool.SPACE);
-				sb.append(CommerceCurrencyConstants.DEFAULT_FORMAT_PATTERN);
-
 				Map<Locale, String> formatPatternMap = HashMapBuilder.put(
-					serviceContext.getLocale(), sb.toString()
+					serviceContext.getLocale(),
+					StringBundler.concat(
+						symbol, StringPool.SPACE,
+						CommerceCurrencyConstants.DECIMAL_FORMAT_PATTERN)
 				).build();
 
 				RoundingMode roundingMode =
@@ -347,7 +345,7 @@ public class CommerceCurrencyLocalServiceImpl
 		if (formatPatternMap.isEmpty()) {
 			formatPatternMap.put(
 				serviceContext.getLocale(),
-				CommerceCurrencyConstants.DEFAULT_FORMAT_PATTERN);
+				CommerceCurrencyConstants.DECIMAL_FORMAT_PATTERN);
 		}
 
 		if (Validator.isNull(roundingMode)) {
@@ -436,25 +434,26 @@ public class CommerceCurrencyLocalServiceImpl
 
 	@Override
 	public void updateExchangeRates() throws PortalException {
-		long[] companyIds = ArrayUtil.toLongArray(
-			commerceCurrencyFinder.getCompanyIds());
+		_companyLocalService.forEachCompanyId(
+			companyId -> {
+				CommerceCurrencyConfiguration commerceCurrencyConfiguration =
+					_configurationProvider.getConfiguration(
+						CommerceCurrencyConfiguration.class,
+						new CompanyServiceSettingsLocator(
+							companyId,
+							CommerceCurrencyExchangeRateConstants.
+								SERVICE_NAME));
 
-		for (long companyId : companyIds) {
-			CommerceCurrencyConfiguration commerceCurrencyConfiguration =
-				_configurationProvider.getConfiguration(
-					CommerceCurrencyConfiguration.class,
-					new CompanyServiceSettingsLocator(
-						companyId,
-						CommerceCurrencyExchangeRateConstants.SERVICE_NAME));
+				if (commerceCurrencyConfiguration.enableAutoUpdate()) {
+					String defaultExchangeRateProviderKey =
+						commerceCurrencyConfiguration.
+							defaultExchangeRateProviderKey();
 
-			if (commerceCurrencyConfiguration.enableAutoUpdate()) {
-				String defaultExchangeRateProviderKey =
-					commerceCurrencyConfiguration.
-						defaultExchangeRateProviderKey();
-
-				_updateExchangeRates(companyId, defaultExchangeRateProviderKey);
-			}
-		}
+					_updateExchangeRates(
+						companyId, defaultExchangeRateProviderKey);
+				}
+			},
+			ArrayUtil.toLongArray(commerceCurrencyFinder.getCompanyIds()));
 	}
 
 	protected void validate(
@@ -462,13 +461,11 @@ public class CommerceCurrencyLocalServiceImpl
 			Map<Locale, String> nameMap, boolean primary)
 		throws PortalException {
 
-		Locale locale = LocaleUtil.getSiteDefault();
-
 		if (Validator.isNull(code)) {
 			throw new CommerceCurrencyCodeException();
 		}
 
-		String name = nameMap.get(locale);
+		String name = nameMap.get(LocaleUtil.getSiteDefault());
 
 		if (Validator.isNull(name)) {
 			throw new CommerceCurrencyNameException();
@@ -506,6 +503,9 @@ public class CommerceCurrencyLocalServiceImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommerceCurrencyLocalServiceImpl.class);
+
+	@ServiceReference(type = CompanyLocalService.class)
+	private CompanyLocalService _companyLocalService;
 
 	@ServiceReference(type = ConfigurationProvider.class)
 	private ConfigurationProvider _configurationProvider;

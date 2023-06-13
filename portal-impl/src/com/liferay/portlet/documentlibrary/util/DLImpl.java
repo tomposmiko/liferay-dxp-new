@@ -32,6 +32,7 @@ import com.liferay.document.library.kernel.util.comparator.RepositoryModelModifi
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelReadCountComparator;
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelSizeComparator;
 import com.liferay.document.library.kernel.util.comparator.RepositoryModelTitleComparator;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -239,14 +240,14 @@ public class DLImpl implements DL {
 		String portletId = PortletProviderUtil.getPortletId(
 			FileEntry.class.getName(), PortletProvider.Action.MANAGE);
 
-		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-			portletRequest, portletId, PortletRequest.RENDER_PHASE);
-
-		portletURL.setParameter(
-			"mvcRenderCommandName", "/document_library/view_file_entry");
-		portletURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
-
-		return portletURL.toString();
+		return PortletURLBuilder.create(
+			PortalUtil.getControlPanelPortletURL(
+				portletRequest, portletId, PortletRequest.RENDER_PHASE)
+		).setMVCRenderCommandName(
+			"/document_library/view_file_entry"
+		).setParameter(
+			"fileEntryId", fileEntryId
+		).buildString();
 	}
 
 	/**
@@ -461,7 +462,8 @@ public class DLImpl implements DL {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						"Documents and Media search index is stale and " +
-							"contains file entry " + fileEntryId);
+							"contains file entry " + fileEntryId,
+						exception);
 				}
 			}
 		}
@@ -473,15 +475,10 @@ public class DLImpl implements DL {
 	public String getFileEntryImage(
 		FileEntry fileEntry, ThemeDisplay themeDisplay) {
 
-		StringBundler sb = new StringBundler(5);
-
-		sb.append("<img src=\"");
-		sb.append(themeDisplay.getPathThemeImages());
-		sb.append("/file_system/small/");
-		sb.append(fileEntry.getIcon());
-		sb.append(".png\" style=\"border-width: 0; text-align: left;\">");
-
-		return sb.toString();
+		return StringBundler.concat(
+			"<img src=\"", themeDisplay.getPathThemeImages(),
+			"/file_system/small/", fileEntry.getIcon(),
+			".png\" style=\"border-width: 0; text-align: left;\">");
 	}
 
 	@Override
@@ -737,15 +734,8 @@ public class DLImpl implements DL {
 			return StringBundler.concat(id, StringPool.PERIOD, version);
 		}
 
-		StringBundler sb = new StringBundler(5);
-
-		sb.append(id);
-		sb.append(StringPool.PERIOD);
-		sb.append(version);
-		sb.append(StringPool.PERIOD);
-		sb.append(languageId);
-
-		return sb.toString();
+		return StringBundler.concat(
+			id, StringPool.PERIOD, version, StringPool.PERIOD, languageId);
 	}
 
 	/**
@@ -864,22 +854,23 @@ public class DLImpl implements DL {
 	public String getUniqueFileName(
 		long groupId, long folderId, String fileName) {
 
-		String uniqueFileName = fileName;
+		String uniqueFileTitle = FileUtil.stripExtension(fileName);
+
+		String extension = FileUtil.getExtension(fileName);
 
 		for (int i = 1;; i++) {
-			try {
-				DLAppLocalServiceUtil.getFileEntry(
-					groupId, folderId, uniqueFileName);
+			if (!_existsFileEntryByTitle(groupId, folderId, uniqueFileTitle) &&
+				!_existsFileEntryByFileName(
+					groupId, extension, folderId, uniqueFileTitle)) {
 
-				uniqueFileName = FileUtil.appendParentheticalSuffix(
-					fileName, String.valueOf(i));
-			}
-			catch (Exception exception) {
 				break;
 			}
+
+			uniqueFileTitle = FileUtil.appendParentheticalSuffix(
+				FileUtil.stripExtension(fileName), String.valueOf(i));
 		}
 
-		return uniqueFileName;
+		return getTitleWithExtension(uniqueFileTitle, extension);
 	}
 
 	/**
@@ -983,7 +974,7 @@ public class DLImpl implements DL {
 
 		if (fileEntry != null) {
 			sb.append(StringPool.SLASH);
-			sb.append(DLWebDAVUtil.escapeURLTitle(fileEntry.getTitle()));
+			sb.append(DLWebDAVUtil.escapeURLTitle(fileEntry.getFileName()));
 		}
 
 		webDavURLSB.append(sb.toString());
@@ -1181,6 +1172,42 @@ public class DLImpl implements DL {
 		for (String extension : extensions) {
 			_genericNames.put(extension, genericName);
 		}
+	}
+
+	private boolean _existsFileEntryByFileName(
+		long groupId, String extension, long folderId, String title) {
+
+		try {
+			DLAppLocalServiceUtil.getFileEntryByFileName(
+				groupId, folderId, getTitleWithExtension(title, extension));
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean _existsFileEntryByTitle(
+		long groupId, long folderId, String uniqueFileTitle) {
+
+		try {
+			DLAppLocalServiceUtil.getFileEntry(
+				groupId, folderId, uniqueFileTitle);
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
+			return false;
+		}
+
+		return true;
 	}
 
 	private static final String _DEFAULT_FILE_ICON = "page";

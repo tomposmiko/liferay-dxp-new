@@ -14,8 +14,8 @@
 
 package com.liferay.headless.delivery.internal.odata.entity.v1_0;
 
+import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
-import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.storage.constants.FieldConstants;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
@@ -81,24 +81,26 @@ public class EntityFieldsProvider {
 			return null;
 		}
 
-		if (Objects.equals(ddmFormField.getType(), DDMFormFieldType.CHECKBOX)) {
+		if (Objects.equals(
+				ddmFormField.getType(), DDMFormFieldTypeConstants.CHECKBOX)) {
+
 			return new BooleanEntityField(
-				ddmFormField.getName(),
+				ddmFormField.getFieldReference(),
 				locale -> _toFilterableOrSortableFieldName(
-					ddmStructure.getStructureId(), ddmFormField.getName(),
-					locale, "String"));
+					ddmStructure.getStructureId(),
+					ddmFormField.getFieldReference(), locale, "String"));
 		}
 		else if (Objects.equals(
 					ddmFormField.getDataType(), FieldConstants.DATE)) {
 
 			return new DateEntityField(
-				ddmFormField.getName(),
+				ddmFormField.getFieldReference(),
 				locale -> _toFilterableOrSortableFieldName(
-					ddmStructure.getStructureId(), ddmFormField.getName(),
-					locale, "String"),
+					ddmStructure.getStructureId(),
+					ddmFormField.getFieldReference(), locale, "String"),
 				locale -> _toFilterableOrSortableFieldName(
-					ddmStructure.getStructureId(), ddmFormField.getName(),
-					locale, "String"),
+					ddmStructure.getStructureId(),
+					ddmFormField.getFieldReference(), locale, "String"),
 				this::_toFieldValue);
 		}
 		else if (Objects.equals(
@@ -107,10 +109,10 @@ public class EntityFieldsProvider {
 					 ddmFormField.getDataType(), FieldConstants.NUMBER)) {
 
 			return new DoubleEntityField(
-				ddmFormField.getName(),
+				ddmFormField.getFieldReference(),
 				locale -> _toFilterableOrSortableFieldName(
-					ddmStructure.getStructureId(), ddmFormField.getName(),
-					locale, "Number"));
+					ddmStructure.getStructureId(),
+					ddmFormField.getFieldReference(), locale, "Number"));
 		}
 		else if (Objects.equals(
 					ddmFormField.getDataType(), FieldConstants.INTEGER) ||
@@ -118,27 +120,27 @@ public class EntityFieldsProvider {
 					 ddmFormField.getDataType(), FieldConstants.LONG)) {
 
 			return new IntegerEntityField(
-				ddmFormField.getName(),
+				ddmFormField.getFieldReference(),
 				locale -> _toFilterableOrSortableFieldName(
-					ddmStructure.getStructureId(), ddmFormField.getName(),
-					locale, "Number"));
+					ddmStructure.getStructureId(),
+					ddmFormField.getFieldReference(), locale, "Number"));
 		}
 		else if (Objects.equals(
-					ddmFormField.getDataType(), DDMFormFieldType.RADIO) ||
+					ddmFormField.getDataType(),
+					DDMFormFieldTypeConstants.RADIO) ||
 				 (Objects.equals(ddmFormField.getIndexType(), "keyword") &&
 				  (Objects.equals(
 					  ddmFormField.getType(),
-					  DDMFormFieldType.CHECKBOX_MULTIPLE) ||
+					  DDMFormFieldTypeConstants.SELECT) ||
 				   Objects.equals(
-					   ddmFormField.getType(), DDMFormFieldType.SELECT) ||
-				   Objects.equals(
-					   ddmFormField.getType(), DDMFormFieldType.TEXT)))) {
+					   ddmFormField.getType(),
+					   DDMFormFieldTypeConstants.TEXT)))) {
 
 			return new StringEntityField(
-				ddmFormField.getName(),
+				ddmFormField.getFieldReference(),
 				locale -> _toFilterableOrSortableFieldName(
-					ddmStructure.getStructureId(), ddmFormField.getName(),
-					locale, "String"));
+					ddmStructure.getStructureId(),
+					ddmFormField.getFieldReference(), locale, "String"));
 		}
 
 		return null;
@@ -162,11 +164,12 @@ public class EntityFieldsProvider {
 	}
 
 	private String _toFilterableOrSortableFieldName(
-		long ddmStructureId, String fieldName, Locale locale, String type) {
+		long ddmStructureId, String fieldReference, Locale locale,
+		String type) {
 
 		return Field.getSortableFieldName(
 			StringBundler.concat(
-				_ddmIndexer.encodeName(ddmStructureId, fieldName, locale),
+				_ddmIndexer.encodeName(ddmStructureId, fieldReference, locale),
 				StringPool.UNDERLINE, type));
 	}
 

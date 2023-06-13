@@ -110,8 +110,8 @@ public class GroupFinderTest {
 		_resourcePermission = ResourcePermissionTestUtil.addResourcePermission(
 			_arbitraryResourceAction.getBitwiseValue(),
 			_arbitraryResourceAction.getName(),
-			String.valueOf(withoutActionIdGroup.getGroupId()),
-			_role.getRoleId(), ResourceConstants.SCOPE_GROUP);
+			String.valueOf(withActionIdGroup.getGroupId()), _role.getRoleId(),
+			ResourceConstants.SCOPE_GROUP);
 
 		List<Group> groups = _groupFinder.findByC_C_PG_N_D(
 			TestPropsValues.getCompanyId(),

@@ -144,9 +144,7 @@
 	);
 </@liferay_aui.script>
 
-<#macro getAbstract
-	asset
->
+<#macro getAbstract asset>
 	<div class="asset-entry-abstract" id="<@portlet.namespace />assetEntryAbstract">
 		<#assign
 			showEditURL = paramUtil.getBoolean(renderRequest, "showEditURL", true)

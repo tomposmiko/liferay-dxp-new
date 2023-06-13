@@ -35,8 +35,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -407,6 +405,7 @@ public abstract class StyleBookEntryLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -425,6 +424,7 @@ public abstract class StyleBookEntryLocalServiceBaseImpl
 			(StyleBookEntry)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<StyleBookEntry> getBasePersistence() {
 		return styleBookEntryPersistence;
 	}
@@ -472,7 +472,7 @@ public abstract class StyleBookEntryLocalServiceBaseImpl
 	 * <strong>Important:</strong> Inspect StyleBookEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
 	 * </p>
 	 *
-	 * @param draftStyleBookEntry the style book entry
+	 * @param styleBookEntry the style book entry
 	 * @return the style book entry that was updated
 	 */
 	@Indexable(type = IndexableType.REINDEX)
@@ -999,13 +999,6 @@ public abstract class StyleBookEntryLocalServiceBaseImpl
 		counterLocalService;
 
 	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@Reference
 	protected StyleBookEntryVersionPersistence styleBookEntryVersionPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		StyleBookEntryLocalServiceBaseImpl.class);
 
 }

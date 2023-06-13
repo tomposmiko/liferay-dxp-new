@@ -17,7 +17,6 @@ package com.liferay.oauth2.provider.service.base;
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalServiceUtil;
-import com.liferay.oauth2.provider.service.persistence.OAuth2AuthorizationFinder;
 import com.liferay.oauth2.provider.service.persistence.OAuth2AuthorizationPersistence;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantFinder;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPersistence;
@@ -35,8 +34,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -316,6 +313,7 @@ public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -334,6 +332,7 @@ public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 			(OAuth2ScopeGrant)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<OAuth2ScopeGrant> getBasePersistence() {
 		return oAuth2ScopeGrantPersistence;
 	}
@@ -660,11 +659,5 @@ public abstract class OAuth2ScopeGrantLocalServiceBaseImpl
 
 	@Reference
 	protected OAuth2AuthorizationPersistence oAuth2AuthorizationPersistence;
-
-	@Reference
-	protected OAuth2AuthorizationFinder oAuth2AuthorizationFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		OAuth2ScopeGrantLocalServiceBaseImpl.class);
 
 }

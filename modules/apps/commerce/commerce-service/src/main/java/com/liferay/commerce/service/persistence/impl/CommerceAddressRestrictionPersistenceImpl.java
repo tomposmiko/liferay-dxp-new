@@ -22,7 +22,6 @@ import com.liferay.commerce.model.impl.CommerceAddressRestrictionModelImpl;
 import com.liferay.commerce.service.persistence.CommerceAddressRestrictionPersistence;
 import com.liferay.commerce.service.persistence.CommerceAddressRestrictionUtil;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -32,13 +31,11 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -51,16 +48,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * The persistence implementation for the commerce address restriction service.
@@ -93,73 +83,70 @@ public class CommerceAddressRestrictionPersistenceImpl
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
-	private FinderPath _finderPathWithPaginationFindByCommerceCountryId;
-	private FinderPath _finderPathWithoutPaginationFindByCommerceCountryId;
-	private FinderPath _finderPathCountByCommerceCountryId;
+	private FinderPath _finderPathWithPaginationFindByCountryId;
+	private FinderPath _finderPathWithoutPaginationFindByCountryId;
+	private FinderPath _finderPathCountByCountryId;
 
 	/**
-	 * Returns all the commerce address restrictions where commerceCountryId = &#63;.
+	 * Returns all the commerce address restrictions where countryId = &#63;.
 	 *
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 * @return the matching commerce address restrictions
 	 */
 	@Override
-	public List<CommerceAddressRestriction> findByCommerceCountryId(
-		long commerceCountryId) {
-
-		return findByCommerceCountryId(
-			commerceCountryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	public List<CommerceAddressRestriction> findByCountryId(long countryId) {
+		return findByCountryId(
+			countryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
 	/**
-	 * Returns a range of all the commerce address restrictions where commerceCountryId = &#63;.
+	 * Returns a range of all the commerce address restrictions where countryId = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceAddressRestrictionModelImpl</code>.
 	 * </p>
 	 *
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 * @param start the lower bound of the range of commerce address restrictions
 	 * @param end the upper bound of the range of commerce address restrictions (not inclusive)
 	 * @return the range of matching commerce address restrictions
 	 */
 	@Override
-	public List<CommerceAddressRestriction> findByCommerceCountryId(
-		long commerceCountryId, int start, int end) {
+	public List<CommerceAddressRestriction> findByCountryId(
+		long countryId, int start, int end) {
 
-		return findByCommerceCountryId(commerceCountryId, start, end, null);
+		return findByCountryId(countryId, start, end, null);
 	}
 
 	/**
-	 * Returns an ordered range of all the commerce address restrictions where commerceCountryId = &#63;.
+	 * Returns an ordered range of all the commerce address restrictions where countryId = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceAddressRestrictionModelImpl</code>.
 	 * </p>
 	 *
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 * @param start the lower bound of the range of commerce address restrictions
 	 * @param end the upper bound of the range of commerce address restrictions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching commerce address restrictions
 	 */
 	@Override
-	public List<CommerceAddressRestriction> findByCommerceCountryId(
-		long commerceCountryId, int start, int end,
+	public List<CommerceAddressRestriction> findByCountryId(
+		long countryId, int start, int end,
 		OrderByComparator<CommerceAddressRestriction> orderByComparator) {
 
-		return findByCommerceCountryId(
-			commerceCountryId, start, end, orderByComparator, true);
+		return findByCountryId(countryId, start, end, orderByComparator, true);
 	}
 
 	/**
-	 * Returns an ordered range of all the commerce address restrictions where commerceCountryId = &#63;.
+	 * Returns an ordered range of all the commerce address restrictions where countryId = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>CommerceAddressRestrictionModelImpl</code>.
 	 * </p>
 	 *
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 * @param start the lower bound of the range of commerce address restrictions
 	 * @param end the upper bound of the range of commerce address restrictions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -167,8 +154,8 @@ public class CommerceAddressRestrictionPersistenceImpl
 	 * @return the ordered range of matching commerce address restrictions
 	 */
 	@Override
-	public List<CommerceAddressRestriction> findByCommerceCountryId(
-		long commerceCountryId, int start, int end,
+	public List<CommerceAddressRestriction> findByCountryId(
+		long countryId, int start, int end,
 		OrderByComparator<CommerceAddressRestriction> orderByComparator,
 		boolean useFinderCache) {
 
@@ -179,15 +166,14 @@ public class CommerceAddressRestrictionPersistenceImpl
 			(orderByComparator == null)) {
 
 			if (useFinderCache) {
-				finderPath =
-					_finderPathWithoutPaginationFindByCommerceCountryId;
-				finderArgs = new Object[] {commerceCountryId};
+				finderPath = _finderPathWithoutPaginationFindByCountryId;
+				finderArgs = new Object[] {countryId};
 			}
 		}
 		else if (useFinderCache) {
-			finderPath = _finderPathWithPaginationFindByCommerceCountryId;
+			finderPath = _finderPathWithPaginationFindByCountryId;
 			finderArgs = new Object[] {
-				commerceCountryId, start, end, orderByComparator
+				countryId, start, end, orderByComparator
 			};
 		}
 
@@ -195,14 +181,14 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceAddressRestriction>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceAddressRestriction commerceAddressRestriction :
 						list) {
 
-					if (commerceCountryId !=
-							commerceAddressRestriction.getCommerceCountryId()) {
+					if (countryId !=
+							commerceAddressRestriction.getCountryId()) {
 
 						list = null;
 
@@ -225,7 +211,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 			sb.append(_SQL_SELECT_COMMERCEADDRESSRESTRICTION_WHERE);
 
-			sb.append(_FINDER_COLUMN_COMMERCECOUNTRYID_COMMERCECOUNTRYID_2);
+			sb.append(_FINDER_COLUMN_COUNTRYID_COUNTRYID_2);
 
 			if (orderByComparator != null) {
 				appendOrderByComparator(
@@ -246,7 +232,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
-				queryPos.add(commerceCountryId);
+				queryPos.add(countryId);
 
 				list = (List<CommerceAddressRestriction>)QueryUtil.list(
 					query, getDialect(), start, end);
@@ -269,22 +255,21 @@ public class CommerceAddressRestrictionPersistenceImpl
 	}
 
 	/**
-	 * Returns the first commerce address restriction in the ordered set where commerceCountryId = &#63;.
+	 * Returns the first commerce address restriction in the ordered set where countryId = &#63;.
 	 *
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching commerce address restriction
 	 * @throws NoSuchAddressRestrictionException if a matching commerce address restriction could not be found
 	 */
 	@Override
-	public CommerceAddressRestriction findByCommerceCountryId_First(
-			long commerceCountryId,
+	public CommerceAddressRestriction findByCountryId_First(
+			long countryId,
 			OrderByComparator<CommerceAddressRestriction> orderByComparator)
 		throws NoSuchAddressRestrictionException {
 
 		CommerceAddressRestriction commerceAddressRestriction =
-			fetchByCommerceCountryId_First(
-				commerceCountryId, orderByComparator);
+			fetchByCountryId_First(countryId, orderByComparator);
 
 		if (commerceAddressRestriction != null) {
 			return commerceAddressRestriction;
@@ -294,8 +279,8 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-		sb.append("commerceCountryId=");
-		sb.append(commerceCountryId);
+		sb.append("countryId=");
+		sb.append(countryId);
 
 		sb.append("}");
 
@@ -303,19 +288,19 @@ public class CommerceAddressRestrictionPersistenceImpl
 	}
 
 	/**
-	 * Returns the first commerce address restriction in the ordered set where commerceCountryId = &#63;.
+	 * Returns the first commerce address restriction in the ordered set where countryId = &#63;.
 	 *
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching commerce address restriction, or <code>null</code> if a matching commerce address restriction could not be found
 	 */
 	@Override
-	public CommerceAddressRestriction fetchByCommerceCountryId_First(
-		long commerceCountryId,
+	public CommerceAddressRestriction fetchByCountryId_First(
+		long countryId,
 		OrderByComparator<CommerceAddressRestriction> orderByComparator) {
 
-		List<CommerceAddressRestriction> list = findByCommerceCountryId(
-			commerceCountryId, 0, 1, orderByComparator);
+		List<CommerceAddressRestriction> list = findByCountryId(
+			countryId, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -325,21 +310,21 @@ public class CommerceAddressRestrictionPersistenceImpl
 	}
 
 	/**
-	 * Returns the last commerce address restriction in the ordered set where commerceCountryId = &#63;.
+	 * Returns the last commerce address restriction in the ordered set where countryId = &#63;.
 	 *
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching commerce address restriction
 	 * @throws NoSuchAddressRestrictionException if a matching commerce address restriction could not be found
 	 */
 	@Override
-	public CommerceAddressRestriction findByCommerceCountryId_Last(
-			long commerceCountryId,
+	public CommerceAddressRestriction findByCountryId_Last(
+			long countryId,
 			OrderByComparator<CommerceAddressRestriction> orderByComparator)
 		throws NoSuchAddressRestrictionException {
 
 		CommerceAddressRestriction commerceAddressRestriction =
-			fetchByCommerceCountryId_Last(commerceCountryId, orderByComparator);
+			fetchByCountryId_Last(countryId, orderByComparator);
 
 		if (commerceAddressRestriction != null) {
 			return commerceAddressRestriction;
@@ -349,8 +334,8 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
 
-		sb.append("commerceCountryId=");
-		sb.append(commerceCountryId);
+		sb.append("countryId=");
+		sb.append(countryId);
 
 		sb.append("}");
 
@@ -358,25 +343,25 @@ public class CommerceAddressRestrictionPersistenceImpl
 	}
 
 	/**
-	 * Returns the last commerce address restriction in the ordered set where commerceCountryId = &#63;.
+	 * Returns the last commerce address restriction in the ordered set where countryId = &#63;.
 	 *
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching commerce address restriction, or <code>null</code> if a matching commerce address restriction could not be found
 	 */
 	@Override
-	public CommerceAddressRestriction fetchByCommerceCountryId_Last(
-		long commerceCountryId,
+	public CommerceAddressRestriction fetchByCountryId_Last(
+		long countryId,
 		OrderByComparator<CommerceAddressRestriction> orderByComparator) {
 
-		int count = countByCommerceCountryId(commerceCountryId);
+		int count = countByCountryId(countryId);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<CommerceAddressRestriction> list = findByCommerceCountryId(
-			commerceCountryId, count - 1, count, orderByComparator);
+		List<CommerceAddressRestriction> list = findByCountryId(
+			countryId, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -386,17 +371,17 @@ public class CommerceAddressRestrictionPersistenceImpl
 	}
 
 	/**
-	 * Returns the commerce address restrictions before and after the current commerce address restriction in the ordered set where commerceCountryId = &#63;.
+	 * Returns the commerce address restrictions before and after the current commerce address restriction in the ordered set where countryId = &#63;.
 	 *
 	 * @param commerceAddressRestrictionId the primary key of the current commerce address restriction
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next commerce address restriction
 	 * @throws NoSuchAddressRestrictionException if a commerce address restriction with the primary key could not be found
 	 */
 	@Override
-	public CommerceAddressRestriction[] findByCommerceCountryId_PrevAndNext(
-			long commerceAddressRestrictionId, long commerceCountryId,
+	public CommerceAddressRestriction[] findByCountryId_PrevAndNext(
+			long commerceAddressRestrictionId, long countryId,
 			OrderByComparator<CommerceAddressRestriction> orderByComparator)
 		throws NoSuchAddressRestrictionException {
 
@@ -411,14 +396,14 @@ public class CommerceAddressRestrictionPersistenceImpl
 			CommerceAddressRestriction[] array =
 				new CommerceAddressRestrictionImpl[3];
 
-			array[0] = getByCommerceCountryId_PrevAndNext(
-				session, commerceAddressRestriction, commerceCountryId,
+			array[0] = getByCountryId_PrevAndNext(
+				session, commerceAddressRestriction, countryId,
 				orderByComparator, true);
 
 			array[1] = commerceAddressRestriction;
 
-			array[2] = getByCommerceCountryId_PrevAndNext(
-				session, commerceAddressRestriction, commerceCountryId,
+			array[2] = getByCountryId_PrevAndNext(
+				session, commerceAddressRestriction, countryId,
 				orderByComparator, false);
 
 			return array;
@@ -431,9 +416,9 @@ public class CommerceAddressRestrictionPersistenceImpl
 		}
 	}
 
-	protected CommerceAddressRestriction getByCommerceCountryId_PrevAndNext(
+	protected CommerceAddressRestriction getByCountryId_PrevAndNext(
 		Session session, CommerceAddressRestriction commerceAddressRestriction,
-		long commerceCountryId,
+		long countryId,
 		OrderByComparator<CommerceAddressRestriction> orderByComparator,
 		boolean previous) {
 
@@ -450,7 +435,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 		sb.append(_SQL_SELECT_COMMERCEADDRESSRESTRICTION_WHERE);
 
-		sb.append(_FINDER_COLUMN_COMMERCECOUNTRYID_COMMERCECOUNTRYID_2);
+		sb.append(_FINDER_COLUMN_COUNTRYID_COUNTRYID_2);
 
 		if (orderByComparator != null) {
 			String[] orderByConditionFields =
@@ -521,7 +506,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 		QueryPos queryPos = QueryPos.getInstance(query);
 
-		queryPos.add(commerceCountryId);
+		queryPos.add(countryId);
 
 		if (orderByComparator != null) {
 			for (Object orderByConditionValue :
@@ -543,41 +528,40 @@ public class CommerceAddressRestrictionPersistenceImpl
 	}
 
 	/**
-	 * Removes all the commerce address restrictions where commerceCountryId = &#63; from the database.
+	 * Removes all the commerce address restrictions where countryId = &#63; from the database.
 	 *
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 */
 	@Override
-	public void removeByCommerceCountryId(long commerceCountryId) {
+	public void removeByCountryId(long countryId) {
 		for (CommerceAddressRestriction commerceAddressRestriction :
-				findByCommerceCountryId(
-					commerceCountryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-					null)) {
+				findByCountryId(
+					countryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 
 			remove(commerceAddressRestriction);
 		}
 	}
 
 	/**
-	 * Returns the number of commerce address restrictions where commerceCountryId = &#63;.
+	 * Returns the number of commerce address restrictions where countryId = &#63;.
 	 *
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 * @return the number of matching commerce address restrictions
 	 */
 	@Override
-	public int countByCommerceCountryId(long commerceCountryId) {
-		FinderPath finderPath = _finderPathCountByCommerceCountryId;
+	public int countByCountryId(long countryId) {
+		FinderPath finderPath = _finderPathCountByCountryId;
 
-		Object[] finderArgs = new Object[] {commerceCountryId};
+		Object[] finderArgs = new Object[] {countryId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
 
 			sb.append(_SQL_COUNT_COMMERCEADDRESSRESTRICTION_WHERE);
 
-			sb.append(_FINDER_COLUMN_COMMERCECOUNTRYID_COMMERCECOUNTRYID_2);
+			sb.append(_FINDER_COLUMN_COUNTRYID_COUNTRYID_2);
 
 			String sql = sb.toString();
 
@@ -590,7 +574,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 				QueryPos queryPos = QueryPos.getInstance(query);
 
-				queryPos.add(commerceCountryId);
+				queryPos.add(countryId);
 
 				count = (Long)query.uniqueResult();
 
@@ -607,9 +591,8 @@ public class CommerceAddressRestrictionPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String
-		_FINDER_COLUMN_COMMERCECOUNTRYID_COMMERCECOUNTRYID_2 =
-			"commerceAddressRestriction.commerceCountryId = ?";
+	private static final String _FINDER_COLUMN_COUNTRYID_COUNTRYID_2 =
+		"commerceAddressRestriction.countryId = ?";
 
 	private FinderPath _finderPathWithPaginationFindByC_C;
 	private FinderPath _finderPathWithoutPaginationFindByC_C;
@@ -716,7 +699,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceAddressRestriction>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceAddressRestriction commerceAddressRestriction :
@@ -1112,7 +1095,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {classNameId, classPK};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1163,21 +1146,21 @@ public class CommerceAddressRestrictionPersistenceImpl
 	private FinderPath _finderPathCountByC_C_C;
 
 	/**
-	 * Returns the commerce address restriction where classNameId = &#63; and classPK = &#63; and commerceCountryId = &#63; or throws a <code>NoSuchAddressRestrictionException</code> if it could not be found.
+	 * Returns the commerce address restriction where classNameId = &#63; and classPK = &#63; and countryId = &#63; or throws a <code>NoSuchAddressRestrictionException</code> if it could not be found.
 	 *
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 * @return the matching commerce address restriction
 	 * @throws NoSuchAddressRestrictionException if a matching commerce address restriction could not be found
 	 */
 	@Override
 	public CommerceAddressRestriction findByC_C_C(
-			long classNameId, long classPK, long commerceCountryId)
+			long classNameId, long classPK, long countryId)
 		throws NoSuchAddressRestrictionException {
 
 		CommerceAddressRestriction commerceAddressRestriction = fetchByC_C_C(
-			classNameId, classPK, commerceCountryId);
+			classNameId, classPK, countryId);
 
 		if (commerceAddressRestriction == null) {
 			StringBundler sb = new StringBundler(8);
@@ -1190,8 +1173,8 @@ public class CommerceAddressRestrictionPersistenceImpl
 			sb.append(", classPK=");
 			sb.append(classPK);
 
-			sb.append(", commerceCountryId=");
-			sb.append(commerceCountryId);
+			sb.append(", countryId=");
+			sb.append(countryId);
 
 			sb.append("}");
 
@@ -1206,45 +1189,44 @@ public class CommerceAddressRestrictionPersistenceImpl
 	}
 
 	/**
-	 * Returns the commerce address restriction where classNameId = &#63; and classPK = &#63; and commerceCountryId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the commerce address restriction where classNameId = &#63; and classPK = &#63; and countryId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 * @return the matching commerce address restriction, or <code>null</code> if a matching commerce address restriction could not be found
 	 */
 	@Override
 	public CommerceAddressRestriction fetchByC_C_C(
-		long classNameId, long classPK, long commerceCountryId) {
+		long classNameId, long classPK, long countryId) {
 
-		return fetchByC_C_C(classNameId, classPK, commerceCountryId, true);
+		return fetchByC_C_C(classNameId, classPK, countryId, true);
 	}
 
 	/**
-	 * Returns the commerce address restriction where classNameId = &#63; and classPK = &#63; and commerceCountryId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the commerce address restriction where classNameId = &#63; and classPK = &#63; and countryId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching commerce address restriction, or <code>null</code> if a matching commerce address restriction could not be found
 	 */
 	@Override
 	public CommerceAddressRestriction fetchByC_C_C(
-		long classNameId, long classPK, long commerceCountryId,
+		long classNameId, long classPK, long countryId,
 		boolean useFinderCache) {
 
 		Object[] finderArgs = null;
 
 		if (useFinderCache) {
-			finderArgs = new Object[] {classNameId, classPK, commerceCountryId};
+			finderArgs = new Object[] {classNameId, classPK, countryId};
 		}
 
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_C_C, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_C_C, finderArgs);
 		}
 
 		if (result instanceof CommerceAddressRestriction) {
@@ -1253,8 +1235,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 			if ((classNameId != commerceAddressRestriction.getClassNameId()) ||
 				(classPK != commerceAddressRestriction.getClassPK()) ||
-				(commerceCountryId !=
-					commerceAddressRestriction.getCommerceCountryId())) {
+				(countryId != commerceAddressRestriction.getCountryId())) {
 
 				result = null;
 			}
@@ -1269,7 +1250,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 			sb.append(_FINDER_COLUMN_C_C_C_CLASSPK_2);
 
-			sb.append(_FINDER_COLUMN_C_C_C_COMMERCECOUNTRYID_2);
+			sb.append(_FINDER_COLUMN_C_C_C_COUNTRYID_2);
 
 			String sql = sb.toString();
 
@@ -1286,7 +1267,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 				queryPos.add(classPK);
 
-				queryPos.add(commerceCountryId);
+				queryPos.add(countryId);
 
 				List<CommerceAddressRestriction> list = query.list();
 
@@ -1322,43 +1303,39 @@ public class CommerceAddressRestrictionPersistenceImpl
 	}
 
 	/**
-	 * Removes the commerce address restriction where classNameId = &#63; and classPK = &#63; and commerceCountryId = &#63; from the database.
+	 * Removes the commerce address restriction where classNameId = &#63; and classPK = &#63; and countryId = &#63; from the database.
 	 *
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 * @return the commerce address restriction that was removed
 	 */
 	@Override
 	public CommerceAddressRestriction removeByC_C_C(
-			long classNameId, long classPK, long commerceCountryId)
+			long classNameId, long classPK, long countryId)
 		throws NoSuchAddressRestrictionException {
 
 		CommerceAddressRestriction commerceAddressRestriction = findByC_C_C(
-			classNameId, classPK, commerceCountryId);
+			classNameId, classPK, countryId);
 
 		return remove(commerceAddressRestriction);
 	}
 
 	/**
-	 * Returns the number of commerce address restrictions where classNameId = &#63; and classPK = &#63; and commerceCountryId = &#63;.
+	 * Returns the number of commerce address restrictions where classNameId = &#63; and classPK = &#63; and countryId = &#63;.
 	 *
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
-	 * @param commerceCountryId the commerce country ID
+	 * @param countryId the country ID
 	 * @return the number of matching commerce address restrictions
 	 */
 	@Override
-	public int countByC_C_C(
-		long classNameId, long classPK, long commerceCountryId) {
-
+	public int countByC_C_C(long classNameId, long classPK, long countryId) {
 		FinderPath finderPath = _finderPathCountByC_C_C;
 
-		Object[] finderArgs = new Object[] {
-			classNameId, classPK, commerceCountryId
-		};
+		Object[] finderArgs = new Object[] {classNameId, classPK, countryId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -1369,7 +1346,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 			sb.append(_FINDER_COLUMN_C_C_C_CLASSPK_2);
 
-			sb.append(_FINDER_COLUMN_C_C_C_COMMERCECOUNTRYID_2);
+			sb.append(_FINDER_COLUMN_C_C_C_COUNTRYID_2);
 
 			String sql = sb.toString();
 
@@ -1386,7 +1363,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 				queryPos.add(classPK);
 
-				queryPos.add(commerceCountryId);
+				queryPos.add(countryId);
 
 				count = (Long)query.uniqueResult();
 
@@ -1409,8 +1386,8 @@ public class CommerceAddressRestrictionPersistenceImpl
 	private static final String _FINDER_COLUMN_C_C_C_CLASSPK_2 =
 		"commerceAddressRestriction.classPK = ? AND ";
 
-	private static final String _FINDER_COLUMN_C_C_C_COMMERCECOUNTRYID_2 =
-		"commerceAddressRestriction.commerceCountryId = ?";
+	private static final String _FINDER_COLUMN_C_C_C_COUNTRYID_2 =
+		"commerceAddressRestriction.countryId = ?";
 
 	public CommerceAddressRestrictionPersistenceImpl() {
 		setModelClass(CommerceAddressRestriction.class);
@@ -1440,7 +1417,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 			new Object[] {
 				commerceAddressRestriction.getClassNameId(),
 				commerceAddressRestriction.getClassPK(),
-				commerceAddressRestriction.getCommerceCountryId()
+				commerceAddressRestriction.getCountryId()
 			},
 			commerceAddressRestriction);
 	}
@@ -1487,9 +1464,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(CommerceAddressRestrictionImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(CommerceAddressRestrictionImpl.class);
 	}
 
 	/**
@@ -1522,9 +1497,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(CommerceAddressRestrictionImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(
@@ -1539,14 +1512,12 @@ public class CommerceAddressRestrictionPersistenceImpl
 		Object[] args = new Object[] {
 			commerceAddressRestrictionModelImpl.getClassNameId(),
 			commerceAddressRestrictionModelImpl.getClassPK(),
-			commerceAddressRestrictionModelImpl.getCommerceCountryId()
+			commerceAddressRestrictionModelImpl.getCountryId()
 		};
 
+		finderCache.putResult(_finderPathCountByC_C_C, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathCountByC_C_C, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByC_C_C, args, commerceAddressRestrictionModelImpl,
-			false);
+			_finderPathFetchByC_C_C, args, commerceAddressRestrictionModelImpl);
 	}
 
 	/**
@@ -1890,7 +1861,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceAddressRestriction>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1963,7 +1934,7 @@ public class CommerceAddressRestrictionPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -2014,52 +1985,40 @@ public class CommerceAddressRestrictionPersistenceImpl
 	 * Initializes the commerce address restriction persistence.
 	 */
 	public void afterPropertiesSet() {
-		Bundle bundle = FrameworkUtil.getBundle(
-			CommerceAddressRestrictionPersistenceImpl.class);
-
-		_bundleContext = bundle.getBundleContext();
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class,
-			new CommerceAddressRestrictionModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name",
-				CommerceAddressRestriction.class.getName()));
-
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByCommerceCountryId = _createFinderPath(
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCommerceCountryId",
+		_finderPathWithPaginationFindByCountryId = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCountryId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), OrderByComparator.class.getName()
 			},
-			new String[] {"commerceCountryId"}, true);
+			new String[] {"countryId"}, true);
 
-		_finderPathWithoutPaginationFindByCommerceCountryId = _createFinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-			"findByCommerceCountryId", new String[] {Long.class.getName()},
-			new String[] {"commerceCountryId"}, true);
+		_finderPathWithoutPaginationFindByCountryId = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCountryId",
+			new String[] {Long.class.getName()}, new String[] {"countryId"},
+			true);
 
-		_finderPathCountByCommerceCountryId = _createFinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
-			"countByCommerceCountryId", new String[] {Long.class.getName()},
-			new String[] {"commerceCountryId"}, false);
+		_finderPathCountByCountryId = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCountryId",
+			new String[] {Long.class.getName()}, new String[] {"countryId"},
+			false);
 
-		_finderPathWithPaginationFindByC_C = _createFinderPath(
+		_finderPathWithPaginationFindByC_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -2068,30 +2027,29 @@ public class CommerceAddressRestrictionPersistenceImpl
 			},
 			new String[] {"classNameId", "classPK"}, true);
 
-		_finderPathWithoutPaginationFindByC_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"classNameId", "classPK"}, true);
 
-		_finderPathCountByC_C = _createFinderPath(
+		_finderPathCountByC_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"classNameId", "classPK"}, false);
 
-		_finderPathFetchByC_C_C = _createFinderPath(
+		_finderPathFetchByC_C_C = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			},
-			new String[] {"classNameId", "classPK", "commerceCountryId"}, true);
+			new String[] {"classNameId", "classPK", "countryId"}, true);
 
-		_finderPathCountByC_C_C = _createFinderPath(
+		_finderPathCountByC_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			},
-			new String[] {"classNameId", "classPK", "commerceCountryId"},
-			false);
+			new String[] {"classNameId", "classPK", "countryId"}, false);
 
 		_setCommerceAddressRestrictionUtilPersistence(this);
 	}
@@ -2100,14 +2058,6 @@ public class CommerceAddressRestrictionPersistenceImpl
 		_setCommerceAddressRestrictionUtilPersistence(null);
 
 		entityCache.removeCache(CommerceAddressRestrictionImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setCommerceAddressRestrictionUtilPersistence(
@@ -2126,8 +2076,6 @@ public class CommerceAddressRestrictionPersistenceImpl
 			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
-
-	private BundleContext _bundleContext;
 
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
@@ -2159,130 +2107,9 @@ public class CommerceAddressRestrictionPersistenceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommerceAddressRestrictionPersistenceImpl.class);
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
-	}
-
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class CommerceAddressRestrictionModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			CommerceAddressRestrictionModelImpl
-				commerceAddressRestrictionModelImpl =
-					(CommerceAddressRestrictionModelImpl)baseModel;
-
-			long columnBitmask =
-				commerceAddressRestrictionModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					commerceAddressRestrictionModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						commerceAddressRestrictionModelImpl.getColumnBitmask(
-							columnName);
-				}
-
-				if (finderPath.isBaseModelResult() &&
-					(CommerceAddressRestrictionPersistenceImpl.
-						FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION ==
-							finderPath.getCacheName())) {
-
-					finderPathColumnBitmask |= _ORDER_BY_COLUMNS_BITMASK;
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					commerceAddressRestrictionModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			CommerceAddressRestrictionModelImpl
-				commerceAddressRestrictionModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						commerceAddressRestrictionModelImpl.
-							getColumnOriginalValue(columnName);
-				}
-				else {
-					arguments[i] =
-						commerceAddressRestrictionModelImpl.getColumnValue(
-							columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-		private static final long _ORDER_BY_COLUMNS_BITMASK;
-
-		static {
-			long orderByColumnsBitmask = 0;
-
-			orderByColumnsBitmask |=
-				CommerceAddressRestrictionModelImpl.getColumnBitmask(
-					"createDate");
-
-			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
-		}
-
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
 }

@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -249,84 +250,106 @@ public class JournalContentSearchModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, JournalContentSearch>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			JournalContentSearch.class.getClassLoader(),
+			JournalContentSearch.class, ModelWrapper.class);
+
+		try {
+			Constructor<JournalContentSearch> constructor =
+				(Constructor<JournalContentSearch>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<JournalContentSearch, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<JournalContentSearch, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<JournalContentSearch, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<JournalContentSearch, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", JournalContentSearch::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", JournalContentSearch::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"contentSearchId", JournalContentSearch::getContentSearchId);
-		attributeGetterFunctions.put(
-			"groupId", JournalContentSearch::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", JournalContentSearch::getCompanyId);
-		attributeGetterFunctions.put(
-			"privateLayout", JournalContentSearch::getPrivateLayout);
-		attributeGetterFunctions.put(
-			"layoutId", JournalContentSearch::getLayoutId);
-		attributeGetterFunctions.put(
-			"portletId", JournalContentSearch::getPortletId);
-		attributeGetterFunctions.put(
-			"articleId", JournalContentSearch::getArticleId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<JournalContentSearch, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<JournalContentSearch, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<JournalContentSearch, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", JournalContentSearch::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<JournalContentSearch, Long>)
 				JournalContentSearch::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", JournalContentSearch::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<JournalContentSearch, Long>)
 				JournalContentSearch::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"contentSearchId", JournalContentSearch::getContentSearchId);
 		attributeSetterBiConsumers.put(
 			"contentSearchId",
 			(BiConsumer<JournalContentSearch, Long>)
 				JournalContentSearch::setContentSearchId);
+		attributeGetterFunctions.put(
+			"groupId", JournalContentSearch::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<JournalContentSearch, Long>)
 				JournalContentSearch::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", JournalContentSearch::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<JournalContentSearch, Long>)
 				JournalContentSearch::setCompanyId);
+		attributeGetterFunctions.put(
+			"privateLayout", JournalContentSearch::getPrivateLayout);
 		attributeSetterBiConsumers.put(
 			"privateLayout",
 			(BiConsumer<JournalContentSearch, Boolean>)
 				JournalContentSearch::setPrivateLayout);
+		attributeGetterFunctions.put(
+			"layoutId", JournalContentSearch::getLayoutId);
 		attributeSetterBiConsumers.put(
 			"layoutId",
 			(BiConsumer<JournalContentSearch, Long>)
 				JournalContentSearch::setLayoutId);
+		attributeGetterFunctions.put(
+			"portletId", JournalContentSearch::getPortletId);
 		attributeSetterBiConsumers.put(
 			"portletId",
 			(BiConsumer<JournalContentSearch, String>)
 				JournalContentSearch::setPortletId);
+		attributeGetterFunctions.put(
+			"articleId", JournalContentSearch::getArticleId);
 		attributeSetterBiConsumers.put(
 			"articleId",
 			(BiConsumer<JournalContentSearch, String>)
 				JournalContentSearch::setArticleId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -603,6 +626,33 @@ public class JournalContentSearchModelImpl
 	}
 
 	@Override
+	public JournalContentSearch cloneWithOriginalValues() {
+		JournalContentSearchImpl journalContentSearchImpl =
+			new JournalContentSearchImpl();
+
+		journalContentSearchImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		journalContentSearchImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		journalContentSearchImpl.setContentSearchId(
+			this.<Long>getColumnOriginalValue("contentSearchId"));
+		journalContentSearchImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		journalContentSearchImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		journalContentSearchImpl.setPrivateLayout(
+			this.<Boolean>getColumnOriginalValue("privateLayout"));
+		journalContentSearchImpl.setLayoutId(
+			this.<Long>getColumnOriginalValue("layoutId"));
+		journalContentSearchImpl.setPortletId(
+			this.<String>getColumnOriginalValue("portletId"));
+		journalContentSearchImpl.setArticleId(
+			this.<String>getColumnOriginalValue("articleId"));
+
+		return journalContentSearchImpl;
+	}
+
+	@Override
 	public int compareTo(JournalContentSearch journalContentSearch) {
 		long primaryKey = journalContentSearch.getPrimaryKey();
 
@@ -793,9 +843,7 @@ public class JournalContentSearchModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, JournalContentSearch>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					JournalContentSearch.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

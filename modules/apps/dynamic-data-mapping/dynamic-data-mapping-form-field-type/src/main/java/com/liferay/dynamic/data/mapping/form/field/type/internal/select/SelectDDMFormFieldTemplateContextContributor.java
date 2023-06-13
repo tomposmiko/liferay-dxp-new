@@ -16,6 +16,7 @@ package com.liferay.dynamic.data.mapping.form.field.type.internal.select;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldOptionsFactory;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
+import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.form.field.type.internal.util.DDMFormFieldTypeUtil;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
@@ -31,6 +32,7 @@ import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.CollatorUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
@@ -50,7 +52,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcellus Tavares
  */
 @Component(
-	immediate = true, property = "ddm.form.field.type.name=select",
+	immediate = true,
+	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.SELECT,
 	service = {
 		DDMFormFieldTemplateContextContributor.class,
 		SelectDDMFormFieldTemplateContextContributor.class
@@ -90,7 +93,16 @@ public class SelectDDMFormFieldTemplateContextContributor
 					ddmFormField, ddmFormFieldRenderingContext.getLocale(),
 					"predefinedValue"))
 		).put(
+			"showEmptyOption",
+			GetterUtil.getBoolean(
+				ddmFormField.getProperty("showEmptyOption"), true)
+		).put(
 			"strings", getStrings(ddmFormFieldRenderingContext)
+		).put(
+			"tooltip",
+			DDMFormFieldTypeUtil.getPropertyValue(
+				ddmFormField, ddmFormFieldRenderingContext.getLocale(),
+				"tooltip")
 		).put(
 			"value",
 			getValue(
@@ -214,7 +226,7 @@ public class SelectDDMFormFieldTemplateContextContributor
 				_log.debug(jsonException, jsonException);
 			}
 
-			jsonArray = jsonFactory.createJSONArray();
+			return ListUtil.fromString(valueString);
 		}
 
 		List<String> values = new ArrayList<>(jsonArray.length());

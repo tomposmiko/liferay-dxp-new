@@ -23,11 +23,12 @@ import com.liferay.fragment.processor.DefaultFragmentEntryProcessorContext;
 import com.liferay.fragment.processor.FragmentEntryProcessorContext;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.fragment.service.base.FragmentEntryLinkLocalServiceBaseImpl;
-import com.liferay.layout.content.page.editor.listener.ContentPageEditorListener;
-import com.liferay.layout.content.page.editor.listener.ContentPageEditorListenerTracker;
+import com.liferay.fragment.service.persistence.FragmentCollectionPersistence;
+import com.liferay.fragment.service.persistence.FragmentEntryPersistence;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -38,10 +39,12 @@ import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -59,7 +62,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -79,28 +81,6 @@ import org.osgi.service.component.annotations.Reference;
 public class FragmentEntryLinkLocalServiceImpl
 	extends FragmentEntryLinkLocalServiceBaseImpl {
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #addFragmentEntryLink(long, long, long, long, long, long,
-	 *             String, String, String, String, String, String, int, String,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public FragmentEntryLink addFragmentEntryLink(
-			long userId, long groupId, long originalFragmentEntryLinkId,
-			long fragmentEntryId, long segmentsExperienceId, long classNameId,
-			long classPK, String css, String html, String js,
-			String configuration, String editableValues, String namespace,
-			int position, String rendererKey, ServiceContext serviceContext)
-		throws PortalException {
-
-		return addFragmentEntryLink(
-			userId, groupId, originalFragmentEntryLinkId, fragmentEntryId,
-			segmentsExperienceId, classPK, css, html, js, configuration,
-			editableValues, namespace, position, rendererKey, serviceContext);
-	}
-
 	@Override
 	public FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long originalFragmentEntryLinkId,
@@ -110,7 +90,7 @@ public class FragmentEntryLinkLocalServiceImpl
 			String rendererKey, ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = userLocalService.getUser(userId);
+		User user = _userLocalService.getUser(userId);
 
 		long fragmentEntryLinkId = counterLocalService.increment();
 
@@ -158,15 +138,19 @@ public class FragmentEntryLinkLocalServiceImpl
 		fragmentEntryLink.setRendererKey(rendererKey);
 
 		if ((httpServletRequest != null) && (httpServletResponse != null)) {
-			FragmentEntryProcessorContext fragmentEntryProcessorContext =
-				new DefaultFragmentEntryProcessorContext(
-					httpServletRequest, httpServletResponse,
-					FragmentEntryLinkConstants.EDIT,
-					LocaleUtil.getMostRelevantLocale());
+			DefaultFragmentEntryProcessorContext
+				defaultFragmentEntryProcessorContext =
+					new DefaultFragmentEntryProcessorContext(
+						httpServletRequest, httpServletResponse,
+						FragmentEntryLinkConstants.EDIT,
+						LocaleUtil.getMostRelevantLocale());
+
+			defaultFragmentEntryProcessorContext.setFragmentElementId(
+				StringPool.BLANK);
 
 			processedHTML =
 				_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
-					fragmentEntryLink, fragmentEntryProcessorContext);
+					fragmentEntryLink, defaultFragmentEntryProcessorContext);
 		}
 
 		if (Validator.isNull(editableValues)) {
@@ -272,6 +256,31 @@ public class FragmentEntryLinkLocalServiceImpl
 	}
 
 	@Override
+	public List<FragmentEntryLink>
+		deleteLayoutPageTemplateEntryFragmentEntryLinks(
+			long groupId, long[] segmentsExperienceIds, long plid) {
+
+		List<FragmentEntryLink> fragmentEntryLinks =
+			getFragmentEntryLinksBySegmentsExperienceId(
+				groupId, segmentsExperienceIds, plid);
+
+		if (ListUtil.isEmpty(fragmentEntryLinks)) {
+			return Collections.emptyList();
+		}
+
+		List<FragmentEntryLink> deletedFragmentEntryLinks = new ArrayList<>();
+
+		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
+			fragmentEntryLinkLocalService.deleteFragmentEntryLink(
+				fragmentEntryLink);
+
+			deletedFragmentEntryLinks.add(fragmentEntryLink);
+		}
+
+		return deletedFragmentEntryLinks;
+	}
+
+	@Override
 	public List<FragmentEntryLink> getAllFragmentEntryLinksByFragmentEntryId(
 		long groupId, long fragmentEntryId, int start, int end,
 		OrderByComparator<FragmentEntryLink> orderByComparator) {
@@ -319,21 +328,6 @@ public class FragmentEntryLinkLocalServiceImpl
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getAllFragmentEntryLinksByFragmentEntryId(long, long, int,
-	 *             int, OrderByComparator)}
-	 */
-	@Deprecated
-	@Override
-	public List<FragmentEntryLink> getFragmentEntryLinks(
-		long groupId, long fragmentEntryId, int start, int end,
-		OrderByComparator<FragmentEntryLink> orderByComparator) {
-
-		return fragmentEntryLinkFinder.findByG_F(
-			groupId, fragmentEntryId, start, end, orderByComparator);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *             #getFragmentEntryLinksByPlid(long, long)}
 	 */
 	@Deprecated
@@ -343,53 +337,6 @@ public class FragmentEntryLinkLocalServiceImpl
 
 		return fragmentEntryLinkPersistence.findByG_C_C(
 			groupId, classNameId, classPK);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getLayoutPageTemplateFragmentEntryLinksByFragmentEntryId(
-	 *             long, long, int, int, int, OrderByComparator)}
-	 */
-	@Deprecated
-	@Override
-	public List<FragmentEntryLink> getFragmentEntryLinks(
-		long groupId, long fragmentEntryId, long classNameId,
-		int layoutPageTemplateType, int start, int end,
-		OrderByComparator<FragmentEntryLink> orderByComparator) {
-
-		return fragmentEntryLinkFinder.findByG_F_C_L(
-			groupId, fragmentEntryId, classNameId, layoutPageTemplateType,
-			start, end, orderByComparator);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getFragmentEntryLinks(long, long, int, int,
-	 *             OrderByComparator)}
-	 */
-	@Deprecated
-	@Override
-	public List<FragmentEntryLink> getFragmentEntryLinks(
-		long groupId, long fragmentEntryId, long classNameId, int start,
-		int end, OrderByComparator<FragmentEntryLink> orderByComparator) {
-
-		return fragmentEntryLinkFinder.findByG_F_C(
-			groupId, fragmentEntryId, classNameId, start, end,
-			orderByComparator);
-	}
-
-	@Override
-	public List<FragmentEntryLink> getFragmentEntryLinks(
-		long companyId, String rendererKey) {
-
-		return fragmentEntryLinkPersistence.findByC_R(companyId, rendererKey);
-	}
-
-	@Override
-	public List<FragmentEntryLink> getFragmentEntryLinks(
-		long companyId, String[] rendererKeys) {
-
-		return fragmentEntryLinkPersistence.findByC_R(companyId, rendererKeys);
 	}
 
 	@Override
@@ -420,57 +367,21 @@ public class FragmentEntryLinkLocalServiceImpl
 			groupId, segmentsExperienceId, plid);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getFragmentEntryLinksBySegmentsExperienceId(long, long,
-	 *             long)}
-	 */
-	@Deprecated
 	@Override
 	public List<FragmentEntryLink> getFragmentEntryLinksBySegmentsExperienceId(
-		long groupId, long segmentsExperienceId, long classNameId,
-		long classPK) {
+		long groupId, long segmentsExperienceId, long plid,
+		String rendererKey) {
 
-		return fragmentEntryLinkPersistence.findByG_S_C_C(
-			groupId, segmentsExperienceId, classNameId, classPK);
+		return fragmentEntryLinkPersistence.findByG_S_P_R(
+			groupId, segmentsExperienceId, plid, rendererKey);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getAllFragmentEntryLinksCountByFragmentEntryId(long, long)}
-	 */
-	@Deprecated
 	@Override
-	public int getFragmentEntryLinksCount(long groupId, long fragmentEntryId) {
-		return fragmentEntryLinkFinder.countByG_F(groupId, fragmentEntryId);
-	}
+	public List<FragmentEntryLink> getFragmentEntryLinksBySegmentsExperienceId(
+		long groupId, long[] segmentsExperienceIds, long plid) {
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getFragmentEntryLinksCount(long, long)}
-	 */
-	@Deprecated
-	@Override
-	public int getFragmentEntryLinksCount(
-		long groupId, long fragmentEntryId, long classNameId) {
-
-		return fragmentEntryLinkFinder.countByG_F_C(
-			groupId, fragmentEntryId, classNameId);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getLayoutPageTemplateFragmentEntryLinksCountByFragmentEntryId(
-	 *             long, long, int)}
-	 */
-	@Deprecated
-	@Override
-	public int getFragmentEntryLinksCount(
-		long groupId, long fragmentEntryId, long classNameId,
-		int layoutPageTemplateType) {
-
-		return fragmentEntryLinkFinder.countByG_F_C_L(
-			groupId, fragmentEntryId, classNameId, layoutPageTemplateType);
+		return fragmentEntryLinkPersistence.findByG_S_P(
+			groupId, segmentsExperienceIds, plid);
 	}
 
 	@Override
@@ -525,27 +436,17 @@ public class FragmentEntryLinkLocalServiceImpl
 
 	@Override
 	public void updateClassedModel(long plid) {
-		Layout layout = _layoutLocalService.fetchLayout(plid);
-
-		if (layout == null) {
-			return;
+		try {
+			_layoutLocalService.updateStatus(
+				PrincipalThreadLocal.getUserId(), plid,
+				WorkflowConstants.STATUS_DRAFT,
+				ServiceContextThreadLocal.getServiceContext());
 		}
-
-		layout.setStatus(WorkflowConstants.STATUS_DRAFT);
-
-		_layoutLocalService.updateLayout(layout);
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #updateClassedModel(long)}
-	 */
-	@Deprecated
-	@Override
-	public void updateClassedModel(long classNameId, long classPK)
-		throws PortalException {
-
-		updateClassedModel(classPK);
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException, portalException);
+			}
+		}
 	}
 
 	@Override
@@ -561,28 +462,6 @@ public class FragmentEntryLinkLocalServiceImpl
 		return fragmentEntryLinkPersistence.update(fragmentEntryLink);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #updateFragmentEntryLink(long, long, long, long, long,
-	 *             String, String, String, String, String, String, int,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public FragmentEntryLink updateFragmentEntryLink(
-			long userId, long fragmentEntryLinkId,
-			long originalFragmentEntryLinkId, long fragmentEntryId,
-			long classNameId, long classPK, String css, String html, String js,
-			String configuration, String editableValues, String namespace,
-			int position, ServiceContext serviceContext)
-		throws PortalException {
-
-		return updateFragmentEntryLink(
-			userId, fragmentEntryLinkId, originalFragmentEntryLinkId,
-			fragmentEntryId, classPK, css, html, js, configuration,
-			editableValues, namespace, position, serviceContext);
-	}
-
 	@Override
 	public FragmentEntryLink updateFragmentEntryLink(
 			long userId, long fragmentEntryLinkId,
@@ -592,7 +471,7 @@ public class FragmentEntryLinkLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = userLocalService.getUser(userId);
+		User user = _userLocalService.getUser(userId);
 
 		FragmentEntryLink fragmentEntryLink = fetchFragmentEntryLink(
 			fragmentEntryLinkId);
@@ -627,8 +506,12 @@ public class FragmentEntryLinkLocalServiceImpl
 			long fragmentEntryLinkId, String editableValues)
 		throws PortalException {
 
-		return updateFragmentEntryLink(
-			fragmentEntryLinkId, editableValues, true);
+		FragmentEntryLink fragmentEntryLink = fetchFragmentEntryLink(
+			fragmentEntryLinkId);
+
+		fragmentEntryLink.setEditableValues(editableValues);
+
+		return fragmentEntryLinkPersistence.update(fragmentEntryLink);
 	}
 
 	@Override
@@ -649,24 +532,6 @@ public class FragmentEntryLinkLocalServiceImpl
 		return fragmentEntryLinkPersistence.update(fragmentEntryLink);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #updateFragmentEntryLinks(long, long, long, long[], String,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public void updateFragmentEntryLinks(
-			long userId, long groupId, long classNameId, long classPK,
-			long[] fragmentEntryIds, String editableValues,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		updateFragmentEntryLinks(
-			userId, groupId, classPK, fragmentEntryIds, editableValues,
-			serviceContext);
-	}
-
 	@Override
 	public void updateFragmentEntryLinks(
 			long userId, long groupId, long plid, long[] fragmentEntryIds,
@@ -683,9 +548,9 @@ public class FragmentEntryLinkLocalServiceImpl
 
 		int position = 0;
 
-		for (long fragmentId : fragmentEntryIds) {
+		for (long fragmentEntryId : fragmentEntryIds) {
 			FragmentEntry fragmentEntry =
-				fragmentEntryPersistence.fetchByPrimaryKey(fragmentId);
+				_fragmentEntryPersistence.fetchByPrimaryKey(fragmentEntryId);
 
 			addFragmentEntryLink(
 				userId, groupId, 0, fragmentEntry.getFragmentEntryId(),
@@ -721,104 +586,43 @@ public class FragmentEntryLinkLocalServiceImpl
 	}
 
 	@Override
-	public void updateLatestChanges(
-			FragmentEntry fragmentEntry, FragmentEntryLink fragmentEntryLink)
-		throws PortalException {
-
-		long fragmentEntryId = fragmentEntryLink.getFragmentEntryId();
-
-		if ((fragmentEntryId != fragmentEntry.getFragmentEntryId()) ||
-			((fragmentEntryId == 0) &&
-			 !Objects.equals(
-				 fragmentEntry.getFragmentEntryKey(),
-				 fragmentEntryLink.getRendererKey()))) {
-
-			throw new UnsupportedOperationException(
-				"Unable to propagate fragment entry " + fragmentEntryId);
-		}
-
-		boolean modified = false;
-
-		// LPS-132154 Set configuration before processing the HTML
-
-		if (!Objects.equals(
-				fragmentEntryLink.getConfiguration(),
-				fragmentEntry.getConfiguration())) {
-
-			fragmentEntryLink.setConfiguration(
-				fragmentEntry.getConfiguration());
-
-			modified = true;
-		}
-
-		if (!Objects.equals(
-				fragmentEntryLink.getHtml(), fragmentEntry.getHtml())) {
-
-			fragmentEntryLink.setHtml(
-				_replaceResources(
-					fragmentEntry.getFragmentEntryId(),
-					fragmentEntry.getHtml()));
-
-			String defaultEditableValues = String.valueOf(
-				_fragmentEntryProcessorRegistry.
-					getDefaultEditableValuesJSONObject(
-						_getProcessedHTML(
-							fragmentEntryLink,
-							ServiceContextThreadLocal.getServiceContext()),
-						fragmentEntryLink.getConfiguration()));
-
-			String newEditableValues = _mergeEditableValues(
-				defaultEditableValues, fragmentEntryLink.getEditableValues());
-
-			fragmentEntryLink.setEditableValues(newEditableValues);
-
-			modified = true;
-		}
-
-		if (!Objects.equals(
-				fragmentEntryLink.getCss(), fragmentEntry.getCss())) {
-
-			fragmentEntryLink.setCss(fragmentEntry.getCss());
-
-			modified = true;
-		}
-
-		if (!Objects.equals(fragmentEntryLink.getJs(), fragmentEntry.getJs())) {
-			fragmentEntryLink.setJs(fragmentEntry.getJs());
-
-			modified = true;
-		}
-
-		if (modified) {
-			fragmentEntryLink.setLastPropagationDate(new Date());
-
-			fragmentEntryLink = fragmentEntryLinkPersistence.update(
-				fragmentEntryLink);
-
-			_updateFragmentEntryLinkLayout(fragmentEntryLink);
-
-			for (ContentPageEditorListener contentPageEditorListener :
-					_contentPageEditorListenerTracker.
-						getContentPageEditorListeners()) {
-
-				contentPageEditorListener.
-					onUpdateFragmentEntryLinkConfigurationValues(
-						fragmentEntryLink);
-			}
-		}
-	}
-
-	@Override
 	public void updateLatestChanges(long fragmentEntryLinkId)
 		throws PortalException {
 
 		FragmentEntryLink fragmentEntryLink =
 			fragmentEntryLinkPersistence.findByPrimaryKey(fragmentEntryLinkId);
 
-		FragmentEntry fragmentEntry = fragmentEntryPersistence.findByPrimaryKey(
-			fragmentEntryLink.getFragmentEntryId());
+		FragmentEntry fragmentEntry =
+			_fragmentEntryPersistence.findByPrimaryKey(
+				fragmentEntryLink.getFragmentEntryId());
 
-		updateLatestChanges(fragmentEntry, fragmentEntryLink);
+		fragmentEntryLink.setHtml(fragmentEntry.getHtml());
+
+		// LPS-132154 Set configuration before processing the HTML
+
+		fragmentEntryLink.setConfiguration(fragmentEntry.getConfiguration());
+
+		String processedHTML = _getProcessedHTML(
+			fragmentEntryLink, ServiceContextThreadLocal.getServiceContext());
+
+		String defaultEditableValues = String.valueOf(
+			_fragmentEntryProcessorRegistry.getDefaultEditableValuesJSONObject(
+				processedHTML, fragmentEntryLink.getConfiguration()));
+
+		fragmentEntryLink.setCss(fragmentEntry.getCss());
+		fragmentEntryLink.setJs(fragmentEntry.getJs());
+
+		String newEditableValues = _mergeEditableValues(
+			defaultEditableValues, fragmentEntryLink.getEditableValues());
+
+		fragmentEntryLink.setEditableValues(newEditableValues);
+
+		fragmentEntryLink.setLastPropagationDate(new Date());
+
+		fragmentEntryLink = fragmentEntryLinkPersistence.update(
+			fragmentEntryLink);
+
+		_updateFragmentEntryLinkLayout(fragmentEntryLink);
 	}
 
 	private String _getProcessedHTML(
@@ -875,30 +679,13 @@ public class FragmentEntryLinkLocalServiceImpl
 					continue;
 				}
 
-				Iterator<String> defaultEditableValuesIterator =
+				Iterator<String> iterator =
 					defaultEditableFragmentEntryProcessorJSONObject.keys();
 
-				while (defaultEditableValuesIterator.hasNext()) {
-					String key = defaultEditableValuesIterator.next();
+				while (iterator.hasNext()) {
+					String key = iterator.next();
 
 					if (editableFragmentEntryProcessorJSONObject.has(key)) {
-						defaultEditableFragmentEntryProcessorJSONObject.put(
-							key,
-							_replaceDefaultValue(
-								editableFragmentEntryProcessorJSONObject.
-									getJSONObject(key)));
-					}
-				}
-
-				Iterator<String> editableValuesIterator =
-					editableFragmentEntryProcessorJSONObject.keys();
-
-				while (editableValuesIterator.hasNext()) {
-					String key = editableValuesIterator.next();
-
-					if (!defaultEditableFragmentEntryProcessorJSONObject.has(
-							key)) {
-
 						defaultEditableFragmentEntryProcessorJSONObject.put(
 							key,
 							editableFragmentEntryProcessorJSONObject.get(key));
@@ -910,84 +697,29 @@ public class FragmentEntryLinkLocalServiceImpl
 					defaultEditableFragmentEntryProcessorJSONObject);
 			}
 
-			return editableValuesJSONObject.toString();
+			return editableValuesJSONObject.toJSONString();
 		}
-		catch (PortalException portalException) {
+		catch (JSONException jsonException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException, portalException);
+				_log.debug(jsonException, jsonException);
 			}
 		}
 
 		return editableValues;
 	}
 
-	private JSONObject _replaceDefaultValue(JSONObject jsonObject) {
-		String defaultValue = jsonObject.getString("defaultValue");
-
-		Matcher matcher = _dlDownloadURLPattern.matcher(defaultValue);
-
-		while (matcher.find()) {
-			long groupId = Long.valueOf(matcher.group(1));
-			String uuid = matcher.group(4);
-			FileEntry fileEntry = null;
-
-			try {
-				fileEntry = PortletFileRepositoryUtil.getPortletFileEntry(
-					uuid, groupId);
-			}
-			catch (PortalException portalException) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to get file entry with uuid " + uuid,
-						portalException);
-				}
-			}
-
-			if (fileEntry == null) {
-				long folderId = Long.valueOf(matcher.group(2));
-				String title = matcher.group(3);
-
-				fileEntry = PortletFileRepositoryUtil.fetchPortletFileEntry(
-					groupId, folderId, title);
-			}
-
-			if (fileEntry != null) {
-				try {
-					String fileEntryURL = _dlURLHelper.getDownloadURL(
-						fileEntry, fileEntry.getFileVersion(), null,
-						StringPool.BLANK, false, false);
-
-					jsonObject.put(
-						"defaultValue",
-						StringUtil.replace(
-							defaultValue, matcher.group(), fileEntryURL));
-				}
-				catch (PortalException portalException) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(
-							"Unable to get file version for file entry " +
-								fileEntry.getFileEntryId(),
-							portalException);
-					}
-				}
-			}
-		}
-
-		return jsonObject;
-	}
-
 	private String _replaceResources(long fragmentEntryId, String html)
 		throws PortalException {
 
 		FragmentEntry fragmentEntry =
-			fragmentEntryPersistence.fetchByPrimaryKey(fragmentEntryId);
+			_fragmentEntryPersistence.fetchByPrimaryKey(fragmentEntryId);
 
 		if (fragmentEntry == null) {
 			return html;
 		}
 
 		FragmentCollection fragmentCollection =
-			fragmentCollectionPersistence.fetchByPrimaryKey(
+			_fragmentCollectionPersistence.fetchByPrimaryKey(
 				fragmentEntry.getFragmentCollectionId());
 
 		Matcher matcher = _pattern.matcher(html);
@@ -1036,9 +768,6 @@ public class FragmentEntryLinkLocalServiceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		FragmentEntryLinkLocalServiceImpl.class);
 
-	private static final Pattern _dlDownloadURLPattern = Pattern.compile(
-		"(?:/?[^\\s]*)/documents/(\\d+)/(\\d+)/([^/?]+)(?:/([-0-9a-fA-F]+))?" +
-			"(?:\\?t=\\d+)?\\&download=true");
 	private static final Pattern _pattern = Pattern.compile(
 		"\\[resources:(.+?)\\]");
 
@@ -1046,10 +775,13 @@ public class FragmentEntryLinkLocalServiceImpl
 	private ClassNameLocalService _classNameLocalService;
 
 	@Reference
-	private ContentPageEditorListenerTracker _contentPageEditorListenerTracker;
+	private DLURLHelper _dlURLHelper;
 
 	@Reference
-	private DLURLHelper _dlURLHelper;
+	private FragmentCollectionPersistence _fragmentCollectionPersistence;
+
+	@Reference
+	private FragmentEntryPersistence _fragmentEntryPersistence;
 
 	@Reference
 	private FragmentEntryProcessorRegistry _fragmentEntryProcessorRegistry;
@@ -1062,5 +794,8 @@ public class FragmentEntryLinkLocalServiceImpl
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

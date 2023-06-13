@@ -57,7 +57,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
-		"mvc.command.name=/content_layout/get_info_item_mapping_fields"
+		"mvc.command.name=/layout_content_page_editor/get_info_item_mapping_fields"
 	},
 	service = MVCResourceCommand.class
 )
@@ -92,9 +92,15 @@ public class GetInfoItemMappingFieldsMVCResourceCommand
 			return;
 		}
 
+		long classPK = ParamUtil.getLong(resourceRequest, "classPK");
+
+		InfoItemIdentifier infoItemIdentifier = new ClassPKInfoItemIdentifier(
+			classPK);
+
 		InfoItemObjectProvider<Object> infoItemObjectProvider =
 			_infoItemServiceTracker.getFirstInfoItemService(
-				InfoItemObjectProvider.class, itemClassName);
+				InfoItemObjectProvider.class, itemClassName,
+				infoItemIdentifier.getInfoItemServiceFilter());
 
 		if (infoItemObjectProvider == null) {
 			JSONPortletResponseUtil.writeJSON(
@@ -103,11 +109,6 @@ public class GetInfoItemMappingFieldsMVCResourceCommand
 
 			return;
 		}
-
-		long classPK = ParamUtil.getLong(resourceRequest, "classPK");
-
-		InfoItemIdentifier infoItemIdentifier = new ClassPKInfoItemIdentifier(
-			classPK);
 
 		Object infoItemObject = infoItemObjectProvider.getInfoItem(
 			infoItemIdentifier);
@@ -144,12 +145,10 @@ public class GetInfoItemMappingFieldsMVCResourceCommand
 				if (_isFieldMappable(infoField, fieldType)) {
 					defaultFieldSetFieldsJSONArray.put(
 						JSONUtil.put(
-							"key", infoField.getUniqueId()
+							"key", infoField.getName()
 						).put(
 							"label",
 							infoField.getLabel(themeDisplay.getLocale())
-						).put(
-							"name", infoField.getName()
 						).put(
 							"type", infoFieldType.getName()
 						));
@@ -166,18 +165,20 @@ public class GetInfoItemMappingFieldsMVCResourceCommand
 					infoField -> _isFieldMappable(infoField, fieldType));
 
 				for (InfoField infoField : infoFields) {
-					InfoFieldType infoFieldType = infoField.getInfoFieldType();
-
 					fieldSetFieldsJSONArray.put(
 						JSONUtil.put(
-							"key", infoField.getUniqueId()
+							"key", infoField.getName()
 						).put(
 							"label",
 							infoField.getLabel(themeDisplay.getLocale())
 						).put(
-							"name", infoField.getName()
-						).put(
-							"type", infoFieldType.getName()
+							"type",
+							() -> {
+								InfoFieldType infoFieldType =
+									infoField.getInfoFieldType();
+
+								return infoFieldType.getName();
+							}
 						));
 				}
 

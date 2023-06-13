@@ -1,7 +1,6 @@
 create table SXPBlueprint (
 	mvccVersion LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
-	externalReferenceCode VARCHAR(75) null,
 	sxpBlueprintId LONG not null primary key,
 	companyId LONG,
 	userId LONG,
@@ -11,9 +10,7 @@ create table SXPBlueprint (
 	configurationJSON TEXT null,
 	description STRING null,
 	elementInstancesJSON TEXT null,
-	schemaVersion VARCHAR(75) null,
 	title STRING null,
-	version VARCHAR(75) null,
 	status INTEGER,
 	statusByUserId LONG,
 	statusByUserName VARCHAR(75) null,
@@ -23,7 +20,6 @@ create table SXPBlueprint (
 create table SXPElement (
 	mvccVersion LONG default 0 not null,
 	uuid_ VARCHAR(75) null,
-	externalReferenceCode VARCHAR(75) null,
 	sxpElementId LONG not null primary key,
 	companyId LONG,
 	userId LONG,
@@ -34,9 +30,7 @@ create table SXPElement (
 	elementDefinitionJSON TEXT null,
 	hidden_ BOOLEAN,
 	readOnly BOOLEAN,
-	schemaVersion VARCHAR(75) null,
 	title STRING null,
 	type_ INTEGER,
-	version VARCHAR(75) null,
 	status INTEGER
 );

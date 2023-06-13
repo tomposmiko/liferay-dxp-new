@@ -165,16 +165,6 @@ public class EditCommerceCurrencyMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest)
 		throws PortalException {
 
-		long commerceCurrencyId = ParamUtil.getLong(
-			actionRequest, "commerceCurrencyId");
-
-		String code = ParamUtil.getString(actionRequest, "code");
-		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
-			actionRequest, "name");
-		String rate = ParamUtil.getString(actionRequest, "rate");
-		Map<Locale, String> formatPatternMap =
-			LocalizationUtil.getLocalizationMap(actionRequest, "formatPattern");
-
 		int maxFractionDigits = ParamUtil.getInteger(
 			actionRequest, "maxFractionDigits");
 		int minFractionDigits = ParamUtil.getInteger(
@@ -186,6 +176,16 @@ public class EditCommerceCurrencyMVCActionCommand extends BaseMVCActionCommand {
 			throw new CommerceCurrencyFractionDigitsException();
 		}
 
+		long commerceCurrencyId = ParamUtil.getLong(
+			actionRequest, "commerceCurrencyId");
+
+		String code = ParamUtil.getString(actionRequest, "code");
+		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
+			actionRequest, "name");
+		String rate = ParamUtil.getString(actionRequest, "rate");
+		Map<Locale, String> formatPatternMap =
+			LocalizationUtil.getLocalizationMap(actionRequest, "formatPattern");
+
 		String roundingMode = ParamUtil.getString(
 			actionRequest, "roundingMode");
 		boolean primary = ParamUtil.getBoolean(actionRequest, "primary");
@@ -193,18 +193,18 @@ public class EditCommerceCurrencyMVCActionCommand extends BaseMVCActionCommand {
 		String symbol = ParamUtil.getString(actionRequest, "symbol");
 		boolean active = ParamUtil.getBoolean(actionRequest, "active");
 
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			CommerceCurrency.class.getName(), actionRequest);
-
 		CommerceCurrency commerceCurrency = null;
 
 		if (commerceCurrencyId <= 0) {
 			commerceCurrency = _commerceCurrencyService.addCommerceCurrency(
-				serviceContext.getUserId(), code, nameMap, symbol,
-				new BigDecimal(rate), formatPatternMap, maxFractionDigits,
-				minFractionDigits, roundingMode, primary, priority, active);
+				code, nameMap, symbol, new BigDecimal(rate), formatPatternMap,
+				maxFractionDigits, minFractionDigits, roundingMode, primary,
+				priority, active);
 		}
 		else {
+			ServiceContext serviceContext = ServiceContextFactory.getInstance(
+				CommerceCurrency.class.getName(), actionRequest);
+
 			commerceCurrency = _commerceCurrencyService.updateCommerceCurrency(
 				commerceCurrencyId, code, nameMap, symbol, new BigDecimal(rate),
 				formatPatternMap, maxFractionDigits, minFractionDigits,

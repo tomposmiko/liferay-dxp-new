@@ -14,15 +14,17 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	@priority = 5
-	test AssertLoadingBar {
+	@description = "Verify loading bar can be visible during new location based SPA load event"
+	@priority = "5"
+	@refactordone
+	test NewURLLoadEventCanDisplayLoadingBar {
 		property portal.acceptance = "true";
-		property test.name.skip.portal.instance = "SPA#AssertLoadingBar";
+		property test.name.skip.portal.instance = "SPA#NewURLLoadEventCanDisplayLoadingBar";
 
 		Navigator.openURL();
 
@@ -31,50 +33,6 @@ definition {
 			portlet = "Web Content");
 
 		AssertVisible.assertVisibleNoSPAWait(locator1 = "//html[contains(@class,'lfr-spa-loading')]");
-	}
-
-	@description = "This test validates disable SPA in IE11"
-	@priority = 5
-	test CheckIE11DisableSPA {
-		property portal.acceptance = "true";
-		property test.name.skip.portal.instance = "SPA#CheckIE11DisableSPA";
-
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "System Settings");
-
-		SystemSettings.gotoConfiguration(
-			configurationCategory = "Infrastructure",
-			configurationName = "Frontend SPA Infrastructure",
-			configurationScope = "System Scope");
-
-		for (var fieldName : list "Disable SPA in Internet Explorer,Disable SPA in Internet Explorer 11") {
-			FormFields.disableCheckbox(fieldName = ${fieldName});
-		}
-
-		SystemSettings.saveConfiguration();
-
-		SystemSettings.exitEditConfiguration();
-
-		SystemSettings.gotoConfiguration(
-			configurationCategory = "Infrastructure",
-			configurationName = "Frontend SPA Infrastructure",
-			configurationScope = "System Scope");
-
-		SystemSettings.resetConfiguration(configurationName = "Frontend SPA Infrastructure");
-
-		var browserType = PropsUtil.get("browser.type");
-
-		if (${browserType} == "internetexplorer") {
-			Navigator.openURL();
-
-			ProductMenu.gotoPortlet(
-				category = "Content & Data",
-				portlet = "Web Content");
-
-			AssertVisible.assertVisibleNoSPAWait(locator1 = "//html[contains(@class,'lfr-spa-loading')]");
-		}
 	}
 
 }

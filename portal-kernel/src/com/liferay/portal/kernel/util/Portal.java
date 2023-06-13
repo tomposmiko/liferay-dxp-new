@@ -683,13 +683,27 @@ public interface Portal {
 	public String getFullName(
 		String firstName, String middleName, String lastName);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public String getGlobalLibDir();
 
 	public String getGoogleGadgetURL(Portlet portlet, ThemeDisplay themeDisplay)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 * #getGroupFriendlyURL(LayoutSet, ThemeDisplay, boolean, boolean)}
+	 */
+	@Deprecated
 	public String getGroupFriendlyURL(
 			LayoutSet layoutSet, ThemeDisplay themeDisplay)
+		throws PortalException;
+
+	public String getGroupFriendlyURL(
+			LayoutSet layoutSet, ThemeDisplay themeDisplay,
+			boolean canonicalURL, boolean controlPanel)
 		throws PortalException;
 
 	public String getGroupFriendlyURL(
@@ -908,11 +922,6 @@ public interface Portal {
 
 	public String getPortletDescription(String portletId, User user);
 
-	public LayoutQueryStringComposite
-		getPortletFriendlyURLMapperLayoutQueryStringComposite(
-			String url, Map<String, String[]> params,
-			Map<String, Object> requestContext);
-
 	public String getPortletId(HttpServletRequest httpServletRequest);
 
 	public String getPortletId(PortletRequest portletRequest);
@@ -1108,7 +1117,7 @@ public interface Portal {
 
 	public String getUserPassword(HttpServletRequest httpServletRequest);
 
-	public String getUserPassword(HttpSession session);
+	public String getUserPassword(HttpSession httpSession);
 
 	public String getUserPassword(PortletRequest portletRequest);
 
@@ -1162,8 +1171,6 @@ public interface Portal {
 
 	public boolean isGroupAdmin(User user, long groupId) throws Exception;
 
-	public boolean isGroupControlPanelPath(String path);
-
 	public boolean isGroupFriendlyURL(
 		String fullURL, String groupFriendlyURL, String layoutFriendlyURL);
 
@@ -1202,8 +1209,6 @@ public interface Portal {
 	public boolean isSystemGroup(String groupName);
 
 	public boolean isSystemRole(String roleName);
-
-	public boolean isUpdateAvailable();
 
 	public boolean isValidResourceId(String resourceId);
 

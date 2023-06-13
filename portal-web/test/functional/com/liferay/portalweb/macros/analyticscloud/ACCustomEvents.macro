@@ -1,21 +1,5 @@
 definition {
 
-	macro addWCWithCustomEventToPage {
-		if (!(isSet(webContentTitle))) {
-			var webContentTitle = "Custom Event AC Title";
-		}
-
-		ACUtils.addWidgetToPage(
-			layoutName = ${layoutName},
-			widgetName = "Web Content Display");
-
-		WebContentDisplayPortlet.selectWebContent(webContentTitle = ${webContentTitle});
-
-		Navigator.gotoSitePage(
-			pageName = ${layoutName},
-			siteName = "Site Name");
-	}
-
 	macro blockAllCustomEvents {
 		var key_actionButton = "Block";
 
@@ -25,30 +9,30 @@ definition {
 
 		ACUtils.clickAnyButton(button = "Block Events");
 
-		ACUtils.clickAnyButton(button = ${key_actionButton});
+		ACUtils.clickAnyButton(button = "${key_actionButton}");
 	}
 
 	macro blockCustomEvent {
 		var key_actionButton = "Block";
-		var key_nameList = ${customEventName};
+		var key_nameList = "${customEventName}";
 
 		WaitForPageLoad();
 
-		while ((IsElementNotPresent(locator1 = "ACUtils#NAME_LIST")) && (maxIterations = "50")) {
-			ACUtils.searchBar(searchItem = ${customEventName});
+		if (IsElementNotPresent(locator1 = "ACUtils#NAME_LIST")) {
+			ACUtils.searchBar(searchItem = "${customEventName}");
 		}
 
 		MouseOver(locator1 = "ACUtils#NAME_LIST");
 
-		Click(locator1 = "ACCustomEvents#BLOCK_UNBLOCK_EVENT_BUTTON");
+		Click(locator1 = "ACCustomEvents#BLOCK_HIDE_BUTTON");
 
-		ACUtils.clickAnyButton(button = ${key_actionButton});
+		ACUtils.clickAnyButton(button = "${key_actionButton}");
 	}
 
 	macro changeAttributeDataType {
 		Select(
 			locator1 = "CustomFields#CUSTOM_INPUT_FIELD_DATA_TYPE",
-			value1 = ${newDataType});
+			value1 = "${newDataType}");
 
 		Button.clickSave();
 	}
@@ -57,13 +41,13 @@ definition {
 		if (isSet(newDisplayName)) {
 			Type(
 				locator1 = "TextInput#TEXT",
-				value1 = ${newDisplayName});
+				value1 = "${newDisplayName}");
 		}
 
 		if (isSet(newDescription)) {
 			Type(
 				locator1 = "TextArea#DESCRIPTION",
-				value1 = ${newDescription});
+				value1 = "${newDescription}");
 		}
 
 		Click(locator1 = "ACCustomEvents#EDIT_MODAL_TITLE");
@@ -73,107 +57,34 @@ definition {
 		}
 	}
 
-	@summary = "Copy the sample JS from an already created custom event and modify the name of the attributes and their values"
-	macro copySampleJavascript {
-		if (!(isSet(disableAttributesList))) {
-
-			// If the list is not set, you must always disable global attributes
-
-			var disableAttributesList = "canonicalUrl,pageTitle,referrer,url";
-		}
-
-		// Disable attributes that will not be included in the JS by the checkbox before copying
-
-		ACCustomEvents.disableAttributes(disableAttributesList = ${disableAttributesList});
-
-		Copy(locator1 = "//code");
-
-		ACUtils.clickAnyButton(button = "Edit");
-
-		Paste(locator1 = "TextArea#DESCRIPTION");
-
-		static var sampleJavascript = selenium.getText("TextArea#DESCRIPTION");
-
-		// Change single quotes to double quotes, remove spaces to be able to create WC with API
-
-		for (var attribute : list ${attributesList}) {
-			var sampleJavascript = StringUtil.replace(${sampleJavascript}, "'${attribute}'", ${attribute});
-		}
-
-		var sampleJavascript = StringUtil.replace(${sampleJavascript}, "'", "\"");
-
-		var sampleJavascript = StringUtil.replace(${sampleJavascript}, " ", "");
-
-		// Change the custom event name to the new name
-
-		var sampleJavascript = StringUtil.replace(${sampleJavascript}, ${oldCustomEventName}, ${newCustomEventName});
-
-		if (isSet(oldAttributeList)) {
-
-			// If the list is set, change the name of the attributes present in the sample JS to put new attributes
-
-			var list1 = ListUtil.newListFromString(${oldAttributeList});
-			var list2 = ListUtil.newListFromString(${newAttributeList});
-			var size = ListUtil.size(${list1});
-			var i = 0;
-
-			while (${i} != ${size}) {
-				var oldAttribute = ListUtil.get(${list1}, ${i});
-				var newAttribute = ListUtil.get(${list2}, ${i});
-
-				var sampleJavascript = StringUtil.replace(${sampleJavascript}, ${oldAttribute}, ${newAttribute});
-				var i = ${i} + 1;
-
-				var i = StringUtil.valueOf(${i});
-			}
-
-			// If the list is set, change the value of the attributes present in the sample JS to put new values in the attributes
-
-			var list3 = ListUtil.newListFromString(${oldValueList});
-			var list4 = ListUtil.newListFromString(${newValueList});
-			var size = ListUtil.size(${list3});
-			var i = 0;
-
-			while (${i} != ${size}) {
-				var oldValue = ListUtil.get(${list3}, ${i});
-				var newValue = ListUtil.get(${list4}, ${i});
-
-				var sampleJavascript = StringUtil.replace(${sampleJavascript}, ${oldValue}, ${newValue});
-				var i = ${i} + 1;
-
-				var i = StringUtil.valueOf(${i});
-			}
-		}
-	}
-
 	macro createCustomEvent {
 		if (!(isSet(attributesName))) {
-			var attributesName = "category,price,temp,birthdate,like,duration";
+			var attributesName = "category,price,temp,birthdate,like";
 		}
 
 		if (!(isSet(attributesValue))) {
-			var attributesValue = "wetsuit,259.95,11,2021-11-25T14:36:30.685Z,true,3600000";
+			var attributesValue = "wetsuit,259.95,11,2021-11-25T14:36:30.685Z,true";
 		}
 
 		Type(
-			key_inputId = "name-custom",
+			key_inputID = "name-custom",
 			locator1 = "ACCustomEvents#INPUT_CUSTOM_EVENT",
-			value1 = ${customEventName});
+			value1 = "${customEventName}");
 
 		Type(
-			key_inputId = "times-custom",
+			key_inputID = "times-custom",
 			locator1 = "ACCustomEvents#INPUT_CUSTOM_EVENT",
-			value1 = ${timeToSendCustomEvent});
+			value1 = "${timeToSendCustomEvent}");
 
 		Type(
-			key_textareaId = "placements",
+			key_textareaID = "placements",
 			locator1 = "ACCustomEvents#TEXTAREA_CUSTOM_EVENT",
-			value1 = ${attributesName});
+			value1 = "${attributesName}");
 
 		Type(
-			key_textareaId = "expected",
+			key_textareaID = "expected",
 			locator1 = "ACCustomEvents#TEXTAREA_CUSTOM_EVENT",
-			value1 = ${attributesValue});
+			value1 = "${attributesValue}");
 
 		Click(locator1 = "ACCustomEvents#INPUT_BUTTON");
 	}
@@ -198,21 +109,15 @@ definition {
 				let placements = document.getElementById("placements").value; let values = document.getElementById("expected").value; placements = placements.split(","); values = values.split(","); if (eventName == "" || eventName.startsWith(" ")) { return alert("Event name is empty or starts with a space character. Please review the name and try again."); } \
 				if (placements.length !== values.length){ return alert("You are missing a placement or value in the input fields.\ Please make sure both fields have the same number of entries."); } const attributesList = {}; placements.forEach((placement, value) => attributesList[placement] = values[value]); timesCustom =  Array.from({length: timesCustom}); \
 				timesCustom.forEach((_) => { Analytics.track(eventName, attributesList); console.log("fired!"); }); console.log(attributesList); } </script></div> </br\>''',
-				webContentTitle = ${webContentTitle});
+				webContentTitle = "${webContentTitle}");
 		}
 
 		if (isSet(customEventsNumber)) {
 			var customEventName = ACCustomEvents.generateCustomEventName();
 
 			ACUtils.createWCAndAddToPage(
-				webContentContent = '''<div><button class="mybutton-shop product-shop-button" onclick="buySurfwear()">Buy</button></div> <script> function buySurfwear() { for(let i = 0; i < ${customEventsNumber}; i = i %2B 1 ) { var message = "Multiple Custom Event ${customEventName} V"; var finalMessage = message.replace("V", i); Analytics.track(finalMessage, {category: "wetsuit"});  } } </script>''',
-				webContentTitle = ${webContentTitle});
-		}
-	}
-
-	macro disableAttributes {
-		for (var key_tableMember : list ${disableAttributesList}) {
-			Click(locator1 = "ACSegments#TABLE_CHECKBOX");
+				webContentContent = '''<div><button class="mybutton-shop product-shop-button" onclick="buySurfwear()">Buy</button></div> <script> function buySurfwear() { for(let i = 0; i < ${customEventsNumber}; i = i + 1) { var message = "Block ${customEventName} N"; var finalMessage = message.replace("N", i); Analytics.track(finalMessage, {category: "wetsuit"});  } } </script>''',
+				webContentTitle = "${webContentTitle}");
 		}
 	}
 
@@ -221,17 +126,9 @@ definition {
 		var displayDateDay = DateUtil.getCurrentDate();
 		var displayDateMonth = DateUtil.getCurrentMonth();
 		var displayDateYear = DateUtil.getCurrentYear();
-
 		var customEventName = "AC-${displayDateHour}-${displayDateDay}-${displayDateMonth}-${displayDateYear}";
 
-		return ${customEventName};
-	}
-
-	macro getSampleRawData {
-		var key_attributeName = ${attributeName};
-		var sampleRawDataValue = selenium.getText("ACCustomEvents#SAMPLE_RAW_DATA_LIST");
-
-		return ${sampleRawDataValue};
+		return "${customEventName}";
 	}
 
 	macro hideAllCustomEvents {
@@ -241,26 +138,26 @@ definition {
 			locator1 = "ACSettings#SELECT_ALL_CHECKBOX",
 			value1 = "\SPACE");
 
-		ACUtils.clickAnyButton(button = ${key_actionButton});
+		ACUtils.clickAnyButton(button = "${key_actionButton}");
 
-		ACUtils.clickAnyButton(button = ${key_actionButton});
+		ACUtils.clickAnyButton(button = "${key_actionButton}");
 	}
 
 	macro hideCustomEvent {
 		var key_actionButton = "Hide";
-		var key_nameList = ${customEventName};
+		var key_nameList = "${customEventName}";
 
 		WaitForPageLoad();
 
-		while ((IsElementNotPresent(locator1 = "ACUtils#NAME_LIST")) && (maxIterations = "50")) {
-			ACUtils.searchBar(searchItem = ${customEventName});
+		if (IsElementNotPresent(locator1 = "ACUtils#NAME_LIST")) {
+			ACUtils.searchBar(searchItem = "${customEventName}");
 		}
 
 		MouseOver(locator1 = "ACUtils#NAME_LIST");
 
-		Click(locator1 = "ACDefinitions#HIDE_UNHIDE_EVENT_BUTTON");
+		Click(locator1 = "ACCustomEvents#BLOCK_HIDE_BUTTON");
 
-		ACUtils.clickAnyButton(button = ${key_actionButton});
+		ACUtils.clickAnyButton(button = "${key_actionButton}");
 	}
 
 	macro openBlockCustomEventList {
@@ -279,62 +176,43 @@ definition {
 
 	macro unblockCustomEvent {
 		var key_actionButton = "Unblock";
-		var key_nameList = ${customEventName};
+		var key_nameList = "${customEventName}";
 
 		WaitForPageLoad();
 
-		while ((IsElementNotPresent(locator1 = "ACUtils#NAME_LIST")) && (maxIterations = "50")) {
-			ACUtils.searchBar(searchItem = ${customEventName});
+		if (IsElementNotPresent(locator1 = "ACUtils#NAME_LIST")) {
+			ACUtils.searchBar(searchItem = "${customEventName}");
 		}
 
 		MouseOver(locator1 = "ACUtils#NAME_LIST");
 
-		Click(locator1 = "ACCustomEvents#BLOCK_UNBLOCK_EVENT_BUTTON");
-	}
-
-	macro viewAlertLimitReached {
-		while ((IsElementNotPresent(locator1 = "ACCustomEvents#ALERT_LIMIT_REACHED")) && (maxIterations = "50")) {
-			TestUtils.hardRefresh();
-		}
-
-		AssertElementPresent(locator1 = "ACCustomEvents#ALERT_LIMIT_REACHED");
+		Click(locator1 = "ACCustomEvents#BLOCK_HIDE_BUTTON");
 	}
 
 	macro viewDataAttribute {
-		for (var attributeValue : list ${attributeValueList}) {
+		for (var attributeValue : list "${attributeValueList}") {
 			AssertElementPresent(
-				itemName = ${attributeValue},
+				itemName = "${attributeValue}",
 				locator1 = "ACSettings#ITEM_ON_LIST");
 		}
 	}
 
-	macro viewDataAttributeInOrder {
-		var index = ${index};
-
-		AssertTextEquals(
-			locator1 = "ACCustomEvents#SAMPLE_RAW_DATA_IN_ORDER",
-			value1 = ${attributeValue});
-	}
-
 	macro viewDataType {
-		var typeValue = StringUtil.upperCase(${typeValue});
-
 		AssertTextEquals(
 			locator1 = "ACSegments#EDITOR_LABEL",
-			value1 = ${typeValue});
+			value1 = "${typeValue}");
 	}
 
 	macro viewDataTypeList {
-		var key_attributeName = ${attributeName};
-		var typeValue = StringUtil.upperCase(${typeValue});
+		var key_attributeName = "${attributeName}";
 
 		AssertTextEquals(
 			locator1 = "ACCustomEvents#DATA_TYPE_LIST",
-			value1 = ${typeValue});
+			value1 = "${typeValue}");
 	}
 
 	macro viewDisplayNameOrDescriptionList {
-		var key_nameValue = ${nameValue};
+		var key_nameValue = "${nameValue}";
 
 		AssertElementPresent(locator1 = "ACCustomEvents#DISPLAY_NAME_OR_DESCRIPTION_LIST");
 	}
@@ -342,7 +220,7 @@ definition {
 	macro viewInvalidCustomEventEdition {
 		AssertTextEquals(
 			locator1 = "ACCustomEvents#INVALID_MESSAGE",
-			value1 = ${invalidMessage});
+			value1 = "${invalidMessage}");
 
 		AssertElementPresent(
 			key_text = "Save",

@@ -42,11 +42,11 @@
 					<#assign popularity = (maxCount - (maxCount - (assetCount - minCount))) * multiplier />
 
 					<#if popularity < 1>
-						<#assign color = "green" />
+						<#assign displayType = "success" />
 					<#elseif (popularity >= 1) && (popularity < 2)>
-						<#assign color = "orange" />
+						<#assign displayType = "warning" />
 					<#else>
-						<#assign color = "red" />
+						<#assign displayType = "danger" />
 					</#if>
 
 					<#assign tagURL = renderResponse.createRenderURL() />
@@ -54,11 +54,11 @@
 					${tagURL.setParameter("resetCur", "true")}
 					${tagURL.setParameter("tag", entry.getName())}
 
-					<a class="tag" href="${tagURL}" style="color: ${color};">
-						${entry.getName()}
+					<a class="label label-${displayType} tag" href="${tagURL}">
+						<span class="label-item label-item-expand">${entry.getName()}</span>
 
 						<#if assetCount?? && getterUtil.getBoolean(showAssetCount)>
-							<span class="tag-asset-count">(${assetCount})</span>
+							<span class="label-item label-item-after tag-asset-count">(${assetCount})</span>
 						</#if>
 					</a>
 				</li>

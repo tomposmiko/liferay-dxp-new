@@ -480,6 +480,9 @@ public interface WebKeys {
 	public static final String PORTAL_RESILIENCY_ACTION =
 		"PORTAL_RESILIENCY_ACTION";
 
+	public static final String PORTAL_SERVLET_URL_PATTERNS =
+		"PORTAL_SERVLET_URL_PATTERNS";
+
 	public static final String PORTLET_AJAX_RENDER = "PORTLET_AJAX_RENDER";
 
 	public static final String PORTLET_BREADCRUMBS =
@@ -610,6 +613,10 @@ public interface WebKeys {
 	public static final String SERVLET_CONTEXT_INCLUDE_FILTER_THEME =
 		"SERVLET_CONTEXT_INCLUDE_FILTER_THEME";
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public static final String SERVLET_MAPPING = "SERVLET_MAPPING";
 
 	public static final String SERVLET_PATH = "SERVLET_PATH";
@@ -815,8 +822,5 @@ public interface WebKeys {
 	public static final String WORKFLOW_INSTANCE = "WORKFLOW_INSTANCE";
 
 	public static final String WORKFLOW_TASK = "WORKFLOW_TASK";
-
-	public static final String XUGGLER_INSTALL_STATUS =
-		"XUGGLER_INSTALL_STATUS";
 
 }

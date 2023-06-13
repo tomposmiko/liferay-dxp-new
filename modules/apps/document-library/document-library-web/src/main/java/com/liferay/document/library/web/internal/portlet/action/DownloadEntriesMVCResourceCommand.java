@@ -111,55 +111,56 @@ public class DownloadEntriesMVCResourceCommand implements MVCResourceCommand {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws IOException, PortalException {
 
-		List<FileEntry> fileEntries = ActionUtil.getFileEntries(
-			resourceRequest);
+		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
-		List<FileShortcut> fileShortcuts = ActionUtil.getFileShortcuts(
-			resourceRequest);
+		long folderId = ParamUtil.getLong(resourceRequest, "folderId");
 
-		List<Folder> folders = ActionUtil.getFolders(resourceRequest);
+		File file = null;
 
-		if (fileEntries.isEmpty() && fileShortcuts.isEmpty() &&
-			folders.isEmpty()) {
+		try {
+			List<FileEntry> fileEntries = ActionUtil.getFileEntries(
+				resourceRequest);
 
-			return;
-		}
+			List<FileShortcut> fileShortcuts = ActionUtil.getFileShortcuts(
+				resourceRequest);
 
-		if ((fileEntries.size() == 1) && fileShortcuts.isEmpty() &&
-			folders.isEmpty()) {
+			List<Folder> folders = ActionUtil.getFolders(resourceRequest);
 
-			FileEntry fileEntry = fileEntries.get(0);
+			if (fileEntries.isEmpty() && fileShortcuts.isEmpty() &&
+				folders.isEmpty()) {
 
-			PortletResponseUtil.sendFile(
-				resourceRequest, resourceResponse, fileEntry.getFileName(),
-				fileEntry.getContentStream(), 0, fileEntry.getMimeType(),
-				HttpHeaders.CONTENT_DISPOSITION_ATTACHMENT);
-		}
-		else if ((fileShortcuts.size() == 1) && fileEntries.isEmpty() &&
-				 folders.isEmpty()) {
+				return;
+			}
 
-			FileShortcut fileShortcut = fileShortcuts.get(0);
+			if ((fileEntries.size() == 1) && fileShortcuts.isEmpty() &&
+				folders.isEmpty()) {
 
-			FileEntry fileEntry = _dlAppService.getFileEntry(
-				fileShortcut.getToFileEntryId());
+				FileEntry fileEntry = fileEntries.get(0);
 
-			PortletResponseUtil.sendFile(
-				resourceRequest, resourceResponse, fileEntry.getFileName(),
-				fileEntry.getContentStream(), 0, fileEntry.getMimeType(),
-				HttpHeaders.CONTENT_DISPOSITION_ATTACHMENT);
-		}
-		else {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)resourceRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
+				PortletResponseUtil.sendFile(
+					resourceRequest, resourceResponse, fileEntry.getFileName(),
+					fileEntry.getContentStream(), 0, fileEntry.getMimeType(),
+					HttpHeaders.CONTENT_DISPOSITION_ATTACHMENT);
+			}
+			else if ((fileShortcuts.size() == 1) && fileEntries.isEmpty() &&
+					 folders.isEmpty()) {
 
-			long folderId = ParamUtil.getLong(resourceRequest, "folderId");
+				FileShortcut fileShortcut = fileShortcuts.get(0);
 
-			String zipFileName = _getZipFileName(folderId, themeDisplay);
+				FileEntry fileEntry = _dlAppService.getFileEntry(
+					fileShortcut.getToFileEntryId());
 
-			ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
+				PortletResponseUtil.sendFile(
+					resourceRequest, resourceResponse, fileEntry.getFileName(),
+					fileEntry.getContentStream(), 0, fileEntry.getMimeType(),
+					HttpHeaders.CONTENT_DISPOSITION_ATTACHMENT);
+			}
+			else {
+				String zipFileName = _getZipFileName(folderId, themeDisplay);
 
-			try {
+				ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
+
 				for (FileEntry fileEntry : fileEntries) {
 					_zipFileEntry(fileEntry, StringPool.SLASH, zipWriter);
 				}
@@ -180,17 +181,17 @@ public class DownloadEntriesMVCResourceCommand implements MVCResourceCommand {
 					}
 				}
 
-				try (InputStream inputStream = new FileInputStream(
-						zipWriter.getFile())) {
+				file = zipWriter.getFile();
 
+				try (InputStream inputStream = new FileInputStream(file)) {
 					PortletResponseUtil.sendFile(
 						resourceRequest, resourceResponse, zipFileName,
 						inputStream, ContentTypes.APPLICATION_ZIP);
 				}
 			}
-			finally {
-				File file = zipWriter.getFile();
-
+		}
+		finally {
+			if (file != null) {
 				file.delete();
 			}
 		}
@@ -207,28 +208,30 @@ public class DownloadEntriesMVCResourceCommand implements MVCResourceCommand {
 
 		_checkFolder(folderId);
 
-		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
+		File file = null;
 
 		try {
 			String zipFileName = _getZipFileName(folderId, themeDisplay);
+
+			ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
 
 			long repositoryId = ParamUtil.getLong(
 				resourceRequest, "repositoryId");
 
 			_zipFolder(repositoryId, folderId, StringPool.SLASH, zipWriter);
 
-			try (InputStream inputStream = new FileInputStream(
-					zipWriter.getFile())) {
+			file = zipWriter.getFile();
 
+			try (InputStream inputStream = new FileInputStream(file)) {
 				PortletResponseUtil.sendFile(
 					resourceRequest, resourceResponse, zipFileName, inputStream,
 					ContentTypes.APPLICATION_ZIP);
 			}
 		}
 		finally {
-			File file = zipWriter.getFile();
-
-			file.delete();
+			if (file != null) {
+				file.delete();
+			}
 		}
 	}
 

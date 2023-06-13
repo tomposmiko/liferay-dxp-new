@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -235,80 +236,102 @@ public class HtmlPreviewEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, HtmlPreviewEntry>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			HtmlPreviewEntry.class.getClassLoader(), HtmlPreviewEntry.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<HtmlPreviewEntry> constructor =
+				(Constructor<HtmlPreviewEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<HtmlPreviewEntry, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<HtmlPreviewEntry, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<HtmlPreviewEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<HtmlPreviewEntry, Object>>();
-
-		attributeGetterFunctions.put(
-			"htmlPreviewEntryId", HtmlPreviewEntry::getHtmlPreviewEntryId);
-		attributeGetterFunctions.put("groupId", HtmlPreviewEntry::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", HtmlPreviewEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", HtmlPreviewEntry::getUserId);
-		attributeGetterFunctions.put("userName", HtmlPreviewEntry::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", HtmlPreviewEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", HtmlPreviewEntry::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", HtmlPreviewEntry::getClassNameId);
-		attributeGetterFunctions.put("classPK", HtmlPreviewEntry::getClassPK);
-		attributeGetterFunctions.put(
-			"fileEntryId", HtmlPreviewEntry::getFileEntryId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<HtmlPreviewEntry, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<HtmlPreviewEntry, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<HtmlPreviewEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"htmlPreviewEntryId", HtmlPreviewEntry::getHtmlPreviewEntryId);
 		attributeSetterBiConsumers.put(
 			"htmlPreviewEntryId",
 			(BiConsumer<HtmlPreviewEntry, Long>)
 				HtmlPreviewEntry::setHtmlPreviewEntryId);
+		attributeGetterFunctions.put("groupId", HtmlPreviewEntry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<HtmlPreviewEntry, Long>)HtmlPreviewEntry::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", HtmlPreviewEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<HtmlPreviewEntry, Long>)HtmlPreviewEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", HtmlPreviewEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<HtmlPreviewEntry, Long>)HtmlPreviewEntry::setUserId);
+		attributeGetterFunctions.put("userName", HtmlPreviewEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<HtmlPreviewEntry, String>)
 				HtmlPreviewEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", HtmlPreviewEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<HtmlPreviewEntry, Date>)
 				HtmlPreviewEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", HtmlPreviewEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<HtmlPreviewEntry, Date>)
 				HtmlPreviewEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", HtmlPreviewEntry::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<HtmlPreviewEntry, Long>)
 				HtmlPreviewEntry::setClassNameId);
+		attributeGetterFunctions.put("classPK", HtmlPreviewEntry::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<HtmlPreviewEntry, Long>)HtmlPreviewEntry::setClassPK);
+		attributeGetterFunctions.put(
+			"fileEntryId", HtmlPreviewEntry::getFileEntryId);
 		attributeSetterBiConsumers.put(
 			"fileEntryId",
 			(BiConsumer<HtmlPreviewEntry, Long>)
 				HtmlPreviewEntry::setFileEntryId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -601,6 +624,34 @@ public class HtmlPreviewEntryModelImpl
 	}
 
 	@Override
+	public HtmlPreviewEntry cloneWithOriginalValues() {
+		HtmlPreviewEntryImpl htmlPreviewEntryImpl = new HtmlPreviewEntryImpl();
+
+		htmlPreviewEntryImpl.setHtmlPreviewEntryId(
+			this.<Long>getColumnOriginalValue("htmlPreviewEntryId"));
+		htmlPreviewEntryImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		htmlPreviewEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		htmlPreviewEntryImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		htmlPreviewEntryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		htmlPreviewEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		htmlPreviewEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		htmlPreviewEntryImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		htmlPreviewEntryImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		htmlPreviewEntryImpl.setFileEntryId(
+			this.<Long>getColumnOriginalValue("fileEntryId"));
+
+		return htmlPreviewEntryImpl;
+	}
+
+	@Override
 	public int compareTo(HtmlPreviewEntry htmlPreviewEntry) {
 		long primaryKey = htmlPreviewEntry.getPrimaryKey();
 
@@ -801,9 +852,7 @@ public class HtmlPreviewEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, HtmlPreviewEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					HtmlPreviewEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

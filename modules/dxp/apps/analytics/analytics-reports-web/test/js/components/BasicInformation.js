@@ -28,26 +28,36 @@ describe('BasicInformation', () => {
 			},
 			canonicalURL:
 				'http://localhost:8080/en/web/guest/-/basic-web-content',
-			languageTag: 'en-US',
-			publishDate: 'Thu Feb 17 08:17:57 GMT 2020',
+			onSelectedLanguageClick: () => {},
+			publishDate: 'Thu Sep 20 08:17:57 GMT 2021',
 			title: 'A testing page',
+			viewURLs: [
+				{
+					default: true,
+					languageId: 'en-US',
+					languageLabel: 'English (United States)',
+					selected: true,
+					viewURL:
+						'http://localhost:8080/en/web/guest/-/basic-web-content',
+				},
+				{
+					default: false,
+					languageId: 'es-ES',
+					languageLabel: 'Spanish (Spain)',
+					selected: false,
+					viewURL:
+						'http://localhost:8080/es/web/guest/-/contenido-web-basico',
+				},
+			],
 		};
 
-		const {getByText} = render(
-			<BasicInformation
-				author={testProps.author}
-				canonicalURL={testProps.canonicalURL}
-				languageTag={testProps.languageTag}
-				publishDate={testProps.publishDate}
-				title={testProps.title}
-			/>
-		);
+		const {getByText} = render(<BasicInformation {...testProps} />);
 
 		expect(getByText(testProps.title)).toBeInTheDocument();
 
 		expect(getByText(testProps.canonicalURL)).toBeInTheDocument();
 
-		const formattedPublishDate = 'February 17, 2020';
+		const formattedPublishDate = 'September 20, 2021';
 		expect(
 			getByText('published-on-' + formattedPublishDate)
 		).toBeInTheDocument();

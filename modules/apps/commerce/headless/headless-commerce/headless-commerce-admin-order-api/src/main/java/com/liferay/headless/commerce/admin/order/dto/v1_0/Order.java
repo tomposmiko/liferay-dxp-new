@@ -97,7 +97,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Account account;
 
-	@Schema(example = "AAB-34098-789-N")
+	@Schema
 	public String getAccountExternalReferenceCode() {
 		return accountExternalReferenceCode;
 	}
@@ -130,7 +130,7 @@ public class Order implements Serializable {
 	protected String accountExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getAccountId() {
 		return accountId;
 	}
@@ -188,7 +188,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, Map<String, String>> actions;
 
-	@Schema(example = "trasmitted")
+	@Schema
 	public String getAdvanceStatus() {
 		return advanceStatus;
 	}
@@ -247,7 +247,7 @@ public class Order implements Serializable {
 	protected BillingAddress billingAddress;
 
 	@DecimalMin("0")
-	@Schema(example = "31130")
+	@Schema
 	public Long getBillingAddressId() {
 		return billingAddressId;
 	}
@@ -304,7 +304,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Channel channel;
 
-	@Schema(example = "AAB-34098-789-N")
+	@Schema
 	public String getChannelExternalReferenceCode() {
 		return channelExternalReferenceCode;
 	}
@@ -337,7 +337,7 @@ public class Order implements Serializable {
 	protected String channelExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getChannelId() {
 		return channelId;
 	}
@@ -366,7 +366,7 @@ public class Order implements Serializable {
 	@NotNull
 	protected Long channelId;
 
-	@Schema(example = "save20")
+	@Schema
 	public String getCouponCode() {
 		return couponCode;
 	}
@@ -394,7 +394,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String couponCode;
 
-	@Schema(example = "2017-07-21")
+	@Schema
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -422,7 +422,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date createDate;
 
-	@Schema(example = "USD")
+	@Schema
 	public String getCurrencyCode() {
 		return currencyCode;
 	}
@@ -480,7 +480,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, ?> customFields;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -509,7 +509,7 @@ public class Order implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -535,7 +535,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@Schema(example = "2017-07-21")
+	@Schema
 	public Date getLastPriceUpdateDate() {
 		return lastPriceUpdateDate;
 	}
@@ -563,7 +563,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date lastPriceUpdateDate;
 
-	@Schema(example = "2017-08-21")
+	@Schema
 	public Date getModifiedDate() {
 		return modifiedDate;
 	}
@@ -591,7 +591,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date modifiedDate;
 
-	@Schema(example = "2017-07-21")
+	@Schema
 	public Date getOrderDate() {
 		return orderDate;
 	}
@@ -649,7 +649,7 @@ public class Order implements Serializable {
 	protected OrderItem[] orderItems;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Integer getOrderStatus() {
 		return orderStatus;
 	}
@@ -706,7 +706,68 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Status orderStatusInfo;
 
-	@Schema(example = "paypal")
+	@Schema
+	public String getOrderTypeExternalReferenceCode() {
+		return orderTypeExternalReferenceCode;
+	}
+
+	public void setOrderTypeExternalReferenceCode(
+		String orderTypeExternalReferenceCode) {
+
+		this.orderTypeExternalReferenceCode = orderTypeExternalReferenceCode;
+	}
+
+	@JsonIgnore
+	public void setOrderTypeExternalReferenceCode(
+		UnsafeSupplier<String, Exception>
+			orderTypeExternalReferenceCodeUnsafeSupplier) {
+
+		try {
+			orderTypeExternalReferenceCode =
+				orderTypeExternalReferenceCodeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String orderTypeExternalReferenceCode;
+
+	@DecimalMin("0")
+	@Schema
+	public Long getOrderTypeId() {
+		return orderTypeId;
+	}
+
+	public void setOrderTypeId(Long orderTypeId) {
+		this.orderTypeId = orderTypeId;
+	}
+
+	@JsonIgnore
+	public void setOrderTypeId(
+		UnsafeSupplier<Long, Exception> orderTypeIdUnsafeSupplier) {
+
+		try {
+			orderTypeId = orderTypeIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long orderTypeId;
+
+	@Schema
 	public String getPaymentMethod() {
 		return paymentMethod;
 	}
@@ -735,7 +796,7 @@ public class Order implements Serializable {
 	protected String paymentMethod;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Integer getPaymentStatus() {
 		return paymentStatus;
 	}
@@ -792,7 +853,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Status paymentStatusInfo;
 
-	@Schema(example = "Order printed note")
+	@Schema
 	public String getPrintedNote() {
 		return printedNote;
 	}
@@ -820,7 +881,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String printedNote;
 
-	@Schema(example = "Abcd1234")
+	@Schema
 	public String getPurchaseOrderNumber() {
 		return purchaseOrderNumber;
 	}
@@ -848,7 +909,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String purchaseOrderNumber;
 
-	@Schema(example = "2017-07-21")
+	@Schema
 	public Date getRequestedDeliveryDate() {
 		return requestedDeliveryDate;
 	}
@@ -907,7 +968,7 @@ public class Order implements Serializable {
 	protected ShippingAddress shippingAddress;
 
 	@DecimalMin("0")
-	@Schema(example = "31130")
+	@Schema
 	public Long getShippingAddressId() {
 		return shippingAddressId;
 	}
@@ -936,7 +997,7 @@ public class Order implements Serializable {
 	protected Long shippingAddressId;
 
 	@DecimalMin("0")
-	@Schema(example = "12")
+	@Schema
 	@Valid
 	public BigDecimal getShippingAmount() {
 		return shippingAmount;
@@ -996,7 +1057,7 @@ public class Order implements Serializable {
 	protected String shippingAmountFormatted;
 
 	@DecimalMin("0")
-	@Schema(example = "12")
+	@Schema
 	public Double getShippingAmountValue() {
 		return shippingAmountValue;
 	}
@@ -1086,7 +1147,7 @@ public class Order implements Serializable {
 	protected String shippingDiscountAmountFormatted;
 
 	@DecimalMin("0")
-	@Schema(example = "20")
+	@Schema
 	public Double getShippingDiscountPercentageLevel1() {
 		return shippingDiscountPercentageLevel1;
 	}
@@ -1120,7 +1181,7 @@ public class Order implements Serializable {
 	protected Double shippingDiscountPercentageLevel1;
 
 	@DecimalMin("0")
-	@Schema(example = "20")
+	@Schema
 	public Double getShippingDiscountPercentageLevel1WithTaxAmount() {
 		return shippingDiscountPercentageLevel1WithTaxAmount;
 	}
@@ -1155,7 +1216,7 @@ public class Order implements Serializable {
 	protected Double shippingDiscountPercentageLevel1WithTaxAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getShippingDiscountPercentageLevel2() {
 		return shippingDiscountPercentageLevel2;
 	}
@@ -1189,7 +1250,7 @@ public class Order implements Serializable {
 	protected Double shippingDiscountPercentageLevel2;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getShippingDiscountPercentageLevel2WithTaxAmount() {
 		return shippingDiscountPercentageLevel2WithTaxAmount;
 	}
@@ -1224,7 +1285,7 @@ public class Order implements Serializable {
 	protected Double shippingDiscountPercentageLevel2WithTaxAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getShippingDiscountPercentageLevel3() {
 		return shippingDiscountPercentageLevel3;
 	}
@@ -1258,7 +1319,7 @@ public class Order implements Serializable {
 	protected Double shippingDiscountPercentageLevel3;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getShippingDiscountPercentageLevel3WithTaxAmount() {
 		return shippingDiscountPercentageLevel3WithTaxAmount;
 	}
@@ -1293,7 +1354,7 @@ public class Order implements Serializable {
 	protected Double shippingDiscountPercentageLevel3WithTaxAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getShippingDiscountPercentageLevel4() {
 		return shippingDiscountPercentageLevel4;
 	}
@@ -1327,7 +1388,7 @@ public class Order implements Serializable {
 	protected Double shippingDiscountPercentageLevel4;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getShippingDiscountPercentageLevel4WithTaxAmount() {
 		return shippingDiscountPercentageLevel4WithTaxAmount;
 	}
@@ -1426,7 +1487,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String shippingDiscountWithTaxAmountFormatted;
 
-	@Schema(example = "fixed")
+	@Schema
 	public String getShippingMethod() {
 		return shippingMethod;
 	}
@@ -1454,7 +1515,7 @@ public class Order implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String shippingMethod;
 
-	@Schema(example = "by Air")
+	@Schema
 	public String getShippingOption() {
 		return shippingOption;
 	}
@@ -1483,7 +1544,7 @@ public class Order implements Serializable {
 	protected String shippingOption;
 
 	@DecimalMin("0")
-	@Schema(example = "12")
+	@Schema
 	@Valid
 	public BigDecimal getShippingWithTaxAmount() {
 		return shippingWithTaxAmount;
@@ -1546,7 +1607,7 @@ public class Order implements Serializable {
 	protected String shippingWithTaxAmountFormatted;
 
 	@DecimalMin("0")
-	@Schema(example = "12")
+	@Schema
 	public Double getShippingWithTaxAmountValue() {
 		return shippingWithTaxAmountValue;
 	}
@@ -1697,7 +1758,7 @@ public class Order implements Serializable {
 	protected String subtotalDiscountAmountFormatted;
 
 	@DecimalMin("0")
-	@Schema(example = "20")
+	@Schema
 	public Double getSubtotalDiscountPercentageLevel1() {
 		return subtotalDiscountPercentageLevel1;
 	}
@@ -1731,7 +1792,7 @@ public class Order implements Serializable {
 	protected Double subtotalDiscountPercentageLevel1;
 
 	@DecimalMin("0")
-	@Schema(example = "20")
+	@Schema
 	public Double getSubtotalDiscountPercentageLevel1WithTaxAmount() {
 		return subtotalDiscountPercentageLevel1WithTaxAmount;
 	}
@@ -1766,7 +1827,7 @@ public class Order implements Serializable {
 	protected Double subtotalDiscountPercentageLevel1WithTaxAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getSubtotalDiscountPercentageLevel2() {
 		return subtotalDiscountPercentageLevel2;
 	}
@@ -1800,7 +1861,7 @@ public class Order implements Serializable {
 	protected Double subtotalDiscountPercentageLevel2;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getSubtotalDiscountPercentageLevel2WithTaxAmount() {
 		return subtotalDiscountPercentageLevel2WithTaxAmount;
 	}
@@ -1835,7 +1896,7 @@ public class Order implements Serializable {
 	protected Double subtotalDiscountPercentageLevel2WithTaxAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getSubtotalDiscountPercentageLevel3() {
 		return subtotalDiscountPercentageLevel3;
 	}
@@ -1869,7 +1930,7 @@ public class Order implements Serializable {
 	protected Double subtotalDiscountPercentageLevel3;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getSubtotalDiscountPercentageLevel3WithTaxAmount() {
 		return subtotalDiscountPercentageLevel3WithTaxAmount;
 	}
@@ -1904,7 +1965,7 @@ public class Order implements Serializable {
 	protected Double subtotalDiscountPercentageLevel3WithTaxAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getSubtotalDiscountPercentageLevel4() {
 		return subtotalDiscountPercentageLevel4;
 	}
@@ -1938,7 +1999,7 @@ public class Order implements Serializable {
 	protected Double subtotalDiscountPercentageLevel4;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getSubtotalDiscountPercentageLevel4WithTaxAmount() {
 		return subtotalDiscountPercentageLevel4WithTaxAmount;
 	}
@@ -2160,18 +2221,19 @@ public class Order implements Serializable {
 	protected Double subtotalWithTaxAmountValue;
 
 	@DecimalMin("0")
-	@Schema(example = "11")
-	public Double getTaxAmount() {
+	@Schema
+	@Valid
+	public BigDecimal getTaxAmount() {
 		return taxAmount;
 	}
 
-	public void setTaxAmount(Double taxAmount) {
+	public void setTaxAmount(BigDecimal taxAmount) {
 		this.taxAmount = taxAmount;
 	}
 
 	@JsonIgnore
 	public void setTaxAmount(
-		UnsafeSupplier<Double, Exception> taxAmountUnsafeSupplier) {
+		UnsafeSupplier<BigDecimal, Exception> taxAmountUnsafeSupplier) {
 
 		try {
 			taxAmount = taxAmountUnsafeSupplier.get();
@@ -2186,7 +2248,7 @@ public class Order implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Double taxAmount;
+	protected BigDecimal taxAmount;
 
 	@Schema
 	public String getTaxAmountFormatted() {
@@ -2217,7 +2279,36 @@ public class Order implements Serializable {
 	protected String taxAmountFormatted;
 
 	@DecimalMin("0")
-	@Schema(example = "113")
+	@Schema
+	public Double getTaxAmountValue() {
+		return taxAmountValue;
+	}
+
+	public void setTaxAmountValue(Double taxAmountValue) {
+		this.taxAmountValue = taxAmountValue;
+	}
+
+	@JsonIgnore
+	public void setTaxAmountValue(
+		UnsafeSupplier<Double, Exception> taxAmountValueUnsafeSupplier) {
+
+		try {
+			taxAmountValue = taxAmountValueUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Double taxAmountValue;
+
+	@DecimalMin("0")
+	@Schema
 	@Valid
 	public BigDecimal getTotal() {
 		return total;
@@ -2247,7 +2338,7 @@ public class Order implements Serializable {
 	protected BigDecimal total;
 
 	@DecimalMin("0")
-	@Schema(example = "113")
+	@Schema
 	public Double getTotalAmount() {
 		return totalAmount;
 	}
@@ -2276,7 +2367,7 @@ public class Order implements Serializable {
 	protected Double totalAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "11")
+	@Schema
 	public Double getTotalDiscountAmount() {
 		return totalDiscountAmount;
 	}
@@ -2337,7 +2428,7 @@ public class Order implements Serializable {
 	protected String totalDiscountAmountFormatted;
 
 	@DecimalMin("0")
-	@Schema(example = "20")
+	@Schema
 	public Double getTotalDiscountPercentageLevel1() {
 		return totalDiscountPercentageLevel1;
 	}
@@ -2370,7 +2461,7 @@ public class Order implements Serializable {
 	protected Double totalDiscountPercentageLevel1;
 
 	@DecimalMin("0")
-	@Schema(example = "20")
+	@Schema
 	public Double getTotalDiscountPercentageLevel1WithTaxAmount() {
 		return totalDiscountPercentageLevel1WithTaxAmount;
 	}
@@ -2404,7 +2495,7 @@ public class Order implements Serializable {
 	protected Double totalDiscountPercentageLevel1WithTaxAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getTotalDiscountPercentageLevel2() {
 		return totalDiscountPercentageLevel2;
 	}
@@ -2437,7 +2528,7 @@ public class Order implements Serializable {
 	protected Double totalDiscountPercentageLevel2;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getTotalDiscountPercentageLevel2WithTaxAmount() {
 		return totalDiscountPercentageLevel2WithTaxAmount;
 	}
@@ -2471,7 +2562,7 @@ public class Order implements Serializable {
 	protected Double totalDiscountPercentageLevel2WithTaxAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getTotalDiscountPercentageLevel3() {
 		return totalDiscountPercentageLevel3;
 	}
@@ -2504,7 +2595,7 @@ public class Order implements Serializable {
 	protected Double totalDiscountPercentageLevel3;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getTotalDiscountPercentageLevel3WithTaxAmount() {
 		return totalDiscountPercentageLevel3WithTaxAmount;
 	}
@@ -2538,7 +2629,7 @@ public class Order implements Serializable {
 	protected Double totalDiscountPercentageLevel3WithTaxAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getTotalDiscountPercentageLevel4() {
 		return totalDiscountPercentageLevel4;
 	}
@@ -2571,7 +2662,7 @@ public class Order implements Serializable {
 	protected Double totalDiscountPercentageLevel4;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Double getTotalDiscountPercentageLevel4WithTaxAmount() {
 		return totalDiscountPercentageLevel4WithTaxAmount;
 	}
@@ -2605,7 +2696,7 @@ public class Order implements Serializable {
 	protected Double totalDiscountPercentageLevel4WithTaxAmount;
 
 	@DecimalMin("0")
-	@Schema(example = "11")
+	@Schema
 	public Double getTotalDiscountWithTaxAmount() {
 		return totalDiscountWithTaxAmount;
 	}
@@ -2699,7 +2790,7 @@ public class Order implements Serializable {
 	protected String totalFormatted;
 
 	@DecimalMin("0")
-	@Schema(example = "113")
+	@Schema
 	@Valid
 	public BigDecimal getTotalWithTaxAmount() {
 		return totalWithTaxAmount;
@@ -2762,7 +2853,7 @@ public class Order implements Serializable {
 	protected String totalWithTaxAmountFormatted;
 
 	@DecimalMin("0")
-	@Schema(example = "113")
+	@Schema
 	public Double getTotalWithTaxAmountValue() {
 		return totalWithTaxAmountValue;
 	}
@@ -3147,6 +3238,30 @@ public class Order implements Serializable {
 			sb.append("\"orderStatusInfo\": ");
 
 			sb.append(String.valueOf(orderStatusInfo));
+		}
+
+		if (orderTypeExternalReferenceCode != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"orderTypeExternalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(orderTypeExternalReferenceCode));
+
+			sb.append("\"");
+		}
+
+		if (orderTypeId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"orderTypeId\": ");
+
+			sb.append(orderTypeId);
 		}
 
 		if (paymentMethod != null) {
@@ -3687,6 +3802,16 @@ public class Order implements Serializable {
 			sb.append(_escape(taxAmountFormatted));
 
 			sb.append("\"");
+		}
+
+		if (taxAmountValue != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"taxAmountValue\": ");
+
+			sb.append(taxAmountValue);
 		}
 
 		if (total != null) {

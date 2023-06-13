@@ -35,8 +35,6 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
-import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
 import com.liferay.portal.search.test.util.IndexerFixture;
 import com.liferay.portal.search.test.util.SearchTestRule;
@@ -74,8 +72,7 @@ public class JournalArticleIndexerLocalizedContentTest {
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
 
-		_indexerFixture = new IndexerFixture<>(
-			JournalArticle.class, _searchRequestBuilderFactory);
+		_indexerFixture = new IndexerFixture<>(JournalArticle.class);
 
 		_journalArticleSearchFixture = new JournalArticleSearchFixture(
 			_journalArticleLocalService);
@@ -160,18 +157,17 @@ public class JournalArticleIndexerLocalizedContentTest {
 
 		String searchTerm = "nev";
 
-		SearchResponse searchResponse =
-			_indexerFixture.searchOnlyOneSearchResponse(
-				searchTerm, LocaleUtil.HUNGARY);
+		Document document = _indexerFixture.searchOnlyOne(
+			searchTerm, LocaleUtil.HUNGARY);
 
 		FieldValuesAssert.assertFieldValues(
-			titleStrings, name -> name.startsWith("title_"), searchResponse);
+			titleStrings, "title", document, searchTerm);
+
 		FieldValuesAssert.assertFieldValues(
-			contentStrings, name -> name.startsWith("content_"),
-			searchResponse);
+			contentStrings, "content", document, searchTerm);
+
 		FieldValuesAssert.assertFieldValues(
-			localizedTitleStrings, name -> name.startsWith("localized_title"),
-			searchResponse);
+			localizedTitleStrings, "localized_title", document, searchTerm);
 	}
 
 	@Test
@@ -199,10 +195,10 @@ public class JournalArticleIndexerLocalizedContentTest {
 			});
 
 		assertSearchOneDocumentOneField(
-			"alpha", LocaleUtil.HUNGARY, "content_", "content_en_US");
+			"alpha", LocaleUtil.HUNGARY, "content", "content_en_US");
 
 		assertSearchOneDocumentOneField(
-			"gamma", LocaleUtil.HUNGARY, "title_", "title_en_US");
+			"gamma", LocaleUtil.HUNGARY, "title", "title_en_US");
 	}
 
 	@Test
@@ -259,20 +255,20 @@ public class JournalArticleIndexerLocalizedContentTest {
 
 		String searchTerm = articleId;
 
-		SearchResponse searchResponse =
-			_indexerFixture.searchOnlyOneSearchResponse(
-				searchTerm, LocaleUtil.BRAZIL);
+		Document document = _indexerFixture.searchOnlyOne(
+			searchTerm, LocaleUtil.BRAZIL);
 
 		FieldValuesAssert.assertFieldValues(
-			titleStrings, name -> name.startsWith("title"), searchResponse);
+			titleStrings, "title", document, searchTerm);
+
 		FieldValuesAssert.assertFieldValues(
-			contentStrings, name -> name.startsWith("content"), searchResponse);
+			contentStrings, "content", document, searchTerm);
+
 		FieldValuesAssert.assertFieldValues(
-			localizedTitleStrings, name -> name.startsWith("localized_title"),
-			searchResponse);
+			localizedTitleStrings, "localized_title", document, searchTerm);
+
 		FieldValuesAssert.assertFieldValues(
-			ddmContentStrings, name -> name.startsWith("ddm__text"),
-			searchResponse);
+			ddmContentStrings, "ddm__text", document, searchTerm);
 	}
 
 	@Test
@@ -336,19 +332,18 @@ public class JournalArticleIndexerLocalizedContentTest {
 			word1, word2, prefix1, prefix2
 		).forEach(
 			searchTerm -> {
-				SearchResponse searchResponse =
-					_indexerFixture.searchOnlyOneSearchResponse(
-						searchTerm, LocaleUtil.JAPAN);
+				Document document = _indexerFixture.searchOnlyOne(
+					searchTerm, LocaleUtil.JAPAN);
 
 				FieldValuesAssert.assertFieldValues(
-					titleStrings, name -> name.startsWith("title_"),
-					searchResponse);
+					titleStrings, "title", document, searchTerm);
+
 				FieldValuesAssert.assertFieldValues(
-					contentStrings, name -> name.startsWith("content_"),
-					searchResponse);
+					contentStrings, "content", document, searchTerm);
+
 				FieldValuesAssert.assertFieldValues(
-					localizedTitleStrings,
-					name -> name.startsWith("localized_title"), searchResponse);
+					localizedTitleStrings, "localized_title", document,
+					searchTerm);
 			}
 		);
 	}
@@ -405,7 +400,7 @@ public class JournalArticleIndexerLocalizedContentTest {
 					searchTerm, LocaleUtil.JAPAN);
 
 				FieldValuesAssert.assertFieldValues(
-					titleStrings, "title_", document, searchTerm);
+					titleStrings, "title", document, searchTerm);
 			}
 		);
 	}
@@ -451,8 +446,5 @@ public class JournalArticleIndexerLocalizedContentTest {
 	private List<JournalArticle> _journalArticles;
 
 	private JournalArticleSearchFixture _journalArticleSearchFixture;
-
-	@Inject
-	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
 
 }

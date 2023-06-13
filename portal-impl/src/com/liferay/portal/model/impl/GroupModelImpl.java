@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -462,105 +463,126 @@ public class GroupModelImpl extends BaseModelImpl<Group> implements GroupModel {
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Group, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Group>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Group, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Group, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Group.class.getClassLoader(), Group.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", Group::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", Group::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", Group::getUuid);
-		attributeGetterFunctions.put("groupId", Group::getGroupId);
-		attributeGetterFunctions.put("companyId", Group::getCompanyId);
-		attributeGetterFunctions.put("creatorUserId", Group::getCreatorUserId);
-		attributeGetterFunctions.put("classNameId", Group::getClassNameId);
-		attributeGetterFunctions.put("classPK", Group::getClassPK);
-		attributeGetterFunctions.put("parentGroupId", Group::getParentGroupId);
-		attributeGetterFunctions.put("liveGroupId", Group::getLiveGroupId);
-		attributeGetterFunctions.put("treePath", Group::getTreePath);
-		attributeGetterFunctions.put("groupKey", Group::getGroupKey);
-		attributeGetterFunctions.put("name", Group::getName);
-		attributeGetterFunctions.put("description", Group::getDescription);
-		attributeGetterFunctions.put("type", Group::getType);
-		attributeGetterFunctions.put("typeSettings", Group::getTypeSettings);
-		attributeGetterFunctions.put(
-			"manualMembership", Group::getManualMembership);
-		attributeGetterFunctions.put(
-			"membershipRestriction", Group::getMembershipRestriction);
-		attributeGetterFunctions.put("friendlyURL", Group::getFriendlyURL);
-		attributeGetterFunctions.put("site", Group::getSite);
-		attributeGetterFunctions.put(
-			"remoteStagingGroupCount", Group::getRemoteStagingGroupCount);
-		attributeGetterFunctions.put(
-			"inheritContent", Group::getInheritContent);
-		attributeGetterFunctions.put("active", Group::getActive);
+		try {
+			Constructor<Group> constructor =
+				(Constructor<Group>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Group, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Group, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Group, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Group, Object>>();
 		Map<String, BiConsumer<Group, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Group, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", Group::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion", (BiConsumer<Group, Long>)Group::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", Group::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<Group, Long>)Group::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", Group::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<Group, String>)Group::setUuid);
+		attributeGetterFunctions.put("groupId", Group::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<Group, Long>)Group::setGroupId);
+		attributeGetterFunctions.put("companyId", Group::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<Group, Long>)Group::setCompanyId);
+		attributeGetterFunctions.put("creatorUserId", Group::getCreatorUserId);
 		attributeSetterBiConsumers.put(
 			"creatorUserId", (BiConsumer<Group, Long>)Group::setCreatorUserId);
+		attributeGetterFunctions.put("classNameId", Group::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId", (BiConsumer<Group, Long>)Group::setClassNameId);
+		attributeGetterFunctions.put("classPK", Group::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK", (BiConsumer<Group, Long>)Group::setClassPK);
+		attributeGetterFunctions.put("parentGroupId", Group::getParentGroupId);
 		attributeSetterBiConsumers.put(
 			"parentGroupId", (BiConsumer<Group, Long>)Group::setParentGroupId);
+		attributeGetterFunctions.put("liveGroupId", Group::getLiveGroupId);
 		attributeSetterBiConsumers.put(
 			"liveGroupId", (BiConsumer<Group, Long>)Group::setLiveGroupId);
+		attributeGetterFunctions.put("treePath", Group::getTreePath);
 		attributeSetterBiConsumers.put(
 			"treePath", (BiConsumer<Group, String>)Group::setTreePath);
+		attributeGetterFunctions.put("groupKey", Group::getGroupKey);
 		attributeSetterBiConsumers.put(
 			"groupKey", (BiConsumer<Group, String>)Group::setGroupKey);
+		attributeGetterFunctions.put("name", Group::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<Group, String>)Group::setName);
+		attributeGetterFunctions.put("description", Group::getDescription);
 		attributeSetterBiConsumers.put(
 			"description", (BiConsumer<Group, String>)Group::setDescription);
+		attributeGetterFunctions.put("type", Group::getType);
 		attributeSetterBiConsumers.put(
 			"type", (BiConsumer<Group, Integer>)Group::setType);
+		attributeGetterFunctions.put("typeSettings", Group::getTypeSettings);
 		attributeSetterBiConsumers.put(
 			"typeSettings", (BiConsumer<Group, String>)Group::setTypeSettings);
+		attributeGetterFunctions.put(
+			"manualMembership", Group::getManualMembership);
 		attributeSetterBiConsumers.put(
 			"manualMembership",
 			(BiConsumer<Group, Boolean>)Group::setManualMembership);
+		attributeGetterFunctions.put(
+			"membershipRestriction", Group::getMembershipRestriction);
 		attributeSetterBiConsumers.put(
 			"membershipRestriction",
 			(BiConsumer<Group, Integer>)Group::setMembershipRestriction);
+		attributeGetterFunctions.put("friendlyURL", Group::getFriendlyURL);
 		attributeSetterBiConsumers.put(
 			"friendlyURL", (BiConsumer<Group, String>)Group::setFriendlyURL);
+		attributeGetterFunctions.put("site", Group::getSite);
 		attributeSetterBiConsumers.put(
 			"site", (BiConsumer<Group, Boolean>)Group::setSite);
+		attributeGetterFunctions.put(
+			"remoteStagingGroupCount", Group::getRemoteStagingGroupCount);
 		attributeSetterBiConsumers.put(
 			"remoteStagingGroupCount",
 			(BiConsumer<Group, Integer>)Group::setRemoteStagingGroupCount);
+		attributeGetterFunctions.put(
+			"inheritContent", Group::getInheritContent);
 		attributeSetterBiConsumers.put(
 			"inheritContent",
 			(BiConsumer<Group, Boolean>)Group::setInheritContent);
+		attributeGetterFunctions.put("active", Group::getActive);
 		attributeSetterBiConsumers.put(
 			"active", (BiConsumer<Group, Boolean>)Group::setActive);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -1501,6 +1523,50 @@ public class GroupModelImpl extends BaseModelImpl<Group> implements GroupModel {
 	}
 
 	@Override
+	public Group cloneWithOriginalValues() {
+		GroupImpl groupImpl = new GroupImpl();
+
+		groupImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		groupImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		groupImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		groupImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		groupImpl.setCompanyId(this.<Long>getColumnOriginalValue("companyId"));
+		groupImpl.setCreatorUserId(
+			this.<Long>getColumnOriginalValue("creatorUserId"));
+		groupImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		groupImpl.setClassPK(this.<Long>getColumnOriginalValue("classPK"));
+		groupImpl.setParentGroupId(
+			this.<Long>getColumnOriginalValue("parentGroupId"));
+		groupImpl.setLiveGroupId(
+			this.<Long>getColumnOriginalValue("liveGroupId"));
+		groupImpl.setTreePath(this.<String>getColumnOriginalValue("treePath"));
+		groupImpl.setGroupKey(this.<String>getColumnOriginalValue("groupKey"));
+		groupImpl.setName(this.<String>getColumnOriginalValue("name"));
+		groupImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		groupImpl.setType(this.<Integer>getColumnOriginalValue("type_"));
+		groupImpl.setTypeSettings(
+			this.<String>getColumnOriginalValue("typeSettings"));
+		groupImpl.setManualMembership(
+			this.<Boolean>getColumnOriginalValue("manualMembership"));
+		groupImpl.setMembershipRestriction(
+			this.<Integer>getColumnOriginalValue("membershipRestriction"));
+		groupImpl.setFriendlyURL(
+			this.<String>getColumnOriginalValue("friendlyURL"));
+		groupImpl.setSite(this.<Boolean>getColumnOriginalValue("site"));
+		groupImpl.setRemoteStagingGroupCount(
+			this.<Integer>getColumnOriginalValue("remoteStagingGroupCount"));
+		groupImpl.setInheritContent(
+			this.<Boolean>getColumnOriginalValue("inheritContent"));
+		groupImpl.setActive(this.<Boolean>getColumnOriginalValue("active_"));
+
+		return groupImpl;
+	}
+
+	@Override
 	public int compareTo(Group group) {
 		int value = 0;
 
@@ -1741,9 +1807,7 @@ public class GroupModelImpl extends BaseModelImpl<Group> implements GroupModel {
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Group>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Group.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

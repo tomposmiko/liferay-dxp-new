@@ -25,7 +25,6 @@ import com.liferay.headless.commerce.delivery.cart.client.serdes.v1_0.CartSerDes
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -89,11 +88,19 @@ public interface CartResource {
 			Long cartId, CouponCode couponCode)
 		throws Exception;
 
-	public Page<Cart> getChannelCartsPage(Long channelId, Pagination pagination)
+	public String getCartPaymentURL(Long cartId, String callbackURL)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse getCartPaymentURLHttpResponse(
+			Long cartId, String callbackURL)
+		throws Exception;
+
+	public Page<Cart> getChannelCartsPage(
+			Long accountId, Long channelId, Pagination pagination)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse getChannelCartsPageHttpResponse(
-			Long channelId, Pagination pagination)
+			Long accountId, Long channelId, Pagination pagination)
 		throws Exception;
 
 	public Cart postChannelCart(Long channelId, Cart cart) throws Exception;
@@ -111,40 +118,8 @@ public interface CartResource {
 			return this;
 		}
 
-		public Builder bearerToken(String token) {
-			return header("Authorization", "Bearer " + token);
-		}
-
 		public CartResource build() {
 			return new CartResourceImpl(this);
-		}
-
-		public Builder contextPath(String contextPath) {
-			_contextPath = contextPath;
-
-			return this;
-		}
-
-		public Builder endpoint(String address, String scheme) {
-			String[] addressParts = address.split(":");
-
-			String host = addressParts[0];
-
-			int port = 443;
-
-			if (addressParts.length > 1) {
-				String portString = addressParts[1];
-
-				try {
-					port = Integer.parseInt(portString);
-				}
-				catch (NumberFormatException numberFormatException) {
-					throw new IllegalArgumentException(
-						"Unable to parse port from " + portString);
-				}
-			}
-
-			return endpoint(host, port, scheme);
 		}
 
 		public Builder endpoint(String host, int port, String scheme) {
@@ -192,7 +167,6 @@ public interface CartResource {
 		private Builder() {
 		}
 
-		private String _contextPath = "";
 		private Map<String, String> _headers = new LinkedHashMap<>();
 		private String _host = "localhost";
 		private Locale _locale;
@@ -224,29 +198,7 @@ public interface CartResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -284,7 +236,7 @@ public interface CartResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}");
 
 			httpInvoker.path("cartId", cartId);
@@ -315,29 +267,7 @@ public interface CartResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -383,7 +313,7 @@ public interface CartResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-commerce-delivery-cart/v1.0/carts/batch");
 
 			httpInvoker.userNameAndPassword(
@@ -409,29 +339,7 @@ public interface CartResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -480,7 +388,7 @@ public interface CartResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}");
 
 			httpInvoker.path("cartId", cartId);
@@ -509,29 +417,7 @@ public interface CartResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -583,7 +469,7 @@ public interface CartResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}");
 
 			httpInvoker.path("cartId", cartId);
@@ -612,29 +498,7 @@ public interface CartResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -686,7 +550,7 @@ public interface CartResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}");
 
 			httpInvoker.path("cartId", cartId);
@@ -717,29 +581,7 @@ public interface CartResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -785,7 +627,7 @@ public interface CartResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-commerce-delivery-cart/v1.0/carts/batch");
 
 			httpInvoker.userNameAndPassword(
@@ -812,29 +654,7 @@ public interface CartResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -884,7 +704,7 @@ public interface CartResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}/checkout");
 
 			httpInvoker.path("cartId", cartId);
@@ -915,29 +735,7 @@ public interface CartResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -989,7 +787,7 @@ public interface CartResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}/coupon-code");
 
 			httpInvoker.path("cartId", cartId);
@@ -1000,12 +798,11 @@ public interface CartResource {
 			return httpInvoker.invoke();
 		}
 
-		public Page<Cart> getChannelCartsPage(
-				Long channelId, Pagination pagination)
+		public String getCartPaymentURL(Long cartId, String callbackURL)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
-				getChannelCartsPageHttpResponse(channelId, pagination);
+				getCartPaymentURLHttpResponse(cartId, callbackURL);
 
 			String content = httpResponse.getContent();
 
@@ -1021,29 +818,95 @@ public interface CartResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+			else {
+				_logger.fine("HTTP response content: " + content);
+				_logger.fine(
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.fine(
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+			}
 
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
+			try {
+				return content;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
 
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+		}
 
-					Problem problem = new Problem();
+		public HttpInvoker.HttpResponse getCartPaymentURLHttpResponse(
+				Long cartId, String callbackURL)
+			throws Exception {
 
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
 
-					problemException = new Problem.ProblemException(problem);
-				}
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
 
-				throw problemException;
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+			if (callbackURL != null) {
+				httpInvoker.parameter(
+					"callbackURL", String.valueOf(callbackURL));
+			}
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port +
+						"/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}/payment-url");
+
+			httpInvoker.path("cartId", cartId);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		public Page<Cart> getChannelCartsPage(
+				Long accountId, Long channelId, Pagination pagination)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				getChannelCartsPageHttpResponse(
+					accountId, channelId, pagination);
+
+			String content = httpResponse.getContent();
+
+			if ((httpResponse.getStatusCode() / 100) != 2) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response content: " + content);
+				_logger.log(
+					Level.WARNING,
+					"HTTP response message: " + httpResponse.getMessage());
+				_logger.log(
+					Level.WARNING,
+					"HTTP response status code: " +
+						httpResponse.getStatusCode());
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1067,7 +930,7 @@ public interface CartResource {
 		}
 
 		public HttpInvoker.HttpResponse getChannelCartsPageHttpResponse(
-				Long channelId, Pagination pagination)
+				Long accountId, Long channelId, Pagination pagination)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -1100,9 +963,10 @@ public interface CartResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
-						"/o/headless-commerce-delivery-cart/v1.0/channels/{channelId}/carts");
+					_builder._port +
+						"/o/headless-commerce-delivery-cart/v1.0/channels/{channelId}/account/{accountId}/carts");
 
+			httpInvoker.path("accountId", accountId);
 			httpInvoker.path("channelId", channelId);
 
 			httpInvoker.userNameAndPassword(
@@ -1131,29 +995,7 @@ public interface CartResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1205,7 +1047,7 @@ public interface CartResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-commerce-delivery-cart/v1.0/channels/{channelId}/carts");
 
 			httpInvoker.path("channelId", channelId);

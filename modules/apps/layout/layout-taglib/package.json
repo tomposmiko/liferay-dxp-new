@@ -1,9 +1,11 @@
 {
 	"dependencies": {
-		"@clayui/button": "3.83.0",
-		"@clayui/form": "3.89.0",
-		"@clayui/layout": "3.56.0",
-		"@clayui/management-toolbar": "3.2.3",
+		"@clayui/button": "3.40.0",
+		"@clayui/form": "3.40.0",
+		"@clayui/layout": "3.40.0",
+		"@clayui/management-toolbar": "3.40.0",
+		"@clayui/pagination": "3.41.0",
+		"@clayui/pagination-bar": "3.41.0",
 		"frontend-js-components-web": "*",
 		"prop-types": "15.7.2",
 		"react": "16.12.0"
@@ -14,5 +16,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "5.4.18"
+	"version": "7.1.11"
 }

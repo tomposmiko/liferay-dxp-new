@@ -1,12 +1,9 @@
 {
 	"dependencies": {
-		"@clayui/icon": "3.56.0",
-		"@clayui/tabs": "3.3.0",
-		"codemirror": "^5.52.0",
+		"@clayui/icon": "3.40.0",
+		"@clayui/tabs": "3.40.0",
+		"codemirror": "^5.59.0",
 		"frontend-js-web": "*",
-		"metal": "2.16.8",
-		"metal-component": "2.16.8",
-		"metal-dom": "2.16.8",
 		"metal-state": "2.16.8"
 	},
 	"name": "fragment-web",
@@ -15,5 +12,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "3.0.76"
+	"version": "4.0.25"
 }

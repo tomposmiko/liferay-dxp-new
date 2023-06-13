@@ -27,7 +27,7 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 	navigationItems="<%= layoutPageTemplatesAdminDisplayContext.getNavigationItems() %>"
 />
 
-<liferay-ui:success key="layoutPageTemplatePublished" message="the-page-template-was-published-succesfully" />
+<liferay-ui:success key="layoutPageTemplatePublished" message="the-page-template-was-published-successfully" />
 
 <clay:container-fluid
 	cssClass="container-view"
@@ -40,7 +40,7 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 				<ul class="nav nav-nested">
 					<li class="nav-item">
 						<portlet:renderURL var="editLayoutPageTemplateCollectionURL">
-							<portlet:param name="mvcRenderCommandName" value="/layout_page_template/edit_layout_page_template_collection" />
+							<portlet:param name="mvcRenderCommandName" value="/layout_page_template_admin/edit_layout_page_template_collection" />
 							<portlet:param name="redirect" value="<%= currentURL %>" />
 						</portlet:renderURL>
 
@@ -75,14 +75,14 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 
 											<li>
 												<portlet:renderURL var="viewLayoutPageTemplateCollectionURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-													<portlet:param name="mvcRenderCommandName" value="/layout_page_template/select_layout_page_template_collections" />
+													<portlet:param name="mvcRenderCommandName" value="/layout_page_template_admin/select_layout_page_template_collections" />
 												</portlet:renderURL>
 
 												<portlet:renderURL var="redirectURL">
 													<portlet:param name="tabs1" value="page-templates" />
 												</portlet:renderURL>
 
-												<liferay-portlet:actionURL copyCurrentRenderParameters="<%= false %>" name="/layout_page_template/delete_layout_page_template_collection" var="deleteLayoutPageTemplateCollectionURL">
+												<liferay-portlet:actionURL copyCurrentRenderParameters="<%= false %>" name="/layout_page_template_admin/delete_layout_page_template_collection" var="deleteLayoutPageTemplateCollectionURL">
 													<portlet:param name="redirect" value="<%= redirectURL %>" />
 												</liferay-portlet:actionURL>
 
@@ -109,15 +109,18 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 									%>
 
 										<li class="nav-item">
-
-											<%
-											PortletURL layoutPageTemplateCollectionURL = renderResponse.createRenderURL();
-
-											layoutPageTemplateCollectionURL.setParameter("layoutPageTemplateCollectionId", String.valueOf(layoutPageTemplateCollection.getLayoutPageTemplateCollectionId()));
-											layoutPageTemplateCollectionURL.setParameter("tabs1", "page-templates");
-											%>
-
-											<a class="nav-link text-truncate <%= (layoutPageTemplateCollection.getLayoutPageTemplateCollectionId() == layoutPageTemplateDisplayContext.getLayoutPageTemplateCollectionId()) ? "active" : StringPool.BLANK %>" href="<%= layoutPageTemplateCollectionURL.toString() %>">
+											<a
+												class="nav-link text-truncate <%= (layoutPageTemplateCollection.getLayoutPageTemplateCollectionId() == layoutPageTemplateDisplayContext.getLayoutPageTemplateCollectionId()) ? "active" : StringPool.BLANK %>"
+												href="<%=
+													PortletURLBuilder.createRenderURL(
+														renderResponse
+													).setTabs1(
+														"page-templates"
+													).setParameter(
+														"layoutPageTemplateCollectionId", layoutPageTemplateCollection.getLayoutPageTemplateCollectionId()
+													).buildString()
+												%>"
+											>
 												<%= HtmlUtil.escape(layoutPageTemplateCollection.getName()) %>
 											</a>
 										</li>
@@ -174,7 +177,15 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 								cssClass="inline-item-after"
 								verticalAlign="end"
 							>
-								<liferay-util:include page="/layout_page_template_collection_action.jsp" servletContext="<%= application %>" />
+
+								<%
+								LayoutPageTemplateCollectionActionDropdownItem layoutPageTemplateCollectionActionDropdownItem = new LayoutPageTemplateCollectionActionDropdownItem(request, renderResponse);
+								%>
+
+								<clay:dropdown-actions
+									dropdownItems="<%= layoutPageTemplateCollectionActionDropdownItem.getActionDropdownItems(layoutPageTemplateCollection) %>"
+									propsTransformer="js/propsTransformers/LayoutPageTemplateCollectionPropsTransformer"
+								/>
 							</clay:content-col>
 						</clay:content-row>
 					</h2>

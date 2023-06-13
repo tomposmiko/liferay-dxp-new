@@ -77,11 +77,10 @@ public interface SamlSpSessionLocalService
 	public SamlSpSession addSamlSpSession(SamlSpSession samlSpSession);
 
 	public SamlSpSession addSamlSpSession(
-			String samlIdpEntityId, String samlSpSessionKey,
 			String assertionXml, String jSessionId, String nameIdFormat,
 			String nameIdNameQualifier, String nameIdSPNameQualifier,
-			String nameIdValue, String sessionIndex,
-			ServiceContext serviceContext)
+			String nameIdValue, String samlIdpEntityId, String samlSpSessionKey,
+			String sessionIndex, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -220,14 +219,6 @@ public interface SamlSpSessionLocalService
 	public SamlSpSession fetchSamlSpSessionBySessionIndex(
 		long companyId, String sessionIndex);
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 #fetchSamlSpSessionBySessionIndex(long, String)}
-	 */
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public SamlSpSession fetchSamlSpSessionBySessionIndex(String sessionIndex);
-
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
@@ -270,7 +261,8 @@ public interface SamlSpSessionLocalService
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public SamlSpSession getSamlSpSessionBySessionIndex(String sessionIndex)
+	public SamlSpSession getSamlSpSessionBySessionIndex(
+			long companyId, String sessionIndex)
 		throws PortalException;
 
 	/**
@@ -288,7 +280,10 @@ public interface SamlSpSessionLocalService
 	public List<SamlSpSession> getSamlSpSessions(int start, int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<SamlSpSession> getSamlSpSessions(String nameIdValue);
+	public List<SamlSpSession> getSamlSpSessions(
+		long companyId, String nameIdFormat, String nameIdNameQualifier,
+		String nameIdSPNameQualifier, String nameIdValue,
+		String samlIdpEntityId);
 
 	/**
 	 * Returns the number of saml sp sessions.
@@ -303,10 +298,10 @@ public interface SamlSpSessionLocalService
 		throws PortalException;
 
 	public SamlSpSession updateSamlSpSession(
-			long samlSpSessionId, String samlIdpEntityId,
-			String samlSpSessionKey, String assertionXml, String jSessionId,
+			long samlSpSessionId, String assertionXml, String jSessionId,
 			String nameIdFormat, String nameIdNameQualifier,
 			String nameIdSPNameQualifier, String nameIdValue,
+			String samlIdpEntityId, String samlSpSessionKey,
 			String sessionIndex, ServiceContext serviceContext)
 		throws PortalException;
 

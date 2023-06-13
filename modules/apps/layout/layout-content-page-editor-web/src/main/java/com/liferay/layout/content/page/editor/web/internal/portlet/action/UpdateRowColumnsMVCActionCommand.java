@@ -14,6 +14,7 @@
 
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
+import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.content.page.editor.listener.ContentPageEditorListenerTracker;
 import com.liferay.layout.content.page.editor.web.internal.util.FragmentEntryLinkUtil;
@@ -45,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
-		"mvc.command.name=/content_layout/update_row_columns"
+		"mvc.command.name=/layout_content_page_editor/update_row_columns"
 	},
 	service = MVCActionCommand.class
 )
@@ -84,21 +85,24 @@ public class UpdateRowColumnsMVCActionCommand
 					deletedLayoutStructureItems)) {
 
 			FragmentEntryLinkUtil.deleteFragmentEntryLink(
-				_contentPageEditorListenerTracker, fragmentEntryLinkId,
-				themeDisplay.getPlid());
+				themeDisplay.getCompanyId(), _contentPageEditorListenerTracker,
+				fragmentEntryLinkId, themeDisplay.getPlid(), _portletRegistry);
 
 			deletedFragmentEntryLinkIds.add(fragmentEntryLinkId);
 		}
 
-		LayoutStructure layoutStructure =
-			LayoutStructureUtil.getLayoutStructure(
-				themeDisplay.getScopeGroupId(), themeDisplay.getPlid(),
-				segmentsExperienceId);
-
 		return JSONUtil.put(
 			"deletedFragmentEntryLinkIds", deletedFragmentEntryLinkIds.toArray()
 		).put(
-			"layoutData", layoutStructure.toJSONObject()
+			"layoutData",
+			() -> {
+				LayoutStructure layoutStructure =
+					LayoutStructureUtil.getLayoutStructure(
+						themeDisplay.getScopeGroupId(), themeDisplay.getPlid(),
+						segmentsExperienceId);
+
+				return layoutStructure.toJSONObject();
+			}
 		);
 	}
 
@@ -107,5 +111,8 @@ public class UpdateRowColumnsMVCActionCommand
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private PortletRegistry _portletRegistry;
 
 }

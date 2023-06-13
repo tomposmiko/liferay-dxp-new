@@ -61,6 +61,7 @@ import org.jivesoftware.smack.packet.Presence;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -68,8 +69,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bruno Farache
  */
 @Component(
-	configurationPid = "com.liferay.chat.internal.configuration.ChatGroupServiceConfiguration",
-	enabled = false, immediate = true, service = Jabber.class
+	configurationPid = "com.liferay.chat.configuration.ChatConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, enabled = false,
+	immediate = true, service = Jabber.class
 )
 public class JabberImpl implements Jabber {
 
@@ -511,7 +513,8 @@ public class JabberImpl implements Jabber {
 
 	private static final Log _log = LogFactoryUtil.getLog(JabberImpl.class);
 
-	private ChatGroupServiceConfiguration _chatGroupServiceConfiguration;
+	private volatile ChatGroupServiceConfiguration
+		_chatGroupServiceConfiguration;
 	private ConnectionConfiguration _connectionConfiguration;
 	private final Map<Long, Connection> _connections = new HashMap<>();
 	private final Set<Long> _onlineUserIds = new HashSet<>();

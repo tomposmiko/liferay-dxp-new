@@ -15,6 +15,7 @@
 package com.liferay.asset.info.item.provider.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.entry.rel.service.AssetEntryAssetCategoryRelLocalService;
 import com.liferay.asset.info.item.provider.AssetEntryInfoItemFieldSetProvider;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetCategoryConstants;
@@ -59,7 +60,6 @@ import java.util.Objects;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -102,8 +102,8 @@ public class AssetEntryInfoItemFieldSetProviderTest {
 		AssetEntry assetEntry = AssetTestUtil.addAssetEntry(
 			_group.getGroupId());
 
-		_assetCategoryLocalService.addAssetEntryAssetCategory(
-			assetEntry.getEntryId(), assetCategory);
+		_assetEntryAssetCategoryRelLocalService.addAssetEntryAssetCategoryRel(
+			assetEntry.getEntryId(), assetCategory.getCategoryId());
 
 		InfoFieldSet infoFieldSet =
 			_assetEntryInfoItemFieldSetProvider.getInfoFieldSet(assetEntry);
@@ -206,8 +206,8 @@ public class AssetEntryInfoItemFieldSetProviderTest {
 		AssetEntry assetEntry = AssetTestUtil.addAssetEntry(
 			_group.getGroupId());
 
-		_assetCategoryLocalService.addAssetEntryAssetCategory(
-			assetEntry.getEntryId(), assetCategory);
+		_assetEntryAssetCategoryRelLocalService.addAssetEntryAssetCategoryRel(
+			assetEntry.getEntryId(), assetCategory.getCategoryId());
 
 		List<InfoFieldValue<Object>> filteredInfoFieldValues =
 			_getInfoFieldValues(assetEntry, assetVocabulary.getName());
@@ -219,7 +219,6 @@ public class AssetEntryInfoItemFieldSetProviderTest {
 			assetCategory.getTitle(LocaleUtil.ENGLISH));
 	}
 
-	@Ignore
 	@Test
 	public void testGetInfoFieldValuesJournalArticleAllAssetCategories()
 		throws Exception {
@@ -306,7 +305,7 @@ public class AssetEntryInfoItemFieldSetProviderTest {
 		throws Exception {
 
 		return _assetCategoryLocalService.addCategory(
-			TestPropsValues.getUserId(), _group.getGroupId(),
+			null, TestPropsValues.getUserId(), _group.getGroupId(),
 			AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID,
 			HashMapBuilder.put(
 				LocaleUtil.US, RandomTestUtil.randomString()
@@ -378,6 +377,10 @@ public class AssetEntryInfoItemFieldSetProviderTest {
 
 	@Inject
 	private AssetCategoryLocalService _assetCategoryLocalService;
+
+	@Inject
+	private AssetEntryAssetCategoryRelLocalService
+		_assetEntryAssetCategoryRelLocalService;
 
 	@Inject
 	private AssetEntryInfoItemFieldSetProvider

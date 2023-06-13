@@ -201,26 +201,24 @@ public interface ERCCompanyEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ERCCompanyEntry fetchERCCompanyEntry(long ercCompanyEntryId);
 
-	@Deprecated
+	/**
+	 * Returns the erc company entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the erc company entry's external reference code
+	 * @return the matching erc company entry, or <code>null</code> if a matching erc company entry could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ERCCompanyEntry fetchERCCompanyEntryByExternalReferenceCode(
 		long companyId, String externalReferenceCode);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchERCCompanyEntryByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ERCCompanyEntry fetchERCCompanyEntryByReferenceCode(
 		long companyId, String externalReferenceCode);
-
-	/**
-	 * Returns the erc company entry with the matching UUID and company.
-	 *
-	 * @param uuid the erc company entry's UUID
-	 * @param companyId the primary key of the company
-	 * @return the matching erc company entry, or <code>null</code> if a matching erc company entry could not be found
-	 */
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public ERCCompanyEntry fetchERCCompanyEntryByUuidAndCompanyId(
-		String uuid, long companyId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
@@ -258,23 +256,17 @@ public interface ERCCompanyEntryLocalService
 	public ERCCompanyEntry getERCCompanyEntry(long ercCompanyEntryId)
 		throws PortalException;
 
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public ERCCompanyEntry getERCCompanyEntryByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
-		throws PortalException;
-
 	/**
-	 * Returns the erc company entry with the matching UUID and company.
+	 * Returns the erc company entry with the matching external reference code and company.
 	 *
-	 * @param uuid the erc company entry's UUID
 	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the erc company entry's external reference code
 	 * @return the matching erc company entry
 	 * @throws PortalException if a matching erc company entry could not be found
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public ERCCompanyEntry getERCCompanyEntryByUuidAndCompanyId(
-			String uuid, long companyId)
+	public ERCCompanyEntry getERCCompanyEntryByExternalReferenceCode(
+			long companyId, String externalReferenceCode)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

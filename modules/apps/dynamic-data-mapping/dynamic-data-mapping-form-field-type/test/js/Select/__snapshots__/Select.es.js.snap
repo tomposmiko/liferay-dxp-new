@@ -11,7 +11,9 @@ exports[`Select calls onChange callback when an item is selected using multisele
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
       size="7"
     >
       <option
@@ -300,6 +302,15 @@ exports[`Select calls onChange callback when an item is selected using multisele
         </ul>
       </div>
     </div>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
     
   </div>
 </div>
@@ -316,7 +327,9 @@ exports[`Select filters according to the input and calls onChange callback when 
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
       size="12"
     >
       <option
@@ -524,6 +537,15 @@ exports[`Select filters according to the input and calls onChange callback when 
         </ul>
       </div>
     </div>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
     
   </div>
 </div>
@@ -540,7 +562,9 @@ exports[`Select has a help text 1`] = `
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
     >
       <option
         disabled=""
@@ -596,10 +620,18 @@ exports[`Select has a help text 1`] = `
         </ul>
       </div>
     </div>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
     <span
       aria-hidden="true"
       class="form-text"
-      id="undefined_fieldHelp"
     >
       Type something
     </span>
@@ -625,7 +657,9 @@ exports[`Select has a key 1`] = `
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
     >
       <option
         disabled=""
@@ -681,6 +715,15 @@ exports[`Select has a key 1`] = `
         </ul>
       </div>
     </div>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
     
   </div>
 </div>
@@ -692,7 +735,6 @@ exports[`Select has a label 1`] = `
     class="form-group hide"
   >
     <label
-      aria-labelledby="undefined_fieldDetails"
       class="ddm-label"
       tabindex="0"
     >
@@ -702,7 +744,9 @@ exports[`Select has a label 1`] = `
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
     >
       <option
         disabled=""
@@ -758,13 +802,16 @@ exports[`Select has a label 1`] = `
         </ul>
       </div>
     </div>
-    <span
-      class="sr-only"
-      id="undefined_fieldDetails"
-    >
-      label
-      <br />
-    </span>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
+    
   </div>
 </div>
 `;
@@ -780,7 +827,9 @@ exports[`Select has a placeholder 1`] = `
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
     >
       <option
         disabled=""
@@ -836,6 +885,15 @@ exports[`Select has a placeholder 1`] = `
         </ul>
       </div>
     </div>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
     
   </div>
 </div>
@@ -852,7 +910,9 @@ exports[`Select has a predefinedValue 1`] = `
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
     >
       <option
         disabled=""
@@ -908,6 +968,15 @@ exports[`Select has a predefinedValue 1`] = `
         </ul>
       </div>
     </div>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
     
   </div>
 </div>
@@ -924,7 +993,9 @@ exports[`Select has a value 1`] = `
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
     >
       <option
         disabled=""
@@ -980,6 +1051,15 @@ exports[`Select has a value 1`] = `
         </ul>
       </div>
     </div>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
     
   </div>
 </div>
@@ -996,7 +1076,9 @@ exports[`Select has an id 1`] = `
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
     >
       <option
         disabled=""
@@ -1053,6 +1135,15 @@ exports[`Select has an id 1`] = `
         </ul>
       </div>
     </div>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
     
   </div>
 </div>
@@ -1069,7 +1160,9 @@ exports[`Select has class dropdown-opened when it's opened 1`] = `
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
     >
       <option
         disabled=""
@@ -1125,6 +1218,15 @@ exports[`Select has class dropdown-opened when it's opened 1`] = `
         </ul>
       </div>
     </div>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
     
   </div>
 </div>
@@ -1141,7 +1243,9 @@ exports[`Select is closed by default 1`] = `
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
     >
       <option
         disabled=""
@@ -1197,6 +1301,15 @@ exports[`Select is closed by default 1`] = `
         </ul>
       </div>
     </div>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
     
   </div>
 </div>
@@ -1213,7 +1326,9 @@ exports[`Select is not required 1`] = `
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
     >
       <option
         disabled=""
@@ -1269,6 +1384,15 @@ exports[`Select is not required 1`] = `
         </ul>
       </div>
     </div>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
     
   </div>
 </div>
@@ -1302,7 +1426,9 @@ exports[`Select puts an asterisk when field is required 1`] = `
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
     >
       <option
         disabled=""
@@ -1358,12 +1484,19 @@ exports[`Select puts an asterisk when field is required 1`] = `
         </ul>
       </div>
     </div>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
     <span
       class="sr-only"
       id="undefined_fieldDetails"
     >
-      This is the label
-      <br />
       required
     </span>
   </div>
@@ -1376,7 +1509,6 @@ exports[`Select renders Label if showLabel is true 1`] = `
     class="form-group hide"
   >
     <label
-      aria-labelledby="undefined_fieldDetails"
       class="ddm-label"
       tabindex="0"
     >
@@ -1386,7 +1518,9 @@ exports[`Select renders Label if showLabel is true 1`] = `
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
     >
       <option
         disabled=""
@@ -1442,13 +1576,16 @@ exports[`Select renders Label if showLabel is true 1`] = `
         </ul>
       </div>
     </div>
-    <span
-      class="sr-only"
-      id="undefined_fieldDetails"
-    >
-      text
-      <br />
-    </span>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
+    
   </div>
 </div>
 `;
@@ -1464,7 +1601,9 @@ exports[`Select renders no options when options come empty 1`] = `
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
     >
       <option
         disabled=""
@@ -1520,6 +1659,15 @@ exports[`Select renders no options when options come empty 1`] = `
         </ul>
       </div>
     </div>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
     
   </div>
 </div>
@@ -1536,7 +1684,9 @@ exports[`Select renders options 1`] = `
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
     >
       <option
         disabled=""
@@ -1603,6 +1753,15 @@ exports[`Select renders options 1`] = `
         </ul>
       </div>
     </div>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
     
   </div>
 </div>
@@ -1619,7 +1778,9 @@ exports[`Select shows a search input when the number of options is more than the
       aria-hidden="true"
       class="form-control form-control"
       hidden=""
+      id="undefined_field"
       multiple=""
+      name="undefined_field"
       size="12"
     >
       <option
@@ -2075,6 +2236,15 @@ exports[`Select shows a search input when the number of options is more than the
         </ul>
       </div>
     </div>
+    <input
+      type="hidden"
+      value=""
+    />
+    <input
+      name="undefined_edited"
+      type="hidden"
+      value="false"
+    />
     
   </div>
 </div>

@@ -15,6 +15,12 @@
 package com.liferay.portal.security.sso.openid.connect.persistence.model.impl;
 
 /**
+ * The extended model implementation for the OpenIdConnectSession service. Represents a row in the &quot;OpenIdConnectSession&quot; database table, with each column mapped to a property of this class.
+ *
+ * <p>
+ * Helper methods and all application logic should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the <code>com.liferay.portal.security.sso.openid.connect.persistence.model.OpenIdConnectSession</code> interface.
+ * </p>
+ *
  * @author Arthur Chan
  */
 public class OpenIdConnectSessionImpl extends OpenIdConnectSessionBaseImpl {

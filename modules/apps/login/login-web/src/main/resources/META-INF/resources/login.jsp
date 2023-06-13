@@ -183,7 +183,7 @@
 
 					<span id="<portlet:namespace />passwordCapsLockSpan" style="display: none;"><liferay-ui:message key="caps-lock-is-on" /></span>
 
-					<c:if test="<%= company.isAutoLogin() && !PropsValues.SESSION_DISABLED %>">
+					<c:if test="<%= company.isAutoLogin() %>">
 						<aui:input checked="<%= rememberMe %>" name="rememberMe" type="checkbox" />
 					</c:if>
 				</aui:fieldset>
@@ -200,7 +200,7 @@
 			var form = document.getElementById('<portlet:namespace /><%= formName %>');
 
 			if (form) {
-				form.addEventListener('submit', function (event) {
+				form.addEventListener('submit', (event) => {
 					<c:if test="<%= PropsValues.SESSION_ENABLE_PERSISTENT_COOKIES && PropsValues.SESSION_TEST_COOKIE_SUPPORT %>">
 						if (!navigator.cookieEnabled) {
 							document.getElementById(
@@ -227,7 +227,7 @@
 				var password = form.querySelector('#<portlet:namespace />password');
 
 				if (password) {
-					password.addEventListener('keypress', function (event) {
+					password.addEventListener('keypress', (event) => {
 						Liferay.Util.showCapsLock(
 							event,
 							'<portlet:namespace />passwordCapsLockSpan'

@@ -91,7 +91,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 		rowIdProperty="friendlyURL"
 	>
 		<liferay-ui:search-container-column-text
-			cssClass="table-cell-content"
+			cssClass="table-cell-expand"
 			name="name"
 		>
 			<liferay-staging:descriptive-name
@@ -110,7 +110,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 		%>
 
 		<liferay-ui:search-container-column-text
-			cssClass="table-cell-content"
+			cssClass="table-cell-expand"
 			name="roles"
 			value="<%= HtmlUtil.escape(UsersAdminUtil.getUserColumnText(locale, userGroupRoles, UsersAdmin.USER_GROUP_ROLE_TITLE_ACCESSOR, userGroupRolesCount)) %>"
 		/>
@@ -145,7 +145,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 
 		var handleOnSelect = A.one('#<portlet:namespace />selectSiteLink').on(
 			'click',
-			function (event) {
+			(event) => {
 				var searchContainerData = searchContainer.getData();
 
 				if (!searchContainerData.length) {
@@ -155,69 +155,72 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 					searchContainerData = searchContainerData.split(',');
 				}
 
-				Util.selectEntity(
-					{
-						dialog: {
-							constrain: true,
-							modal: true,
-						},
+				Util.openSelectionModal({
+					onSelect: (selectedItem) => {
+						if (selectedItem) {
+							const entityId = selectedItem.entityid;
 
-						<%
-						String eventName = liferayPortletResponse.getNamespace() + "selectSite";
-						%>
+							const rowColumns = [];
 
-						id: '<%= eventName %>',
-						selectedData: searchContainerData,
-						title: '<liferay-ui:message arguments="site" key="select-x" />',
+							rowColumns.push(selectedItem.entityname);
+							rowColumns.push('');
+							rowColumns.push(
+								'<a class="modify-link" data-rowId="' +
+									entityId +
+									'" href="javascript:;"><%= UnicodeFormatter.toString(removeGroupIcon) %></a>'
+							);
 
-						<%
-						PortletURL groupSelectorURL = PortletProviderUtil.getPortletURL(request, Group.class.getName(), PortletProvider.Action.BROWSE);
+							searchContainer.addRow(rowColumns, entityId);
 
-						groupSelectorURL.setParameter("p_u_i_d", (selUser == null) ? "0" : String.valueOf(selUser.getUserId()));
-						groupSelectorURL.setParameter("filterManageableGroups", Boolean.FALSE.toString());
-						groupSelectorURL.setParameter("includeCurrentGroup", Boolean.FALSE.toString());
-						groupSelectorURL.setParameter("manualMembership", Boolean.TRUE.toString());
-						groupSelectorURL.setParameter("eventName", eventName);
-						groupSelectorURL.setWindowState(LiferayWindowState.POP_UP);
-						%>
+							searchContainer.updateDataStore();
 
-						uri: '<%= groupSelectorURL.toString() %>',
+							addGroupIds.push(entityId);
+
+							AArray.removeItem(deleteGroupIds, entityId);
+
+							document.<portlet:namespace />fm.<portlet:namespace />addGroupIds.value = addGroupIds.join(
+								','
+							);
+							document.<portlet:namespace />fm.<portlet:namespace />deleteGroupIds.value = deleteGroupIds.join(
+								','
+							);
+						}
 					},
-					function (event) {
-						var entityId = event.entityid;
 
-						var rowColumns = [];
+					<%
+					String eventName = liferayPortletResponse.getNamespace() + "selectSite";
+					%>
 
-						rowColumns.push(event.entityname);
-						rowColumns.push('');
-						rowColumns.push(
-							'<a class="modify-link" data-rowId="' +
-								entityId +
-								'" href="javascript:;"><%= UnicodeFormatter.toString(removeGroupIcon) %></a>'
-						);
+					selectEventName: '<%= eventName %>',
+					selectedData: [searchContainerData],
+					title: '<liferay-ui:message arguments="site" key="select-x" />',
 
-						searchContainer.addRow(rowColumns, entityId);
+					<%
+					PortletURL groupSelectorURL = PortletURLBuilder.create(
+						PortletProviderUtil.getPortletURL(request, Group.class.getName(), PortletProvider.Action.BROWSE)
+					).setParameter(
+						"eventName", eventName
+					).setParameter(
+						"filterManageableGroups", false
+					).setParameter(
+						"includeCurrentGroup", false
+					).setParameter(
+						"manualMembership", true
+					).setParameter(
+						"p_u_i_d", (selUser == null) ? "0" : String.valueOf(selUser.getUserId())
+					).setWindowState(
+						LiferayWindowState.POP_UP
+					).buildPortletURL();
+					%>
 
-						searchContainer.updateDataStore();
-
-						addGroupIds.push(entityId);
-
-						AArray.removeItem(deleteGroupIds, entityId);
-
-						document.<portlet:namespace />fm.<portlet:namespace />addGroupIds.value = addGroupIds.join(
-							','
-						);
-						document.<portlet:namespace />fm.<portlet:namespace />deleteGroupIds.value = deleteGroupIds.join(
-							','
-						);
-					}
-				);
+					url: '<%= groupSelectorURL.toString() %>',
+				});
 			}
 		);
 
 		var handleOnModifyLink = searchContainerContentBox.delegate(
 			'click',
-			function (event) {
+			(event) => {
 				var link = event.currentTarget;
 
 				var rowId = link.attr('data-rowId');
@@ -251,8 +254,8 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 
 		var handleEnableRemoveSite = Liferay.on(
 			'<portlet:namespace />enableRemovedSites',
-			function (event) {
-				event.selectors.each(function (item, index, collection) {
+			(event) => {
+				event.selectors.each((item, index, collection) => {
 					var groupId = item.attr('data-entityid');
 
 					if (deleteGroupIds.indexOf(groupId) != -1) {
@@ -298,7 +301,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 			rowIdProperty="friendlyURL"
 		>
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="name"
 				value="<%= HtmlUtil.escape(inheritedSite.getDescriptiveName(locale)) %>"
 			/>
@@ -314,7 +317,7 @@ currentURLObj.setParameter("historyKey", liferayPortletResponse.getNamespace() +
 			%>
 
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="roles"
 				value="<%= HtmlUtil.escape(UsersAdminUtil.getUserColumnText(locale, inheritedRoles, UsersAdmin.USER_GROUP_ROLE_TITLE_ACCESSOR, inheritedRolesCount)) %>"
 			/>

@@ -33,8 +33,6 @@ import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.SearchEngine;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -44,7 +42,6 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
@@ -68,7 +65,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -91,8 +87,6 @@ public class IndexerClausesPermissionTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Assume.assumeTrue(!isSearchEngine("Solr"));
-
 		BlogsEntrySearchFixture blogsEntrySearchFixture =
 			new BlogsEntrySearchFixture(blogsEntryLocalService);
 
@@ -330,25 +324,6 @@ public class IndexerClausesPermissionTest {
 		return serviceContext;
 	}
 
-	protected boolean isSearchEngine(String engine) {
-		SearchEngine searchEngine = searchEngineHelper.getSearchEngine(
-			searchEngineHelper.getDefaultSearchEngineId());
-
-		String vendor = searchEngine.getVendor();
-
-		if (engine.equals("Elasticsearch7")) {
-			String version = searchEngineInformation.getClientVersionString();
-
-			if (vendor.equals("Elasticsearch") && version.startsWith("7")) {
-				return true;
-			}
-
-			return false;
-		}
-
-		return vendor.equals(engine);
-	}
-
 	protected Consumer<SearchRequestBuilder> withoutIndexerClauses() {
 		return searchRequestBuilder -> searchRequestBuilder.withSearchContext(
 			searchContext -> searchContext.setAttribute(
@@ -380,12 +355,6 @@ public class IndexerClausesPermissionTest {
 
 	@Inject
 	protected Queries queries;
-
-	@Inject
-	protected SearchEngineHelper searchEngineHelper;
-
-	@Inject
-	protected SearchEngineInformation searchEngineInformation;
 
 	@Inject
 	protected Searcher searcher;

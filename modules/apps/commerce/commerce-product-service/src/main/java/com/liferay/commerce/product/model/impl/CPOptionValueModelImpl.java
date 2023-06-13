@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -83,7 +84,8 @@ public class CPOptionValueModelImpl
 	public static final String TABLE_NAME = "CPOptionValue";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"uuid_", Types.VARCHAR}, {"externalReferenceCode", Types.VARCHAR},
+		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
+		{"externalReferenceCode", Types.VARCHAR},
 		{"CPOptionValueId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
@@ -96,6 +98,7 @@ public class CPOptionValueModelImpl
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("externalReferenceCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("CPOptionValueId", Types.BIGINT);
@@ -112,7 +115,7 @@ public class CPOptionValueModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CPOptionValue (uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,CPOptionValueId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,CPOptionId LONG,name STRING null,priority DOUBLE,key_ VARCHAR(75) null,lastPublishDate DATE null)";
+		"create table CPOptionValue (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,CPOptionValueId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,CPOptionId LONG,name STRING null,priority DOUBLE,key_ VARCHAR(75) null,lastPublishDate DATE null)";
 
 	public static final String TABLE_SQL_DROP = "drop table CPOptionValue";
 
@@ -205,6 +208,7 @@ public class CPOptionValueModelImpl
 
 		CPOptionValue model = new CPOptionValueImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setUuid(soapModel.getUuid());
 		model.setExternalReferenceCode(soapModel.getExternalReferenceCode());
 		model.setCPOptionValueId(soapModel.getCPOptionValueId());
@@ -334,84 +338,126 @@ public class CPOptionValueModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<CPOptionValue, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, CPOptionValue>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<CPOptionValue, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<CPOptionValue, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CPOptionValue.class.getClassLoader(), CPOptionValue.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("uuid", CPOptionValue::getUuid);
-		attributeGetterFunctions.put(
-			"externalReferenceCode", CPOptionValue::getExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"CPOptionValueId", CPOptionValue::getCPOptionValueId);
-		attributeGetterFunctions.put("companyId", CPOptionValue::getCompanyId);
-		attributeGetterFunctions.put("userId", CPOptionValue::getUserId);
-		attributeGetterFunctions.put("userName", CPOptionValue::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CPOptionValue::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CPOptionValue::getModifiedDate);
-		attributeGetterFunctions.put(
-			"CPOptionId", CPOptionValue::getCPOptionId);
-		attributeGetterFunctions.put("name", CPOptionValue::getName);
-		attributeGetterFunctions.put("priority", CPOptionValue::getPriority);
-		attributeGetterFunctions.put("key", CPOptionValue::getKey);
-		attributeGetterFunctions.put(
-			"lastPublishDate", CPOptionValue::getLastPublishDate);
+		try {
+			Constructor<CPOptionValue> constructor =
+				(Constructor<CPOptionValue>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<CPOptionValue, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<CPOptionValue, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<CPOptionValue, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<CPOptionValue, Object>>();
 		Map<String, BiConsumer<CPOptionValue, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<CPOptionValue, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CPOptionValue::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CPOptionValue, Long>)CPOptionValue::setMvccVersion);
+		attributeGetterFunctions.put("uuid", CPOptionValue::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<CPOptionValue, String>)CPOptionValue::setUuid);
+		attributeGetterFunctions.put(
+			"externalReferenceCode", CPOptionValue::getExternalReferenceCode);
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<CPOptionValue, String>)
 				CPOptionValue::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"CPOptionValueId", CPOptionValue::getCPOptionValueId);
 		attributeSetterBiConsumers.put(
 			"CPOptionValueId",
 			(BiConsumer<CPOptionValue, Long>)CPOptionValue::setCPOptionValueId);
+		attributeGetterFunctions.put("companyId", CPOptionValue::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CPOptionValue, Long>)CPOptionValue::setCompanyId);
+		attributeGetterFunctions.put("userId", CPOptionValue::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CPOptionValue, Long>)CPOptionValue::setUserId);
+		attributeGetterFunctions.put("userName", CPOptionValue::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CPOptionValue, String>)CPOptionValue::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CPOptionValue::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CPOptionValue, Date>)CPOptionValue::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CPOptionValue::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CPOptionValue, Date>)CPOptionValue::setModifiedDate);
+		attributeGetterFunctions.put(
+			"CPOptionId", CPOptionValue::getCPOptionId);
 		attributeSetterBiConsumers.put(
 			"CPOptionId",
 			(BiConsumer<CPOptionValue, Long>)CPOptionValue::setCPOptionId);
+		attributeGetterFunctions.put("name", CPOptionValue::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<CPOptionValue, String>)CPOptionValue::setName);
+		attributeGetterFunctions.put("priority", CPOptionValue::getPriority);
 		attributeSetterBiConsumers.put(
 			"priority",
 			(BiConsumer<CPOptionValue, Double>)CPOptionValue::setPriority);
+		attributeGetterFunctions.put("key", CPOptionValue::getKey);
 		attributeSetterBiConsumers.put(
 			"key", (BiConsumer<CPOptionValue, String>)CPOptionValue::setKey);
+		attributeGetterFunctions.put(
+			"lastPublishDate", CPOptionValue::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<CPOptionValue, Date>)CPOptionValue::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@JSON
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@JSON
@@ -918,6 +964,7 @@ public class CPOptionValueModelImpl
 	public Object clone() {
 		CPOptionValueImpl cpOptionValueImpl = new CPOptionValueImpl();
 
+		cpOptionValueImpl.setMvccVersion(getMvccVersion());
 		cpOptionValueImpl.setUuid(getUuid());
 		cpOptionValueImpl.setExternalReferenceCode(getExternalReferenceCode());
 		cpOptionValueImpl.setCPOptionValueId(getCPOptionValueId());
@@ -933,6 +980,39 @@ public class CPOptionValueModelImpl
 		cpOptionValueImpl.setLastPublishDate(getLastPublishDate());
 
 		cpOptionValueImpl.resetOriginalValues();
+
+		return cpOptionValueImpl;
+	}
+
+	@Override
+	public CPOptionValue cloneWithOriginalValues() {
+		CPOptionValueImpl cpOptionValueImpl = new CPOptionValueImpl();
+
+		cpOptionValueImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		cpOptionValueImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		cpOptionValueImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
+		cpOptionValueImpl.setCPOptionValueId(
+			this.<Long>getColumnOriginalValue("CPOptionValueId"));
+		cpOptionValueImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		cpOptionValueImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		cpOptionValueImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		cpOptionValueImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		cpOptionValueImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		cpOptionValueImpl.setCPOptionId(
+			this.<Long>getColumnOriginalValue("CPOptionId"));
+		cpOptionValueImpl.setName(this.<String>getColumnOriginalValue("name"));
+		cpOptionValueImpl.setPriority(
+			this.<Double>getColumnOriginalValue("priority"));
+		cpOptionValueImpl.setKey(this.<String>getColumnOriginalValue("key_"));
+		cpOptionValueImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
 
 		return cpOptionValueImpl;
 	}
@@ -1022,6 +1102,8 @@ public class CPOptionValueModelImpl
 	public CacheModel<CPOptionValue> toCacheModel() {
 		CPOptionValueCacheModel cpOptionValueCacheModel =
 			new CPOptionValueCacheModel();
+
+		cpOptionValueCacheModel.mvccVersion = getMvccVersion();
 
 		cpOptionValueCacheModel.uuid = getUuid();
 
@@ -1190,12 +1272,11 @@ public class CPOptionValueModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CPOptionValue>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CPOptionValue.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private String _uuid;
 	private String _externalReferenceCode;
 	private long _CPOptionValueId;
@@ -1241,6 +1322,7 @@ public class CPOptionValueModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put(
 			"externalReferenceCode", _externalReferenceCode);
@@ -1279,31 +1361,33 @@ public class CPOptionValueModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("uuid_", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("externalReferenceCode", 2L);
+		columnBitmasks.put("uuid_", 2L);
 
-		columnBitmasks.put("CPOptionValueId", 4L);
+		columnBitmasks.put("externalReferenceCode", 4L);
 
-		columnBitmasks.put("companyId", 8L);
+		columnBitmasks.put("CPOptionValueId", 8L);
 
-		columnBitmasks.put("userId", 16L);
+		columnBitmasks.put("companyId", 16L);
 
-		columnBitmasks.put("userName", 32L);
+		columnBitmasks.put("userId", 32L);
 
-		columnBitmasks.put("createDate", 64L);
+		columnBitmasks.put("userName", 64L);
 
-		columnBitmasks.put("modifiedDate", 128L);
+		columnBitmasks.put("createDate", 128L);
 
-		columnBitmasks.put("CPOptionId", 256L);
+		columnBitmasks.put("modifiedDate", 256L);
 
-		columnBitmasks.put("name", 512L);
+		columnBitmasks.put("CPOptionId", 512L);
 
-		columnBitmasks.put("priority", 1024L);
+		columnBitmasks.put("name", 1024L);
 
-		columnBitmasks.put("key_", 2048L);
+		columnBitmasks.put("priority", 2048L);
 
-		columnBitmasks.put("lastPublishDate", 4096L);
+		columnBitmasks.put("key_", 4096L);
+
+		columnBitmasks.put("lastPublishDate", 8192L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

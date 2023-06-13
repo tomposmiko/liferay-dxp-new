@@ -15,7 +15,7 @@
 package com.liferay.commerce.product.content.web.internal.util;
 
 import com.liferay.commerce.media.CommerceMediaResolverUtil;
-import com.liferay.commerce.product.catalog.CPMedia;
+import com.liferay.commerce.product.content.util.CPMedia;
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.petra.string.StringPool;
@@ -31,29 +31,29 @@ public class CPMediaImpl implements CPMedia {
 	public CPMediaImpl(FileEntry fileEntry, ThemeDisplay themeDisplay)
 		throws PortalException {
 
-		String defaultUrl = DLUtil.getDownloadURL(
+		String defaultURL = DLUtil.getDownloadURL(
 			fileEntry, fileEntry.getFileVersion(), themeDisplay,
 			StringPool.BLANK);
 
-		_downloadURL = defaultUrl;
+		_downloadURL = defaultURL;
 
 		_id = fileEntry.getFileEntryId();
-		_url = defaultUrl;
-		_thumbnailURL = defaultUrl;
+		_url = defaultURL;
+		_thumbnailURL = defaultURL;
 		_mimeType = fileEntry.getMimeType();
 		_title = fileEntry.getTitle();
 	}
 
 	public CPMediaImpl(long groupId) throws PortalException {
-		String defaultUrl = CommerceMediaResolverUtil.getDefaultUrl(groupId);
+		String defaultURL = CommerceMediaResolverUtil.getDefaultURL(groupId);
 
-		_downloadURL = defaultUrl;
+		_downloadURL = defaultURL;
 
 		_id = 0;
 		_mimeType = null;
-		_thumbnailURL = defaultUrl;
+		_thumbnailURL = defaultURL;
 		_title = null;
-		_url = defaultUrl;
+		_url = defaultURL;
 	}
 
 	public CPMediaImpl(
@@ -66,7 +66,7 @@ public class CPMediaImpl implements CPMedia {
 			cpAttachmentFileEntry.getCPAttachmentFileEntryId());
 		_id = cpAttachmentFileEntry.getCPAttachmentFileEntryId();
 
-		FileEntry fileEntry = cpAttachmentFileEntry.getFileEntry();
+		FileEntry fileEntry = cpAttachmentFileEntry.fetchFileEntry();
 
 		if (fileEntry == null) {
 			_mimeType = StringPool.BLANK;
@@ -85,7 +85,7 @@ public class CPMediaImpl implements CPMedia {
 	}
 
 	@Override
-	public String getDownloadUrl() {
+	public String getDownloadURL() {
 		return _downloadURL;
 	}
 
@@ -95,7 +95,7 @@ public class CPMediaImpl implements CPMedia {
 	}
 
 	@Override
-	public String getThumbnailUrl() {
+	public String getThumbnailURL() {
 		return _thumbnailURL;
 	}
 
@@ -105,7 +105,7 @@ public class CPMediaImpl implements CPMedia {
 	}
 
 	@Override
-	public String getUrl() {
+	public String getURL() {
 		return _url;
 	}
 

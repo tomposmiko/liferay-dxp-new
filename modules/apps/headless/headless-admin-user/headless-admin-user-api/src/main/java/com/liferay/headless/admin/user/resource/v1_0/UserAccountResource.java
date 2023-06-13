@@ -23,9 +23,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -56,6 +54,76 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface UserAccountResource {
 
+	public static Builder builder() {
+		return FactoryHolder.factory.create();
+	}
+
+	public void
+			deleteAccountByExternalReferenceCodeUserAccountByExternalReferenceCode(
+				String accountExternalReferenceCode,
+				String userAccountExternalReferenceCode)
+		throws Exception;
+
+	public void
+			postAccountByExternalReferenceCodeUserAccountByExternalReferenceCode(
+				String accountExternalReferenceCode,
+				String userAccountExternalReferenceCode)
+		throws Exception;
+
+	public Page<UserAccount> getAccountUserAccountsByExternalReferenceCodePage(
+			String externalReferenceCode, String search, Filter filter,
+			Pagination pagination, Sort[] sorts)
+		throws Exception;
+
+	public UserAccount postAccountUserAccountByExternalReferenceCode(
+			String externalReferenceCode, UserAccount userAccount)
+		throws Exception;
+
+	public void deleteAccountUserAccountsByExternalReferenceCodeByEmailAddress(
+			String externalReferenceCode, String[] strings)
+		throws Exception;
+
+	public void postAccountUserAccountsByExternalReferenceCodeByEmailAddress(
+			String externalReferenceCode, String[] strings)
+		throws Exception;
+
+	public void deleteAccountUserAccountByExternalReferenceCodeByEmailAddress(
+			String externalReferenceCode, String emailAddress)
+		throws Exception;
+
+	public void postAccountUserAccountByExternalReferenceCodeByEmailAddress(
+			String externalReferenceCode, String emailAddress)
+		throws Exception;
+
+	public Page<UserAccount> getAccountUserAccountsPage(
+			Long accountId, String search, Filter filter, Pagination pagination,
+			Sort[] sorts)
+		throws Exception;
+
+	public UserAccount postAccountUserAccount(
+			Long accountId, UserAccount userAccount)
+		throws Exception;
+
+	public Response postAccountUserAccountBatch(
+			Long accountId, String callbackURL, Object object)
+		throws Exception;
+
+	public void deleteAccountUserAccountsByEmailAddress(
+			Long accountId, String[] strings)
+		throws Exception;
+
+	public Page<UserAccount> postAccountUserAccountsByEmailAddress(
+			Long accountId, String accountRoleIds, String[] strings)
+		throws Exception;
+
+	public void deleteAccountUserAccountByEmailAddress(
+			Long accountId, String emailAddress)
+		throws Exception;
+
+	public UserAccount postAccountUserAccountByEmailAddress(
+			Long accountId, String emailAddress)
+		throws Exception;
+
 	public UserAccount getMyUserAccount() throws Exception;
 
 	public Page<UserAccount> getOrganizationUserAccountsPage(
@@ -76,6 +144,18 @@ public interface UserAccountResource {
 		throws Exception;
 
 	public Response postUserAccountBatch(String callbackURL, Object object)
+		throws Exception;
+
+	public void deleteUserAccountByExternalReferenceCode(
+			String externalReferenceCode)
+		throws Exception;
+
+	public UserAccount getUserAccountByExternalReferenceCode(
+			String externalReferenceCode)
+		throws Exception;
+
+	public UserAccount putUserAccountByExternalReferenceCode(
+			String externalReferenceCode, UserAccount userAccount)
 		throws Exception;
 
 	public void deleteUserAccount(Long userAccountId) throws Exception;
@@ -133,12 +213,6 @@ public interface UserAccountResource {
 
 	public void setRoleLocalService(RoleLocalService roleLocalService);
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider);
-
-	public void setVulcanBatchEngineImportTaskResource(
-		VulcanBatchEngineImportTaskResource
-			vulcanBatchEngineImportTaskResource);
-
 	public default Filter toFilter(String filterString) {
 		return toFilter(
 			filterString, Collections.<String, List<String>>emptyMap());
@@ -150,8 +224,10 @@ public interface UserAccountResource {
 		return null;
 	}
 
-	public default Sort[] toSorts(String sortsString) {
-		return new Sort[0];
+	public static class FactoryHolder {
+
+		public static volatile Factory factory;
+
 	}
 
 	@ProviderType

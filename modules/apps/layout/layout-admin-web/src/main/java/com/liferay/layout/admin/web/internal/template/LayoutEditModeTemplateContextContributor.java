@@ -14,7 +14,6 @@
 
 package com.liferay.layout.admin.web.internal.template;
 
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.template.TemplateContextContributor;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -45,14 +44,13 @@ public class LayoutEditModeTemplateContextContributor
 		String layoutMode = ParamUtil.getString(
 			httpServletRequest, "p_l_mode", Constants.VIEW);
 
-		if (layoutMode.equals(Constants.EDIT)) {
-			StringBuilder sb = new StringBuilder(3);
+		if (layoutMode.equals(Constants.EDIT) ||
+			layoutMode.equals(Constants.PREVIEW)) {
 
-			sb.append(GetterUtil.getString(contextObjects.get("bodyCssClass")));
-			sb.append(StringPool.SPACE);
-			sb.append("has-edit-mode-menu");
-
-			contextObjects.put("bodyCssClass", sb.toString());
+			contextObjects.put(
+				"bodyCssClass",
+				GetterUtil.getString(contextObjects.get("bodyCssClass")) +
+					" has-edit-mode-menu");
 		}
 	}
 

@@ -32,7 +32,6 @@ public class ERCCompanyEntrySoap implements Serializable {
 	public static ERCCompanyEntrySoap toSoapModel(ERCCompanyEntry model) {
 		ERCCompanyEntrySoap soapModel = new ERCCompanyEntrySoap();
 
-		soapModel.setUuid(model.getUuid());
 		soapModel.setExternalReferenceCode(model.getExternalReferenceCode());
 		soapModel.setErcCompanyEntryId(model.getErcCompanyEntryId());
 		soapModel.setCompanyId(model.getCompanyId());
@@ -95,14 +94,6 @@ public class ERCCompanyEntrySoap implements Serializable {
 		setErcCompanyEntryId(pk);
 	}
 
-	public String getUuid() {
-		return _uuid;
-	}
-
-	public void setUuid(String uuid) {
-		_uuid = uuid;
-	}
-
 	public String getExternalReferenceCode() {
 		return _externalReferenceCode;
 	}
@@ -127,7 +118,6 @@ public class ERCCompanyEntrySoap implements Serializable {
 		_companyId = companyId;
 	}
 
-	private String _uuid;
 	private String _externalReferenceCode;
 	private long _ercCompanyEntryId;
 	private long _companyId;

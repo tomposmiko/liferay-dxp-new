@@ -51,7 +51,7 @@ import org.apache.chemistry.opencmis.client.api.Session;
 /**
  * @author Alexander Chow
  */
-public class CMISFolder extends CMISModel implements Folder {
+public class CMISFolder extends BaseCMISModel implements Folder {
 
 	public CMISFolder(
 		CMISRepository cmisRepository, String uuid, long folderId,
@@ -76,6 +76,9 @@ public class CMISFolder extends CMISModel implements Folder {
 			cmisFolder.setParentFolder(getParentFolder());
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 
 		cmisFolder.setPrimaryKey(getPrimaryKey());
@@ -93,7 +96,7 @@ public class CMISFolder extends CMISModel implements Folder {
 		ObjectType objectType = _cmisFolder.getType();
 
 		if (cmisRepositoryDetector.isNuxeo() &&
-			!Objects.equals(objectType.getId(), "Workspace") &&
+			!Objects.equals("Workspace", objectType.getId()) &&
 			Objects.equals(ActionKeys.ADD_DOCUMENT, actionId)) {
 
 			return false;
@@ -251,6 +254,9 @@ public class CMISFolder extends CMISModel implements Folder {
 			}
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 
 		if (_cmisFolder.isRootFolder()) {
@@ -357,6 +363,9 @@ public class CMISFolder extends CMISModel implements Folder {
 			return user.getUserUuid();
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 
 		return StringPool.BLANK;

@@ -22,6 +22,7 @@
 <liferay-ui:error exception="<%= ContactNameException.MustHaveLastName.class %>" message="please-enter-a-valid-last-name" />
 <liferay-ui:error exception="<%= ContactNameException.MustHaveMiddleName.class %>" message="please-enter-a-valid-middle-name" />
 <liferay-ui:error exception="<%= ContactNameException.MustHaveValidFullName.class %>" message="please-enter-a-valid-first-middle-and-last-name" />
+<liferay-ui:error exception="<%= DataLimitExceededException.class %>" message="unable-to-create-organization-because-the-maximum-number-of-organizations-has-been-reached" />
 <liferay-ui:error exception="<%= NoSuchOrganizationException.class %>" message="the-organization-could-not-be-found" />
 <liferay-ui:error exception="<%= NoSuchRoleException.class %>" message="the-role-could-not-be-found" />
 <liferay-ui:error exception="<%= NoSuchUserException.class %>" message="the-user-could-not-be-found" />

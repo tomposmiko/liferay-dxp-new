@@ -49,7 +49,7 @@ public class InfoItemFieldReaderFieldSetProviderImpl
 	public InfoFieldSet getInfoFieldSet(String className) {
 		return InfoFieldSet.builder(
 		).infoFieldSetEntry(
-			consumer -> {
+			unsafeConsumer -> {
 				List<InfoItemFieldReader> infoItemFieldReaders =
 					_infoItemFieldReaderTracker.getInfoItemFieldReaders(
 						className);
@@ -57,7 +57,7 @@ public class InfoItemFieldReaderFieldSetProviderImpl
 				for (InfoItemFieldReader infoItemFieldReader :
 						infoItemFieldReaders) {
 
-					consumer.accept(infoItemFieldReader.getField());
+					unsafeConsumer.accept(infoItemFieldReader.getInfoField());
 				}
 			}
 		).labelInfoLocalizedValue(
@@ -80,7 +80,7 @@ public class InfoItemFieldReaderFieldSetProviderImpl
 			ServiceContextThreadLocal.getServiceContext();
 
 		for (InfoItemFieldReader infoItemFieldReader : infoItemFieldReaders) {
-			InfoField infoField = infoItemFieldReader.getField();
+			InfoField infoField = infoItemFieldReader.getInfoField();
 			Object value = infoItemFieldReader.getValue(itemObject);
 
 			if ((serviceContext != null) &&

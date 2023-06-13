@@ -23,7 +23,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -32,8 +31,7 @@ import org.junit.Test;
 public class StatsClusterRequestExecutorTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@Before
@@ -62,10 +60,10 @@ public class StatsClusterRequestExecutorTest {
 		StatsClusterRequestExecutorImpl statsClusterRequestExecutorImpl =
 			new StatsClusterRequestExecutorImpl() {
 				{
-					setClusterHealthStatusTranslator(
-						new ClusterHealthStatusTranslatorImpl());
 					setElasticsearchClientResolver(
 						_elasticsearchConnectionFixture);
+					setClusterHealthStatusTranslator(
+						new ClusterHealthStatusTranslatorImpl());
 				}
 			};
 

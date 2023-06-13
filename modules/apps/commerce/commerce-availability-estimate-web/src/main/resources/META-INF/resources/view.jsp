@@ -70,7 +70,7 @@ CommerceAvailabilityEstimateDisplayContext commerceAvailabilityEstimateDisplayCo
 		</liferay-frontend:management-bar-action-buttons>
 	</liferay-frontend:management-bar>
 
-	<div class="container-fluid-1280">
+	<div class="container-fluid container-fluid-max-xl">
 		<portlet:actionURL name="/commerce_availability_estimate/edit_commerce_availability_estimate" var="editCommerceAvailabilityEstimateActionURL" />
 
 		<aui:form action="<%= editCommerceAvailabilityEstimateActionURL %>" method="post" name="fm">
@@ -87,29 +87,30 @@ CommerceAvailabilityEstimateDisplayContext commerceAvailabilityEstimateDisplayCo
 					keyProperty="commerceAvailabilityEstimateId"
 					modelVar="commerceAvailabilityEstimate"
 				>
-
-					<%
-					PortletURL rowURL = renderResponse.createRenderURL();
-
-					rowURL.setParameter("mvcRenderCommandName", "/commerce_availability_estimate/edit_commerce_availability_estimate");
-					rowURL.setParameter("redirect", currentURL);
-					rowURL.setParameter("commerceAvailabilityEstimateId", String.valueOf(commerceAvailabilityEstimate.getCommerceAvailabilityEstimateId()));
-					%>
-
 					<liferay-ui:search-container-column-text
-						cssClass="important table-cell-content"
-						href="<%= rowURL %>"
+						cssClass="important table-cell-expand"
+						href='<%=
+							PortletURLBuilder.createRenderURL(
+								renderResponse
+							).setMVCRenderCommandName(
+								"/commerce_availability_estimate/edit_commerce_availability_estimate"
+							).setRedirect(
+								currentURL
+							).setParameter(
+								"commerceAvailabilityEstimateId", commerceAvailabilityEstimate.getCommerceAvailabilityEstimateId()
+							).buildPortletURL()
+						%>'
 						name="title"
 						value="<%= HtmlUtil.escape(commerceAvailabilityEstimate.getTitle(languageId)) %>"
 					/>
 
 					<liferay-ui:search-container-column-text
-						cssClass="table-cell-content"
+						cssClass="table-cell-expand"
 						property="priority"
 					/>
 
 					<liferay-ui:search-container-column-date
-						cssClass="table-cell-content"
+						cssClass="table-cell-expand"
 						name="modified-date"
 						property="modifiedDate"
 					/>

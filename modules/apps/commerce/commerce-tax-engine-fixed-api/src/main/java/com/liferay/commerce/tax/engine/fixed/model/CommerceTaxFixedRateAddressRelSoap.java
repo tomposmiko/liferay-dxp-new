@@ -36,6 +36,7 @@ public class CommerceTaxFixedRateAddressRelSoap implements Serializable {
 		CommerceTaxFixedRateAddressRelSoap soapModel =
 			new CommerceTaxFixedRateAddressRelSoap();
 
+		soapModel.setMvccVersion(model.getMvccVersion());
 		soapModel.setCommerceTaxFixedRateAddressRelId(
 			model.getCommerceTaxFixedRateAddressRelId());
 		soapModel.setGroupId(model.getGroupId());
@@ -46,8 +47,8 @@ public class CommerceTaxFixedRateAddressRelSoap implements Serializable {
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setCommerceTaxMethodId(model.getCommerceTaxMethodId());
 		soapModel.setCPTaxCategoryId(model.getCPTaxCategoryId());
-		soapModel.setCommerceCountryId(model.getCommerceCountryId());
-		soapModel.setCommerceRegionId(model.getCommerceRegionId());
+		soapModel.setCountryId(model.getCountryId());
+		soapModel.setRegionId(model.getRegionId());
 		soapModel.setZip(model.getZip());
 		soapModel.setRate(model.getRate());
 
@@ -110,6 +111,14 @@ public class CommerceTaxFixedRateAddressRelSoap implements Serializable {
 
 	public void setPrimaryKey(long pk) {
 		setCommerceTaxFixedRateAddressRelId(pk);
+	}
+
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	public void setMvccVersion(long mvccVersion) {
+		_mvccVersion = mvccVersion;
 	}
 
 	public long getCommerceTaxFixedRateAddressRelId() {
@@ -186,20 +195,20 @@ public class CommerceTaxFixedRateAddressRelSoap implements Serializable {
 		_CPTaxCategoryId = CPTaxCategoryId;
 	}
 
-	public long getCommerceCountryId() {
-		return _commerceCountryId;
+	public long getCountryId() {
+		return _countryId;
 	}
 
-	public void setCommerceCountryId(long commerceCountryId) {
-		_commerceCountryId = commerceCountryId;
+	public void setCountryId(long countryId) {
+		_countryId = countryId;
 	}
 
-	public long getCommerceRegionId() {
-		return _commerceRegionId;
+	public long getRegionId() {
+		return _regionId;
 	}
 
-	public void setCommerceRegionId(long commerceRegionId) {
-		_commerceRegionId = commerceRegionId;
+	public void setRegionId(long regionId) {
+		_regionId = regionId;
 	}
 
 	public String getZip() {
@@ -218,6 +227,7 @@ public class CommerceTaxFixedRateAddressRelSoap implements Serializable {
 		_rate = rate;
 	}
 
+	private long _mvccVersion;
 	private long _commerceTaxFixedRateAddressRelId;
 	private long _groupId;
 	private long _companyId;
@@ -227,8 +237,8 @@ public class CommerceTaxFixedRateAddressRelSoap implements Serializable {
 	private Date _modifiedDate;
 	private long _commerceTaxMethodId;
 	private long _CPTaxCategoryId;
-	private long _commerceCountryId;
-	private long _commerceRegionId;
+	private long _countryId;
+	private long _regionId;
 	private String _zip;
 	private double _rate;
 

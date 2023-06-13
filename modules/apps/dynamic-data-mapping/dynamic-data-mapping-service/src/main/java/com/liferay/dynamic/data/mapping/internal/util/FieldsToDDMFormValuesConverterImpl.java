@@ -26,17 +26,13 @@ import com.liferay.dynamic.data.mapping.storage.Field;
 import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.dynamic.data.mapping.util.DDMFieldsCounter;
 import com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverter;
-import com.liferay.petra.string.CharPool;
+import com.liferay.dynamic.data.mapping.util.NumericDDMFormFieldUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
-import java.math.BigDecimal;
-
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -225,28 +221,17 @@ public class FieldsToDDMFormValuesConverterImpl
 		else if ((fieldValue instanceof Number) &&
 				 !(fieldValue instanceof Integer)) {
 
-			NumberFormat numberFormat = null;
-
-			if (StringUtil.equals(locale.getLanguage(), "ar")) {
-				numberFormat = _getArabicDecimalFormat(locale);
-			}
-			else {
-				numberFormat = NumberFormat.getInstance(locale);
-			}
+			DecimalFormat decimalFormat =
+				NumericDDMFormFieldUtil.getDecimalFormat(locale);
 
 			Number number = (Number)fieldValue;
 
-			if (!_isBigDecimalAndInteger(number) ||
-				(number instanceof Double) || (number instanceof Float)) {
-
-				numberFormat.setMaximumFractionDigits(Integer.MAX_VALUE);
-				numberFormat.setMinimumFractionDigits(1);
+			if (number instanceof Double || number instanceof Float) {
+				decimalFormat.setMaximumFractionDigits(Integer.MAX_VALUE);
+				decimalFormat.setMinimumFractionDigits(1);
 			}
 
-			String valueString = numberFormat.format(number.doubleValue());
-
-			return StringUtil.removeChars(
-				valueString, CharPool.NO_BREAK_SPACE, CharPool.SPACE);
+			return decimalFormat.format(number.doubleValue());
 		}
 
 		return String.valueOf(fieldValue);
@@ -390,41 +375,6 @@ public class FieldsToDDMFormValuesConverterImpl
 		String value = (String)fieldsDisplayField.getValue();
 
 		return StringUtil.split(value);
-	}
-
-	private DecimalFormat _getArabicDecimalFormat(Locale locale) {
-		DecimalFormat decimalFormat = (DecimalFormat)DecimalFormat.getInstance(
-			locale);
-
-		DecimalFormatSymbols decimalFormatSymbols =
-			decimalFormat.getDecimalFormatSymbols();
-
-		decimalFormatSymbols.setZeroDigit('0');
-
-		decimalFormat.setDecimalFormatSymbols(decimalFormatSymbols);
-
-		decimalFormat.setGroupingUsed(false);
-		decimalFormat.setMaximumFractionDigits(Integer.MAX_VALUE);
-		decimalFormat.setParseBigDecimal(true);
-
-		return decimalFormat;
-	}
-
-	private boolean _isBigDecimalAndInteger(Object number) {
-		if ((number == null) || !(number instanceof BigDecimal)) {
-			return false;
-		}
-
-		try {
-			BigDecimal bigDecimalValue = (BigDecimal)number;
-
-			bigDecimalValue.toBigIntegerExact();
-		}
-		catch (ArithmeticException arithmeticException) {
-			return false;
-		}
-
-		return true;
 	}
 
 }

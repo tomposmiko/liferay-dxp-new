@@ -157,9 +157,9 @@ public class NettyFabricWorkerExecutionChannelHandler
 		Map<Path, Path> mergedPaths = HashMapBuilder.<Path, Path>putAll(
 			bootstrapPaths
 		).putAll(
-			inputPaths
-		).putAll(
 			runtimePaths
+		).putAll(
+			inputPaths
 		).build();
 
 		return new NoticeableFutureConverter<LoadedPaths, Map<Path, Path>>(
@@ -341,17 +341,9 @@ public class NettyFabricWorkerExecutionChannelHandler
 
 		@Override
 		public String toString() {
-			StringBundler sb = new StringBundler(7);
-
-			sb.append("{id=");
-			sb.append(_id);
-			sb.append(", result=");
-			sb.append(_result);
-			sb.append(", throwable=");
-			sb.append(_throwable);
-			sb.append("}");
-
-			return sb.toString();
+			return StringBundler.concat(
+				"{id=", _id, ", result=", _result, ", throwable=", _throwable,
+				"}");
 		}
 
 		protected FabricWorkerResultProcessCallable(

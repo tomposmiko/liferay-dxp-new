@@ -14,13 +14,16 @@
 
 package com.liferay.fragment.web.internal.display.context;
 
+import com.liferay.fragment.constants.FragmentPortletKeys;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.service.FragmentCollectionServiceUtil;
 import com.liferay.fragment.util.comparator.FragmentCollectionCreateDateComparator;
 import com.liferay.fragment.util.comparator.FragmentCollectionNameComparator;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -80,16 +83,9 @@ public class SelectFragmentCollectionDisplayContext {
 				"there-are-no-collections");
 
 		fragmentCollectionsSearchContainer.setOrderByCol(_getOrderByCol());
-
-		OrderByComparator<FragmentCollection> orderByComparator =
-			_getFragmentCollectionOrderByComparator();
-
 		fragmentCollectionsSearchContainer.setOrderByComparator(
-			orderByComparator);
-
+			_getFragmentCollectionOrderByComparator());
 		fragmentCollectionsSearchContainer.setOrderByType(_getOrderByType());
-		fragmentCollectionsSearchContainer.setRowChecker(
-			new EmptyOnClickRowChecker(_renderResponse));
 
 		List<FragmentCollection> fragmentCollections = null;
 		int fragmentCollectionsCount = 0;
@@ -112,7 +108,7 @@ public class SelectFragmentCollectionDisplayContext {
 					includeSystem,
 					fragmentCollectionsSearchContainer.getStart(),
 					fragmentCollectionsSearchContainer.getEnd(),
-					orderByComparator);
+					fragmentCollectionsSearchContainer.getOrderByComparator());
 
 			fragmentCollectionsCount =
 				FragmentCollectionServiceUtil.getFragmentCollectionsCount(
@@ -125,7 +121,7 @@ public class SelectFragmentCollectionDisplayContext {
 					themeDisplay.getScopeGroupId(), includeSystem,
 					fragmentCollectionsSearchContainer.getStart(),
 					fragmentCollectionsSearchContainer.getEnd(),
-					orderByComparator);
+					fragmentCollectionsSearchContainer.getOrderByComparator());
 
 			fragmentCollectionsCount =
 				FragmentCollectionServiceUtil.getFragmentCollectionsCount(
@@ -133,6 +129,8 @@ public class SelectFragmentCollectionDisplayContext {
 		}
 
 		fragmentCollectionsSearchContainer.setResults(fragmentCollections);
+		fragmentCollectionsSearchContainer.setRowChecker(
+			new EmptyOnClickRowChecker(_renderResponse));
 		fragmentCollectionsSearchContainer.setTotal(fragmentCollectionsCount);
 
 		_fragmentCollectionsSearchContainer =
@@ -142,31 +140,45 @@ public class SelectFragmentCollectionDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCRenderCommandName(
+			"/fragment/select_fragment_collection"
+		).setKeywords(
+			() -> {
+				String keywords = _getKeywords();
 
-		portletURL.setParameter(
-			"mvcRenderCommandName", "/fragment/select_fragment_collection");
-		portletURL.setParameter("eventName", getEventName());
+				if (Validator.isNotNull(keywords)) {
+					return keywords;
+				}
 
-		String keywords = _getKeywords();
+				return null;
+			}
+		).setParameter(
+			"eventName", getEventName()
+		).setParameter(
+			"orderByCol",
+			() -> {
+				String orderByCol = _getOrderByCol();
 
-		if (Validator.isNotNull(keywords)) {
-			portletURL.setParameter("keywords", keywords);
-		}
+				if (Validator.isNotNull(orderByCol)) {
+					return orderByCol;
+				}
 
-		String orderByCol = _getOrderByCol();
+				return null;
+			}
+		).setParameter(
+			"orderByType",
+			() -> {
+				String orderByType = _getOrderByType();
 
-		if (Validator.isNotNull(orderByCol)) {
-			portletURL.setParameter("orderByCol", orderByCol);
-		}
+				if (Validator.isNotNull(orderByType)) {
+					return orderByType;
+				}
 
-		String orderByType = _getOrderByType();
-
-		if (Validator.isNotNull(orderByType)) {
-			portletURL.setParameter("orderByType", orderByType);
-		}
-
-		return portletURL;
+				return null;
+			}
+		).buildPortletURL();
 	}
 
 	private OrderByComparator<FragmentCollection>
@@ -207,8 +219,9 @@ public class SelectFragmentCollectionDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = ParamUtil.getString(
-			_httpServletRequest, "orderByCol", "create-date");
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			_httpServletRequest, FragmentPortletKeys.FRAGMENT,
+			"select-fragment-collection-order-by-col", "create-date");
 
 		return _orderByCol;
 	}
@@ -218,8 +231,9 @@ public class SelectFragmentCollectionDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = ParamUtil.getString(
-			_httpServletRequest, "orderByType", "asc");
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_httpServletRequest, FragmentPortletKeys.FRAGMENT,
+			"select-fragment-collection-order-by-type", "asc");
 
 		return _orderByType;
 	}

@@ -84,13 +84,13 @@ public class CommerceChannelServiceSoap {
 
 	public static com.liferay.commerce.product.model.CommerceChannelSoap
 			fetchByExternalReferenceCode(
-				long companyId, String externalReferenceCode)
+				String externalReferenceCode, long companyId)
 		throws RemoteException {
 
 		try {
 			com.liferay.commerce.product.model.CommerceChannel returnValue =
 				CommerceChannelServiceUtil.fetchByExternalReferenceCode(
-					companyId, externalReferenceCode);
+					externalReferenceCode, companyId);
 
 			return com.liferay.commerce.product.model.CommerceChannelSoap.
 				toSoapModel(returnValue);
@@ -198,50 +198,12 @@ public class CommerceChannelServiceSoap {
 	}
 
 	public static com.liferay.commerce.product.model.CommerceChannelSoap[]
-			getCommerceChannels(
-				long companyId, String keywords, int start, int end)
+			search(long companyId)
 		throws RemoteException {
 
 		try {
 			java.util.List<com.liferay.commerce.product.model.CommerceChannel>
-				returnValue = CommerceChannelServiceUtil.getCommerceChannels(
-					companyId, keywords, start, end);
-
-			return com.liferay.commerce.product.model.CommerceChannelSoap.
-				toSoapModels(returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	public static int getCommerceChannelsCount(long companyId, String keywords)
-		throws RemoteException {
-
-		try {
-			int returnValue =
-				CommerceChannelServiceUtil.getCommerceChannelsCount(
-					companyId, keywords);
-
-			return returnValue;
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	public static com.liferay.commerce.product.model.CommerceChannelSoap[]
-			searchCommerceChannels(long companyId)
-		throws RemoteException {
-
-		try {
-			java.util.List<com.liferay.commerce.product.model.CommerceChannel>
-				returnValue = CommerceChannelServiceUtil.searchCommerceChannels(
-					companyId);
+				returnValue = CommerceChannelServiceUtil.search(companyId);
 
 			return com.liferay.commerce.product.model.CommerceChannelSoap.
 				toSoapModels(returnValue);
@@ -254,14 +216,14 @@ public class CommerceChannelServiceSoap {
 	}
 
 	public static com.liferay.commerce.product.model.CommerceChannelSoap[]
-			searchCommerceChannels(
+			search(
 				long companyId, String keywords, int start, int end,
 				com.liferay.portal.kernel.search.Sort sort)
 		throws RemoteException {
 
 		try {
 			java.util.List<com.liferay.commerce.product.model.CommerceChannel>
-				returnValue = CommerceChannelServiceUtil.searchCommerceChannels(
+				returnValue = CommerceChannelServiceUtil.search(
 					companyId, keywords, start, end, sort);
 
 			return com.liferay.commerce.product.model.CommerceChannelSoap.
@@ -294,14 +256,14 @@ public class CommerceChannelServiceSoap {
 
 	public static com.liferay.commerce.product.model.CommerceChannelSoap
 			updateCommerceChannelExternalReferenceCode(
-				long commerceChannelId, String externalReferenceCode)
+				String externalReferenceCode, long commerceChannelId)
 		throws RemoteException {
 
 		try {
 			com.liferay.commerce.product.model.CommerceChannel returnValue =
 				CommerceChannelServiceUtil.
 					updateCommerceChannelExternalReferenceCode(
-						commerceChannelId, externalReferenceCode);
+						externalReferenceCode, commerceChannelId);
 
 			return com.liferay.commerce.product.model.CommerceChannelSoap.
 				toSoapModel(returnValue);

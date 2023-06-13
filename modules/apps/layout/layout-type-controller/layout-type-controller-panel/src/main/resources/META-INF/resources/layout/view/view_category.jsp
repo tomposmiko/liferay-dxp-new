@@ -79,16 +79,17 @@ portlets = ListUtil.sort(portlets, new PortletTitleComparator(application, local
 			%>
 
 				<c:if test="<%= !portlet.isInstanceable() %>">
-
-					<%
-					PortletURL portletURL = PortletURLFactoryUtil.create(request, portlet.getRootPortlet(), PortletRequest.ACTION_PHASE);
-
-					portletURL.setPortletMode(PortletMode.VIEW);
-					portletURL.setWindowState(WindowState.MAXIMIZED);
-					%>
-
 					<div>
-						<a href="<%= portletURL %>"><%= PortalUtil.getPortletTitle(portlet, application, locale) %></a>
+						<a
+							href="<%=
+PortletURLBuilder.create(
+						PortletURLFactoryUtil.create(request, portlet.getRootPortlet(), PortletRequest.ACTION_PHASE)
+					).setPortletMode(
+						PortletMode.VIEW
+					).setWindowState(
+						WindowState.MAXIMIZED
+					).buildPortletURL() %>"><%= PortalUtil.getPortletTitle(portlet, application, locale) %></a
+						>
 					</div>
 				</c:if>
 

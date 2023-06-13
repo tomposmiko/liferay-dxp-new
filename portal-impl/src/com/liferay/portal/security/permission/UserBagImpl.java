@@ -69,6 +69,7 @@ public class UserBagImpl implements UserBag {
 		long[] userUserGroupGroupIds, long[] userRoleIds) {
 
 		_userId = userId;
+
 		_userGroupIds = userGroupIds;
 
 		Arrays.sort(userGroupIds);

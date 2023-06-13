@@ -18,7 +18,7 @@ AUI.add(
 		var AArray = A.Array;
 		var Lang = A.Lang;
 
-		var BODY = A.getBody();
+		var BODY = document.body;
 
 		var instanceOf = A.instanceOf;
 		var isArray = Array.isArray;
@@ -193,6 +193,7 @@ AUI.add(
 					value: {
 						strings: {
 							asc: Liferay.Language.get('ascending'),
+							// eslint-disable-next-line @liferay/no-abbreviations
 							desc: Liferay.Language.get('descending'),
 							propertyName: Liferay.Language.get('property-name'),
 							reverseSortBy: Lang.sub(
@@ -206,10 +207,6 @@ AUI.add(
 							value: Liferay.Language.get('value'),
 						},
 					},
-				},
-
-				requiredDescriptionEnabled: {
-					value: false,
 				},
 
 				strings: {
@@ -260,24 +257,22 @@ AUI.add(
 
 				validator: {
 					setter(val) {
-						var config = A.merge(
-							{
-								fieldStrings: {
-									name: {
-										required: Liferay.Language.get(
-											'this-field-is-required'
-										),
-									},
-								},
-								rules: {
-									name: {
-										required: true,
-										structureFieldName: true,
-									},
+						var config = {
+							fieldStrings: {
+								name: {
+									required: Liferay.Language.get(
+										'this-field-is-required'
+									),
 								},
 							},
-							val
-						);
+							rules: {
+								name: {
+									required: true,
+									structureFieldName: true,
+								},
+							},
+							...val,
+						};
 
 						return config;
 					},
@@ -652,29 +647,17 @@ AUI.add(
 						}
 						else if (editingField.get('type') === 'ddm-image') {
 							if (attributeName === 'required') {
-								if (
-									instance.get('requiredDescriptionEnabled')
-								) {
-									if (
-										editingField.get('requiredDescription')
-									) {
-										instance._toggleImageDescriptionAsterisk(
-											editingField,
-											changed.value.newVal === 'true'
-										);
-									}
-
-									instance._toggleRequiredDescriptionPropertyModel(
-										editingField,
-										changed.value.newVal === 'true'
-									);
-								}
-								else {
+								if (editingField.get('requiredDescription')) {
 									instance._toggleImageDescriptionAsterisk(
 										editingField,
 										changed.value.newVal === 'true'
 									);
 								}
+
+								instance._toggleRequiredDescriptionPropertyModel(
+									editingField,
+									changed.value.newVal === 'true'
+								);
 							}
 							else if (
 								attributeName === 'requiredDescription' &&
@@ -812,8 +795,8 @@ AUI.add(
 				_toggleInputDirection(locale) {
 					var rtl = Liferay.Language.direction[locale] === 'rtl';
 
-					BODY.toggleClass('form-builder-ltr-inputs', !rtl);
-					BODY.toggleClass('form-builder-rtl-inputs', rtl);
+					BODY.classList.toggle('form-builder-ltr-inputs', !rtl);
+					BODY.classList.toggle('form-builder-rtl-inputs', rtl);
 				},
 
 				_toggleOptionsEditorInputs(editor) {
@@ -943,26 +926,10 @@ AUI.add(
 								'requiredDescription'
 							);
 						}
-						else if (
-							!instance.get('requiredDescriptionEnabled')
-						) {
-							instance.MAP_HIDDEN_FIELD_ATTRS.DEFAULT.push(
-								'requiredDescription'
-							);
-						}
 						else if (field.get('requiredDescription') === false) {
 							instance._toggleImageDescriptionAsterisk(
 								field,
 								false
-							);
-						}
-
-						if (
-							field.get('required') &&
-							instance.get('requiredDescriptionEnabled')
-						) {
-							instance.MAP_HIDDEN_FIELD_ATTRS.DEFAULT = instance.MAP_HIDDEN_FIELD_ATTRS.DEFAULT.filter(
-								(item) => item !== 'requiredDescription'
 							);
 						}
 					}
@@ -1003,10 +970,10 @@ AUI.add(
 					field.set('strings', instance.get('strings'));
 
 					var fieldHiddenAttributeMap = {
-						checkbox: instance.MAP_HIDDEN_FIELD_ATTRS.checkbox,
+						'checkbox': instance.MAP_HIDDEN_FIELD_ATTRS.checkbox,
 						'ddm-separator':
 							instance.MAP_HIDDEN_FIELD_ATTRS.separator,
-						default: instance.MAP_HIDDEN_FIELD_ATTRS.DEFAULT,
+						'default': instance.MAP_HIDDEN_FIELD_ATTRS.DEFAULT,
 					};
 
 					var hiddenAtributes =
@@ -1158,7 +1125,7 @@ AUI.add(
 						!A.Text.Unicode.test(item, 'L') &&
 						!A.Text.Unicode.test(item, 'N') &&
 						!A.Text.Unicode.test(item, 'Pd') &&
-						item != STR_UNDERSCORE
+						item !== STR_UNDERSCORE
 					) {
 						key = key.replace(item, STR_SPACE);
 					}
@@ -1183,7 +1150,7 @@ AUI.add(
 				try {
 					data = JSON.parse(value);
 				}
-				catch (e) {}
+				catch (error) {}
 
 				return data;
 			},
@@ -1204,7 +1171,7 @@ AUI.add(
 						!A.Text.Unicode.test(item, 'L') &&
 						!A.Text.Unicode.test(item, 'N') &&
 						!A.Text.Unicode.test(item, 'Pd') &&
-						item != STR_UNDERSCORE
+						item !== STR_UNDERSCORE
 					) {
 						valid = false;
 
@@ -1359,9 +1326,9 @@ AUI.add(
 					type: 'text',
 				},
 				{
-					fieldLabel: Liferay.Language.get('text-area'),
+					fieldLabel: Liferay.Language.get('text-area-html'),
 					iconClass: 'textbox',
-					label: Liferay.Language.get('text-area'),
+					label: Liferay.Language.get('text-area-html'),
 					type: 'textarea',
 				},
 				{

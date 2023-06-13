@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -76,13 +77,14 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 	public static final String TABLE_NAME = "CommerceTaxFixedRateAddressRel";
 
 	public static final Object[][] TABLE_COLUMNS = {
+		{"mvccVersion", Types.BIGINT},
 		{"CTaxFixedRateAddressRelId", Types.BIGINT}, {"groupId", Types.BIGINT},
 		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
 		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
 		{"modifiedDate", Types.TIMESTAMP},
 		{"commerceTaxMethodId", Types.BIGINT},
-		{"CPTaxCategoryId", Types.BIGINT}, {"commerceCountryId", Types.BIGINT},
-		{"commerceRegionId", Types.BIGINT}, {"zip", Types.VARCHAR},
+		{"CPTaxCategoryId", Types.BIGINT}, {"countryId", Types.BIGINT},
+		{"regionId", Types.BIGINT}, {"zip", Types.VARCHAR},
 		{"rate", Types.DOUBLE}
 	};
 
@@ -90,6 +92,7 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("CTaxFixedRateAddressRelId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -99,14 +102,14 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("commerceTaxMethodId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("CPTaxCategoryId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("commerceCountryId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("commerceRegionId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("countryId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("regionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("zip", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("rate", Types.DOUBLE);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CommerceTaxFixedRateAddressRel (CTaxFixedRateAddressRelId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commerceTaxMethodId LONG,CPTaxCategoryId LONG,commerceCountryId LONG,commerceRegionId LONG,zip VARCHAR(75) null,rate DOUBLE)";
+		"create table CommerceTaxFixedRateAddressRel (mvccVersion LONG default 0 not null,CTaxFixedRateAddressRelId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commerceTaxMethodId LONG,CPTaxCategoryId LONG,countryId LONG,regionId LONG,zip VARCHAR(75) null,rate DOUBLE)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table CommerceTaxFixedRateAddressRel";
@@ -151,13 +154,13 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long COMMERCECOUNTRYID_COLUMN_BITMASK = 2L;
+	public static final long COMMERCETAXMETHODID_COLUMN_BITMASK = 2L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long COMMERCETAXMETHODID_COLUMN_BITMASK = 4L;
+	public static final long COUNTRYID_COLUMN_BITMASK = 4L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
@@ -184,6 +187,7 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 		CommerceTaxFixedRateAddressRel model =
 			new CommerceTaxFixedRateAddressRelImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setCommerceTaxFixedRateAddressRelId(
 			soapModel.getCommerceTaxFixedRateAddressRelId());
 		model.setGroupId(soapModel.getGroupId());
@@ -194,8 +198,8 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 		model.setModifiedDate(soapModel.getModifiedDate());
 		model.setCommerceTaxMethodId(soapModel.getCommerceTaxMethodId());
 		model.setCPTaxCategoryId(soapModel.getCPTaxCategoryId());
-		model.setCommerceCountryId(soapModel.getCommerceCountryId());
-		model.setCommerceRegionId(soapModel.getCommerceRegionId());
+		model.setCountryId(soapModel.getCountryId());
+		model.setRegionId(soapModel.getRegionId());
 		model.setZip(soapModel.getZip());
 		model.setRate(soapModel.getRate());
 
@@ -318,9 +322,40 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CommerceTaxFixedRateAddressRel>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceTaxFixedRateAddressRel.class.getClassLoader(),
+			CommerceTaxFixedRateAddressRel.class, ModelWrapper.class);
+
+		try {
+			Constructor<CommerceTaxFixedRateAddressRel> constructor =
+				(Constructor<CommerceTaxFixedRateAddressRel>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map
 		<String, Function<CommerceTaxFixedRateAddressRel, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommerceTaxFixedRateAddressRel, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceTaxFixedRateAddressRel, Object>>
@@ -328,110 +363,120 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 				new LinkedHashMap
 					<String,
 					 Function<CommerceTaxFixedRateAddressRel, Object>>();
-
-		attributeGetterFunctions.put(
-			"commerceTaxFixedRateAddressRelId",
-			CommerceTaxFixedRateAddressRel::
-				getCommerceTaxFixedRateAddressRelId);
-		attributeGetterFunctions.put(
-			"groupId", CommerceTaxFixedRateAddressRel::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceTaxFixedRateAddressRel::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceTaxFixedRateAddressRel::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceTaxFixedRateAddressRel::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceTaxFixedRateAddressRel::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceTaxFixedRateAddressRel::getModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceTaxMethodId",
-			CommerceTaxFixedRateAddressRel::getCommerceTaxMethodId);
-		attributeGetterFunctions.put(
-			"CPTaxCategoryId",
-			CommerceTaxFixedRateAddressRel::getCPTaxCategoryId);
-		attributeGetterFunctions.put(
-			"commerceCountryId",
-			CommerceTaxFixedRateAddressRel::getCommerceCountryId);
-		attributeGetterFunctions.put(
-			"commerceRegionId",
-			CommerceTaxFixedRateAddressRel::getCommerceRegionId);
-		attributeGetterFunctions.put(
-			"zip", CommerceTaxFixedRateAddressRel::getZip);
-		attributeGetterFunctions.put(
-			"rate", CommerceTaxFixedRateAddressRel::getRate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CommerceTaxFixedRateAddressRel, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceTaxFixedRateAddressRel, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceTaxFixedRateAddressRel, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CommerceTaxFixedRateAddressRel::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
+				CommerceTaxFixedRateAddressRel::setMvccVersion);
+		attributeGetterFunctions.put(
+			"commerceTaxFixedRateAddressRelId",
+			CommerceTaxFixedRateAddressRel::
+				getCommerceTaxFixedRateAddressRelId);
 		attributeSetterBiConsumers.put(
 			"commerceTaxFixedRateAddressRelId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
 				CommerceTaxFixedRateAddressRel::
 					setCommerceTaxFixedRateAddressRelId);
+		attributeGetterFunctions.put(
+			"groupId", CommerceTaxFixedRateAddressRel::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
 				CommerceTaxFixedRateAddressRel::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceTaxFixedRateAddressRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
 				CommerceTaxFixedRateAddressRel::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceTaxFixedRateAddressRel::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
 				CommerceTaxFixedRateAddressRel::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceTaxFixedRateAddressRel::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, String>)
 				CommerceTaxFixedRateAddressRel::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceTaxFixedRateAddressRel::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Date>)
 				CommerceTaxFixedRateAddressRel::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceTaxFixedRateAddressRel::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Date>)
 				CommerceTaxFixedRateAddressRel::setModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceTaxMethodId",
+			CommerceTaxFixedRateAddressRel::getCommerceTaxMethodId);
 		attributeSetterBiConsumers.put(
 			"commerceTaxMethodId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
 				CommerceTaxFixedRateAddressRel::setCommerceTaxMethodId);
+		attributeGetterFunctions.put(
+			"CPTaxCategoryId",
+			CommerceTaxFixedRateAddressRel::getCPTaxCategoryId);
 		attributeSetterBiConsumers.put(
 			"CPTaxCategoryId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
 				CommerceTaxFixedRateAddressRel::setCPTaxCategoryId);
+		attributeGetterFunctions.put(
+			"countryId", CommerceTaxFixedRateAddressRel::getCountryId);
 		attributeSetterBiConsumers.put(
-			"commerceCountryId",
+			"countryId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
-				CommerceTaxFixedRateAddressRel::setCommerceCountryId);
+				CommerceTaxFixedRateAddressRel::setCountryId);
+		attributeGetterFunctions.put(
+			"regionId", CommerceTaxFixedRateAddressRel::getRegionId);
 		attributeSetterBiConsumers.put(
-			"commerceRegionId",
+			"regionId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
-				CommerceTaxFixedRateAddressRel::setCommerceRegionId);
+				CommerceTaxFixedRateAddressRel::setRegionId);
+		attributeGetterFunctions.put(
+			"zip", CommerceTaxFixedRateAddressRel::getZip);
 		attributeSetterBiConsumers.put(
 			"zip",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, String>)
 				CommerceTaxFixedRateAddressRel::setZip);
+		attributeGetterFunctions.put(
+			"rate", CommerceTaxFixedRateAddressRel::getRate);
 		attributeSetterBiConsumers.put(
 			"rate",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Double>)
 				CommerceTaxFixedRateAddressRel::setRate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@JSON
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@JSON
@@ -620,17 +665,17 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 
 	@JSON
 	@Override
-	public long getCommerceCountryId() {
-		return _commerceCountryId;
+	public long getCountryId() {
+		return _countryId;
 	}
 
 	@Override
-	public void setCommerceCountryId(long commerceCountryId) {
+	public void setCountryId(long countryId) {
 		if (_columnOriginalValues == Collections.EMPTY_MAP) {
 			_setColumnOriginalValues();
 		}
 
-		_commerceCountryId = commerceCountryId;
+		_countryId = countryId;
 	}
 
 	/**
@@ -638,24 +683,24 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 	 *             #getColumnOriginalValue(String)}
 	 */
 	@Deprecated
-	public long getOriginalCommerceCountryId() {
+	public long getOriginalCountryId() {
 		return GetterUtil.getLong(
-			this.<Long>getColumnOriginalValue("commerceCountryId"));
+			this.<Long>getColumnOriginalValue("countryId"));
 	}
 
 	@JSON
 	@Override
-	public long getCommerceRegionId() {
-		return _commerceRegionId;
+	public long getRegionId() {
+		return _regionId;
 	}
 
 	@Override
-	public void setCommerceRegionId(long commerceRegionId) {
+	public void setRegionId(long regionId) {
 		if (_columnOriginalValues == Collections.EMPTY_MAP) {
 			_setColumnOriginalValues();
 		}
 
-		_commerceRegionId = commerceRegionId;
+		_regionId = regionId;
 	}
 
 	@JSON
@@ -751,6 +796,7 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 		CommerceTaxFixedRateAddressRelImpl commerceTaxFixedRateAddressRelImpl =
 			new CommerceTaxFixedRateAddressRelImpl();
 
+		commerceTaxFixedRateAddressRelImpl.setMvccVersion(getMvccVersion());
 		commerceTaxFixedRateAddressRelImpl.setCommerceTaxFixedRateAddressRelId(
 			getCommerceTaxFixedRateAddressRelId());
 		commerceTaxFixedRateAddressRelImpl.setGroupId(getGroupId());
@@ -763,14 +809,49 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 			getCommerceTaxMethodId());
 		commerceTaxFixedRateAddressRelImpl.setCPTaxCategoryId(
 			getCPTaxCategoryId());
-		commerceTaxFixedRateAddressRelImpl.setCommerceCountryId(
-			getCommerceCountryId());
-		commerceTaxFixedRateAddressRelImpl.setCommerceRegionId(
-			getCommerceRegionId());
+		commerceTaxFixedRateAddressRelImpl.setCountryId(getCountryId());
+		commerceTaxFixedRateAddressRelImpl.setRegionId(getRegionId());
 		commerceTaxFixedRateAddressRelImpl.setZip(getZip());
 		commerceTaxFixedRateAddressRelImpl.setRate(getRate());
 
 		commerceTaxFixedRateAddressRelImpl.resetOriginalValues();
+
+		return commerceTaxFixedRateAddressRelImpl;
+	}
+
+	@Override
+	public CommerceTaxFixedRateAddressRel cloneWithOriginalValues() {
+		CommerceTaxFixedRateAddressRelImpl commerceTaxFixedRateAddressRelImpl =
+			new CommerceTaxFixedRateAddressRelImpl();
+
+		commerceTaxFixedRateAddressRelImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		commerceTaxFixedRateAddressRelImpl.setCommerceTaxFixedRateAddressRelId(
+			this.<Long>getColumnOriginalValue("CTaxFixedRateAddressRelId"));
+		commerceTaxFixedRateAddressRelImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		commerceTaxFixedRateAddressRelImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commerceTaxFixedRateAddressRelImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commerceTaxFixedRateAddressRelImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commerceTaxFixedRateAddressRelImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commerceTaxFixedRateAddressRelImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commerceTaxFixedRateAddressRelImpl.setCommerceTaxMethodId(
+			this.<Long>getColumnOriginalValue("commerceTaxMethodId"));
+		commerceTaxFixedRateAddressRelImpl.setCPTaxCategoryId(
+			this.<Long>getColumnOriginalValue("CPTaxCategoryId"));
+		commerceTaxFixedRateAddressRelImpl.setCountryId(
+			this.<Long>getColumnOriginalValue("countryId"));
+		commerceTaxFixedRateAddressRelImpl.setRegionId(
+			this.<Long>getColumnOriginalValue("regionId"));
+		commerceTaxFixedRateAddressRelImpl.setZip(
+			this.<String>getColumnOriginalValue("zip"));
+		commerceTaxFixedRateAddressRelImpl.setRate(
+			this.<Double>getColumnOriginalValue("rate"));
 
 		return commerceTaxFixedRateAddressRelImpl;
 	}
@@ -854,6 +935,8 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 			commerceTaxFixedRateAddressRelCacheModel =
 				new CommerceTaxFixedRateAddressRelCacheModel();
 
+		commerceTaxFixedRateAddressRelCacheModel.mvccVersion = getMvccVersion();
+
 		commerceTaxFixedRateAddressRelCacheModel.
 			commerceTaxFixedRateAddressRelId =
 				getCommerceTaxFixedRateAddressRelId();
@@ -900,11 +983,9 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 		commerceTaxFixedRateAddressRelCacheModel.CPTaxCategoryId =
 			getCPTaxCategoryId();
 
-		commerceTaxFixedRateAddressRelCacheModel.commerceCountryId =
-			getCommerceCountryId();
+		commerceTaxFixedRateAddressRelCacheModel.countryId = getCountryId();
 
-		commerceTaxFixedRateAddressRelCacheModel.commerceRegionId =
-			getCommerceRegionId();
+		commerceTaxFixedRateAddressRelCacheModel.regionId = getRegionId();
 
 		commerceTaxFixedRateAddressRelCacheModel.zip = getZip();
 
@@ -1007,12 +1088,11 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 		private static final Function
 			<InvocationHandler, CommerceTaxFixedRateAddressRel>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						CommerceTaxFixedRateAddressRel.class,
-						ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private long _commerceTaxFixedRateAddressRelId;
 	private long _groupId;
 	private long _companyId;
@@ -1023,8 +1103,8 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 	private boolean _setModifiedDate;
 	private long _commerceTaxMethodId;
 	private long _CPTaxCategoryId;
-	private long _commerceCountryId;
-	private long _commerceRegionId;
+	private long _countryId;
+	private long _regionId;
 	private String _zip;
 	private double _rate;
 
@@ -1057,6 +1137,7 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put(
 			"CTaxFixedRateAddressRelId", _commerceTaxFixedRateAddressRelId);
 		_columnOriginalValues.put("groupId", _groupId);
@@ -1067,8 +1148,8 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 		_columnOriginalValues.put("modifiedDate", _modifiedDate);
 		_columnOriginalValues.put("commerceTaxMethodId", _commerceTaxMethodId);
 		_columnOriginalValues.put("CPTaxCategoryId", _CPTaxCategoryId);
-		_columnOriginalValues.put("commerceCountryId", _commerceCountryId);
-		_columnOriginalValues.put("commerceRegionId", _commerceRegionId);
+		_columnOriginalValues.put("countryId", _countryId);
+		_columnOriginalValues.put("regionId", _regionId);
 		_columnOriginalValues.put("zip", _zip);
 		_columnOriginalValues.put("rate", _rate);
 	}
@@ -1095,31 +1176,33 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("CTaxFixedRateAddressRelId", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("groupId", 2L);
+		columnBitmasks.put("CTaxFixedRateAddressRelId", 2L);
 
-		columnBitmasks.put("companyId", 4L);
+		columnBitmasks.put("groupId", 4L);
 
-		columnBitmasks.put("userId", 8L);
+		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("userName", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("createDate", 32L);
+		columnBitmasks.put("userName", 32L);
 
-		columnBitmasks.put("modifiedDate", 64L);
+		columnBitmasks.put("createDate", 64L);
 
-		columnBitmasks.put("commerceTaxMethodId", 128L);
+		columnBitmasks.put("modifiedDate", 128L);
 
-		columnBitmasks.put("CPTaxCategoryId", 256L);
+		columnBitmasks.put("commerceTaxMethodId", 256L);
 
-		columnBitmasks.put("commerceCountryId", 512L);
+		columnBitmasks.put("CPTaxCategoryId", 512L);
 
-		columnBitmasks.put("commerceRegionId", 1024L);
+		columnBitmasks.put("countryId", 1024L);
 
-		columnBitmasks.put("zip", 2048L);
+		columnBitmasks.put("regionId", 2048L);
 
-		columnBitmasks.put("rate", 4096L);
+		columnBitmasks.put("zip", 4096L);
+
+		columnBitmasks.put("rate", 8192L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

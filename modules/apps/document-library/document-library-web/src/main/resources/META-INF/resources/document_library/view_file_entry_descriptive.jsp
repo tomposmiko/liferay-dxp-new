@@ -57,7 +57,7 @@ if ((user.getUserId() == fileEntry.getUserId()) || permissionChecker.isContentRe
 
 latestFileVersion = latestFileVersion.toEscapedModel();
 
-Date modifiedDate = fileEntry.getModifiedDate();
+Date modifiedDate = latestFileVersion.getModifiedDate();
 
 String modifiedDateDescription = LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - modifiedDate.getTime(), true);
 
@@ -69,16 +69,22 @@ if (fileShortcut == null) {
 else {
 	dlViewFileVersionDisplayContext = dlDisplayContextProvider.getDLViewFileVersionDisplayContext(request, response, fileShortcut);
 }
-
-PortletURL rowURL = liferayPortletResponse.createRenderURL();
-
-rowURL.setParameter("mvcRenderCommandName", "/document_library/view_file_entry");
-rowURL.setParameter("redirect", HttpUtil.removeParameter(currentURL, liferayPortletResponse.getNamespace() + "ajax"));
-rowURL.setParameter("fileEntryId", String.valueOf(fileEntry.getFileEntryId()));
 %>
 
 <h2 class="h5">
-	<aui:a href="<%= rowURL.toString() %>">
+	<aui:a
+		href='<%=
+			PortletURLBuilder.createRenderURL(
+				liferayPortletResponse
+			).setMVCRenderCommandName(
+				"/document_library/view_file_entry"
+			).setRedirect(
+				HttpUtil.removeParameter(currentURL, liferayPortletResponse.getNamespace() + "ajax")
+			).setParameter(
+				"fileEntryId", fileEntry.getFileEntryId()
+			).buildString()
+		%>'
+	>
 		<%= latestFileVersion.getTitle() %>
 	</aui:a>
 </h2>

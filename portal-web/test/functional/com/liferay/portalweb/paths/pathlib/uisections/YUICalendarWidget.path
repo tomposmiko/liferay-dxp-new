@@ -30,11 +30,6 @@
 	<td>//div[contains(@class,'yui3-calendar-content')]//table[@class='yui3-calendar-grid']//td[contains(@class,'yui3-calendar-day') and contains(.,'${key_day}')]</td>
 	<td></td>
 </tr>
-<tr>
-	<td>DATEPICKER_SPECIFIC_DAY_1</td>
-	<td>//div[contains(@class,'yui3-calendar-content') and contains(.,'${key_month} ${key_year}')]//table[@class='yui3-calendar-grid']//td[contains(@class,'yui3-calendar-day')and not(contains(@class,'hidden')) and contains(.,'${key_day}')]</td>
-	<td></td>
-</tr>
 </tbody>
 </table>
 </body>

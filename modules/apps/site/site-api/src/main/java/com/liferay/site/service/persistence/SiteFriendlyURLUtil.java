@@ -539,10 +539,10 @@ public class SiteFriendlyURLUtil {
 	 * @param companyId the company ID
 	 * @return the matching site friendly urls
 	 */
-	public static List<SiteFriendlyURL> findByC_G(
+	public static List<SiteFriendlyURL> findByG_C(
 		long groupId, long companyId) {
 
-		return getPersistence().findByC_G(groupId, companyId);
+		return getPersistence().findByG_C(groupId, companyId);
 	}
 
 	/**
@@ -558,10 +558,10 @@ public class SiteFriendlyURLUtil {
 	 * @param end the upper bound of the range of site friendly urls (not inclusive)
 	 * @return the range of matching site friendly urls
 	 */
-	public static List<SiteFriendlyURL> findByC_G(
+	public static List<SiteFriendlyURL> findByG_C(
 		long groupId, long companyId, int start, int end) {
 
-		return getPersistence().findByC_G(groupId, companyId, start, end);
+		return getPersistence().findByG_C(groupId, companyId, start, end);
 	}
 
 	/**
@@ -578,11 +578,11 @@ public class SiteFriendlyURLUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching site friendly urls
 	 */
-	public static List<SiteFriendlyURL> findByC_G(
+	public static List<SiteFriendlyURL> findByG_C(
 		long groupId, long companyId, int start, int end,
 		OrderByComparator<SiteFriendlyURL> orderByComparator) {
 
-		return getPersistence().findByC_G(
+		return getPersistence().findByG_C(
 			groupId, companyId, start, end, orderByComparator);
 	}
 
@@ -601,12 +601,12 @@ public class SiteFriendlyURLUtil {
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching site friendly urls
 	 */
-	public static List<SiteFriendlyURL> findByC_G(
+	public static List<SiteFriendlyURL> findByG_C(
 		long groupId, long companyId, int start, int end,
 		OrderByComparator<SiteFriendlyURL> orderByComparator,
 		boolean useFinderCache) {
 
-		return getPersistence().findByC_G(
+		return getPersistence().findByG_C(
 			groupId, companyId, start, end, orderByComparator, useFinderCache);
 	}
 
@@ -619,12 +619,12 @@ public class SiteFriendlyURLUtil {
 	 * @return the first matching site friendly url
 	 * @throws NoSuchFriendlyURLException if a matching site friendly url could not be found
 	 */
-	public static SiteFriendlyURL findByC_G_First(
+	public static SiteFriendlyURL findByG_C_First(
 			long groupId, long companyId,
 			OrderByComparator<SiteFriendlyURL> orderByComparator)
 		throws com.liferay.site.exception.NoSuchFriendlyURLException {
 
-		return getPersistence().findByC_G_First(
+		return getPersistence().findByG_C_First(
 			groupId, companyId, orderByComparator);
 	}
 
@@ -636,11 +636,11 @@ public class SiteFriendlyURLUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching site friendly url, or <code>null</code> if a matching site friendly url could not be found
 	 */
-	public static SiteFriendlyURL fetchByC_G_First(
+	public static SiteFriendlyURL fetchByG_C_First(
 		long groupId, long companyId,
 		OrderByComparator<SiteFriendlyURL> orderByComparator) {
 
-		return getPersistence().fetchByC_G_First(
+		return getPersistence().fetchByG_C_First(
 			groupId, companyId, orderByComparator);
 	}
 
@@ -653,12 +653,12 @@ public class SiteFriendlyURLUtil {
 	 * @return the last matching site friendly url
 	 * @throws NoSuchFriendlyURLException if a matching site friendly url could not be found
 	 */
-	public static SiteFriendlyURL findByC_G_Last(
+	public static SiteFriendlyURL findByG_C_Last(
 			long groupId, long companyId,
 			OrderByComparator<SiteFriendlyURL> orderByComparator)
 		throws com.liferay.site.exception.NoSuchFriendlyURLException {
 
-		return getPersistence().findByC_G_Last(
+		return getPersistence().findByG_C_Last(
 			groupId, companyId, orderByComparator);
 	}
 
@@ -670,11 +670,11 @@ public class SiteFriendlyURLUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching site friendly url, or <code>null</code> if a matching site friendly url could not be found
 	 */
-	public static SiteFriendlyURL fetchByC_G_Last(
+	public static SiteFriendlyURL fetchByG_C_Last(
 		long groupId, long companyId,
 		OrderByComparator<SiteFriendlyURL> orderByComparator) {
 
-		return getPersistence().fetchByC_G_Last(
+		return getPersistence().fetchByG_C_Last(
 			groupId, companyId, orderByComparator);
 	}
 
@@ -688,12 +688,12 @@ public class SiteFriendlyURLUtil {
 	 * @return the previous, current, and next site friendly url
 	 * @throws NoSuchFriendlyURLException if a site friendly url with the primary key could not be found
 	 */
-	public static SiteFriendlyURL[] findByC_G_PrevAndNext(
+	public static SiteFriendlyURL[] findByG_C_PrevAndNext(
 			long siteFriendlyURLId, long groupId, long companyId,
 			OrderByComparator<SiteFriendlyURL> orderByComparator)
 		throws com.liferay.site.exception.NoSuchFriendlyURLException {
 
-		return getPersistence().findByC_G_PrevAndNext(
+		return getPersistence().findByG_C_PrevAndNext(
 			siteFriendlyURLId, groupId, companyId, orderByComparator);
 	}
 
@@ -703,8 +703,8 @@ public class SiteFriendlyURLUtil {
 	 * @param groupId the group ID
 	 * @param companyId the company ID
 	 */
-	public static void removeByC_G(long groupId, long companyId) {
-		getPersistence().removeByC_G(groupId, companyId);
+	public static void removeByG_C(long groupId, long companyId) {
+		getPersistence().removeByG_C(groupId, companyId);
 	}
 
 	/**
@@ -714,8 +714,8 @@ public class SiteFriendlyURLUtil {
 	 * @param companyId the company ID
 	 * @return the number of matching site friendly urls
 	 */
-	public static int countByC_G(long groupId, long companyId) {
-		return getPersistence().countByC_G(groupId, companyId);
+	public static int countByG_C(long groupId, long companyId) {
+		return getPersistence().countByG_C(groupId, companyId);
 	}
 
 	/**
@@ -794,11 +794,11 @@ public class SiteFriendlyURLUtil {
 	 * @return the matching site friendly url
 	 * @throws NoSuchFriendlyURLException if a matching site friendly url could not be found
 	 */
-	public static SiteFriendlyURL findByC_G_L(
+	public static SiteFriendlyURL findByG_C_L(
 			long groupId, long companyId, String languageId)
 		throws com.liferay.site.exception.NoSuchFriendlyURLException {
 
-		return getPersistence().findByC_G_L(groupId, companyId, languageId);
+		return getPersistence().findByG_C_L(groupId, companyId, languageId);
 	}
 
 	/**
@@ -809,10 +809,10 @@ public class SiteFriendlyURLUtil {
 	 * @param languageId the language ID
 	 * @return the matching site friendly url, or <code>null</code> if a matching site friendly url could not be found
 	 */
-	public static SiteFriendlyURL fetchByC_G_L(
+	public static SiteFriendlyURL fetchByG_C_L(
 		long groupId, long companyId, String languageId) {
 
-		return getPersistence().fetchByC_G_L(groupId, companyId, languageId);
+		return getPersistence().fetchByG_C_L(groupId, companyId, languageId);
 	}
 
 	/**
@@ -824,11 +824,11 @@ public class SiteFriendlyURLUtil {
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching site friendly url, or <code>null</code> if a matching site friendly url could not be found
 	 */
-	public static SiteFriendlyURL fetchByC_G_L(
+	public static SiteFriendlyURL fetchByG_C_L(
 		long groupId, long companyId, String languageId,
 		boolean useFinderCache) {
 
-		return getPersistence().fetchByC_G_L(
+		return getPersistence().fetchByG_C_L(
 			groupId, companyId, languageId, useFinderCache);
 	}
 
@@ -840,11 +840,11 @@ public class SiteFriendlyURLUtil {
 	 * @param languageId the language ID
 	 * @return the site friendly url that was removed
 	 */
-	public static SiteFriendlyURL removeByC_G_L(
+	public static SiteFriendlyURL removeByG_C_L(
 			long groupId, long companyId, String languageId)
 		throws com.liferay.site.exception.NoSuchFriendlyURLException {
 
-		return getPersistence().removeByC_G_L(groupId, companyId, languageId);
+		return getPersistence().removeByG_C_L(groupId, companyId, languageId);
 	}
 
 	/**
@@ -855,10 +855,10 @@ public class SiteFriendlyURLUtil {
 	 * @param languageId the language ID
 	 * @return the number of matching site friendly urls
 	 */
-	public static int countByC_G_L(
+	public static int countByG_C_L(
 		long groupId, long companyId, String languageId) {
 
-		return getPersistence().countByC_G_L(groupId, companyId, languageId);
+		return getPersistence().countByG_C_L(groupId, companyId, languageId);
 	}
 
 	/**

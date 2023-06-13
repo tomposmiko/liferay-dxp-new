@@ -27,6 +27,10 @@ public class AccountEntryUserRelLocalServiceWrapper
 	implements AccountEntryUserRelLocalService,
 			   ServiceWrapper<AccountEntryUserRelLocalService> {
 
+	public AccountEntryUserRelLocalServiceWrapper() {
+		this(null);
+	}
+
 	public AccountEntryUserRelLocalServiceWrapper(
 		AccountEntryUserRelLocalService accountEntryUserRelLocalService) {
 
@@ -64,12 +68,27 @@ public class AccountEntryUserRelLocalServiceWrapper
 	public com.liferay.account.model.AccountEntryUserRel addAccountEntryUserRel(
 			long accountEntryId, long creatorUserId, String screenName,
 			String emailAddress, java.util.Locale locale, String firstName,
-			String middleName, String lastName, long prefixId, long suffixId)
+			String middleName, String lastName, long prefixId, long suffixId,
+			String jobTitle)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _accountEntryUserRelLocalService.addAccountEntryUserRel(
 			accountEntryId, creatorUserId, screenName, emailAddress, locale,
-			firstName, middleName, lastName, prefixId, suffixId);
+			firstName, middleName, lastName, prefixId, suffixId, jobTitle);
+	}
+
+	@Override
+	public com.liferay.account.model.AccountEntryUserRel
+			addAccountEntryUserRelByEmailAddress(
+				long accountEntryId, String emailAddress, long[] accountRoleIds,
+				String userExternalReferenceCode,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _accountEntryUserRelLocalService.
+			addAccountEntryUserRelByEmailAddress(
+				accountEntryId, emailAddress, accountRoleIds,
+				userExternalReferenceCode, serviceContext);
 	}
 
 	@Override
@@ -87,13 +106,13 @@ public class AccountEntryUserRelLocalServiceWrapper
 				long accountEntryId, long creatorUserId, String screenName,
 				String emailAddress, java.util.Locale locale, String firstName,
 				String middleName, String lastName, long prefixId,
-				long suffixId)
+				long suffixId, String jobTitle)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _accountEntryUserRelLocalService.
 			addPersonTypeAccountEntryUserRel(
 				accountEntryId, creatorUserId, screenName, emailAddress, locale,
-				firstName, middleName, lastName, prefixId, suffixId);
+				firstName, middleName, lastName, prefixId, suffixId, jobTitle);
 	}
 
 	/**
@@ -162,6 +181,16 @@ public class AccountEntryUserRelLocalServiceWrapper
 	}
 
 	@Override
+	public void deleteAccountEntryUserRelByEmailAddress(
+			long accountEntryId, String emailAddress)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_accountEntryUserRelLocalService.
+			deleteAccountEntryUserRelByEmailAddress(
+				accountEntryId, emailAddress);
+	}
+
+	@Override
 	public void deleteAccountEntryUserRels(
 			long accountEntryId, long[] accountUserIds)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -176,6 +205,12 @@ public class AccountEntryUserRelLocalServiceWrapper
 
 		_accountEntryUserRelLocalService.
 			deleteAccountEntryUserRelsByAccountEntryId(accountEntryId);
+	}
+
+	@Override
+	public void deleteAccountEntryUserRelsByAccountUserId(long accountUserId) {
+		_accountEntryUserRelLocalService.
+			deleteAccountEntryUserRelsByAccountUserId(accountUserId);
 	}
 
 	/**
@@ -301,6 +336,14 @@ public class AccountEntryUserRelLocalServiceWrapper
 			accountEntryUserRelId);
 	}
 
+	@Override
+	public com.liferay.account.model.AccountEntryUserRel
+		fetchAccountEntryUserRel(long accountEntryId, long accountUserId) {
+
+		return _accountEntryUserRelLocalService.fetchAccountEntryUserRel(
+			accountEntryId, accountUserId);
+	}
+
 	/**
 	 * Returns the account entry user rel with the primary key.
 	 *
@@ -315,6 +358,15 @@ public class AccountEntryUserRelLocalServiceWrapper
 
 		return _accountEntryUserRelLocalService.getAccountEntryUserRel(
 			accountEntryUserRelId);
+	}
+
+	@Override
+	public com.liferay.account.model.AccountEntryUserRel getAccountEntryUserRel(
+			long accountEntryId, long accountUserId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _accountEntryUserRelLocalService.getAccountEntryUserRel(
+			accountEntryId, accountUserId);
 	}
 
 	/**
@@ -342,6 +394,15 @@ public class AccountEntryUserRelLocalServiceWrapper
 
 		return _accountEntryUserRelLocalService.
 			getAccountEntryUserRelsByAccountEntryId(accountEntryId);
+	}
+
+	@Override
+	public java.util.List<com.liferay.account.model.AccountEntryUserRel>
+		getAccountEntryUserRelsByAccountEntryId(
+			long accountEntryId, int start, int end) {
+
+		return _accountEntryUserRelLocalService.
+			getAccountEntryUserRelsByAccountEntryId(accountEntryId, start, end);
 	}
 
 	@Override

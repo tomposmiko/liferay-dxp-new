@@ -14,6 +14,8 @@
 
 package com.liferay.commerce.theme.speedwell.site.initializer.internal;
 
+import com.liferay.account.settings.AccountEntryGroupSettings;
+import com.liferay.commerce.account.configuration.CommerceAccountGroupServiceConfiguration;
 import com.liferay.commerce.account.constants.CommerceAccountConstants;
 import com.liferay.commerce.account.util.CommerceAccountRoleHelper;
 import com.liferay.commerce.currency.model.CommerceCurrency;
@@ -52,10 +54,10 @@ import com.liferay.commerce.product.service.CPDefinitionLocalService;
 import com.liferay.commerce.product.service.CPMeasurementUnitLocalService;
 import com.liferay.commerce.product.service.CommerceCatalogLocalService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
-import com.liferay.commerce.service.CommerceCountryLocalService;
 import com.liferay.commerce.service.CommerceShippingMethodLocalService;
 import com.liferay.commerce.shipping.engine.fixed.service.CommerceShippingFixedOptionLocalService;
 import com.liferay.commerce.theme.speedwell.site.initializer.internal.dependencies.resolver.SpeedwellDependencyResolver;
+import com.liferay.commerce.util.AccountEntryAllowedTypesUtil;
 import com.liferay.commerce.util.CommerceShippingEngineRegistry;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
@@ -77,6 +79,7 @@ import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.model.ThemeSetting;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -297,7 +300,6 @@ public class SpeedwellSiteInitializer implements SiteInitializer {
 
 		_groupLocalService.updateGroup(group);
 
-		_commerceCountryLocalService.importDefaultCountries(serviceContext);
 		_commerceCurrencyLocalService.importDefaultValues(serviceContext);
 		_cpMeasurementUnitLocalService.importDefaultValues(serviceContext);
 
@@ -315,6 +317,9 @@ public class SpeedwellSiteInitializer implements SiteInitializer {
 			String.valueOf(CommerceAccountConstants.SITE_TYPE_B2C));
 
 		modifiableSettings.store();
+
+		_accountEntryGroupSettings.setAllowedTypes(
+			serviceContext.getScopeGroupId(), _getAllowedTypes(groupId));
 	}
 
 	protected CommerceCatalog createCatalog(ServiceContext serviceContext)
@@ -327,9 +332,9 @@ public class SpeedwellSiteInitializer implements SiteInitializer {
 				serviceContext.getCompanyId());
 
 		return _commerceCatalogLocalService.addCommerceCatalog(
-			group.getName(serviceContext.getLanguageId()),
+			StringPool.BLANK, group.getName(serviceContext.getLanguageId()),
 			commerceCurrency.getCode(), serviceContext.getLanguageId(),
-			StringPool.BLANK, serviceContext);
+			serviceContext);
 	}
 
 	protected CommerceChannel createChannel(
@@ -339,11 +344,10 @@ public class SpeedwellSiteInitializer implements SiteInitializer {
 		Group group = serviceContext.getScopeGroup();
 
 		return _commerceChannelLocalService.addCommerceChannel(
-			group.getGroupId(),
+			StringPool.BLANK, group.getGroupId(),
 			group.getName(serviceContext.getLanguageId()) + " Portal",
 			CommerceChannelConstants.CHANNEL_TYPE_SITE, null,
-			commerceCatalog.getCommerceCurrencyCode(), StringPool.BLANK,
-			serviceContext);
+			commerceCatalog.getCommerceCurrencyCode(), serviceContext);
 	}
 
 	protected void createRoles(ServiceContext serviceContext) throws Exception {
@@ -548,6 +552,21 @@ public class SpeedwellSiteInitializer implements SiteInitializer {
 			ResourceConstants.SCOPE_GROUP_TEMPLATE,
 			String.valueOf(GroupConstants.DEFAULT_PARENT_GROUP_ID),
 			role.getRoleId(), "VIEW_PRICE");
+	}
+
+	private String[] _getAllowedTypes(long commerceChannelGroupId)
+		throws Exception {
+
+		CommerceAccountGroupServiceConfiguration
+			commerceAccountGroupServiceConfiguration =
+				_configurationProvider.getConfiguration(
+					CommerceAccountGroupServiceConfiguration.class,
+					new GroupServiceSettingsLocator(
+						commerceChannelGroupId,
+						CommerceAccountConstants.SERVICE_NAME));
+
+		return AccountEntryAllowedTypesUtil.getAllowedTypes(
+			commerceAccountGroupServiceConfiguration.commerceSiteType());
 	}
 
 	private long[] _getCProductIds(JSONArray jsonArray) {
@@ -977,6 +996,9 @@ public class SpeedwellSiteInitializer implements SiteInitializer {
 		SpeedwellSiteInitializer.class);
 
 	@Reference
+	private AccountEntryGroupSettings _accountEntryGroupSettings;
+
+	@Reference
 	private AssetCategoriesImporter _assetCategoriesImporter;
 
 	@Reference
@@ -996,9 +1018,6 @@ public class SpeedwellSiteInitializer implements SiteInitializer {
 
 	@Reference
 	private CommerceChannelLocalService _commerceChannelLocalService;
-
-	@Reference
-	private CommerceCountryLocalService _commerceCountryLocalService;
 
 	@Reference
 	private CommerceCurrencyLocalService _commerceCurrencyLocalService;
@@ -1032,6 +1051,9 @@ public class SpeedwellSiteInitializer implements SiteInitializer {
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private ConfigurationProvider _configurationProvider;
 
 	@Reference
 	private CPDefinitionLinkLocalService _cpDefinitionLinkLocalService;

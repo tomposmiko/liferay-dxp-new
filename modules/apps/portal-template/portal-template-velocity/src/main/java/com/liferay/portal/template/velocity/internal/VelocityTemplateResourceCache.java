@@ -14,7 +14,13 @@
 
 package com.liferay.portal.template.velocity.internal;
 
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.cache.MultiVMPool;
+import com.liferay.portal.kernel.cache.SingleVMPool;
+import com.liferay.portal.kernel.template.TemplateConstants;
+import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.template.BaseTemplateResourceCache;
 import com.liferay.portal.template.velocity.configuration.VelocityEngineConfiguration;
 
@@ -22,14 +28,18 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Tina Tian
  */
 @Component(
 	configurationPid = "com.liferay.portal.template.velocity.configuration.VelocityEngineConfiguration",
-	immediate = true, service = VelocityTemplateResourceCache.class
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	service = VelocityTemplateResourceCache.class
 )
 public class VelocityTemplateResourceCache extends BaseTemplateResourceCache {
 
@@ -41,7 +51,10 @@ public class VelocityTemplateResourceCache extends BaseTemplateResourceCache {
 
 		init(
 			velocityEngineConfiguration.resourceModificationCheckInterval(),
-			_PORTAL_CACHE_NAME);
+			_multiVMPool, _singleVMPool, _PORTAL_CACHE_NAME,
+			StringBundler.concat(
+				TemplateResource.class.getName(), StringPool.POUND,
+				TemplateConstants.LANG_TYPE_VM));
 	}
 
 	@Deactivate
@@ -49,7 +62,23 @@ public class VelocityTemplateResourceCache extends BaseTemplateResourceCache {
 		destroy();
 	}
 
+	@Modified
+	protected void modified(Map<String, Object> properties) {
+		VelocityEngineConfiguration velocityEngineConfiguration =
+			ConfigurableUtil.createConfigurable(
+				VelocityEngineConfiguration.class, properties);
+
+		setModificationCheckInterval(
+			velocityEngineConfiguration.resourceModificationCheckInterval());
+	}
+
 	private static final String _PORTAL_CACHE_NAME =
 		VelocityTemplateResourceCache.class.getName();
+
+	@Reference
+	private MultiVMPool _multiVMPool;
+
+	@Reference
+	private SingleVMPool _singleVMPool;
 
 }

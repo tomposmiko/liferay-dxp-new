@@ -34,13 +34,30 @@ public class EqualsFunctionTest {
 		LiferayUnitTestRule.INSTANCE;
 
 	@Test
-	public void testApply() {
+	public void testApplyFalse1() {
 		EqualsFunction equalsFunction = new EqualsFunction();
 
 		Assert.assertFalse(equalsFunction.apply("FORMS", "forms"));
+	}
+
+	@Test
+	public void testApplyFalse2() {
+		EqualsFunction equalsFunction = new EqualsFunction();
+
 		Assert.assertFalse(equalsFunction.apply(null, "forms"));
-		Assert.assertFalse(equalsFunction.apply("forms&#39;", "forms'"));
+	}
+
+	@Test
+	public void testApplyTrue1() {
+		EqualsFunction equalsFunction = new EqualsFunction();
+
 		Assert.assertTrue(equalsFunction.apply("1", new BigDecimal(1)));
+	}
+
+	@Test
+	public void testApplyTrue2() {
+		EqualsFunction equalsFunction = new EqualsFunction();
+
 		Assert.assertTrue(equalsFunction.apply("forms", "forms"));
 	}
 

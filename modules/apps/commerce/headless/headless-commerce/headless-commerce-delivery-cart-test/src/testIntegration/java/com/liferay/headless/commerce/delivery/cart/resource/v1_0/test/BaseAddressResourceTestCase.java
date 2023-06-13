@@ -47,26 +47,25 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
+
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -219,16 +218,10 @@ public abstract class BaseAddressResourceTestCase {
 	public void testGetCartBillingAddres() throws Exception {
 		Address postAddress = testGetCartBillingAddres_addAddress();
 
-		Address getAddress = addressResource.getCartBillingAddres(
-			testGetCartBillingAddres_getCartId());
+		Address getAddress = addressResource.getCartBillingAddres(null);
 
 		assertEquals(postAddress, getAddress);
 		assertValid(getAddress);
-	}
-
-	protected Long testGetCartBillingAddres_getCartId() throws Exception {
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	protected Address testGetCartBillingAddres_addAddress() throws Exception {
@@ -238,7 +231,7 @@ public abstract class BaseAddressResourceTestCase {
 
 	@Test
 	public void testGraphQLGetCartBillingAddres() throws Exception {
-		Address address = testGraphQLGetCartBillingAddres_addAddress();
+		Address address = testGraphQLAddress_addAddress();
 
 		Assert.assertTrue(
 			equals(
@@ -250,20 +243,11 @@ public abstract class BaseAddressResourceTestCase {
 								"cartBillingAddres",
 								new HashMap<String, Object>() {
 									{
-										put(
-											"cartId",
-											testGraphQLGetCartBillingAddres_getCartId());
+										put("cartId", null);
 									}
 								},
 								getGraphQLFields())),
 						"JSONObject/data", "Object/cartBillingAddres"))));
-	}
-
-	protected Long testGraphQLGetCartBillingAddres_getCartId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	@Test
@@ -286,26 +270,14 @@ public abstract class BaseAddressResourceTestCase {
 				"Object/code"));
 	}
 
-	protected Address testGraphQLGetCartBillingAddres_addAddress()
-		throws Exception {
-
-		return testGraphQLAddress_addAddress();
-	}
-
 	@Test
 	public void testGetCartShippingAddres() throws Exception {
 		Address postAddress = testGetCartShippingAddres_addAddress();
 
-		Address getAddress = addressResource.getCartShippingAddres(
-			testGetCartShippingAddres_getCartId());
+		Address getAddress = addressResource.getCartShippingAddres(null);
 
 		assertEquals(postAddress, getAddress);
 		assertValid(getAddress);
-	}
-
-	protected Long testGetCartShippingAddres_getCartId() throws Exception {
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	protected Address testGetCartShippingAddres_addAddress() throws Exception {
@@ -315,7 +287,7 @@ public abstract class BaseAddressResourceTestCase {
 
 	@Test
 	public void testGraphQLGetCartShippingAddres() throws Exception {
-		Address address = testGraphQLGetCartShippingAddres_addAddress();
+		Address address = testGraphQLAddress_addAddress();
 
 		Assert.assertTrue(
 			equals(
@@ -327,20 +299,11 @@ public abstract class BaseAddressResourceTestCase {
 								"cartShippingAddres",
 								new HashMap<String, Object>() {
 									{
-										put(
-											"cartId",
-											testGraphQLGetCartShippingAddres_getCartId());
+										put("cartId", null);
 									}
 								},
 								getGraphQLFields())),
 						"JSONObject/data", "Object/cartShippingAddres"))));
-	}
-
-	protected Long testGraphQLGetCartShippingAddres_getCartId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
 	}
 
 	@Test
@@ -361,12 +324,6 @@ public abstract class BaseAddressResourceTestCase {
 						getGraphQLFields())),
 				"JSONArray/errors", "Object/0", "JSONObject/extensions",
 				"Object/code"));
-	}
-
-	protected Address testGraphQLGetCartShippingAddres_addAddress()
-		throws Exception {
-
-		return testGraphQLAddress_addAddress();
 	}
 
 	protected Address testGraphQLAddress_addAddress() throws Exception {
@@ -591,12 +548,6 @@ public abstract class BaseAddressResourceTestCase {
 	}
 
 	protected void assertValid(Page<Address> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<Address> page, Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<Address> addresses = page.getItems();
@@ -611,20 +562,6 @@ public abstract class BaseAddressResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -908,16 +845,14 @@ public abstract class BaseAddressResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -934,10 +869,6 @@ public abstract class BaseAddressResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -947,18 +878,18 @@ public abstract class BaseAddressResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1012,15 +943,13 @@ public abstract class BaseAddressResourceTestCase {
 		}
 
 		if (entityFieldName.equals("latitude")) {
-			sb.append(String.valueOf(address.getLatitude()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("longitude")) {
-			sb.append(String.valueOf(address.getLongitude()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("name")) {
@@ -1088,9 +1017,8 @@ public abstract class BaseAddressResourceTestCase {
 		}
 
 		if (entityFieldName.equals("typeId")) {
-			sb.append(String.valueOf(address.getTypeId()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("vatNumber")) {
@@ -1195,115 +1123,6 @@ public abstract class BaseAddressResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -1378,6 +1197,18 @@ public abstract class BaseAddressResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseAddressResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

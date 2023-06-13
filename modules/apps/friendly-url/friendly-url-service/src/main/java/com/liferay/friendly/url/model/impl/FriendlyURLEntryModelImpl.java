@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -251,87 +252,109 @@ public class FriendlyURLEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, FriendlyURLEntry>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			FriendlyURLEntry.class.getClassLoader(), FriendlyURLEntry.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<FriendlyURLEntry> constructor =
+				(Constructor<FriendlyURLEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<FriendlyURLEntry, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<FriendlyURLEntry, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<FriendlyURLEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<FriendlyURLEntry, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", FriendlyURLEntry::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", FriendlyURLEntry::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", FriendlyURLEntry::getUuid);
-		attributeGetterFunctions.put(
-			"defaultLanguageId", FriendlyURLEntry::getDefaultLanguageId);
-		attributeGetterFunctions.put(
-			"friendlyURLEntryId", FriendlyURLEntry::getFriendlyURLEntryId);
-		attributeGetterFunctions.put("groupId", FriendlyURLEntry::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", FriendlyURLEntry::getCompanyId);
-		attributeGetterFunctions.put(
-			"createDate", FriendlyURLEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", FriendlyURLEntry::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", FriendlyURLEntry::getClassNameId);
-		attributeGetterFunctions.put("classPK", FriendlyURLEntry::getClassPK);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<FriendlyURLEntry, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<FriendlyURLEntry, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<FriendlyURLEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", FriendlyURLEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<FriendlyURLEntry, Long>)
 				FriendlyURLEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", FriendlyURLEntry::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<FriendlyURLEntry, Long>)
 				FriendlyURLEntry::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", FriendlyURLEntry::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<FriendlyURLEntry, String>)FriendlyURLEntry::setUuid);
+		attributeGetterFunctions.put(
+			"defaultLanguageId", FriendlyURLEntry::getDefaultLanguageId);
 		attributeSetterBiConsumers.put(
 			"defaultLanguageId",
 			(BiConsumer<FriendlyURLEntry, String>)
 				FriendlyURLEntry::setDefaultLanguageId);
+		attributeGetterFunctions.put(
+			"friendlyURLEntryId", FriendlyURLEntry::getFriendlyURLEntryId);
 		attributeSetterBiConsumers.put(
 			"friendlyURLEntryId",
 			(BiConsumer<FriendlyURLEntry, Long>)
 				FriendlyURLEntry::setFriendlyURLEntryId);
+		attributeGetterFunctions.put("groupId", FriendlyURLEntry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<FriendlyURLEntry, Long>)FriendlyURLEntry::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", FriendlyURLEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<FriendlyURLEntry, Long>)FriendlyURLEntry::setCompanyId);
+		attributeGetterFunctions.put(
+			"createDate", FriendlyURLEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<FriendlyURLEntry, Date>)
 				FriendlyURLEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", FriendlyURLEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<FriendlyURLEntry, Date>)
 				FriendlyURLEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", FriendlyURLEntry::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<FriendlyURLEntry, Long>)
 				FriendlyURLEntry::setClassNameId);
+		attributeGetterFunctions.put("classPK", FriendlyURLEntry::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<FriendlyURLEntry, Long>)FriendlyURLEntry::setClassPK);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -740,6 +763,36 @@ public class FriendlyURLEntryModelImpl
 	}
 
 	@Override
+	public FriendlyURLEntry cloneWithOriginalValues() {
+		FriendlyURLEntryImpl friendlyURLEntryImpl = new FriendlyURLEntryImpl();
+
+		friendlyURLEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		friendlyURLEntryImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		friendlyURLEntryImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		friendlyURLEntryImpl.setDefaultLanguageId(
+			this.<String>getColumnOriginalValue("defaultLanguageId"));
+		friendlyURLEntryImpl.setFriendlyURLEntryId(
+			this.<Long>getColumnOriginalValue("friendlyURLEntryId"));
+		friendlyURLEntryImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		friendlyURLEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		friendlyURLEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		friendlyURLEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		friendlyURLEntryImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		friendlyURLEntryImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+
+		return friendlyURLEntryImpl;
+	}
+
+	@Override
 	public int compareTo(FriendlyURLEntry friendlyURLEntry) {
 		long primaryKey = friendlyURLEntry.getPrimaryKey();
 
@@ -948,9 +1001,7 @@ public class FriendlyURLEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, FriendlyURLEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					FriendlyURLEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

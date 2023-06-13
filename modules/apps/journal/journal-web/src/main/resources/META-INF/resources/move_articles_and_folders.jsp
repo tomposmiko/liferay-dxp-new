@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-JournalMoveEntriesDisplayContext journalMoveEntriesDisplayContext = new JournalMoveEntriesDisplayContext(liferayPortletRequest, liferayPortletResponse);
+JournalMoveEntriesDisplayContext journalMovesEntriesDisplayContext = new JournalMoveEntriesDisplayContext(liferayPortletRequest, liferayPortletResponse);
 %>
 
 <portlet:actionURL name="/journal/move_articles_and_folders" var="moveArticleURL">
@@ -28,8 +28,8 @@ JournalMoveEntriesDisplayContext journalMoveEntriesDisplayContext = new JournalM
 	action="<%= moveArticleURL %>"
 	name="fm"
 >
-	<aui:input name="redirect" type="hidden" value="<%= journalMoveEntriesDisplayContext.getRedirect() %>" />
-	<aui:input name="newFolderId" type="hidden" value="<%= journalMoveEntriesDisplayContext.getNewFolderId() %>" />
+	<aui:input name="redirect" type="hidden" value="<%= journalMovesEntriesDisplayContext.getRedirect() %>" />
+	<aui:input name="newFolderId" type="hidden" value="<%= journalMovesEntriesDisplayContext.getNewFolderId() %>" />
 
 	<liferay-frontend:edit-form-body>
 		<liferay-ui:error exception="<%= DuplicateFolderNameException.class %>" message="the-folder-you-selected-already-has-an-entry-with-this-name.-please-select-a-different-folder" />
@@ -50,7 +50,7 @@ JournalMoveEntriesDisplayContext journalMoveEntriesDisplayContext = new JournalM
 			<liferay-frontend:fieldset>
 
 				<%
-				List<JournalFolder> validMoveFolders = journalMoveEntriesDisplayContext.getValidMoveFolders();
+				List<JournalFolder> validMoveFolders = journalMovesEntriesDisplayContext.getValidMoveFolders();
 				%>
 
 				<c:if test="<%= !validMoveFolders.isEmpty() %>">
@@ -76,7 +76,7 @@ JournalMoveEntriesDisplayContext journalMoveEntriesDisplayContext = new JournalM
 				</c:if>
 
 				<%
-				List<JournalFolder> invalidMoveFolders = journalMoveEntriesDisplayContext.getInvalidMoveFolders();
+				List<JournalFolder> invalidMoveFolders = journalMovesEntriesDisplayContext.getInvalidMoveFolders();
 				%>
 
 				<c:if test="<%= !invalidMoveFolders.isEmpty() %>">
@@ -107,7 +107,7 @@ JournalMoveEntriesDisplayContext journalMoveEntriesDisplayContext = new JournalM
 				<aui:input name="rowIdsJournalFolder" type="hidden" value="<%= ListUtil.toString(validMoveFolders, JournalFolder.FOLDER_ID_ACCESSOR) %>" />
 
 				<%
-				List<JournalArticle> validMoveArticles = journalMoveEntriesDisplayContext.getValidMoveArticles();
+				List<JournalArticle> validMoveArticles = journalMovesEntriesDisplayContext.getValidMoveArticles();
 				%>
 
 				<c:if test="<%= !validMoveArticles.isEmpty() %>">
@@ -133,7 +133,7 @@ JournalMoveEntriesDisplayContext journalMoveEntriesDisplayContext = new JournalM
 				</c:if>
 
 				<%
-				List<JournalArticle> invalidMoveArticles = journalMoveEntriesDisplayContext.getInvalidMoveArticles();
+				List<JournalArticle> invalidMoveArticles = journalMovesEntriesDisplayContext.getInvalidMoveArticles();
 				%>
 
 				<c:if test="<%= !invalidMoveArticles.isEmpty() %>">
@@ -163,7 +163,7 @@ JournalMoveEntriesDisplayContext journalMoveEntriesDisplayContext = new JournalM
 
 				<aui:input name="rowIdsJournalArticle" type="hidden" value="<%= ListUtil.toString(validMoveArticles, JournalArticle.ARTICLE_ID_ACCESSOR) %>" />
 
-				<aui:input label="new-folder" name="folderName" title="new-folder" type="resource" value="<%= journalMoveEntriesDisplayContext.getNewFolderName() %>" />
+				<aui:input label="new-folder" name="folderName" title="new-folder" type="resource" value="<%= journalMovesEntriesDisplayContext.getNewFolderName() %>" />
 
 				<aui:button name="selectFolderButton" value="select" />
 			</liferay-frontend:fieldset>
@@ -173,20 +173,22 @@ JournalMoveEntriesDisplayContext journalMoveEntriesDisplayContext = new JournalM
 	<liferay-frontend:edit-form-footer>
 		<aui:button type="submit" value="move" />
 
-		<aui:button href="<%= journalMoveEntriesDisplayContext.getRedirect() %>" type="cancel" />
+		<aui:button href="<%= journalMovesEntriesDisplayContext.getRedirect() %>" type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
 
 <portlet:renderURL var="selectFolderURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
 	<portlet:param name="mvcPath" value="/select_folder.jsp" />
-	<portlet:param name="folderId" value="<%= String.valueOf(journalMoveEntriesDisplayContext.getNewFolderId()) %>" />
+	<portlet:param name="folderId" value="<%= String.valueOf(journalMovesEntriesDisplayContext.getNewFolderId()) %>" />
 </portlet:renderURL>
 
 <liferay-frontend:component
 	context='<%=
 		HashMapBuilder.<String, Object>put(
+			"inputName", "newFolderId"
+		).put(
 			"selectFolderURL", selectFolderURL
 		).build()
 	%>'
-	module="js/MoveEntries.es"
+	module="js/SelectFolderButton.es"
 />

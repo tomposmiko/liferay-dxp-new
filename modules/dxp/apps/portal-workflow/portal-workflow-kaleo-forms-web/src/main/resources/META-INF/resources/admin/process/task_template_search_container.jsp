@@ -51,7 +51,6 @@ KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialState
 
 		<liferay-ui:search-container-row
 			className="com.liferay.portal.workflow.kaleo.forms.model.KaleoTaskFormPair"
-			cssClass="entry-display-style"
 			modelVar="taskFormsPair"
 		>
 			<liferay-ui:search-container-row-parameter
@@ -108,70 +107,61 @@ KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialState
 	</liferay-ui:search-container>
 </div>
 
+<portlet:resourceURL id="saveInPortletSession" var="saveInPortletSessionURL" />
+
+<liferay-frontend:component
+	context='<%=
+		HashMapBuilder.<String, Object>put(
+			"backURL", HtmlUtil.escapeURL(backURL)
+		).put(
+			"itemSelectorURL",
+			PortletURLBuilder.create(
+				PortletURLFactoryUtil.create(request, DDMPortletKeys.DYNAMIC_DATA_MAPPING, themeDisplay.getPlid(), PortletRequest.RENDER_PHASE)
+			).setMVCPath(
+				"/select_template.jsp"
+			).setParameter(
+				"classNameId", PortalUtil.getClassNameId(DDMStructure.class)
+			).setParameter(
+				"navigationStartsOn", DDMNavigationHelper.SELECT_TEMPLATE
+			).setParameter(
+				"portletResourceNamespace", liferayPortletResponse.getNamespace()
+			).setParameter(
+				"refererPortletName", portletDisplay.getId()
+			).setParameter(
+				"resourceClassNameId", scopeClassNameId
+			).setParameter(
+				"scopeTitle", LanguageUtil.get(request, "form")
+			).setParameter(
+				"showBackURL", false
+			).setParameter(
+				"showHeader", false
+			).setParameter(
+				"structureAvailableFields", liferayPortletResponse.getNamespace() + "getAvailableFields"
+			).setWindowState(
+				LiferayWindowState.POP_UP
+			).buildString()
+		).put(
+			"portletNamespace", liferayPortletResponse.getNamespace()
+		).put(
+			"saveInPortletSessionURL", saveInPortletSessionURL
+		).build()
+	%>'
+	module="admin/js/KaleoFormsTemplateSelector"
+/>
+
 <aui:script use="aui-base,aui-io-request,liferay-util">
 	Liferay.provide(
 		window,
-		'<portlet:namespace />selectFormTemplate',
-		function (classPK, mode, sessionParamName) {
-			Liferay.Util.openDDMPortlet(
-				{
-					basePortletURL:
-						'<%= PortletURLFactoryUtil.create(request, DDMPortletKeys.DYNAMIC_DATA_MAPPING, themeDisplay.getPlid(), PortletRequest.RENDER_PHASE) %>',
-					classNameId: <%= PortalUtil.getClassNameId(DDMStructure.class) %>,
-					classPK: classPK,
-					dialog: {
-						destroyOnHide: true,
-					},
-					id: 'ddmDialog',
-					mode: mode,
-					mvcPath: '/select_template.jsp',
-					navigationStartsOn:
-						'<%= DDMNavigationHelper.SELECT_TEMPLATE %>',
-					portletResourceNamespace:
-						'<%= liferayPortletResponse.getNamespace() %>',
-					refererPortletName: '<%= portletDisplay.getId() %>',
-					resourceClassNameId: <%= scopeClassNameId %>,
-					showBackURL: false,
-					showHeader: false,
-					structureAvailableFields:
-						'<%= liferayPortletResponse.getNamespace() + "getAvailableFields" %>',
-					title: '<liferay-ui:message key="form" />',
-				},
-				function (event) {
-					var A = AUI();
-
-					var data = {};
-
-					data[sessionParamName] = event.ddmtemplateid;
-
-					A.io.request(
-						'<portlet:resourceURL id="saveInPortletSession" />',
-						{
-							after: {
-								success: function () {
-									window.location = decodeURIComponent(
-										'<%= HtmlUtil.escapeURL(backURL) %>'
-									);
-								},
-							},
-							data: data,
-						}
-					);
-				}
-			);
-		},
-		['aui-base', 'aui-io-request', 'liferay-util']
-	);
-
-	Liferay.provide(
-		window,
 		'<portlet:namespace />editFormTemplate',
-		function (uri) {
+		(uri) => {
 			var A = AUI();
 
 			var WIN = A.config.win;
 
 			Liferay.Util.openWindow({
+				dialog: {
+					destroyOnHide: true,
+				},
 				id: A.guid(),
 				refreshWindow: WIN,
 				title: '<liferay-ui:message key="forms" />',
@@ -184,7 +174,7 @@ KaleoTaskFormPair initialStateKaleoTaskFormPair = KaleoFormsUtil.getInitialState
 	Liferay.provide(
 		window,
 		'<portlet:namespace />unassignForm',
-		function (event) {
+		(event) => {
 			var A = AUI();
 
 			var taskFormPairsParamName = event.taskFormPairsParamName;

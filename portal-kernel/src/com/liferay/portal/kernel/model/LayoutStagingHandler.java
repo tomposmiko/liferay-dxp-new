@@ -15,7 +15,6 @@
 package com.liferay.portal.kernel.model;
 
 import com.liferay.exportimport.kernel.staging.StagingUtil;
-import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -39,7 +38,6 @@ import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -223,33 +221,6 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 			return layoutRevision;
 		}
 
-		if (layout.isTypeContent()) {
-			long layoutRevisionsCount =
-				LayoutRevisionLocalServiceUtil.dslQueryCount(
-					DSLQueryFactoryUtil.count(
-					).from(
-						LayoutRevisionTable.INSTANCE
-					).where(
-						LayoutRevisionTable.INSTANCE.companyId.eq(
-							layout.getCompanyId()
-						).and(
-							LayoutRevisionTable.INSTANCE.groupId.eq(
-								layout.getGroupId()
-							).and(
-								LayoutRevisionTable.INSTANCE.plid.eq(
-									layout.getPlid())
-							)
-						)
-					));
-
-			if (layoutRevisionsCount == 0) {
-				_initializeLayoutRevisionsForUpgradedContentLayout(layout);
-
-				return LayoutRevisionLocalServiceUtil.fetchLatestLayoutRevision(
-					layoutSetBranchId, layout.getPlid());
-			}
-		}
-
 		LayoutBranch layoutBranch =
 			LayoutBranchLocalServiceUtil.getMasterLayoutBranch(
 				layoutSetBranchId, layout.getPlid(), serviceContext);
@@ -280,7 +251,7 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 			serviceContext, "explicitCreation");
 
 		if (!explicitCreation) {
-			LayoutRevisionLocalServiceUtil.updateStatus(
+			layoutRevision = LayoutRevisionLocalServiceUtil.updateStatus(
 				serviceContext.getUserId(),
 				layoutRevision.getLayoutRevisionId(),
 				WorkflowConstants.STATUS_INCOMPLETE, serviceContext);
@@ -295,37 +266,6 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 				PortalClassLoaderUtil.getClassLoader(),
 				new Class<?>[] {Layout.class},
 				new LayoutStagingHandler(_layout, _layoutRevision)));
-	}
-
-	private void _initializeLayoutRevisionsForUpgradedContentLayout(
-			Layout layout)
-		throws PortalException {
-
-		List<LayoutSetBranch> layoutSetBranches =
-			LayoutSetBranchLocalServiceUtil.getLayoutSetBranches(
-				layout.getGroupId(), layout.isPrivateLayout());
-
-		for (LayoutSetBranch layoutSetBranch : layoutSetBranches) {
-			ServiceContext serviceContext =
-				ServiceContextThreadLocal.getServiceContext();
-
-			LayoutBranch layoutBranch =
-				LayoutBranchLocalServiceUtil.getMasterLayoutBranch(
-					layoutSetBranch.getLayoutSetBranchId(), layout.getPlid(),
-					serviceContext);
-
-			LayoutRevisionLocalServiceUtil.addLayoutRevision(
-				layout.getUserId(), layoutSetBranch.getLayoutSetBranchId(),
-				layoutBranch.getLayoutBranchId(),
-				LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID, true,
-				layout.getPlid(), LayoutConstants.DEFAULT_PLID,
-				layout.isPrivateLayout(), layout.getName(), layout.getTitle(),
-				layout.getDescription(), layout.getKeywords(),
-				layout.getRobots(), layout.getTypeSettings(),
-				layout.getIconImage(), layout.getIconImageId(),
-				layout.getThemeId(), layout.getColorSchemeId(), layout.getCss(),
-				serviceContext);
-		}
 	}
 
 	private boolean _isBelongsToLayout(
@@ -356,18 +296,17 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 	private static final Set<String> _layoutRevisionMethodNames = new HashSet<>(
 		Arrays.asList(
 			"getColorScheme", "getColorSchemeId", "getCss", "getCssText",
-			"getDescription", "getDescriptionMap", "getKeywordsMap",
-			"getGroupId", "getHTMLTitle", "getIconImage", "getIconImageId",
-			"getKeywords", "getLayoutSet", "getModifiedDate", "getName",
-			"getNameMap", "getRobots", "getRobotsMap", "getTarget", "getTheme",
-			"getThemeId", "getThemeSetting", "getTitle", "getTitleMap",
-			"getTypeSettings", "getTypeSettingsProperties",
-			"getTypeSettingsProperty", "isContentDisplayPage", "isCustomizable",
-			"isEscapedModel", "isIconImage", "isInheritLookAndFeel",
-			"setColorSchemeId", "setCss", "setDescription", "setDescriptionMap",
-			"setEscapedModel", "setGroupId", "setIconImage", "setIconImageId",
-			"setKeywords", "setKeywordsMap", "setModifiedDate", "setName",
-			"setNameMap", "setRobots", "setRobotsMap", "setThemeId", "setTitle",
+			"getDescription", "getGroupId", "getHTMLTitle", "getIconImage",
+			"getIconImageId", "getKeywords", "getLayoutSet", "getModifiedDate",
+			"getName", "getNameMap", "getRobots", "getTarget", "getTheme",
+			"getThemeId", "getThemeSetting", "getTitle", "getTypeSettings",
+			"getTypeSettingsProperties", "getTypeSettingsProperty",
+			"isContentDisplayPage", "isCustomizable", "isEscapedModel",
+			"isIconImage", "isInheritLookAndFeel", "setColorSchemeId", "setCss",
+			"setDescription", "setDescriptionMap", "setEscapedModel",
+			"setGroupId", "setIconImage", "setIconImageId", "setKeywords",
+			"setKeywordsMap", "setModifiedDate", "setName", "setNameMap",
+			"setRobots", "setRobotsMap", "setThemeId", "setTitle",
 			"setTitleMap", "setTypeSettings", "setTypeSettingsProperties"));
 
 	private final Layout _layout;

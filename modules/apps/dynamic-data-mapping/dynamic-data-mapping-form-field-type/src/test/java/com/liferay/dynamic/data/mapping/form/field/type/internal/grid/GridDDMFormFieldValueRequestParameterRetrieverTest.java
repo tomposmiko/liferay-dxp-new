@@ -16,6 +16,7 @@ package com.liferay.dynamic.data.mapping.form.field.type.internal.grid;
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
@@ -43,7 +44,7 @@ public class GridDDMFormFieldValueRequestParameterRetrieverTest {
 			new GridDDMFormFieldValueRequestParameterRetriever();
 
 		_gridDDMFormFieldValueRequestParameterRetriever.jsonFactory =
-			new JSONFactoryImpl();
+			_jsonFactory;
 	}
 
 	@Test
@@ -107,7 +108,25 @@ public class GridDDMFormFieldValueRequestParameterRetrieverTest {
 			parameterValue);
 	}
 
-	@Test(expected = IndexOutOfBoundsException.class)
+	@Test
+	public void testGetRequestParameterValueWithOneOption() {
+		MockHttpServletRequest mockHttpServletRequest =
+			new MockHttpServletRequest();
+
+		mockHttpServletRequest.addParameter(_PARAMETER_NAME, "row1;column1");
+
+		String parameterValue =
+			_gridDDMFormFieldValueRequestParameterRetriever.get(
+				mockHttpServletRequest, _PARAMETER_NAME, StringPool.BLANK);
+
+		Assert.assertEquals(
+			JSONUtil.put(
+				"row1", "column1"
+			).toString(),
+			parameterValue);
+	}
+
+	@Test
 	public void testGetRequestParameterWithMalformedString() {
 		MockHttpServletRequest mockHttpServletRequest =
 			new MockHttpServletRequest();
@@ -115,8 +134,15 @@ public class GridDDMFormFieldValueRequestParameterRetrieverTest {
 		mockHttpServletRequest.addParameter(
 			_PARAMETER_NAME, "row1/column2", "row2;column1");
 
-		_gridDDMFormFieldValueRequestParameterRetriever.get(
-			mockHttpServletRequest, _PARAMETER_NAME, StringPool.BLANK);
+		String parameterValue =
+			_gridDDMFormFieldValueRequestParameterRetriever.get(
+				mockHttpServletRequest, _PARAMETER_NAME, StringPool.BLANK);
+
+		Assert.assertEquals(
+			JSONUtil.put(
+				"row2", "column1"
+			).toString(),
+			parameterValue);
 	}
 
 	@Test
@@ -133,5 +159,6 @@ public class GridDDMFormFieldValueRequestParameterRetrieverTest {
 
 	private GridDDMFormFieldValueRequestParameterRetriever
 		_gridDDMFormFieldValueRequestParameterRetriever;
+	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
 
 }

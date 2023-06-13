@@ -168,11 +168,11 @@ public class LayoutStagedModelDataHandlerTest
 				liveGroup.getGroupId(), TestPropsValues.getUserId());
 
 		FileEntry fileEntry = DLAppLocalServiceUtil.addFileEntry(
-			TestPropsValues.getUserId(), stagingGroup.getGroupId(),
+			null, TestPropsValues.getUserId(), stagingGroup.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, fileName,
 			ContentTypes.APPLICATION_PDF,
-			FileUtil.getBytes(getClass(), "dependencies/" + fileName),
-			serviceContext);
+			FileUtil.getBytes(getClass(), "dependencies/" + fileName), null,
+			null, serviceContext);
 
 		String stagingPreviewURL = DLURLHelperUtil.getPreviewURL(
 			fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK);

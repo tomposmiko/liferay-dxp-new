@@ -20,11 +20,11 @@
 String redirect = ParamUtil.getString(request, "redirect");
 
 if (Validator.isNull(redirect)) {
-	PortletURL redirectURL = renderResponse.createRenderURL();
-
-	redirectURL.setParameter("mvcPath", "/admin/view.jsp");
-
-	redirect = redirectURL.toString();
+	redirect = PortletURLBuilder.createRenderURL(
+		renderResponse
+	).setMVCPath(
+		"/admin/view.jsp"
+	).buildString();
 }
 
 String historyKey = ParamUtil.getString(request, "historyKey");
@@ -45,9 +45,11 @@ if (kaleoProcess != null) {
 
 portletDisplay.setShowBackIcon(true);
 
-PortletURL backPortletURL = renderResponse.createRenderURL();
-
-backPortletURL.setParameter("mvcPath", "/admin/view.jsp");
+PortletURL backPortletURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCPath(
+	"/admin/view.jsp"
+).buildPortletURL();
 
 portletDisplay.setURLBack(backPortletURL.toString());
 
@@ -71,12 +73,12 @@ renderResponse.setTitle(title);
 	</clay:container-fluid>
 </c:if>
 
-<portlet:actionURL name="/kaleo_forms/update_kaleo_process" var="editKaleoProcessURL">
+<portlet:actionURL name="/kaleo_forms_admin/update_kaleo_process" var="editKaleoProcessURL">
 	<portlet:param name="mvcPath" value="/admin/edit_kaleo_process.jsp" />
 	<portlet:param name="redirect" value="<%= backPortletURL.toString() %>" />
 </portlet:actionURL>
 
-<aui:form action="<%= editKaleoProcessURL %>" cssClass="container-fluid-1280" method="post" name="fm">
+<aui:form action="<%= editKaleoProcessURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
 	<aui:input name="kaleoProcessId" type="hidden" value="<%= kaleoProcessId %>" />
 	<aui:input name="groupId" type="hidden" value="<%= groupId %>" />
 	<aui:input name="scope" type="hidden" value="1" />
@@ -88,7 +90,7 @@ renderResponse.setTitle(title);
 	<liferay-util:buffer
 		var="htmlBottom"
 	>
-		<aui:button-row cssClass="kaleo-process-buttons">
+		<aui:button-row cssClass="kaleo-process-buttons mt-4">
 			<aui:button cssClass='<%= (historyKey.equals("forms") ? StringPool.BLANK : "hide") + " float-left kaleo-process-previous" %>' icon="icon-circle-arrow-left" value="previous" />
 
 			<aui:button cssClass='<%= (historyKey.equals("forms") ? StringPool.BLANK : "hide") + " float-right kaleo-process-submit" %>' disabled="<%= true %>" primary="<%= true %>" type="submit" />
@@ -99,12 +101,10 @@ renderResponse.setTitle(title);
 		</aui:button-row>
 	</liferay-util:buffer>
 
-	<liferay-ui:form-navigator
-		displayStyle="steps"
+	<liferay-frontend:form-navigator-steps
 		formName="fm"
 		htmlBottom="<%= htmlBottom %>"
 		id="kaleo.form"
-		markupView="lexicon"
 		showButtons="<%= false %>"
 	/>
 
@@ -113,7 +113,7 @@ renderResponse.setTitle(title);
 			var form = Liferay.Form.get('<portlet:namespace />fm');
 
 			if (form === event.form) {
-				Liferay.component('<portlet:namespace />KaleoFormsAdmin', function () {
+				Liferay.component('<portlet:namespace />KaleoFormsAdmin', () => {
 					return new Liferay.KaleoFormsAdmin({
 						currentURL: '<%= HtmlUtil.escapeJS(currentURL) %>',
 						form: form,

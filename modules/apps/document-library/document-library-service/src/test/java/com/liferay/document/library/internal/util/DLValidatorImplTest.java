@@ -17,13 +17,10 @@ package com.liferay.document.library.internal.util;
 import com.liferay.document.library.configuration.DLConfiguration;
 import com.liferay.document.library.kernel.exception.FileExtensionException;
 import com.liferay.document.library.kernel.util.DLValidator;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.FileImpl;
 
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -34,8 +31,7 @@ import org.mockito.Mockito;
 public class DLValidatorImplTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@Before
@@ -47,10 +43,6 @@ public class DLValidatorImplTest {
 		dlValidatorImpl.setDLConfiguration(_dlConfiguration);
 
 		_dlValidator = dlValidatorImpl;
-
-		FileUtil fileUtil = new FileUtil();
-
-		fileUtil.setFile(FileImpl.getInstance());
 	}
 
 	@Test(expected = FileExtensionException.class)

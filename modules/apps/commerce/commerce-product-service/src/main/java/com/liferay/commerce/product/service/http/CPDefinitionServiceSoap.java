@@ -135,14 +135,14 @@ public class CPDefinitionServiceSoap {
 
 	public static com.liferay.commerce.product.model.CPDefinitionSoap
 			fetchCPDefinitionByCProductExternalReferenceCode(
-				long companyId, String externalReferenceCode)
+				String externalReferenceCode, long companyId)
 		throws RemoteException {
 
 		try {
 			com.liferay.commerce.product.model.CPDefinition returnValue =
 				CPDefinitionServiceUtil.
 					fetchCPDefinitionByCProductExternalReferenceCode(
-						companyId, externalReferenceCode);
+						externalReferenceCode, companyId);
 
 			return com.liferay.commerce.product.model.CPDefinitionSoap.
 				toSoapModel(returnValue);
@@ -230,6 +230,30 @@ public class CPDefinitionServiceSoap {
 		}
 	}
 
+	public static com.liferay.commerce.product.model.CPAttachmentFileEntrySoap
+			getDefaultImageCPAttachmentFileEntry(long cpDefinitionId)
+		throws RemoteException {
+
+		try {
+			com.liferay.commerce.product.model.CPAttachmentFileEntry
+				returnValue =
+					CPDefinitionServiceUtil.
+						getDefaultImageCPAttachmentFileEntry(cpDefinitionId);
+
+			return com.liferay.commerce.product.model.CPAttachmentFileEntrySoap.
+				toSoapModel(returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public static String getLayoutUuid(long cpDefinitionId)
 		throws RemoteException {
 
@@ -387,6 +411,10 @@ public class CPDefinitionServiceSoap {
 		}
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public static void updateCPDisplayLayout(
 			long cpDefinitionId, String layoutUuid,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -405,13 +433,13 @@ public class CPDefinitionServiceSoap {
 
 	public static com.liferay.commerce.product.model.CPDefinitionSoap
 			updateExternalReferenceCode(
-				long cpDefinitionId, String externalReferenceCode)
+				String externalReferenceCode, long cpDefinitionId)
 		throws RemoteException {
 
 		try {
 			com.liferay.commerce.product.model.CPDefinition returnValue =
 				CPDefinitionServiceUtil.updateExternalReferenceCode(
-					cpDefinitionId, externalReferenceCode);
+					externalReferenceCode, cpDefinitionId);
 
 			return com.liferay.commerce.product.model.CPDefinitionSoap.
 				toSoapModel(returnValue);

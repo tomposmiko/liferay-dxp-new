@@ -6,10 +6,16 @@ definition {
 		AssertConfirm(value1 = "Changes made to this master are going to be propagated to all page templates, display page templates, and pages using it. Are you sure you want to proceed?");
 	}
 
+	macro publishMaster {
+		Button.click(button = "Publish Master");
+
+		Alert.viewSuccessMessage();
+	}
+
 	macro searchAllowedFragments {
 		Type(
 			locator1 = "TextInput#FRAGMENTS_SEARCH",
-			value1 = ${searchValue});
+			value1 = "${searchValue}");
 	}
 
 	macro selectAllowedFragments {
@@ -17,15 +23,15 @@ definition {
 
 		Uncheck.uncheckToggleSwitch(locator1 = "Checkbox#ALL_FRAGMENTS");
 
-		for (var fragmentName : list ${fragmentNameList}) {
-			MastersPageTemplates.searchAllowedFragments(searchValue = ${fragmentName});
+		for (var fragmentName : list "${fragmentNameList}") {
+			MastersPageTemplates.searchAllowedFragments(searchValue = "${fragmentName}");
 
 			Check.checkToggleSwitch(
-				key_fragmentName = ${fragmentName},
+				key_fragmentName = "${fragmentName}",
 				locator1 = "Checkbox#ALLOWED_FRAGMENT");
 
 			AssertChecked.assertCheckedNotVisible(
-				key_fragmentName = ${fragmentName},
+				key_fragmentName = "${fragmentName}",
 				locator1 = "Checkbox#ALLOWED_FRAGMENT");
 		}
 
@@ -35,10 +41,10 @@ definition {
 	macro selectMaster {
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		LexiconCard.clickCardTitle(card = ${masterLayoutName});
+		LexiconCard.clickCardTitle(card = "${masterLayoutName}");
 
 		AssertElementPresent(
-			key_card = ${masterLayoutName},
+			key_card = "${masterLayoutName}",
 			locator1 = "Card#CARD_SELECTED");
 
 		SelectFrameTop();
@@ -49,14 +55,12 @@ definition {
 	macro selectMasterViaPageDesignOptions {
 		Navigator.gotoNavTab(navTab = "Master");
 
-		WaitForPageLoad();
-
-		Click(
-			key_card = ${masterLayoutName},
+		Click.waitForMenuToggleJSClick(
+			key_card = "${masterLayoutName}",
 			locator1 = "Card#CARD_TYPE_ASSET");
 
 		AssertElementPresent(
-			key_card = ${masterLayoutName},
+			key_card = "${masterLayoutName}",
 			locator1 = "Card#CARD_SELECTED");
 
 		PageEditor.waitForAutoSave();

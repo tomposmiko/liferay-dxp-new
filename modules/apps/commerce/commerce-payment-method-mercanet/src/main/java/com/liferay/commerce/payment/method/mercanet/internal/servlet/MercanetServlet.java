@@ -115,7 +115,7 @@ public class MercanetServlet extends HttpServlet {
 
 			Map<String, String> parameterMap = _getResponseParameters(data);
 
-			if (Objects.equals(type, "normal")) {
+			if (Objects.equals("normal", type)) {
 				if (PortalSessionThreadLocal.getHttpSession() == null) {
 					PortalSessionThreadLocal.setHttpSession(
 						httpServletRequest.getSession());
@@ -146,7 +146,7 @@ public class MercanetServlet extends HttpServlet {
 				httpServletResponse.sendRedirect(redirect);
 			}
 
-			if (Objects.equals(type, "automatic")) {
+			if (Objects.equals("automatic", type)) {
 				String uuid = ParamUtil.getString(httpServletRequest, "uuid");
 				long groupId = ParamUtil.getLong(httpServletRequest, "groupId");
 
@@ -223,7 +223,12 @@ public class MercanetServlet extends HttpServlet {
 		for (String param : params) {
 			String[] kvp = StringUtil.split(param, CharPool.EQUAL);
 
-			map.put(kvp[0], kvp[1]);
+			if (kvp.length < 2) {
+				map.put(kvp[0], StringPool.BLANK);
+			}
+			else {
+				map.put(kvp[0], kvp[1]);
+			}
 		}
 
 		return map;

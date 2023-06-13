@@ -63,10 +63,15 @@ public interface CommerceChannelService extends BaseService {
 	 * Never modify this interface directly. Add custom service methods to <code>com.liferay.commerce.product.service.impl.CommerceChannelServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface. Consume the commerce channel remote service via injection or a <code>org.osgi.util.tracker.ServiceTracker</code>. Use {@link CommerceChannelServiceUtil} if injection and service tracking are not available.
 	 */
 	public CommerceChannel addCommerceChannel(
-			long siteGroupId, String name, String type,
-			UnicodeProperties typeSettingsUnicodeProperties,
-			String commerceCurrencyCode, String externalReferenceCode,
-			ServiceContext serviceContext)
+			String externalReferenceCode, long siteGroupId, String name,
+			String type, UnicodeProperties typeSettingsUnicodeProperties,
+			String commerceCurrencyCode, ServiceContext serviceContext)
+		throws PortalException;
+
+	public CommerceChannel addOrUpdateCommerceChannel(
+			String externalReferenceCode, long siteGroupId, String name,
+			String type, UnicodeProperties typeSettingsUnicodeProperties,
+			String commerceCurrencyCode, ServiceContext serviceContext)
 		throws PortalException;
 
 	public CommerceChannel deleteCommerceChannel(long commerceChannelId)
@@ -74,7 +79,7 @@ public interface CommerceChannelService extends BaseService {
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceChannel fetchByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
+			String externalReferenceCode, long companyId)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -97,15 +102,6 @@ public interface CommerceChannelService extends BaseService {
 	public List<CommerceChannel> getCommerceChannels(long companyId)
 		throws PortalException;
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CommerceChannel> getCommerceChannels(
-			long companyId, String keywords, int start, int end)
-		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getCommerceChannelsCount(long companyId, String keywords)
-		throws PortalException;
-
 	/**
 	 * Returns the OSGi service identifier.
 	 *
@@ -114,11 +110,10 @@ public interface CommerceChannelService extends BaseService {
 	public String getOSGiServiceIdentifier();
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CommerceChannel> searchCommerceChannels(long companyId)
-		throws PortalException;
+	public List<CommerceChannel> search(long companyId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CommerceChannel> searchCommerceChannels(
+	public List<CommerceChannel> search(
 			long companyId, String keywords, int start, int end, Sort sort)
 		throws PortalException;
 
@@ -140,7 +135,7 @@ public interface CommerceChannelService extends BaseService {
 		throws PortalException;
 
 	public CommerceChannel updateCommerceChannelExternalReferenceCode(
-			long commerceChannelId, String externalReferenceCode)
+			String externalReferenceCode, long commerceChannelId)
 		throws PortalException;
 
 }

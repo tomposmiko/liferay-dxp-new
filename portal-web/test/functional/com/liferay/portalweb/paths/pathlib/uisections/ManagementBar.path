@@ -11,8 +11,18 @@
 
 <tbody>
 <tr>
+	<td>ANY_ICON</td>
+	<td>//nav[contains(@class,'management-bar')]//*[*[name()='svg'][contains(@class,'icon-${key_text}')]]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>FILTER_AND_ORDER</td>
 	<td>//nav[contains(@class,'management-bar')]//*[*[normalize-space(text())='Filter and Order']]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FILTER_AND_ORDER_ACTIVE_ITEM</td>
+	<td>//div[contains(@class,'dropdown-menu')]//a[contains(text(),'${key_menuItem}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -21,8 +31,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>FILTER_AND_ORDER_ACTIVE_ITEM</td>
-	<td>//div[contains(@class,'dropdown-menu')]//a[contains(@class,'active')][contains(text(),'${key_menuItem}')]</td>
+	<td>FILTER_AND_ORDER_ITEM_SELECTED</td>
+	<td>//li[contains(@aria-selected,'true')]//a[contains(text(),'${key_menuItem}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -32,7 +42,7 @@
 </tr>
 <tr>
 	<td>FILTER_RESULTS_SCOPE</td>
-	<td>//span[contains(@class,'label-item')]//div[contains(@class,'label-section') and contains(.,'${key_filterScope}')]</td>
+	<td>//span[contains(@class,'label-item') and contains(.,'${key_filterScope}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -42,12 +52,12 @@
 </tr>
 <tr>
 	<td>ORDER_ICON_GENERIC</td>
-	<td>//nav[contains(@class,'management-bar')]//a[contains(@class,'order') and contains(@class,'active')]</td>
+	<td>//nav[contains(@class,'management-bar')]//a[*[name()='svg'][contains(@class,'icon-order')]]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ORDER_ICON_SPECIFIC</td>
-	<td>//nav[contains(@class,'management-bar')]//a[contains(@class,'${key_order}')][@title='Reverse Sort Direction']</td>
+	<td>//nav[contains(@class,'management-bar')]//a[@title='Reverse Sort Direction']//*[contains(@class,'${key_order}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -57,12 +67,12 @@
 </tr>
 <tr>
 	<td>REMOVE</td>
-	<td>//div[contains(@id,'ManagementToolbar')]//button[contains(@title,'Remove')]</td>
+	<td>//nav[contains(@class,'management-bar')]//button[contains(@title,'Remove')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SEARCH_RESULT_SUMMARY</td>
-	<td>//div[contains(@id,'ManagementToolbar')]//span[@class='text-truncate']</td>
+	<td>//nav[contains(@class,'subnav-tbar')]//span[@class='text-truncate']</td>
 	<td></td>
 </tr>
 </tbody>

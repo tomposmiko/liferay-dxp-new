@@ -298,10 +298,10 @@ public class CommerceShipmentItemUtil {
 	 * @param commerceShipmentId the commerce shipment ID
 	 * @return the matching commerce shipment items
 	 */
-	public static List<CommerceShipmentItem> findByCommerceShipment(
+	public static List<CommerceShipmentItem> findByCommerceShipmentId(
 		long commerceShipmentId) {
 
-		return getPersistence().findByCommerceShipment(commerceShipmentId);
+		return getPersistence().findByCommerceShipmentId(commerceShipmentId);
 	}
 
 	/**
@@ -316,10 +316,10 @@ public class CommerceShipmentItemUtil {
 	 * @param end the upper bound of the range of commerce shipment items (not inclusive)
 	 * @return the range of matching commerce shipment items
 	 */
-	public static List<CommerceShipmentItem> findByCommerceShipment(
+	public static List<CommerceShipmentItem> findByCommerceShipmentId(
 		long commerceShipmentId, int start, int end) {
 
-		return getPersistence().findByCommerceShipment(
+		return getPersistence().findByCommerceShipmentId(
 			commerceShipmentId, start, end);
 	}
 
@@ -336,11 +336,11 @@ public class CommerceShipmentItemUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching commerce shipment items
 	 */
-	public static List<CommerceShipmentItem> findByCommerceShipment(
+	public static List<CommerceShipmentItem> findByCommerceShipmentId(
 		long commerceShipmentId, int start, int end,
 		OrderByComparator<CommerceShipmentItem> orderByComparator) {
 
-		return getPersistence().findByCommerceShipment(
+		return getPersistence().findByCommerceShipmentId(
 			commerceShipmentId, start, end, orderByComparator);
 	}
 
@@ -358,12 +358,12 @@ public class CommerceShipmentItemUtil {
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching commerce shipment items
 	 */
-	public static List<CommerceShipmentItem> findByCommerceShipment(
+	public static List<CommerceShipmentItem> findByCommerceShipmentId(
 		long commerceShipmentId, int start, int end,
 		OrderByComparator<CommerceShipmentItem> orderByComparator,
 		boolean useFinderCache) {
 
-		return getPersistence().findByCommerceShipment(
+		return getPersistence().findByCommerceShipmentId(
 			commerceShipmentId, start, end, orderByComparator, useFinderCache);
 	}
 
@@ -375,12 +375,12 @@ public class CommerceShipmentItemUtil {
 	 * @return the first matching commerce shipment item
 	 * @throws NoSuchShipmentItemException if a matching commerce shipment item could not be found
 	 */
-	public static CommerceShipmentItem findByCommerceShipment_First(
+	public static CommerceShipmentItem findByCommerceShipmentId_First(
 			long commerceShipmentId,
 			OrderByComparator<CommerceShipmentItem> orderByComparator)
 		throws com.liferay.commerce.exception.NoSuchShipmentItemException {
 
-		return getPersistence().findByCommerceShipment_First(
+		return getPersistence().findByCommerceShipmentId_First(
 			commerceShipmentId, orderByComparator);
 	}
 
@@ -391,11 +391,11 @@ public class CommerceShipmentItemUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching commerce shipment item, or <code>null</code> if a matching commerce shipment item could not be found
 	 */
-	public static CommerceShipmentItem fetchByCommerceShipment_First(
+	public static CommerceShipmentItem fetchByCommerceShipmentId_First(
 		long commerceShipmentId,
 		OrderByComparator<CommerceShipmentItem> orderByComparator) {
 
-		return getPersistence().fetchByCommerceShipment_First(
+		return getPersistence().fetchByCommerceShipmentId_First(
 			commerceShipmentId, orderByComparator);
 	}
 
@@ -407,12 +407,12 @@ public class CommerceShipmentItemUtil {
 	 * @return the last matching commerce shipment item
 	 * @throws NoSuchShipmentItemException if a matching commerce shipment item could not be found
 	 */
-	public static CommerceShipmentItem findByCommerceShipment_Last(
+	public static CommerceShipmentItem findByCommerceShipmentId_Last(
 			long commerceShipmentId,
 			OrderByComparator<CommerceShipmentItem> orderByComparator)
 		throws com.liferay.commerce.exception.NoSuchShipmentItemException {
 
-		return getPersistence().findByCommerceShipment_Last(
+		return getPersistence().findByCommerceShipmentId_Last(
 			commerceShipmentId, orderByComparator);
 	}
 
@@ -423,11 +423,11 @@ public class CommerceShipmentItemUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching commerce shipment item, or <code>null</code> if a matching commerce shipment item could not be found
 	 */
-	public static CommerceShipmentItem fetchByCommerceShipment_Last(
+	public static CommerceShipmentItem fetchByCommerceShipmentId_Last(
 		long commerceShipmentId,
 		OrderByComparator<CommerceShipmentItem> orderByComparator) {
 
-		return getPersistence().fetchByCommerceShipment_Last(
+		return getPersistence().fetchByCommerceShipmentId_Last(
 			commerceShipmentId, orderByComparator);
 	}
 
@@ -440,12 +440,12 @@ public class CommerceShipmentItemUtil {
 	 * @return the previous, current, and next commerce shipment item
 	 * @throws NoSuchShipmentItemException if a commerce shipment item with the primary key could not be found
 	 */
-	public static CommerceShipmentItem[] findByCommerceShipment_PrevAndNext(
+	public static CommerceShipmentItem[] findByCommerceShipmentId_PrevAndNext(
 			long commerceShipmentItemId, long commerceShipmentId,
 			OrderByComparator<CommerceShipmentItem> orderByComparator)
 		throws com.liferay.commerce.exception.NoSuchShipmentItemException {
 
-		return getPersistence().findByCommerceShipment_PrevAndNext(
+		return getPersistence().findByCommerceShipmentId_PrevAndNext(
 			commerceShipmentItemId, commerceShipmentId, orderByComparator);
 	}
 
@@ -454,8 +454,8 @@ public class CommerceShipmentItemUtil {
 	 *
 	 * @param commerceShipmentId the commerce shipment ID
 	 */
-	public static void removeByCommerceShipment(long commerceShipmentId) {
-		getPersistence().removeByCommerceShipment(commerceShipmentId);
+	public static void removeByCommerceShipmentId(long commerceShipmentId) {
+		getPersistence().removeByCommerceShipmentId(commerceShipmentId);
 	}
 
 	/**
@@ -464,8 +464,8 @@ public class CommerceShipmentItemUtil {
 	 * @param commerceShipmentId the commerce shipment ID
 	 * @return the number of matching commerce shipment items
 	 */
-	public static int countByCommerceShipment(long commerceShipmentId) {
-		return getPersistence().countByCommerceShipment(commerceShipmentId);
+	public static int countByCommerceShipmentId(long commerceShipmentId) {
+		return getPersistence().countByCommerceShipmentId(commerceShipmentId);
 	}
 
 	/**

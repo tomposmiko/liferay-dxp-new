@@ -98,7 +98,7 @@ if (fixedHeader) {
 									if (entry.isTruncate()) {
 										truncate = true;
 
-										cssClass += " table-cell-content";
+										cssClass += " table-cell-expand";
 									}
 
 									if (!Validator.isBlank(entry.getAlign())) {
@@ -120,7 +120,7 @@ if (fixedHeader) {
 								if (entry.isTruncate()) {
 									truncate = true;
 
-									cssClass += " table-cell-content";
+									cssClass += " table-cell-expand";
 								}
 							}
 						}
@@ -308,7 +308,7 @@ if (fixedHeader) {
 							if (entry.isTruncate()) {
 								truncate = true;
 
-								columnClassName += " table-cell-content";
+								columnClassName += " table-cell-expand";
 							}
 
 							String normalizedColumnName = null;
@@ -363,7 +363,7 @@ if (fixedHeader) {
 			%>
 
 			<c:if test="<%= headerNames != null %>">
-				<tr class="lfr-template <%= searchContainerRowCssClass %>" data-qa-id="row">
+				<tr class="d-none <%= searchContainerRowCssClass %>" data-qa-id="row">
 
 					<%
 					for (int i = 0; i < headerNames.size(); i++) {

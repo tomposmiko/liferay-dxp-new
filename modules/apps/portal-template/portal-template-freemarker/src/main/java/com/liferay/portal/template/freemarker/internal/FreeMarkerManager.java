@@ -46,6 +46,8 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.template.BaseTemplateManager;
 import com.liferay.portal.template.TemplateContextHelper;
 import com.liferay.portal.template.freemarker.configuration.FreeMarkerEngineConfiguration;
+import com.liferay.portal.template.freemarker.internal.helper.FreeMarkerTemplateContextHelper;
+import com.liferay.taglib.TagSupport;
 
 import freemarker.cache.TemplateCache;
 
@@ -102,12 +104,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.wiring.BundleCapability;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
@@ -121,7 +125,7 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
  */
 @Component(
 	configurationPid = "com.liferay.portal.template.freemarker.configuration.FreeMarkerEngineConfiguration",
-	immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = "language.type=" + TemplateConstants.LANG_TYPE_FTL,
 	service = TemplateManager.class
 )
@@ -376,7 +380,8 @@ public class FreeMarkerManager extends BaseTemplateManager {
 
 		_bundle = bundleContext.getBundle();
 
-		_freeMarkerBundleClassloader = new FreeMarkerBundleClassloader(_bundle);
+		_freeMarkerBundleClassloader = new FreeMarkerBundleClassloader(
+			_bundle, FrameworkUtil.getBundle(TagSupport.class));
 
 		int stateMask = ~Bundle.INSTALLED & ~Bundle.UNINSTALLED;
 
@@ -881,6 +886,10 @@ public class FreeMarkerManager extends BaseTemplateManager {
 				return url.openStream();
 			}
 			catch (IOException ioException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(ioException, ioException);
+				}
+
 				return null;
 			}
 		}

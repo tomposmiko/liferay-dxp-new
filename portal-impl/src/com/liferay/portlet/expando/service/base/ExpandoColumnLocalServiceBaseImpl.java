@@ -36,8 +36,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -46,7 +44,6 @@ import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
-import com.liferay.portal.kernel.service.persistence.SystemEventPersistence;
 import com.liferay.portal.kernel.service.persistence.UserFinder;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
@@ -310,6 +307,7 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -328,6 +326,7 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 			(ExpandoColumn)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<ExpandoColumn> getBasePersistence() {
 		return expandoColumnPersistence;
 	}
@@ -643,49 +642,6 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the system event local service.
-	 *
-	 * @return the system event local service
-	 */
-	public com.liferay.portal.kernel.service.SystemEventLocalService
-		getSystemEventLocalService() {
-
-		return systemEventLocalService;
-	}
-
-	/**
-	 * Sets the system event local service.
-	 *
-	 * @param systemEventLocalService the system event local service
-	 */
-	public void setSystemEventLocalService(
-		com.liferay.portal.kernel.service.SystemEventLocalService
-			systemEventLocalService) {
-
-		this.systemEventLocalService = systemEventLocalService;
-	}
-
-	/**
-	 * Returns the system event persistence.
-	 *
-	 * @return the system event persistence
-	 */
-	public SystemEventPersistence getSystemEventPersistence() {
-		return systemEventPersistence;
-	}
-
-	/**
-	 * Sets the system event persistence.
-	 *
-	 * @param systemEventPersistence the system event persistence
-	 */
-	public void setSystemEventPersistence(
-		SystemEventPersistence systemEventPersistence) {
-
-		this.systemEventPersistence = systemEventPersistence;
-	}
-
-	/**
 	 * Returns the user local service.
 	 *
 	 * @return the user local service
@@ -886,15 +842,6 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 		resourceLocalService;
 
 	@BeanReference(
-		type = com.liferay.portal.kernel.service.SystemEventLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.SystemEventLocalService
-		systemEventLocalService;
-
-	@BeanReference(type = SystemEventPersistence.class)
-	protected SystemEventPersistence systemEventPersistence;
-
-	@BeanReference(
 		type = com.liferay.portal.kernel.service.UserLocalService.class
 	)
 	protected com.liferay.portal.kernel.service.UserLocalService
@@ -905,9 +852,6 @@ public abstract class ExpandoColumnLocalServiceBaseImpl
 
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ExpandoColumnLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

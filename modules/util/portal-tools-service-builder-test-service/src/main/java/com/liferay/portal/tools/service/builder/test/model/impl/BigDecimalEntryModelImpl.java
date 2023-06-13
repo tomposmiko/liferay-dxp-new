@@ -30,6 +30,7 @@ import com.liferay.portal.tools.service.builder.test.model.BigDecimalEntryModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.math.BigDecimal;
@@ -232,44 +233,66 @@ public class BigDecimalEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, BigDecimalEntry>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			BigDecimalEntry.class.getClassLoader(), BigDecimalEntry.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<BigDecimalEntry> constructor =
+				(Constructor<BigDecimalEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<BigDecimalEntry, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<BigDecimalEntry, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<BigDecimalEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<BigDecimalEntry, Object>>();
-
-		attributeGetterFunctions.put(
-			"bigDecimalEntryId", BigDecimalEntry::getBigDecimalEntryId);
-		attributeGetterFunctions.put(
-			"companyId", BigDecimalEntry::getCompanyId);
-		attributeGetterFunctions.put(
-			"bigDecimalValue", BigDecimalEntry::getBigDecimalValue);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<BigDecimalEntry, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<BigDecimalEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<BigDecimalEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"bigDecimalEntryId", BigDecimalEntry::getBigDecimalEntryId);
 		attributeSetterBiConsumers.put(
 			"bigDecimalEntryId",
 			(BiConsumer<BigDecimalEntry, Long>)
 				BigDecimalEntry::setBigDecimalEntryId);
+		attributeGetterFunctions.put(
+			"companyId", BigDecimalEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<BigDecimalEntry, Long>)BigDecimalEntry::setCompanyId);
+		attributeGetterFunctions.put(
+			"bigDecimalValue", BigDecimalEntry::getBigDecimalValue);
 		attributeSetterBiConsumers.put(
 			"bigDecimalValue",
 			(BiConsumer<BigDecimalEntry, BigDecimal>)
 				BigDecimalEntry::setBigDecimalValue);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -386,6 +409,20 @@ public class BigDecimalEntryModelImpl
 		bigDecimalEntryImpl.setBigDecimalValue(getBigDecimalValue());
 
 		bigDecimalEntryImpl.resetOriginalValues();
+
+		return bigDecimalEntryImpl;
+	}
+
+	@Override
+	public BigDecimalEntry cloneWithOriginalValues() {
+		BigDecimalEntryImpl bigDecimalEntryImpl = new BigDecimalEntryImpl();
+
+		bigDecimalEntryImpl.setBigDecimalEntryId(
+			this.<Long>getColumnOriginalValue("bigDecimalEntryId"));
+		bigDecimalEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		bigDecimalEntryImpl.setBigDecimalValue(
+			this.<BigDecimal>getColumnOriginalValue("bigDecimalValue"));
 
 		return bigDecimalEntryImpl;
 	}
@@ -553,9 +590,7 @@ public class BigDecimalEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, BigDecimalEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					BigDecimalEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

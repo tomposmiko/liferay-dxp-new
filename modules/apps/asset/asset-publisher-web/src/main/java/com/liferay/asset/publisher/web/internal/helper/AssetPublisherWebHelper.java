@@ -24,6 +24,7 @@ import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.publisher.util.AssetPublisherHelper;
 import com.liferay.asset.publisher.web.internal.configuration.AssetPublisherPortletInstanceConfiguration;
+import com.liferay.asset.publisher.web.internal.constants.AssetPublisherSelectionStyleConstants;
 import com.liferay.asset.util.AssetEntryQueryProcessor;
 import com.liferay.asset.util.AssetRendererFactoryClassProvider;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
@@ -128,9 +129,12 @@ public class AssetPublisherWebHelper {
 		}
 
 		String selectionStyle = portletPreferences.getValue(
-			"selectionStyle", "dynamic");
+			"selectionStyle",
+			AssetPublisherSelectionStyleConstants.TYPE_DYNAMIC);
 
-		if (selectionStyle.equals("dynamic")) {
+		if (selectionStyle.equals(
+				AssetPublisherSelectionStyleConstants.TYPE_DYNAMIC)) {
+
 			return;
 		}
 
@@ -194,9 +198,9 @@ public class AssetPublisherWebHelper {
 	}
 
 	public String encodeName(
-		long ddmStructureId, String fieldName, Locale locale) {
+		long ddmStructureId, String fieldReference, Locale locale) {
 
-		return _ddmIndexer.encodeName(ddmStructureId, fieldName, locale);
+		return _ddmIndexer.encodeName(ddmStructureId, fieldReference, locale);
 	}
 
 	public String[] filterAssetTagNames(long groupId, String[] assetTagNames) {
@@ -653,7 +657,7 @@ public class AssetPublisherWebHelper {
 	@Reference
 	private AssetPublisherHelper _assetPublisherHelper;
 
-	private AssetPublisherPortletInstanceConfiguration
+	private volatile AssetPublisherPortletInstanceConfiguration
 		_assetPublisherPortletInstanceConfiguration;
 
 	@Reference

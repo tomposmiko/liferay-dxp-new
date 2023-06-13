@@ -16,7 +16,6 @@ package com.liferay.saml.persistence.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -27,13 +26,12 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -57,17 +55,13 @@ import java.sql.Timestamp;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -83,7 +77,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Mika Koivisto
  * @generated
  */
-@Component(service = SamlSpMessagePersistence.class)
+@Component(service = {SamlSpMessagePersistence.class, BasePersistence.class})
 public class SamlSpMessagePersistenceImpl
 	extends BasePersistenceImpl<SamlSpMessage>
 	implements SamlSpMessagePersistence {
@@ -105,8 +99,8 @@ public class SamlSpMessagePersistenceImpl
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
-	private FinderPath _finderPathWithPaginationFindByExpirationDate;
-	private FinderPath _finderPathWithPaginationCountByExpirationDate;
+	private FinderPath _finderPathWithPaginationFindByLtExpirationDate;
+	private FinderPath _finderPathWithPaginationCountByLtExpirationDate;
 
 	/**
 	 * Returns all the saml sp messages where expirationDate &lt; &#63;.
@@ -115,8 +109,8 @@ public class SamlSpMessagePersistenceImpl
 	 * @return the matching saml sp messages
 	 */
 	@Override
-	public List<SamlSpMessage> findByExpirationDate(Date expirationDate) {
-		return findByExpirationDate(
+	public List<SamlSpMessage> findByLtExpirationDate(Date expirationDate) {
+		return findByLtExpirationDate(
 			expirationDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
@@ -133,10 +127,10 @@ public class SamlSpMessagePersistenceImpl
 	 * @return the range of matching saml sp messages
 	 */
 	@Override
-	public List<SamlSpMessage> findByExpirationDate(
+	public List<SamlSpMessage> findByLtExpirationDate(
 		Date expirationDate, int start, int end) {
 
-		return findByExpirationDate(expirationDate, start, end, null);
+		return findByLtExpirationDate(expirationDate, start, end, null);
 	}
 
 	/**
@@ -153,11 +147,11 @@ public class SamlSpMessagePersistenceImpl
 	 * @return the ordered range of matching saml sp messages
 	 */
 	@Override
-	public List<SamlSpMessage> findByExpirationDate(
+	public List<SamlSpMessage> findByLtExpirationDate(
 		Date expirationDate, int start, int end,
 		OrderByComparator<SamlSpMessage> orderByComparator) {
 
-		return findByExpirationDate(
+		return findByLtExpirationDate(
 			expirationDate, start, end, orderByComparator, true);
 	}
 
@@ -176,7 +170,7 @@ public class SamlSpMessagePersistenceImpl
 	 * @return the ordered range of matching saml sp messages
 	 */
 	@Override
-	public List<SamlSpMessage> findByExpirationDate(
+	public List<SamlSpMessage> findByLtExpirationDate(
 		Date expirationDate, int start, int end,
 		OrderByComparator<SamlSpMessage> orderByComparator,
 		boolean useFinderCache) {
@@ -184,7 +178,7 @@ public class SamlSpMessagePersistenceImpl
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
-		finderPath = _finderPathWithPaginationFindByExpirationDate;
+		finderPath = _finderPathWithPaginationFindByLtExpirationDate;
 		finderArgs = new Object[] {
 			_getTime(expirationDate), start, end, orderByComparator
 		};
@@ -193,7 +187,7 @@ public class SamlSpMessagePersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<SamlSpMessage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SamlSpMessage samlSpMessage : list) {
@@ -225,12 +219,12 @@ public class SamlSpMessagePersistenceImpl
 			boolean bindExpirationDate = false;
 
 			if (expirationDate == null) {
-				sb.append(_FINDER_COLUMN_EXPIRATIONDATE_EXPIRATIONDATE_1);
+				sb.append(_FINDER_COLUMN_LTEXPIRATIONDATE_EXPIRATIONDATE_1);
 			}
 			else {
 				bindExpirationDate = true;
 
-				sb.append(_FINDER_COLUMN_EXPIRATIONDATE_EXPIRATIONDATE_2);
+				sb.append(_FINDER_COLUMN_LTEXPIRATIONDATE_EXPIRATIONDATE_2);
 			}
 
 			if (orderByComparator != null) {
@@ -285,12 +279,12 @@ public class SamlSpMessagePersistenceImpl
 	 * @throws NoSuchSpMessageException if a matching saml sp message could not be found
 	 */
 	@Override
-	public SamlSpMessage findByExpirationDate_First(
+	public SamlSpMessage findByLtExpirationDate_First(
 			Date expirationDate,
 			OrderByComparator<SamlSpMessage> orderByComparator)
 		throws NoSuchSpMessageException {
 
-		SamlSpMessage samlSpMessage = fetchByExpirationDate_First(
+		SamlSpMessage samlSpMessage = fetchByLtExpirationDate_First(
 			expirationDate, orderByComparator);
 
 		if (samlSpMessage != null) {
@@ -317,11 +311,11 @@ public class SamlSpMessagePersistenceImpl
 	 * @return the first matching saml sp message, or <code>null</code> if a matching saml sp message could not be found
 	 */
 	@Override
-	public SamlSpMessage fetchByExpirationDate_First(
+	public SamlSpMessage fetchByLtExpirationDate_First(
 		Date expirationDate,
 		OrderByComparator<SamlSpMessage> orderByComparator) {
 
-		List<SamlSpMessage> list = findByExpirationDate(
+		List<SamlSpMessage> list = findByLtExpirationDate(
 			expirationDate, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -340,12 +334,12 @@ public class SamlSpMessagePersistenceImpl
 	 * @throws NoSuchSpMessageException if a matching saml sp message could not be found
 	 */
 	@Override
-	public SamlSpMessage findByExpirationDate_Last(
+	public SamlSpMessage findByLtExpirationDate_Last(
 			Date expirationDate,
 			OrderByComparator<SamlSpMessage> orderByComparator)
 		throws NoSuchSpMessageException {
 
-		SamlSpMessage samlSpMessage = fetchByExpirationDate_Last(
+		SamlSpMessage samlSpMessage = fetchByLtExpirationDate_Last(
 			expirationDate, orderByComparator);
 
 		if (samlSpMessage != null) {
@@ -372,17 +366,17 @@ public class SamlSpMessagePersistenceImpl
 	 * @return the last matching saml sp message, or <code>null</code> if a matching saml sp message could not be found
 	 */
 	@Override
-	public SamlSpMessage fetchByExpirationDate_Last(
+	public SamlSpMessage fetchByLtExpirationDate_Last(
 		Date expirationDate,
 		OrderByComparator<SamlSpMessage> orderByComparator) {
 
-		int count = countByExpirationDate(expirationDate);
+		int count = countByLtExpirationDate(expirationDate);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<SamlSpMessage> list = findByExpirationDate(
+		List<SamlSpMessage> list = findByLtExpirationDate(
 			expirationDate, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -402,7 +396,7 @@ public class SamlSpMessagePersistenceImpl
 	 * @throws NoSuchSpMessageException if a saml sp message with the primary key could not be found
 	 */
 	@Override
-	public SamlSpMessage[] findByExpirationDate_PrevAndNext(
+	public SamlSpMessage[] findByLtExpirationDate_PrevAndNext(
 			long samlSpMessageId, Date expirationDate,
 			OrderByComparator<SamlSpMessage> orderByComparator)
 		throws NoSuchSpMessageException {
@@ -416,13 +410,13 @@ public class SamlSpMessagePersistenceImpl
 
 			SamlSpMessage[] array = new SamlSpMessageImpl[3];
 
-			array[0] = getByExpirationDate_PrevAndNext(
+			array[0] = getByLtExpirationDate_PrevAndNext(
 				session, samlSpMessage, expirationDate, orderByComparator,
 				true);
 
 			array[1] = samlSpMessage;
 
-			array[2] = getByExpirationDate_PrevAndNext(
+			array[2] = getByLtExpirationDate_PrevAndNext(
 				session, samlSpMessage, expirationDate, orderByComparator,
 				false);
 
@@ -436,7 +430,7 @@ public class SamlSpMessagePersistenceImpl
 		}
 	}
 
-	protected SamlSpMessage getByExpirationDate_PrevAndNext(
+	protected SamlSpMessage getByLtExpirationDate_PrevAndNext(
 		Session session, SamlSpMessage samlSpMessage, Date expirationDate,
 		OrderByComparator<SamlSpMessage> orderByComparator, boolean previous) {
 
@@ -456,12 +450,12 @@ public class SamlSpMessagePersistenceImpl
 		boolean bindExpirationDate = false;
 
 		if (expirationDate == null) {
-			sb.append(_FINDER_COLUMN_EXPIRATIONDATE_EXPIRATIONDATE_1);
+			sb.append(_FINDER_COLUMN_LTEXPIRATIONDATE_EXPIRATIONDATE_1);
 		}
 		else {
 			bindExpirationDate = true;
 
-			sb.append(_FINDER_COLUMN_EXPIRATIONDATE_EXPIRATIONDATE_2);
+			sb.append(_FINDER_COLUMN_LTEXPIRATIONDATE_EXPIRATIONDATE_2);
 		}
 
 		if (orderByComparator != null) {
@@ -562,9 +556,9 @@ public class SamlSpMessagePersistenceImpl
 	 * @param expirationDate the expiration date
 	 */
 	@Override
-	public void removeByExpirationDate(Date expirationDate) {
+	public void removeByLtExpirationDate(Date expirationDate) {
 		for (SamlSpMessage samlSpMessage :
-				findByExpirationDate(
+				findByLtExpirationDate(
 					expirationDate, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
 					null)) {
 
@@ -579,12 +573,13 @@ public class SamlSpMessagePersistenceImpl
 	 * @return the number of matching saml sp messages
 	 */
 	@Override
-	public int countByExpirationDate(Date expirationDate) {
-		FinderPath finderPath = _finderPathWithPaginationCountByExpirationDate;
+	public int countByLtExpirationDate(Date expirationDate) {
+		FinderPath finderPath =
+			_finderPathWithPaginationCountByLtExpirationDate;
 
 		Object[] finderArgs = new Object[] {_getTime(expirationDate)};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -594,12 +589,12 @@ public class SamlSpMessagePersistenceImpl
 			boolean bindExpirationDate = false;
 
 			if (expirationDate == null) {
-				sb.append(_FINDER_COLUMN_EXPIRATIONDATE_EXPIRATIONDATE_1);
+				sb.append(_FINDER_COLUMN_LTEXPIRATIONDATE_EXPIRATIONDATE_1);
 			}
 			else {
 				bindExpirationDate = true;
 
-				sb.append(_FINDER_COLUMN_EXPIRATIONDATE_EXPIRATIONDATE_2);
+				sb.append(_FINDER_COLUMN_LTEXPIRATIONDATE_EXPIRATIONDATE_2);
 			}
 
 			String sql = sb.toString();
@@ -632,11 +627,13 @@ public class SamlSpMessagePersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_EXPIRATIONDATE_EXPIRATIONDATE_1 =
-		"samlSpMessage.expirationDate IS NULL";
+	private static final String
+		_FINDER_COLUMN_LTEXPIRATIONDATE_EXPIRATIONDATE_1 =
+			"samlSpMessage.expirationDate IS NULL";
 
-	private static final String _FINDER_COLUMN_EXPIRATIONDATE_EXPIRATIONDATE_2 =
-		"samlSpMessage.expirationDate < ?";
+	private static final String
+		_FINDER_COLUMN_LTEXPIRATIONDATE_EXPIRATIONDATE_2 =
+			"samlSpMessage.expirationDate < ?";
 
 	private FinderPath _finderPathFetchBySIEI_SIRK;
 	private FinderPath _finderPathCountBySIEI_SIRK;
@@ -720,7 +717,7 @@ public class SamlSpMessagePersistenceImpl
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchBySIEI_SIRK, finderArgs, this);
+				_finderPathFetchBySIEI_SIRK, finderArgs);
 		}
 
 		if (result instanceof SamlSpMessage) {
@@ -869,7 +866,7 @@ public class SamlSpMessagePersistenceImpl
 			samlIdpEntityId, samlIdpResponseKey
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1010,9 +1007,7 @@ public class SamlSpMessagePersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(SamlSpMessageImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(SamlSpMessageImpl.class);
 	}
 
 	/**
@@ -1036,9 +1031,7 @@ public class SamlSpMessagePersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(SamlSpMessageImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(SamlSpMessageImpl.class, primaryKey);
@@ -1054,9 +1047,9 @@ public class SamlSpMessagePersistenceImpl
 		};
 
 		finderCache.putResult(
-			_finderPathCountBySIEI_SIRK, args, Long.valueOf(1), false);
+			_finderPathCountBySIEI_SIRK, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathFetchBySIEI_SIRK, args, samlSpMessageModelImpl, false);
+			_finderPathFetchBySIEI_SIRK, args, samlSpMessageModelImpl);
 	}
 
 	/**
@@ -1367,7 +1360,7 @@ public class SamlSpMessagePersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<SamlSpMessage>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1437,7 +1430,7 @@ public class SamlSpMessagePersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1487,48 +1480,41 @@ public class SamlSpMessagePersistenceImpl
 	 * Initializes the saml sp message persistence.
 	 */
 	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class, new SamlSpMessageModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", SamlSpMessage.class.getName()));
-
+	public void activate() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByExpirationDate = _createFinderPath(
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByExpirationDate",
+		_finderPathWithPaginationFindByLtExpirationDate = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByLtExpirationDate",
 			new String[] {
 				Date.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), OrderByComparator.class.getName()
 			},
 			new String[] {"expirationDate"}, true);
 
-		_finderPathWithPaginationCountByExpirationDate = _createFinderPath(
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByExpirationDate",
+		_finderPathWithPaginationCountByLtExpirationDate = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByLtExpirationDate",
 			new String[] {Date.class.getName()},
 			new String[] {"expirationDate"}, false);
 
-		_finderPathFetchBySIEI_SIRK = _createFinderPath(
+		_finderPathFetchBySIEI_SIRK = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchBySIEI_SIRK",
 			new String[] {String.class.getName(), String.class.getName()},
 			new String[] {"samlIdpEntityId", "samlIdpResponseKey"}, true);
 
-		_finderPathCountBySIEI_SIRK = _createFinderPath(
+		_finderPathCountBySIEI_SIRK = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countBySIEI_SIRK",
 			new String[] {String.class.getName(), String.class.getName()},
 			new String[] {"samlIdpEntityId", "samlIdpResponseKey"}, false);
@@ -1541,14 +1527,6 @@ public class SamlSpMessagePersistenceImpl
 		_setSamlSpMessageUtilPersistence(null);
 
 		entityCache.removeCache(SamlSpMessageImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setSamlSpMessageUtilPersistence(
@@ -1593,8 +1571,6 @@ public class SamlSpMessagePersistenceImpl
 		super.setSessionFactory(sessionFactory);
 	}
 
-	private BundleContext _bundleContext;
-
 	@Reference
 	protected EntityCache entityCache;
 
@@ -1632,103 +1608,13 @@ public class SamlSpMessagePersistenceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		SamlSpMessagePersistenceImpl.class);
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class SamlSpMessageModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			SamlSpMessageModelImpl samlSpMessageModelImpl =
-				(SamlSpMessageModelImpl)baseModel;
-
-			long columnBitmask = samlSpMessageModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(samlSpMessageModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						samlSpMessageModelImpl.getColumnBitmask(columnName);
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(samlSpMessageModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			SamlSpMessageModelImpl samlSpMessageModelImpl, String[] columnNames,
-			boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						samlSpMessageModelImpl.getColumnOriginalValue(
-							columnName);
-				}
-				else {
-					arguments[i] = samlSpMessageModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-	}
+	@Reference
+	private SamlSpMessageModelArgumentsResolver
+		_samlSpMessageModelArgumentsResolver;
 
 }

@@ -174,11 +174,7 @@ public class DefaultSearchResponseTranslator
 
 		Field uidField = document.getField(Field.UID);
 
-		if (uidField != null) {
-			return;
-		}
-
-		if (Validator.isNull(alternateUidFieldName)) {
+		if ((uidField != null) || Validator.isNull(alternateUidFieldName)) {
 			return;
 		}
 
@@ -375,7 +371,7 @@ public class DefaultSearchResponseTranslator
 		Hits hits, Map<String, Aggregation> aggregationsMap,
 		Map<String, Stats> statsMap) {
 
-		if (MapUtil.isNotEmpty(statsMap)) {
+		if (!MapUtil.isEmpty(statsMap)) {
 			for (Stats stats : statsMap.values()) {
 				hits.addStatsResults(getStatsResults(aggregationsMap, stats));
 			}

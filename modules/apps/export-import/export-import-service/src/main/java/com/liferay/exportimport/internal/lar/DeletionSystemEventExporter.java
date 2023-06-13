@@ -190,9 +190,8 @@ public class DeletionSystemEventExporter {
 	}
 
 	protected List<Long> doExportDeletionSystemEvents(
-			final PortletDataContext portletDataContext,
-			final Element rootElement,
-			final Set<StagedModelType> deletionSystemEventStagedModelTypes)
+			PortletDataContext portletDataContext, Element rootElement,
+			Set<StagedModelType> deletionSystemEventStagedModelTypes)
 		throws PortalException {
 
 		List<Long> systemEventIds = new ArrayList<>();

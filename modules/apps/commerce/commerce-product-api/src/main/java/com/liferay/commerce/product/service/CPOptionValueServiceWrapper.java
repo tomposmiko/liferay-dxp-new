@@ -26,6 +26,10 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class CPOptionValueServiceWrapper
 	implements CPOptionValueService, ServiceWrapper<CPOptionValueService> {
 
+	public CPOptionValueServiceWrapper() {
+		this(null);
+	}
+
 	public CPOptionValueServiceWrapper(
 		CPOptionValueService cpOptionValueService) {
 
@@ -44,6 +48,20 @@ public class CPOptionValueServiceWrapper
 	}
 
 	@Override
+	public com.liferay.commerce.product.model.CPOptionValue
+			addOrUpdateCPOptionValue(
+				String externalReferenceCode, long cpOptionId,
+				java.util.Map<java.util.Locale, String> nameMap,
+				double priority, String key,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _cpOptionValueService.addOrUpdateCPOptionValue(
+			externalReferenceCode, cpOptionId, nameMap, priority, key,
+			serviceContext);
+	}
+
+	@Override
 	public void deleteCPOptionValue(long cpOptionValueId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -53,11 +71,11 @@ public class CPOptionValueServiceWrapper
 	@Override
 	public com.liferay.commerce.product.model.CPOptionValue
 			fetchByExternalReferenceCode(
-				long companyId, String externalReferenceCode)
+				String externalReferenceCode, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpOptionValueService.fetchByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	@Override
@@ -102,6 +120,26 @@ public class CPOptionValueServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.kernel.search.BaseModelSearchResult
+		<com.liferay.commerce.product.model.CPOptionValue> searchCPOptionValues(
+				long companyId, long cpOptionId, String keywords, int start,
+				int end, com.liferay.portal.kernel.search.Sort[] sorts)
+			throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _cpOptionValueService.searchCPOptionValues(
+			companyId, cpOptionId, keywords, start, end, sorts);
+	}
+
+	@Override
+	public int searchCPOptionValuesCount(
+			long companyId, long cpOptionId, String keywords)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _cpOptionValueService.searchCPOptionValuesCount(
+			companyId, cpOptionId, keywords);
+	}
+
+	@Override
 	public com.liferay.commerce.product.model.CPOptionValue updateCPOptionValue(
 			long cpOptionValueId,
 			java.util.Map<java.util.Locale, String> titleMap, double priority,
@@ -111,18 +149,6 @@ public class CPOptionValueServiceWrapper
 
 		return _cpOptionValueService.updateCPOptionValue(
 			cpOptionValueId, titleMap, priority, key, serviceContext);
-	}
-
-	@Override
-	public com.liferay.commerce.product.model.CPOptionValue upsertCPOptionValue(
-			long cpOptionId, java.util.Map<java.util.Locale, String> nameMap,
-			double priority, String key, String externalReferenceCode,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _cpOptionValueService.upsertCPOptionValue(
-			cpOptionId, nameMap, priority, key, externalReferenceCode,
-			serviceContext);
 	}
 
 	@Override

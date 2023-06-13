@@ -16,12 +16,12 @@ package com.liferay.dynamic.data.mapping.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.dynamic.data.mapping.constants.DDMStructureConstants;
-import com.liferay.dynamic.data.mapping.helper.DDMFormInstanceTestHelper;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordService;
 import com.liferay.dynamic.data.mapping.storage.StorageType;
+import com.liferay.dynamic.data.mapping.test.util.DDMFormInstanceTestUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
@@ -66,14 +66,14 @@ public class DDMFormInstanceRecordServiceTest extends BaseDDMServiceTestCase {
 		DDMStructure ddmStructure = addStructure(
 			0, PortalUtil.getClassNameId(DDMFormInstance.class), null,
 			RandomTestUtil.randomString(), null,
-			read("ddm-structure-text-field.xsd"), StorageType.JSON.getValue(),
-			DDMStructureConstants.TYPE_DEFAULT);
+			read("ddm-structure-text-field.xsd"),
+			StorageType.DEFAULT.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
 		_ddmFormInstance = _ddmFormInstanceLocalService.addFormInstance(
 			TestPropsValues.getUserId(), ddmStructure.getGroupId(),
 			ddmStructure.getStructureId(), ddmStructure.getNameMap(),
 			ddmStructure.getNameMap(),
-			DDMFormInstanceTestHelper.createFormInstanceSettingsDDMFormValues(),
+			DDMFormInstanceTestUtil.createSettingsDDMFormValues(),
 			ServiceContextTestUtil.getServiceContext(
 				group, TestPropsValues.getUserId()));
 

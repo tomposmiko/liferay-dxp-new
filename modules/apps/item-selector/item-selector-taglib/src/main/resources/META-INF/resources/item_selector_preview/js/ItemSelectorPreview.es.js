@@ -12,7 +12,8 @@
  * details.
  */
 
-import {useIsMounted} from 'frontend-js-react-web';
+import {useIsMounted} from '@liferay/frontend-js-react-web';
+import {ImageEditor} from 'item-selector-taglib';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useState} from 'react';
 import ReactDOM from 'react-dom';
@@ -21,29 +22,29 @@ import Carousel from './Carousel.es';
 import Footer from './Footer.es';
 import Header from './Header.es';
 
+import '../../css/item_selector_preview.scss';
+
 const KEY_CODE = {
 	ESC: 27,
 	LEFT: 37,
 	RIGTH: 39,
 };
 
-const itemIsImage = ({mimeType, type}) =>
-	type === 'image' || Boolean(mimeType?.match(/image.*/));
-
 const ItemSelectorPreview = ({
 	container,
 	currentIndex = 0,
-	editItemURL,
+	editImageURL,
 	handleSelectedItem,
 	headerTitle,
+	itemReturnType,
 	items,
-	uploadItemReturnType,
-	uploadItemURL,
 }) => {
 	const [currentItemIndex, setCurrentItemIndex] = useState(currentIndex);
-	const [isImage, setIsImage] = useState(itemIsImage(items[currentIndex]));
+	const [isEditing, setIsEditing] = useState();
 	const [itemList, setItemList] = useState(items);
 	const [reloadOnHide, setReloadOnHide] = useState(false);
+
+	const currentItem = itemList[currentItemIndex];
 
 	const infoButtonRef = React.createRef();
 
@@ -52,6 +53,35 @@ const ItemSelectorPreview = ({
 	const close = useCallback(() => {
 		ReactDOM.unmountComponentAtNode(container);
 	}, [container]);
+
+	const handleCancelEditing = () => {
+		setIsEditing(false);
+	};
+
+	const handleClickBack = () => {
+		close();
+
+		if (reloadOnHide) {
+			const frame = window.frameElement;
+
+			if (frame) {
+				frame.contentWindow.location.reload();
+			}
+		}
+	};
+
+	const handleClickDone = () => {
+
+		// LPS-120692
+
+		close();
+
+		handleSelectedItem(currentItem);
+	};
+
+	const handleClickEdit = () => {
+		setIsEditing(true);
+	};
 
 	const handleClickNext = useCallback(() => {
 		if (itemList.length > 1) {
@@ -76,12 +106,12 @@ const ItemSelectorPreview = ({
 	}, [itemList.length]);
 
 	const handleOnKeyDown = useCallback(
-		(e) => {
+		(event) => {
 			if (!isMounted()) {
 				return;
 			}
 
-			switch (e.which || e.keyCode) {
+			switch (event.which || event.keyCode) {
 				case KEY_CODE.LEFT:
 					handleClickPrevious();
 					break;
@@ -89,8 +119,8 @@ const ItemSelectorPreview = ({
 					handleClickNext();
 					break;
 				case KEY_CODE.ESC:
-					e.preventDefault();
-					e.stopPropagation();
+					event.preventDefault();
+					event.stopPropagation();
 					close();
 					break;
 				default:
@@ -100,7 +130,37 @@ const ItemSelectorPreview = ({
 		[close, handleClickNext, handleClickPrevious, isMounted]
 	);
 
-	const currentItem = itemList[currentItemIndex];
+	const handleSaveEditedImage = ({file, success}) => {
+		if (success) {
+			const newItem = {
+				...currentItem,
+				fileEntryId: file.fileEntryId,
+				groupId: file.groupId,
+				title: file.title,
+				url: file.url,
+				uuid: file.uuid,
+				value: file.resolvedValue,
+			};
+
+			if (!newItem.value) {
+				const imageValue = {
+					fileEntryId: newItem.fileEntryId,
+					groupId: newItem.groupId,
+					title: newItem.title,
+					type: newItem.type,
+					url: newItem.url,
+					uuid: newItem.uuid,
+				};
+
+				newItem.value = JSON.stringify(imageValue);
+			}
+
+			setIsEditing(false);
+
+			close();
+			handleSelectedItem(newItem);
+		}
+	};
 
 	const updateItemList = (newItemList) => {
 		setItemList(newItemList);
@@ -108,11 +168,11 @@ const ItemSelectorPreview = ({
 	};
 
 	const updateCurrentItem = useCallback(
-		({url, value}) => {
+		(itemData) => {
 			if (isMounted()) {
 				const newItemList = [...itemList];
 
-				newItemList[currentItemIndex] = {...currentItem, url, value};
+				newItemList[currentItemIndex] = {...currentItem, ...itemData};
 
 				updateItemList(newItemList);
 			}
@@ -152,101 +212,7 @@ const ItemSelectorPreview = ({
 				width: '320px',
 			});
 		}
-
-		return () => {
-			Liferay.SideNavigation.destroy(sidenavToggle);
-		};
 	}, [infoButtonRef]);
-
-	const handleClickBack = () => {
-		close();
-
-		if (reloadOnHide) {
-			const frame = window.frameElement;
-
-			if (frame) {
-				frame.contentWindow.location.reload();
-			}
-		}
-	};
-
-	const handleClickDone = () => {
-
-		// LPS-120692
-
-		close();
-
-		handleSelectedItem(currentItem);
-	};
-
-	const handleSaveEdit = (e) => {
-		const itemData = e.data.file;
-
-		const editedItemMetadata = {
-			groups: [
-				{
-					data: [
-						{
-							key: Liferay.Language.get('format'),
-							value: itemData.type,
-						},
-						{
-							key: Liferay.Language.get('name'),
-							value: itemData.title,
-						},
-					],
-					title: Liferay.Language.get('file-info'),
-				},
-			],
-		};
-
-		const editedItem = {
-			fileentryid: currentItem.fileentryid,
-			metadata: JSON.stringify(editedItemMetadata),
-			returntype: uploadItemReturnType,
-			title: itemData.title,
-			url: itemData.url,
-			value: itemData.resolvedValue,
-		};
-
-		const updatedItemList = [...itemList, editedItem];
-		updateItemList(updatedItemList);
-		setCurrentItemIndex(updatedItemList.length - 1);
-	};
-
-	const handleClickEdit = () => {
-		const itemTitle = currentItem.title;
-		const editDialogTitle = `${Liferay.Language.get(
-			'edit'
-		)} ${itemTitle} (${Liferay.Language.get('copy')})`;
-
-		const editEntityBaseZIndex = Liferay.zIndex.WINDOW;
-
-		Liferay.Util.editEntity(
-			{
-				dialog: {
-					destroyOnHide: true,
-					zIndex: editEntityBaseZIndex + 100,
-				},
-				id: 'Edit_' + itemTitle,
-				stack: false,
-				title: editDialogTitle,
-				uri: editItemURL,
-				urlParams: {
-					entityURL: currentItem.url,
-					saveFileEntryId: currentItem.fileentryid,
-					saveFileName: itemTitle,
-					saveParamName: 'imageSelectorFileName',
-					saveURL: uploadItemURL,
-				},
-			},
-			handleSaveEdit
-		);
-	};
-
-	useEffect(() => {
-		setIsImage(itemIsImage(currentItem));
-	}, [currentItem]);
 
 	return (
 		<div className="fullscreen item-selector-preview">
@@ -257,23 +223,36 @@ const ItemSelectorPreview = ({
 				handleClickEdit={handleClickEdit}
 				headerTitle={headerTitle}
 				infoButtonRef={infoButtonRef}
-				showEditIcon={isImage}
+				showEditIcon={true}
 				showInfoIcon={!!currentItem.metadata}
+				showNavbar={!isEditing}
 			/>
 
-			<Carousel
-				currentItem={currentItem}
-				handleClickNext={handleClickNext}
-				handleClickPrevious={handleClickPrevious}
-				isImage={isImage}
-				showArrows={itemList.length > 1}
-			/>
+			{isEditing ? (
+				<ImageEditor
+					imageId={currentItem.fileEntryId || currentItem.fileentryid}
+					imageSrc={currentItem.url}
+					itemReturnType={itemReturnType}
+					onCancel={handleCancelEditing}
+					onSave={handleSaveEditedImage}
+					saveURL={editImageURL}
+				/>
+			) : (
+				<>
+					<Carousel
+						currentItem={currentItem}
+						handleClickNext={handleClickNext}
+						handleClickPrevious={handleClickPrevious}
+						showArrows={itemList.length > 1}
+					/>
 
-			<Footer
-				currentIndex={currentItemIndex}
-				title={currentItem.title}
-				totalItems={itemList.length}
-			/>
+					<Footer
+						currentIndex={currentItemIndex}
+						title={currentItem.title}
+						totalItems={itemList.length}
+					/>
+				</>
+			)}
 		</div>
 	);
 };
@@ -294,8 +273,6 @@ ItemSelectorPreview.propTypes = {
 			value: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
 		})
 	).isRequired,
-	uploadItemReturnType: PropTypes.string,
-	uploadItemURL: PropTypes.string,
 };
 
 export default ItemSelectorPreview;

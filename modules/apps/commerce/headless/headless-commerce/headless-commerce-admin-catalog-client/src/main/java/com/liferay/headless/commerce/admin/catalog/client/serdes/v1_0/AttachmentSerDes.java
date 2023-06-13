@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -58,7 +59,7 @@ public class AttachmentSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (attachment.getAttachment() != null) {
 			if (sb.length() > 1) {
@@ -70,6 +71,44 @@ public class AttachmentSerDes {
 			sb.append("\"");
 
 			sb.append(_escape(attachment.getAttachment()));
+
+			sb.append("\"");
+		}
+
+		if (attachment.getCdnEnabled() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"cdnEnabled\": ");
+
+			sb.append(attachment.getCdnEnabled());
+		}
+
+		if (attachment.getCdnURL() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"cdnURL\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(attachment.getCdnURL()));
+
+			sb.append("\"");
+		}
+
+		if (attachment.getContentType() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"contentType\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(attachment.getContentType()));
 
 			sb.append("\"");
 		}
@@ -231,13 +270,34 @@ public class AttachmentSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (attachment.getAttachment() == null) {
 			map.put("attachment", null);
 		}
 		else {
 			map.put("attachment", String.valueOf(attachment.getAttachment()));
+		}
+
+		if (attachment.getCdnEnabled() == null) {
+			map.put("cdnEnabled", null);
+		}
+		else {
+			map.put("cdnEnabled", String.valueOf(attachment.getCdnEnabled()));
+		}
+
+		if (attachment.getCdnURL() == null) {
+			map.put("cdnURL", null);
+		}
+		else {
+			map.put("cdnURL", String.valueOf(attachment.getCdnURL()));
+		}
+
+		if (attachment.getContentType() == null) {
+			map.put("contentType", null);
+		}
+		else {
+			map.put("contentType", String.valueOf(attachment.getContentType()));
 		}
 
 		if (attachment.getCustomFields() == null) {
@@ -350,20 +410,31 @@ public class AttachmentSerDes {
 					attachment.setAttachment((String)jsonParserFieldValue);
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "cdnEnabled")) {
+				if (jsonParserFieldValue != null) {
+					attachment.setCdnEnabled((Boolean)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "cdnURL")) {
+				if (jsonParserFieldValue != null) {
+					attachment.setCdnURL((String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "contentType")) {
+				if (jsonParserFieldValue != null) {
+					attachment.setContentType((String)jsonParserFieldValue);
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "customFields")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					CustomField[] customFieldsArray =
-						new CustomField[jsonParserFieldValues.length];
-
-					for (int i = 0; i < customFieldsArray.length; i++) {
-						customFieldsArray[i] = CustomFieldSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					attachment.setCustomFields(customFieldsArray);
+					attachment.setCustomFields(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomFieldSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CustomField[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "displayDate")) {

@@ -19,7 +19,6 @@ import com.liferay.oauth2.provider.service.OAuth2AuthorizationService;
 import com.liferay.oauth2.provider.service.OAuth2AuthorizationServiceUtil;
 import com.liferay.oauth2.provider.service.persistence.OAuth2AuthorizationFinder;
 import com.liferay.oauth2.provider.service.persistence.OAuth2AuthorizationPersistence;
-import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantFinder;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantPersistence;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -27,8 +26,6 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -157,11 +154,5 @@ public abstract class OAuth2AuthorizationServiceBaseImpl
 
 	@Reference
 	protected OAuth2ScopeGrantPersistence oAuth2ScopeGrantPersistence;
-
-	@Reference
-	protected OAuth2ScopeGrantFinder oAuth2ScopeGrantFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		OAuth2AuthorizationServiceBaseImpl.class);
 
 }

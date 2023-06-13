@@ -414,6 +414,10 @@
 			}
 		],
 		"properties": {
+			"active": {
+				"store": true,
+				"type": "boolean"
+			},
 			"assetTitle": {
 				"store": true,
 				"term_vector": "with_positions_offsets",
@@ -479,15 +483,49 @@
 				"store": true,
 				"type": "long"
 			},
+			"slaResults": {
+				"properties": {
+					"onTime": {
+						"store": true,
+						"type": "boolean"
+					},
+					"overdueDate": {
+						"format": "yyyyMMddHHmmss",
+						"store": true,
+						"type": "date"
+					},
+					"remainingTime": {
+						"store": true,
+						"type": "long"
+					},
+					"slaDefinitionId": {
+						"store": true,
+						"type": "long"
+					},
+					"status": {
+						"store": true,
+						"type": "keyword"
+					}
+				},
+				"type": "nested"
+			},
 			"slaStatus": {
 				"store": true,
 				"type": "keyword"
 			},
 			"tasks": {
 				"properties": {
+					"assigneeGroupIds": {
+						"store": true,
+						"type": "long"
+					},
 					"assigneeIds": {
 						"store": true,
 						"type": "long"
+					},
+					"assigneeName": {
+						"store": true,
+						"type": "keyword"
 					},
 					"assigneeType": {
 						"store": true,
@@ -1066,6 +1104,10 @@
 			"version": {
 				"store": true,
 				"type": "keyword"
+			},
+			"versions": {
+				"store": true,
+				"type": "keyword"
 			}
 		}
 	},
@@ -1084,6 +1126,10 @@
 			}
 		],
 		"properties": {
+			"active": {
+				"store": true,
+				"type": "boolean"
+			},
 			"companyId": {
 				"store": true,
 				"type": "long"
@@ -1109,7 +1155,7 @@
 				"store": true,
 				"type": "long"
 			},
-			"lastCheckDate": {
+			"modifiedDate": {
 				"format": "yyyyMMddHHmmss",
 				"store": true,
 				"type": "date"
@@ -1160,6 +1206,10 @@
 			}
 		],
 		"properties": {
+			"active": {
+				"store": true,
+				"type": "boolean"
+			},
 			"assigneeIds": {
 				"store": true,
 				"type": "long"
@@ -1202,7 +1252,7 @@
 				"store": true,
 				"type": "long"
 			},
-			"lastCheckDate": {
+			"modifiedDate": {
 				"format": "yyyyMMddHHmmss",
 				"store": true,
 				"type": "date"
@@ -1656,6 +1706,10 @@
 			}
 		],
 		"properties": {
+			"active": {
+				"store": true,
+				"type": "boolean"
+			},
 			"assetTitle": {
 				"store": true,
 				"term_vector": "with_positions_offsets",

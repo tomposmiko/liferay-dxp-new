@@ -20,7 +20,6 @@ import com.liferay.asset.kernel.exception.DuplicateQueryRuleException;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.list.asset.entry.provider.AssetListAssetEntryProvider;
-import com.liferay.asset.list.service.AssetListEntrySegmentsEntryRelLocalService;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.publisher.constants.AssetPublisherWebKeys;
 import com.liferay.asset.publisher.util.AssetPublisherHelper;
@@ -28,6 +27,7 @@ import com.liferay.asset.publisher.util.AssetQueryRule;
 import com.liferay.asset.publisher.web.internal.action.AssetEntryActionRegistry;
 import com.liferay.asset.publisher.web.internal.configuration.AssetPublisherPortletInstanceConfiguration;
 import com.liferay.asset.publisher.web.internal.configuration.AssetPublisherWebConfiguration;
+import com.liferay.asset.publisher.web.internal.constants.AssetPublisherSelectionStyleConstants;
 import com.liferay.asset.publisher.web.internal.display.context.AssetPublisherDisplayContext;
 import com.liferay.asset.publisher.web.internal.helper.AssetPublisherWebHelper;
 import com.liferay.asset.publisher.web.internal.util.AssetPublisherCustomizer;
@@ -35,7 +35,7 @@ import com.liferay.asset.publisher.web.internal.util.AssetPublisherCustomizerReg
 import com.liferay.asset.util.AssetHelper;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.Staging;
-import com.liferay.info.list.provider.InfoListProviderTracker;
+import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -149,12 +149,10 @@ public class AssetPublisherConfigurationAction
 		AssetPublisherDisplayContext assetPublisherDisplayContext =
 			new AssetPublisherDisplayContext(
 				assetEntryActionRegistry, assetHelper,
-				assetListAssetEntryProvider,
-				assetListEntrySegmentsEntryRelLocalService,
-				assetPublisherCustomizer, assetPublisherHelper,
-				assetPublisherWebConfiguration, assetPublisherWebHelper,
-				infoListProviderTracker, itemSelector, renderRequest, portal,
-				renderResponse, renderRequest.getPreferences(),
+				assetListAssetEntryProvider, assetPublisherCustomizer,
+				assetPublisherHelper, assetPublisherWebConfiguration,
+				assetPublisherWebHelper, infoItemServiceTracker, itemSelector,
+				renderRequest, renderResponse, renderRequest.getPreferences(),
 				requestContextMapper, segmentsEntryRetriever);
 
 		httpServletRequest.setAttribute(
@@ -244,10 +242,13 @@ public class AssetPublisherConfigurationAction
 					actionRequest, "selectionStyle");
 
 				if (Validator.isNull(selectionStyle)) {
-					selectionStyle = "dynamic";
+					selectionStyle =
+						AssetPublisherSelectionStyleConstants.TYPE_DYNAMIC;
 				}
 
-				if (selectionStyle.equals("dynamic")) {
+				if (selectionStyle.equals(
+						AssetPublisherSelectionStyleConstants.TYPE_DYNAMIC)) {
+
 					updateQueryLogic(actionRequest, preferences);
 				}
 
@@ -626,7 +627,8 @@ public class AssetPublisherConfigurationAction
 
 		preferences.setValue("selectionStyle", selectionStyle);
 
-		if (selectionStyle.equals("manual") ||
+		if (selectionStyle.equals(
+				AssetPublisherSelectionStyleConstants.TYPE_MANUAL) ||
 			selectionStyle.equals("view-count")) {
 
 			preferences.setValue("enableRss", Boolean.FALSE.toString());
@@ -799,7 +801,9 @@ public class AssetPublisherConfigurationAction
 		String selectionStyle = getParameter(actionRequest, "selectionStyle");
 
 		if (Validator.isNull(selectionStyle)) {
-			setPreference(actionRequest, "selectionStyle", "dynamic");
+			setPreference(
+				actionRequest, "selectionStyle",
+				AssetPublisherSelectionStyleConstants.TYPE_DYNAMIC);
 		}
 	}
 
@@ -832,16 +836,13 @@ public class AssetPublisherConfigurationAction
 	protected AssetListAssetEntryProvider assetListAssetEntryProvider;
 
 	@Reference
-	protected AssetListEntrySegmentsEntryRelLocalService
-		assetListEntrySegmentsEntryRelLocalService;
-
-	@Reference
 	protected AssetPublisherCustomizerRegistry assetPublisherCustomizerRegistry;
 
 	@Reference
 	protected AssetPublisherHelper assetPublisherHelper;
 
-	protected AssetPublisherWebConfiguration assetPublisherWebConfiguration;
+	protected volatile AssetPublisherWebConfiguration
+		assetPublisherWebConfiguration;
 
 	@Reference
 	protected AssetPublisherWebHelper assetPublisherWebHelper;
@@ -853,7 +854,7 @@ public class AssetPublisherConfigurationAction
 	protected GroupLocalService groupLocalService;
 
 	@Reference
-	protected InfoListProviderTracker infoListProviderTracker;
+	protected InfoItemServiceTracker infoItemServiceTracker;
 
 	@Reference
 	protected ItemSelector itemSelector;

@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -280,63 +281,85 @@ public class AccountEntryOrganizationRelModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, AccountEntryOrganizationRel>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AccountEntryOrganizationRel.class.getClassLoader(),
+			AccountEntryOrganizationRel.class, ModelWrapper.class);
+
+		try {
+			Constructor<AccountEntryOrganizationRel> constructor =
+				(Constructor<AccountEntryOrganizationRel>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map
 		<String, Function<AccountEntryOrganizationRel, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<AccountEntryOrganizationRel, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<AccountEntryOrganizationRel, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<AccountEntryOrganizationRel, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", AccountEntryOrganizationRel::getMvccVersion);
-		attributeGetterFunctions.put(
-			"accountEntryOrganizationRelId",
-			AccountEntryOrganizationRel::getAccountEntryOrganizationRelId);
-		attributeGetterFunctions.put(
-			"companyId", AccountEntryOrganizationRel::getCompanyId);
-		attributeGetterFunctions.put(
-			"accountEntryId", AccountEntryOrganizationRel::getAccountEntryId);
-		attributeGetterFunctions.put(
-			"organizationId", AccountEntryOrganizationRel::getOrganizationId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<AccountEntryOrganizationRel, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<AccountEntryOrganizationRel, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<AccountEntryOrganizationRel, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", AccountEntryOrganizationRel::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AccountEntryOrganizationRel, Long>)
 				AccountEntryOrganizationRel::setMvccVersion);
+		attributeGetterFunctions.put(
+			"accountEntryOrganizationRelId",
+			AccountEntryOrganizationRel::getAccountEntryOrganizationRelId);
 		attributeSetterBiConsumers.put(
 			"accountEntryOrganizationRelId",
 			(BiConsumer<AccountEntryOrganizationRel, Long>)
 				AccountEntryOrganizationRel::setAccountEntryOrganizationRelId);
+		attributeGetterFunctions.put(
+			"companyId", AccountEntryOrganizationRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AccountEntryOrganizationRel, Long>)
 				AccountEntryOrganizationRel::setCompanyId);
+		attributeGetterFunctions.put(
+			"accountEntryId", AccountEntryOrganizationRel::getAccountEntryId);
 		attributeSetterBiConsumers.put(
 			"accountEntryId",
 			(BiConsumer<AccountEntryOrganizationRel, Long>)
 				AccountEntryOrganizationRel::setAccountEntryId);
+		attributeGetterFunctions.put(
+			"organizationId", AccountEntryOrganizationRel::getOrganizationId);
 		attributeSetterBiConsumers.put(
 			"organizationId",
 			(BiConsumer<AccountEntryOrganizationRel, Long>)
 				AccountEntryOrganizationRel::setOrganizationId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -504,6 +527,25 @@ public class AccountEntryOrganizationRelModelImpl
 		accountEntryOrganizationRelImpl.setOrganizationId(getOrganizationId());
 
 		accountEntryOrganizationRelImpl.resetOriginalValues();
+
+		return accountEntryOrganizationRelImpl;
+	}
+
+	@Override
+	public AccountEntryOrganizationRel cloneWithOriginalValues() {
+		AccountEntryOrganizationRelImpl accountEntryOrganizationRelImpl =
+			new AccountEntryOrganizationRelImpl();
+
+		accountEntryOrganizationRelImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		accountEntryOrganizationRelImpl.setAccountEntryOrganizationRelId(
+			this.<Long>getColumnOriginalValue("accountEntryOrganizationRelId"));
+		accountEntryOrganizationRelImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		accountEntryOrganizationRelImpl.setAccountEntryId(
+			this.<Long>getColumnOriginalValue("accountEntryId"));
+		accountEntryOrganizationRelImpl.setOrganizationId(
+			this.<Long>getColumnOriginalValue("organizationId"));
 
 		return accountEntryOrganizationRelImpl;
 	}
@@ -688,8 +730,7 @@ public class AccountEntryOrganizationRelModelImpl
 		private static final Function
 			<InvocationHandler, AccountEntryOrganizationRel>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						AccountEntryOrganizationRel.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 

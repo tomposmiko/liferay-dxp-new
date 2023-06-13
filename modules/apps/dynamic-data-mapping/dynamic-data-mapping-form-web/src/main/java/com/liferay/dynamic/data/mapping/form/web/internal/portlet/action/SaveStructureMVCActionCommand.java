@@ -20,6 +20,7 @@ import com.liferay.dynamic.data.mapping.exception.StructureDefinitionException;
 import com.liferay.dynamic.data.mapping.exception.StructureLayoutException;
 import com.liferay.dynamic.data.mapping.form.builder.context.DDMFormContextDeserializer;
 import com.liferay.dynamic.data.mapping.form.builder.context.DDMFormContextDeserializerRequest;
+import com.liferay.dynamic.data.mapping.form.web.internal.portlet.action.helper.SaveFormInstanceMVCCommandHelper;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
@@ -99,7 +100,7 @@ public class SaveStructureMVCActionCommand extends BaseMVCActionCommand {
 				groupId, DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID,
 				_portal.getClassNameId(DDMFormInstance.class), structureKey,
 				nameMap, descriptionMap, ddmForm, ddmFormLayout,
-				StorageType.JSON.toString(),
+				StorageType.DEFAULT.toString(),
 				DDMStructureConstants.TYPE_FRAGMENT, serviceContext);
 		}
 		else {

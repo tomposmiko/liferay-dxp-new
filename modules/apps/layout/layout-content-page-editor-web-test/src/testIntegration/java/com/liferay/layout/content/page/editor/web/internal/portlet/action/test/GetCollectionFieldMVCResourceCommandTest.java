@@ -19,13 +19,11 @@ import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryLocalService;
-import com.liferay.info.list.provider.InfoListProvider;
-import com.liferay.info.list.provider.InfoListProviderContext;
+import com.liferay.info.collection.provider.CollectionQuery;
+import com.liferay.info.collection.provider.InfoCollectionProvider;
 import com.liferay.info.list.provider.item.selector.criterion.InfoListProviderItemSelectorReturnType;
-import com.liferay.info.pagination.Pagination;
-import com.liferay.info.sort.Sort;
+import com.liferay.info.pagination.InfoPage;
 import com.liferay.item.selector.criteria.InfoListItemSelectorReturnType;
-import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -33,8 +31,6 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -45,27 +41,16 @@ import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceRegistration;
-import com.liferay.segments.criteria.Criteria;
-import com.liferay.segments.criteria.CriteriaSerializer;
-import com.liferay.segments.criteria.contributor.SegmentsCriteriaContributor;
-import com.liferay.segments.model.SegmentsEntry;
-import com.liferay.segments.test.util.SegmentsTestUtil;
 
-import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -78,6 +63,11 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceRegistration;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -100,21 +90,23 @@ public class GetCollectionFieldMVCResourceCommandTest {
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
 
-		_layout = LayoutTestUtil.addLayout(_group.getGroupId());
-		_user = UserTestUtil.addUser(_group.getGroupId());
-
 		_serviceContext = new ServiceContext();
 
 		_serviceContext.setScopeGroupId(_group.getGroupId());
-		_serviceContext.setUserId(_user.getUserId());
+		_serviceContext.setUserId(TestPropsValues.getUserId());
 
 		ServiceContextThreadLocal.pushServiceContext(_serviceContext);
 
-		Registry registry = RegistryUtil.getRegistry();
+		Bundle bundle = FrameworkUtil.getBundle(
+			GetCollectionFieldMVCResourceCommandTest.class);
 
-		_infoListProviderServiceRegistration = registry.registerService(
-			(Class<InfoListProvider<?>>)(Class<?>)InfoListProvider.class,
-			new TestInfoListProvider());
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		_infoCollectionProviderServiceRegistration =
+			bundleContext.registerService(
+				(Class<InfoCollectionProvider<?>>)
+					(Class<?>)InfoCollectionProvider.class,
+				new TestInfoCollectionProvider(), null);
 
 		_originalThemeDisplayDefaultLocale =
 			LocaleThreadLocal.getThemeDisplayLocale();
@@ -126,8 +118,8 @@ public class GetCollectionFieldMVCResourceCommandTest {
 	public void tearDown() {
 		ServiceContextThreadLocal.popServiceContext();
 
-		if (_infoListProviderServiceRegistration != null) {
-			_infoListProviderServiceRegistration.unregister();
+		if (_infoCollectionProviderServiceRegistration != null) {
+			_infoCollectionProviderServiceRegistration.unregister();
 		}
 
 		LocaleThreadLocal.setThemeDisplayLocale(
@@ -140,68 +132,24 @@ public class GetCollectionFieldMVCResourceCommandTest {
 
 		BlogsEntry blogsEntry = _addBlogsEntry();
 
-		JSONObject layoutObjectReferenceJSONObject = JSONUtil.put(
-			"itemType", BlogsEntry.class.getName()
-		).put(
-			"key", TestInfoListProvider.class.getName()
-		).put(
-			"type", InfoListProviderItemSelectorReturnType.class.getName()
-		);
-
 		JSONObject jsonObject = ReflectionTestUtil.invoke(
 			_mvcResourceCommand, "_getCollectionFieldsJSONObject",
 			new Class<?>[] {
-				HttpServletRequest.class, HttpServletResponse.class,
+				HttpServletRequest.class, HttpServletResponse.class, int.class,
 				String.class, String.class, String.class, String.class,
-				String.class, int.class
+				String.class, int.class, int.class, String.class, String.class
 			},
-			new MockHttpServletRequest(), new MockHttpServletResponse(),
-			LocaleUtil.toLanguageId(LocaleUtil.US),
-			layoutObjectReferenceJSONObject.toString(), StringPool.BLANK,
-			StringPool.BLANK, StringPool.BLANK, 1);
-
-		Assert.assertEquals(1, jsonObject.getInt("length"));
-
-		JSONArray jsonArray = jsonObject.getJSONArray("items");
-
-		Assert.assertEquals(1, jsonArray.length());
-
-		JSONObject itemJSONObject = jsonArray.getJSONObject(0);
-
-		Assert.assertEquals(
-			blogsEntry.getTitle(), itemJSONObject.getString("title"));
-	}
-
-	@Test
-	public void testGetCollectionFieldFromCollectionProviderWithSegments()
-		throws Exception {
-
-		_addSegmentsEntry(_user);
-
-		BlogsEntry blogsEntry = _addBlogsEntry();
-
-		MockHttpServletRequest request = new MockHttpServletRequest();
-
-		request.setAttribute(WebKeys.LAYOUT, _layout);
-		request.setAttribute(WebKeys.USER_ID, _user.getUserId());
-
-		JSONObject jsonObject = ReflectionTestUtil.invoke(
-			_mvcResourceCommand, "_getCollectionFieldsJSONObject",
-			new Class<?>[] {
-				HttpServletRequest.class, HttpServletResponse.class,
-				String.class, String.class, String.class, String.class,
-				String.class, int.class
-			},
-			request, new MockHttpServletResponse(),
+			new MockHttpServletRequest(), new MockHttpServletResponse(), 0,
 			LocaleUtil.toLanguageId(LocaleUtil.US),
 			JSONUtil.put(
 				"itemType", BlogsEntry.class.getName()
 			).put(
-				"key", TestInfoListProvider.class.getName()
+				"key", TestInfoCollectionProvider.class.getName()
 			).put(
 				"type", InfoListProviderItemSelectorReturnType.class.getName()
 			).toString(),
-			StringPool.BLANK, StringPool.BLANK, StringPool.BLANK, 1);
+			StringPool.BLANK, StringPool.BLANK, StringPool.BLANK, 1, 20,
+			"regular", StringPool.BLANK);
 
 		Assert.assertEquals(1, jsonObject.getInt("length"));
 
@@ -226,29 +174,28 @@ public class GetCollectionFieldMVCResourceCommandTest {
 				TestPropsValues.getUserId(), _group.getGroupId(),
 				"Collection Title", _getTypeSettings(), _serviceContext);
 
-		JSONObject layoutObjectReferenceJSONObject = JSONUtil.put(
-			"classNameId",
-			String.valueOf(
-				_portal.getClassNameId(AssetListEntry.class.getName()))
-		).put(
-			"classPK", String.valueOf(assetListEntry.getAssetListEntryId())
-		).put(
-			"itemType", BlogsEntry.class.getName()
-		).put(
-			"type", InfoListItemSelectorReturnType.class.getName()
-		);
-
 		JSONObject jsonObject = ReflectionTestUtil.invoke(
 			_mvcResourceCommand, "_getCollectionFieldsJSONObject",
 			new Class<?>[] {
-				HttpServletRequest.class, HttpServletResponse.class,
+				HttpServletRequest.class, HttpServletResponse.class, int.class,
 				String.class, String.class, String.class, String.class,
-				String.class, int.class
+				String.class, int.class, int.class, String.class, String.class
 			},
-			new MockHttpServletRequest(), new MockHttpServletResponse(),
+			new MockHttpServletRequest(), new MockHttpServletResponse(), 0,
 			LocaleUtil.toLanguageId(LocaleUtil.US),
-			layoutObjectReferenceJSONObject.toString(), StringPool.BLANK,
-			StringPool.BLANK, StringPool.BLANK, 2);
+			JSONUtil.put(
+				"classNameId",
+				String.valueOf(
+					_portal.getClassNameId(AssetListEntry.class.getName()))
+			).put(
+				"classPK", String.valueOf(assetListEntry.getAssetListEntryId())
+			).put(
+				"itemType", BlogsEntry.class.getName()
+			).put(
+				"type", InfoListItemSelectorReturnType.class.getName()
+			).toString(),
+			StringPool.BLANK, StringPool.BLANK, StringPool.BLANK, 2, 20,
+			"regular", StringPool.BLANK);
 
 		Assert.assertEquals(2, jsonObject.getInt("length"));
 
@@ -280,29 +227,28 @@ public class GetCollectionFieldMVCResourceCommandTest {
 				TestPropsValues.getUserId(), _group.getGroupId(),
 				"Collection Title", _getTypeSettings(), _serviceContext);
 
-		JSONObject layoutObjectReferenceJSONObject = JSONUtil.put(
-			"classNameId",
-			String.valueOf(
-				_portal.getClassNameId(AssetListEntry.class.getName()))
-		).put(
-			"classPK", String.valueOf(assetListEntry.getAssetListEntryId())
-		).put(
-			"itemType", BlogsEntry.class.getName()
-		).put(
-			"type", InfoListItemSelectorReturnType.class.getName()
-		);
-
 		JSONObject jsonObject = ReflectionTestUtil.invoke(
 			_mvcResourceCommand, "_getCollectionFieldsJSONObject",
 			new Class<?>[] {
-				HttpServletRequest.class, HttpServletResponse.class,
+				HttpServletRequest.class, HttpServletResponse.class, int.class,
 				String.class, String.class, String.class, String.class,
-				String.class, int.class
+				String.class, int.class, int.class, String.class, String.class
 			},
-			new MockHttpServletRequest(), new MockHttpServletResponse(),
+			new MockHttpServletRequest(), new MockHttpServletResponse(), 0,
 			LocaleUtil.toLanguageId(LocaleUtil.US),
-			layoutObjectReferenceJSONObject.toString(), StringPool.BLANK,
-			StringPool.BLANK, StringPool.BLANK, 1);
+			JSONUtil.put(
+				"classNameId",
+				String.valueOf(
+					_portal.getClassNameId(AssetListEntry.class.getName()))
+			).put(
+				"classPK", String.valueOf(assetListEntry.getAssetListEntryId())
+			).put(
+				"itemType", BlogsEntry.class.getName()
+			).put(
+				"type", InfoListItemSelectorReturnType.class.getName()
+			).toString(),
+			StringPool.BLANK, StringPool.BLANK, StringPool.BLANK, 1, 20,
+			"regular", StringPool.BLANK);
 
 		Assert.assertEquals(2, jsonObject.getInt("length"));
 
@@ -325,32 +271,25 @@ public class GetCollectionFieldMVCResourceCommandTest {
 			RandomTestUtil.randomString(), _serviceContext);
 	}
 
-	private SegmentsEntry _addSegmentsEntry(User user) throws Exception {
-		Criteria criteria = new Criteria();
-
-		_userSegmentsCriteriaContributor.contribute(
-			criteria, String.format("(firstName eq '%s')", user.getFirstName()),
-			Criteria.Conjunction.AND);
-
-		return SegmentsTestUtil.addSegmentsEntry(
-			_group.getGroupId(), CriteriaSerializer.serialize(criteria),
-			User.class.getName());
-	}
-
 	private String _getTypeSettings() {
-		UnicodeProperties unicodeProperties = new UnicodeProperties(true);
-
-		unicodeProperties.put(
+		return UnicodePropertiesBuilder.create(
+			true
+		).put(
 			"anyAssetType",
-			String.valueOf(_portal.getClassNameId(BlogsEntry.class)));
-		unicodeProperties.put("classNameIds", BlogsEntry.class.getName());
-		unicodeProperties.put("groupIds", String.valueOf(_group.getGroupId()));
-		unicodeProperties.put("orderByColumn1", "modifiedDate");
-		unicodeProperties.put("orderByColumn2", "title");
-		unicodeProperties.put("orderByType1", "ASC");
-		unicodeProperties.put("orderByType2", "ASC");
-
-		return unicodeProperties.toString();
+			String.valueOf(_portal.getClassNameId(BlogsEntry.class))
+		).put(
+			"classNameIds", BlogsEntry.class.getName()
+		).put(
+			"groupIds", String.valueOf(_group.getGroupId())
+		).put(
+			"orderByColumn1", "modifiedDate"
+		).put(
+			"orderByColumn2", "title"
+		).put(
+			"orderByType1", "ASC"
+		).put(
+			"orderByType2", "ASC"
+		).buildString();
 	}
 
 	@Inject
@@ -362,11 +301,12 @@ public class GetCollectionFieldMVCResourceCommandTest {
 	@DeleteAfterTestRun
 	private Group _group;
 
-	private ServiceRegistration<InfoListProvider<?>>
-		_infoListProviderServiceRegistration;
-	private Layout _layout;
+	private ServiceRegistration<InfoCollectionProvider<?>>
+		_infoCollectionProviderServiceRegistration;
 
-	@Inject(filter = "mvc.command.name=/content_layout/get_collection_field")
+	@Inject(
+		filter = "mvc.command.name=/layout_content_page_editor/get_collection_field"
+	)
 	private MVCResourceCommand _mvcResourceCommand;
 
 	private Locale _originalThemeDisplayDefaultLocale;
@@ -375,44 +315,25 @@ public class GetCollectionFieldMVCResourceCommandTest {
 	private Portal _portal;
 
 	private ServiceContext _serviceContext;
-	private User _user;
 
-	@Inject(
-		filter = "segments.criteria.contributor.key=user",
-		type = SegmentsCriteriaContributor.class
-	)
-	private SegmentsCriteriaContributor _userSegmentsCriteriaContributor;
-
-	private class TestInfoListProvider implements InfoListProvider<BlogsEntry> {
+	private class TestInfoCollectionProvider
+		implements InfoCollectionProvider<BlogsEntry> {
 
 		@Override
-		public List<BlogsEntry> getInfoList(
-			InfoListProviderContext infoListProviderContext) {
+		public InfoPage<BlogsEntry> getCollectionInfoPage(
+			CollectionQuery collectionQuery) {
 
-			return _blogsEntryLocalService.getGroupEntries(
-				_group.getGroupId(), _queryDefinition);
-		}
-
-		@Override
-		public List<BlogsEntry> getInfoList(
-			InfoListProviderContext infoListProviderContext,
-			Pagination pagination, Sort sort) {
-
-			return _blogsEntryLocalService.getGroupEntries(
-				_group.getGroupId(), _queryDefinition);
-		}
-
-		@Override
-		public int getInfoListCount(
-			InfoListProviderContext infoListProviderContext) {
-
-			return _blogsEntryLocalService.getGroupEntriesCount(
-				_group.getGroupId(), _queryDefinition);
+			return InfoPage.of(
+				_blogsEntryLocalService.getGroupEntries(
+					_group.getGroupId(), _queryDefinition),
+				collectionQuery.getPagination(),
+				_blogsEntryLocalService.getGroupEntriesCount(
+					_group.getGroupId(), _queryDefinition));
 		}
 
 		@Override
 		public String getLabel(Locale locale) {
-			return TestInfoListProvider.class.getSimpleName();
+			return TestInfoCollectionProvider.class.getSimpleName();
 		}
 
 		private final QueryDefinition<BlogsEntry> _queryDefinition =

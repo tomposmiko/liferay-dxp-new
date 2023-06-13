@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -60,7 +61,7 @@ public class TaxonomyVocabularySerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (taxonomyVocabulary.getActions() != null) {
 			if (sb.length() > 1) {
@@ -204,6 +205,20 @@ public class TaxonomyVocabularySerDes {
 			sb.append(_toJSON(taxonomyVocabulary.getDescription_i18n()));
 		}
 
+		if (taxonomyVocabulary.getExternalReferenceCode() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"externalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(taxonomyVocabulary.getExternalReferenceCode()));
+
+			sb.append("\"");
+		}
+
 		if (taxonomyVocabulary.getId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -294,7 +309,7 @@ public class TaxonomyVocabularySerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (taxonomyVocabulary.getActions() == null) {
 			map.put("actions", null);
@@ -373,6 +388,15 @@ public class TaxonomyVocabularySerDes {
 			map.put(
 				"description_i18n",
 				String.valueOf(taxonomyVocabulary.getDescription_i18n()));
+		}
+
+		if (taxonomyVocabulary.getExternalReferenceCode() == null) {
+			map.put("externalReferenceCode", null);
+		}
+		else {
+			map.put(
+				"externalReferenceCode",
+				String.valueOf(taxonomyVocabulary.getExternalReferenceCode()));
 		}
 
 		if (taxonomyVocabulary.getId() == null) {
@@ -459,18 +483,14 @@ public class TaxonomyVocabularySerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "assetTypes")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					AssetType[] assetTypesArray =
-						new AssetType[jsonParserFieldValues.length];
-
-					for (int i = 0; i < assetTypesArray.length; i++) {
-						assetTypesArray[i] = AssetTypeSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					taxonomyVocabulary.setAssetTypes(assetTypesArray);
+					taxonomyVocabulary.setAssetTypes(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AssetTypeSerDes.toDTO((String)object)
+						).toArray(
+							size -> new AssetType[size]
+						));
 				}
 			}
 			else if (Objects.equals(
@@ -510,6 +530,14 @@ public class TaxonomyVocabularySerDes {
 					taxonomyVocabulary.setDescription_i18n(
 						(Map)TaxonomyVocabularySerDes.toMap(
 							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "externalReferenceCode")) {
+
+				if (jsonParserFieldValue != null) {
+					taxonomyVocabulary.setExternalReferenceCode(
+						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {

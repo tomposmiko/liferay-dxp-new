@@ -1,11 +1,10 @@
 Bundle-Name: Liferay Redirect API
 Bundle-SymbolicName: com.liferay.redirect.api
-Bundle-Version: 3.2.1
+Bundle-Version: 4.3.1
 Export-Package:\
 	com.liferay.redirect.configuration,\
 	com.liferay.redirect.constants,\
 	com.liferay.redirect.exception,\
 	com.liferay.redirect.model,\
 	com.liferay.redirect.service,\
-	com.liferay.redirect.service.persistence,\
-	com.liferay.redirect.tracker
+	com.liferay.redirect.service.persistence

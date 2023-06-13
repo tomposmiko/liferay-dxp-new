@@ -36,6 +36,7 @@ import com.liferay.layout.util.LayoutClassedModelUsageActionMenuContributor;
 import com.liferay.layout.util.LayoutClassedModelUsageActionMenuContributorRegistryUtil;
 import com.liferay.layout.util.comparator.LayoutClassedModelUsageModifiedDateComparator;
 import com.liferay.layout.util.constants.LayoutClassedModelUsageConstants;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -146,18 +147,13 @@ public class LayoutClassedModelUsagesDisplayContext {
 				return StringPool.BLANK;
 			}
 
-			if (!_isDraft(layout)) {
+			if (!layout.isDraftLayout()) {
 				return layout.getName(_themeDisplay.getLocale());
 			}
 
-			StringBundler sb = new StringBundler(4);
-
-			sb.append(layout.getName(_themeDisplay.getLocale()));
-			sb.append(" (");
-			sb.append(LanguageUtil.get(_themeDisplay.getLocale(), "draft"));
-			sb.append(")");
-
-			return sb.toString();
+			return StringBundler.concat(
+				layout.getName(_themeDisplay.getLocale()), " (",
+				LanguageUtil.get(_themeDisplay.getLocale(), "draft"), ")");
 		}
 
 		long plid = layoutClassedModelUsage.getPlid();
@@ -165,7 +161,7 @@ public class LayoutClassedModelUsagesDisplayContext {
 		Layout layout = LayoutLocalServiceUtil.fetchLayout(
 			layoutClassedModelUsage.getPlid());
 
-		if ((layout.getClassNameId() > 0) && (layout.getClassPK() > 0)) {
+		if (layout.isDraftLayout()) {
 			plid = layout.getClassPK();
 		}
 
@@ -177,18 +173,13 @@ public class LayoutClassedModelUsagesDisplayContext {
 			return StringPool.BLANK;
 		}
 
-		if (!_isDraft(layout)) {
+		if (!layout.isDraftLayout()) {
 			return layoutPageTemplateEntry.getName();
 		}
 
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(layoutPageTemplateEntry.getName());
-		sb.append(" (");
-		sb.append(LanguageUtil.get(_themeDisplay.getLocale(), "draft"));
-		sb.append(")");
-
-		return sb.toString();
+		return StringBundler.concat(
+			layoutPageTemplateEntry.getName(), " (",
+			LanguageUtil.get(_themeDisplay.getLocale(), "draft"), ")");
 	}
 
 	public String getLayoutClassedModelUsageTypeLabel(
@@ -318,21 +309,18 @@ public class LayoutClassedModelUsagesDisplayContext {
 				String.valueOf(AssetRendererFactory.TYPE_LATEST));
 		}
 		else {
-			PortletURL portletURL = PortletURLFactoryUtil.create(
-				_renderRequest, layoutClassedModelUsage.getContainerKey(),
-				layoutClassedModelUsage.getPlid(), PortletRequest.RENDER_PHASE);
-
-			portletURL.setParameter(
-				"previewClassNameId",
-				String.valueOf(layoutClassedModelUsage.getClassNameId()));
-			portletURL.setParameter(
-				"previewClassPK",
-				String.valueOf(layoutClassedModelUsage.getClassPK()));
-			portletURL.setParameter(
-				"previewType",
-				String.valueOf(AssetRendererFactory.TYPE_LATEST));
-
-			layoutURL = portletURL.toString();
+			layoutURL = PortletURLBuilder.create(
+				PortletURLFactoryUtil.create(
+					_renderRequest, layoutClassedModelUsage.getContainerKey(),
+					layoutClassedModelUsage.getPlid(),
+					PortletRequest.RENDER_PHASE)
+			).setParameter(
+				"previewClassNameId", layoutClassedModelUsage.getClassNameId()
+			).setParameter(
+				"previewClassPK", layoutClassedModelUsage.getClassPK()
+			).setParameter(
+				"previewType", AssetRendererFactory.TYPE_LATEST
+			).buildString();
 		}
 
 		String portletURLString = HttpUtil.addParameter(
@@ -452,14 +440,10 @@ public class LayoutClassedModelUsagesDisplayContext {
 			return true;
 		}
 
-		if (layoutClassedModelUsage.getType() ==
-				LayoutClassedModelUsageConstants.TYPE_DISPLAY_PAGE_TEMPLATE) {
-
-			return false;
-		}
-
-		if (layoutClassedModelUsage.getType() !=
-				LayoutClassedModelUsageConstants.TYPE_PAGE_TEMPLATE) {
+		if ((layoutClassedModelUsage.getType() ==
+				LayoutClassedModelUsageConstants.TYPE_DISPLAY_PAGE_TEMPLATE) ||
+			(layoutClassedModelUsage.getType() !=
+				LayoutClassedModelUsageConstants.TYPE_PAGE_TEMPLATE)) {
 
 			return false;
 		}
@@ -468,7 +452,7 @@ public class LayoutClassedModelUsagesDisplayContext {
 
 		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
 
-		if ((layout.getClassNameId() > 0) && (layout.getClassPK() > 0)) {
+		if (layout.isDraftLayout()) {
 			plid = layout.getClassPK();
 		}
 
@@ -476,12 +460,9 @@ public class LayoutClassedModelUsagesDisplayContext {
 			LayoutPageTemplateEntryLocalServiceUtil.
 				fetchLayoutPageTemplateEntryByPlid(plid);
 
-		if (layoutPageTemplateEntry == null) {
-			return false;
-		}
-
-		if (layoutPageTemplateEntry.getType() ==
-				LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE) {
+		if ((layoutPageTemplateEntry == null) ||
+			(layoutPageTemplateEntry.getType() ==
+				LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE)) {
 
 			return false;
 		}
@@ -582,16 +563,6 @@ public class LayoutClassedModelUsagesDisplayContext {
 		}
 
 		return 0;
-	}
-
-	private boolean _isDraft(Layout layout) {
-		if (layout.getClassNameId() != PortalUtil.getClassNameId(
-				Layout.class.getName())) {
-
-			return false;
-		}
-
-		return true;
 	}
 
 	private final String _className;

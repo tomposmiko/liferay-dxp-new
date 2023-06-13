@@ -79,7 +79,7 @@ public class PriceEntryResourceImpl extends BasePriceEntryResourceImpl {
 
 		if (commercePriceEntry == null) {
 			throw new NoSuchPriceEntryException(
-				"Unable to find Price Entry with externalReferenceCode: " +
+				"Unable to find price entry with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -110,7 +110,7 @@ public class PriceEntryResourceImpl extends BasePriceEntryResourceImpl {
 
 		if (commercePriceEntry == null) {
 			throw new NoSuchPriceEntryException(
-				"Unable to find Price Entry with externalReferenceCode: " +
+				"Unable to find price entry with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -124,11 +124,11 @@ public class PriceEntryResourceImpl extends BasePriceEntryResourceImpl {
 
 		CommercePriceList commercePriceList =
 			_commercePriceListService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (commercePriceList == null) {
 			throw new NoSuchPriceListException(
-				"Unable to find Price List with externalReferenceCode: " +
+				"Unable to find price list with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -192,7 +192,7 @@ public class PriceEntryResourceImpl extends BasePriceEntryResourceImpl {
 
 		if (commercePriceEntry == null) {
 			throw new NoSuchPriceEntryException(
-				"Unable to find Price Entry with externalReferenceCode: " +
+				"Unable to find price entry with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -210,11 +210,11 @@ public class PriceEntryResourceImpl extends BasePriceEntryResourceImpl {
 
 		CommercePriceList commercePriceList =
 			_commercePriceListService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (commercePriceList == null) {
 			throw new NoSuchPriceListException(
-				"Unable to find Price List with externalReferenceCode: " +
+				"Unable to find price list with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -256,7 +256,7 @@ public class PriceEntryResourceImpl extends BasePriceEntryResourceImpl {
 		}
 		else if (Validator.isNotNull(skuExternalReferenceCode)) {
 			cpInstance = _cpInstanceService.fetchByExternalReferenceCode(
-				serviceContext.getCompanyId(), skuExternalReferenceCode);
+				skuExternalReferenceCode, serviceContext.getCompanyId());
 		}
 
 		if (cpInstance != null) {
@@ -268,7 +268,7 @@ public class PriceEntryResourceImpl extends BasePriceEntryResourceImpl {
 		}
 
 		CommercePriceEntry commercePriceEntry =
-			_commercePriceEntryService.upsertCommercePriceEntry(
+			_commercePriceEntryService.addOrUpdateCommercePriceEntry(
 				priceEntry.getExternalReferenceCode(),
 				GetterUtil.getLong(priceEntry.getId()), cProductId,
 				cpInstanceUuid, commercePriceList.getCommercePriceListId(),
@@ -316,7 +316,7 @@ public class PriceEntryResourceImpl extends BasePriceEntryResourceImpl {
 
 		if (tierPrices != null) {
 			for (TierPrice tierPrice : tierPrices) {
-				TierPriceUtil.upsertCommerceTierPriceEntry(
+				TierPriceUtil.addOrUpdateCommerceTierPriceEntry(
 					_commerceTierPriceEntryService, tierPrice,
 					commercePriceEntry, serviceContext);
 			}

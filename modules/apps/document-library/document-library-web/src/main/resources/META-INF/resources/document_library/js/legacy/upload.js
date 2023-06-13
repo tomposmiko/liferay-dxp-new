@@ -152,7 +152,7 @@ AUI.add(
 			'</span>';
 
 		var TPL_ENTRY_WRAPPER =
-			'<li class="lfr-asset-item data-title="{title}"></li>';
+			'<li class="card-page-item card-page-item-asset" data-title="{title}"></li>';
 
 		var TPL_ERROR_FOLDER = new A.Template(
 			'<span class="lfr-status-success-label">{validFilesLength}</span>',
@@ -177,6 +177,7 @@ AUI.add(
 		var DocumentLibraryUpload = A.Component.create({
 			ATTRS: {
 				appViewEntryTemplates: {
+					// eslint-disable-next-line @liferay/aui/no-one
 					validator: A.one,
 					value: {},
 				},
@@ -202,6 +203,7 @@ AUI.add(
 				},
 
 				entriesContainer: {
+					// eslint-disable-next-line @liferay/aui/no-one
 					validator: A.one,
 					value: {},
 				},
@@ -327,7 +329,7 @@ AUI.add(
 
 				_bindDragDropUI() {
 					var instance = this;
-
+					// eslint-disable-next-line @liferay/aui/no-one
 					var docElement = A.one(DOC.documentElement);
 
 					var entriesContainer = instance._entriesContainer;
@@ -450,7 +452,7 @@ AUI.add(
 
 								parentElement.toggleClass(
 									CSS_ACTIVE_AREA,
-									event.type == 'dragover'
+									event.type === 'dragover'
 								);
 							}
 						},
@@ -495,7 +497,7 @@ AUI.add(
 
 				_createEntriesContainer(searchContainer, displayStyle) {
 					var containerClasses =
-						'display-style-descriptive tabular-list-group';
+						'list-group list-group-notification show-quick-actions-on-hover';
 
 					if (displayStyle === CSS_ICON) {
 						containerClasses = 'card-page card-page-equal-height';
@@ -532,11 +534,11 @@ AUI.add(
 					}
 					else {
 						var entriesContainerSelector =
-							'ul.tabular-list-group:last-of-type';
+							'ul.list-group:last-of-type';
 
 						if (displayStyle === CSS_ICON) {
 							entriesContainerSelector =
-								'ul.list-unstyled:last-of-type';
+								'ul.card-page:last-of-type';
 						}
 
 						entriesContainer =
@@ -571,21 +573,23 @@ AUI.add(
 
 						instance._removeEmptyResultsMessage(searchContainer);
 
-						var searchContainerWrapper = A.one(
-							'div.lfr-search-container-wrapper.main-content-body'
+						var searchContainerWrapper = document.querySelector(
+							'div.lfr-search-container-wrapper'
 						);
 
 						if (searchContainerWrapper) {
-							searchContainerWrapper.show();
+							searchContainerWrapper.style.display = 'block';
+
+							searchContainerWrapper.classList.remove('hide');
 						}
 					}
 
 					entryNode.attr({
 						'data-title': name,
-						id: A.guid(),
+						'id': A.guid(),
 					});
 
-					if (displayStyle == CSS_ICON) {
+					if (displayStyle === CSS_ICON) {
 						var entryNodeWrapper = ANode.create(
 							Lang.sub(TPL_ENTRY_WRAPPER, {
 								title: name,
@@ -619,13 +623,13 @@ AUI.add(
 						(item, index) => {
 							var value = STR_BLANK;
 
-							if (item == STR_NAME) {
+							if (item === STR_NAME) {
 								value = sub(TPL_ENTRY_ROW_TITLE, [name]);
 							}
-							else if (item == STR_SIZE) {
+							else if (item === STR_SIZE) {
 								value = Liferay.Util.formatStorage(size);
 							}
-							else if (item == 'downloads') {
+							else if (item === 'downloads') {
 								value = '0';
 							}
 							else if (index === 0) {
@@ -747,7 +751,7 @@ AUI.add(
 				_displayEntryError(node, message, displayStyle) {
 					var instance = this;
 
-					if (displayStyle == STR_LIST) {
+					if (displayStyle === STR_LIST) {
 						var imageIcon = node.one(SELECTOR_IMAGE_ICON);
 
 						imageIcon.attr(
@@ -798,7 +802,7 @@ AUI.add(
 							if (error === true) {
 								uploadResultClass = CSS_UPLOAD_ERROR;
 							}
-							else if (error == ERROR_RESULTS_MIXED) {
+							else if (error === ERROR_RESULTS_MIXED) {
 								uploadResultClass = CSS_UPLOAD_WARNING;
 							}
 						}
@@ -844,7 +848,7 @@ AUI.add(
 					var displayStyle = instance._displayStyle;
 
 					if (style) {
-						displayStyle = style == displayStyle;
+						displayStyle = style === displayStyle;
 					}
 
 					return displayStyle;
@@ -991,7 +995,7 @@ AUI.add(
 					try {
 						responseData = JSON.parse(responseData);
 					}
-					catch (e) {}
+					catch (error) {}
 
 					if (Lang.isObject(responseData)) {
 						error =
@@ -1026,23 +1030,19 @@ AUI.add(
 				_getUploadURL(folderId) {
 					var instance = this;
 
-					var uploadURL = instance._uploadURL;
-
-					if (!uploadURL) {
-						var redirect = instance.get('redirect');
-
-						uploadURL = instance.get('uploadURL');
-
-						instance._uploadURL = Liferay.Util.addParams(
-							{
-								redirect,
-								ts: Date.now(),
-							},
-							uploadURL
+					if (!instance._uploadURL) {
+						instance._uploadURL = instance._decodeURI(
+							Liferay.Util.addParams(
+								{
+									redirect: instance.get('redirect'),
+									ts: Date.now(),
+								},
+								instance.get('uploadURL')
+							)
 						);
 					}
 
-					return sub(uploadURL, {
+					return sub(instance._uploadURL, {
 						folderId,
 					});
 				},
@@ -1111,8 +1111,9 @@ AUI.add(
 						!!queue &&
 						(queue.queuedFiles.length > 0 ||
 							queue.numberOfUploads > 0 ||
+							// eslint-disable-next-line @liferay/aui/no-object
 							!A.Object.isEmpty(queue.currentFiles)) &&
-						queue._currentState == UploaderQueue.UPLOADING
+						queue._currentState === UploaderQueue.UPLOADING
 					);
 				},
 
@@ -1188,12 +1189,14 @@ AUI.add(
 				_removeEmptyResultsMessage(searchContainer) {
 					var id = searchContainer.getAttribute('id');
 
-					var emptyResultsMessage = A.one(
-						'#' + id + 'EmptyResultsMessage'
+					var emptyResultsMessage = document.getElementById(
+						`${id}EmptyResultsMessage`
 					);
 
 					if (emptyResultsMessage) {
-						emptyResultsMessage.hide();
+						emptyResultsMessage.style.display = 'none';
+
+						emptyResultsMessage.classList.remove('hide');
 					}
 				},
 
@@ -1217,7 +1220,7 @@ AUI.add(
 							);
 						}
 						else {
-							var displayStyleList = displayStyle == STR_LIST;
+							var displayStyleList = displayStyle === STR_LIST;
 
 							var fileEntryId = JSON.parse(event.data)
 								.fileEntryId;
@@ -1229,7 +1232,7 @@ AUI.add(
 							instance._updateFileLink(
 								fileNode,
 								response.message,
-								displayStyleList
+								displayStyle
 							);
 
 							instance._updateFileHiddenInput(
@@ -1386,12 +1389,15 @@ AUI.add(
 					}
 				},
 
-				_updateFileLink(node, id, displayStyleList) {
+				_updateFileLink(node, id, displayStyle) {
 					var instance = this;
 
-					var selector = SELECTOR_ENTRY_LINK;
+					var selector = 'a';
 
-					if (displayStyleList) {
+					if (displayStyle === CSS_ICON) {
+						selector = SELECTOR_ENTRY_LINK;
+					}
+					else if (displayStyle === STR_LIST) {
 						selector =
 							SELECTOR_ENTRY_DISPLAY_STYLE +
 							STR_SPACE +

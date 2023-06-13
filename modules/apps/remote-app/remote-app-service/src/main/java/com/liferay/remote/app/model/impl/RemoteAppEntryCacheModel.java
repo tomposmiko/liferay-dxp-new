@@ -77,7 +77,7 @@ public class RemoteAppEntryCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(49);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -95,10 +95,38 @@ public class RemoteAppEntryCacheModel
 		sb.append(createDate);
 		sb.append(", modifiedDate=");
 		sb.append(modifiedDate);
+		sb.append(", customElementCSSURLs=");
+		sb.append(customElementCSSURLs);
+		sb.append(", customElementHTMLElementName=");
+		sb.append(customElementHTMLElementName);
+		sb.append(", customElementURLs=");
+		sb.append(customElementURLs);
+		sb.append(", description=");
+		sb.append(description);
+		sb.append(", friendlyURLMapping=");
+		sb.append(friendlyURLMapping);
+		sb.append(", iFrameURL=");
+		sb.append(iFrameURL);
+		sb.append(", instanceable=");
+		sb.append(instanceable);
 		sb.append(", name=");
 		sb.append(name);
-		sb.append(", url=");
-		sb.append(url);
+		sb.append(", portletCategoryName=");
+		sb.append(portletCategoryName);
+		sb.append(", properties=");
+		sb.append(properties);
+		sb.append(", sourceCodeURL=");
+		sb.append(sourceCodeURL);
+		sb.append(", type=");
+		sb.append(type);
+		sb.append(", status=");
+		sb.append(status);
+		sb.append(", statusByUserId=");
+		sb.append(statusByUserId);
+		sb.append(", statusByUserName=");
+		sb.append(statusByUserName);
+		sb.append(", statusDate=");
+		sb.append(statusDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -142,6 +170,51 @@ public class RemoteAppEntryCacheModel
 			remoteAppEntryImpl.setModifiedDate(new Date(modifiedDate));
 		}
 
+		if (customElementCSSURLs == null) {
+			remoteAppEntryImpl.setCustomElementCSSURLs("");
+		}
+		else {
+			remoteAppEntryImpl.setCustomElementCSSURLs(customElementCSSURLs);
+		}
+
+		if (customElementHTMLElementName == null) {
+			remoteAppEntryImpl.setCustomElementHTMLElementName("");
+		}
+		else {
+			remoteAppEntryImpl.setCustomElementHTMLElementName(
+				customElementHTMLElementName);
+		}
+
+		if (customElementURLs == null) {
+			remoteAppEntryImpl.setCustomElementURLs("");
+		}
+		else {
+			remoteAppEntryImpl.setCustomElementURLs(customElementURLs);
+		}
+
+		if (description == null) {
+			remoteAppEntryImpl.setDescription("");
+		}
+		else {
+			remoteAppEntryImpl.setDescription(description);
+		}
+
+		if (friendlyURLMapping == null) {
+			remoteAppEntryImpl.setFriendlyURLMapping("");
+		}
+		else {
+			remoteAppEntryImpl.setFriendlyURLMapping(friendlyURLMapping);
+		}
+
+		if (iFrameURL == null) {
+			remoteAppEntryImpl.setIFrameURL("");
+		}
+		else {
+			remoteAppEntryImpl.setIFrameURL(iFrameURL);
+		}
+
+		remoteAppEntryImpl.setInstanceable(instanceable);
+
 		if (name == null) {
 			remoteAppEntryImpl.setName("");
 		}
@@ -149,11 +222,49 @@ public class RemoteAppEntryCacheModel
 			remoteAppEntryImpl.setName(name);
 		}
 
-		if (url == null) {
-			remoteAppEntryImpl.setUrl("");
+		if (portletCategoryName == null) {
+			remoteAppEntryImpl.setPortletCategoryName("");
 		}
 		else {
-			remoteAppEntryImpl.setUrl(url);
+			remoteAppEntryImpl.setPortletCategoryName(portletCategoryName);
+		}
+
+		if (properties == null) {
+			remoteAppEntryImpl.setProperties("");
+		}
+		else {
+			remoteAppEntryImpl.setProperties(properties);
+		}
+
+		if (sourceCodeURL == null) {
+			remoteAppEntryImpl.setSourceCodeURL("");
+		}
+		else {
+			remoteAppEntryImpl.setSourceCodeURL(sourceCodeURL);
+		}
+
+		if (type == null) {
+			remoteAppEntryImpl.setType("");
+		}
+		else {
+			remoteAppEntryImpl.setType(type);
+		}
+
+		remoteAppEntryImpl.setStatus(status);
+		remoteAppEntryImpl.setStatusByUserId(statusByUserId);
+
+		if (statusByUserName == null) {
+			remoteAppEntryImpl.setStatusByUserName("");
+		}
+		else {
+			remoteAppEntryImpl.setStatusByUserName(statusByUserName);
+		}
+
+		if (statusDate == Long.MIN_VALUE) {
+			remoteAppEntryImpl.setStatusDate(null);
+		}
+		else {
+			remoteAppEntryImpl.setStatusDate(new Date(statusDate));
 		}
 
 		remoteAppEntryImpl.resetOriginalValues();
@@ -162,7 +273,9 @@ public class RemoteAppEntryCacheModel
 	}
 
 	@Override
-	public void readExternal(ObjectInput objectInput) throws IOException {
+	public void readExternal(ObjectInput objectInput)
+		throws ClassNotFoundException, IOException {
+
 		mvccVersion = objectInput.readLong();
 		uuid = objectInput.readUTF();
 
@@ -174,8 +287,25 @@ public class RemoteAppEntryCacheModel
 		userName = objectInput.readUTF();
 		createDate = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
+		customElementCSSURLs = (String)objectInput.readObject();
+		customElementHTMLElementName = objectInput.readUTF();
+		customElementURLs = (String)objectInput.readObject();
+		description = (String)objectInput.readObject();
+		friendlyURLMapping = objectInput.readUTF();
+		iFrameURL = objectInput.readUTF();
+
+		instanceable = objectInput.readBoolean();
 		name = objectInput.readUTF();
-		url = objectInput.readUTF();
+		portletCategoryName = objectInput.readUTF();
+		properties = (String)objectInput.readObject();
+		sourceCodeURL = objectInput.readUTF();
+		type = objectInput.readUTF();
+
+		status = objectInput.readInt();
+
+		statusByUserId = objectInput.readLong();
+		statusByUserName = objectInput.readUTF();
+		statusDate = objectInput.readLong();
 	}
 
 	@Override
@@ -205,6 +335,50 @@ public class RemoteAppEntryCacheModel
 		objectOutput.writeLong(createDate);
 		objectOutput.writeLong(modifiedDate);
 
+		if (customElementCSSURLs == null) {
+			objectOutput.writeObject("");
+		}
+		else {
+			objectOutput.writeObject(customElementCSSURLs);
+		}
+
+		if (customElementHTMLElementName == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(customElementHTMLElementName);
+		}
+
+		if (customElementURLs == null) {
+			objectOutput.writeObject("");
+		}
+		else {
+			objectOutput.writeObject(customElementURLs);
+		}
+
+		if (description == null) {
+			objectOutput.writeObject("");
+		}
+		else {
+			objectOutput.writeObject(description);
+		}
+
+		if (friendlyURLMapping == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(friendlyURLMapping);
+		}
+
+		if (iFrameURL == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(iFrameURL);
+		}
+
+		objectOutput.writeBoolean(instanceable);
+
 		if (name == null) {
 			objectOutput.writeUTF("");
 		}
@@ -212,12 +386,46 @@ public class RemoteAppEntryCacheModel
 			objectOutput.writeUTF(name);
 		}
 
-		if (url == null) {
+		if (portletCategoryName == null) {
 			objectOutput.writeUTF("");
 		}
 		else {
-			objectOutput.writeUTF(url);
+			objectOutput.writeUTF(portletCategoryName);
 		}
+
+		if (properties == null) {
+			objectOutput.writeObject("");
+		}
+		else {
+			objectOutput.writeObject(properties);
+		}
+
+		if (sourceCodeURL == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(sourceCodeURL);
+		}
+
+		if (type == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(type);
+		}
+
+		objectOutput.writeInt(status);
+
+		objectOutput.writeLong(statusByUserId);
+
+		if (statusByUserName == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(statusByUserName);
+		}
+
+		objectOutput.writeLong(statusDate);
 	}
 
 	public long mvccVersion;
@@ -228,7 +436,21 @@ public class RemoteAppEntryCacheModel
 	public String userName;
 	public long createDate;
 	public long modifiedDate;
+	public String customElementCSSURLs;
+	public String customElementHTMLElementName;
+	public String customElementURLs;
+	public String description;
+	public String friendlyURLMapping;
+	public String iFrameURL;
+	public boolean instanceable;
 	public String name;
-	public String url;
+	public String portletCategoryName;
+	public String properties;
+	public String sourceCodeURL;
+	public String type;
+	public int status;
+	public long statusByUserId;
+	public String statusByUserName;
+	public long statusDate;
 
 }

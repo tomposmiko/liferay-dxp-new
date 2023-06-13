@@ -68,7 +68,9 @@ public class MessageBoardMessage implements Serializable {
 			MessageBoardMessage.class, json);
 	}
 
-	@Schema
+	@Schema(
+		description = "Block of actions allowed by the user making the request."
+	)
 	@Valid
 	public Map<String, Map<String, String>> getActions() {
 		return actions;
@@ -94,7 +96,9 @@ public class MessageBoardMessage implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "Block of actions allowed by the user making the request."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, Map<String, String>> actions;
 
@@ -217,7 +221,9 @@ public class MessageBoardMessage implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
-	@Schema
+	@Schema(
+		description = "The message's creator statistics (rank, join date, number of posts, ...)"
+	)
 	@Valid
 	public CreatorStatistics getCreatorStatistics() {
 		return creatorStatistics;
@@ -243,11 +249,15 @@ public class MessageBoardMessage implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The message's creator statistics (rank, join date, number of posts, ...)"
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected CreatorStatistics creatorStatistics;
 
-	@Schema
+	@Schema(
+		description = "A list of the custom fields associated with the blog post."
+	)
 	@Valid
 	public CustomField[] getCustomFields() {
 		return customFields;
@@ -272,7 +282,9 @@ public class MessageBoardMessage implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A list of the custom fields associated with the blog post."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected CustomField[] customFields;
 
@@ -367,6 +379,34 @@ public class MessageBoardMessage implements Serializable {
 	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String encodingFormat;
+
+	@Schema(description = "The message's external reference code.")
+	public String getExternalReferenceCode() {
+		return externalReferenceCode;
+	}
+
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		this.externalReferenceCode = externalReferenceCode;
+	}
+
+	@JsonIgnore
+	public void setExternalReferenceCode(
+		UnsafeSupplier<String, Exception> externalReferenceCodeUnsafeSupplier) {
+
+		try {
+			externalReferenceCode = externalReferenceCodeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(description = "The message's external reference code.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String externalReferenceCode;
 
 	@Schema
 	public String getFriendlyUrlPath() {
@@ -478,7 +518,9 @@ public class MessageBoardMessage implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] keywords;
 
-	@Schema
+	@Schema(
+		description = "The ID of the Message Board Section to which this message is scoped."
+	)
 	public Long getMessageBoardSectionId() {
 		return messageBoardSectionId;
 	}
@@ -502,7 +544,9 @@ public class MessageBoardMessage implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The ID of the Message Board Section to which this message is scoped."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long messageBoardSectionId;
 
@@ -602,7 +646,7 @@ public class MessageBoardMessage implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfMessageBoardMessages;
 
-	@Schema
+	@Schema(description = "The ID of the message's parent, if it exists.")
 	public Long getParentMessageBoardMessageId() {
 		return parentMessageBoardMessageId;
 	}
@@ -630,11 +674,11 @@ public class MessageBoardMessage implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The ID of the message's parent, if it exists.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long parentMessageBoardMessageId;
 
-	@Schema
+	@Schema(description = "A list of related contents to this message.")
 	@Valid
 	public RelatedContent[] getRelatedContents() {
 		return relatedContents;
@@ -660,7 +704,7 @@ public class MessageBoardMessage implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A list of related contents to this message.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected RelatedContent[] relatedContents;
 
@@ -726,7 +770,37 @@ public class MessageBoardMessage implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
-	@Schema
+	@Schema(description = "The message's status.")
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	@JsonIgnore
+	public void setStatus(
+		UnsafeSupplier<String, Exception> statusUnsafeSupplier) {
+
+		try {
+			status = statusUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(description = "The message's status.")
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected String status;
+
+	@Schema(
+		description = "A flag that indicates whether the user making the requests is subscribed to this message."
+	)
 	public Boolean getSubscribed() {
 		return subscribed;
 	}
@@ -750,7 +824,9 @@ public class MessageBoardMessage implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether the user making the requests is subscribed to this message."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean subscribed;
 
@@ -952,6 +1028,20 @@ public class MessageBoardMessage implements Serializable {
 			sb.append("\"");
 		}
 
+		if (externalReferenceCode != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"externalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(externalReferenceCode));
+
+			sb.append("\"");
+		}
+
 		if (friendlyUrlPath != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -1102,6 +1192,20 @@ public class MessageBoardMessage implements Serializable {
 			sb.append("\"siteId\": ");
 
 			sb.append(siteId);
+		}
+
+		if (status != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"status\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(status));
+
+			sb.append("\"");
 		}
 
 		if (subscribed != null) {

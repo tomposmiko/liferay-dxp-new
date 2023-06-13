@@ -1,15 +1,15 @@
 .alloy-editor-container {
 	.alloy-editor {
 		&.ae-placeholder {
-			color: #2b4259;
-
-			&:not(:focus) {
-				background: transparent;
-				border-left-color: #dbdde1;
-				color: #b0b4bb;
+			~ .alloy-editor-placeholder {
+				color: #2b4259;
+				&:not(:focus) {
+					background: transparent;
+					border-left-color: #dbdde1;
+					color: #b0b4bb;
+				}
 			}
-
-			&.readonly {
+			&.readonly ~ .alloy-editor-placeholder {
 				color: #ccc;
 			}
 		}
@@ -22,7 +22,7 @@
 	}
 }
 
-.has-error .alloy-editor-container .alloy-editor {
+.has-error .alloy-editor-container .alloy-editor.alloy-editor-placeholder {
 	&.ae-placeholder:not(:focus) {
 		border-left-color: #cc6677;
 	}

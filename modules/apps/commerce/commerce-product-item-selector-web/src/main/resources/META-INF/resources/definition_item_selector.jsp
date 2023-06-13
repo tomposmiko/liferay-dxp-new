@@ -62,7 +62,7 @@ PortletURL portletURL = cpDefinitionItemSelectorViewDisplayContext.getPortletURL
 	</liferay-frontend:management-bar-filters>
 </liferay-frontend:management-bar>
 
-<div class="container-fluid-1280" id="<portlet:namespace />cpDefinitionSelectorWrapper">
+<div class="container-fluid container-fluid-max-xl" id="<portlet:namespace />cpDefinitionSelectorWrapper">
 	<liferay-ui:search-container
 		id="cpDefinitions"
 		searchContainer="<%= cpDefinitionSearchContainer %>"
@@ -84,7 +84,7 @@ PortletURL portletURL = cpDefinitionItemSelectorViewDisplayContext.getPortletURL
 
 			CPType cpType = cpDefinitionItemSelectorViewDisplayContext.getCPType(cpDefinition.getProductTypeName());
 
-			String thumbnailSrc = cpDefinition.getDefaultImageThumbnailSrc();
+			String thumbnailSrc = cpDefinition.getDefaultImageThumbnailSrc(CommerceAccountConstants.ACCOUNT_ID_GUEST);
 			%>
 
 			<c:choose>
@@ -103,7 +103,7 @@ PortletURL portletURL = cpDefinitionItemSelectorViewDisplayContext.getPortletURL
 			</c:choose>
 
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="name"
 			>
 				<div class="commerce-product-definition-title" data-id="<%= cpDefinition.getCPDefinitionId() %>">
@@ -112,33 +112,33 @@ PortletURL portletURL = cpDefinitionItemSelectorViewDisplayContext.getPortletURL
 			</liferay-ui:search-container-column-text>
 
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="type"
 			>
 				<%= HtmlUtil.escapeAttribute(cpType.getLabel(locale)) %>
 			</liferay-ui:search-container-column-text>
 
 			<liferay-ui:search-container-column-text
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="sku"
 				value="<%= HtmlUtil.escape(cpDefinitionItemSelectorViewDisplayContext.getSku(cpDefinition, locale)) %>"
 			/>
 
 			<liferay-ui:search-container-column-date
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="modified-date"
 				property="modifiedDate"
 			/>
 
 			<liferay-ui:search-container-column-status
-				cssClass="table-cell-content"
+				cssClass="table-cell-expand"
 				name="status"
 				status="<%= cpDefinition.getStatus() %>"
 			/>
 
 			<c:if test="<%= cpDefinitionItemSelectorViewDisplayContext.isSingleSelection() %>">
 				<liferay-ui:search-container-column-text
-					cssClass="table-cell-content"
+					cssClass="table-cell-expand"
 				>
 					<aui:button cssClass="selector-button" value="choose" />
 				</liferay-ui:search-container-column-text>
@@ -180,27 +180,4 @@ PortletURL portletURL = cpDefinitionItemSelectorViewDisplayContext.getPortletURL
 			);
 		</aui:script>
 	</c:when>
-	<c:otherwise>
-		<aui:script use="liferay-search-container">
-			var cpDefinitionSelectorWrapper = A.one(
-				'#<portlet:namespace />cpDefinitionSelectorWrapper'
-			);
-
-			var searchContainer = Liferay.SearchContainer.get(
-				'<portlet:namespace />cpDefinitions'
-			);
-
-			searchContainer.on('rowToggled', function (event) {
-				Liferay.Util.getOpener().Liferay.fire(
-					'<%= HtmlUtil.escapeJS(itemSelectedEventName) %>',
-					{
-						data: Liferay.Util.listCheckedExcept(
-							cpDefinitionSelectorWrapper,
-							'<portlet:namespace />allRowIds'
-						),
-					}
-				);
-			});
-		</aui:script>
-	</c:otherwise>
 </c:choose>

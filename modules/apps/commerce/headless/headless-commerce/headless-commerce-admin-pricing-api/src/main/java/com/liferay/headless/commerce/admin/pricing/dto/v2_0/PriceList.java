@@ -98,7 +98,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, Map<String, String>> actions;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getActive() {
 		return active;
 	}
@@ -126,7 +126,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean active;
 
-	@Schema(example = "admin")
+	@Schema
 	public String getAuthor() {
 		return author;
 	}
@@ -154,7 +154,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String author;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getCatalogBasePriceList() {
 		return catalogBasePriceList;
 	}
@@ -183,7 +183,7 @@ public class PriceList implements Serializable {
 	protected Boolean catalogBasePriceList;
 
 	@DecimalMin("0")
-	@Schema(example = "23130")
+	@Schema
 	public Long getCatalogId() {
 		return catalogId;
 	}
@@ -212,7 +212,7 @@ public class PriceList implements Serializable {
 	@NotNull
 	protected Long catalogId;
 
-	@Schema(example = "catalog")
+	@Schema
 	public String getCatalogName() {
 		return catalogName;
 	}
@@ -240,7 +240,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String catalogName;
 
-	@Schema(example = "2017-07-21")
+	@Schema
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -268,7 +268,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date createDate;
 
-	@Schema(example = "EUR")
+	@Schema
 	public String getCurrencyCode() {
 		return currencyCode;
 	}
@@ -326,7 +326,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, ?> customFields;
 
-	@Schema(example = "2017-07-21")
+	@Schema
 	public Date getDisplayDate() {
 		return displayDate;
 	}
@@ -354,7 +354,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date displayDate;
 
-	@Schema(example = "2017-08-21")
+	@Schema
 	public Date getExpirationDate() {
 		return expirationDate;
 	}
@@ -382,7 +382,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date expirationDate;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -411,7 +411,7 @@ public class PriceList implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -437,7 +437,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@Schema(example = "Laptops, Beverages")
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -464,7 +464,7 @@ public class PriceList implements Serializable {
 	@NotEmpty
 	protected String name;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getNetPrice() {
 		return netPrice;
 	}
@@ -492,7 +492,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean netPrice;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getNeverExpire() {
 		return neverExpire;
 	}
@@ -521,7 +521,7 @@ public class PriceList implements Serializable {
 	protected Boolean neverExpire;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getParentPriceListId() {
 		return parentPriceListId;
 	}
@@ -702,6 +702,38 @@ public class PriceList implements Serializable {
 
 	@Schema
 	@Valid
+	public PriceListOrderType[] getPriceListOrderTypes() {
+		return priceListOrderTypes;
+	}
+
+	public void setPriceListOrderTypes(
+		PriceListOrderType[] priceListOrderTypes) {
+
+		this.priceListOrderTypes = priceListOrderTypes;
+	}
+
+	@JsonIgnore
+	public void setPriceListOrderTypes(
+		UnsafeSupplier<PriceListOrderType[], Exception>
+			priceListOrderTypesUnsafeSupplier) {
+
+		try {
+			priceListOrderTypes = priceListOrderTypesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected PriceListOrderType[] priceListOrderTypes;
+
+	@Schema
+	@Valid
 	public PriceModifier[] getPriceModifiers() {
 		return priceModifiers;
 	}
@@ -730,7 +762,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected PriceModifier[] priceModifiers;
 
-	@Schema(example = "1.2")
+	@Schema
 	public Double getPriority() {
 		return priority;
 	}
@@ -758,7 +790,7 @@ public class PriceList implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Double priority;
 
-	@Schema(example = "price-list, promotion, contract")
+	@Schema
 	@Valid
 	public Type getType() {
 		return type;
@@ -1149,6 +1181,26 @@ public class PriceList implements Serializable {
 				sb.append(String.valueOf(priceListDiscounts[i]));
 
 				if ((i + 1) < priceListDiscounts.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		if (priceListOrderTypes != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"priceListOrderTypes\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < priceListOrderTypes.length; i++) {
+				sb.append(String.valueOf(priceListOrderTypes[i]));
+
+				if ((i + 1) < priceListOrderTypes.length) {
 					sb.append(", ");
 				}
 			}

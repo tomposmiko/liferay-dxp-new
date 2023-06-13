@@ -17,9 +17,9 @@
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
-taglib uri="http://liferay.com/tld/ddm" prefix="liferay-ddm" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
-taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %>
+taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
+taglib uri="http://liferay.com/tld/template" prefix="liferay-template" %>
 
 <%@ page import="com.liferay.portal.kernel.util.Constants" %><%@
 page import="com.liferay.portal.search.similar.results.web.internal.configuration.SimilarResultsPortletInstanceConfiguration" %><%@
@@ -57,7 +57,7 @@ SimilarResultsPortletPreferences similarResultsPortletPreferences = new SimilarR
 				label="display-settings"
 			>
 				<div class="display-template">
-					<liferay-ddm:template-selector
+					<liferay-template:template-selector
 						className="<%= SimilarResultsDocumentDisplayContext.class.getName() %>"
 						displayStyle="<%= similarResultsPortletInstanceConfiguration.displayStyle() %>"
 						displayStyleGroupId="<%= similarResultsDisplayContext.getDisplayStyleGroupId() %>"
@@ -115,7 +115,7 @@ SimilarResultsPortletPreferences similarResultsPortletPreferences = new SimilarR
 					<aui:validator name="min">1</aui:validator>
 				</aui:input>
 
-				<aui:input helpMessage="federated-search-key-help" label="federated-search-key" name="<%= PortletPreferencesJspUtil.getInputName(similarResultsPortletPreferences.PREFERENCE_KEY_FEDERATED_SEARCH_KEY) %>" type="text" value="<%= similarResultsPortletPreferences.getFederatedSearchKey() %>" />
+				<aui:input helpMessage="enter-the-key-of-an-alternate-search-this-widget-is-participating-on" label="federated-search-key" name="<%= PortletPreferencesJspUtil.getInputName(similarResultsPortletPreferences.PREFERENCE_KEY_FEDERATED_SEARCH_KEY) %>" type="text" value="<%= similarResultsPortletPreferences.getFederatedSearchKey() %>" />
 			</liferay-frontend:fieldset>
 		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>

@@ -22,7 +22,11 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Alessio Antonio Rendina
@@ -52,7 +56,7 @@ public class CommerceAccountUpgradeProcess extends UpgradeProcess {
 						indexMetadata.getIndexName(), tableName));
 			}
 
-			if (!hasIndex(tableName, indexMetadata.getIndexName())) {
+			if (!_tableHasIndex(tableName, indexMetadata.getIndexName())) {
 				runSQL(indexMetadata.getCreateSQL(null));
 			}
 			else if (_log.isInfoEnabled()) {
@@ -73,7 +77,7 @@ public class CommerceAccountUpgradeProcess extends UpgradeProcess {
 					"Dropping index %s from table %s", indexName, tableName));
 		}
 
-		if (hasIndex(tableName, indexName)) {
+		if (_tableHasIndex(tableName, indexName)) {
 			runSQL(
 				StringBundler.concat(
 					"drop index ", indexName, " on ", tableName));
@@ -86,6 +90,31 @@ public class CommerceAccountUpgradeProcess extends UpgradeProcess {
 						indexName, tableName));
 			}
 		}
+	}
+
+	private boolean _tableHasIndex(String tableName, String indexName)
+		throws Exception {
+
+		DatabaseMetaData metadata = connection.getMetaData();
+
+		try (ResultSet resultSet = metadata.getIndexInfo(
+				null, null, tableName, false, false)) {
+
+			while (resultSet.next()) {
+				String curIndexName = resultSet.getString("index_name");
+
+				if (Objects.equals(indexName, curIndexName)) {
+					return true;
+				}
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+		}
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

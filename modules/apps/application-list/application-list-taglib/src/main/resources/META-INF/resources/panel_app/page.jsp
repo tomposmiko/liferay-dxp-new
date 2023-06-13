@@ -23,8 +23,8 @@ String url = (String)request.getAttribute("liferay-application-list:panel-app:ur
 %>
 
 <c:if test="<%= Validator.isNotNull(url) %>">
-	<li class="<%= active ? "active" : StringPool.BLANK %>" role="presentation">
-		<aui:a ariaRole="menuitem" data='<%= (Map<String, Object>)request.getAttribute("liferay-application-list:panel-app:data") %>' href="<%= url %>" id='<%= (String)request.getAttribute("liferay-application-list:panel-app:id") %>'>
+	<li class="<%= active ? "active" : StringPool.BLANK %> nav-item" role="presentation">
+		<aui:a ariaRole="menuitem" cssClass="nav-link" data='<%= (Map<String, Object>)request.getAttribute("liferay-application-list:panel-app:data") %>' href="<%= url %>" id='<%= (String)request.getAttribute("liferay-application-list:panel-app:id") %>'>
 			<%= (String)request.getAttribute("liferay-application-list:panel-app:label") %>
 
 			<c:if test="<%= notificationsCount > 0 %>">

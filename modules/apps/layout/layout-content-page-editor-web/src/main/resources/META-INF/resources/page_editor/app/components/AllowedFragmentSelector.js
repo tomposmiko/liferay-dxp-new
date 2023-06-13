@@ -17,7 +17,7 @@ import {Treeview} from 'frontend-js-components-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useState} from 'react';
 
-import {useSelector} from '../store/index';
+import {useSelector} from '../contexts/StoreContext';
 import AllowedFragmentTreeNode from './AllowedFragmentTreeNode';
 
 const toFragmentEntryKeysArray = (collections) => {
@@ -92,7 +92,8 @@ const AllowedFragmentSelector = ({dropZoneConfig, onSelectedFragment}) => {
 	);
 
 	const initialAllowNewFragmentEntries =
-		dropZoneConfig.allowNewFragmentEntries == undefined
+		dropZoneConfig.allowNewFragmentEntries === undefined ||
+		dropZoneConfig.allowNewFragmentEntries === null
 			? true
 			: dropZoneConfig.allowNewFragmentEntries;
 
@@ -146,7 +147,7 @@ const AllowedFragmentSelector = ({dropZoneConfig, onSelectedFragment}) => {
 				<div className="mb-2 page-editor__allowed-fragment__tree">
 					<Treeview
 						NodeComponent={AllowedFragmentTreeNode}
-						filterQuery={filter}
+						filter={filter}
 						inheritSelection
 						initialSelectedNodeIds={[...fragmentEntryKeys]}
 						nodes={nodes}

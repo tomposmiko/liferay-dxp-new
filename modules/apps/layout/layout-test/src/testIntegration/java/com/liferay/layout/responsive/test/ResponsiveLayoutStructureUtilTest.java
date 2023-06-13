@@ -109,8 +109,8 @@ public class ResponsiveLayoutStructureUtilTest {
 				TestPropsValues.getUserId(), _group.getGroupId(), 0,
 				StringUtil.randomString(), StringUtil.randomString(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-				RandomTestUtil.randomString(), "{fieldSets: []}", 0,
-				FragmentConstants.TYPE_COMPONENT,
+				RandomTestUtil.randomString(), false, "{fieldSets: []}", null,
+				0, FragmentConstants.TYPE_COMPONENT,
 				WorkflowConstants.STATUS_APPROVED, serviceContext);
 
 		_fragmentEntryLink = _fragmentEntryLinkService.addFragmentEntryLink(
@@ -127,9 +127,9 @@ public class ResponsiveLayoutStructureUtilTest {
 		_themeDisplay.setLanguageId(
 			LanguageUtil.getLanguageId(LocaleUtil.getDefault()));
 		_themeDisplay.setLayout(_layout);
-		_themeDisplay.setLayoutSet(_group.getPublicLayoutSet());
 		_themeDisplay.setLayoutTypePortlet(
 			(LayoutTypePortlet)_layout.getLayoutType());
+		_themeDisplay.setLayoutSet(_group.getPublicLayoutSet());
 		_themeDisplay.setLocale(LocaleUtil.US);
 		_themeDisplay.setLookAndFeel(
 			_layout.getTheme(), _layout.getColorScheme());
@@ -178,10 +178,8 @@ public class ResponsiveLayoutStructureUtilTest {
 
 		httpServletRequest.setMethod(HttpMethods.GET);
 
-		MockHttpServletResponse httpServletResponse =
-			new MockHttpServletResponse();
-
-		_layout.includeLayoutContent(httpServletRequest, httpServletResponse);
+		_layout.includeLayoutContent(
+			httpServletRequest, new MockHttpServletResponse());
 
 		String content = String.valueOf(
 			(StringBundler)httpServletRequest.getAttribute(
@@ -191,12 +189,6 @@ public class ResponsiveLayoutStructureUtilTest {
 			if (viewportSize.equals(ViewportSize.DESKTOP)) {
 				continue;
 			}
-
-			String alignClassName =
-				"align-items" + viewportSize.getCssClassPrefix();
-
-			Assert.assertThat(
-				content, CoreMatchers.containsString(alignClassName));
 
 			String flexClassName =
 				"flex" + viewportSize.getCssClassPrefix() + "row";

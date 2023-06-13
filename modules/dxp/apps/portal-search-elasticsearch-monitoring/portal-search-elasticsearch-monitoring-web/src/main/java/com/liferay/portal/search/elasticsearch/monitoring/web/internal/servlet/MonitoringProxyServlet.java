@@ -63,7 +63,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.search.elasticsearch.monitoring.web.internal.configuration.MonitoringConfiguration",
-	immediate = true,
+	enabled = false, immediate = true,
 	property = {
 		"osgi.http.whiteboard.context.select=portal-search-elasticsearch-monitoring",
 		"osgi.http.whiteboard.servlet.name=com.liferay.portal.search.elasticsearch.monitoring.web.internal.servlet.MonitoringProxyServlet",
@@ -140,14 +140,14 @@ public class MonitoringProxyServlet extends ProxyServlet {
 
 	@Override
 	protected void copyRequestHeaders(
-		HttpServletRequest httpServletRequest, HttpRequest proxyRequest) {
+		HttpServletRequest httpServletRequest, HttpRequest proxyHttpRequest) {
 
-		super.copyRequestHeaders(httpServletRequest, proxyRequest);
+		super.copyRequestHeaders(httpServletRequest, proxyHttpRequest);
 
-		proxyRequest.addHeader(
+		proxyHttpRequest.addHeader(
 			HttpHeaders.AUTHORIZATION, getShieldAuthorization());
 
-		proxyRequest.removeHeaders(HttpHeaders.ACCEPT_ENCODING);
+		proxyHttpRequest.removeHeaders(HttpHeaders.ACCEPT_ENCODING);
 	}
 
 	@Override
@@ -184,7 +184,9 @@ public class MonitoringProxyServlet extends ProxyServlet {
 		}
 		catch (NullPointerException nullPointerException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn("Unable to initialize monitoring proxy servlet");
+				_log.warn(
+					"Unable to initialize monitoring proxy servlet",
+					nullPointerException);
 			}
 		}
 	}
@@ -235,6 +237,6 @@ public class MonitoringProxyServlet extends ProxyServlet {
 	private static final Log _log = LogFactoryUtil.getLog(
 		MonitoringProxyServlet.class);
 
-	private MonitoringConfiguration _monitoringConfiguration;
+	private volatile MonitoringConfiguration _monitoringConfiguration;
 
 }

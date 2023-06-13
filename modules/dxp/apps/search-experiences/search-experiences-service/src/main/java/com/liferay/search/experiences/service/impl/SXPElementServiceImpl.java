@@ -25,6 +25,7 @@ import com.liferay.search.experiences.constants.SXPActionKeys;
 import com.liferay.search.experiences.constants.SXPConstants;
 import com.liferay.search.experiences.exception.SXPElementReadOnlyException;
 import com.liferay.search.experiences.model.SXPElement;
+import com.liferay.search.experiences.service.SXPElementLocalService;
 import com.liferay.search.experiences.service.base.SXPElementServiceBaseImpl;
 
 import java.util.Locale;
@@ -37,6 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  */
 @Component(
+	enabled = false,
 	property = {
 		"json.web.service.context.name=sxp",
 		"json.web.service.context.path=SXPElement"
@@ -48,8 +50,7 @@ public class SXPElementServiceImpl extends SXPElementServiceBaseImpl {
 	@Override
 	public SXPElement addSXPElement(
 			Map<Locale, String> descriptionMap, String elementDefinitionJSON,
-			boolean readOnly, String schemaVersion,
-			Map<Locale, String> titleMap, int type,
+			boolean readOnly, Map<Locale, String> titleMap, int type,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -57,8 +58,8 @@ public class SXPElementServiceImpl extends SXPElementServiceBaseImpl {
 			getPermissionChecker(), null, SXPActionKeys.ADD_SXP_ELEMENT);
 
 		return sxpElementLocalService.addSXPElement(
-			null, getUserId(), descriptionMap, elementDefinitionJSON, readOnly,
-			schemaVersion, titleMap, type, serviceContext);
+			getUserId(), descriptionMap, elementDefinitionJSON, readOnly,
+			titleMap, type, serviceContext);
 	}
 
 	@Override
@@ -80,7 +81,7 @@ public class SXPElementServiceImpl extends SXPElementServiceBaseImpl {
 
 	@Override
 	public SXPElement getSXPElement(long sxpElementId) throws PortalException {
-		SXPElement sxpElement = sxpElementLocalService.getSXPElement(
+		SXPElement sxpElement = _sxpElementLocalService.getSXPElement(
 			sxpElementId);
 
 		_sxpElementModelResourcePermission.check(
@@ -92,20 +93,23 @@ public class SXPElementServiceImpl extends SXPElementServiceBaseImpl {
 	@Override
 	public SXPElement updateSXPElement(
 			long sxpElementId, Map<Locale, String> descriptionMap,
-			String elementDefinitionJSON, String schemaVersion, boolean hidden,
+			String elementDefinitionJSON, boolean hidden,
 			Map<Locale, String> titleMap, ServiceContext serviceContext)
 		throws PortalException {
 
 		_sxpElementModelResourcePermission.check(
 			getPermissionChecker(), sxpElementId, ActionKeys.UPDATE);
 
-		return sxpElementLocalService.updateSXPElement(
+		return _sxpElementLocalService.updateSXPElement(
 			getUserId(), sxpElementId, descriptionMap, elementDefinitionJSON,
-			hidden, schemaVersion, titleMap, serviceContext);
+			hidden, titleMap, serviceContext);
 	}
 
 	@Reference(target = "(resource.name=" + SXPConstants.RESOURCE_NAME + ")")
 	private volatile PortletResourcePermission _portletResourcePermission;
+
+	@Reference
+	private SXPElementLocalService _sxpElementLocalService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.search.experiences.model.SXPElement)"

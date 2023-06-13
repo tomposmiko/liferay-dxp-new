@@ -21,6 +21,7 @@ import com.liferay.fragment.processor.FragmentEntryProcessor;
 import com.liferay.fragment.processor.FragmentEntryProcessorContext;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
+import com.liferay.petra.io.DummyWriter;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -122,14 +123,19 @@ public class FreeMarkerFragmentEntryProcessor
 		JSONObject configurationValuesJSONObject =
 			_fragmentEntryConfigurationParser.getConfigurationJSONObject(
 				fragmentEntryLink.getConfiguration(),
-				fragmentEntryLink.getEditableValues());
+				fragmentEntryLink.getEditableValues(),
+				fragmentEntryProcessorContext.getLocale());
+		String fragmentEntryLinkNamespace = _getFragmentEntryLinkNamespace(
+			fragmentEntryLink);
 
 		template.putAll(
 			HashMapBuilder.<String, Object>put(
 				"configuration", configurationValuesJSONObject
 			).put(
-				"fragmentEntryLinkNamespace",
-				_getFragmentEntryLinkNamespace(fragmentEntryLink)
+				"fragmentElementId",
+				fragmentEntryProcessorContext.getFragmentElementId()
+			).put(
+				"fragmentEntryLinkNamespace", fragmentEntryLinkNamespace
 			).putAll(
 				_fragmentEntryConfigurationParser.getContextObjects(
 					configurationValuesJSONObject,
@@ -164,7 +170,9 @@ public class FreeMarkerFragmentEntryProcessor
 					FreeMarkerFragmentEntryProcessorConfiguration.class,
 					CompanyThreadLocal.getCompanyId());
 
-		if (!freeMarkerFragmentEntryProcessorConfiguration.enable()) {
+		if (!freeMarkerFragmentEntryProcessorConfiguration.enable() ||
+			!_isFreemarkerTemplate(html)) {
+
 			return;
 		}
 
@@ -200,6 +208,8 @@ public class FreeMarkerFragmentEntryProcessor
 					HashMapBuilder.<String, Object>put(
 						"configuration", configurationDefaultValuesJSONObject
 					).put(
+						"fragmentElementId", StringPool.BLANK
+					).put(
 						"fragmentEntryLinkNamespace", StringPool.BLANK
 					).putAll(
 						_fragmentEntryConfigurationParser.getContextObjects(
@@ -211,7 +221,7 @@ public class FreeMarkerFragmentEntryProcessor
 
 				template.prepare(httpServletRequest);
 
-				template.processTemplate(new UnsyncStringWriter());
+				template.processTemplate(new DummyWriter());
 			}
 		}
 		catch (TemplateException templateException) {
@@ -266,6 +276,14 @@ public class FreeMarkerFragmentEntryProcessor
 		).orElse(
 			fragmentEntryLink
 		);
+	}
+
+	private boolean _isFreemarkerTemplate(String html) {
+		if (html.contains("${") || html.contains("<#") || html.contains("<@")) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean _isRelated(Layout layout, long plid) {

@@ -1,10 +1,9 @@
 {
 	"dependencies": {
-		"@clayui/button": "3.83.0",
-		"@clayui/icon": "3.56.0",
+		"@clayui/button": "3.40.0",
+		"@clayui/icon": "3.40.0",
 		"asset-taglib": "*",
-		"frontend-js-web": "*",
-		"metal-state": "2.16.8"
+		"frontend-js-web": "*"
 	},
 	"name": "asset-list-web",
 	"scripts": {
@@ -12,5 +11,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "2.0.98"
+	"version": "3.0.22"
 }

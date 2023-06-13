@@ -20,7 +20,6 @@ import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleEvent;
-import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleEventListenerRegistryUtil;
 import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleListener;
 import com.liferay.exportimport.kernel.lifecycle.constants.ExportImportLifecycleConstants;
 import com.liferay.exportimport.test.util.constants.DummyFolderPortletKeys;
@@ -54,12 +53,16 @@ import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.model.Statement;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Akos Thurzo
@@ -81,20 +84,23 @@ public class ExportedMissingReferenceBackwardCompatbilityExportImportTest
 		_removeAttributeFromLARExportImportLifecycleListener =
 			new RemoveAttributeFromLARExportImportLifecycleListener();
 
-		ExportImportLifecycleEventListenerRegistryUtil.register(
-			_removeAttributeFromLARExportImportLifecycleListener);
+		Bundle bundle = FrameworkUtil.getBundle(getClass());
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		_serviceRegistration = bundleContext.registerService(
+			ExportImportLifecycleListener.class,
+			_removeAttributeFromLARExportImportLifecycleListener, null);
 	}
 
 	@After
 	@Override
 	public void tearDown() throws Exception {
-		ExportImportLifecycleEventListenerRegistryUtil.unregister(
-			_removeAttributeFromLARExportImportLifecycleListener);
+		_serviceRegistration.unregister();
 
 		super.tearDown();
 	}
 
-	@Ignore
 	@Test
 	public void testBackwardCompatibility() throws Exception {
 		List<PortletDataHandler> portletDataHandlers = setPortletDataHandler(
@@ -104,7 +110,7 @@ public class ExportedMissingReferenceBackwardCompatbilityExportImportTest
 		long[] layoutIds = {layout.getLayoutId()};
 
 		try {
-			exportImportLayouts(layoutIds, getExportParameterMap());
+			exportImportLayouts(layoutIds, getExportParameterMap(), true);
 		}
 		catch (PortletDataException portletDataException) {
 			Throwable throwable = portletDataException.getCause();
@@ -286,5 +292,6 @@ public class ExportedMissingReferenceBackwardCompatbilityExportImportTest
 		getClass().getSuperclass(), Test.class);
 	private RemoveAttributeFromLARExportImportLifecycleListener
 		_removeAttributeFromLARExportImportLifecycleListener;
+	private ServiceRegistration<?> _serviceRegistration;
 
 }

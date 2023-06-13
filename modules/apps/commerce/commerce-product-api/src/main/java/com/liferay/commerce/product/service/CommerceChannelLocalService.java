@@ -83,10 +83,17 @@ public interface CommerceChannelLocalService
 
 	@Indexable(type = IndexableType.REINDEX)
 	public CommerceChannel addCommerceChannel(
-			long siteGroupId, String name, String type,
+			String externalReferenceCode, long siteGroupId, String name,
+			String type, UnicodeProperties typeSettingsUnicodeProperties,
+			String commerceCurrencyCode, ServiceContext serviceContext)
+		throws PortalException;
+
+	@Indexable(type = IndexableType.REINDEX)
+	public CommerceChannel addOrUpdateCommerceChannel(
+			long userId, String externalReferenceCode, long siteGroupId,
+			String name, String type,
 			UnicodeProperties typeSettingsUnicodeProperties,
-			String commerceCurrencyCode, String externalReferenceCode,
-			ServiceContext serviceContext)
+			String commerceCurrencyCode, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -219,16 +226,25 @@ public interface CommerceChannelLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceChannel fetchByExternalReferenceCode(
-		long companyId, String externalReferenceCode);
+		String externalReferenceCode, long companyId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceChannel fetchCommerceChannel(long commerceChannelId);
 
-	@Deprecated
+	/**
+	 * Returns the commerce channel with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce channel's external reference code
+	 * @return the matching commerce channel, or <code>null</code> if a matching commerce channel could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceChannel fetchCommerceChannelByExternalReferenceCode(
 		long companyId, String externalReferenceCode);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceChannelByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceChannel fetchCommerceChannelByReferenceCode(
@@ -255,7 +271,14 @@ public interface CommerceChannelLocalService
 	public CommerceChannel getCommerceChannel(long commerceChannelId)
 		throws PortalException;
 
-	@Deprecated
+	/**
+	 * Returns the commerce channel with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce channel's external reference code
+	 * @return the matching commerce channel
+	 * @throws PortalException if a matching commerce channel could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommerceChannel getCommerceChannelByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -294,11 +317,6 @@ public interface CommerceChannelLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CommerceChannel> getCommerceChannels(long companyId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CommerceChannel> getCommerceChannels(
-			long companyId, String keywords, int start, int end)
-		throws PortalException;
-
 	/**
 	 * Returns the number of commerce channels.
 	 *
@@ -306,10 +324,6 @@ public interface CommerceChannelLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getCommerceChannelsCount();
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getCommerceChannelsCount(long companyId, String keywords)
-		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
@@ -330,11 +344,10 @@ public interface CommerceChannelLocalService
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CommerceChannel> searchCommerceChannels(long companyId)
-		throws PortalException;
+	public List<CommerceChannel> search(long companyId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CommerceChannel> searchCommerceChannels(
+	public List<CommerceChannel> search(
 			long companyId, String keywords, int start, int end, Sort sort)
 		throws PortalException;
 
@@ -373,7 +386,7 @@ public interface CommerceChannelLocalService
 
 	@Indexable(type = IndexableType.REINDEX)
 	public CommerceChannel updateCommerceChannelExternalReferenceCode(
-			long commerceChannelId, String externalReferenceCode)
+			String externalReferenceCode, long commerceChannelId)
 		throws PortalException;
 
 }

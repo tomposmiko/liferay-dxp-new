@@ -33,6 +33,7 @@ import com.liferay.portal.tools.service.builder.test.model.DataLimitEntryModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -218,54 +219,76 @@ public class DataLimitEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<DataLimitEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, DataLimitEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<DataLimitEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<DataLimitEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DataLimitEntry.class.getClassLoader(), DataLimitEntry.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"dataLimitEntryId", DataLimitEntry::getDataLimitEntryId);
-		attributeGetterFunctions.put("companyId", DataLimitEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", DataLimitEntry::getUserId);
-		attributeGetterFunctions.put("userName", DataLimitEntry::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", DataLimitEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", DataLimitEntry::getModifiedDate);
+		try {
+			Constructor<DataLimitEntry> constructor =
+				(Constructor<DataLimitEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<DataLimitEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<DataLimitEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<DataLimitEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DataLimitEntry, Object>>();
 		Map<String, BiConsumer<DataLimitEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<DataLimitEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"dataLimitEntryId", DataLimitEntry::getDataLimitEntryId);
 		attributeSetterBiConsumers.put(
 			"dataLimitEntryId",
 			(BiConsumer<DataLimitEntry, Long>)
 				DataLimitEntry::setDataLimitEntryId);
+		attributeGetterFunctions.put("companyId", DataLimitEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DataLimitEntry, Long>)DataLimitEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", DataLimitEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<DataLimitEntry, Long>)DataLimitEntry::setUserId);
+		attributeGetterFunctions.put("userName", DataLimitEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<DataLimitEntry, String>)DataLimitEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", DataLimitEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<DataLimitEntry, Date>)DataLimitEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", DataLimitEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<DataLimitEntry, Date>)DataLimitEntry::setModifiedDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -445,6 +468,26 @@ public class DataLimitEntryModelImpl
 		dataLimitEntryImpl.setModifiedDate(getModifiedDate());
 
 		dataLimitEntryImpl.resetOriginalValues();
+
+		return dataLimitEntryImpl;
+	}
+
+	@Override
+	public DataLimitEntry cloneWithOriginalValues() {
+		DataLimitEntryImpl dataLimitEntryImpl = new DataLimitEntryImpl();
+
+		dataLimitEntryImpl.setDataLimitEntryId(
+			this.<Long>getColumnOriginalValue("dataLimitEntryId"));
+		dataLimitEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		dataLimitEntryImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		dataLimitEntryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		dataLimitEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		dataLimitEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
 
 		return dataLimitEntryImpl;
 	}
@@ -641,9 +684,7 @@ public class DataLimitEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DataLimitEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DataLimitEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

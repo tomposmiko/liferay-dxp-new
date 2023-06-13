@@ -15,6 +15,8 @@
 package com.liferay.dynamic.data.mapping.form.field.type.internal.radio;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
+import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
+import com.liferay.dynamic.data.mapping.form.field.type.internal.radio.helper.RadioDDMFormFieldContextHelper;
 import com.liferay.dynamic.data.mapping.form.field.type.internal.util.DDMFormFieldTypeUtil;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
@@ -39,7 +41,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Marcellus Tavares
  */
 @Component(
-	immediate = true, property = "ddm.form.field.type.name=radio",
+	immediate = true,
+	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.RADIO,
 	service = {
 		DDMFormFieldTemplateContextContributor.class,
 		RadioDDMFormFieldTemplateContextContributor.class

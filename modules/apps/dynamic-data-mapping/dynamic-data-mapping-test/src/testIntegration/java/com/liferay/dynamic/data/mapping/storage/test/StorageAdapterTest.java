@@ -52,9 +52,8 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
 
 import java.io.Serializable;
 
@@ -96,8 +95,6 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		setUpDDMFormValuesToFieldsConverter();
-		setUpFieldsToDDMFormValuesConverter();
 		setUpJSONStorageAdapter();
 	}
 
@@ -107,7 +104,7 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 
 		DDMStructure structure = addStructure(
 			_classNameId, null, "Boolean Field Structure", definition,
-			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+			StorageType.DEFAULT.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
 		Fields fields = new Fields();
 
@@ -170,7 +167,7 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 
 		ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
 
-		_jsonStorageAdapter.create(
+		_defaultStorageAdapter.create(
 			TestPropsValues.getCompanyId(), structure.getStructureId(),
 			ddmFormValues,
 			ServiceContextTestUtil.getServiceContext(group.getGroupId()));
@@ -191,7 +188,7 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 		DDMFormValues ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(
 			ddmForm);
 
-		_jsonStorageAdapter.create(
+		_defaultStorageAdapter.create(
 			TestPropsValues.getCompanyId(), structure.getStructureId(),
 			ddmFormValues,
 			ServiceContextTestUtil.getServiceContext(group.getGroupId()));
@@ -235,7 +232,7 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 
 		ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
 
-		_jsonStorageAdapter.create(
+		_defaultStorageAdapter.create(
 			TestPropsValues.getCompanyId(), structure.getStructureId(),
 			ddmFormValues,
 			ServiceContextTestUtil.getServiceContext(group.getGroupId()));
@@ -247,7 +244,7 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 
 		DDMStructure structure = addStructure(
 			_classNameId, null, "Date Field Structure", definition,
-			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+			StorageType.DEFAULT.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
 		Fields fields = new Fields();
 
@@ -286,7 +283,7 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 
 		DDMStructure structure = addStructure(
 			_classNameId, null, "Decimal Field Structure", definition,
-			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+			StorageType.DEFAULT.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
 		Fields fields = new Fields();
 
@@ -323,7 +320,7 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 
 		DDMStructure structure = addStructure(
 			_classNameId, null, "Documents and Media Field Structure",
-			definition, StorageType.JSON.getValue(),
+			definition, StorageType.DEFAULT.getValue(),
 			DDMStructureConstants.TYPE_DEFAULT);
 
 		Fields fields = new Fields();
@@ -341,10 +338,10 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 		String file1Value = getDocLibraryFieldValue(file1);
 
 		FileEntry file2 = DLAppLocalServiceUtil.addFileEntry(
-			TestPropsValues.getUserId(), TestPropsValues.getGroupId(),
+			null, TestPropsValues.getUserId(), TestPropsValues.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Test 2.txt",
-			ContentTypes.TEXT_PLAIN, TestDataConstants.TEST_BYTE_ARRAY,
-			serviceContext);
+			ContentTypes.TEXT_PLAIN, TestDataConstants.TEST_BYTE_ARRAY, null,
+			null, serviceContext);
 
 		String file2Value = getDocLibraryFieldValue(file2);
 
@@ -374,7 +371,7 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 
 		DDMStructure structure = addStructure(
 			_classNameId, null, "Integer Field Structure", definition,
-			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+			StorageType.DEFAULT.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
 		Fields fields = new Fields();
 
@@ -405,7 +402,7 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 
 		DDMStructure structure = addStructure(
 			_classNameId, null, "Link to Page Field Structure", definition,
-			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+			StorageType.DEFAULT.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
 		Fields fields = new Fields();
 
@@ -438,7 +435,7 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 
 		DDMStructure structure = addStructure(
 			_classNameId, null, "Number Field Structure", definition,
-			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+			StorageType.DEFAULT.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
 		Fields fields = new Fields();
 
@@ -468,7 +465,7 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 
 		DDMStructure structure = addStructure(
 			_classNameId, null, "Radio Field Structure", definition,
-			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+			StorageType.DEFAULT.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
 		Fields fields = new Fields();
 
@@ -498,7 +495,7 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 
 		DDMStructure structure = addStructure(
 			_classNameId, null, "Select Field Structure", definition,
-			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+			StorageType.DEFAULT.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
 		Fields fields = new Fields();
 
@@ -529,7 +526,7 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 
 		DDMStructure structure = addStructure(
 			_classNameId, null, "Text Field Structure", definition,
-			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+			StorageType.DEFAULT.getValue(), DDMStructureConstants.TYPE_DEFAULT);
 
 		Fields fields = new Fields();
 
@@ -574,14 +571,14 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 
 		ddmFormValues.addDDMFormFieldValue(ddmFormFieldValue);
 
-		long classPK = _jsonStorageAdapter.create(
+		long classPK = _defaultStorageAdapter.create(
 			TestPropsValues.getCompanyId(), structure.getStructureId(),
 			ddmFormValues,
 			ServiceContextTestUtil.getServiceContext(group.getGroupId()));
 
 		ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(ddmForm);
 
-		_jsonStorageAdapter.update(
+		_defaultStorageAdapter.update(
 			classPK, ddmFormValues,
 			ServiceContextTestUtil.getServiceContext(group.getGroupId()));
 	}
@@ -624,41 +621,15 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 	}
 
 	protected String getDocLibraryFieldValue(FileEntry fileEntry) {
-		StringBundler sb = new StringBundler(7);
-
-		sb.append("{\"groupId\":");
-		sb.append(fileEntry.getGroupId());
-		sb.append(",\"uuid\":\"");
-		sb.append(fileEntry.getUuid());
-		sb.append("\",\"version\":\"");
-		sb.append(fileEntry.getVersion());
-		sb.append("\"}");
-
-		return sb.toString();
-	}
-
-	protected void setUpDDMFormValuesToFieldsConverter() {
-		Registry registry = RegistryUtil.getRegistry();
-
-		_ddmFormValuesToFieldsConverter = registry.getService(
-			registry.getServiceReference(DDMFormValuesToFieldsConverter.class));
-	}
-
-	protected void setUpFieldsToDDMFormValuesConverter() {
-		Registry registry = RegistryUtil.getRegistry();
-
-		_fieldsToDDMFormValuesConverter = registry.getService(
-			registry.getServiceReference(FieldsToDDMFormValuesConverter.class));
+		return StringBundler.concat(
+			"{\"groupId\":", fileEntry.getGroupId(), ",\"uuid\":\"",
+			fileEntry.getUuid(), "\",\"version\":\"", fileEntry.getVersion(),
+			"\"}");
 	}
 
 	protected void setUpJSONStorageAdapter() {
-		Registry registry = RegistryUtil.getRegistry();
-
-		_storageAdapterRegistry = registry.getService(
-			registry.getServiceReference(StorageAdapterRegistry.class));
-
-		_jsonStorageAdapter = _storageAdapterRegistry.getStorageAdapter(
-			StorageType.JSON.toString());
+		_defaultStorageAdapter = _storageAdapterRegistry.getStorageAdapter(
+			StorageType.DEFAULT.toString());
 	}
 
 	protected void validate(long ddmStructureId, Fields fields)
@@ -668,13 +639,13 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 
 		String expectedFieldsString = jsonSerializer.serializeDeep(fields);
 
-		long classPK = create(_jsonStorageAdapter, ddmStructureId, fields);
+		long classPK = create(_defaultStorageAdapter, ddmStructureId, fields);
 
 		DDMStructure ddmStructure = DDMStructureLocalServiceUtil.getStructure(
 			ddmStructureId);
 
 		DDMFormValues actualDDMFormValues =
-			_jsonStorageAdapter.getDDMFormValues(classPK);
+			_defaultStorageAdapter.getDDMFormValues(classPK);
 
 		Fields actualFields = _ddmFormValuesToFieldsConverter.convert(
 			ddmStructure, actualDDMFormValues);
@@ -687,9 +658,15 @@ public class StorageAdapterTest extends BaseDDMServiceTestCase {
 	private static Locale _enLocale;
 	private static Locale _ptLocale;
 
+	@Inject
 	private DDMFormValuesToFieldsConverter _ddmFormValuesToFieldsConverter;
+
+	private StorageAdapter _defaultStorageAdapter;
+
+	@Inject
 	private FieldsToDDMFormValuesConverter _fieldsToDDMFormValuesConverter;
-	private StorageAdapter _jsonStorageAdapter;
+
+	@Inject
 	private StorageAdapterRegistry _storageAdapterRegistry;
 
 }

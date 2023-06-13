@@ -16,15 +16,12 @@ package com.liferay.portal.template;
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.template.TemplateConstants;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.FileImpl;
 
 import java.net.URL;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -33,16 +30,11 @@ import org.junit.Test;
 public class URLResourceParserTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@Test
 	public void testIsTemplateResourceValid() {
-		FileUtil fileUtil = new FileUtil();
-
-		fileUtil.setFile(FileImpl.getInstance());
-
 		URLResourceParser urlResourceParser = new URLResourceParser() {
 
 			@Override

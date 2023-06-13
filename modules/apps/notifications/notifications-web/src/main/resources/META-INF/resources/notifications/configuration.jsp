@@ -43,9 +43,11 @@
 		>
 
 			<%
-			Map<String, List<UserNotificationDefinition>> userNotificationDefinitionsMap = new TreeMap<String, List<UserNotificationDefinition>>(new PortletIdComparator(locale));
-
-			userNotificationDefinitionsMap.putAll(UserNotificationManagerUtil.getActiveUserNotificationDefinitions());
+			Map<String, List<UserNotificationDefinition>> userNotificationDefinitionsMap = TreeMapBuilder.<String, List<UserNotificationDefinition>>create(
+				new PortletIdComparator(locale)
+			).putAll(
+				UserNotificationManagerUtil.getActiveUserNotificationDefinitions()
+			).build();
 
 			List<Long> userNotificationDeliveryIds = new ArrayList<Long>();
 			%>
@@ -79,7 +81,7 @@
 
 										<c:if test="<%= i == 0 %>">
 											<tr>
-												<th class="table-cell-content">
+												<th class="table-cell-expand">
 													<liferay-ui:message key="receive-a-notification-when-someone" />
 												</th>
 
@@ -100,7 +102,7 @@
 										</c:if>
 
 										<tr>
-											<td class="table-cell-content">
+											<td class="table-cell-expand">
 												<liferay-ui:message key="<%= userNotificationDefinition.getDescription(locale) %>" />
 											</td>
 

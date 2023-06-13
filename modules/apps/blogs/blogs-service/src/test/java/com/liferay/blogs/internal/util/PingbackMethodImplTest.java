@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.FriendlyURLMapper;
-import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFunction;
@@ -43,7 +42,6 @@ import com.liferay.portal.kernel.xmlrpc.XmlRpc;
 import com.liferay.portal.kernel.xmlrpc.XmlRpcConstants;
 import com.liferay.portal.kernel.xmlrpc.XmlRpcUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.registry.collections.ServiceTrackerMap;
 
 import java.io.IOException;
 
@@ -664,7 +662,7 @@ public class PingbackMethodImplTest {
 	}
 
 	protected void whenFriendlyURLMapperPopulateParams(
-		String friendlyURLPath, final String name, final String value) {
+		String friendlyURLPath, String name, String value) {
 
 		Mockito.doAnswer(
 			invocationOnMock -> {
@@ -760,9 +758,6 @@ public class PingbackMethodImplTest {
 
 	@Mock
 	private PortletLocalService _portletLocalService;
-
-	@Mock
-	private ServiceTrackerMap<String, PortletProvider> _serviceTrackerMap;
 
 	@Mock
 	private UserLocalService _userLocalService;

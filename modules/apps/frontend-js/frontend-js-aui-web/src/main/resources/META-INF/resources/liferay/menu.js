@@ -35,8 +35,6 @@ AUI.add(
 
 		var EVENT_CLICK = 'click';
 
-		var EVENT_KEYDOWN = 'keydown';
-
 		var PARENT_NODE = 'parentNode';
 
 		var STR_BOTTOM = 'b';
@@ -129,10 +127,6 @@ AUI.add(
 					instance._activeMenu = null;
 					instance._activeTrigger = null;
 
-					trigger.attr({
-						'aria-expanded': false,
-					});
-
 					if (trigger.hasClass(CSS_EXTENDED)) {
 						trigger.removeClass(CSS_BTN_PRIMARY);
 					}
@@ -177,7 +171,7 @@ AUI.add(
 					var direction =
 						(directionMatch && directionMatch[1]) || AUTO;
 
-					if (direction != 'down') {
+					if (direction !== 'down') {
 						var overlayHorizontal =
 							mapAlignHorizontalOverlay[direction] ||
 							defaultOverlayHorizontalAlign;
@@ -231,6 +225,7 @@ AUI.add(
 						},
 						constrain: true,
 						hideClass: false,
+						modal: Util.isPhone() || Util.isTablet(),
 						preventOverlap: true,
 						zIndex: Liferay.zIndex.MENU,
 					}).render();
@@ -388,26 +383,20 @@ AUI.add(
 
 					var listNode = menu.one('ul');
 
+					overlay.show();
+
 					var listNodeHeight = listNode.get('offsetHeight');
 					var listNodeWidth = listNode.get('offsetWidth');
-
-					var modalMask = false;
 
 					align.points = instance._getAlignPoints(cssClass);
 
 					menu.addClass('lfr-icon-menu-open');
 
-					if (Util.isPhone() || Util.isTablet()) {
-						overlay.hide();
-
-						modalMask = true;
-					}
-
 					overlay.setAttrs({
 						align,
 						centered: false,
 						height: listNodeHeight,
-						modal: modalMask,
+						modal: Util.isPhone() || Util.isTablet(),
 						width: listNodeWidth,
 					});
 
@@ -418,8 +407,6 @@ AUI.add(
 							focusManager.focus(0);
 						}
 					}
-
-					overlay.show();
 
 					if (cssClass.indexOf(CSS_EXTENDED) > -1) {
 						trigger.addClass(CSS_BTN_PRIMARY);
@@ -437,9 +424,7 @@ AUI.add(
 			},
 
 			_setARIARoles(trigger, menu) {
-				var links = menu
-					.all(SELECTOR_ANCHOR)
-					.filter(':not([aria-haspopup="dialog"]');
+				var links = menu.all(SELECTOR_ANCHOR);
 
 				var searchContainer = menu.one(SELECTOR_SEARCH_CONTAINER);
 
@@ -449,17 +434,16 @@ AUI.add(
 				var ariaListNodeAttr = 'menu';
 
 				if (searchContainer) {
-					ariaLinksAttr = 'option';
 					ariaListNodeAttr = 'listbox';
+					ariaListNodeAttr = 'option';
 				}
 
-				if (links.size() > 0) {
-					listNode.setAttribute(ARIA_ATTR_ROLE, ariaListNodeAttr);
-					links.set(ARIA_ATTR_ROLE, ariaLinksAttr);
-				}
+				listNode.setAttribute(ARIA_ATTR_ROLE, ariaListNodeAttr);
+				links.set(ARIA_ATTR_ROLE, ariaLinksAttr);
 
 				trigger.attr({
 					'aria-haspopup': true,
+					'role': 'button',
 				});
 
 				listNode.setAttribute('aria-labelledby', trigger.guid());
@@ -503,10 +487,7 @@ AUI.add(
 			if (buffer.length) {
 				var nodes = A.all(buffer);
 
-				nodes.on(
-					[EVENT_CLICK, EVENT_KEYDOWN],
-					A.bind('_registerMenu', Menu)
-				);
+				nodes.on(EVENT_CLICK, A.bind('_registerMenu', Menu));
 
 				buffer.length = 0;
 			}
@@ -587,10 +568,6 @@ AUI.add(
 					});
 
 					menuInstance._focusManager = focusManager;
-
-					Liferay.once('beforeScreenFlip', () => {
-						menuInstance._focusManager = null;
-					});
 				}
 
 				focusManager.refresh();
@@ -621,7 +598,6 @@ AUI.add(
 
 					liveSearch = new Liferay.MenuFilter({
 						content: listNode,
-						menu: Menu._INSTANCE,
 						minQueryLength: 0,
 						queryDelay: 0,
 						resultFilters: 'phraseMatch',
@@ -642,15 +618,6 @@ AUI.add(
 			Menu,
 			'_registerMenu',
 			(event) => {
-				var key = event.key || event.keyCode;
-
-				if (
-					event.type === EVENT_KEYDOWN &&
-					key !== A.Event.KeyMap.SPACE
-				) {
-					return;
-				}
-
 				var menuInstance = Menu._INSTANCE;
 
 				var handles = menuInstance._handles;
@@ -660,7 +627,7 @@ AUI.add(
 				var activeTrigger = menuInstance._activeTrigger;
 
 				if (activeTrigger) {
-					if (activeTrigger != trigger) {
+					if (activeTrigger !== trigger) {
 						activeTrigger.removeClass(CSS_BTN_PRIMARY);
 
 						activeTrigger.get(PARENT_NODE).removeClass(CSS_OPEN);
@@ -672,6 +639,8 @@ AUI.add(
 						}
 					}
 					else {
+						menuInstance._closeActiveMenu();
+
 						return;
 					}
 				}
@@ -681,10 +650,6 @@ AUI.add(
 
 					menuInstance._activeMenu = menu;
 					menuInstance._activeTrigger = trigger;
-
-					trigger.attr({
-						'aria-expanded': true,
-					});
 
 					if (!handles.length) {
 						var listContainer = trigger.getData(
@@ -763,11 +728,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: [
-			'array-invoke',
-			'aui-debounce',
-			'aui-node',
-			'portal-available-languages',
-		],
+		requires: ['array-invoke', 'aui-debounce', 'aui-node'],
 	}
 );

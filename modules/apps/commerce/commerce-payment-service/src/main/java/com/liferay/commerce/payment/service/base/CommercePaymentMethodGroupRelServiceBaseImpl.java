@@ -24,12 +24,9 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
-import com.liferay.portal.kernel.service.persistence.ImagePersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
@@ -222,66 +219,6 @@ public abstract class CommercePaymentMethodGroupRelServiceBaseImpl
 	}
 
 	/**
-	 * Returns the image local service.
-	 *
-	 * @return the image local service
-	 */
-	public com.liferay.portal.kernel.service.ImageLocalService
-		getImageLocalService() {
-
-		return imageLocalService;
-	}
-
-	/**
-	 * Sets the image local service.
-	 *
-	 * @param imageLocalService the image local service
-	 */
-	public void setImageLocalService(
-		com.liferay.portal.kernel.service.ImageLocalService imageLocalService) {
-
-		this.imageLocalService = imageLocalService;
-	}
-
-	/**
-	 * Returns the image remote service.
-	 *
-	 * @return the image remote service
-	 */
-	public com.liferay.portal.kernel.service.ImageService getImageService() {
-		return imageService;
-	}
-
-	/**
-	 * Sets the image remote service.
-	 *
-	 * @param imageService the image remote service
-	 */
-	public void setImageService(
-		com.liferay.portal.kernel.service.ImageService imageService) {
-
-		this.imageService = imageService;
-	}
-
-	/**
-	 * Returns the image persistence.
-	 *
-	 * @return the image persistence
-	 */
-	public ImagePersistence getImagePersistence() {
-		return imagePersistence;
-	}
-
-	/**
-	 * Sets the image persistence.
-	 *
-	 * @param imagePersistence the image persistence
-	 */
-	public void setImagePersistence(ImagePersistence imagePersistence) {
-		this.imagePersistence = imagePersistence;
-	}
-
-	/**
 	 * Returns the resource local service.
 	 *
 	 * @return the resource local service
@@ -470,20 +407,6 @@ public abstract class CommercePaymentMethodGroupRelServiceBaseImpl
 	protected ClassNamePersistence classNamePersistence;
 
 	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ImageLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ImageLocalService
-		imageLocalService;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.ImageService.class
-	)
-	protected com.liferay.portal.kernel.service.ImageService imageService;
-
-	@ServiceReference(type = ImagePersistence.class)
-	protected ImagePersistence imagePersistence;
-
-	@ServiceReference(
 		type = com.liferay.portal.kernel.service.ResourceLocalService.class
 	)
 	protected com.liferay.portal.kernel.service.ResourceLocalService
@@ -502,8 +425,5 @@ public abstract class CommercePaymentMethodGroupRelServiceBaseImpl
 
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommercePaymentMethodGroupRelServiceBaseImpl.class);
 
 }

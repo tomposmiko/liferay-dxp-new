@@ -145,5 +145,5 @@ else if (Validator.isNotNull(exception)) {
 <a href="javascript:history.go(-1);">&laquo; <liferay-ui:message key="back" /></a>
 
 <%!
-private static Log _log = LogFactoryUtil.getLog("portal_web.docroot.html.portal.status_jsp");
+private static final Log _log = LogFactoryUtil.getLog("portal_web.docroot.html.portal.status_jsp");
 %>

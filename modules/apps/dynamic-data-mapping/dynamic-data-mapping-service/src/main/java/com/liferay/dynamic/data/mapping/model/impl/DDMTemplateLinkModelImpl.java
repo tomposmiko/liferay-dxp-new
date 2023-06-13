@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -228,63 +229,85 @@ public class DDMTemplateLinkModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, DDMTemplateLink>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DDMTemplateLink.class.getClassLoader(), DDMTemplateLink.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<DDMTemplateLink> constructor =
+				(Constructor<DDMTemplateLink>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<DDMTemplateLink, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DDMTemplateLink, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<DDMTemplateLink, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<DDMTemplateLink, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", DDMTemplateLink::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", DDMTemplateLink::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"templateLinkId", DDMTemplateLink::getTemplateLinkId);
-		attributeGetterFunctions.put(
-			"companyId", DDMTemplateLink::getCompanyId);
-		attributeGetterFunctions.put(
-			"classNameId", DDMTemplateLink::getClassNameId);
-		attributeGetterFunctions.put("classPK", DDMTemplateLink::getClassPK);
-		attributeGetterFunctions.put(
-			"templateId", DDMTemplateLink::getTemplateId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<DDMTemplateLink, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<DDMTemplateLink, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<DDMTemplateLink, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", DDMTemplateLink::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DDMTemplateLink, Long>)DDMTemplateLink::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", DDMTemplateLink::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<DDMTemplateLink, Long>)
 				DDMTemplateLink::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"templateLinkId", DDMTemplateLink::getTemplateLinkId);
 		attributeSetterBiConsumers.put(
 			"templateLinkId",
 			(BiConsumer<DDMTemplateLink, Long>)
 				DDMTemplateLink::setTemplateLinkId);
+		attributeGetterFunctions.put(
+			"companyId", DDMTemplateLink::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DDMTemplateLink, Long>)DDMTemplateLink::setCompanyId);
+		attributeGetterFunctions.put(
+			"classNameId", DDMTemplateLink::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<DDMTemplateLink, Long>)DDMTemplateLink::setClassNameId);
+		attributeGetterFunctions.put("classPK", DDMTemplateLink::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<DDMTemplateLink, Long>)DDMTemplateLink::setClassPK);
+		attributeGetterFunctions.put(
+			"templateId", DDMTemplateLink::getTemplateId);
 		attributeSetterBiConsumers.put(
 			"templateId",
 			(BiConsumer<DDMTemplateLink, Long>)DDMTemplateLink::setTemplateId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -506,6 +529,28 @@ public class DDMTemplateLinkModelImpl
 	}
 
 	@Override
+	public DDMTemplateLink cloneWithOriginalValues() {
+		DDMTemplateLinkImpl ddmTemplateLinkImpl = new DDMTemplateLinkImpl();
+
+		ddmTemplateLinkImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		ddmTemplateLinkImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		ddmTemplateLinkImpl.setTemplateLinkId(
+			this.<Long>getColumnOriginalValue("templateLinkId"));
+		ddmTemplateLinkImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		ddmTemplateLinkImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		ddmTemplateLinkImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		ddmTemplateLinkImpl.setTemplateId(
+			this.<Long>getColumnOriginalValue("templateId"));
+
+		return ddmTemplateLinkImpl;
+	}
+
+	@Override
 	public int compareTo(DDMTemplateLink ddmTemplateLink) {
 		long primaryKey = ddmTemplateLink.getPrimaryKey();
 
@@ -677,9 +722,7 @@ public class DDMTemplateLinkModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DDMTemplateLink>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DDMTemplateLink.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

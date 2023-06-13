@@ -16,17 +16,14 @@ package com.liferay.analytics.reports.web.internal.portlet.action;
 
 import com.liferay.analytics.reports.web.internal.constants.AnalyticsReportsPortletKeys;
 import com.liferay.analytics.reports.web.internal.data.provider.AnalyticsReportsDataProvider;
-import com.liferay.analytics.reports.web.internal.info.display.contributor.util.LayoutDisplayPageProviderUtil;
-import com.liferay.analytics.reports.web.internal.layout.seo.CanonicalURLProvider;
 import com.liferay.analytics.reports.web.internal.model.DirectTrafficChannelImpl;
 import com.liferay.analytics.reports.web.internal.model.OrganicTrafficChannelImpl;
 import com.liferay.analytics.reports.web.internal.model.PaidTrafficChannelImpl;
 import com.liferay.analytics.reports.web.internal.model.ReferralTrafficChannelImpl;
 import com.liferay.analytics.reports.web.internal.model.SocialTrafficChannelImpl;
+import com.liferay.analytics.reports.web.internal.model.TimeRange;
+import com.liferay.analytics.reports.web.internal.model.TimeSpan;
 import com.liferay.analytics.reports.web.internal.model.TrafficChannel;
-import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
-import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
-import com.liferay.layout.seo.kernel.LayoutSEOLinkManager;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -40,6 +37,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -55,8 +53,6 @@ import java.util.stream.Stream;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -87,41 +83,24 @@ public class GetTrafficSourcesMVCResourceCommand
 			themeDisplay.getLocale(), getClass());
 
 		try {
-			HttpServletRequest httpServletRequest =
-				_portal.getHttpServletRequest(resourceRequest);
-
-			LayoutDisplayPageObjectProvider<Object>
-				layoutDisplayPageObjectProvider =
-					(LayoutDisplayPageObjectProvider<Object>)
-						LayoutDisplayPageProviderUtil.
-							getLayoutDisplayPageObjectProvider(
-								httpServletRequest,
-								_layoutDisplayPageProviderTracker, _portal);
-
-			if (layoutDisplayPageObjectProvider == null) {
-				JSONPortletResponseUtil.writeJSON(
-					resourceRequest, resourceResponse,
-					JSONUtil.put(
-						"error",
-						_language.get(
-							httpServletRequest,
-							"an-unexpected-error-occurred")));
-
-				return;
-			}
-
 			AnalyticsReportsDataProvider analyticsReportsDataProvider =
 				new AnalyticsReportsDataProvider(_http);
-			CanonicalURLProvider canonicalURLProvider =
-				new CanonicalURLProvider(
-					_portal.getHttpServletRequest(resourceRequest),
-					_layoutSEOLinkManager, _portal);
+			String canonicalURL = ParamUtil.getString(
+				resourceRequest, "canonicalURL");
+
+			String timeSpanKey = ParamUtil.getString(
+				resourceRequest, "timeSpanKey", TimeSpan.defaultTimeSpanKey());
+
+			TimeSpan timeSpan = TimeSpan.of(timeSpanKey);
+
+			int timeSpanOffset = ParamUtil.getInteger(
+				resourceRequest, "timeSpanOffset");
 
 			JSONObject jsonObject = JSONUtil.put(
 				"trafficSources",
 				_getTrafficSourcesJSONArray(
 					analyticsReportsDataProvider, themeDisplay.getCompanyId(),
-					canonicalURLProvider.getCanonicalURL(),
+					timeSpan.toTimeRange(timeSpanOffset), canonicalURL,
 					themeDisplay.getLocale(), resourceBundle));
 
 			JSONPortletResponseUtil.writeJSON(
@@ -141,7 +120,7 @@ public class GetTrafficSourcesMVCResourceCommand
 
 	private List<TrafficChannel> _getTrafficChannels(
 		AnalyticsReportsDataProvider analyticsReportsDataProvider,
-		String canonicalURL, long companyId) {
+		String canonicalURL, long companyId, TimeRange timeRange) {
 
 		Map<String, TrafficChannel> emptyMap = HashMapBuilder.put(
 			"direct", (TrafficChannel)new DirectTrafficChannelImpl(false)
@@ -164,7 +143,7 @@ public class GetTrafficSourcesMVCResourceCommand
 		try {
 			Map<String, TrafficChannel> trafficChannels =
 				analyticsReportsDataProvider.getTrafficChannels(
-					companyId, canonicalURL);
+					companyId, timeRange, canonicalURL);
 
 			emptyMap.forEach(
 				(name, trafficChannel) -> trafficChannels.merge(
@@ -187,11 +166,11 @@ public class GetTrafficSourcesMVCResourceCommand
 
 	private JSONArray _getTrafficSourcesJSONArray(
 		AnalyticsReportsDataProvider analyticsReportsDataProvider,
-		long companyId, String canonicalURL, Locale locale,
+		long companyId, TimeRange timeRange, String canonicalURL, Locale locale,
 		ResourceBundle resourceBundle) {
 
 		List<TrafficChannel> trafficChannels = _getTrafficChannels(
-			analyticsReportsDataProvider, canonicalURL, companyId);
+			analyticsReportsDataProvider, canonicalURL, companyId, timeRange);
 
 		Stream<TrafficChannel> stream = trafficChannels.stream();
 
@@ -215,12 +194,6 @@ public class GetTrafficSourcesMVCResourceCommand
 
 	@Reference
 	private Language _language;
-
-	@Reference
-	private LayoutDisplayPageProviderTracker _layoutDisplayPageProviderTracker;
-
-	@Reference
-	private LayoutSEOLinkManager _layoutSEOLinkManager;
 
 	@Reference
 	private Portal _portal;

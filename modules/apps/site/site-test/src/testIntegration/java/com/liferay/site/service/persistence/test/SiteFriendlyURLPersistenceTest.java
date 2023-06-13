@@ -217,11 +217,11 @@ public class SiteFriendlyURLPersistenceTest {
 	}
 
 	@Test
-	public void testCountByC_G() throws Exception {
-		_persistence.countByC_G(
+	public void testCountByG_C() throws Exception {
+		_persistence.countByG_C(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
 
-		_persistence.countByC_G(0L, 0L);
+		_persistence.countByG_C(0L, 0L);
 	}
 
 	@Test
@@ -234,13 +234,13 @@ public class SiteFriendlyURLPersistenceTest {
 	}
 
 	@Test
-	public void testCountByC_G_L() throws Exception {
-		_persistence.countByC_G_L(
+	public void testCountByG_C_L() throws Exception {
+		_persistence.countByG_C_L(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(), "");
 
-		_persistence.countByC_G_L(0L, 0L, "null");
+		_persistence.countByG_C_L(0L, 0L, "null");
 
-		_persistence.countByC_G_L(0L, 0L, (String)null);
+		_persistence.countByG_C_L(0L, 0L, (String)null);
 	}
 
 	@Test

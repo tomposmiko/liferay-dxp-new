@@ -100,24 +100,10 @@ public interface UserLocalService
 	 * <code>admin.default.group.names</code>.
 	 *
 	 * @param userId the primary key of the user
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public void addDefaultGroups(long userId) throws PortalException;
-
-	/**
-	 * Adds the user to the default groups, unless the user is already in these
-	 * groups. The default groups can be specified in
-	 * <code>portal.properties</code> with the key
-	 * <code>admin.default.group.names</code>.
-	 *
-	 * @param user the user
 	 * @return <code>true</code> if user was added to default groups;
 	 <code>false</code> if user was already a member
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
-	@Deprecated
-	public boolean addDefaultGroups(User user) throws PortalException;
+	public boolean addDefaultGroups(long userId) throws PortalException;
 
 	/**
 	 * Adds the user to the default regular roles, unless the user already has
@@ -126,24 +112,10 @@ public interface UserLocalService
 	 * <code>admin.default.role.names</code>.
 	 *
 	 * @param userId the primary key of the user
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public void addDefaultRoles(long userId) throws PortalException;
-
-	/**
-	 * Adds the user to the default regular roles, unless the user already has
-	 * these regular roles. The default regular roles can be specified in
-	 * <code>portal.properties</code> with the key
-	 * <code>admin.default.role.names</code>.
-	 *
-	 * @param user the user
 	 * @return <code>true</code> if user was given default roles;
 	 <code>false</code> if user already has default roles
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
-	@Deprecated
-	public boolean addDefaultRoles(User user) throws PortalException;
+	public boolean addDefaultRoles(long userId) throws PortalException;
 
 	/**
 	 * Adds the user to the default user groups, unless the user is already in
@@ -152,24 +124,10 @@ public interface UserLocalService
 	 * <code>admin.default.user.group.names</code>.
 	 *
 	 * @param userId the primary key of the user
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public void addDefaultUserGroups(long userId) throws PortalException;
-
-	/**
-	 * Adds the user to the default user groups, unless the user is already in
-	 * these user groups. The default user groups can be specified in
-	 * <code>portal.properties</code> with the property
-	 * <code>admin.default.user.group.names</code>.
-	 *
-	 * @param user the user
 	 * @return <code>true</code> if user was added to default user groups;
 	 <code>false</code> if user is already a user group member
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
-	@Deprecated
-	public boolean addDefaultUserGroups(User user) throws PortalException;
+	public boolean addDefaultUserGroups(long userId) throws PortalException;
 
 	public void addGroupUser(long groupId, long userId);
 
@@ -201,6 +159,16 @@ public interface UserLocalService
 	 * @throws PortalException
 	 */
 	public void addOrganizationUsers(long organizationId, long[] userIds)
+		throws PortalException;
+
+	public User addOrUpdateUser(
+			String externalReferenceCode, long creatorUserId, long companyId,
+			boolean autoPassword, String password1, String password2,
+			boolean autoScreenName, String screenName, String emailAddress,
+			Locale locale, String firstName, String middleName, String lastName,
+			long prefixId, long suffixId, boolean male, int birthdayMonth,
+			int birthdayDay, int birthdayYear, String jobTitle,
+			boolean sendEmail, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -632,6 +600,7 @@ public interface UserLocalService
 	 * authentication, without using the AuthPipeline. Primarily used for
 	 * authenticating users of <code>tunnel-web</code>.
 	 *
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
 	 * @param companyId the primary key of the user's company
 	 * @param realm unused
 	 * @param nonce the number used once
@@ -641,6 +610,7 @@ public interface UserLocalService
 	 * @return the user's primary key if authentication is successful;
 	 <code>0</code> otherwise
 	 */
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS)
 	public long authenticateForDigest(
 			long companyId, String userName, String realm, String nonce,
@@ -655,7 +625,9 @@ public interface UserLocalService
 	 * @param encPassword the encrypted password
 	 * @return <code>true</code> if authentication is successful;
 	 <code>false</code> otherwise
+	 * @deprecated As of Cavanaugh (7.4.x), with no replacement
 	 */
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean authenticateForJAAS(long userId, String encPassword);
 
@@ -981,7 +953,13 @@ public interface UserLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public User fetchUserByEmailAddress(long companyId, String emailAddress);
 
-	@Deprecated
+	/**
+	 * Returns the user with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user's external reference code
+	 * @return the matching user, or <code>null</code> if a matching user could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public User fetchUserByExternalReferenceCode(
 		long companyId, String externalReferenceCode);
@@ -1043,6 +1021,9 @@ public interface UserLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public User fetchUserByPortraitId(long portraitId);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchUserByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public User fetchUserByReferenceCode(
@@ -1532,7 +1513,14 @@ public interface UserLocalService
 	public User getUserByEmailAddress(long companyId, String emailAddress)
 		throws PortalException;
 
-	@Deprecated
+	/**
+	 * Returns the user with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user's external reference code
+	 * @return the matching user
+	 * @throws PortalException if a matching user could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public User getUserByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -1956,6 +1944,27 @@ public interface UserLocalService
 		LinkedHashMap<String, Object> params, boolean andSearch, int start,
 		int end, Sort[] sorts);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<User> searchBySocial(
+			long userId, int[] socialRelationTypes, String keywords, int start,
+			int end)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<User> searchBySocial(
+		long companyId, long[] groupIds, String keywords, int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<User> searchBySocial(
+		long companyId, long[] groupIds, String keywords, int start, int end,
+		OrderByComparator<User> orderByComparator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<User> searchBySocial(
+			long[] groupIds, long userId, int[] socialRelationTypes,
+			String keywords, int start, int end)
+		throws PortalException;
+
 	/**
 	 * Returns the number of users who match the keywords and status.
 	 *
@@ -2005,21 +2014,42 @@ public interface UserLocalService
 	public Map<Long, Integer> searchCounts(
 		long companyId, int status, long[] groupIds);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #searchBySocial(long, int[], String, int, int)}
+	 */
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<User> searchSocial(
 			long userId, int[] socialRelationTypes, String keywords, int start,
 			int end)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #searchBySocial(long, long[], String, int, int)}
+	 */
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<User> searchSocial(
 		long companyId, long[] groupIds, String keywords, int start, int end);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #searchBySocial(long, long[], String, int, int,
+	 OrderByComparator)}
+	 */
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<User> searchSocial(
 		long companyId, long[] groupIds, String keywords, int start, int end,
 		OrderByComparator<User> orderByComparator);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #searchBySocial(long[], long, int[], String, int, int)}
+	 */
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<User> searchSocial(
 			long[] groupIds, long userId, int[] socialRelationTypes,
@@ -2256,7 +2286,6 @@ public interface UserLocalService
 	 use
 	 * @return the user
 	 */
-	@CTAware(onProduction = true)
 	public User updateAgreedToTermsOfUse(
 			long userId, boolean agreedToTermsOfUse)
 		throws PortalException;
@@ -2325,7 +2354,6 @@ public interface UserLocalService
 	 * @param emailAddressVerified whether the user has verified email address
 	 * @return the user
 	 */
-	@CTAware(onProduction = true)
 	public User updateEmailAddressVerified(
 			long userId, boolean emailAddressVerified)
 		throws PortalException;
@@ -2576,7 +2604,6 @@ public interface UserLocalService
 	 password the next time they log in
 	 * @return the user
 	 */
-	@CTAware(onProduction = true)
 	public User updatePassword(
 			long userId, String password1, String password2,
 			boolean passwordReset)
@@ -2595,7 +2622,6 @@ public interface UserLocalService
 	 tracked, or validated. Primarily used for password imports.
 	 * @return the user
 	 */
-	@CTAware(onProduction = true)
 	public User updatePassword(
 			long userId, String password1, String password2,
 			boolean passwordReset, boolean silentUpdate)
@@ -2627,7 +2653,6 @@ public interface UserLocalService
 	 password the next time they login
 	 * @return the user
 	 */
-	@CTAware(onProduction = true)
 	public User updatePasswordReset(long userId, boolean passwordReset)
 		throws PortalException;
 
@@ -2649,7 +2674,6 @@ public interface UserLocalService
 	 * @param answer the user's new password reset answer
 	 * @return the user
 	 */
-	@CTAware(onProduction = true)
 	public User updateReminderQuery(long userId, String question, String answer)
 		throws PortalException;
 

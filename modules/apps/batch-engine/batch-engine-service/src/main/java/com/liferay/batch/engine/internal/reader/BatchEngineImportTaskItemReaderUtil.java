@@ -14,6 +14,7 @@
 
 package com.liferay.batch.engine.internal.reader;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.liferay.petra.string.StringPool;
@@ -25,6 +26,7 @@ import java.lang.reflect.Field;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -42,18 +44,48 @@ public class BatchEngineImportTaskItemReaderUtil {
 
 			Field field = null;
 
-			try {
-				field = itemClass.getDeclaredField(name);
+			for (Field declaredField : itemClass.getDeclaredFields()) {
+				if (name.equals(declaredField.getName()) ||
+					Objects.equals(
+						StringPool.UNDERLINE + name, declaredField.getName())) {
+
+					field = declaredField;
+
+					break;
+				}
 			}
-			catch (NoSuchFieldException noSuchFieldException) {
-				field = itemClass.getDeclaredField(StringPool.UNDERLINE + name);
+
+			if (field != null) {
+				field.setAccessible(true);
+
+				field.set(
+					item,
+					_objectMapper.convertValue(
+						entry.getValue(), field.getType()));
+
+				continue;
+			}
+
+			for (Field declaredField : itemClass.getDeclaredFields()) {
+				JsonAnySetter[] annotationsByType =
+					declaredField.getAnnotationsByType(JsonAnySetter.class);
+
+				if (annotationsByType.length > 0) {
+					field = declaredField;
+
+					break;
+				}
+			}
+
+			if (field == null) {
+				throw new NoSuchFieldException(entry.getKey());
 			}
 
 			field.setAccessible(true);
 
-			field.set(
-				item,
-				_objectMapper.convertValue(entry.getValue(), field.getType()));
+			Map<String, Object> map = (Map)field.get(item);
+
+			map.put(entry.getKey(), entry.getValue());
 		}
 
 		return item;

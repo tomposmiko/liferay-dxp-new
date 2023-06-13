@@ -20,14 +20,10 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
 
-import java.lang.reflect.Method;
-
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.Generated;
-
-import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -46,12 +42,13 @@ import org.osgi.service.component.annotations.Reference;
  * @generated
  */
 @Component(
+	enabled = false,
 	properties = "OSGI-INF/liferay/rest/v2_0/openapi.properties",
 	service = OpenAPIResourceImpl.class
 )
 @Generated("")
 @OpenAPIDefinition(
-	info = @Info(description = "Liferay Commerce Admin Pricing API. A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.headless.commerce.admin.pricing.client', and version '3.0.34'.", license = @License(name = "Apache 2.0", url = "http://www.apache.org/licenses/LICENSE-2.0.html"), title = "Liferay Commerce Admin Pricing API", version = "v2.0")
+	info = @Info(description = "Liferay Commerce Admin Pricing API. A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.headless.commerce.admin.pricing.client', and version '4.0.11'.", license = @License(name = "Apache 2.0", url = "http://www.apache.org/licenses/LICENSE-2.0.html"), title = "Liferay Commerce Admin Pricing API", version = "v2.0")
 )
 @Path("/v2.0")
 public class OpenAPIResourceImpl {
@@ -59,38 +56,28 @@ public class OpenAPIResourceImpl {
 	@GET
 	@Path("/openapi.{type:json|yaml}")
 	@Produces({MediaType.APPLICATION_JSON, "application/yaml"})
-	public Response getOpenAPI(
-			@Context HttpServletRequest httpServletRequest,
-			@PathParam("type") String type, @Context UriInfo uriInfo)
+	public Response getOpenAPI(@PathParam("type") String type)
 		throws Exception {
 
-		Class<? extends OpenAPIResource> clazz = _openAPIResource.getClass();
-
 		try {
-			Method method = clazz.getMethod(
-				"getOpenAPI", HttpServletRequest.class, Set.class, String.class,
-				UriInfo.class);
+			Class<? extends OpenAPIResource> clazz =
+				_openAPIResource.getClass();
 
-			return (Response)method.invoke(
-				_openAPIResource, httpServletRequest, _resourceClasses, type,
-				uriInfo);
+			clazz.getMethod(
+				"getOpenAPI", Set.class, String.class, UriInfo.class);
 		}
-		catch (NoSuchMethodException noSuchMethodException1) {
-			try {
-				Method method = clazz.getMethod(
-					"getOpenAPI", Set.class, String.class, UriInfo.class);
+		catch (NoSuchMethodException noSuchMethodException) {
+			return _openAPIResource.getOpenAPI(_resourceClasses, type);
+		}
 
-				return (Response)method.invoke(
-					_openAPIResource, _resourceClasses, type, uriInfo);
-			}
-			catch (NoSuchMethodException noSuchMethodException2) {
-				return _openAPIResource.getOpenAPI(_resourceClasses, type);
-			}
-		}
+		return _openAPIResource.getOpenAPI(_resourceClasses, type, _uriInfo);
 	}
 
 	@Reference
 	private OpenAPIResource _openAPIResource;
+
+	@Context
+	private UriInfo _uriInfo;
 
 	private final Set<Class<?>> _resourceClasses = new HashSet<Class<?>>() {
 		{
@@ -112,11 +99,17 @@ public class OpenAPIResourceImpl {
 
 			add(DiscountChannelResourceImpl.class);
 
+			add(DiscountOrderTypeResourceImpl.class);
+
 			add(DiscountProductResourceImpl.class);
 
 			add(DiscountProductGroupResourceImpl.class);
 
 			add(DiscountRuleResourceImpl.class);
+
+			add(DiscountSkuResourceImpl.class);
+
+			add(OrderTypeResourceImpl.class);
 
 			add(PriceEntryResourceImpl.class);
 
@@ -129,6 +122,8 @@ public class OpenAPIResourceImpl {
 			add(PriceListChannelResourceImpl.class);
 
 			add(PriceListDiscountResourceImpl.class);
+
+			add(PriceListOrderTypeResourceImpl.class);
 
 			add(PriceModifierResourceImpl.class);
 

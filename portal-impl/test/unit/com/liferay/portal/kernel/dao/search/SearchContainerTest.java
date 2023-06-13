@@ -14,19 +14,15 @@
 
 package com.liferay.portal.kernel.dao.search;
 
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.PropsImpl;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -35,14 +31,8 @@ import org.junit.Test;
 public class SearchContainerTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() {
-		PropsUtil.setProps(new PropsImpl());
-	}
 
 	@After
 	public void tearDown() {

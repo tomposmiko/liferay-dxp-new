@@ -33,6 +33,8 @@ public class OpenIdConnectProviderImpl
 		OpenIdConnectMetadataFactory openIdConnectMetadataFactory,
 		int tokenConnectionTimeout) {
 
+		// TODO LPS-139642
+
 		_name = name;
 		_clientId = clientId;
 		_clientSecret = clientSecret;

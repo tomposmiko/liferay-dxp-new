@@ -67,7 +67,9 @@ public class Document implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(Document.class, json);
 	}
 
-	@Schema
+	@Schema(
+		description = "Block of actions allowed by the user making the request."
+	)
 	@Valid
 	public Map<String, Map<String, String>> getActions() {
 		return actions;
@@ -93,7 +95,9 @@ public class Document implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "Block of actions allowed by the user making the request."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, Map<String, String>> actions;
 
@@ -160,7 +164,9 @@ public class Document implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected AggregateRating aggregateRating;
 
-	@Schema
+	@Schema(
+		description = "The key of the asset library to which the document is scoped."
+	)
 	public String getAssetLibraryKey() {
 		return assetLibraryKey;
 	}
@@ -184,7 +190,9 @@ public class Document implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The key of the asset library to which the document is scoped."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String assetLibraryKey;
 
@@ -217,7 +225,7 @@ public class Document implements Serializable {
 	protected String contentUrl;
 
 	@Schema(
-		description = "optional field with the content of the document in Base64, can be embedded with nestedFields"
+		description = "The optional field with the content of the document in Base64, can be embedded with nestedFields."
 	)
 	public String getContentValue() {
 		return contentValue;
@@ -243,7 +251,7 @@ public class Document implements Serializable {
 	}
 
 	@GraphQLField(
-		description = "optional field with the content of the document in Base64, can be embedded with nestedFields"
+		description = "The optional field with the content of the document in Base64, can be embedded with nestedFields."
 	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String contentValue;
@@ -277,7 +285,9 @@ public class Document implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
-	@Schema
+	@Schema(
+		description = "A list of the custom fields associated with the document."
+	)
 	@Valid
 	public CustomField[] getCustomFields() {
 		return customFields;
@@ -302,7 +312,9 @@ public class Document implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A list of the custom fields associated with the document."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected CustomField[] customFields;
 
@@ -485,6 +497,34 @@ public class Document implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String encodingFormat;
 
+	@Schema(description = "The document's external reference code.")
+	public String getExternalReferenceCode() {
+		return externalReferenceCode;
+	}
+
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		this.externalReferenceCode = externalReferenceCode;
+	}
+
+	@JsonIgnore
+	public void setExternalReferenceCode(
+		UnsafeSupplier<String, Exception> externalReferenceCodeUnsafeSupplier) {
+
+		try {
+			externalReferenceCode = externalReferenceCodeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(description = "The document's external reference code.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String externalReferenceCode;
+
 	@Schema(description = "The document's file extension.")
 	public String getFileExtension() {
 		return fileExtension;
@@ -595,7 +635,7 @@ public class Document implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfComments;
 
-	@Schema
+	@Schema(description = "A list of related contents to this document.")
 	@Valid
 	public RelatedContent[] getRelatedContents() {
 		return relatedContents;
@@ -621,9 +661,43 @@ public class Document implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A list of related contents to this document.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected RelatedContent[] relatedContents;
+
+	@Schema(
+		description = "A list of rendered documents, which results from using a display page to process the document and return HTML."
+	)
+	@Valid
+	public RenderedContent[] getRenderedContents() {
+		return renderedContents;
+	}
+
+	public void setRenderedContents(RenderedContent[] renderedContents) {
+		this.renderedContents = renderedContents;
+	}
+
+	@JsonIgnore
+	public void setRenderedContents(
+		UnsafeSupplier<RenderedContent[], Exception>
+			renderedContentsUnsafeSupplier) {
+
+		try {
+			renderedContents = renderedContentsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(
+		description = "A list of rendered documents, which results from using a display page to process the document and return HTML."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected RenderedContent[] renderedContents;
 
 	@Schema(
 		description = "The ID of the site to which this document is scoped."
@@ -1037,6 +1111,20 @@ public class Document implements Serializable {
 			sb.append("\"");
 		}
 
+		if (externalReferenceCode != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"externalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(externalReferenceCode));
+
+			sb.append("\"");
+		}
+
 		if (fileExtension != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -1108,6 +1196,26 @@ public class Document implements Serializable {
 				sb.append(String.valueOf(relatedContents[i]));
 
 				if ((i + 1) < relatedContents.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		if (renderedContents != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"renderedContents\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < renderedContents.length; i++) {
+				sb.append(String.valueOf(renderedContents[i]));
+
+				if ((i + 1) < renderedContents.length) {
 					sb.append(", ");
 				}
 			}

@@ -52,8 +52,6 @@ import com.liferay.portal.model.impl.GroupImpl;
 import com.liferay.portal.service.impl.GroupLocalServiceImpl;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
-import java.io.Serializable;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -358,13 +356,6 @@ public class GroupFinderImpl
 		finally {
 			closeSession(session);
 		}
-	}
-
-	@Override
-	public Map<Serializable, Group> fetchByPrimaryKeys(
-		Set<Serializable> primaryKeys) {
-
-		return super.fetchByPrimaryKeys(primaryKeys);
 	}
 
 	@Override
@@ -703,15 +694,10 @@ public class GroupFinderImpl
 			closeSession(session);
 		}
 
-		StringBundler sb = new StringBundler(5);
-
-		sb.append("No Group exists with the key {companyId=");
-		sb.append(companyId);
-		sb.append(", groupKey=");
-		sb.append(groupKey);
-		sb.append("}");
-
-		throw new NoSuchGroupException(sb.toString());
+		throw new NoSuchGroupException(
+			StringBundler.concat(
+				"No Group exists with the key {companyId=", companyId,
+				", groupKey=", groupKey, "}"));
 	}
 
 	@Override
@@ -1231,7 +1217,6 @@ public class GroupFinderImpl
 				queryPos.add(
 					RoleLocalServiceUtil.hasUserRole(
 						userId, adminRole.getRoleId()));
-
 				queryPos.add(userId);
 
 				queryPos.add(siteAdminRole.getRoleId());
@@ -1269,15 +1254,11 @@ public class GroupFinderImpl
 
 				if (!groupsTree.isEmpty()) {
 					for (Group group : groupsTree) {
-						StringBundler sb = new StringBundler(5);
-
-						sb.append(StringPool.PERCENT);
-						sb.append(StringPool.SLASH);
-						sb.append(group.getGroupId());
-						sb.append(StringPool.SLASH);
-						sb.append(StringPool.PERCENT);
-
-						queryPos.add(sb.toString());
+						queryPos.add(
+							StringBundler.concat(
+								StringPool.PERCENT, StringPool.SLASH,
+								group.getGroupId(), StringPool.SLASH,
+								StringPool.PERCENT));
 					}
 				}
 			}

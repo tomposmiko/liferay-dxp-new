@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -61,7 +62,7 @@ public class MessageBoardMessageSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (messageBoardMessage.getActions() != null) {
 			if (sb.length() > 1) {
@@ -193,6 +194,20 @@ public class MessageBoardMessageSerDes {
 			sb.append("\"");
 
 			sb.append(_escape(messageBoardMessage.getEncodingFormat()));
+
+			sb.append("\"");
+		}
+
+		if (messageBoardMessage.getExternalReferenceCode() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"externalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(messageBoardMessage.getExternalReferenceCode()));
 
 			sb.append("\"");
 		}
@@ -353,6 +368,20 @@ public class MessageBoardMessageSerDes {
 			sb.append(messageBoardMessage.getSiteId());
 		}
 
+		if (messageBoardMessage.getStatus() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"status\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(messageBoardMessage.getStatus()));
+
+			sb.append("\"");
+		}
+
 		if (messageBoardMessage.getSubscribed() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -399,7 +428,7 @@ public class MessageBoardMessageSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (messageBoardMessage.getActions() == null) {
 			map.put("actions", null);
@@ -489,6 +518,15 @@ public class MessageBoardMessageSerDes {
 			map.put(
 				"encodingFormat",
 				String.valueOf(messageBoardMessage.getEncodingFormat()));
+		}
+
+		if (messageBoardMessage.getExternalReferenceCode() == null) {
+			map.put("externalReferenceCode", null);
+		}
+		else {
+			map.put(
+				"externalReferenceCode",
+				String.valueOf(messageBoardMessage.getExternalReferenceCode()));
 		}
 
 		if (messageBoardMessage.getFriendlyUrlPath() == null) {
@@ -596,6 +634,13 @@ public class MessageBoardMessageSerDes {
 			map.put("siteId", String.valueOf(messageBoardMessage.getSiteId()));
 		}
 
+		if (messageBoardMessage.getStatus() == null) {
+			map.put("status", null);
+		}
+		else {
+			map.put("status", String.valueOf(messageBoardMessage.getStatus()));
+		}
+
 		if (messageBoardMessage.getSubscribed() == null) {
 			map.put("subscribed", null);
 		}
@@ -676,18 +721,14 @@ public class MessageBoardMessageSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "customFields")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					CustomField[] customFieldsArray =
-						new CustomField[jsonParserFieldValues.length];
-
-					for (int i = 0; i < customFieldsArray.length; i++) {
-						customFieldsArray[i] = CustomFieldSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					messageBoardMessage.setCustomFields(customFieldsArray);
+					messageBoardMessage.setCustomFields(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> CustomFieldSerDes.toDTO((String)object)
+						).toArray(
+							size -> new CustomField[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
@@ -705,6 +746,14 @@ public class MessageBoardMessageSerDes {
 			else if (Objects.equals(jsonParserFieldName, "encodingFormat")) {
 				if (jsonParserFieldValue != null) {
 					messageBoardMessage.setEncodingFormat(
+						(String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "externalReferenceCode")) {
+
+				if (jsonParserFieldValue != null) {
+					messageBoardMessage.setExternalReferenceCode(
 						(String)jsonParserFieldValue);
 				}
 			}
@@ -775,19 +824,14 @@ public class MessageBoardMessageSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "relatedContents")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					RelatedContent[] relatedContentsArray =
-						new RelatedContent[jsonParserFieldValues.length];
-
-					for (int i = 0; i < relatedContentsArray.length; i++) {
-						relatedContentsArray[i] = RelatedContentSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
 					messageBoardMessage.setRelatedContents(
-						relatedContentsArray);
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> RelatedContentSerDes.toDTO((String)object)
+						).toArray(
+							size -> new RelatedContent[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "showAsAnswer")) {
@@ -800,6 +844,11 @@ public class MessageBoardMessageSerDes {
 				if (jsonParserFieldValue != null) {
 					messageBoardMessage.setSiteId(
 						Long.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "status")) {
+				if (jsonParserFieldValue != null) {
+					messageBoardMessage.setStatus((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "subscribed")) {

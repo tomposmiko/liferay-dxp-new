@@ -71,14 +71,25 @@ public class CommerceOrderNoteLocalServiceUtil {
 	}
 
 	public static CommerceOrderNote addCommerceOrderNote(
-			long commerceOrderId, String content, boolean restricted,
-			String externalReferenceCode,
+			String externalReferenceCode, long commerceOrderId, String content,
+			boolean restricted,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addCommerceOrderNote(
-			commerceOrderId, content, restricted, externalReferenceCode,
+			externalReferenceCode, commerceOrderId, content, restricted,
 			serviceContext);
+	}
+
+	public static CommerceOrderNote addOrUpdateCommerceOrderNote(
+			String externalReferenceCode, long commerceOrderNoteId,
+			long commerceOrderId, String content, boolean restricted,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addOrUpdateCommerceOrderNote(
+			externalReferenceCode, commerceOrderNoteId, commerceOrderId,
+			content, restricted, serviceContext);
 	}
 
 	/**
@@ -237,10 +248,10 @@ public class CommerceOrderNoteLocalServiceUtil {
 	}
 
 	public static CommerceOrderNote fetchByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
+		String externalReferenceCode, long companyId) {
 
 		return getService().fetchByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	public static CommerceOrderNote fetchCommerceOrderNote(
@@ -249,7 +260,13 @@ public class CommerceOrderNoteLocalServiceUtil {
 		return getService().fetchCommerceOrderNote(commerceOrderNoteId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce order note with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order note's external reference code
+	 * @return the matching commerce order note, or <code>null</code> if a matching commerce order note could not be found
+	 */
 	public static CommerceOrderNote
 		fetchCommerceOrderNoteByExternalReferenceCode(
 			long companyId, String externalReferenceCode) {
@@ -258,6 +275,9 @@ public class CommerceOrderNoteLocalServiceUtil {
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceOrderNoteByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static CommerceOrderNote fetchCommerceOrderNoteByReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -286,7 +306,14 @@ public class CommerceOrderNoteLocalServiceUtil {
 		return getService().getCommerceOrderNote(commerceOrderNoteId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce order note with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce order note's external reference code
+	 * @return the matching commerce order note
+	 * @throws PortalException if a matching commerce order note could not be found
+	 */
 	public static CommerceOrderNote getCommerceOrderNoteByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
 		throws PortalException {
@@ -394,23 +421,12 @@ public class CommerceOrderNoteLocalServiceUtil {
 	}
 
 	public static CommerceOrderNote updateCommerceOrderNote(
-			long commerceOrderNoteId, String content, boolean restricted,
-			String externalReferenceCode)
+			String externalReferenceCode, long commerceOrderNoteId,
+			String content, boolean restricted)
 		throws PortalException {
 
 		return getService().updateCommerceOrderNote(
-			commerceOrderNoteId, content, restricted, externalReferenceCode);
-	}
-
-	public static CommerceOrderNote upsertCommerceOrderNote(
-			long commerceOrderNoteId, long commerceOrderId, String content,
-			boolean restricted, String externalReferenceCode,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
-
-		return getService().upsertCommerceOrderNote(
-			commerceOrderNoteId, commerceOrderId, content, restricted,
-			externalReferenceCode, serviceContext);
+			externalReferenceCode, commerceOrderNoteId, content, restricted);
 	}
 
 	public static CommerceOrderNoteLocalService getService() {

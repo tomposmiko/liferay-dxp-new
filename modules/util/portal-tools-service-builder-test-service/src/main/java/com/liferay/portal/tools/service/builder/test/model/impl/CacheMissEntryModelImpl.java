@@ -30,6 +30,7 @@ import com.liferay.portal.tools.service.builder.test.model.CacheMissEntryModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -211,43 +212,65 @@ public class CacheMissEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<CacheMissEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, CacheMissEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<CacheMissEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<CacheMissEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CacheMissEntry.class.getClassLoader(), CacheMissEntry.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", CacheMissEntry::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", CacheMissEntry::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"cacheMissEntryId", CacheMissEntry::getCacheMissEntryId);
+		try {
+			Constructor<CacheMissEntry> constructor =
+				(Constructor<CacheMissEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<CacheMissEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<CacheMissEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<CacheMissEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<CacheMissEntry, Object>>();
 		Map<String, BiConsumer<CacheMissEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<CacheMissEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CacheMissEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<CacheMissEntry, Long>)CacheMissEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CacheMissEntry::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<CacheMissEntry, Long>)
 				CacheMissEntry::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"cacheMissEntryId", CacheMissEntry::getCacheMissEntryId);
 		attributeSetterBiConsumers.put(
 			"cacheMissEntryId",
 			(BiConsumer<CacheMissEntry, Long>)
 				CacheMissEntry::setCacheMissEntryId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -355,6 +378,20 @@ public class CacheMissEntryModelImpl
 		cacheMissEntryImpl.setCacheMissEntryId(getCacheMissEntryId());
 
 		cacheMissEntryImpl.resetOriginalValues();
+
+		return cacheMissEntryImpl;
+	}
+
+	@Override
+	public CacheMissEntry cloneWithOriginalValues() {
+		CacheMissEntryImpl cacheMissEntryImpl = new CacheMissEntryImpl();
+
+		cacheMissEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		cacheMissEntryImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		cacheMissEntryImpl.setCacheMissEntryId(
+			this.<Long>getColumnOriginalValue("cacheMissEntryId"));
 
 		return cacheMissEntryImpl;
 	}
@@ -523,9 +560,7 @@ public class CacheMissEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CacheMissEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CacheMissEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

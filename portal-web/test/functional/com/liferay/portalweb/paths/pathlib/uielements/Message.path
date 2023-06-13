@@ -16,13 +16,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ASSET_INFO</td>
+	<td>//*[contains(@class,'sheet-title')][.//*[normalize-space(text())='${assetTitle}']]/parent::div//*[contains(@class,'mb-2') or contains(@class,'mr-2')][normalize-space()='${info}']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CATEGORY_ALERT</td>
 	<td>//div[contains(@id,'categorization')]/div[contains(@class,'alert-danger')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>CHECKOUT_SUCCESS</td>
-	<td>//div[contains(@class,'content')]//div[contains(@class,'alert-info') and not(contains(@class,'center'))]</td>
+	<td>//div[contains(@class,'content')]//div[contains(@class,'alert-info')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -32,7 +37,7 @@
 </tr>
 <tr>
 	<td>CUSTOMIZED_PAGE_INFO</td>
-	<td>//div[contains(@class,'layout')]/span[contains(@class,'message-info')]</td>
+	<td>//div[contains(@class,'popover')]//p[contains(@class,'message-info')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -58,6 +63,11 @@
 <tr>
 	<td>EMPTY_INFO_2</td>
 	<td>//div[contains(@class,'panel-default')][2]//div[contains(@class,'empty-result-message')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ROLE_EMPTY_MUTED_INFO</td>
+	<td>//div[h3[*[*[contains(text(),'${key_RoleType}')]]]]//div[*[contains(@class,'text-muted')]or contains(@class,'text-muted')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -182,7 +192,7 @@
 </tr>
 <tr>
 	<td>ERROR_FIELD_REQUIRED</td>
-	<td>//div[@role='alert' and contains(.,'This field is required')] | //span[contains(@id,'title')]//div[contains(.,'This field is required.')]</td>
+	<td>//label[contains(.,'${key_fieldFieldLabel}')]/..//div[@role='alert' and contains(.,'This field is required')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -193,6 +203,36 @@
 <tr>
 	<td>ERROR_FORM_VALIDATION</td>
 	<td>//div[contains(@class,'form-validator-stack')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ERROR_IMPORT_TRANSLATIONS</td>
+	<td>//h4[contains(@class,'text-danger')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ERROR_IMPORT_TRANSLATIONS_ITEM_MESSAGE</td>
+	<td>//li[contains(@class,'list-group-item')]//div[contains(@class,'text-danger')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ERROR_IMPORT_TRANSLATIONS_ITEM</td>
+	<td>//div[contains(@class,'text-danger')]/preceding-sibling::div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ERROR_INVALID_FACEBOOK_VIDEO</td>
+	<td>//div[contains(@class,'pluginSkinLight')]//div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ERROR_INVALID_VIMEO_VIDEO</td>
+	<td>//div[contains(@id,'sun')]//p</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ERROR_INVALID_YOUTUBE_VIDEO</td>
+	<td>//div[contains(@class,'ytp-error-content-wrap')]//span</td>
 	<td></td>
 </tr>
 <tr>
@@ -233,6 +273,11 @@
 <tr>
 	<td>INFO</td>
 	<td>//div[contains(@class,'alert alert-info') and not(contains(@class,'hide'))]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>INFO_EXTERNAL_VIDEO_PREVIEW</td>
+	<td>//div[contains(@class,'video-preview-placeholder-text')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -288,11 +333,6 @@
 <tr>
 	<td>LOGOUT_URL_SUCCESS</td>
 	<td>//tr[contains(.,'Logout URL')]/td//span[contains(@class,'lfr-status-success')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>MAX_FILESIZE_ALERT</td>
-	<td>//div[(@class='maxFileSize') and (@role='alert')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -356,8 +396,28 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SUCCESS_IMPORT_TRANSLATIONS</td>
+	<td>//h4[contains(@class,'text-success')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SUCCESS_IMPORT_TRANSLATIONS_ITEM</td>
+	<td>//div[contains(@class,'text-success')]/preceding-sibling::div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SUCCESS_IMPORT_TRANSLATIONS_ITEM_2</td>
+	<td>xpath=(//div[contains(@class,'text-success')]/preceding-sibling::div)[2]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SUCCESS_RESTORE_LOCATION</td>
 	<td>//div[@class='portlet-body']/div/em[2]/a[contains(.,'${key_assetRestoreLocation}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SUCCESS_SPECIFIC_FORM_FIELD_REQUIRED</td>
+	<td>//div[@class='form-group' and contains(.,'${key_fieldName}')]//div[contains(@class,'form-feedback-item')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -378,6 +438,11 @@
 <tr>
 	<td>USER_BLOCKED</td>
 	<td>//div[contains(@class,'alert-block')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WARNING_FEEDBACK</td>
+	<td>//div[contains(@class,'form-feedback-item')]</td>
 	<td></td>
 </tr>
 <tr>

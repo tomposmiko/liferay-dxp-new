@@ -4,6 +4,7 @@ definition {
 	property custom.properties = "jsonws.web.service.paths.excludes=";
 	property portal.release = "true";
 	property portal.upstream = "true";
+	property testray.component.names = "Asset Sharing";
 	property testray.main.component.name = "Depot";
 
 	setUp {
@@ -30,13 +31,13 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			Site.tearDownCP();
+			JSONDepot.deleteDepot(depotName = "Test Depot Name");
 
-			Depot.tearDownCP();
+			Site.tearDownCP();
 
 			DMDocument.tearDownCP();
 
@@ -46,99 +47,10 @@ definition {
 		}
 	}
 
-	@description = "This test asserts that users get the proper notification based on depot sharing permissions granted to him."
-	@priority = 5
-	test AssertNotifications {
-		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
-
-		DMDocument.addMultipleCP(dmDocumentFileList = "Document_1.doc,Document_1.png,Document_1.odt");
-
-		DepotNavigator.gotoShare(dmDocumentTitle = "Document_1.doc");
-
-		Asset.share(
-			noAutocomplete = "true",
-			sharingPermissions = "View",
-			userEmailAddress = "userea@liferay.com",
-			userName = "userfn userln");
-
-		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
-
-		LexiconEntry.changeDisplayStyle(displayStyle = "Cards");
-
-		AssertVisible(
-			key_dmDocumentTitle = "Document_1.doc",
-			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_SHARED");
-
-		DepotNavigator.gotoShare(dmDocumentTitle = "Document_1.png");
-
-		Asset.share(
-			sharingPermissions = "Update",
-			userEmailAddress = "userea@liferay.com",
-			userName = "userfn userln");
-
-		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
-
-		LexiconEntry.changeDisplayStyle(displayStyle = "list");
-
-		AssertVisible(
-			key_dmDocumentTitle = "Document_1.png",
-			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_SHARED");
-
-		DepotNavigator.gotoShare(dmDocumentTitle = "Document_1.odt");
-
-		Asset.share(
-			sharingPermissions = "Comment",
-			userEmailAddress = "userea@liferay.com",
-			userName = "userfn userln");
-
-		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
-
-		LexiconEntry.changeDisplayStyle(displayStyle = "table");
-
-		AssertVisible(
-			key_dmDocumentTitle = "Document_1.odt",
-			locator1 = "DocumentsAndMedia#TABLE_DOCUMENT_SHARED");
-
-		User.logoutPG();
-
-		User.loginUserPG(
-			password = "test",
-			userEmailAddress = "userea@liferay.com");
-
-		Notifications.viewBadgeCount(notificationCount = 3);
-
-		Notifications.gotoNotifications();
-
-		Notifications.viewNewSharedContent(
-			contentSharingPermission = "viewing",
-			contentTitle = "Document_1.doc",
-			ownerName = "Test Test");
-
-		Notifications.gotoNotifications();
-
-		Notifications.viewNewSharedContent(
-			contentSharingPermission = "updating",
-			contentTitle = "Document_1.png",
-			openNotification = "true",
-			ownerName = "Test Test");
-
-		NotificationsPortlet.configureNotificationPG(menuItem = "Edit");
-
-		DMDocument.editCmd(dmDocumentTitleEdit = "DM Document Title");
-
-		Button.clickPublish();
-
-		Notifications.gotoNotifications();
-
-		Notifications.viewNewSharedContent(
-			contentSharingPermission = "commenting",
-			contentTitle = "Document_1.odt",
-			ownerName = "Test Test");
-	}
-
 	@description = "This test ensures that sharing can be disabled in a depot."
-	@priority = 5
-	test DisableSharing {
+	@priority = "5"
+	@refactordone
+	test CanDisableDepotSharing {
 		JSONDocument.addFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "Document_1.doc",
@@ -146,29 +58,19 @@ definition {
 
 		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
-		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+		DMDocumentSharing.viewSharingOption(
+			dmDocumentTitle = "Document_1.doc",
+			sharing = "true");
 
-		Click(
-			key_dmDocumentTitle = "Document_1.doc",
-			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS");
-
-		MenuItem.viewPresent(menuItem = "Share");
-
-		DepotNavigator.openDepotAdmin();
-
-		DepotNavigator.gotoEdit(depotName = "Test Depot Name");
+		DepotNavigator.openDepotSettingsGeneral(depotName = "Test Depot Name");
 
 		Depot.configureSharing(sharing = "Disabled");
 
-		DepotNavigator.openDepotAdmin();
+		DepotNavigator.openDepotSettingsGeneral(depotName = "Test Depot Name");
 
-		DepotNavigator.gotoDepotPortlet(
-			depotName = "Test Depot Name",
-			portlet = "Settings");
-
-		AssertNotChecked.assertNotCheckedNotVisible(
-			key_toggleSwitchLabel = "Enable Sharing",
-			locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
+		Depot.viewDepotConfiguration(
+			configuration = "disabled",
+			toggleSwitchLabel = "Enable Sharing");
 
 		JSONDocument.addFile(
 			dmDocumentDescription = "DM Document Description",
@@ -177,22 +79,54 @@ definition {
 
 		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
-		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+		DMDocumentSharing.viewSharingOption(dmDocumentTitle = "Document_1.doc");
+	}
 
-		Click(
-			key_dmDocumentTitle = "Document_1.txt",
-			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS");
+	@description = "This test ensures that depot sharing can be disabled at the instance level."
+	@priority = "4"
+	@refactordone
+	test CanDisableDepotSharingAtInstanceScope {
+		property test.name.skip.portal.instance = "DepotSharing#CanDisableDepotSharingAtInstanceScope";
 
-		MenuItem.viewNotPresent(menuItem = "Share");
+		DepotNavigator.openToConfigSharingInInstanceSettings();
+
+		FormFields.disableCheckbox(fieldName = "enabled");
+
+		SystemSettings.saveConfiguration();
+
+		DepotNavigator.openDepotSettingsGeneral(depotName = "Test Depot Name");
+
+		Depot.viewNoPanel(panelName = "Sharing");
+	}
+
+	@description = "This test ensures that depot sharing can be disabled at the system level."
+	@priority = "4"
+	@refactordone
+	test CanDisableDepotSharingAtSystemScope {
+		property test.name.skip.portal.instance = "DepotSharing#CanDisableDepotSharingAtSystemScope";
+
+		DepotNavigator.openToConfigSharingInSystemSettings();
+
+		FormFields.disableCheckbox(fieldName = "enabled");
+
+		SystemSettings.saveConfiguration();
+
+		DepotNavigator.openDepotSettingsGeneral(depotName = "Test Depot Name");
+
+		Depot.viewNoPanel(panelName = "Sharing");
 	}
 
 	@description = "This test ensures that sharing a depot document to a user, and changing its sharing permissions via Manage Collaborators."
-	@priority = 5
-	test ManageCollaborators {
-		JSONDocument.addFile(
+	@priority = "5"
+	@refactordone
+	test CanManageCollaborators {
+		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "Document_1.doc",
-			groupName = "Test Depot Name");
+			groupName = "Test Depot Name",
+			guestPermissions = "false",
+			mimeType = "application/msword",
+			sourceFileName = "Document_1.doc");
 
 		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
@@ -204,9 +138,9 @@ definition {
 			userEmailAddress = "userea@liferay.com",
 			userName = "userfn userln");
 
-		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
-
-		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_1.doc");
+		DepotNavigator.openToDMEntryInDepot(
+			depotName = "Test Depot Name",
+			dmDocumentTitle = "Document_1.doc");
 
 		DMDocumentSharing.changePermission(
 			depotName = "Test Depot Name",
@@ -228,22 +162,11 @@ definition {
 			openNotification = "true",
 			ownerName = "Test Test");
 
-		AssertElementPresent(locator1 = "Comments#COMMENT_FIELD");
+		DMDocumentSharing.viewDocumentViaSharedContent(
+			contentSharingPermission = "Comment",
+			dmDocumentTitle = "Document_1.doc");
 
-		AssertElementNotPresent(locator1 = "Button#EDIT");
-
-		Navigator.openURL();
-
-		UserBar.gotoDropdownItem(dropdownItem = "Shared Content");
-
-		AssertTextEquals(
-			key_contentTitle = "Document_1.doc",
-			locator1 = "Sharing#SHARED_CONTENT_CONTENT_TITLE",
-			value1 = "Document_1.doc");
-
-		AssertElementNotPresent(
-			key_contentTitle = "Document_1.doc",
-			locator1 = "Sharing#SHARED_CONTENT_CONTENT_TITLE_2");
+		DMDocumentSharing.viewNoDuplicateDocument(dmDocumentTitle = "Document_1.doc");
 
 		User.logoutPG();
 
@@ -251,9 +174,9 @@ definition {
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
-		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
-
-		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_1.doc");
+		DepotNavigator.openToDMEntryInDepot(
+			depotName = "Test Depot Name",
+			dmDocumentTitle = "Document_1.doc");
 
 		DMDocumentSharing.changePermission(
 			depotName = "Test Depot Name",
@@ -281,23 +204,50 @@ definition {
 
 		Button.clickPublish();
 
-		Navigator.openURL();
+		DMDocumentSharing.viewNoDuplicateDocument(dmDocumentTitle = "DM Document Title");
+	}
 
-		UserBar.gotoDropdownItem(dropdownItem = "Shared Content");
+	@description = "This ensures that a document can be shared with another user in a depot."
+	@priority = "4"
+	@refactordone
+	test CanShareDocument {
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Test Depot Name",
+			guestPermissions = "false",
+			mimeType = "application/msword",
+			sourceFileName = "Document_1.doc");
 
-		AssertTextEquals(
-			key_contentTitle = "DM Document Title",
-			locator1 = "Sharing#SHARED_CONTENT_CONTENT_TITLE",
-			value1 = "DM Document Title");
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
-		AssertElementNotPresent(
-			key_contentTitle = "DM Document Title",
-			locator1 = "Sharing#SHARED_CONTENT_CONTENT_TITLE_2");
+		DMNavigator.gotoShareInfoPanel(dmDocumentTitle = "DM Document Title");
+
+		DMDocument.sharePG(
+			userEmailAddress = "userea@liferay.com",
+			userName = "userfn userln");
+
+		User.logoutPG();
+
+		User.loginUserPG(
+			password = "test",
+			userEmailAddress = "userea@liferay.com");
+
+		Notifications.viewBadgeCount(notificationCount = "1");
+
+		Notifications.gotoNotifications();
+
+		Notifications.viewNewSharedContent(
+			contentSharingPermission = "viewing",
+			contentTitle = "DM Document Title",
+			openNotification = "true",
+			ownerName = "Test Test");
 	}
 
 	@description = "This test ensures that the same document can be shared by different users with sharing permissions."
-	@priority = 4
-	test ShareSameDocumentByDifferentUsers {
+	@priority = "4"
+	@refactordone
+	test CanShareSameDocumentByDifferentUsers {
 		JSONRole.assignRoleToUser(
 			roleTitle = "Administrator",
 			userEmailAddress = "userea@liferay.com");
@@ -317,6 +267,7 @@ definition {
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "Document_1.jpg",
 			groupName = "Test Depot Name",
+			guestPermissions = "false",
 			mimeType = "image/jpeg",
 			sourceFileName = "Document_1.jpg");
 
@@ -350,21 +301,13 @@ definition {
 			password = "test",
 			userEmailAddress = "userea2@liferay.com");
 
-		UserBar.gotoDropdownItem(dropdownItem = "Shared Content");
-
-		AssertTextEquals(
-			key_contentTitle = "Document_1.jpg",
-			locator1 = "Sharing#SHARED_CONTENT_CONTENT_TITLE",
-			value1 = "Document_1.jpg");
-
-		AssertElementNotPresent(
-			key_contentTitle = "Document_1.jpg",
-			locator1 = "Sharing#SHARED_CONTENT_CONTENT_TITLE_2");
+		DMDocumentSharing.viewNoDuplicateDocument(dmDocumentTitle = "Document_1.jpg");
 	}
 
-	@description = "This test makes sure all collaborators will view all collaborators of a depot document that was shared to him. It also covers that a user can successfully remove collaborators through Manage Collaborators and asserts that empty message displays when all collaborators are removed."
-	@priority = 5
-	test ViewAndRemoveCollaborators {
+	@description = "This test makes sure all collaborators will view all collaborators of a depot document that was shared to him. It also covers that a user can successfully remove collaborators through Manage Collaborators."
+	@priority = "5"
+	@refactordone
+	test CanViewAndRemoveCollaborators {
 		JSONUser.addUser(
 			userEmailAddress = "userea2@liferay.com",
 			userFirstName = "userfn2",
@@ -376,10 +319,13 @@ definition {
 			requireReset = "false",
 			userEmailAddress = "userea2@liferay.com");
 
-		JSONDocument.addFile(
+		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "Document_1.doc",
-			groupName = "Test Depot Name");
+			groupName = "Test Depot Name",
+			guestPermissions = "false",
+			mimeType = "application/msword",
+			sourceFileName = "Document_1.doc");
 
 		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
@@ -401,15 +347,19 @@ definition {
 
 		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 
-		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_1.doc");
+		DMDocumentSharing.viewSharedFlag(
+			detailsView = "true",
+			dmDocumentTitle = "Document_1");
 
-		DMDocumentSharing.viewSharedFlag(detailsView = "true");
+		DepotNavigator.openToDMEntryInDepot(
+			depotName = "Test Depot Name",
+			dmDocumentTitle = "Document_1.doc");
 
 		DMDocumentSharing.viewCollaborators(collaboratorList = "userfn,userfn2");
 
-		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
-
-		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_1.doc");
+		DepotNavigator.openToDMEntryInDepot(
+			depotName = "Test Depot Name",
+			dmDocumentTitle = "Document_1.doc");
 
 		DMDocumentSharing.removeCollaborator(
 			collaboratorList = "userfn,userfn2",
@@ -428,6 +378,98 @@ definition {
 		AssertTextEquals(
 			locator1 = "Message#NO_ENTRIES",
 			value1 = "No entries were found.");
+	}
+
+	@description = "This test asserts that users get the proper notification based on depot sharing permissions granted to him."
+	@priority = "5"
+	@refactordone
+	test CanViewSharingNotifications {
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		DMDocument.addMultipleCP(dmDocumentFileList = "Document_1.doc,Document_2.png,Document_3.odt");
+
+		DepotNavigator.gotoShare(dmDocumentTitle = "Document_1");
+
+		Asset.share(
+			noAutocomplete = "true",
+			sharingPermissions = "View",
+			userEmailAddress = "userea@liferay.com",
+			userName = "userfn userln");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "Cards");
+
+		DMDocumentSharing.viewSharedFlag(
+			detailsView = "true",
+			dmDocumentTitle = "Document_1");
+
+		DepotNavigator.gotoShare(dmDocumentTitle = "Document_2");
+
+		Asset.share(
+			sharingPermissions = "Update",
+			userEmailAddress = "userea@liferay.com",
+			userName = "userfn userln");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+
+		DMDocumentSharing.viewSharedFlag(
+			detailsView = "true",
+			dmDocumentTitle = "Document_2");
+
+		DepotNavigator.gotoShare(dmDocumentTitle = "Document_3");
+
+		Asset.share(
+			sharingPermissions = "Comment",
+			userEmailAddress = "userea@liferay.com",
+			userName = "userfn userln");
+
+		DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "table");
+
+		DMDocumentSharing.viewSharedFlag(
+			detailsView = "true",
+			displayStyle = "table",
+			dmDocumentTitle = "Document_3");
+
+		User.logoutPG();
+
+		User.loginUserPG(
+			password = "test",
+			userEmailAddress = "userea@liferay.com");
+
+		Notifications.viewBadgeCount(notificationCount = "3");
+
+		Notifications.gotoNotifications();
+
+		Notifications.viewNewSharedContent(
+			contentSharingPermission = "viewing",
+			contentTitle = "Document_1",
+			ownerName = "Test Test");
+
+		Notifications.gotoNotifications();
+
+		Notifications.viewNewSharedContent(
+			contentSharingPermission = "updating",
+			contentTitle = "Document_2",
+			openNotification = "true",
+			ownerName = "Test Test");
+
+		NotificationsPortlet.configureNotificationPG(menuItem = "Edit");
+
+		DMDocument.editCmd(dmDocumentTitleEdit = "DM Document Title");
+
+		Button.clickPublish();
+
+		Notifications.gotoNotifications();
+
+		Notifications.viewNewSharedContent(
+			contentSharingPermission = "commenting",
+			contentTitle = "Document_3",
+			ownerName = "Test Test");
 	}
 
 }

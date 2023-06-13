@@ -16,7 +16,7 @@
 
 <%@ include file="/init.jsp" %>
 
-<div class="container-fluid-1280">
+<div class="container-fluid container-fluid-max-xl">
 	<div class="card main-content-card">
 		<div class="card-body">
 
@@ -68,9 +68,7 @@
 				List<String> activityDefinitionLanguageKeys = new ArrayList<String>();
 
 				for (String modelName : activitySettingsMap.keySet()) {
-					List<SocialActivityDefinition> activityDefinitions = SocialConfigurationUtil.getActivityDefinitions(modelName);
-
-					for (SocialActivityDefinition activityDefinition : activityDefinitions) {
+					for (SocialActivityDefinition activityDefinition : SocialConfigurationUtil.getActivityDefinitions(modelName)) {
 						activityDefinitionLanguageKeys.add("'" + modelName + "." + activityDefinition.getLanguageKey() + "': \"" + activityDefinition.getName(locale) + "\"");
 					}
 				}

@@ -3,13 +3,7 @@
 		<#list entries as entry>
 			<li class="breadcrumb-item">
 				<#if entry?has_next>
-					<a
-						class="breadcrumb-link"
-
-						<#if entry.isBrowsable()>
-							href="${htmlUtil.escapeAttribute(entry.getURL()!"")}"
-						</#if>
-					>
+					<a class="breadcrumb-link" href="${entry.getURL()!""}" title="${htmlUtil.escape(entry.getTitle())}">
 						<span class="breadcrumb-text-truncate">${htmlUtil.escape(entry.getTitle())}</span>
 					</a>
 				<#else>

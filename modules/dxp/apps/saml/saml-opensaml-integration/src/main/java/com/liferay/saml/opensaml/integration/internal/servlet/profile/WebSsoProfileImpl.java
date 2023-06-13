@@ -163,6 +163,7 @@ import org.opensaml.xmlsec.signature.support.SignatureTrustEngine;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
@@ -172,7 +173,8 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  */
 @Component(
 	configurationPid = "com.liferay.saml.runtime.configuration.SamlConfiguration",
-	immediate = true, service = WebSsoProfile.class
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	service = WebSsoProfile.class
 )
 public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 
@@ -829,6 +831,11 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 				(MessageContext<Response>)messageContext),
 			serviceContext);
 
+		if (user == null) {
+			throw new SubjectException(
+				"No user could not be matched or provisioned");
+		}
+
 		serviceContext.setUserId(user.getUserId());
 
 		SamlSpSession samlSpSession = getSamlSpSession(httpServletRequest);
@@ -847,21 +854,21 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 
 		if (samlSpSession != null) {
 			samlSpSessionLocalService.updateSamlSpSession(
-				samlSpSession.getSamlSpSessionId(), issuer.getValue(),
-				samlSpSession.getSamlSpSessionKey(),
+				samlSpSession.getSamlSpSessionId(),
 				OpenSamlUtil.marshall(assertion), httpSession.getId(),
 				nameID.getFormat(), nameID.getNameQualifier(),
-				nameID.getSPNameQualifier(), nameID.getValue(), sessionIndex,
-				serviceContext);
+				nameID.getSPNameQualifier(), nameID.getValue(),
+				issuer.getValue(), samlSpSession.getSamlSpSessionKey(),
+				sessionIndex, serviceContext);
 		}
 		else {
 			String samlSpSessionKey = generateIdentifier(30);
 
 			samlSpSession = samlSpSessionLocalService.addSamlSpSession(
-				issuer.getValue(), samlSpSessionKey,
 				OpenSamlUtil.marshall(assertion), httpSession.getId(),
 				nameID.getFormat(), nameID.getNameQualifier(),
-				nameID.getSPNameQualifier(), nameID.getValue(), sessionIndex,
+				nameID.getSPNameQualifier(), nameID.getValue(),
+				issuer.getValue(), samlSpSessionKey, sessionIndex,
 				serviceContext);
 		}
 
@@ -1761,6 +1768,11 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 				samlPeerEntityContext.getEntityId());
 		}
 		catch (NoSuchIdpSpSessionException noSuchIdpSpSessionException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					noSuchIdpSpSessionException, noSuchIdpSpSessionException);
+			}
+
 			_samlIdpSpSessionLocalService.addSamlIdpSpSession(
 				samlIdpSsoSession.getSamlIdpSsoSessionId(),
 				samlPeerEntityContext.getEntityId(), nameID.getFormat(),

@@ -30,9 +30,18 @@
 	<td></td>
 	<td></td>
 </tr>
-
+<!--PERMISSIONS_MODAL-->
+<tr>
+	<td>PERMISSIONS_MODAL_CHECKBOX</td>
+	<td>//input[@id='${key_roleTitle}_ACTION_${key_actionName}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
 <!--CONFIGURATION_PERMISSIONS-->
-
 <tr>
 	<td>CONFIGURATION_PERMISSIONS_ROLE_NAME</td>
 	<td>//tr[contains(.,'${key_roleName}')]/td[1]</td>
@@ -44,8 +53,28 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CONFIGURATION_PERMISSIONS_ADD_DOCUMENT_CHECKBOX</td>
+	<td>//input[@id='${key_roleTitle}_ACTION_ADD_DOCUMENT']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CONFIGURATION_PERMISSIONS_ADD_ENTRY</td>
 	<td>//input[@id='${key_roleTitle}_ACTION_ADD_ENTRY']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONFIGURATION_PERMISSIONS_ADD_FOLDER</td>
+	<td>//input[@id='${key_roleTitle}_ACTION_ADD_FOLDER']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONFIGURATION_PERMISSIONS_ADD_SHORTCUT_CHECKBOX</td>
+	<td>//input[@id='${key_roleTitle}_ACTION_ADD_SHORTCUT']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONFIGURATION_PERMISSIONS_ADD_SUBFOLDER_CHECKBOX</td>
+	<td>//input[@id='${key_roleTitle}_ACTION_ADD_SUBFOLDER']</td>
 	<td></td>
 </tr>
 <tr>
@@ -88,9 +117,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--INLINE_PERMISSIONS-->
-
 <tr>
 	<td>INLINE_PERMISSIONS_ADD_DISCUSSION_CHECKBOX</td>
 	<td>//input[@id='${key_roleTitle}_ACTION_ADD_DISCUSSION']</td>
@@ -127,6 +154,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>INLINE_PERMISSIONS_DELETE_CHECKBOX</td>
+	<td>//input[@id='${key_roleTitle}_ACTION_DELETE']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>INLINE_PERMISSIONS_SUBSCRIBE_CHECKBOX</td>
 	<td>//input[@id='${key_roleTitle}_ACTION_SUBSCRIBE']</td>
 	<td></td>
@@ -147,18 +179,11 @@
 	<td></td>
 </tr>
 <tr>
-	<td>INLINE_PERMISSIONS_ADD_WEB_CONTENT_CHECKBOX</td>
-	<td>//input[@id='${key_roleTitle}_ACTION_ADD_ARTICLE']</td>
-	<td></td>
-</tr>
-<tr>
 	<td></td>
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CONTENT_PERMISSIONS-->
-
 <tr>
 	<td>CONTENT_PERMISSIONS_ROLE_NAME</td>
 	<td>//tr[contains(.,'${key_roleTitle}')]/td[1]</td>
@@ -240,6 +265,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CONTENT_PERMISSIONS_MANAGE_PAGES_CHECKBOX</td>
+	<td>//input[@id='${key_roleTitle}_ACTION_MANAGE_LAYOUTS']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CONTENT_PERMISSIONS_PERMISSIONS_CHECKBOX</td>
 	<td>//input[@id='${key_roleTitle}_ACTION_PERMISSIONS'] | //tr[contains(.,'${key_roleTitle}')]//input[contains(@id,'ACTION_PERMISSIONS')]</td>
 	<td></td>
@@ -269,9 +299,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--EVENT_PERMISSIONS-->
-
 <tr>
 	<td>EVENT_PERMISSIONS_VIEW_CHECKBOX</td>
 	<td>//input[contains(@id,'${key_roleTitle}_ACTION_VIEW')]</td>

@@ -17,7 +17,6 @@ package com.liferay.change.tracking.service.base;
 import com.liferay.change.tracking.model.CTEntry;
 import com.liferay.change.tracking.service.CTEntryLocalService;
 import com.liferay.change.tracking.service.CTEntryLocalServiceUtil;
-import com.liferay.change.tracking.service.persistence.CTCollectionPersistence;
 import com.liferay.change.tracking.service.persistence.CTEntryPersistence;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
@@ -33,8 +32,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -302,6 +299,7 @@ public abstract class CTEntryLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -318,6 +316,7 @@ public abstract class CTEntryLocalServiceBaseImpl
 		return ctEntryLocalService.deleteCTEntry((CTEntry)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<CTEntry> getBasePersistence() {
 		return ctEntryPersistence;
 	}
@@ -458,13 +457,7 @@ public abstract class CTEntryLocalServiceBaseImpl
 	protected CTEntryPersistence ctEntryPersistence;
 
 	@Reference
-	protected CTCollectionPersistence ctCollectionPersistence;
-
-	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CTEntryLocalServiceBaseImpl.class);
 
 }

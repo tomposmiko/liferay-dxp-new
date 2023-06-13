@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -75,15 +76,15 @@ public class DDLRecordVersionModelImpl
 	public static final String TABLE_NAME = "DDLRecordVersion";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"recordVersionId", Types.BIGINT},
-		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
-		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
-		{"createDate", Types.TIMESTAMP}, {"DDMStorageId", Types.BIGINT},
-		{"recordSetId", Types.BIGINT}, {"recordSetVersion", Types.VARCHAR},
-		{"recordId", Types.BIGINT}, {"version", Types.VARCHAR},
-		{"displayIndex", Types.INTEGER}, {"status", Types.INTEGER},
-		{"statusByUserId", Types.BIGINT}, {"statusByUserName", Types.VARCHAR},
-		{"statusDate", Types.TIMESTAMP}
+		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
+		{"recordVersionId", Types.BIGINT}, {"groupId", Types.BIGINT},
+		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
+		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
+		{"DDMStorageId", Types.BIGINT}, {"recordSetId", Types.BIGINT},
+		{"recordSetVersion", Types.VARCHAR}, {"recordId", Types.BIGINT},
+		{"version", Types.VARCHAR}, {"displayIndex", Types.INTEGER},
+		{"status", Types.INTEGER}, {"statusByUserId", Types.BIGINT},
+		{"statusByUserName", Types.VARCHAR}, {"statusDate", Types.TIMESTAMP}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -91,6 +92,7 @@ public class DDLRecordVersionModelImpl
 
 	static {
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("recordVersionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -110,7 +112,7 @@ public class DDLRecordVersionModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table DDLRecordVersion (mvccVersion LONG default 0 not null,recordVersionId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,DDMStorageId LONG,recordSetId LONG,recordSetVersion VARCHAR(75) null,recordId LONG,version VARCHAR(75) null,displayIndex INTEGER,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
+		"create table DDLRecordVersion (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,recordVersionId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,DDMStorageId LONG,recordSetId LONG,recordSetVersion VARCHAR(75) null,recordId LONG,version VARCHAR(75) null,displayIndex INTEGER,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,primary key (recordVersionId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP = "drop table DDLRecordVersion";
 
@@ -199,6 +201,7 @@ public class DDLRecordVersionModelImpl
 		DDLRecordVersion model = new DDLRecordVersionImpl();
 
 		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
 		model.setRecordVersionId(soapModel.getRecordVersionId());
 		model.setGroupId(soapModel.getGroupId());
 		model.setCompanyId(soapModel.getCompanyId());
@@ -329,118 +332,146 @@ public class DDLRecordVersionModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, DDLRecordVersion>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DDLRecordVersion.class.getClassLoader(), DDLRecordVersion.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<DDLRecordVersion> constructor =
+				(Constructor<DDLRecordVersion>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<DDLRecordVersion, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<DDLRecordVersion, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<DDLRecordVersion, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<DDLRecordVersion, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", DDLRecordVersion::getMvccVersion);
-		attributeGetterFunctions.put(
-			"recordVersionId", DDLRecordVersion::getRecordVersionId);
-		attributeGetterFunctions.put("groupId", DDLRecordVersion::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", DDLRecordVersion::getCompanyId);
-		attributeGetterFunctions.put("userId", DDLRecordVersion::getUserId);
-		attributeGetterFunctions.put("userName", DDLRecordVersion::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", DDLRecordVersion::getCreateDate);
-		attributeGetterFunctions.put(
-			"DDMStorageId", DDLRecordVersion::getDDMStorageId);
-		attributeGetterFunctions.put(
-			"recordSetId", DDLRecordVersion::getRecordSetId);
-		attributeGetterFunctions.put(
-			"recordSetVersion", DDLRecordVersion::getRecordSetVersion);
-		attributeGetterFunctions.put("recordId", DDLRecordVersion::getRecordId);
-		attributeGetterFunctions.put("version", DDLRecordVersion::getVersion);
-		attributeGetterFunctions.put(
-			"displayIndex", DDLRecordVersion::getDisplayIndex);
-		attributeGetterFunctions.put("status", DDLRecordVersion::getStatus);
-		attributeGetterFunctions.put(
-			"statusByUserId", DDLRecordVersion::getStatusByUserId);
-		attributeGetterFunctions.put(
-			"statusByUserName", DDLRecordVersion::getStatusByUserName);
-		attributeGetterFunctions.put(
-			"statusDate", DDLRecordVersion::getStatusDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<DDLRecordVersion, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<DDLRecordVersion, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<DDLRecordVersion, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", DDLRecordVersion::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DDLRecordVersion, Long>)
 				DDLRecordVersion::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", DDLRecordVersion::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<DDLRecordVersion, Long>)
+				DDLRecordVersion::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"recordVersionId", DDLRecordVersion::getRecordVersionId);
 		attributeSetterBiConsumers.put(
 			"recordVersionId",
 			(BiConsumer<DDLRecordVersion, Long>)
 				DDLRecordVersion::setRecordVersionId);
+		attributeGetterFunctions.put("groupId", DDLRecordVersion::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<DDLRecordVersion, Long>)DDLRecordVersion::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", DDLRecordVersion::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DDLRecordVersion, Long>)DDLRecordVersion::setCompanyId);
+		attributeGetterFunctions.put("userId", DDLRecordVersion::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<DDLRecordVersion, Long>)DDLRecordVersion::setUserId);
+		attributeGetterFunctions.put("userName", DDLRecordVersion::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<DDLRecordVersion, String>)
 				DDLRecordVersion::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", DDLRecordVersion::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<DDLRecordVersion, Date>)
 				DDLRecordVersion::setCreateDate);
+		attributeGetterFunctions.put(
+			"DDMStorageId", DDLRecordVersion::getDDMStorageId);
 		attributeSetterBiConsumers.put(
 			"DDMStorageId",
 			(BiConsumer<DDLRecordVersion, Long>)
 				DDLRecordVersion::setDDMStorageId);
+		attributeGetterFunctions.put(
+			"recordSetId", DDLRecordVersion::getRecordSetId);
 		attributeSetterBiConsumers.put(
 			"recordSetId",
 			(BiConsumer<DDLRecordVersion, Long>)
 				DDLRecordVersion::setRecordSetId);
+		attributeGetterFunctions.put(
+			"recordSetVersion", DDLRecordVersion::getRecordSetVersion);
 		attributeSetterBiConsumers.put(
 			"recordSetVersion",
 			(BiConsumer<DDLRecordVersion, String>)
 				DDLRecordVersion::setRecordSetVersion);
+		attributeGetterFunctions.put("recordId", DDLRecordVersion::getRecordId);
 		attributeSetterBiConsumers.put(
 			"recordId",
 			(BiConsumer<DDLRecordVersion, Long>)DDLRecordVersion::setRecordId);
+		attributeGetterFunctions.put("version", DDLRecordVersion::getVersion);
 		attributeSetterBiConsumers.put(
 			"version",
 			(BiConsumer<DDLRecordVersion, String>)DDLRecordVersion::setVersion);
+		attributeGetterFunctions.put(
+			"displayIndex", DDLRecordVersion::getDisplayIndex);
 		attributeSetterBiConsumers.put(
 			"displayIndex",
 			(BiConsumer<DDLRecordVersion, Integer>)
 				DDLRecordVersion::setDisplayIndex);
+		attributeGetterFunctions.put("status", DDLRecordVersion::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<DDLRecordVersion, Integer>)DDLRecordVersion::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", DDLRecordVersion::getStatusByUserId);
 		attributeSetterBiConsumers.put(
 			"statusByUserId",
 			(BiConsumer<DDLRecordVersion, Long>)
 				DDLRecordVersion::setStatusByUserId);
+		attributeGetterFunctions.put(
+			"statusByUserName", DDLRecordVersion::getStatusByUserName);
 		attributeSetterBiConsumers.put(
 			"statusByUserName",
 			(BiConsumer<DDLRecordVersion, String>)
 				DDLRecordVersion::setStatusByUserName);
+		attributeGetterFunctions.put(
+			"statusDate", DDLRecordVersion::getStatusDate);
 		attributeSetterBiConsumers.put(
 			"statusDate",
 			(BiConsumer<DDLRecordVersion, Date>)
 				DDLRecordVersion::setStatusDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -458,6 +489,21 @@ public class DDLRecordVersionModelImpl
 		}
 
 		_mvccVersion = mvccVersion;
+	}
+
+	@JSON
+	@Override
+	public long getCtCollectionId() {
+		return _ctCollectionId;
+	}
+
+	@Override
+	public void setCtCollectionId(long ctCollectionId) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_ctCollectionId = ctCollectionId;
 	}
 
 	@JSON
@@ -946,6 +992,7 @@ public class DDLRecordVersionModelImpl
 		DDLRecordVersionImpl ddlRecordVersionImpl = new DDLRecordVersionImpl();
 
 		ddlRecordVersionImpl.setMvccVersion(getMvccVersion());
+		ddlRecordVersionImpl.setCtCollectionId(getCtCollectionId());
 		ddlRecordVersionImpl.setRecordVersionId(getRecordVersionId());
 		ddlRecordVersionImpl.setGroupId(getGroupId());
 		ddlRecordVersionImpl.setCompanyId(getCompanyId());
@@ -964,6 +1011,50 @@ public class DDLRecordVersionModelImpl
 		ddlRecordVersionImpl.setStatusDate(getStatusDate());
 
 		ddlRecordVersionImpl.resetOriginalValues();
+
+		return ddlRecordVersionImpl;
+	}
+
+	@Override
+	public DDLRecordVersion cloneWithOriginalValues() {
+		DDLRecordVersionImpl ddlRecordVersionImpl = new DDLRecordVersionImpl();
+
+		ddlRecordVersionImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		ddlRecordVersionImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		ddlRecordVersionImpl.setRecordVersionId(
+			this.<Long>getColumnOriginalValue("recordVersionId"));
+		ddlRecordVersionImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		ddlRecordVersionImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		ddlRecordVersionImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		ddlRecordVersionImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		ddlRecordVersionImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		ddlRecordVersionImpl.setDDMStorageId(
+			this.<Long>getColumnOriginalValue("DDMStorageId"));
+		ddlRecordVersionImpl.setRecordSetId(
+			this.<Long>getColumnOriginalValue("recordSetId"));
+		ddlRecordVersionImpl.setRecordSetVersion(
+			this.<String>getColumnOriginalValue("recordSetVersion"));
+		ddlRecordVersionImpl.setRecordId(
+			this.<Long>getColumnOriginalValue("recordId"));
+		ddlRecordVersionImpl.setVersion(
+			this.<String>getColumnOriginalValue("version"));
+		ddlRecordVersionImpl.setDisplayIndex(
+			this.<Integer>getColumnOriginalValue("displayIndex"));
+		ddlRecordVersionImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
+		ddlRecordVersionImpl.setStatusByUserId(
+			this.<Long>getColumnOriginalValue("statusByUserId"));
+		ddlRecordVersionImpl.setStatusByUserName(
+			this.<String>getColumnOriginalValue("statusByUserName"));
+		ddlRecordVersionImpl.setStatusDate(
+			this.<Date>getColumnOriginalValue("statusDate"));
 
 		return ddlRecordVersionImpl;
 	}
@@ -1041,6 +1132,8 @@ public class DDLRecordVersionModelImpl
 			new DDLRecordVersionCacheModel();
 
 		ddlRecordVersionCacheModel.mvccVersion = getMvccVersion();
+
+		ddlRecordVersionCacheModel.ctCollectionId = getCtCollectionId();
 
 		ddlRecordVersionCacheModel.recordVersionId = getRecordVersionId();
 
@@ -1199,13 +1292,12 @@ public class DDLRecordVersionModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DDLRecordVersion>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DDLRecordVersion.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
 	private long _mvccVersion;
+	private long _ctCollectionId;
 	private long _recordVersionId;
 	private long _groupId;
 	private long _companyId;
@@ -1251,6 +1343,7 @@ public class DDLRecordVersionModelImpl
 		_columnOriginalValues = new HashMap<String, Object>();
 
 		_columnOriginalValues.put("mvccVersion", _mvccVersion);
+		_columnOriginalValues.put("ctCollectionId", _ctCollectionId);
 		_columnOriginalValues.put("recordVersionId", _recordVersionId);
 		_columnOriginalValues.put("groupId", _groupId);
 		_columnOriginalValues.put("companyId", _companyId);
@@ -1282,37 +1375,39 @@ public class DDLRecordVersionModelImpl
 
 		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("recordVersionId", 2L);
+		columnBitmasks.put("ctCollectionId", 2L);
 
-		columnBitmasks.put("groupId", 4L);
+		columnBitmasks.put("recordVersionId", 4L);
 
-		columnBitmasks.put("companyId", 8L);
+		columnBitmasks.put("groupId", 8L);
 
-		columnBitmasks.put("userId", 16L);
+		columnBitmasks.put("companyId", 16L);
 
-		columnBitmasks.put("userName", 32L);
+		columnBitmasks.put("userId", 32L);
 
-		columnBitmasks.put("createDate", 64L);
+		columnBitmasks.put("userName", 64L);
 
-		columnBitmasks.put("DDMStorageId", 128L);
+		columnBitmasks.put("createDate", 128L);
 
-		columnBitmasks.put("recordSetId", 256L);
+		columnBitmasks.put("DDMStorageId", 256L);
 
-		columnBitmasks.put("recordSetVersion", 512L);
+		columnBitmasks.put("recordSetId", 512L);
 
-		columnBitmasks.put("recordId", 1024L);
+		columnBitmasks.put("recordSetVersion", 1024L);
 
-		columnBitmasks.put("version", 2048L);
+		columnBitmasks.put("recordId", 2048L);
 
-		columnBitmasks.put("displayIndex", 4096L);
+		columnBitmasks.put("version", 4096L);
 
-		columnBitmasks.put("status", 8192L);
+		columnBitmasks.put("displayIndex", 8192L);
 
-		columnBitmasks.put("statusByUserId", 16384L);
+		columnBitmasks.put("status", 16384L);
 
-		columnBitmasks.put("statusByUserName", 32768L);
+		columnBitmasks.put("statusByUserId", 32768L);
 
-		columnBitmasks.put("statusDate", 65536L);
+		columnBitmasks.put("statusByUserName", 65536L);
+
+		columnBitmasks.put("statusDate", 131072L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

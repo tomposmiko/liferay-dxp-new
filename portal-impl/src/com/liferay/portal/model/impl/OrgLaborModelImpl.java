@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -304,86 +305,108 @@ public class OrgLaborModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<OrgLabor, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, OrgLabor>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<OrgLabor, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<OrgLabor, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			OrgLabor.class.getClassLoader(), OrgLabor.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", OrgLabor::getMvccVersion);
-		attributeGetterFunctions.put("orgLaborId", OrgLabor::getOrgLaborId);
-		attributeGetterFunctions.put("companyId", OrgLabor::getCompanyId);
-		attributeGetterFunctions.put(
-			"organizationId", OrgLabor::getOrganizationId);
-		attributeGetterFunctions.put("typeId", OrgLabor::getTypeId);
-		attributeGetterFunctions.put("sunOpen", OrgLabor::getSunOpen);
-		attributeGetterFunctions.put("sunClose", OrgLabor::getSunClose);
-		attributeGetterFunctions.put("monOpen", OrgLabor::getMonOpen);
-		attributeGetterFunctions.put("monClose", OrgLabor::getMonClose);
-		attributeGetterFunctions.put("tueOpen", OrgLabor::getTueOpen);
-		attributeGetterFunctions.put("tueClose", OrgLabor::getTueClose);
-		attributeGetterFunctions.put("wedOpen", OrgLabor::getWedOpen);
-		attributeGetterFunctions.put("wedClose", OrgLabor::getWedClose);
-		attributeGetterFunctions.put("thuOpen", OrgLabor::getThuOpen);
-		attributeGetterFunctions.put("thuClose", OrgLabor::getThuClose);
-		attributeGetterFunctions.put("friOpen", OrgLabor::getFriOpen);
-		attributeGetterFunctions.put("friClose", OrgLabor::getFriClose);
-		attributeGetterFunctions.put("satOpen", OrgLabor::getSatOpen);
-		attributeGetterFunctions.put("satClose", OrgLabor::getSatClose);
+		try {
+			Constructor<OrgLabor> constructor =
+				(Constructor<OrgLabor>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<OrgLabor, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<OrgLabor, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<OrgLabor, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<OrgLabor, Object>>();
 		Map<String, BiConsumer<OrgLabor, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<OrgLabor, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", OrgLabor::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<OrgLabor, Long>)OrgLabor::setMvccVersion);
+		attributeGetterFunctions.put("orgLaborId", OrgLabor::getOrgLaborId);
 		attributeSetterBiConsumers.put(
 			"orgLaborId", (BiConsumer<OrgLabor, Long>)OrgLabor::setOrgLaborId);
+		attributeGetterFunctions.put("companyId", OrgLabor::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<OrgLabor, Long>)OrgLabor::setCompanyId);
+		attributeGetterFunctions.put(
+			"organizationId", OrgLabor::getOrganizationId);
 		attributeSetterBiConsumers.put(
 			"organizationId",
 			(BiConsumer<OrgLabor, Long>)OrgLabor::setOrganizationId);
+		attributeGetterFunctions.put("typeId", OrgLabor::getTypeId);
 		attributeSetterBiConsumers.put(
 			"typeId", (BiConsumer<OrgLabor, Long>)OrgLabor::setTypeId);
+		attributeGetterFunctions.put("sunOpen", OrgLabor::getSunOpen);
 		attributeSetterBiConsumers.put(
 			"sunOpen", (BiConsumer<OrgLabor, Integer>)OrgLabor::setSunOpen);
+		attributeGetterFunctions.put("sunClose", OrgLabor::getSunClose);
 		attributeSetterBiConsumers.put(
 			"sunClose", (BiConsumer<OrgLabor, Integer>)OrgLabor::setSunClose);
+		attributeGetterFunctions.put("monOpen", OrgLabor::getMonOpen);
 		attributeSetterBiConsumers.put(
 			"monOpen", (BiConsumer<OrgLabor, Integer>)OrgLabor::setMonOpen);
+		attributeGetterFunctions.put("monClose", OrgLabor::getMonClose);
 		attributeSetterBiConsumers.put(
 			"monClose", (BiConsumer<OrgLabor, Integer>)OrgLabor::setMonClose);
+		attributeGetterFunctions.put("tueOpen", OrgLabor::getTueOpen);
 		attributeSetterBiConsumers.put(
 			"tueOpen", (BiConsumer<OrgLabor, Integer>)OrgLabor::setTueOpen);
+		attributeGetterFunctions.put("tueClose", OrgLabor::getTueClose);
 		attributeSetterBiConsumers.put(
 			"tueClose", (BiConsumer<OrgLabor, Integer>)OrgLabor::setTueClose);
+		attributeGetterFunctions.put("wedOpen", OrgLabor::getWedOpen);
 		attributeSetterBiConsumers.put(
 			"wedOpen", (BiConsumer<OrgLabor, Integer>)OrgLabor::setWedOpen);
+		attributeGetterFunctions.put("wedClose", OrgLabor::getWedClose);
 		attributeSetterBiConsumers.put(
 			"wedClose", (BiConsumer<OrgLabor, Integer>)OrgLabor::setWedClose);
+		attributeGetterFunctions.put("thuOpen", OrgLabor::getThuOpen);
 		attributeSetterBiConsumers.put(
 			"thuOpen", (BiConsumer<OrgLabor, Integer>)OrgLabor::setThuOpen);
+		attributeGetterFunctions.put("thuClose", OrgLabor::getThuClose);
 		attributeSetterBiConsumers.put(
 			"thuClose", (BiConsumer<OrgLabor, Integer>)OrgLabor::setThuClose);
+		attributeGetterFunctions.put("friOpen", OrgLabor::getFriOpen);
 		attributeSetterBiConsumers.put(
 			"friOpen", (BiConsumer<OrgLabor, Integer>)OrgLabor::setFriOpen);
+		attributeGetterFunctions.put("friClose", OrgLabor::getFriClose);
 		attributeSetterBiConsumers.put(
 			"friClose", (BiConsumer<OrgLabor, Integer>)OrgLabor::setFriClose);
+		attributeGetterFunctions.put("satOpen", OrgLabor::getSatOpen);
 		attributeSetterBiConsumers.put(
 			"satOpen", (BiConsumer<OrgLabor, Integer>)OrgLabor::setSatOpen);
+		attributeGetterFunctions.put("satClose", OrgLabor::getSatClose);
 		attributeSetterBiConsumers.put(
 			"satClose", (BiConsumer<OrgLabor, Integer>)OrgLabor::setSatClose);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -765,6 +788,51 @@ public class OrgLaborModelImpl
 	}
 
 	@Override
+	public OrgLabor cloneWithOriginalValues() {
+		OrgLaborImpl orgLaborImpl = new OrgLaborImpl();
+
+		orgLaborImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		orgLaborImpl.setOrgLaborId(
+			this.<Long>getColumnOriginalValue("orgLaborId"));
+		orgLaborImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		orgLaborImpl.setOrganizationId(
+			this.<Long>getColumnOriginalValue("organizationId"));
+		orgLaborImpl.setTypeId(this.<Long>getColumnOriginalValue("typeId"));
+		orgLaborImpl.setSunOpen(
+			this.<Integer>getColumnOriginalValue("sunOpen"));
+		orgLaborImpl.setSunClose(
+			this.<Integer>getColumnOriginalValue("sunClose"));
+		orgLaborImpl.setMonOpen(
+			this.<Integer>getColumnOriginalValue("monOpen"));
+		orgLaborImpl.setMonClose(
+			this.<Integer>getColumnOriginalValue("monClose"));
+		orgLaborImpl.setTueOpen(
+			this.<Integer>getColumnOriginalValue("tueOpen"));
+		orgLaborImpl.setTueClose(
+			this.<Integer>getColumnOriginalValue("tueClose"));
+		orgLaborImpl.setWedOpen(
+			this.<Integer>getColumnOriginalValue("wedOpen"));
+		orgLaborImpl.setWedClose(
+			this.<Integer>getColumnOriginalValue("wedClose"));
+		orgLaborImpl.setThuOpen(
+			this.<Integer>getColumnOriginalValue("thuOpen"));
+		orgLaborImpl.setThuClose(
+			this.<Integer>getColumnOriginalValue("thuClose"));
+		orgLaborImpl.setFriOpen(
+			this.<Integer>getColumnOriginalValue("friOpen"));
+		orgLaborImpl.setFriClose(
+			this.<Integer>getColumnOriginalValue("friClose"));
+		orgLaborImpl.setSatOpen(
+			this.<Integer>getColumnOriginalValue("satOpen"));
+		orgLaborImpl.setSatClose(
+			this.<Integer>getColumnOriginalValue("satClose"));
+
+		return orgLaborImpl;
+	}
+
+	@Override
 	public int compareTo(OrgLabor orgLabor) {
 		int value = 0;
 
@@ -979,9 +1047,7 @@ public class OrgLaborModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, OrgLabor>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					OrgLabor.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

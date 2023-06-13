@@ -1,11 +1,9 @@
 {
 	"dependencies": {
-		"@clayui/button": "3.83.0",
-		"@clayui/form": "3.89.0",
+		"@clayui/button": "3.40.0",
+		"@clayui/form": "3.40.0",
 		"dynamic-data-mapping-form-field-type": "*",
 		"frontend-js-web": "*",
-		"metal-component": "2.16.8",
-		"metal-soy": "2.16.8",
 		"react": "16.12.0"
 	},
 	"name": "journal-article-dynamic-data-mapping-form-field-type",
@@ -15,5 +13,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "1.0.22"
+	"version": "2.0.13"
 }

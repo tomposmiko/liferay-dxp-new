@@ -76,8 +76,6 @@ for (AssetEntryResult assetEntryResult : assetPublisherDisplayContext.getAssetEn
 			for (int assetEntryIndex = 0; assetEntryIndex < assetEntries.size(); assetEntryIndex++) {
 				AssetEntry assetEntry = assetEntries.get(assetEntryIndex);
 
-				long classPK = assetEntry.getClassPK();
-
 				AssetRendererFactory<?> assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassNameId(assetEntry.getClassNameId());
 
 				if (assetRendererFactory == null) {
@@ -87,7 +85,7 @@ for (AssetEntryResult assetEntryResult : assetPublisherDisplayContext.getAssetEn
 				AssetRenderer<?> assetRenderer = null;
 
 				try {
-					assetRenderer = assetRendererFactory.getAssetRenderer(classPK);
+					assetRenderer = assetRendererFactory.getAssetRenderer(assetEntry.getClassPK());
 				}
 				catch (Exception e) {
 					if (_log.isWarnEnabled()) {
@@ -127,5 +125,5 @@ for (AssetEntryResult assetEntryResult : assetPublisherDisplayContext.getAssetEn
 %>
 
 <%!
-private static Log _log = LogFactoryUtil.getLog("com_liferay_asset_publisher_web.view_asset_entry_list_jsp");
+private static final Log _log = LogFactoryUtil.getLog("com_liferay_asset_publisher_web.view_asset_entry_list_jsp");
 %>

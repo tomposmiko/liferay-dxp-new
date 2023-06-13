@@ -23,8 +23,8 @@ import com.liferay.blogs.service.persistence.BlogsEntryPersistence;
 import com.liferay.blogs.service.persistence.BlogsEntryUtil;
 import com.liferay.blogs.service.persistence.impl.constants.BlogsPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.sanitizer.Sanitizer;
 import com.liferay.portal.kernel.sanitizer.SanitizerException;
 import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
@@ -46,11 +45,12 @@ import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
+import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -67,19 +67,20 @@ import java.lang.reflect.InvocationHandler;
 
 import java.sql.Timestamp;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -95,7 +96,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = BlogsEntryPersistence.class)
+@Component(service = {BlogsEntryPersistence.class, BasePersistence.class})
 public class BlogsEntryPersistenceImpl
 	extends BasePersistenceImpl<BlogsEntry> implements BlogsEntryPersistence {
 
@@ -191,27 +192,30 @@ public class BlogsEntryPersistenceImpl
 
 		uuid = Objects.toString(uuid, "");
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByUuid;
 				finderArgs = new Object[] {uuid};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByUuid;
 			finderArgs = new Object[] {uuid, start, end, orderByComparator};
 		}
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -276,7 +280,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -587,11 +591,21 @@ public class BlogsEntryPersistenceImpl
 	public int countByUuid(String uuid) {
 		uuid = Objects.toString(uuid, "");
 
-		FinderPath finderPath = _finderPathCountByUuid;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {uuid};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByUuid;
+
+			finderArgs = new Object[] {uuid};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -626,7 +640,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -711,17 +727,20 @@ public class BlogsEntryPersistenceImpl
 
 		uuid = Objects.toString(uuid, "");
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		Object[] finderArgs = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			finderArgs = new Object[] {uuid, groupId};
 		}
 
 		Object result = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof BlogsEntry) {
@@ -772,7 +791,7 @@ public class BlogsEntryPersistenceImpl
 				List<BlogsEntry> list = query.list();
 
 				if (list.isEmpty()) {
-					if (useFinderCache) {
+					if (useFinderCache && productionMode) {
 						finderCache.putResult(
 							_finderPathFetchByUUID_G, finderArgs, list);
 					}
@@ -828,11 +847,21 @@ public class BlogsEntryPersistenceImpl
 	public int countByUUID_G(String uuid, long groupId) {
 		uuid = Objects.toString(uuid, "");
 
-		FinderPath finderPath = _finderPathCountByUUID_G;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {uuid, groupId};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByUUID_G;
+
+			finderArgs = new Object[] {uuid, groupId};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -871,7 +900,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -976,18 +1007,21 @@ public class BlogsEntryPersistenceImpl
 
 		uuid = Objects.toString(uuid, "");
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByUuid_C;
 				finderArgs = new Object[] {uuid, companyId};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByUuid_C;
 			finderArgs = new Object[] {
 				uuid, companyId, start, end, orderByComparator
@@ -996,9 +1030,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -1069,7 +1103,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -1406,11 +1440,21 @@ public class BlogsEntryPersistenceImpl
 	public int countByUuid_C(String uuid, long companyId) {
 		uuid = Objects.toString(uuid, "");
 
-		FinderPath finderPath = _finderPathCountByUuid_C;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {uuid, companyId};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByUuid_C;
+
+			finderArgs = new Object[] {uuid, companyId};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1449,7 +1493,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -1545,27 +1591,30 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByGroupId;
 				finderArgs = new Object[] {groupId};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByGroupId;
 			finderArgs = new Object[] {groupId, start, end, orderByComparator};
 		}
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -1619,7 +1668,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -2241,11 +2290,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByGroupId(long groupId) {
-		FinderPath finderPath = _finderPathCountByGroupId;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {groupId};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByGroupId;
+
+			finderArgs = new Object[] {groupId};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -2269,7 +2328,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -2409,18 +2470,21 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByCompanyId;
 				finderArgs = new Object[] {companyId};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByCompanyId;
 			finderArgs = new Object[] {
 				companyId, start, end, orderByComparator
@@ -2429,9 +2493,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -2485,7 +2549,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -2785,11 +2849,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByCompanyId(long companyId) {
-		FinderPath finderPath = _finderPathCountByCompanyId;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {companyId};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByCompanyId;
+
+			finderArgs = new Object[] {companyId};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -2813,7 +2887,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -2895,17 +2971,19 @@ public class BlogsEntryPersistenceImpl
 
 		urlTitle = Objects.toString(urlTitle, "");
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		Object[] finderArgs = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			finderArgs = new Object[] {groupId, urlTitle};
 		}
 
 		Object result = null;
 
-		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByG_UT, finderArgs, this);
+		if (useFinderCache && productionMode) {
+			result = finderCache.getResult(_finderPathFetchByG_UT, finderArgs);
 		}
 
 		if (result instanceof BlogsEntry) {
@@ -2956,7 +3034,7 @@ public class BlogsEntryPersistenceImpl
 				List<BlogsEntry> list = query.list();
 
 				if (list.isEmpty()) {
-					if (useFinderCache) {
+					if (useFinderCache && productionMode) {
 						finderCache.putResult(
 							_finderPathFetchByG_UT, finderArgs, list);
 					}
@@ -3012,11 +3090,21 @@ public class BlogsEntryPersistenceImpl
 	public int countByG_UT(long groupId, String urlTitle) {
 		urlTitle = Objects.toString(urlTitle, "");
 
-		FinderPath finderPath = _finderPathCountByG_UT;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {groupId, urlTitle};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByG_UT;
+
+			finderArgs = new Object[] {groupId, urlTitle};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3055,7 +3143,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -3157,6 +3247,9 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -3167,9 +3260,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -3241,7 +3334,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -3937,11 +4030,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByG_LtD(long groupId, Date displayDate) {
-		FinderPath finderPath = _finderPathWithPaginationCountByG_LtD;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {groupId, _getTime(displayDate)};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByG_LtD;
+
+			finderArgs = new Object[] {groupId, _getTime(displayDate)};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3980,7 +4083,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -4146,18 +4251,21 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByG_S;
 				finderArgs = new Object[] {groupId, status};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByG_S;
 			finderArgs = new Object[] {
 				groupId, status, start, end, orderByComparator
@@ -4166,9 +4274,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -4228,7 +4336,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -4886,11 +4994,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByG_S(long groupId, int status) {
-		FinderPath finderPath = _finderPathCountByG_S;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {groupId, status};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByG_S;
+
+			finderArgs = new Object[] {groupId, status};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -4918,7 +5036,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -5070,6 +5190,9 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -5080,9 +5203,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -5142,7 +5265,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -5800,11 +5923,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByG_NotS(long groupId, int status) {
-		FinderPath finderPath = _finderPathWithPaginationCountByG_NotS;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {groupId, status};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByG_NotS;
+
+			finderArgs = new Object[] {groupId, status};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -5832,7 +5965,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -5985,18 +6120,21 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByC_U;
 				finderArgs = new Object[] {companyId, userId};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByC_U;
 			finderArgs = new Object[] {
 				companyId, userId, start, end, orderByComparator
@@ -6005,9 +6143,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -6067,7 +6205,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -6391,11 +6529,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByC_U(long companyId, long userId) {
-		FinderPath finderPath = _finderPathCountByC_U;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {companyId, userId};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByC_U;
+
+			finderArgs = new Object[] {companyId, userId};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -6423,7 +6571,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -6522,6 +6672,9 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -6532,9 +6685,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -6606,7 +6759,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -6942,11 +7095,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByC_LtD(long companyId, Date displayDate) {
-		FinderPath finderPath = _finderPathWithPaginationCountByC_LtD;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {companyId, _getTime(displayDate)};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByC_LtD;
+
+			finderArgs = new Object[] {companyId, _getTime(displayDate)};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -6985,7 +7148,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -7088,18 +7253,21 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByC_S;
 				finderArgs = new Object[] {companyId, status};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByC_S;
 			finderArgs = new Object[] {
 				companyId, status, start, end, orderByComparator
@@ -7108,9 +7276,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -7170,7 +7338,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -7494,11 +7662,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByC_S(long companyId, int status) {
-		FinderPath finderPath = _finderPathCountByC_S;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {companyId, status};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByC_S;
+
+			finderArgs = new Object[] {companyId, status};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -7526,7 +7704,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -7625,6 +7805,9 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -7635,9 +7818,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -7697,7 +7880,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -8021,11 +8204,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByC_NotS(long companyId, int status) {
-		FinderPath finderPath = _finderPathWithPaginationCountByC_NotS;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {companyId, status};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByC_NotS;
+
+			finderArgs = new Object[] {companyId, status};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -8053,7 +8246,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -8152,6 +8347,9 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -8162,9 +8360,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -8235,7 +8433,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -8570,11 +8768,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByLtD_S(Date displayDate, int status) {
-		FinderPath finderPath = _finderPathWithPaginationCountByLtD_S;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {_getTime(displayDate), status};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByLtD_S;
+
+			finderArgs = new Object[] {_getTime(displayDate), status};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -8613,7 +8821,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -8722,6 +8932,9 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -8733,9 +8946,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -8812,7 +9025,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -9543,13 +9756,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByG_U_LtD(long groupId, long userId, Date displayDate) {
-		FinderPath finderPath = _finderPathWithPaginationCountByG_U_LtD;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {
-			groupId, userId, _getTime(displayDate)
-		};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByG_U_LtD;
+
+			finderArgs = new Object[] {groupId, userId, _getTime(displayDate)};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -9592,7 +9813,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -9775,18 +9998,21 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByG_U_S;
 				finderArgs = new Object[] {groupId, userId, status};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByG_U_S;
 			finderArgs = new Object[] {
 				groupId, userId, status, start, end, orderByComparator
@@ -9795,9 +10021,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -9862,7 +10088,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -10762,7 +10988,7 @@ public class BlogsEntryPersistenceImpl
 	 *
 	 * @param groupId the group ID
 	 * @param userId the user ID
-	 * @param statuses the statuses
+	 * @param status the status
 	 * @param start the lower bound of the range of blogs entries
 	 * @param end the upper bound of the range of blogs entries (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -10787,18 +11013,21 @@ public class BlogsEntryPersistenceImpl
 				groupId, userId, statuses[0], start, end, orderByComparator);
 		}
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderArgs = new Object[] {
 					groupId, userId, StringUtil.merge(statuses)
 				};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderArgs = new Object[] {
 				groupId, userId, StringUtil.merge(statuses), start, end,
 				orderByComparator
@@ -10807,9 +11036,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				_finderPathWithPaginationFindByG_U_S, finderArgs, this);
+				_finderPathWithPaginationFindByG_U_S, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -10877,7 +11106,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(
 						_finderPathWithPaginationFindByG_U_S, finderArgs, list);
 				}
@@ -10921,11 +11150,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByG_U_S(long groupId, long userId, int status) {
-		FinderPath finderPath = _finderPathCountByG_U_S;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {groupId, userId, status};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByG_U_S;
+
+			finderArgs = new Object[] {groupId, userId, status};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -10957,7 +11196,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -10987,12 +11228,21 @@ public class BlogsEntryPersistenceImpl
 			statuses = ArrayUtil.sortedUnique(statuses);
 		}
 
-		Object[] finderArgs = new Object[] {
-			groupId, userId, StringUtil.merge(statuses)
-		};
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByG_U_S, finderArgs, this);
+		Object[] finderArgs = null;
+
+		Long count = null;
+
+		if (productionMode) {
+			finderArgs = new Object[] {
+				groupId, userId, StringUtil.merge(statuses)
+			};
+
+			count = (Long)finderCache.getResult(
+				_finderPathWithPaginationCountByG_U_S, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -11035,8 +11285,11 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(
-					_finderPathWithPaginationCountByG_U_S, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(
+						_finderPathWithPaginationCountByG_U_S, finderArgs,
+						count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -11282,6 +11535,9 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -11292,9 +11548,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -11359,7 +11615,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -12056,11 +12312,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByG_U_NotS(long groupId, long userId, int status) {
-		FinderPath finderPath = _finderPathWithPaginationCountByG_U_NotS;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {groupId, userId, status};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByG_U_NotS;
+
+			finderArgs = new Object[] {groupId, userId, status};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -12092,7 +12358,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -12260,20 +12528,23 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByG_D_S;
 				finderArgs = new Object[] {
 					groupId, _getTime(displayDate), status
 				};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByG_D_S;
 			finderArgs = new Object[] {
 				groupId, _getTime(displayDate), status, start, end,
@@ -12283,9 +12554,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -12362,7 +12633,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -13093,13 +13364,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByG_D_S(long groupId, Date displayDate, int status) {
-		FinderPath finderPath = _finderPathCountByG_D_S;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {
-			groupId, _getTime(displayDate), status
-		};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByG_D_S;
+
+			finderArgs = new Object[] {groupId, _getTime(displayDate), status};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -13142,7 +13421,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -13323,6 +13604,9 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -13334,9 +13618,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -13412,7 +13696,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -14143,13 +14427,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByG_GtD_S(long groupId, Date displayDate, int status) {
-		FinderPath finderPath = _finderPathWithPaginationCountByG_GtD_S;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {
-			groupId, _getTime(displayDate), status
-		};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByG_GtD_S;
+
+			finderArgs = new Object[] {groupId, _getTime(displayDate), status};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -14192,7 +14484,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -14375,6 +14669,9 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -14386,9 +14683,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -14464,7 +14761,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -15195,13 +15492,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByG_LtD_S(long groupId, Date displayDate, int status) {
-		FinderPath finderPath = _finderPathWithPaginationCountByG_LtD_S;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {
-			groupId, _getTime(displayDate), status
-		};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByG_LtD_S;
+
+			finderArgs = new Object[] {groupId, _getTime(displayDate), status};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -15244,7 +15549,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -15427,6 +15734,9 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -15438,9 +15748,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -15516,7 +15826,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -16247,13 +16557,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByG_LtD_NotS(long groupId, Date displayDate, int status) {
-		FinderPath finderPath = _finderPathWithPaginationCountByG_LtD_NotS;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {
-			groupId, _getTime(displayDate), status
-		};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByG_LtD_NotS;
+
+			finderArgs = new Object[] {groupId, _getTime(displayDate), status};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -16296,7 +16614,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -16480,18 +16800,21 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByC_U_S;
 				finderArgs = new Object[] {companyId, userId, status};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByC_U_S;
 			finderArgs = new Object[] {
 				companyId, userId, status, start, end, orderByComparator
@@ -16500,9 +16823,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -16567,7 +16890,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -16909,11 +17232,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByC_U_S(long companyId, long userId, int status) {
-		FinderPath finderPath = _finderPathCountByC_U_S;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {companyId, userId, status};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByC_U_S;
+
+			finderArgs = new Object[] {companyId, userId, status};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -16945,7 +17278,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -17054,6 +17389,9 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -17064,9 +17402,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -17131,7 +17469,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -17473,11 +17811,21 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByC_U_NotS(long companyId, long userId, int status) {
-		FinderPath finderPath = _finderPathWithPaginationCountByC_U_NotS;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {companyId, userId, status};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByC_U_NotS;
+
+			finderArgs = new Object[] {companyId, userId, status};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -17509,7 +17857,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -17619,6 +17969,9 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -17630,9 +17983,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -17708,7 +18061,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -18062,13 +18415,23 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByC_LtD_S(long companyId, Date displayDate, int status) {
-		FinderPath finderPath = _finderPathWithPaginationCountByC_LtD_S;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {
-			companyId, _getTime(displayDate), status
-		};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByC_LtD_S;
+
+			finderArgs = new Object[] {
+				companyId, _getTime(displayDate), status
+			};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -18111,7 +18474,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -18225,6 +18590,9 @@ public class BlogsEntryPersistenceImpl
 		OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -18236,9 +18604,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -18314,7 +18682,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -18670,13 +19038,23 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countByC_LtD_NotS(long companyId, Date displayDate, int status) {
-		FinderPath finderPath = _finderPathWithPaginationCountByC_LtD_NotS;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {
-			companyId, _getTime(displayDate), status
-		};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByC_LtD_NotS;
+
+			finderArgs = new Object[] {
+				companyId, _getTime(displayDate), status
+			};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -18719,7 +19097,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -18838,6 +19218,9 @@ public class BlogsEntryPersistenceImpl
 		int end, OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -18849,9 +19232,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -18932,7 +19315,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -19700,13 +20083,23 @@ public class BlogsEntryPersistenceImpl
 	public int countByG_U_LtD_S(
 		long groupId, long userId, Date displayDate, int status) {
 
-		FinderPath finderPath = _finderPathWithPaginationCountByG_U_LtD_S;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {
-			groupId, userId, _getTime(displayDate), status
-		};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByG_U_LtD_S;
+
+			finderArgs = new Object[] {
+				groupId, userId, _getTime(displayDate), status
+			};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(5);
@@ -19753,7 +20146,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -19951,6 +20346,9 @@ public class BlogsEntryPersistenceImpl
 		int end, OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -19962,9 +20360,9 @@ public class BlogsEntryPersistenceImpl
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (BlogsEntry blogsEntry : list) {
@@ -20045,7 +20443,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -20813,13 +21211,23 @@ public class BlogsEntryPersistenceImpl
 	public int countByG_U_LtD_NotS(
 		long groupId, long userId, Date displayDate, int status) {
 
-		FinderPath finderPath = _finderPathWithPaginationCountByG_U_LtD_NotS;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
 
-		Object[] finderArgs = new Object[] {
-			groupId, userId, _getTime(displayDate), status
-		};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByG_U_LtD_NotS;
+
+			finderArgs = new Object[] {
+				groupId, userId, _getTime(displayDate), status
+			};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(5);
@@ -20866,7 +21274,9 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -20970,6 +21380,287 @@ public class BlogsEntryPersistenceImpl
 	private static final String _FINDER_COLUMN_G_U_LTD_NOTS_STATUS_2 =
 		"blogsEntry.status != ?";
 
+	private FinderPath _finderPathFetchByG_ERC;
+	private FinderPath _finderPathCountByG_ERC;
+
+	/**
+	 * Returns the blogs entry where groupId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchEntryException</code> if it could not be found.
+	 *
+	 * @param groupId the group ID
+	 * @param externalReferenceCode the external reference code
+	 * @return the matching blogs entry
+	 * @throws NoSuchEntryException if a matching blogs entry could not be found
+	 */
+	@Override
+	public BlogsEntry findByG_ERC(long groupId, String externalReferenceCode)
+		throws NoSuchEntryException {
+
+		BlogsEntry blogsEntry = fetchByG_ERC(groupId, externalReferenceCode);
+
+		if (blogsEntry == null) {
+			StringBundler sb = new StringBundler(6);
+
+			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			sb.append("groupId=");
+			sb.append(groupId);
+
+			sb.append(", externalReferenceCode=");
+			sb.append(externalReferenceCode);
+
+			sb.append("}");
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(sb.toString());
+			}
+
+			throw new NoSuchEntryException(sb.toString());
+		}
+
+		return blogsEntry;
+	}
+
+	/**
+	 * Returns the blogs entry where groupId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param externalReferenceCode the external reference code
+	 * @return the matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
+	 */
+	@Override
+	public BlogsEntry fetchByG_ERC(long groupId, String externalReferenceCode) {
+		return fetchByG_ERC(groupId, externalReferenceCode, true);
+	}
+
+	/**
+	 * Returns the blogs entry where groupId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param externalReferenceCode the external reference code
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching blogs entry, or <code>null</code> if a matching blogs entry could not be found
+	 */
+	@Override
+	public BlogsEntry fetchByG_ERC(
+		long groupId, String externalReferenceCode, boolean useFinderCache) {
+
+		externalReferenceCode = Objects.toString(externalReferenceCode, "");
+
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
+		Object[] finderArgs = null;
+
+		if (useFinderCache && productionMode) {
+			finderArgs = new Object[] {groupId, externalReferenceCode};
+		}
+
+		Object result = null;
+
+		if (useFinderCache && productionMode) {
+			result = finderCache.getResult(_finderPathFetchByG_ERC, finderArgs);
+		}
+
+		if (result instanceof BlogsEntry) {
+			BlogsEntry blogsEntry = (BlogsEntry)result;
+
+			if ((groupId != blogsEntry.getGroupId()) ||
+				!Objects.equals(
+					externalReferenceCode,
+					blogsEntry.getExternalReferenceCode())) {
+
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler sb = new StringBundler(4);
+
+			sb.append(_SQL_SELECT_BLOGSENTRY_WHERE);
+
+			sb.append(_FINDER_COLUMN_G_ERC_GROUPID_2);
+
+			boolean bindExternalReferenceCode = false;
+
+			if (externalReferenceCode.isEmpty()) {
+				sb.append(_FINDER_COLUMN_G_ERC_EXTERNALREFERENCECODE_3);
+			}
+			else {
+				bindExternalReferenceCode = true;
+
+				sb.append(_FINDER_COLUMN_G_ERC_EXTERNALREFERENCECODE_2);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(groupId);
+
+				if (bindExternalReferenceCode) {
+					queryPos.add(externalReferenceCode);
+				}
+
+				List<BlogsEntry> list = query.list();
+
+				if (list.isEmpty()) {
+					if (useFinderCache && productionMode) {
+						finderCache.putResult(
+							_finderPathFetchByG_ERC, finderArgs, list);
+					}
+				}
+				else {
+					if (list.size() > 1) {
+						Collections.sort(list, Collections.reverseOrder());
+
+						if (_log.isWarnEnabled()) {
+							if (!productionMode || !useFinderCache) {
+								finderArgs = new Object[] {
+									groupId, externalReferenceCode
+								};
+							}
+
+							_log.warn(
+								"BlogsEntryPersistenceImpl.fetchByG_ERC(long, String, boolean) with parameters (" +
+									StringUtil.merge(finderArgs) +
+										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+						}
+					}
+
+					BlogsEntry blogsEntry = list.get(0);
+
+					result = blogsEntry;
+
+					cacheResult(blogsEntry);
+				}
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (BlogsEntry)result;
+		}
+	}
+
+	/**
+	 * Removes the blogs entry where groupId = &#63; and externalReferenceCode = &#63; from the database.
+	 *
+	 * @param groupId the group ID
+	 * @param externalReferenceCode the external reference code
+	 * @return the blogs entry that was removed
+	 */
+	@Override
+	public BlogsEntry removeByG_ERC(long groupId, String externalReferenceCode)
+		throws NoSuchEntryException {
+
+		BlogsEntry blogsEntry = findByG_ERC(groupId, externalReferenceCode);
+
+		return remove(blogsEntry);
+	}
+
+	/**
+	 * Returns the number of blogs entries where groupId = &#63; and externalReferenceCode = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param externalReferenceCode the external reference code
+	 * @return the number of matching blogs entries
+	 */
+	@Override
+	public int countByG_ERC(long groupId, String externalReferenceCode) {
+		externalReferenceCode = Objects.toString(externalReferenceCode, "");
+
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByG_ERC;
+
+			finderArgs = new Object[] {groupId, externalReferenceCode};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
+		}
+
+		if (count == null) {
+			StringBundler sb = new StringBundler(3);
+
+			sb.append(_SQL_COUNT_BLOGSENTRY_WHERE);
+
+			sb.append(_FINDER_COLUMN_G_ERC_GROUPID_2);
+
+			boolean bindExternalReferenceCode = false;
+
+			if (externalReferenceCode.isEmpty()) {
+				sb.append(_FINDER_COLUMN_G_ERC_EXTERNALREFERENCECODE_3);
+			}
+			else {
+				bindExternalReferenceCode = true;
+
+				sb.append(_FINDER_COLUMN_G_ERC_EXTERNALREFERENCECODE_2);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(groupId);
+
+				if (bindExternalReferenceCode) {
+					queryPos.add(externalReferenceCode);
+				}
+
+				count = (Long)query.uniqueResult();
+
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_G_ERC_GROUPID_2 =
+		"blogsEntry.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_ERC_EXTERNALREFERENCECODE_2 =
+		"blogsEntry.externalReferenceCode = ?";
+
+	private static final String _FINDER_COLUMN_G_ERC_EXTERNALREFERENCECODE_3 =
+		"(blogsEntry.externalReferenceCode IS NULL OR blogsEntry.externalReferenceCode = '')";
+
 	public BlogsEntryPersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
@@ -20992,6 +21683,10 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public void cacheResult(BlogsEntry blogsEntry) {
+		if (blogsEntry.getCtCollectionId() != 0) {
+			return;
+		}
+
 		entityCache.putResult(
 			BlogsEntryImpl.class, blogsEntry.getPrimaryKey(), blogsEntry);
 
@@ -21003,6 +21698,13 @@ public class BlogsEntryPersistenceImpl
 		finderCache.putResult(
 			_finderPathFetchByG_UT,
 			new Object[] {blogsEntry.getGroupId(), blogsEntry.getUrlTitle()},
+			blogsEntry);
+
+		finderCache.putResult(
+			_finderPathFetchByG_ERC,
+			new Object[] {
+				blogsEntry.getGroupId(), blogsEntry.getExternalReferenceCode()
+			},
 			blogsEntry);
 	}
 
@@ -21023,6 +21725,10 @@ public class BlogsEntryPersistenceImpl
 		}
 
 		for (BlogsEntry blogsEntry : blogsEntries) {
+			if (blogsEntry.getCtCollectionId() != 0) {
+				continue;
+			}
+
 			if (entityCache.getResult(
 					BlogsEntryImpl.class, blogsEntry.getPrimaryKey()) == null) {
 
@@ -21042,9 +21748,7 @@ public class BlogsEntryPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(BlogsEntryImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(BlogsEntryImpl.class);
 	}
 
 	/**
@@ -21068,9 +21772,7 @@ public class BlogsEntryPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(BlogsEntryImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(BlogsEntryImpl.class, primaryKey);
@@ -21084,19 +21786,26 @@ public class BlogsEntryPersistenceImpl
 			blogsEntryModelImpl.getUuid(), blogsEntryModelImpl.getGroupId()
 		};
 
+		finderCache.putResult(_finderPathCountByUUID_G, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathCountByUUID_G, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByUUID_G, args, blogsEntryModelImpl, false);
+			_finderPathFetchByUUID_G, args, blogsEntryModelImpl);
 
 		args = new Object[] {
 			blogsEntryModelImpl.getGroupId(), blogsEntryModelImpl.getUrlTitle()
 		};
 
+		finderCache.putResult(_finderPathCountByG_UT, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathCountByG_UT, args, Long.valueOf(1), false);
+			_finderPathFetchByG_UT, args, blogsEntryModelImpl);
+
+		args = new Object[] {
+			blogsEntryModelImpl.getGroupId(),
+			blogsEntryModelImpl.getExternalReferenceCode()
+		};
+
+		finderCache.putResult(_finderPathCountByG_ERC, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathFetchByG_UT, args, blogsEntryModelImpl, false);
+			_finderPathFetchByG_ERC, args, blogsEntryModelImpl);
 	}
 
 	/**
@@ -21186,7 +21895,9 @@ public class BlogsEntryPersistenceImpl
 					BlogsEntryImpl.class, blogsEntry.getPrimaryKeyObj());
 			}
 
-			if (blogsEntry != null) {
+			if ((blogsEntry != null) &&
+				ctPersistenceHelper.isRemove(blogsEntry)) {
+
 				session.delete(blogsEntry);
 			}
 		}
@@ -21299,7 +22010,12 @@ public class BlogsEntryPersistenceImpl
 		try {
 			session = openSession();
 
-			if (isNew) {
+			if (ctPersistenceHelper.isInsert(blogsEntry)) {
+				if (!isNew) {
+					session.evict(
+						BlogsEntryImpl.class, blogsEntry.getPrimaryKeyObj());
+				}
+
 				session.save(blogsEntry);
 			}
 			else {
@@ -21311,6 +22027,16 @@ public class BlogsEntryPersistenceImpl
 		}
 		finally {
 			closeSession(session);
+		}
+
+		if (blogsEntry.getCtCollectionId() != 0) {
+			if (isNew) {
+				blogsEntry.setNew(false);
+			}
+
+			blogsEntry.resetOriginalValues();
+
+			return blogsEntry;
 		}
 
 		entityCache.putResult(
@@ -21369,12 +22095,139 @@ public class BlogsEntryPersistenceImpl
 	/**
 	 * Returns the blogs entry with the primary key or returns <code>null</code> if it could not be found.
 	 *
+	 * @param primaryKey the primary key of the blogs entry
+	 * @return the blogs entry, or <code>null</code> if a blogs entry with the primary key could not be found
+	 */
+	@Override
+	public BlogsEntry fetchByPrimaryKey(Serializable primaryKey) {
+		if (ctPersistenceHelper.isProductionMode(BlogsEntry.class)) {
+			return super.fetchByPrimaryKey(primaryKey);
+		}
+
+		BlogsEntry blogsEntry = null;
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			blogsEntry = (BlogsEntry)session.get(
+				BlogsEntryImpl.class, primaryKey);
+
+			if (blogsEntry != null) {
+				cacheResult(blogsEntry);
+			}
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+
+		return blogsEntry;
+	}
+
+	/**
+	 * Returns the blogs entry with the primary key or returns <code>null</code> if it could not be found.
+	 *
 	 * @param entryId the primary key of the blogs entry
 	 * @return the blogs entry, or <code>null</code> if a blogs entry with the primary key could not be found
 	 */
 	@Override
 	public BlogsEntry fetchByPrimaryKey(long entryId) {
 		return fetchByPrimaryKey((Serializable)entryId);
+	}
+
+	@Override
+	public Map<Serializable, BlogsEntry> fetchByPrimaryKeys(
+		Set<Serializable> primaryKeys) {
+
+		if (ctPersistenceHelper.isProductionMode(BlogsEntry.class)) {
+			return super.fetchByPrimaryKeys(primaryKeys);
+		}
+
+		if (primaryKeys.isEmpty()) {
+			return Collections.emptyMap();
+		}
+
+		Map<Serializable, BlogsEntry> map =
+			new HashMap<Serializable, BlogsEntry>();
+
+		if (primaryKeys.size() == 1) {
+			Iterator<Serializable> iterator = primaryKeys.iterator();
+
+			Serializable primaryKey = iterator.next();
+
+			BlogsEntry blogsEntry = fetchByPrimaryKey(primaryKey);
+
+			if (blogsEntry != null) {
+				map.put(primaryKey, blogsEntry);
+			}
+
+			return map;
+		}
+
+		if ((databaseInMaxParameters > 0) &&
+			(primaryKeys.size() > databaseInMaxParameters)) {
+
+			Iterator<Serializable> iterator = primaryKeys.iterator();
+
+			while (iterator.hasNext()) {
+				Set<Serializable> page = new HashSet<>();
+
+				for (int i = 0;
+					 (i < databaseInMaxParameters) && iterator.hasNext(); i++) {
+
+					page.add(iterator.next());
+				}
+
+				map.putAll(fetchByPrimaryKeys(page));
+			}
+
+			return map;
+		}
+
+		StringBundler sb = new StringBundler((primaryKeys.size() * 2) + 1);
+
+		sb.append(getSelectSQL());
+		sb.append(" WHERE ");
+		sb.append(getPKDBName());
+		sb.append(" IN (");
+
+		for (Serializable primaryKey : primaryKeys) {
+			sb.append((long)primaryKey);
+
+			sb.append(",");
+		}
+
+		sb.setIndex(sb.index() - 1);
+
+		sb.append(")");
+
+		String sql = sb.toString();
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			Query query = session.createQuery(sql);
+
+			for (BlogsEntry blogsEntry : (List<BlogsEntry>)query.list()) {
+				map.put(blogsEntry.getPrimaryKeyObj(), blogsEntry);
+
+				cacheResult(blogsEntry);
+			}
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+
+		return map;
 	}
 
 	/**
@@ -21440,27 +22293,30 @@ public class BlogsEntryPersistenceImpl
 		int start, int end, OrderByComparator<BlogsEntry> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindAll;
 				finderArgs = FINDER_ARGS_EMPTY;
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<BlogsEntry> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<BlogsEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -21496,7 +22352,7 @@ public class BlogsEntryPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -21529,8 +22385,15 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			BlogsEntry.class);
+
+		Long count = null;
+
+		if (productionMode) {
+			count = (Long)finderCache.getResult(
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
+		}
 
 		if (count == null) {
 			Session session = null;
@@ -21542,8 +22405,10 @@ public class BlogsEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
-				finderCache.putResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				if (productionMode) {
+					finderCache.putResult(
+						_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				}
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -21577,38 +22442,115 @@ public class BlogsEntryPersistenceImpl
 	}
 
 	@Override
-	protected Map<String, Integer> getTableColumnsMap() {
+	public Set<String> getCTColumnNames(
+		CTColumnResolutionType ctColumnResolutionType) {
+
+		return _ctColumnNamesMap.getOrDefault(
+			ctColumnResolutionType, Collections.emptySet());
+	}
+
+	@Override
+	public List<String> getMappingTableNames() {
+		return _mappingTableNames;
+	}
+
+	@Override
+	public Map<String, Integer> getTableColumnsMap() {
 		return BlogsEntryModelImpl.TABLE_COLUMNS_MAP;
+	}
+
+	@Override
+	public String getTableName() {
+		return "BlogsEntry";
+	}
+
+	@Override
+	public List<String[]> getUniqueIndexColumnNames() {
+		return _uniqueIndexColumnNames;
+	}
+
+	private static final Map<CTColumnResolutionType, Set<String>>
+		_ctColumnNamesMap = new EnumMap<CTColumnResolutionType, Set<String>>(
+			CTColumnResolutionType.class);
+	private static final List<String> _mappingTableNames =
+		new ArrayList<String>();
+	private static final List<String[]> _uniqueIndexColumnNames =
+		new ArrayList<String[]>();
+
+	static {
+		Set<String> ctControlColumnNames = new HashSet<String>();
+		Set<String> ctIgnoreColumnNames = new HashSet<String>();
+		Set<String> ctMergeColumnNames = new HashSet<String>();
+		Set<String> ctStrictColumnNames = new HashSet<String>();
+
+		ctControlColumnNames.add("mvccVersion");
+		ctControlColumnNames.add("ctCollectionId");
+		ctStrictColumnNames.add("uuid_");
+		ctStrictColumnNames.add("externalReferenceCode");
+		ctStrictColumnNames.add("groupId");
+		ctStrictColumnNames.add("companyId");
+		ctStrictColumnNames.add("userId");
+		ctStrictColumnNames.add("userName");
+		ctStrictColumnNames.add("createDate");
+		ctIgnoreColumnNames.add("modifiedDate");
+		ctMergeColumnNames.add("title");
+		ctMergeColumnNames.add("subtitle");
+		ctMergeColumnNames.add("urlTitle");
+		ctMergeColumnNames.add("description");
+		ctMergeColumnNames.add("content");
+		ctMergeColumnNames.add("displayDate");
+		ctStrictColumnNames.add("allowPingbacks");
+		ctStrictColumnNames.add("allowTrackbacks");
+		ctStrictColumnNames.add("trackbacks");
+		ctStrictColumnNames.add("coverImageCaption");
+		ctStrictColumnNames.add("coverImageFileEntryId");
+		ctStrictColumnNames.add("coverImageURL");
+		ctStrictColumnNames.add("smallImage");
+		ctStrictColumnNames.add("smallImageFileEntryId");
+		ctStrictColumnNames.add("smallImageId");
+		ctStrictColumnNames.add("smallImageURL");
+		ctStrictColumnNames.add("lastPublishDate");
+		ctStrictColumnNames.add("status");
+		ctStrictColumnNames.add("statusByUserId");
+		ctStrictColumnNames.add("statusByUserName");
+		ctStrictColumnNames.add("statusDate");
+
+		_ctColumnNamesMap.put(
+			CTColumnResolutionType.CONTROL, ctControlColumnNames);
+		_ctColumnNamesMap.put(
+			CTColumnResolutionType.IGNORE, ctIgnoreColumnNames);
+		_ctColumnNamesMap.put(CTColumnResolutionType.MERGE, ctMergeColumnNames);
+		_ctColumnNamesMap.put(
+			CTColumnResolutionType.PK, Collections.singleton("entryId"));
+		_ctColumnNamesMap.put(
+			CTColumnResolutionType.STRICT, ctStrictColumnNames);
+
+		_uniqueIndexColumnNames.add(new String[] {"uuid_", "groupId"});
+
+		_uniqueIndexColumnNames.add(new String[] {"groupId", "urlTitle"});
 	}
 
 	/**
 	 * Initializes the blogs entry persistence.
 	 */
 	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class, new BlogsEntryModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", BlogsEntry.class.getName()));
-
+	public void activate() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByUuid = _createFinderPath(
+		_finderPathWithPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
@@ -21616,27 +22558,27 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"uuid_"}, true);
 
-		_finderPathWithoutPaginationFindByUuid = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			true);
 
-		_finderPathCountByUuid = _createFinderPath(
+		_finderPathCountByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			false);
 
-		_finderPathFetchByUUID_G = _createFinderPath(
+		_finderPathFetchByUUID_G = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "groupId"}, true);
 
-		_finderPathCountByUUID_G = _createFinderPath(
+		_finderPathCountByUUID_G = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "groupId"}, false);
 
-		_finderPathWithPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -21645,17 +22587,17 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathWithoutPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathCountByUuid_C = _createFinderPath(
+		_finderPathCountByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
 
-		_finderPathWithPaginationFindByGroupId = _createFinderPath(
+		_finderPathWithPaginationFindByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -21663,17 +22605,17 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId"}, true);
 
-		_finderPathWithoutPaginationFindByGroupId = _createFinderPath(
+		_finderPathWithoutPaginationFindByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			true);
 
-		_finderPathCountByGroupId = _createFinderPath(
+		_finderPathCountByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			false);
 
-		_finderPathWithPaginationFindByCompanyId = _createFinderPath(
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -21681,27 +22623,27 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"companyId"}, true);
 
-		_finderPathWithoutPaginationFindByCompanyId = _createFinderPath(
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			true);
 
-		_finderPathCountByCompanyId = _createFinderPath(
+		_finderPathCountByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
 
-		_finderPathFetchByG_UT = _createFinderPath(
+		_finderPathFetchByG_UT = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByG_UT",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "urlTitle"}, true);
 
-		_finderPathCountByG_UT = _createFinderPath(
+		_finderPathCountByG_UT = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_UT",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "urlTitle"}, false);
 
-		_finderPathWithPaginationFindByG_LtD = _createFinderPath(
+		_finderPathWithPaginationFindByG_LtD = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_LtD",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -21710,12 +22652,12 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "displayDate"}, true);
 
-		_finderPathWithPaginationCountByG_LtD = _createFinderPath(
+		_finderPathWithPaginationCountByG_LtD = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_LtD",
 			new String[] {Long.class.getName(), Date.class.getName()},
 			new String[] {"groupId", "displayDate"}, false);
 
-		_finderPathWithPaginationFindByG_S = _createFinderPath(
+		_finderPathWithPaginationFindByG_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_S",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -21724,17 +22666,17 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "status"}, true);
 
-		_finderPathWithoutPaginationFindByG_S = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"groupId", "status"}, true);
 
-		_finderPathCountByG_S = _createFinderPath(
+		_finderPathCountByG_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"groupId", "status"}, false);
 
-		_finderPathWithPaginationFindByG_NotS = _createFinderPath(
+		_finderPathWithPaginationFindByG_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_NotS",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -21743,12 +22685,12 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "status"}, true);
 
-		_finderPathWithPaginationCountByG_NotS = _createFinderPath(
+		_finderPathWithPaginationCountByG_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_NotS",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"groupId", "status"}, false);
 
-		_finderPathWithPaginationFindByC_U = _createFinderPath(
+		_finderPathWithPaginationFindByC_U = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_U",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -21757,17 +22699,17 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"companyId", "userId"}, true);
 
-		_finderPathWithoutPaginationFindByC_U = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_U = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_U",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"companyId", "userId"}, true);
 
-		_finderPathCountByC_U = _createFinderPath(
+		_finderPathCountByC_U = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_U",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"companyId", "userId"}, false);
 
-		_finderPathWithPaginationFindByC_LtD = _createFinderPath(
+		_finderPathWithPaginationFindByC_LtD = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_LtD",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -21776,12 +22718,12 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"companyId", "displayDate"}, true);
 
-		_finderPathWithPaginationCountByC_LtD = _createFinderPath(
+		_finderPathWithPaginationCountByC_LtD = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_LtD",
 			new String[] {Long.class.getName(), Date.class.getName()},
 			new String[] {"companyId", "displayDate"}, false);
 
-		_finderPathWithPaginationFindByC_S = _createFinderPath(
+		_finderPathWithPaginationFindByC_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_S",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -21790,17 +22732,17 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"companyId", "status"}, true);
 
-		_finderPathWithoutPaginationFindByC_S = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"companyId", "status"}, true);
 
-		_finderPathCountByC_S = _createFinderPath(
+		_finderPathCountByC_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_S",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"companyId", "status"}, false);
 
-		_finderPathWithPaginationFindByC_NotS = _createFinderPath(
+		_finderPathWithPaginationFindByC_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_NotS",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -21809,12 +22751,12 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"companyId", "status"}, true);
 
-		_finderPathWithPaginationCountByC_NotS = _createFinderPath(
+		_finderPathWithPaginationCountByC_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_NotS",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"companyId", "status"}, false);
 
-		_finderPathWithPaginationFindByLtD_S = _createFinderPath(
+		_finderPathWithPaginationFindByLtD_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByLtD_S",
 			new String[] {
 				Date.class.getName(), Integer.class.getName(),
@@ -21823,12 +22765,12 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"displayDate", "status"}, true);
 
-		_finderPathWithPaginationCountByLtD_S = _createFinderPath(
+		_finderPathWithPaginationCountByLtD_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByLtD_S",
 			new String[] {Date.class.getName(), Integer.class.getName()},
 			new String[] {"displayDate", "status"}, false);
 
-		_finderPathWithPaginationFindByG_U_LtD = _createFinderPath(
+		_finderPathWithPaginationFindByG_U_LtD = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_LtD",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -21837,14 +22779,14 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "displayDate"}, true);
 
-		_finderPathWithPaginationCountByG_U_LtD = _createFinderPath(
+		_finderPathWithPaginationCountByG_U_LtD = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_LtD",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Date.class.getName()
 			},
 			new String[] {"groupId", "userId", "displayDate"}, false);
 
-		_finderPathWithPaginationFindByG_U_S = _createFinderPath(
+		_finderPathWithPaginationFindByG_U_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -21853,7 +22795,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "status"}, true);
 
-		_finderPathWithoutPaginationFindByG_U_S = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_U_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -21861,7 +22803,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "status"}, true);
 
-		_finderPathCountByG_U_S = _createFinderPath(
+		_finderPathCountByG_U_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -21869,7 +22811,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "status"}, false);
 
-		_finderPathWithPaginationCountByG_U_S = _createFinderPath(
+		_finderPathWithPaginationCountByG_U_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -21877,7 +22819,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "status"}, false);
 
-		_finderPathWithPaginationFindByG_U_NotS = _createFinderPath(
+		_finderPathWithPaginationFindByG_U_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_NotS",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -21886,7 +22828,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "status"}, true);
 
-		_finderPathWithPaginationCountByG_U_NotS = _createFinderPath(
+		_finderPathWithPaginationCountByG_U_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_NotS",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -21894,7 +22836,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "status"}, false);
 
-		_finderPathWithPaginationFindByG_D_S = _createFinderPath(
+		_finderPathWithPaginationFindByG_D_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_D_S",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -21903,7 +22845,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "displayDate", "status"}, true);
 
-		_finderPathWithoutPaginationFindByG_D_S = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_D_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_D_S",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -21911,7 +22853,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "displayDate", "status"}, true);
 
-		_finderPathCountByG_D_S = _createFinderPath(
+		_finderPathCountByG_D_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_D_S",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -21919,7 +22861,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "displayDate", "status"}, false);
 
-		_finderPathWithPaginationFindByG_GtD_S = _createFinderPath(
+		_finderPathWithPaginationFindByG_GtD_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_GtD_S",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -21928,7 +22870,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "displayDate", "status"}, true);
 
-		_finderPathWithPaginationCountByG_GtD_S = _createFinderPath(
+		_finderPathWithPaginationCountByG_GtD_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_GtD_S",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -21936,7 +22878,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "displayDate", "status"}, false);
 
-		_finderPathWithPaginationFindByG_LtD_S = _createFinderPath(
+		_finderPathWithPaginationFindByG_LtD_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_LtD_S",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -21945,7 +22887,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "displayDate", "status"}, true);
 
-		_finderPathWithPaginationCountByG_LtD_S = _createFinderPath(
+		_finderPathWithPaginationCountByG_LtD_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_LtD_S",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -21953,7 +22895,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "displayDate", "status"}, false);
 
-		_finderPathWithPaginationFindByG_LtD_NotS = _createFinderPath(
+		_finderPathWithPaginationFindByG_LtD_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_LtD_NotS",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -21962,7 +22904,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "displayDate", "status"}, true);
 
-		_finderPathWithPaginationCountByG_LtD_NotS = _createFinderPath(
+		_finderPathWithPaginationCountByG_LtD_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_LtD_NotS",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -21970,7 +22912,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "displayDate", "status"}, false);
 
-		_finderPathWithPaginationFindByC_U_S = _createFinderPath(
+		_finderPathWithPaginationFindByC_U_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_U_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -21979,7 +22921,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"companyId", "userId", "status"}, true);
 
-		_finderPathWithoutPaginationFindByC_U_S = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_U_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_U_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -21987,7 +22929,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"companyId", "userId", "status"}, true);
 
-		_finderPathCountByC_U_S = _createFinderPath(
+		_finderPathCountByC_U_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_U_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -21995,7 +22937,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"companyId", "userId", "status"}, false);
 
-		_finderPathWithPaginationFindByC_U_NotS = _createFinderPath(
+		_finderPathWithPaginationFindByC_U_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_U_NotS",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22004,7 +22946,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"companyId", "userId", "status"}, true);
 
-		_finderPathWithPaginationCountByC_U_NotS = _createFinderPath(
+		_finderPathWithPaginationCountByC_U_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_U_NotS",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22012,7 +22954,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"companyId", "userId", "status"}, false);
 
-		_finderPathWithPaginationFindByC_LtD_S = _createFinderPath(
+		_finderPathWithPaginationFindByC_LtD_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_LtD_S",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -22021,7 +22963,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"companyId", "displayDate", "status"}, true);
 
-		_finderPathWithPaginationCountByC_LtD_S = _createFinderPath(
+		_finderPathWithPaginationCountByC_LtD_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_LtD_S",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -22029,7 +22971,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"companyId", "displayDate", "status"}, false);
 
-		_finderPathWithPaginationFindByC_LtD_NotS = _createFinderPath(
+		_finderPathWithPaginationFindByC_LtD_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_LtD_NotS",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -22038,7 +22980,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"companyId", "displayDate", "status"}, true);
 
-		_finderPathWithPaginationCountByC_LtD_NotS = _createFinderPath(
+		_finderPathWithPaginationCountByC_LtD_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_LtD_NotS",
 			new String[] {
 				Long.class.getName(), Date.class.getName(),
@@ -22046,7 +22988,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"companyId", "displayDate", "status"}, false);
 
-		_finderPathWithPaginationFindByG_U_LtD_S = _createFinderPath(
+		_finderPathWithPaginationFindByG_U_LtD_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_LtD_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22056,7 +22998,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "displayDate", "status"}, true);
 
-		_finderPathWithPaginationCountByG_U_LtD_S = _createFinderPath(
+		_finderPathWithPaginationCountByG_U_LtD_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_LtD_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22064,7 +23006,7 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "displayDate", "status"}, false);
 
-		_finderPathWithPaginationFindByG_U_LtD_NotS = _createFinderPath(
+		_finderPathWithPaginationFindByG_U_LtD_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_LtD_NotS",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -22074,13 +23016,23 @@ public class BlogsEntryPersistenceImpl
 			},
 			new String[] {"groupId", "userId", "displayDate", "status"}, true);
 
-		_finderPathWithPaginationCountByG_U_LtD_NotS = _createFinderPath(
+		_finderPathWithPaginationCountByG_U_LtD_NotS = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_LtD_NotS",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
 				Date.class.getName(), Integer.class.getName()
 			},
 			new String[] {"groupId", "userId", "displayDate", "status"}, false);
+
+		_finderPathFetchByG_ERC = new FinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByG_ERC",
+			new String[] {Long.class.getName(), String.class.getName()},
+			new String[] {"groupId", "externalReferenceCode"}, true);
+
+		_finderPathCountByG_ERC = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_ERC",
+			new String[] {Long.class.getName(), String.class.getName()},
+			new String[] {"groupId", "externalReferenceCode"}, false);
 
 		_setBlogsEntryUtilPersistence(this);
 	}
@@ -22090,14 +23042,6 @@ public class BlogsEntryPersistenceImpl
 		_setBlogsEntryUtilPersistence(null);
 
 		entityCache.removeCache(BlogsEntryImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setBlogsEntryUtilPersistence(
@@ -22141,7 +23085,8 @@ public class BlogsEntryPersistenceImpl
 		super.setSessionFactory(sessionFactory);
 	}
 
-	private BundleContext _bundleContext;
+	@Reference
+	protected CTPersistenceHelper ctPersistenceHelper;
 
 	@Reference
 	protected EntityCache entityCache;
@@ -22206,123 +23151,12 @@ public class BlogsEntryPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"uuid"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class BlogsEntryModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			BlogsEntryModelImpl blogsEntryModelImpl =
-				(BlogsEntryModelImpl)baseModel;
-
-			long columnBitmask = blogsEntryModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(blogsEntryModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						blogsEntryModelImpl.getColumnBitmask(columnName);
-				}
-
-				if (finderPath.isBaseModelResult() &&
-					(BlogsEntryPersistenceImpl.
-						FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION ==
-							finderPath.getCacheName())) {
-
-					finderPathColumnBitmask |= _ORDER_BY_COLUMNS_BITMASK;
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(blogsEntryModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			BlogsEntryModelImpl blogsEntryModelImpl, String[] columnNames,
-			boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] = blogsEntryModelImpl.getColumnOriginalValue(
-						columnName);
-				}
-				else {
-					arguments[i] = blogsEntryModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-		private static final long _ORDER_BY_COLUMNS_BITMASK;
-
-		static {
-			long orderByColumnsBitmask = 0;
-
-			orderByColumnsBitmask |= BlogsEntryModelImpl.getColumnBitmask(
-				"displayDate");
-			orderByColumnsBitmask |= BlogsEntryModelImpl.getColumnBitmask(
-				"createDate");
-
-			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
-		}
-
-	}
+	@Reference
+	private BlogsEntryModelArgumentsResolver _blogsEntryModelArgumentsResolver;
 
 }

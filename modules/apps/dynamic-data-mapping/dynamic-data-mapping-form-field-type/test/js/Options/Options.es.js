@@ -14,7 +14,7 @@
 
 import {act, cleanup, fireEvent, render} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {PageProvider} from 'dynamic-data-mapping-form-renderer';
+import {PageProvider} from 'data-engine-js-components-web';
 import React from 'react';
 
 import Options from '../../../src/main/resources/META-INF/resources/Options/Options.es';
@@ -22,6 +22,9 @@ import Options from '../../../src/main/resources/META-INF/resources/Options/Opti
 const DEFAULT_OPTION_NAME_REGEX = /^Option[0-9]{8}$/;
 
 let liferayLanguageSpy;
+
+const globalLanguageDirection = Liferay.Language.direction;
+
 const spritemap = 'icons.svg';
 
 const OptionsWithProvider = (props) => (
@@ -33,11 +36,13 @@ const OptionsWithProvider = (props) => (
 const optionsValue = {
 	[themeDisplay.getLanguageId()]: [
 		{
+			id: 'option1',
 			label: 'Option 1',
 			reference: 'Option1',
 			value: 'Option1',
 		},
 		{
+			id: 'option2',
 			label: 'Option 2',
 			reference: 'Option2',
 			value: 'Option2',
@@ -73,11 +78,17 @@ describe('Options', () => {
 			}
 			originalWarn.call(console, ...args);
 		};
+
+		Liferay.Language.direction = {
+			en_US: 'rtl',
+		};
 	});
 
 	afterAll(() => {
 		// eslint-disable-next-line no-console
 		console.warn = originalWarn;
+
+		Liferay.Language.direction = globalLanguageDirection;
 	});
 
 	afterEach(cleanup);
@@ -138,6 +149,7 @@ describe('Options', () => {
 				value={{
 					[themeDisplay.getLanguageId()]: [
 						{
+							id: 'option1',
 							label: 'Option 1',
 							value: 'Option1',
 						},
@@ -171,6 +183,7 @@ describe('Options', () => {
 				value={{
 					[themeDisplay.getLanguageId()]: [
 						{
+							id: 'option1',
 							label: 'Option 1',
 							reference: 'Reference1',
 							value: 'Option1',
@@ -206,6 +219,7 @@ describe('Options', () => {
 				value={{
 					[themeDisplay.getLanguageId()]: [
 						{
+							id: 'option',
 							label: 'Option',
 							value: 'Option',
 						},
@@ -246,12 +260,14 @@ describe('Options', () => {
 				value={{
 					[themeDisplay.getLanguageId()]: [
 						{
+							id: 'option',
 							label: 'Option',
 							value: 'Option',
 						},
 					],
 					pt_BR: [
 						{
+							id: 'option',
 							label: 'Option',
 							value: 'Option',
 						},
@@ -281,6 +297,7 @@ describe('Options', () => {
 				value={{
 					[themeDisplay.getLanguageId()]: [
 						{
+							id: 'option1',
 							label: 'Option 1',
 							value: 'Option1',
 						},
@@ -314,6 +331,7 @@ describe('Options', () => {
 				value={{
 					[themeDisplay.getLanguageId()]: [
 						{
+							id: 'option',
 							label: 'Option',
 							value: 'Option',
 						},
@@ -353,6 +371,7 @@ describe('Options', () => {
 				value={{
 					[themeDisplay.getLanguageId()]: [
 						{
+							id: 'option',
 							label: 'Option',
 							value: 'Option',
 						},
@@ -394,12 +413,14 @@ describe('Options', () => {
 				value={{
 					[themeDisplay.getLanguageId()]: [
 						{
+							id: 'option',
 							label: 'Option',
 							value: 'Option',
 						},
 					],
 					pt_BR: [
 						{
+							id: 'option',
 							label: 'Option',
 							value: 'Option',
 						},
@@ -437,6 +458,7 @@ describe('Options', () => {
 				value={{
 					[themeDisplay.getLanguageId()]: [
 						{
+							id: 'foo',
 							label: 'Foo',
 							value: 'Foo',
 						},
@@ -476,10 +498,12 @@ describe('Options', () => {
 				value={{
 					[themeDisplay.getLanguageId()]: [
 						{
+							id: 'bar',
 							label: 'Bar',
 							value: 'Bar',
 						},
 						{
+							id: 'foo',
 							label: 'Foo',
 							value: 'Foo',
 						},
@@ -515,6 +539,7 @@ describe('Options', () => {
 				value={{
 					[themeDisplay.getLanguageId()]: [
 						{
+							id: 'bar',
 							label: 'Bar',
 							value: 'Bar',
 						},
@@ -548,7 +573,23 @@ describe('Options', () => {
 				name="options"
 				onChange={jest.fn()}
 				spritemap={spritemap}
-				value={optionsValue}
+				value={{
+					...optionsValue,
+					pt_BR: [
+						{
+							id: 'option1',
+							label: 'Option 1',
+							reference: 'Option1',
+							value: 'Option1',
+						},
+						{
+							id: 'option2',
+							label: 'Option 2',
+							reference: 'Option2',
+							value: 'Option2',
+						},
+					],
+				}}
 			/>
 		);
 

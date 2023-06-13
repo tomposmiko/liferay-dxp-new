@@ -29,7 +29,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -42,8 +42,10 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8595 | Test Summary: Delete a criteria"
-	@priority = 3
+	@priority = "3"
 	test CanDeleteCriteria {
+		property portal.upstream = "quarantine";
+
 		task ("Get site assigned property name") {
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
@@ -51,7 +53,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add a new dynamic segment") {
@@ -59,14 +61,14 @@ definition {
 
 			ACSegments.createDynamicSegment();
 
-			ACUtils.setItemName(itemName = "New Segment Test");
+			ACSegments.nameSegment(segmentName = "New Segment Test");
 		}
 
 		task ("Add a birthDate and createDate field") {
 			ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
 
 			for (var criteriaName : list "birthDate,createDate") {
-				ACSegments.addSegmentField(segmentField = ${criteriaName});
+				ACSegments.addSegmentField(segmentField = "${criteriaName}");
 			}
 
 			ACSegments.saveSegment();
@@ -77,7 +79,7 @@ definition {
 
 			ACSegments.viewSegmentCriteriaIndividualAttributes(
 				attributeName = "createDate",
-				index = 2);
+				index = "2");
 		}
 
 		task ("Go to Segment and edit it") {
@@ -96,14 +98,19 @@ definition {
 			ACSegments.viewSegmentCriteriaIndividualAttributes(attributeName = "createDate");
 
 			AssertElementNotPresent(
-				key_criteriaName = "birthDate",
+				key_CriteriaName = "birthDate",
 				locator1 = "ACSegments#CRITERIA_ROW");
 		}
 	}
 
 	@description = "Delete a dynamic segment"
-	@priority = 5
+	@ignore = "true"
+	@priority = "5"
 	test CanDeleteDynamicSegment {
+		property portal.upstream = "quarantine";
+
+		// AC Bug Ticket: LRAC-10060
+
 		ACUtils.createBlogsAndAddToPage();
 
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
@@ -130,19 +137,19 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = ${propertyName});
+		ACProperties.switchProperty(propertyName = "${propertyName}");
 
 		ACNavigation.goToSegments();
 
 		ACSegments.createDynamicSegment();
 
-		ACUtils.setItemName(itemName = "Dynamic Segment Test");
+		ACSegments.nameSegment(segmentName = "Dynamic Segment Test");
 
 		ACSegments.addSegmentField(segmentField = "Viewed Blog");
 
 		ACSegments.selectDocument(
 			documentTitle = "Blogs AC Title",
-			indexField = 1);
+			indexField = "1");
 
 		ACSegments.saveSegment();
 
@@ -156,8 +163,10 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8597 | Test Summary: Delete a Segment via the Segment List"
-	@priority = 4
+	@priority = "4"
 	test CanDeleteSegmentViaSegmentList {
+		property portal.upstream = "quarantine";
+
 		task ("Get site assigned property name") {
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
@@ -189,7 +198,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Go to Segments and add a new segment") {
@@ -197,7 +206,7 @@ definition {
 
 			ACSegments.createStaticSegment();
 
-			ACUtils.setItemName(itemName = "New Segment Test");
+			ACSegments.nameSegment(segmentName = "New Segment Test");
 
 			ACSegments.addStaticMember(tableMember = "ac ac");
 
@@ -216,7 +225,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8138 | Test Summary: Delete a static segment"
-	@priority = 5
+	@priority = "5"
 	test CanDeleteStaticSegment {
 		property portal.upstream = "quarantine";
 
@@ -242,13 +251,13 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = ${propertyName});
+		ACProperties.switchProperty(propertyName = "${propertyName}");
 
 		ACNavigation.goToSegments();
 
 		ACSegments.createStaticSegment();
 
-		ACUtils.setItemName(itemName = "Static Segment Test");
+		ACSegments.nameSegment(segmentName = "Static Segment Test");
 
 		ACSegments.addStaticMember(tableMember = "ac ac");
 
@@ -267,97 +276,9 @@ definition {
 		ACSegments.viewDeletedSegmentName(searchTerm = "Static Segment Test");
 	}
 
-	@description = "Bug: LRAC-10247 | Automation ID: LRAC-10247 | Test Summary: Deleting a static segment does not remove user in known individuals"
-	@priority = 5
-	test CheckIfKnownIndividualsDontDisappearAfterDeleteStaticSegment {
-		task ("Connect the DXP to AC") {
-			ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
-		}
-
-		task ("Add a new user") {
-			JSONUser.addUser(
-				userEmailAddress = "ac@liferay.com",
-				userFirstName = "ac",
-				userLastName = "ac",
-				userScreenName = "ac");
-		}
-
-		task ("Sync the Contact Data") {
-			ACDXPSettings.syncNewContactData();
-		}
-
-		task ("Sign in as new user") {
-			User.logoutAndLoginPG(
-				userLoginEmailAddress = "ac@liferay.com",
-				userLoginFullName = "ac ac");
-		}
-
-		task ("View the site page") {
-			ACUtils.navigateToSitePage(
-				pageName = "AC Page",
-				siteName = "Site Name");
-		}
-
-		task ("Close sessions") {
-			ACUtils.closeAllSessionsAndWait();
-		}
-
-		task ("Switch to new property in AC") {
-			ACUtils.launchAC();
-
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
-		}
-
-		task ("Go to Segments and add a new segment") {
-			ACNavigation.goToSegments();
-
-			ACSegments.createStaticSegment();
-
-			ACUtils.setItemName(itemName = "Static Segment Test");
-
-			ACSegments.addStaticMember(tableMember = "ac ac");
-
-			ACSegments.saveSegment();
-		}
-
-		task ("Delete the segment via Segment List") {
-			ACNavigation.goToSegments();
-
-			ACSegments.viewSegmentName(searchTerm = "Static Segment Test");
-
-			ACSegments.deleteSegment(searchTerm = "Static Segment Test");
-
-			ACSegments.viewDeletedSegmentName(searchTerm = "Static Segment Test");
-		}
-
-		task ("Go to Individual > Known Individuals") {
-			ACNavigation.goToIndividuals();
-
-			ACIndividualsDashboard.goToKnownIndividualsTab();
-		}
-
-		task ("Search for user") {
-			ACUtils.searchBar(searchItem = "ac ac");
-
-			ACIndividualsDashboard.assertIndividualAttribute(key_individualAttribute = "ac ac");
-		}
-
-		task ("Go to Segments and add a new segment") {
-			ACNavigation.goToSegments();
-
-			ACSegments.createStaticSegment();
-
-			ACUtils.setItemName(itemName = "Static Segment Test");
-
-			ACSegments.addStaticMember(tableMember = "ac ac");
-
-			ACSegments.saveSegment();
-		}
-	}
-
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8592 | Test Summary: Deleting a custom field that is used by a segment should reset the data"
 	@ignore = "true"
-	@priority = 4
+	@priority = "4"
 	test DeleteCustomFieldUsedSegmentResetData {
 		property portal.upstream = "quarantine";
 
@@ -422,7 +343,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add a new dynamic segment") {
@@ -430,7 +351,7 @@ definition {
 
 			ACSegments.createDynamicSegment();
 
-			ACUtils.setItemName(itemName = "New Segment Test");
+			ACSegments.nameSegment(segmentName = "New Segment Test");
 		}
 
 		task ("Add a Hobby Custom Fields field") {
@@ -453,9 +374,9 @@ definition {
 			ACSegments.accessSegment(segmentName = "New Segment Test");
 
 			ACSegments.viewSegmentMembershipLegendNumbers(
-				anonymousNumber = 0,
-				knownNumber = 1,
-				totalNumber = 1);
+				anonymousNumber = "0",
+				knownNumber = "1",
+				totalNumber = "1");
 		}
 
 		task ("Sign in DXP") {
@@ -480,7 +401,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("View the segment membership") {
@@ -489,14 +410,14 @@ definition {
 			ACSegments.accessSegment(segmentName = "New Segment Test");
 
 			ACSegments.viewSegmentMembershipLegendNumbers(
-				anonymousNumber = 0,
-				knownNumber = 0,
-				totalNumber = 0);
+				anonymousNumber = "0",
+				knownNumber = "0",
+				totalNumber = "0");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8594 | Test Summary: Deleting a data source causes individuals to be removed from segment"
-	@priority = 4
+	@priority = "4"
 	test DeleteDataSourceIndividualsRemovedSegment {
 		property portal.upstream = "quarantine";
 
@@ -531,7 +452,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${propertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add a CSV Data Source") {
@@ -549,7 +470,7 @@ definition {
 
 			ACSegments.createDynamicSegment();
 
-			ACUtils.setItemName(itemName = "New Segment Test");
+			ACSegments.nameSegment(segmentName = "New Segment Test");
 		}
 
 		task ("Add a jobTitle field") {

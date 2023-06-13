@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -177,40 +176,8 @@ public interface CommentResource {
 			return this;
 		}
 
-		public Builder bearerToken(String token) {
-			return header("Authorization", "Bearer " + token);
-		}
-
 		public CommentResource build() {
 			return new CommentResourceImpl(this);
-		}
-
-		public Builder contextPath(String contextPath) {
-			_contextPath = contextPath;
-
-			return this;
-		}
-
-		public Builder endpoint(String address, String scheme) {
-			String[] addressParts = address.split(":");
-
-			String host = addressParts[0];
-
-			int port = 443;
-
-			if (addressParts.length > 1) {
-				String portString = addressParts[1];
-
-				try {
-					port = Integer.parseInt(portString);
-				}
-				catch (NumberFormatException numberFormatException) {
-					throw new IllegalArgumentException(
-						"Unable to parse port from " + portString);
-				}
-			}
-
-			return endpoint(host, port, scheme);
 		}
 
 		public Builder endpoint(String host, int port, String scheme) {
@@ -258,7 +225,6 @@ public interface CommentResource {
 		private Builder() {
 		}
 
-		private String _contextPath = "";
 		private Map<String, String> _headers = new LinkedHashMap<>();
 		private String _host = "localhost";
 		private Locale _locale;
@@ -296,29 +262,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -388,7 +332,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/blog-postings/{blogPostingId}/comments");
 
 			httpInvoker.path("blogPostingId", blogPostingId);
@@ -420,29 +364,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -494,7 +416,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/blog-postings/{blogPostingId}/comments");
 
 			httpInvoker.path("blogPostingId", blogPostingId);
@@ -527,29 +449,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -595,7 +495,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/blog-postings/{blogPostingId}/comments/batch");
 
 			httpInvoker.path("blogPostingId", blogPostingId);
@@ -624,29 +524,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -696,7 +574,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/comments/{commentId}");
 
 			httpInvoker.path("commentId", commentId);
@@ -727,29 +605,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -795,7 +651,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/comments/batch");
 
 			httpInvoker.userNameAndPassword(
@@ -822,29 +678,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -893,7 +727,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/comments/{commentId}");
 
 			httpInvoker.path("commentId", commentId);
@@ -924,29 +758,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -998,7 +810,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/comments/{commentId}");
 
 			httpInvoker.path("commentId", commentId);
@@ -1029,29 +841,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1097,7 +887,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/comments/batch");
 
 			httpInvoker.userNameAndPassword(
@@ -1130,29 +920,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1222,7 +990,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/comments/{parentCommentId}/comments");
 
 			httpInvoker.path("parentCommentId", parentCommentId);
@@ -1253,29 +1021,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1327,7 +1073,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/comments/{parentCommentId}/comments");
 
 			httpInvoker.path("parentCommentId", parentCommentId);
@@ -1362,29 +1108,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1454,7 +1178,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/documents/{documentId}/comments");
 
 			httpInvoker.path("documentId", documentId);
@@ -1485,29 +1209,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1559,7 +1261,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/documents/{documentId}/comments");
 
 			httpInvoker.path("documentId", documentId);
@@ -1592,29 +1294,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1660,7 +1340,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/documents/{documentId}/comments/batch");
 
 			httpInvoker.path("documentId", documentId);
@@ -1696,29 +1376,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1790,7 +1448,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/structured-contents/{structuredContentId}/comments");
 
 			httpInvoker.path("structuredContentId", structuredContentId);
@@ -1823,29 +1481,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -1898,7 +1534,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/structured-contents/{structuredContentId}/comments");
 
 			httpInvoker.path("structuredContentId", structuredContentId);
@@ -1931,29 +1567,7 @@ public interface CommentResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 
-				Problem.ProblemException problemException = null;
-
-				if (Objects.equals(
-						httpResponse.getContentType(), "application/json")) {
-
-					problemException = new Problem.ProblemException(
-						Problem.toDTO(content));
-				}
-				else {
-					_logger.log(
-						Level.WARNING,
-						"Unable to process content type: " +
-							httpResponse.getContentType());
-
-					Problem problem = new Problem();
-
-					problem.setStatus(
-						String.valueOf(httpResponse.getStatusCode()));
-
-					problemException = new Problem.ProblemException(problem);
-				}
-
-				throw problemException;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 			else {
 				_logger.fine("HTTP response content: " + content);
@@ -2000,7 +1614,7 @@ public interface CommentResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port + _builder._contextPath +
+					_builder._port +
 						"/o/headless-delivery/v1.0/structured-contents/{structuredContentId}/comments/batch");
 
 			httpInvoker.path("structuredContentId", structuredContentId);

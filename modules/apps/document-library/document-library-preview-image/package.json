@@ -1,8 +1,9 @@
 {
 	"dependencies": {
-		"@clayui/button": "3.83.0",
-		"@clayui/icon": "3.56.0",
-		"frontend-js-react-web": "*",
+		"@clayui/button": "3.40.0",
+		"@clayui/icon": "3.40.0",
+		"@liferay/document-library-preview-css": "*",
+		"@liferay/frontend-js-react-web": "*",
 		"frontend-js-web": "*",
 		"prop-types": "15.7.2",
 		"react": "16.12.0"
@@ -15,5 +16,5 @@
 		"format": "liferay-npm-scripts fix",
 		"test": "liferay-npm-scripts test"
 	},
-	"version": "2.0.26"
+	"version": "3.0.12"
 }

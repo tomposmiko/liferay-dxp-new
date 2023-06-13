@@ -22,9 +22,6 @@ import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.language.LanguageImpl;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.registry.BasicRegistryImpl;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
 
 import org.hamcrest.core.StringContains;
 
@@ -42,8 +39,7 @@ import org.junit.rules.ExpectedException;
 public class FragmentEntryValidatorImplTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@BeforeClass
@@ -52,10 +48,6 @@ public class FragmentEntryValidatorImplTest {
 
 		languageUtil.setLanguage(new LanguageImpl());
 
-		Registry registry = new BasicRegistryImpl();
-
-		RegistryUtil.setRegistry(registry);
-
 		_classLoader = PortalClassLoaderUtil.getClassLoader();
 
 		PortalClassLoaderUtil.setClassLoader(null);
@@ -63,8 +55,6 @@ public class FragmentEntryValidatorImplTest {
 
 	@AfterClass
 	public static void tearDownClass() {
-		RegistryUtil.setRegistry(null);
-
 		PortalClassLoaderUtil.setClassLoader(_classLoader);
 	}
 

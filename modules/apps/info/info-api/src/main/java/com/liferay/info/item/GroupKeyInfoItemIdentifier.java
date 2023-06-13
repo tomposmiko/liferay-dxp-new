@@ -14,6 +14,7 @@
 
 package com.liferay.info.item;
 
+import com.liferay.info.item.provider.filter.InfoItemServiceFilter;
 import com.liferay.petra.string.StringBundler;
 
 import java.util.Objects;
@@ -22,6 +23,9 @@ import java.util.Objects;
  * @author Jorge Ferrer
  */
 public class GroupKeyInfoItemIdentifier extends BaseInfoItemIdentifier {
+
+	public static final InfoItemServiceFilter INFO_ITEM_SERVICE_FILTER =
+		getInfoItemServiceFilter(GroupKeyInfoItemIdentifier.class);
 
 	public GroupKeyInfoItemIdentifier(long groupId, String key) {
 		_groupId = groupId;
@@ -54,6 +58,11 @@ public class GroupKeyInfoItemIdentifier extends BaseInfoItemIdentifier {
 		return _groupId;
 	}
 
+	@Override
+	public InfoItemServiceFilter getInfoItemServiceFilter() {
+		return INFO_ITEM_SERVICE_FILTER;
+	}
+
 	public String getKey() {
 		return _key;
 	}
@@ -65,17 +74,9 @@ public class GroupKeyInfoItemIdentifier extends BaseInfoItemIdentifier {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(7);
-
-		sb.append("{className=");
-		sb.append(GroupKeyInfoItemIdentifier.class.getName());
-		sb.append(", _groupId=");
-		sb.append(_groupId);
-		sb.append(", _key=");
-		sb.append(_key);
-		sb.append("}");
-
-		return sb.toString();
+		return StringBundler.concat(
+			"{className=", GroupKeyInfoItemIdentifier.class.getName(),
+			", _groupId=", _groupId, ", _key=", _key, "}");
 	}
 
 	private final long _groupId;

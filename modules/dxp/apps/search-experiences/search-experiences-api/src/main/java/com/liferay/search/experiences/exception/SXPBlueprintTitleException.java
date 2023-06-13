@@ -15,6 +15,9 @@
 package com.liferay.search.experiences.exception;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.search.experiences.problem.Problem;
+
+import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
@@ -22,6 +25,10 @@ import com.liferay.portal.kernel.exception.PortalException;
 public class SXPBlueprintTitleException extends PortalException {
 
 	public SXPBlueprintTitleException() {
+	}
+
+	public SXPBlueprintTitleException(List<Problem> problems) {
+		_problems = problems;
 	}
 
 	public SXPBlueprintTitleException(String msg) {
@@ -36,6 +43,12 @@ public class SXPBlueprintTitleException extends PortalException {
 		super(throwable);
 	}
 
+	public List<Problem> getProblems() {
+		return _problems;
+	}
+
 	private static final long serialVersionUID = 1L;
+
+	private List<Problem> _problems;
 
 }

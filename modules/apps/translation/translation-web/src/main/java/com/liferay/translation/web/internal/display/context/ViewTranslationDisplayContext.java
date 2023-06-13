@@ -127,7 +127,7 @@ public class ViewTranslationDisplayContext {
 			_translationSnapshot.getInfoItemFieldValues();
 
 		InfoFieldValue<Object> infoFieldValue =
-			infoItemFieldValues.getInfoFieldValue(infoField.getUniqueId());
+			infoItemFieldValues.getInfoFieldValue(infoField.getName());
 
 		if (infoFieldValue != null) {
 			return GetterUtil.getString(infoFieldValue.getValue(locale));

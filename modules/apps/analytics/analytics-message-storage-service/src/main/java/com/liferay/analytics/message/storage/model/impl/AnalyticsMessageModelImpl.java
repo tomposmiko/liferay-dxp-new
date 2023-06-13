@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -218,64 +219,86 @@ public class AnalyticsMessageModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, AnalyticsMessage>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AnalyticsMessage.class.getClassLoader(), AnalyticsMessage.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<AnalyticsMessage> constructor =
+				(Constructor<AnalyticsMessage>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<AnalyticsMessage, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AnalyticsMessage, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<AnalyticsMessage, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<AnalyticsMessage, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", AnalyticsMessage::getMvccVersion);
-		attributeGetterFunctions.put(
-			"analyticsMessageId", AnalyticsMessage::getAnalyticsMessageId);
-		attributeGetterFunctions.put(
-			"companyId", AnalyticsMessage::getCompanyId);
-		attributeGetterFunctions.put("userId", AnalyticsMessage::getUserId);
-		attributeGetterFunctions.put("userName", AnalyticsMessage::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", AnalyticsMessage::getCreateDate);
-		attributeGetterFunctions.put("body", AnalyticsMessage::getBody);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<AnalyticsMessage, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<AnalyticsMessage, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<AnalyticsMessage, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", AnalyticsMessage::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AnalyticsMessage, Long>)
 				AnalyticsMessage::setMvccVersion);
+		attributeGetterFunctions.put(
+			"analyticsMessageId", AnalyticsMessage::getAnalyticsMessageId);
 		attributeSetterBiConsumers.put(
 			"analyticsMessageId",
 			(BiConsumer<AnalyticsMessage, Long>)
 				AnalyticsMessage::setAnalyticsMessageId);
+		attributeGetterFunctions.put(
+			"companyId", AnalyticsMessage::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AnalyticsMessage, Long>)AnalyticsMessage::setCompanyId);
+		attributeGetterFunctions.put("userId", AnalyticsMessage::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<AnalyticsMessage, Long>)AnalyticsMessage::setUserId);
+		attributeGetterFunctions.put("userName", AnalyticsMessage::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<AnalyticsMessage, String>)
 				AnalyticsMessage::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", AnalyticsMessage::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<AnalyticsMessage, Date>)
 				AnalyticsMessage::setCreateDate);
+		attributeGetterFunctions.put("body", AnalyticsMessage::getBody);
 		attributeSetterBiConsumers.put(
 			"body",
 			(BiConsumer<AnalyticsMessage, Blob>)AnalyticsMessage::setBody);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -500,6 +523,26 @@ public class AnalyticsMessageModelImpl
 	}
 
 	@Override
+	public AnalyticsMessage cloneWithOriginalValues() {
+		AnalyticsMessageImpl analyticsMessageImpl = new AnalyticsMessageImpl();
+
+		analyticsMessageImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		analyticsMessageImpl.setAnalyticsMessageId(
+			this.<Long>getColumnOriginalValue("analyticsMessageId"));
+		analyticsMessageImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		analyticsMessageImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		analyticsMessageImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		analyticsMessageImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+
+		return analyticsMessageImpl;
+	}
+
+	@Override
 	public int compareTo(AnalyticsMessage analyticsMessage) {
 		int value = 0;
 
@@ -696,9 +739,7 @@ public class AnalyticsMessageModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AnalyticsMessage>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AnalyticsMessage.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

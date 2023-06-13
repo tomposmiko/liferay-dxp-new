@@ -15,9 +15,7 @@
 package com.liferay.document.library.preview.audio.internal;
 
 import com.liferay.document.library.constants.DLFileVersionPreviewConstants;
-import com.liferay.document.library.kernel.model.DLProcessorConstants;
 import com.liferay.document.library.kernel.util.AudioProcessor;
-import com.liferay.document.library.kernel.util.DLProcessor;
 import com.liferay.document.library.kernel.util.DLProcessorRegistryUtil;
 import com.liferay.document.library.preview.DLPreviewRenderer;
 import com.liferay.document.library.preview.DLPreviewRendererProvider;
@@ -63,7 +61,9 @@ public class AudioDLPreviewRendererProvider
 	public DLPreviewRenderer getPreviewDLPreviewRenderer(
 		FileVersion fileVersion) {
 
-		if (!_audioProcessor.isAudioSupported(fileVersion)) {
+		if (!_audioProcessor.hasAudio(fileVersion) &&
+			!_audioProcessor.isAudioSupported(fileVersion)) {
+
 			return null;
 		}
 
@@ -108,15 +108,6 @@ public class AudioDLPreviewRendererProvider
 
 			throw new DLPreviewGenerationInProcessException();
 		}
-	}
-
-	@Reference(
-		policyOption = ReferencePolicyOption.GREEDY,
-		target = "(type=" + DLProcessorConstants.AUDIO_PROCESSOR + ")",
-		unbind = "-"
-	)
-	protected void setDLProcessor(DLProcessor dlProcessor) {
-		_audioProcessor = (AudioProcessor)dlProcessor;
 	}
 
 	private List<String> _getPreviewFileURLs(
@@ -167,6 +158,7 @@ public class AudioDLPreviewRendererProvider
 		return previewFileURLs;
 	}
 
+	@Reference(policyOption = ReferencePolicyOption.GREEDY)
 	private AudioProcessor _audioProcessor;
 
 	@Reference

@@ -27,6 +27,10 @@ public class CommerceShippingMethodLocalServiceWrapper
 	implements CommerceShippingMethodLocalService,
 			   ServiceWrapper<CommerceShippingMethodLocalService> {
 
+	public CommerceShippingMethodLocalServiceWrapper() {
+		this(null);
+	}
+
 	public CommerceShippingMethodLocalServiceWrapper(
 		CommerceShippingMethodLocalService commerceShippingMethodLocalService) {
 
@@ -38,12 +42,12 @@ public class CommerceShippingMethodLocalServiceWrapper
 	public com.liferay.commerce.model.CommerceAddressRestriction
 			addCommerceAddressRestriction(
 				long userId, long groupId, long commerceShippingMethodId,
-				long commerceCountryId)
+				long countryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceShippingMethodLocalService.
 			addCommerceAddressRestriction(
-				userId, groupId, commerceShippingMethodId, commerceCountryId);
+				userId, groupId, commerceShippingMethodId, countryId);
 	}
 
 	/**
@@ -53,13 +57,13 @@ public class CommerceShippingMethodLocalServiceWrapper
 	@Override
 	public com.liferay.commerce.model.CommerceAddressRestriction
 			addCommerceAddressRestriction(
-				long commerceShippingMethodId, long commerceCountryId,
+				long commerceShippingMethodId, long countryId,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceShippingMethodLocalService.
 			addCommerceAddressRestriction(
-				commerceShippingMethodId, commerceCountryId, serviceContext);
+				commerceShippingMethodId, countryId, serviceContext);
 	}
 
 	/**
@@ -396,10 +400,10 @@ public class CommerceShippingMethodLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.commerce.model.CommerceShippingMethod>
 		getCommerceShippingMethods(
-			long groupId, long commerceCountryId, boolean active) {
+			long groupId, long countryId, boolean active) {
 
 		return _commerceShippingMethodLocalService.getCommerceShippingMethods(
-			groupId, commerceCountryId, active);
+			groupId, countryId, active);
 	}
 
 	/**

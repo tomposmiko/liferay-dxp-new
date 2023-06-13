@@ -30,11 +30,6 @@ DLAccessFromDesktopDisplayContext dlAccessFromDesktopDisplayContext = new DLAcce
 	<div class="portlet-document-library">
 		<liferay-ui:message key="<%= dlAccessFromDesktopDisplayContext.getWebDAVHelpMessage() %>" />
 
-		<liferay-learn:message
-			key="webdav"
-			resource="document-library-web"
-		/>
-
 		<br /><br />
 
 		<aui:input cssClass="webdav-url-resource" id='<%= dlAccessFromDesktopDisplayContext.getRandomNamespace() + "webDavURL" %>' name="webDavURL" type="resource" value="<%= dlAccessFromDesktopDisplayContext.getWebDAVURL() %>" />
@@ -60,7 +55,7 @@ DLAccessFromDesktopDisplayContext dlAccessFromDesktopDisplayContext = new DLAcce
 		);
 
 		if (webdavActionLink) {
-			webdavActionLink.addEventListener('click', function (event) {
+			webdavActionLink.addEventListener('click', (event) => {
 				event.preventDefault();
 
 				if (webdavContentContainer) {

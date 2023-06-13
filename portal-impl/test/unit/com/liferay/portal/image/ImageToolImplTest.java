@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.image.ImageTool;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.FileImpl;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
@@ -36,9 +35,7 @@ import java.util.Arrays;
 import javax.imageio.ImageIO;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -48,16 +45,8 @@ import org.junit.Test;
 public class ImageToolImplTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() {
-		FileUtil fileUtil = new FileUtil();
-
-		fileUtil.setFile(new FileImpl());
-	}
 
 	@Test
 	public void testCropBMP() throws Exception {

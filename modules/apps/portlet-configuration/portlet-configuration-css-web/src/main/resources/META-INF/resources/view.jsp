@@ -44,12 +44,14 @@
 			</liferay-frontend:edit-form-footer>
 		</liferay-frontend:edit-form>
 
-		<aui:script require="metal-dom/src/dom as dom">
-			dom.delegate(
+		<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
+			var delegate = delegateModule.default;
+
+			delegate(
 				document.getElementById('<portlet:namespace />fm'),
 				'change',
 				'input[type=checkbox]',
-				function (event) {
+				(event) => {
 					var toggle = event.delegateTarget;
 
 					var disableOnChecked = toggle.dataset.disableonchecked;
@@ -61,19 +63,6 @@
 						input.disabled = disableOnChecked
 							? !toggle.checked
 							: toggle.checked;
-
-						if (!input.disabled) {
-							input.classList.remove('disabled');
-
-							if (input.labels.length > 0) {
-								input.labels[0].classList.remove('disabled');
-							}
-						}
-						else {
-							if (input.labels.length > 0) {
-								input.labels[0].classList.add('disabled');
-							}
-						}
 					}
 				}
 			);

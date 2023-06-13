@@ -25,10 +25,7 @@ import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryVersion;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
-import com.liferay.fragment.service.persistence.FragmentCollectionPersistence;
 import com.liferay.fragment.service.persistence.FragmentEntryFinder;
-import com.liferay.fragment.service.persistence.FragmentEntryLinkFinder;
-import com.liferay.fragment.service.persistence.FragmentEntryLinkPersistence;
 import com.liferay.fragment.service.persistence.FragmentEntryPersistence;
 import com.liferay.fragment.service.persistence.FragmentEntryVersionPersistence;
 import com.liferay.petra.function.UnsafeFunction;
@@ -53,8 +50,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -481,6 +476,7 @@ public abstract class FragmentEntryLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -499,6 +495,7 @@ public abstract class FragmentEntryLocalServiceBaseImpl
 			(FragmentEntry)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<FragmentEntry> getBasePersistence() {
 		return fragmentEntryPersistence;
 	}
@@ -546,7 +543,7 @@ public abstract class FragmentEntryLocalServiceBaseImpl
 	 * <strong>Important:</strong> Inspect FragmentEntryLocalServiceImpl for overloaded versions of the method. If provided, use these entry points to the API, as the implementation logic may require the additional parameters defined there.
 	 * </p>
 	 *
-	 * @param draftFragmentEntry the fragment entry
+	 * @param fragmentEntry the fragment entry
 	 * @return the fragment entry that was updated
 	 * @throws PortalException
 	 */
@@ -974,6 +971,7 @@ public abstract class FragmentEntryLocalServiceBaseImpl
 		draftFragmentEntry.setCacheable(publishedFragmentEntry.getCacheable());
 		draftFragmentEntry.setConfiguration(
 			publishedFragmentEntry.getConfiguration());
+		draftFragmentEntry.setIcon(publishedFragmentEntry.getIcon());
 		draftFragmentEntry.setPreviewFileEntryId(
 			publishedFragmentEntry.getPreviewFileEntryId());
 		draftFragmentEntry.setReadOnly(publishedFragmentEntry.getReadOnly());
@@ -1087,26 +1085,6 @@ public abstract class FragmentEntryLocalServiceBaseImpl
 		counterLocalService;
 
 	@Reference
-	protected FragmentCollectionPersistence fragmentCollectionPersistence;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@Reference
 	protected FragmentEntryVersionPersistence fragmentEntryVersionPersistence;
-
-	@Reference
-	protected FragmentEntryLinkPersistence fragmentEntryLinkPersistence;
-
-	@Reference
-	protected FragmentEntryLinkFinder fragmentEntryLinkFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		FragmentEntryLocalServiceBaseImpl.class);
 
 }

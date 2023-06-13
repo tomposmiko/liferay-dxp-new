@@ -1,89 +1,64 @@
 definition {
 
 	macro gotoAddCollection {
-		var browserType = PropsUtil.get("browser.type");
-
-		if (${browserType} == "internetexplorer") {
-			Click(locator1 = "NavNested#NAV_NESTED_PLUS_IE");
+		if (IsElementPresent(locator1 = "NavNested#NAV_NESTED_PLUS")) {
+			Click(locator1 = "NavNested#NAV_NESTED_PLUS");
 		}
 		else {
-			if (IsElementPresent(locator1 = "NavNested#NAV_NESTED_PLUS")) {
-				Click(locator1 = "NavNested#NAV_NESTED_PLUS");
-			}
-			else {
-				Button.click(button = "New");
+			Button.click(button = "New");
 
-				MenuItem.click(menuItem = "Collection");
-			}
+			MenuItem.click(menuItem = "Collection");
 		}
 	}
 
 	macro gotoCollection {
-		SelectFrameTop();
-
-		AssertClick.assertPartialTextClickAt(
-			locator1 = "FragmentAdmin#FRAGMENT_COLLECTION",
-			value1 = ${collectionName});
+		MenuBar.click(menuBar = "${collectionName}");
 	}
 
 	macro gotoEntry {
-		LexiconCard.clickCardTitle(card = ${entry});
+		LexiconCard.clickCardTitleLink(card = "${entry}");
 	}
 
 	macro gotoEntryEllipsisItem {
 		LexiconCard.clickEllipsisItem(
-			card = ${entry},
-			item = ${item});
+			card = "${entry}",
+			item = "${item}");
 	}
 
 	macro gotoExportCollection {
-		var browserType = PropsUtil.get("browser.type");
-
-		if (${browserType} == "internetexplorer") {
-			Click(locator1 = "NavNested#NAV_NESTED_ELLIPSIS_IE");
-		}
-		else {
-			Click.waitForMenuToggleJSClick(locator1 = "NavNested#NAV_NESTED_ELLIPSIS");
-		}
+		Click.waitForMenuToggleJSClick(locator1 = "NavNested#NAV_NESTED_ELLIPSIS");
 
 		DropdownMenuItem.click(menuItem = "Export");
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_IFRAME");
 	}
 
 	macro gotoImportCollection {
-		var browserType = PropsUtil.get("browser.type");
-
-		if (${browserType} == "internetexplorer") {
-			Click(locator1 = "NavNested#NAV_NESTED_ELLIPSIS_IE");
+		if (IsElementPresent(locator1 = "NavNested#NAV_NESTED_ELLIPSIS")) {
+			Click.waitForMenuToggleJSClick(locator1 = "NavNested#NAV_NESTED_ELLIPSIS");
 		}
 		else {
-			if (IsElementPresent(locator1 = "NavNested#NAV_NESTED_ELLIPSIS")) {
-				Click.waitForMenuToggleJSClick(locator1 = "NavNested#NAV_NESTED_ELLIPSIS");
-			}
-			else {
-				Button.click(button = "New");
-			}
+			Button.click(button = "New");
 		}
 
 		DropdownMenuItem.click(menuItem = "Import");
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_IFRAME");
 	}
 
 	macro gotoSpecificScopeCollection {
-		AssertClick.assertPartialTextClickAt(
-			locator1 = "FragmentAdmin#FRAGMENT_COLLECTION_SPECIFIC_SCOPE",
-			value1 = ${collectionName});
+		MenuBar.clickInStack(
+			menuBar = "${collectionName}",
+			stackName = "${scope}");
 	}
 
 	macro openFragmentsAdmin {
 		Navigator.openWithAppendToBaseURL(
-			baseURL = ${baseURL},
+			baseURL = "${baseURL}",
 			urlAppend = "group/${siteURLKey}/~/control_panel/manage/-/fragments");
 	}
 

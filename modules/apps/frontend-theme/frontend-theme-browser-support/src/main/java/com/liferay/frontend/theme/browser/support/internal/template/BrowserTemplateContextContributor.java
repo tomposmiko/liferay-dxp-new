@@ -14,6 +14,7 @@
 
 package com.liferay.frontend.theme.browser.support.internal.template;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.template.TemplateContextContributor;
@@ -41,15 +42,14 @@ public class BrowserTemplateContextContributor
 		Map<String, Object> contextObjects,
 		HttpServletRequest httpServletRequest) {
 
-		StringBuilder sb = new StringBuilder();
+		StringBundler sb = new StringBundler(4);
 
 		sb.append(GetterUtil.getString(contextObjects.get("bodyCssClass")));
 		sb.append(StringPool.SPACE);
 		sb.append(BrowserSnifferUtil.getBrowserId(httpServletRequest));
 
 		if (BrowserSnifferUtil.isMobile(httpServletRequest)) {
-			sb.append(StringPool.SPACE);
-			sb.append("mobile");
+			sb.append(" mobile");
 		}
 
 		contextObjects.put("bodyCssClass", sb.toString());

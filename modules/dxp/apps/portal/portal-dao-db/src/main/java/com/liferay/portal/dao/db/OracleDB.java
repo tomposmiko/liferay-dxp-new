@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.util.Validator;
 import java.io.IOException;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -66,21 +65,17 @@ public class OracleDB extends BaseDB {
 	public List<Index> getIndexes(Connection connection) throws SQLException {
 		List<Index> indexes = new ArrayList<>();
 
-		StringBundler sb = new StringBundler(3);
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				StringBundler.concat(
+					"select index_name, table_name, uniqueness from ",
+					"user_indexes where index_name like 'LIFERAY_%' or ",
+					"index_name like 'IX_%'"));
+			ResultSet resultSet = preparedStatement.executeQuery()) {
 
-		sb.append("select index_name, table_name, uniqueness from ");
-		sb.append("user_indexes where index_name like 'LIFERAY_%' or ");
-		sb.append("index_name like 'IX_%'");
-
-		String sql = sb.toString();
-
-		try (PreparedStatement ps = connection.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery()) {
-
-			while (rs.next()) {
-				String indexName = rs.getString("index_name");
-				String tableName = rs.getString("table_name");
-				String uniqueness = rs.getString("uniqueness");
+			while (resultSet.next()) {
+				String indexName = resultSet.getString("index_name");
+				String tableName = resultSet.getString("table_name");
+				String uniqueness = resultSet.getString("uniqueness");
 
 				boolean unique = true;
 
@@ -96,29 +91,9 @@ public class OracleDB extends BaseDB {
 	}
 
 	@Override
-	public ResultSet getIndexResultSet(Connection connection, String tableName)
-		throws SQLException {
-
-		DatabaseMetaData databaseMetaData = connection.getMetaData();
-
-		DBInspector dbInspector = new DBInspector(connection);
-
-		return databaseMetaData.getIndexInfo(
-			dbInspector.getCatalog(), dbInspector.getSchema(), tableName, false,
-			true);
-	}
-
-	@Override
 	public String getPopulateSQL(String databaseName, String sqlContent) {
-		StringBundler sb = new StringBundler(5);
-
-		sb.append("connect &1/&2;\n");
-		sb.append("set define off;\n");
-		sb.append("\n");
-		sb.append(sqlContent);
-		sb.append("quit");
-
-		return sb.toString();
+		return StringBundler.concat(
+			"connect &1/&2;\n", "set define off;\n\n", sqlContent, "quit");
 	}
 
 	@Override
@@ -165,8 +140,8 @@ public class OracleDB extends BaseDB {
 	protected boolean isNullable(String tableName, String columnName)
 		throws SQLException {
 
-		try (Connection con = DataAccess.getConnection()) {
-			DBInspector dbInspector = new DBInspector(con);
+		try (Connection connection = DataAccess.getConnection()) {
+			DBInspector dbInspector = new DBInspector(connection);
 
 			return dbInspector.isNullable(tableName, columnName);
 		}

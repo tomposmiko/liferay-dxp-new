@@ -70,9 +70,9 @@ public class BatchEngineExportTaskTable
 	public final Column<BatchEngineExportTaskTable, Date> endTime =
 		createColumn(
 			"endTime", Date.class, Types.TIMESTAMP, Column.FLAG_DEFAULT);
-	public final Column<BatchEngineExportTaskTable, String> errorMessage =
+	public final Column<BatchEngineExportTaskTable, Clob> errorMessage =
 		createColumn(
-			"errorMessage", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
+			"errorMessage", Clob.class, Types.CLOB, Column.FLAG_DEFAULT);
 	public final Column<BatchEngineExportTaskTable, String> fieldNames =
 		createColumn(
 			"fieldNames", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
@@ -81,12 +81,20 @@ public class BatchEngineExportTaskTable
 			"executeStatus", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
 	public final Column<BatchEngineExportTaskTable, Clob> parameters =
 		createColumn("parameters", Clob.class, Types.CLOB, Column.FLAG_DEFAULT);
+	public final Column<BatchEngineExportTaskTable, Integer>
+		processedItemsCount = createColumn(
+			"processedItemsCount", Integer.class, Types.INTEGER,
+			Column.FLAG_DEFAULT);
 	public final Column<BatchEngineExportTaskTable, Date> startTime =
 		createColumn(
 			"startTime", Date.class, Types.TIMESTAMP, Column.FLAG_DEFAULT);
 	public final Column<BatchEngineExportTaskTable, String>
 		taskItemDelegateName = createColumn(
 			"taskItemDelegateName", String.class, Types.VARCHAR,
+			Column.FLAG_DEFAULT);
+	public final Column<BatchEngineExportTaskTable, Integer> totalItemsCount =
+		createColumn(
+			"totalItemsCount", Integer.class, Types.INTEGER,
 			Column.FLAG_DEFAULT);
 
 	private BatchEngineExportTaskTable() {

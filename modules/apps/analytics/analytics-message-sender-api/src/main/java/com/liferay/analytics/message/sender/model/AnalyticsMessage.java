@@ -63,7 +63,7 @@ public final class AnalyticsMessage implements Serializable {
 				"type", _analyticsMessage.getType()
 			);
 
-			return jsonObject.toString();
+			return jsonObject.toJSONString();
 		}
 
 		public Builder object(JSONObject objectJSONObject) {

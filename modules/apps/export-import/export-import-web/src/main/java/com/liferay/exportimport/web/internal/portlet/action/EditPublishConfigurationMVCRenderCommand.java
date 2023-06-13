@@ -26,16 +26,16 @@ import org.osgi.service.component.annotations.Component;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ExportImportPortletKeys.EXPORT_IMPORT,
-		"mvc.command.name=editPublishConfiguration"
+		"mvc.command.name=/export_import/edit_publish_configuration"
 	},
 	service = MVCRenderCommand.class
 )
 public class EditPublishConfigurationMVCRenderCommand
-	extends GetGroupMVCRenderCommand {
+	extends BaseGroupMVCRenderCommand {
 
 	@Override
 	protected String getPath() {
-		return "/publish/publish_layouts.jsp";
+		return "/publish/edit_publish_configuration.jsp";
 	}
 
 }

@@ -30,6 +30,7 @@ import com.liferay.portal.tools.service.builder.test.model.CacheDisabledEntryMod
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -216,41 +217,63 @@ public class CacheDisabledEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CacheDisabledEntry>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CacheDisabledEntry.class.getClassLoader(), CacheDisabledEntry.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<CacheDisabledEntry> constructor =
+				(Constructor<CacheDisabledEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<CacheDisabledEntry, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CacheDisabledEntry, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CacheDisabledEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CacheDisabledEntry, Object>>();
-
-		attributeGetterFunctions.put(
-			"cacheDisabledEntryId",
-			CacheDisabledEntry::getCacheDisabledEntryId);
-		attributeGetterFunctions.put("name", CacheDisabledEntry::getName);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CacheDisabledEntry, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CacheDisabledEntry, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<CacheDisabledEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"cacheDisabledEntryId",
+			CacheDisabledEntry::getCacheDisabledEntryId);
 		attributeSetterBiConsumers.put(
 			"cacheDisabledEntryId",
 			(BiConsumer<CacheDisabledEntry, Long>)
 				CacheDisabledEntry::setCacheDisabledEntryId);
+		attributeGetterFunctions.put("name", CacheDisabledEntry::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CacheDisabledEntry, String>)
 				CacheDisabledEntry::setName);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -359,6 +382,19 @@ public class CacheDisabledEntryModelImpl
 		cacheDisabledEntryImpl.setName(getName());
 
 		cacheDisabledEntryImpl.resetOriginalValues();
+
+		return cacheDisabledEntryImpl;
+	}
+
+	@Override
+	public CacheDisabledEntry cloneWithOriginalValues() {
+		CacheDisabledEntryImpl cacheDisabledEntryImpl =
+			new CacheDisabledEntryImpl();
+
+		cacheDisabledEntryImpl.setCacheDisabledEntryId(
+			this.<Long>getColumnOriginalValue("cacheDisabledEntryId"));
+		cacheDisabledEntryImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
 
 		return cacheDisabledEntryImpl;
 	}
@@ -533,9 +569,7 @@ public class CacheDisabledEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CacheDisabledEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CacheDisabledEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

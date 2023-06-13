@@ -238,7 +238,7 @@ public class IndexerClausesExpandoTest {
 
 	protected MBMessage addMessage(String expandoValue) throws Exception {
 		return mbMessageLocalService.addMessage(
-			_user.getUserId(), RandomTestUtil.randomString(),
+			null, _user.getUserId(), RandomTestUtil.randomString(),
 			_group.getGroupId(), MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID,
 			0L, MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID,
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),

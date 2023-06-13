@@ -17,6 +17,8 @@ package com.liferay.portal.servlet;
 import com.liferay.petra.encryptor.Encryptor;
 import com.liferay.petra.encryptor.EncryptorException;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -41,8 +43,6 @@ public class EncryptedServletRequest extends HttpServletRequestWrapper {
 
 		_key = key;
 
-		_params = new HashMap<>();
-
 		Map<String, String[]> parameters = httpServletRequest.getParameterMap();
 
 		for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
@@ -56,6 +56,10 @@ public class EncryptedServletRequest extends HttpServletRequestWrapper {
 						values[i] = Encryptor.decrypt(_key, values[i]);
 					}
 					catch (EncryptorException encryptorException) {
+						if (_log.isDebugEnabled()) {
+							_log.debug(encryptorException, encryptorException);
+						}
+
 						values[i] = StringPool.BLANK;
 					}
 				}
@@ -86,7 +90,10 @@ public class EncryptedServletRequest extends HttpServletRequestWrapper {
 		return _params.get(name);
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		EncryptedServletRequest.class);
+
 	private final Key _key;
-	private final Map<String, String[]> _params;
+	private final Map<String, String[]> _params = new HashMap<>();
 
 }

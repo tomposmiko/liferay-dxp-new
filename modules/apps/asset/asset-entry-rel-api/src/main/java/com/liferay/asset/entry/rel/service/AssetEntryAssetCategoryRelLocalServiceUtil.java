@@ -368,6 +368,14 @@ public class AssetEntryAssetCategoryRelLocalServiceUtil {
 		return getService().getAssetEntryAssetCategoryRelsCount(assetEntryId);
 	}
 
+	public static int getAssetEntryAssetCategoryRelsCountByAssetCategoryId(
+		long assetCategoryId) {
+
+		return getService().
+			getAssetEntryAssetCategoryRelsCountByAssetCategoryId(
+				assetCategoryId);
+	}
+
 	public static long[] getAssetEntryPrimaryKeys(long assetCategoryId) {
 		return getService().getAssetEntryPrimaryKeys(assetCategoryId);
 	}

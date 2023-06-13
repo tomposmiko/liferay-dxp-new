@@ -22,6 +22,7 @@ import com.liferay.blogs.constants.BlogsPortletKeys;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.web.internal.security.permission.resource.BlogsEntryPermission;
 import com.liferay.blogs.web.internal.util.BlogsEntryUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -174,14 +175,15 @@ public class BlogsEntryAssetRenderer
 			group = themeDisplay.getScopeGroup();
 		}
 
-		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
-			httpServletRequest, group, BlogsPortletKeys.BLOGS, 0, 0,
-			PortletRequest.RENDER_PHASE);
-
-		portletURL.setParameter("mvcRenderCommandName", "/blogs/edit_entry");
-		portletURL.setParameter("entryId", String.valueOf(_entry.getEntryId()));
-
-		return portletURL;
+		return PortletURLBuilder.create(
+			PortalUtil.getControlPanelPortletURL(
+				httpServletRequest, group, BlogsPortletKeys.BLOGS, 0, 0,
+				PortletRequest.RENDER_PHASE)
+		).setMVCRenderCommandName(
+			"/blogs/edit_entry"
+		).setParameter(
+			"entryId", _entry.getEntryId()
+		).buildPortletURL();
 	}
 
 	@Override
@@ -207,14 +209,15 @@ public class BlogsEntryAssetRenderer
 		AssetRendererFactory<BlogsEntry> assetRendererFactory =
 			getAssetRendererFactory();
 
-		PortletURL portletURL = assetRendererFactory.getURLView(
-			liferayPortletResponse, windowState);
-
-		portletURL.setParameter("mvcRenderCommandName", "/blogs/view_entry");
-		portletURL.setParameter("entryId", String.valueOf(_entry.getEntryId()));
-		portletURL.setWindowState(windowState);
-
-		return portletURL.toString();
+		return PortletURLBuilder.create(
+			assetRendererFactory.getURLView(liferayPortletResponse, windowState)
+		).setMVCRenderCommandName(
+			"/blogs/view_entry"
+		).setParameter(
+			"entryId", _entry.getEntryId()
+		).setWindowState(
+			windowState
+		).buildString();
 	}
 
 	@Override
@@ -224,18 +227,11 @@ public class BlogsEntryAssetRenderer
 			String noSuchEntryRedirect)
 		throws PortalException {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)liferayPortletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return getURLViewInContext(themeDisplay, noSuchEntryRedirect);
-	}
-
-	public String getURLViewInContext(
-			ThemeDisplay themeDisplay, String noSuchEntryRedirect)
-		throws PortalException {
-
 		if (_assetDisplayPageFriendlyURLProvider != null) {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)liferayPortletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
 			String friendlyURL =
 				_assetDisplayPageFriendlyURLProvider.getFriendlyURL(
 					getClassName(), getClassPK(), themeDisplay);
@@ -245,13 +241,17 @@ public class BlogsEntryAssetRenderer
 			}
 		}
 
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)liferayPortletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
 		if (!_hasViewInContextGroupLayout(_entry.getGroupId(), themeDisplay)) {
 			return null;
 		}
 
 		return getURLViewInContext(
-			themeDisplay, noSuchEntryRedirect, "/blogs/find_entry", "entryId",
-			_entry.getEntryId());
+			liferayPortletRequest, noSuchEntryRedirect, "/blogs/find_entry",
+			"entryId", _entry.getEntryId());
 	}
 
 	@Override

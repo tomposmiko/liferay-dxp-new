@@ -26,6 +26,10 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class CommerceChannelServiceWrapper
 	implements CommerceChannelService, ServiceWrapper<CommerceChannelService> {
 
+	public CommerceChannelServiceWrapper() {
+		this(null);
+	}
+
 	public CommerceChannelServiceWrapper(
 		CommerceChannelService commerceChannelService) {
 
@@ -35,16 +39,35 @@ public class CommerceChannelServiceWrapper
 	@Override
 	public com.liferay.commerce.product.model.CommerceChannel
 			addCommerceChannel(
-				long siteGroupId, String name, String type,
+				String externalReferenceCode, long siteGroupId, String name,
+				String type,
 				com.liferay.portal.kernel.util.UnicodeProperties
 					typeSettingsUnicodeProperties,
-				String commerceCurrencyCode, String externalReferenceCode,
+				String commerceCurrencyCode,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceChannelService.addCommerceChannel(
-			siteGroupId, name, type, typeSettingsUnicodeProperties,
-			commerceCurrencyCode, externalReferenceCode, serviceContext);
+			externalReferenceCode, siteGroupId, name, type,
+			typeSettingsUnicodeProperties, commerceCurrencyCode,
+			serviceContext);
+	}
+
+	@Override
+	public com.liferay.commerce.product.model.CommerceChannel
+			addOrUpdateCommerceChannel(
+				String externalReferenceCode, long siteGroupId, String name,
+				String type,
+				com.liferay.portal.kernel.util.UnicodeProperties
+					typeSettingsUnicodeProperties,
+				String commerceCurrencyCode,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _commerceChannelService.addOrUpdateCommerceChannel(
+			externalReferenceCode, siteGroupId, name, type,
+			typeSettingsUnicodeProperties, commerceCurrencyCode,
+			serviceContext);
 	}
 
 	@Override
@@ -58,11 +81,11 @@ public class CommerceChannelServiceWrapper
 	@Override
 	public com.liferay.commerce.product.model.CommerceChannel
 			fetchByExternalReferenceCode(
-				long companyId, String externalReferenceCode)
+				String externalReferenceCode, long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceChannelService.fetchByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	@Override
@@ -106,24 +129,6 @@ public class CommerceChannelServiceWrapper
 		return _commerceChannelService.getCommerceChannels(companyId);
 	}
 
-	@Override
-	public java.util.List<com.liferay.commerce.product.model.CommerceChannel>
-			getCommerceChannels(
-				long companyId, String keywords, int start, int end)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _commerceChannelService.getCommerceChannels(
-			companyId, keywords, start, end);
-	}
-
-	@Override
-	public int getCommerceChannelsCount(long companyId, String keywords)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _commerceChannelService.getCommerceChannelsCount(
-			companyId, keywords);
-	}
-
 	/**
 	 * Returns the OSGi service identifier.
 	 *
@@ -136,20 +141,20 @@ public class CommerceChannelServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.commerce.product.model.CommerceChannel>
-			searchCommerceChannels(long companyId)
+			search(long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _commerceChannelService.searchCommerceChannels(companyId);
+		return _commerceChannelService.search(companyId);
 	}
 
 	@Override
 	public java.util.List<com.liferay.commerce.product.model.CommerceChannel>
-			searchCommerceChannels(
+			search(
 				long companyId, String keywords, int start, int end,
 				com.liferay.portal.kernel.search.Sort sort)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _commerceChannelService.searchCommerceChannels(
+		return _commerceChannelService.search(
 			companyId, keywords, start, end, sort);
 	}
 
@@ -196,12 +201,12 @@ public class CommerceChannelServiceWrapper
 	@Override
 	public com.liferay.commerce.product.model.CommerceChannel
 			updateCommerceChannelExternalReferenceCode(
-				long commerceChannelId, String externalReferenceCode)
+				String externalReferenceCode, long commerceChannelId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceChannelService.
 			updateCommerceChannelExternalReferenceCode(
-				commerceChannelId, externalReferenceCode);
+				externalReferenceCode, commerceChannelId);
 	}
 
 	@Override

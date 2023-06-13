@@ -21,8 +21,9 @@ import com.liferay.content.dashboard.web.internal.constants.ContentDashboardPort
 import com.liferay.content.dashboard.web.internal.item.ContentDashboardItem;
 import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFactory;
 import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFactoryTracker;
-import com.liferay.content.dashboard.web.internal.item.type.ContentDashboardItemType;
+import com.liferay.content.dashboard.web.internal.item.type.ContentDashboardItemSubtype;
 import com.liferay.info.item.InfoItemReference;
+import com.liferay.info.type.WebImage;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -37,13 +38,13 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.time.Instant;
@@ -58,7 +59,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -92,9 +92,6 @@ public class GetContentDashboardItemInfoMVCResourceCommand
 		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
 			resourceRequest);
 		Locale locale = _portal.getLocale(resourceRequest);
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
 
 		try {
 			String className = ParamUtil.getString(
@@ -138,14 +135,23 @@ public class GetContentDashboardItemInfoMVCResourceCommand
 					"modifiedDate",
 					_toString(contentDashboardItem.getModifiedDate())
 				).put(
+					"specificFields",
+					contentDashboardItem.getSpecificInformationJSONObject(
+						ParamUtil.getString(resourceRequest, "backURL"),
+						_portal.getLiferayPortletResponse(resourceResponse),
+						locale,
+						(ThemeDisplay)httpServletRequest.getAttribute(
+							WebKeys.THEME_DISPLAY))
+				).put(
 					"subType", _getSubtype(contentDashboardItem, locale)
 				).put(
 					"tags", _getAssetTagsJSONArray(contentDashboardItem)
 				).put(
 					"title", contentDashboardItem.getTitle(locale)
 				).put(
-					"user",
-					_getUserJSONObject(contentDashboardItem, themeDisplay)
+					"type", contentDashboardItem.getTypeLabel(locale)
+				).put(
+					"user", _getUserJSONObject(contentDashboardItem, locale)
 				).put(
 					"versions",
 					_getVersionsJSONArray(contentDashboardItem, locale)
@@ -166,15 +172,13 @@ public class GetContentDashboardItemInfoMVCResourceCommand
 				_log.info(exception, exception);
 			}
 
-			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-				locale, getClass());
-
 			JSONPortletResponseUtil.writeJSON(
 				resourceRequest, resourceResponse,
 				JSONUtil.put(
 					"error",
 					ResourceBundleUtil.getString(
-						resourceBundle, "an-unexpected-error-occurred")));
+						ResourceBundleUtil.getBundle(locale, getClass()),
+						"an-unexpected-error-occurred")));
 		}
 	}
 
@@ -245,37 +249,31 @@ public class GetContentDashboardItemInfoMVCResourceCommand
 	private String _getSubtype(
 		ContentDashboardItem contentDashboardItem, Locale locale) {
 
-		ContentDashboardItemType contentDashboardItemType =
-			contentDashboardItem.getContentDashboardItemType();
+		ContentDashboardItemSubtype contentDashboardItemSubtype =
+			contentDashboardItem.getContentDashboardItemSubtype();
 
-		return contentDashboardItemType.getLabel(locale);
+		return contentDashboardItemSubtype.getLabel(locale);
 	}
 
 	private JSONObject _getUserJSONObject(
-		ContentDashboardItem contentDashboardItem, ThemeDisplay themeDisplay) {
+		ContentDashboardItem contentDashboardItem, Locale locale) {
+
+		String authorProfileImage = null;
+
+		WebImage webImage = (WebImage)contentDashboardItem.getDisplayFieldValue(
+			"authorProfileImage", locale);
+
+		long portraitId = GetterUtil.getLong(
+			_http.getParameter(HtmlUtil.escape(webImage.getUrl()), "img_id"));
+
+		if (portraitId > 0) {
+			authorProfileImage = webImage.getUrl();
+		}
 
 		return JSONUtil.put(
-			"name", contentDashboardItem.getUserName()
+			"name", webImage.getAlt()
 		).put(
-			"url",
-			Optional.ofNullable(
-				_userLocalService.fetchUser(contentDashboardItem.getUserId())
-			).filter(
-				user -> user.getPortraitId() > 0
-			).map(
-				user -> {
-					try {
-						return user.getPortraitURL(themeDisplay);
-					}
-					catch (PortalException portalException) {
-						_log.error(portalException, portalException);
-
-						return null;
-					}
-				}
-			).orElse(
-				null
-			)
+			"url", authorProfileImage
 		).put(
 			"userId", contentDashboardItem.getUserId()
 		);
@@ -293,18 +291,6 @@ public class GetContentDashboardItemInfoMVCResourceCommand
 			stream.map(
 				ContentDashboardItem.Version::toJSONObject
 			).toArray());
-	}
-
-	private String _getViewURL(
-		HttpServletRequest httpServletRequest, String url) {
-
-		String backURL = ParamUtil.getString(httpServletRequest, "backURL");
-
-		if (Validator.isNotNull(backURL)) {
-			return _http.setParameter(url, "p_l_back_url", backURL);
-		}
-
-		return url;
 	}
 
 	private JSONArray _getViewURLsJSONArray(
@@ -344,10 +330,7 @@ public class GetContentDashboardItemInfoMVCResourceCommand
 				).put(
 					"languageId", LocaleUtil.toBCP47LanguageId(locale)
 				).put(
-					"viewURL",
-					_getViewURL(
-						httpServletRequest,
-						contentDashboardItemAction.getURL(locale))
+					"viewURL", contentDashboardItemAction.getURL(locale)
 				)
 			).toArray());
 	}

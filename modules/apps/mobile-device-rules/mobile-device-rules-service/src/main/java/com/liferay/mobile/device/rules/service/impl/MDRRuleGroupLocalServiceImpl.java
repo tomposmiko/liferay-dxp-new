@@ -19,16 +19,19 @@ import com.liferay.mobile.device.rules.model.MDRRuleGroup;
 import com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceLocalService;
 import com.liferay.mobile.device.rules.service.MDRRuleLocalService;
 import com.liferay.mobile.device.rules.service.base.MDRRuleGroupLocalServiceBaseImpl;
+import com.liferay.mobile.device.rules.service.persistence.MDRRulePersistence;
 import com.liferay.mobile.device.rules.util.comparator.RuleGroupCreateDateComparator;
+import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
@@ -60,48 +63,32 @@ public class MDRRuleGroupLocalServiceImpl
 			Map<Locale, String> descriptionMap, ServiceContext serviceContext)
 		throws PortalException {
 
+		return _addRuleGroup(
+			groupId, nameMap, descriptionMap, serviceContext,
+			ruleGroup -> _resourceLocalService.addModelResources(
+				ruleGroup, serviceContext));
+	}
+
+	@Override
+	public MDRRuleGroup copyRuleGroup(
+			long oldRuleGroupId, long groupId, ServiceContext serviceContext)
+		throws PortalException {
+
+		MDRRuleGroup oldRuleGroup = mdrRuleGroupPersistence.findByPrimaryKey(
+			oldRuleGroupId);
+
+		return copyRuleGroup(oldRuleGroup, groupId, serviceContext);
+	}
+
+	@Override
+	public MDRRuleGroup copyRuleGroup(
+			MDRRuleGroup oldRuleGroup, long groupId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
 		// Rule group
 
-		User user = userLocalService.getUser(serviceContext.getUserId());
-
-		long ruleGroupId = counterLocalService.increment();
-
-		MDRRuleGroup ruleGroup = createMDRRuleGroup(ruleGroupId);
-
-		ruleGroup.setUuid(serviceContext.getUuid());
-		ruleGroup.setGroupId(groupId);
-		ruleGroup.setCompanyId(serviceContext.getCompanyId());
-		ruleGroup.setUserId(user.getUserId());
-		ruleGroup.setUserName(user.getFullName());
-		ruleGroup.setNameMap(nameMap);
-		ruleGroup.setDescriptionMap(descriptionMap);
-
-		// Resources
-
-		resourceLocalService.addModelResources(ruleGroup, serviceContext);
-
-		return updateMDRRuleGroup(ruleGroup);
-	}
-
-	@Override
-	public MDRRuleGroup copyRuleGroup(
-			long ruleGroupId, long groupId, ServiceContext serviceContext)
-		throws PortalException {
-
-		MDRRuleGroup ruleGroup = mdrRuleGroupPersistence.findByPrimaryKey(
-			ruleGroupId);
-
-		return copyRuleGroup(ruleGroup, groupId, serviceContext);
-	}
-
-	@Override
-	public MDRRuleGroup copyRuleGroup(
-			MDRRuleGroup ruleGroup, long groupId, ServiceContext serviceContext)
-		throws PortalException {
-
-		Group group = groupLocalService.getGroup(groupId);
-
-		Map<Locale, String> nameMap = ruleGroup.getNameMap();
+		Map<Locale, String> nameMap = oldRuleGroup.getNameMap();
 
 		for (Map.Entry<Locale, String> entry : nameMap.entrySet()) {
 			String name = entry.getValue();
@@ -120,18 +107,22 @@ public class MDRRuleGroupLocalServiceImpl
 				locale, StringBundler.concat(name, StringPool.SPACE, postfix));
 		}
 
-		MDRRuleGroup newRuleGroup = addRuleGroup(
-			group.getGroupId(), nameMap, ruleGroup.getDescriptionMap(),
-			serviceContext);
+		MDRRuleGroup newRuleGroup = _addRuleGroup(
+			groupId, nameMap, oldRuleGroup.getDescriptionMap(), serviceContext,
+			ruleGroup -> _resourceLocalService.copyModelResources(
+				oldRuleGroup.getCompanyId(), MDRRuleGroup.class.getName(),
+				oldRuleGroup.getPrimaryKey(), ruleGroup.getPrimaryKey()));
 
-		List<MDRRule> rules = mdrRulePersistence.findByRuleGroupId(
-			ruleGroup.getRuleGroupId());
+		// Rules
 
-		for (MDRRule rule : rules) {
+		List<MDRRule> oldRules = _mdrRulePersistence.findByRuleGroupId(
+			oldRuleGroup.getRuleGroupId());
+
+		for (MDRRule oldRule : oldRules) {
 			serviceContext.setUuid(PortalUUIDUtil.generate());
 
 			_mdrRuleLocalService.copyRule(
-				rule, newRuleGroup.getRuleGroupId(), serviceContext);
+				oldRule, newRuleGroup.getRuleGroupId(), serviceContext);
 		}
 
 		return newRuleGroup;
@@ -276,10 +267,44 @@ public class MDRRuleGroupLocalServiceImpl
 		return mdrRuleGroupPersistence.update(ruleGroup);
 	}
 
+	private MDRRuleGroup _addRuleGroup(
+			long groupId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, ServiceContext serviceContext,
+			UnsafeConsumer<MDRRuleGroup, PortalException> unsafeBiConsumer)
+		throws PortalException {
+
+		User user = _userLocalService.getUser(serviceContext.getUserId());
+
+		long ruleGroupId = counterLocalService.increment();
+
+		MDRRuleGroup ruleGroup = createMDRRuleGroup(ruleGroupId);
+
+		ruleGroup.setUuid(serviceContext.getUuid());
+		ruleGroup.setGroupId(groupId);
+		ruleGroup.setCompanyId(serviceContext.getCompanyId());
+		ruleGroup.setUserId(user.getUserId());
+		ruleGroup.setUserName(user.getFullName());
+		ruleGroup.setNameMap(nameMap);
+		ruleGroup.setDescriptionMap(descriptionMap);
+
+		unsafeBiConsumer.accept(ruleGroup);
+
+		return updateMDRRuleGroup(ruleGroup);
+	}
+
 	@Reference
 	private MDRRuleGroupInstanceLocalService _mdrRuleGroupInstanceLocalService;
 
 	@Reference
 	private MDRRuleLocalService _mdrRuleLocalService;
+
+	@Reference
+	private MDRRulePersistence _mdrRulePersistence;
+
+	@Reference
+	private ResourceLocalService _resourceLocalService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

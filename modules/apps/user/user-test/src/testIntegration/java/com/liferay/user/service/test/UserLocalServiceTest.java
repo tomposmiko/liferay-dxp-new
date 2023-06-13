@@ -19,15 +19,11 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.exception.PasswordExpiredException;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.RequiredRoleException;
-import com.liferay.portal.kernel.exception.UserLockoutException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
-import com.liferay.portal.kernel.model.PasswordPolicy;
 import com.liferay.portal.kernel.model.PortalPreferences;
 import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.model.Role;
@@ -35,13 +31,10 @@ import com.liferay.portal.kernel.model.Ticket;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.model.role.RoleConstants;
-import com.liferay.portal.kernel.security.auth.AuthException;
-import com.liferay.portal.kernel.security.auth.Authenticator;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.PasswordPolicyLocalService;
 import com.liferay.portal.kernel.service.PortalPreferencesLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
@@ -100,57 +93,6 @@ public class UserLocalServiceTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
-
-	@Test
-	public void testAuthenticateByEmailAddress() throws Exception {
-		User user = UserTestUtil.addUser();
-
-		String password = "password";
-
-		user = _userLocalService.updatePassword(
-			user.getUserId(), password, password, false, true);
-
-		PasswordPolicy passwordPolicy = user.getPasswordPolicy();
-
-		passwordPolicy.setExpireable(true);
-		passwordPolicy.setMaxAge(0);
-
-		_passwordPolicyLocalService.updatePasswordPolicy(passwordPolicy);
-
-		int failedLoginAttempts = user.getFailedLoginAttempts();
-
-		Assert.assertEquals(
-			Authenticator.FAILURE,
-			_userLocalService.authenticateByEmailAddress(
-				user.getCompanyId(), user.getEmailAddress(),
-				RandomTestUtil.randomString(), null, null, null));
-
-		try {
-			_userLocalService.authenticateByEmailAddress(
-				user.getCompanyId(), user.getEmailAddress(), password, null,
-				null, null);
-		}
-		catch (PortalException portalException) {
-			Assert.assertEquals(
-				PasswordExpiredException.class, portalException.getClass());
-		}
-
-		user = _userLocalService.fetchUser(user.getUserId());
-
-		Assert.assertEquals(
-			failedLoginAttempts + 2, user.getFailedLoginAttempts());
-		passwordPolicy = user.getPasswordPolicy();
-
-		passwordPolicy.setExpireable(false);
-
-		_passwordPolicyLocalService.updatePasswordPolicy(passwordPolicy);
-
-		Assert.assertEquals(
-			Authenticator.SUCCESS,
-			_userLocalService.authenticateByEmailAddress(
-				user.getCompanyId(), user.getEmailAddress(), password, null,
-				null, null));
-	}
 
 	@Test
 	public void testDeleteUserDeletesNotificationEvents() throws Exception {
@@ -435,75 +377,6 @@ public class UserLocalServiceTest {
 	}
 
 	@Test
-	public void testLockout() throws Exception {
-		User user = UserTestUtil.addUser();
-
-		String password = "password";
-
-		user = _userLocalService.updatePassword(
-			user.getUserId(), password, password, false, true);
-
-		Assert.assertEquals(
-			Authenticator.SUCCESS,
-			_userLocalService.authenticateByEmailAddress(
-				user.getCompanyId(), user.getEmailAddress(), password, null,
-				null, null));
-
-		PasswordPolicy passwordPolicy = user.getPasswordPolicy();
-
-		passwordPolicy.setLockout(true);
-		passwordPolicy.setMaxFailure(1);
-
-		_passwordPolicyLocalService.updatePasswordPolicy(passwordPolicy);
-
-		int failedLoginAttempts = user.getFailedLoginAttempts();
-
-		Assert.assertEquals(
-			Authenticator.FAILURE,
-			_userLocalService.authenticateByEmailAddress(
-				user.getCompanyId(), user.getEmailAddress(),
-				RandomTestUtil.randomString(), null, null, null));
-
-		try {
-			_userLocalService.authenticateByEmailAddress(
-				user.getCompanyId(), user.getEmailAddress(), password, null,
-				null, null);
-		}
-		catch (PortalException portalException) {
-			Assert.assertEquals(
-				UserLockoutException.PasswordPolicyLockout.class,
-				portalException.getClass());
-		}
-
-		try {
-			_userLocalService.authenticateByEmailAddress(
-				user.getCompanyId(), user.getEmailAddress(),
-				RandomTestUtil.randomString(), null, null, null);
-		}
-		catch (PortalException portalException) {
-			Assert.assertEquals(
-				AuthException.class, portalException.getClass());
-		}
-
-		user = _userLocalService.fetchUser(user.getUserId());
-
-		Assert.assertEquals(
-			failedLoginAttempts + 3, user.getFailedLoginAttempts());
-
-		passwordPolicy = user.getPasswordPolicy();
-
-		passwordPolicy.setLockout(false);
-
-		_passwordPolicyLocalService.updatePasswordPolicy(passwordPolicy);
-
-		Assert.assertEquals(
-			Authenticator.SUCCESS,
-			_userLocalService.authenticateByEmailAddress(
-				user.getCompanyId(), user.getEmailAddress(), password, null,
-				null, null));
-	}
-
-	@Test
 	public void testSearchCounts() throws Exception {
 
 		// LPS-119805
@@ -665,9 +538,10 @@ public class UserLocalServiceTest {
 
 		user = _userLocalService.getUser(user.getUserId());
 
-		Date passwordModifiedDate = user.getPasswordModifiedDate();
+		Date newPasswordModifiedDate = user.getPasswordModifiedDate();
 
-		Assert.assertTrue(passwordModifiedDate.after(oldPasswordModifiedDate));
+		Assert.assertTrue(
+			newPasswordModifiedDate.after(oldPasswordModifiedDate));
 	}
 
 	@Test
@@ -728,9 +602,6 @@ public class UserLocalServiceTest {
 
 	@Inject
 	private GroupLocalService _groupLocalService;
-
-	@Inject
-	private PasswordPolicyLocalService _passwordPolicyLocalService;
 
 	@Inject
 	private PortalPreferencesLocalService _portalPreferencesLocalService;

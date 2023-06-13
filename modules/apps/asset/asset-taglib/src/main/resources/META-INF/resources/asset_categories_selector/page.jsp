@@ -27,12 +27,13 @@ List<Map<String, Object>> vocabularies = (List<Map<String, Object>>)data.get("vo
 
 		<%
 		for (Map<String, Object> vocabulary : vocabularies) {
+			String vocabularyId = GetterUtil.getString(vocabulary.get("id"));
 		%>
 
 			<div class="field-content">
-				<div class="form-group" id="namespace_assetCategoriesSelector_<%= GetterUtil.getString(vocabulary.get("id")) %>">
+				<div class="form-group" id="<%= "namespace_assetCategoriesSelector_" + vocabularyId %>">
 					<c:if test='<%= Validator.isNotNull(vocabulary.get("title")) %>'>
-						<label for="namespace_assetCategoriesSelector_<%= GetterUtil.getString(vocabulary.get("id")) %>_MultiSelect">
+						<label>
 							<%= HtmlUtil.escape(GetterUtil.getString(vocabulary.get("title"))) %>
 
 							<c:if test='<%= GetterUtil.getBoolean(vocabulary.get("required")) %>'>
@@ -77,7 +78,7 @@ List<Map<String, Object>> vocabularies = (List<Map<String, Object>>)data.get("vo
 
 									</c:if>
 
-									<input class="form-control-inset" id="namespace_assetCategoriesSelector_<%= GetterUtil.getString(vocabulary.get("id")) %>_MultiSelect" type="text" value="" />
+									<input class="form-control-inset" type="text" value="" />
 								</div>
 							</div>
 						</div>

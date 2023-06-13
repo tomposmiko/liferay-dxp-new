@@ -1,0 +1,11 @@
+{
+	"articleId": "BLOG-05",
+	"assetCategoryERCs": [
+		"MASCAT0001",
+		"MASCAT0002"
+	],
+	"ddmStructureKey": "BLOG",
+	"ddmTemplateKey": "BLOG",
+	"folder": "Blog Entries",
+	"name": "When professionals run into problems with design"
+}

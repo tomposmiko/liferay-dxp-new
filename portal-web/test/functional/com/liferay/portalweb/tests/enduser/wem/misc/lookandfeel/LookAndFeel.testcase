@@ -15,12 +15,12 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ConfigureCustomStylesViaLookAndFeelPG {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
@@ -69,29 +69,17 @@ definition {
 
 		Portlet.viewApplicationDecorator(decorator = "Borderless");
 
-		Portlet.gotoPortletOptions(
-			portletName = "Web Content Display",
-			portletOption = "Look and Feel Configuration");
-
-		IFrame.selectConfigurationFrame();
-
-		Portlet.selectApplicationDecorator(decorator = "Decorate");
-
-		PortletEntry.save();
+		Portlet.configureApplicationDecorator(
+			decorator = "Decorate",
+			portletName = "Web Content Display");
 
 		Navigator.gotoPage(pageName = "Test Page Name");
 
 		Portlet.viewApplicationDecorator(decorator = "Decorate");
 
-		Portlet.gotoPortletOptions(
-			portletName = "Web Content Display",
-			portletOption = "Look and Feel Configuration");
-
-		IFrame.selectConfigurationFrame();
-
-		Portlet.selectApplicationDecorator(decorator = "Barebone");
-
-		PortletEntry.save();
+		Portlet.configureApplicationDecorator(
+			decorator = "Barebone",
+			portletName = "Web Content Display");
 
 		Navigator.gotoPage(pageName = "Test Page Name");
 

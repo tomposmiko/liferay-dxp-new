@@ -14,6 +14,7 @@
 
 package com.liferay.site.memberships.web.internal.display.context;
 
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -138,40 +139,58 @@ public class UserGroupRolesDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/user_groups_roles.jsp"
+		).setKeywords(
+			() -> {
+				String keywords = getKeywords();
 
-		portletURL.setParameter("mvcPath", "/user_groups_roles.jsp");
-		portletURL.setParameter(
-			"userGroupId", String.valueOf(getUserGroupId()));
+				if (Validator.isNotNull(keywords)) {
+					return keywords;
+				}
 
-		portletURL.setParameter(
-			"assignRoles", String.valueOf(_isAssignRoles()));
+				return null;
+			}
+		).setParameter(
+			"assignRoles", _isAssignRoles()
+		).setParameter(
+			"displayStyle",
+			() -> {
+				String displayStyle = getDisplayStyle();
 
-		String displayStyle = getDisplayStyle();
+				if (Validator.isNotNull(displayStyle)) {
+					return displayStyle;
+				}
 
-		if (Validator.isNotNull(displayStyle)) {
-			portletURL.setParameter("displayStyle", displayStyle);
-		}
+				return null;
+			}
+		).setParameter(
+			"orderByCol",
+			() -> {
+				String orderByCol = getOrderByCol();
 
-		String keywords = getKeywords();
+				if (Validator.isNotNull(orderByCol)) {
+					return orderByCol;
+				}
 
-		if (Validator.isNotNull(keywords)) {
-			portletURL.setParameter("keywords", keywords);
-		}
+				return null;
+			}
+		).setParameter(
+			"orderByType",
+			() -> {
+				String orderByType = getOrderByType();
 
-		String orderByCol = getOrderByCol();
+				if (Validator.isNotNull(orderByType)) {
+					return orderByType;
+				}
 
-		if (Validator.isNotNull(orderByCol)) {
-			portletURL.setParameter("orderByCol", orderByCol);
-		}
-
-		String orderByType = getOrderByType();
-
-		if (Validator.isNotNull(orderByType)) {
-			portletURL.setParameter("orderByType", orderByType);
-		}
-
-		return portletURL;
+				return null;
+			}
+		).setParameter(
+			"userGroupId", getUserGroupId()
+		).buildPortletURL();
 	}
 
 	public SearchContainer<Role> getRoleSearchSearchContainer()

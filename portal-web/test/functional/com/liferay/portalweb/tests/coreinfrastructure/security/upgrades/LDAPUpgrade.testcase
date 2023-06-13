@@ -10,17 +10,10 @@ definition {
 	setUp {
 		SignIn.signIn();
 
-		Smoke.viewWelcomePage();
-
-		ApplicationsMenu.gotoPortlet(
-			category = "Configuration",
-			panel = "Control Panel",
-			portlet = "Search");
-
-		SearchAdministration.executeSearchActions(actionsDescription = "Reindex all search indexes.");
+		SearchAdministration.executeReindex();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewLDAPConfigurationAfterUpgrade713 {
 		property data.archive.type = "data-archive-ldap";
 		property database.types = "mariadb,mysql,postgresql";
@@ -29,7 +22,7 @@ definition {
 		Upgrade.viewLDAPConfiguration();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewLDAPConfigurationAfterUpgrade721 {
 		property data.archive.type = "data-archive-ldap";
 		property database.types = "mariadb,mysql,postgresql";
@@ -38,7 +31,7 @@ definition {
 		Upgrade.viewLDAPConfiguration();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewLDAPConfigurationAfterUpgrade71103 {
 		property data.archive.type = "data-archive-ldap";
 		property portal.version = "7.1.10.3";
@@ -46,7 +39,7 @@ definition {
 		Upgrade.viewLDAPConfiguration();
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewLDAPConfigurationAfterUpgrade72101 {
 		property data.archive.type = "data-archive-ldap";
 		property portal.version = "7.2.10.1";

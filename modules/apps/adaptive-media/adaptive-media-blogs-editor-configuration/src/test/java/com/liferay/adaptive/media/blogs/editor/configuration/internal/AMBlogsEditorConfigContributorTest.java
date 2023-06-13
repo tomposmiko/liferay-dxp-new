@@ -113,7 +113,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 			"blogsItemSelectorCriterionFileEntryItemSelectorReturnType");
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
@@ -166,7 +166,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 			"blogsItemSelectorCriterionFileEntryItemSelectorReturnType");
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
@@ -221,7 +221,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 		);
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
@@ -341,7 +341,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 			"allowedContent", "a[*](*); div(*);");
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
@@ -354,7 +354,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 			"allowedContent", "a[*](*); div(*); img[*](*){*};");
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	@Test
@@ -362,7 +362,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 		JSONObject originalJSONObject = JSONFactoryUtil.createJSONObject();
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
@@ -374,7 +374,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 		JSONObject expectedJSONObject = JSONFactoryUtil.createJSONObject();
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	@Test
@@ -385,7 +385,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 			"allowedContent", "a[*](*); div(*); img[*](*){*};");
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
@@ -398,7 +398,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 			"allowedContent", "a[*](*); div(*); img[*](*){*};");
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	@Test
@@ -409,7 +409,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 			"allowedContent", Boolean.TRUE.toString());
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
@@ -422,7 +422,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 			"allowedContent", Boolean.TRUE.toString());
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	@Test
@@ -433,7 +433,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 			"filebrowserImageBrowseLinkUrl", StringPool.BLANK);
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
@@ -453,10 +453,10 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 		);
 
 		JSONObject expectedJSONObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	@Test
@@ -475,7 +475,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 			"audioItemSelectorCriterionFileEntryItemSelectorReturnType");
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
@@ -495,10 +495,10 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 		);
 
 		JSONObject expectedJSONObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	@Test
@@ -539,7 +539,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 			"blogsItemSelectorCriterionFileEntryItemSelectorReturnType");
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();
@@ -597,7 +597,7 @@ public class AMBlogsEditorConfigContributorTest extends PowerMockito {
 			"fileItemSelectorCriterionFileEntryItemSelectorReturnType");
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		AMBlogsEditorConfigContributor amBlogsEditorConfigContributor =
 			new AMBlogsEditorConfigContributor();

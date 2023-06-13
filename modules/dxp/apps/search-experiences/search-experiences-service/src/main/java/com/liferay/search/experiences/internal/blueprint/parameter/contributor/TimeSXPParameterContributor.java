@@ -15,14 +15,12 @@
 package com.liferay.search.experiences.internal.blueprint.parameter.contributor;
 
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.search.experiences.blueprint.parameter.DateSXPParameter;
+import com.liferay.search.experiences.blueprint.parameter.IntegerSXPParameter;
 import com.liferay.search.experiences.blueprint.parameter.SXPParameter;
+import com.liferay.search.experiences.blueprint.parameter.StringSXPParameter;
 import com.liferay.search.experiences.blueprint.parameter.contributor.SXPParameterContributorDefinition;
-import com.liferay.search.experiences.internal.blueprint.parameter.DateSXPParameter;
-import com.liferay.search.experiences.internal.blueprint.parameter.IntegerSXPParameter;
-import com.liferay.search.experiences.internal.blueprint.parameter.StringSXPParameter;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
-
-import java.beans.ExceptionListener;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -32,7 +30,6 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -43,8 +40,8 @@ public class TimeSXPParameterContributor implements SXPParameterContributor {
 
 	@Override
 	public void contribute(
-		ExceptionListener exceptionListener, SearchContext searchContext,
-		SXPBlueprint sxpBlueprint, Set<SXPParameter> sxpParameters) {
+		SearchContext searchContext, SXPBlueprint sxpBlueprint,
+		Set<SXPParameter> sxpParameters) {
 
 		TimeZone timeZone = searchContext.getTimeZone();
 
@@ -99,7 +96,7 @@ public class TimeSXPParameterContributor implements SXPParameterContributor {
 
 	@Override
 	public List<SXPParameterContributorDefinition>
-		getSXPParameterContributorDefinitions(long companyId, Locale locale) {
+		getSXPParameterContributorDefinitions(long companyId) {
 
 		return Arrays.asList(
 			new SXPParameterContributorDefinition(

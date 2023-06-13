@@ -16,24 +16,30 @@ package com.liferay.remote.app.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
+import com.liferay.portal.kernel.sanitizer.Sanitizer;
+import com.liferay.portal.kernel.sanitizer.SanitizerException;
+import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -41,7 +47,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
-import com.liferay.remote.app.exception.NoSuchEntryException;
+import com.liferay.remote.app.exception.NoSuchRemoteAppEntryException;
 import com.liferay.remote.app.model.RemoteAppEntry;
 import com.liferay.remote.app.model.RemoteAppEntryTable;
 import com.liferay.remote.app.model.impl.RemoteAppEntryImpl;
@@ -57,17 +63,13 @@ import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -83,7 +85,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = RemoteAppEntryPersistence.class)
+@Component(service = {RemoteAppEntryPersistence.class, BasePersistence.class})
 public class RemoteAppEntryPersistenceImpl
 	extends BasePersistenceImpl<RemoteAppEntry>
 	implements RemoteAppEntryPersistence {
@@ -200,7 +202,7 @@ public class RemoteAppEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<RemoteAppEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (RemoteAppEntry remoteAppEntry : list) {
@@ -286,12 +288,12 @@ public class RemoteAppEntryPersistenceImpl
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching remote app entry
-	 * @throws NoSuchEntryException if a matching remote app entry could not be found
+	 * @throws NoSuchRemoteAppEntryException if a matching remote app entry could not be found
 	 */
 	@Override
 	public RemoteAppEntry findByUuid_First(
 			String uuid, OrderByComparator<RemoteAppEntry> orderByComparator)
-		throws NoSuchEntryException {
+		throws NoSuchRemoteAppEntryException {
 
 		RemoteAppEntry remoteAppEntry = fetchByUuid_First(
 			uuid, orderByComparator);
@@ -309,7 +311,7 @@ public class RemoteAppEntryPersistenceImpl
 
 		sb.append("}");
 
-		throw new NoSuchEntryException(sb.toString());
+		throw new NoSuchRemoteAppEntryException(sb.toString());
 	}
 
 	/**
@@ -338,12 +340,12 @@ public class RemoteAppEntryPersistenceImpl
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching remote app entry
-	 * @throws NoSuchEntryException if a matching remote app entry could not be found
+	 * @throws NoSuchRemoteAppEntryException if a matching remote app entry could not be found
 	 */
 	@Override
 	public RemoteAppEntry findByUuid_Last(
 			String uuid, OrderByComparator<RemoteAppEntry> orderByComparator)
-		throws NoSuchEntryException {
+		throws NoSuchRemoteAppEntryException {
 
 		RemoteAppEntry remoteAppEntry = fetchByUuid_Last(
 			uuid, orderByComparator);
@@ -361,7 +363,7 @@ public class RemoteAppEntryPersistenceImpl
 
 		sb.append("}");
 
-		throw new NoSuchEntryException(sb.toString());
+		throw new NoSuchRemoteAppEntryException(sb.toString());
 	}
 
 	/**
@@ -398,13 +400,13 @@ public class RemoteAppEntryPersistenceImpl
 	 * @param uuid the uuid
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next remote app entry
-	 * @throws NoSuchEntryException if a remote app entry with the primary key could not be found
+	 * @throws NoSuchRemoteAppEntryException if a remote app entry with the primary key could not be found
 	 */
 	@Override
 	public RemoteAppEntry[] findByUuid_PrevAndNext(
 			long remoteAppEntryId, String uuid,
 			OrderByComparator<RemoteAppEntry> orderByComparator)
-		throws NoSuchEntryException {
+		throws NoSuchRemoteAppEntryException {
 
 		uuid = Objects.toString(uuid, "");
 
@@ -556,6 +558,363 @@ public class RemoteAppEntryPersistenceImpl
 	}
 
 	/**
+	 * Returns all the remote app entries that the user has permission to view where uuid = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @return the matching remote app entries that the user has permission to view
+	 */
+	@Override
+	public List<RemoteAppEntry> filterFindByUuid(String uuid) {
+		return filterFindByUuid(
+			uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the remote app entries that the user has permission to view where uuid = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>RemoteAppEntryModelImpl</code>.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param start the lower bound of the range of remote app entries
+	 * @param end the upper bound of the range of remote app entries (not inclusive)
+	 * @return the range of matching remote app entries that the user has permission to view
+	 */
+	@Override
+	public List<RemoteAppEntry> filterFindByUuid(
+		String uuid, int start, int end) {
+
+		return filterFindByUuid(uuid, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the remote app entries that the user has permissions to view where uuid = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>RemoteAppEntryModelImpl</code>.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param start the lower bound of the range of remote app entries
+	 * @param end the upper bound of the range of remote app entries (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching remote app entries that the user has permission to view
+	 */
+	@Override
+	public List<RemoteAppEntry> filterFindByUuid(
+		String uuid, int start, int end,
+		OrderByComparator<RemoteAppEntry> orderByComparator) {
+
+		if (!InlineSQLHelperUtil.isEnabled()) {
+			return findByUuid(uuid, start, end, orderByComparator);
+		}
+
+		uuid = Objects.toString(uuid, "");
+
+		StringBundler sb = null;
+
+		if (orderByComparator != null) {
+			sb = new StringBundler(
+				3 + (orderByComparator.getOrderByFields().length * 2));
+		}
+		else {
+			sb = new StringBundler(4);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			sb.append(_FILTER_SQL_SELECT_REMOTEAPPENTRY_WHERE);
+		}
+		else {
+			sb.append(
+				_FILTER_SQL_SELECT_REMOTEAPPENTRY_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		boolean bindUuid = false;
+
+		if (uuid.isEmpty()) {
+			sb.append(_FINDER_COLUMN_UUID_UUID_3_SQL);
+		}
+		else {
+			bindUuid = true;
+
+			sb.append(_FINDER_COLUMN_UUID_UUID_2_SQL);
+		}
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			sb.append(
+				_FILTER_SQL_SELECT_REMOTEAPPENTRY_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			if (getDB().isSupportsInlineDistinct()) {
+				appendOrderByComparator(
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+			}
+			else {
+				appendOrderByComparator(
+					sb, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				sb.append(RemoteAppEntryModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				sb.append(RemoteAppEntryModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			sb.toString(), RemoteAppEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
+
+			if (getDB().isSupportsInlineDistinct()) {
+				sqlQuery.addEntity(
+					_FILTER_ENTITY_ALIAS, RemoteAppEntryImpl.class);
+			}
+			else {
+				sqlQuery.addEntity(
+					_FILTER_ENTITY_TABLE, RemoteAppEntryImpl.class);
+			}
+
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
+
+			if (bindUuid) {
+				queryPos.add(uuid);
+			}
+
+			return (List<RemoteAppEntry>)QueryUtil.list(
+				sqlQuery, getDialect(), start, end);
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	/**
+	 * Returns the remote app entries before and after the current remote app entry in the ordered set of remote app entries that the user has permission to view where uuid = &#63;.
+	 *
+	 * @param remoteAppEntryId the primary key of the current remote app entry
+	 * @param uuid the uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next remote app entry
+	 * @throws NoSuchRemoteAppEntryException if a remote app entry with the primary key could not be found
+	 */
+	@Override
+	public RemoteAppEntry[] filterFindByUuid_PrevAndNext(
+			long remoteAppEntryId, String uuid,
+			OrderByComparator<RemoteAppEntry> orderByComparator)
+		throws NoSuchRemoteAppEntryException {
+
+		if (!InlineSQLHelperUtil.isEnabled()) {
+			return findByUuid_PrevAndNext(
+				remoteAppEntryId, uuid, orderByComparator);
+		}
+
+		uuid = Objects.toString(uuid, "");
+
+		RemoteAppEntry remoteAppEntry = findByPrimaryKey(remoteAppEntryId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			RemoteAppEntry[] array = new RemoteAppEntryImpl[3];
+
+			array[0] = filterGetByUuid_PrevAndNext(
+				session, remoteAppEntry, uuid, orderByComparator, true);
+
+			array[1] = remoteAppEntry;
+
+			array[2] = filterGetByUuid_PrevAndNext(
+				session, remoteAppEntry, uuid, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected RemoteAppEntry filterGetByUuid_PrevAndNext(
+		Session session, RemoteAppEntry remoteAppEntry, String uuid,
+		OrderByComparator<RemoteAppEntry> orderByComparator, boolean previous) {
+
+		StringBundler sb = null;
+
+		if (orderByComparator != null) {
+			sb = new StringBundler(
+				5 + (orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			sb = new StringBundler(4);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			sb.append(_FILTER_SQL_SELECT_REMOTEAPPENTRY_WHERE);
+		}
+		else {
+			sb.append(
+				_FILTER_SQL_SELECT_REMOTEAPPENTRY_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		boolean bindUuid = false;
+
+		if (uuid.isEmpty()) {
+			sb.append(_FINDER_COLUMN_UUID_UUID_3_SQL);
+		}
+		else {
+			bindUuid = true;
+
+			sb.append(_FINDER_COLUMN_UUID_UUID_2_SQL);
+		}
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			sb.append(
+				_FILTER_SQL_SELECT_REMOTEAPPENTRY_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				sb.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					sb.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
+				}
+				else {
+					sb.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
+				}
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			sb.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					sb.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+				}
+				else {
+					sb.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+				}
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						sb.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC);
+					}
+					else {
+						sb.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				sb.append(RemoteAppEntryModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				sb.append(RemoteAppEntryModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			sb.toString(), RemoteAppEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+
+		SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
+
+		sqlQuery.setFirstResult(0);
+		sqlQuery.setMaxResults(2);
+
+		if (getDB().isSupportsInlineDistinct()) {
+			sqlQuery.addEntity(_FILTER_ENTITY_ALIAS, RemoteAppEntryImpl.class);
+		}
+		else {
+			sqlQuery.addEntity(_FILTER_ENTITY_TABLE, RemoteAppEntryImpl.class);
+		}
+
+		QueryPos queryPos = QueryPos.getInstance(sqlQuery);
+
+		if (bindUuid) {
+			queryPos.add(uuid);
+		}
+
+		if (orderByComparator != null) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						remoteAppEntry)) {
+
+				queryPos.add(orderByConditionValue);
+			}
+		}
+
+		List<RemoteAppEntry> list = sqlQuery.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
 	 * Removes all the remote app entries where uuid = &#63; from the database.
 	 *
 	 * @param uuid the uuid
@@ -583,7 +942,7 @@ public class RemoteAppEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -631,11 +990,78 @@ public class RemoteAppEntryPersistenceImpl
 		return count.intValue();
 	}
 
+	/**
+	 * Returns the number of remote app entries that the user has permission to view where uuid = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @return the number of matching remote app entries that the user has permission to view
+	 */
+	@Override
+	public int filterCountByUuid(String uuid) {
+		if (!InlineSQLHelperUtil.isEnabled()) {
+			return countByUuid(uuid);
+		}
+
+		uuid = Objects.toString(uuid, "");
+
+		StringBundler sb = new StringBundler(2);
+
+		sb.append(_FILTER_SQL_COUNT_REMOTEAPPENTRY_WHERE);
+
+		boolean bindUuid = false;
+
+		if (uuid.isEmpty()) {
+			sb.append(_FINDER_COLUMN_UUID_UUID_3_SQL);
+		}
+		else {
+			bindUuid = true;
+
+			sb.append(_FINDER_COLUMN_UUID_UUID_2_SQL);
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			sb.toString(), RemoteAppEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
+
+			sqlQuery.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
+
+			if (bindUuid) {
+				queryPos.add(uuid);
+			}
+
+			Long count = (Long)sqlQuery.uniqueResult();
+
+			return count.intValue();
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
 	private static final String _FINDER_COLUMN_UUID_UUID_2 =
 		"remoteAppEntry.uuid = ?";
 
 	private static final String _FINDER_COLUMN_UUID_UUID_3 =
 		"(remoteAppEntry.uuid IS NULL OR remoteAppEntry.uuid = '')";
+
+	private static final String _FINDER_COLUMN_UUID_UUID_2_SQL =
+		"remoteAppEntry.uuid_ = ?";
+
+	private static final String _FINDER_COLUMN_UUID_UUID_3_SQL =
+		"(remoteAppEntry.uuid_ IS NULL OR remoteAppEntry.uuid_ = '')";
 
 	private FinderPath _finderPathWithPaginationFindByUuid_C;
 	private FinderPath _finderPathWithoutPaginationFindByUuid_C;
@@ -742,7 +1168,7 @@ public class RemoteAppEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<RemoteAppEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (RemoteAppEntry remoteAppEntry : list) {
@@ -835,13 +1261,13 @@ public class RemoteAppEntryPersistenceImpl
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching remote app entry
-	 * @throws NoSuchEntryException if a matching remote app entry could not be found
+	 * @throws NoSuchRemoteAppEntryException if a matching remote app entry could not be found
 	 */
 	@Override
 	public RemoteAppEntry findByUuid_C_First(
 			String uuid, long companyId,
 			OrderByComparator<RemoteAppEntry> orderByComparator)
-		throws NoSuchEntryException {
+		throws NoSuchRemoteAppEntryException {
 
 		RemoteAppEntry remoteAppEntry = fetchByUuid_C_First(
 			uuid, companyId, orderByComparator);
@@ -862,7 +1288,7 @@ public class RemoteAppEntryPersistenceImpl
 
 		sb.append("}");
 
-		throw new NoSuchEntryException(sb.toString());
+		throw new NoSuchRemoteAppEntryException(sb.toString());
 	}
 
 	/**
@@ -895,13 +1321,13 @@ public class RemoteAppEntryPersistenceImpl
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching remote app entry
-	 * @throws NoSuchEntryException if a matching remote app entry could not be found
+	 * @throws NoSuchRemoteAppEntryException if a matching remote app entry could not be found
 	 */
 	@Override
 	public RemoteAppEntry findByUuid_C_Last(
 			String uuid, long companyId,
 			OrderByComparator<RemoteAppEntry> orderByComparator)
-		throws NoSuchEntryException {
+		throws NoSuchRemoteAppEntryException {
 
 		RemoteAppEntry remoteAppEntry = fetchByUuid_C_Last(
 			uuid, companyId, orderByComparator);
@@ -922,7 +1348,7 @@ public class RemoteAppEntryPersistenceImpl
 
 		sb.append("}");
 
-		throw new NoSuchEntryException(sb.toString());
+		throw new NoSuchRemoteAppEntryException(sb.toString());
 	}
 
 	/**
@@ -962,13 +1388,13 @@ public class RemoteAppEntryPersistenceImpl
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next remote app entry
-	 * @throws NoSuchEntryException if a remote app entry with the primary key could not be found
+	 * @throws NoSuchRemoteAppEntryException if a remote app entry with the primary key could not be found
 	 */
 	@Override
 	public RemoteAppEntry[] findByUuid_C_PrevAndNext(
 			long remoteAppEntryId, String uuid, long companyId,
 			OrderByComparator<RemoteAppEntry> orderByComparator)
-		throws NoSuchEntryException {
+		throws NoSuchRemoteAppEntryException {
 
 		uuid = Objects.toString(uuid, "");
 
@@ -1127,6 +1553,380 @@ public class RemoteAppEntryPersistenceImpl
 	}
 
 	/**
+	 * Returns all the remote app entries that the user has permission to view where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @return the matching remote app entries that the user has permission to view
+	 */
+	@Override
+	public List<RemoteAppEntry> filterFindByUuid_C(
+		String uuid, long companyId) {
+
+		return filterFindByUuid_C(
+			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the remote app entries that the user has permission to view where uuid = &#63; and companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>RemoteAppEntryModelImpl</code>.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of remote app entries
+	 * @param end the upper bound of the range of remote app entries (not inclusive)
+	 * @return the range of matching remote app entries that the user has permission to view
+	 */
+	@Override
+	public List<RemoteAppEntry> filterFindByUuid_C(
+		String uuid, long companyId, int start, int end) {
+
+		return filterFindByUuid_C(uuid, companyId, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the remote app entries that the user has permissions to view where uuid = &#63; and companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>RemoteAppEntryModelImpl</code>.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of remote app entries
+	 * @param end the upper bound of the range of remote app entries (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching remote app entries that the user has permission to view
+	 */
+	@Override
+	public List<RemoteAppEntry> filterFindByUuid_C(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<RemoteAppEntry> orderByComparator) {
+
+		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
+			return findByUuid_C(uuid, companyId, start, end, orderByComparator);
+		}
+
+		uuid = Objects.toString(uuid, "");
+
+		StringBundler sb = null;
+
+		if (orderByComparator != null) {
+			sb = new StringBundler(
+				4 + (orderByComparator.getOrderByFields().length * 2));
+		}
+		else {
+			sb = new StringBundler(5);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			sb.append(_FILTER_SQL_SELECT_REMOTEAPPENTRY_WHERE);
+		}
+		else {
+			sb.append(
+				_FILTER_SQL_SELECT_REMOTEAPPENTRY_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		boolean bindUuid = false;
+
+		if (uuid.isEmpty()) {
+			sb.append(_FINDER_COLUMN_UUID_C_UUID_3_SQL);
+		}
+		else {
+			bindUuid = true;
+
+			sb.append(_FINDER_COLUMN_UUID_C_UUID_2_SQL);
+		}
+
+		sb.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			sb.append(
+				_FILTER_SQL_SELECT_REMOTEAPPENTRY_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			if (getDB().isSupportsInlineDistinct()) {
+				appendOrderByComparator(
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator, true);
+			}
+			else {
+				appendOrderByComparator(
+					sb, _ORDER_BY_ENTITY_TABLE, orderByComparator, true);
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				sb.append(RemoteAppEntryModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				sb.append(RemoteAppEntryModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			sb.toString(), RemoteAppEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
+
+			if (getDB().isSupportsInlineDistinct()) {
+				sqlQuery.addEntity(
+					_FILTER_ENTITY_ALIAS, RemoteAppEntryImpl.class);
+			}
+			else {
+				sqlQuery.addEntity(
+					_FILTER_ENTITY_TABLE, RemoteAppEntryImpl.class);
+			}
+
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
+
+			if (bindUuid) {
+				queryPos.add(uuid);
+			}
+
+			queryPos.add(companyId);
+
+			return (List<RemoteAppEntry>)QueryUtil.list(
+				sqlQuery, getDialect(), start, end);
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	/**
+	 * Returns the remote app entries before and after the current remote app entry in the ordered set of remote app entries that the user has permission to view where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param remoteAppEntryId the primary key of the current remote app entry
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next remote app entry
+	 * @throws NoSuchRemoteAppEntryException if a remote app entry with the primary key could not be found
+	 */
+	@Override
+	public RemoteAppEntry[] filterFindByUuid_C_PrevAndNext(
+			long remoteAppEntryId, String uuid, long companyId,
+			OrderByComparator<RemoteAppEntry> orderByComparator)
+		throws NoSuchRemoteAppEntryException {
+
+		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
+			return findByUuid_C_PrevAndNext(
+				remoteAppEntryId, uuid, companyId, orderByComparator);
+		}
+
+		uuid = Objects.toString(uuid, "");
+
+		RemoteAppEntry remoteAppEntry = findByPrimaryKey(remoteAppEntryId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			RemoteAppEntry[] array = new RemoteAppEntryImpl[3];
+
+			array[0] = filterGetByUuid_C_PrevAndNext(
+				session, remoteAppEntry, uuid, companyId, orderByComparator,
+				true);
+
+			array[1] = remoteAppEntry;
+
+			array[2] = filterGetByUuid_C_PrevAndNext(
+				session, remoteAppEntry, uuid, companyId, orderByComparator,
+				false);
+
+			return array;
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected RemoteAppEntry filterGetByUuid_C_PrevAndNext(
+		Session session, RemoteAppEntry remoteAppEntry, String uuid,
+		long companyId, OrderByComparator<RemoteAppEntry> orderByComparator,
+		boolean previous) {
+
+		StringBundler sb = null;
+
+		if (orderByComparator != null) {
+			sb = new StringBundler(
+				6 + (orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			sb = new StringBundler(5);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			sb.append(_FILTER_SQL_SELECT_REMOTEAPPENTRY_WHERE);
+		}
+		else {
+			sb.append(
+				_FILTER_SQL_SELECT_REMOTEAPPENTRY_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		boolean bindUuid = false;
+
+		if (uuid.isEmpty()) {
+			sb.append(_FINDER_COLUMN_UUID_C_UUID_3_SQL);
+		}
+		else {
+			bindUuid = true;
+
+			sb.append(_FINDER_COLUMN_UUID_C_UUID_2_SQL);
+		}
+
+		sb.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			sb.append(
+				_FILTER_SQL_SELECT_REMOTEAPPENTRY_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				sb.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					sb.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByConditionFields[i],
+							true));
+				}
+				else {
+					sb.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByConditionFields[i],
+							true));
+				}
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			sb.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					sb.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_ALIAS, orderByFields[i], true));
+				}
+				else {
+					sb.append(
+						getColumnName(
+							_ORDER_BY_ENTITY_TABLE, orderByFields[i], true));
+				}
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						sb.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC);
+					}
+					else {
+						sb.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				sb.append(RemoteAppEntryModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				sb.append(RemoteAppEntryModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			sb.toString(), RemoteAppEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+
+		SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
+
+		sqlQuery.setFirstResult(0);
+		sqlQuery.setMaxResults(2);
+
+		if (getDB().isSupportsInlineDistinct()) {
+			sqlQuery.addEntity(_FILTER_ENTITY_ALIAS, RemoteAppEntryImpl.class);
+		}
+		else {
+			sqlQuery.addEntity(_FILTER_ENTITY_TABLE, RemoteAppEntryImpl.class);
+		}
+
+		QueryPos queryPos = QueryPos.getInstance(sqlQuery);
+
+		if (bindUuid) {
+			queryPos.add(uuid);
+		}
+
+		queryPos.add(companyId);
+
+		if (orderByComparator != null) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						remoteAppEntry)) {
+
+				queryPos.add(orderByConditionValue);
+			}
+		}
+
+		List<RemoteAppEntry> list = sqlQuery.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
 	 * Removes all the remote app entries where uuid = &#63; and companyId = &#63; from the database.
 	 *
 	 * @param uuid the uuid
@@ -1158,7 +1958,7 @@ public class RemoteAppEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1210,267 +2010,92 @@ public class RemoteAppEntryPersistenceImpl
 		return count.intValue();
 	}
 
+	/**
+	 * Returns the number of remote app entries that the user has permission to view where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @return the number of matching remote app entries that the user has permission to view
+	 */
+	@Override
+	public int filterCountByUuid_C(String uuid, long companyId) {
+		if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
+			return countByUuid_C(uuid, companyId);
+		}
+
+		uuid = Objects.toString(uuid, "");
+
+		StringBundler sb = new StringBundler(3);
+
+		sb.append(_FILTER_SQL_COUNT_REMOTEAPPENTRY_WHERE);
+
+		boolean bindUuid = false;
+
+		if (uuid.isEmpty()) {
+			sb.append(_FINDER_COLUMN_UUID_C_UUID_3_SQL);
+		}
+		else {
+			bindUuid = true;
+
+			sb.append(_FINDER_COLUMN_UUID_C_UUID_2_SQL);
+		}
+
+		sb.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(
+			sb.toString(), RemoteAppEntry.class.getName(),
+			_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
+
+			sqlQuery.addScalar(
+				COUNT_COLUMN_NAME, com.liferay.portal.kernel.dao.orm.Type.LONG);
+
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
+
+			if (bindUuid) {
+				queryPos.add(uuid);
+			}
+
+			queryPos.add(companyId);
+
+			Long count = (Long)sqlQuery.uniqueResult();
+
+			return count.intValue();
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
 	private static final String _FINDER_COLUMN_UUID_C_UUID_2 =
 		"remoteAppEntry.uuid = ? AND ";
 
 	private static final String _FINDER_COLUMN_UUID_C_UUID_3 =
 		"(remoteAppEntry.uuid IS NULL OR remoteAppEntry.uuid = '') AND ";
 
+	private static final String _FINDER_COLUMN_UUID_C_UUID_2_SQL =
+		"remoteAppEntry.uuid_ = ? AND ";
+
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3_SQL =
+		"(remoteAppEntry.uuid_ IS NULL OR remoteAppEntry.uuid_ = '') AND ";
+
 	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 =
 		"remoteAppEntry.companyId = ?";
-
-	private FinderPath _finderPathFetchByC_U;
-	private FinderPath _finderPathCountByC_U;
-
-	/**
-	 * Returns the remote app entry where companyId = &#63; and url = &#63; or throws a <code>NoSuchEntryException</code> if it could not be found.
-	 *
-	 * @param companyId the company ID
-	 * @param url the url
-	 * @return the matching remote app entry
-	 * @throws NoSuchEntryException if a matching remote app entry could not be found
-	 */
-	@Override
-	public RemoteAppEntry findByC_U(long companyId, String url)
-		throws NoSuchEntryException {
-
-		RemoteAppEntry remoteAppEntry = fetchByC_U(companyId, url);
-
-		if (remoteAppEntry == null) {
-			StringBundler sb = new StringBundler(6);
-
-			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-			sb.append("companyId=");
-			sb.append(companyId);
-
-			sb.append(", url=");
-			sb.append(url);
-
-			sb.append("}");
-
-			if (_log.isDebugEnabled()) {
-				_log.debug(sb.toString());
-			}
-
-			throw new NoSuchEntryException(sb.toString());
-		}
-
-		return remoteAppEntry;
-	}
-
-	/**
-	 * Returns the remote app entry where companyId = &#63; and url = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
-	 *
-	 * @param companyId the company ID
-	 * @param url the url
-	 * @return the matching remote app entry, or <code>null</code> if a matching remote app entry could not be found
-	 */
-	@Override
-	public RemoteAppEntry fetchByC_U(long companyId, String url) {
-		return fetchByC_U(companyId, url, true);
-	}
-
-	/**
-	 * Returns the remote app entry where companyId = &#63; and url = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
-	 *
-	 * @param companyId the company ID
-	 * @param url the url
-	 * @param useFinderCache whether to use the finder cache
-	 * @return the matching remote app entry, or <code>null</code> if a matching remote app entry could not be found
-	 */
-	@Override
-	public RemoteAppEntry fetchByC_U(
-		long companyId, String url, boolean useFinderCache) {
-
-		url = Objects.toString(url, "");
-
-		Object[] finderArgs = null;
-
-		if (useFinderCache) {
-			finderArgs = new Object[] {companyId, url};
-		}
-
-		Object result = null;
-
-		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_U, finderArgs, this);
-		}
-
-		if (result instanceof RemoteAppEntry) {
-			RemoteAppEntry remoteAppEntry = (RemoteAppEntry)result;
-
-			if ((companyId != remoteAppEntry.getCompanyId()) ||
-				!Objects.equals(url, remoteAppEntry.getUrl())) {
-
-				result = null;
-			}
-		}
-
-		if (result == null) {
-			StringBundler sb = new StringBundler(4);
-
-			sb.append(_SQL_SELECT_REMOTEAPPENTRY_WHERE);
-
-			sb.append(_FINDER_COLUMN_C_U_COMPANYID_2);
-
-			boolean bindUrl = false;
-
-			if (url.isEmpty()) {
-				sb.append(_FINDER_COLUMN_C_U_URL_3);
-			}
-			else {
-				bindUrl = true;
-
-				sb.append(_FINDER_COLUMN_C_U_URL_2);
-			}
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				queryPos.add(companyId);
-
-				if (bindUrl) {
-					queryPos.add(url);
-				}
-
-				List<RemoteAppEntry> list = query.list();
-
-				if (list.isEmpty()) {
-					if (useFinderCache) {
-						finderCache.putResult(
-							_finderPathFetchByC_U, finderArgs, list);
-					}
-				}
-				else {
-					RemoteAppEntry remoteAppEntry = list.get(0);
-
-					result = remoteAppEntry;
-
-					cacheResult(remoteAppEntry);
-				}
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		if (result instanceof List<?>) {
-			return null;
-		}
-		else {
-			return (RemoteAppEntry)result;
-		}
-	}
-
-	/**
-	 * Removes the remote app entry where companyId = &#63; and url = &#63; from the database.
-	 *
-	 * @param companyId the company ID
-	 * @param url the url
-	 * @return the remote app entry that was removed
-	 */
-	@Override
-	public RemoteAppEntry removeByC_U(long companyId, String url)
-		throws NoSuchEntryException {
-
-		RemoteAppEntry remoteAppEntry = findByC_U(companyId, url);
-
-		return remove(remoteAppEntry);
-	}
-
-	/**
-	 * Returns the number of remote app entries where companyId = &#63; and url = &#63;.
-	 *
-	 * @param companyId the company ID
-	 * @param url the url
-	 * @return the number of matching remote app entries
-	 */
-	@Override
-	public int countByC_U(long companyId, String url) {
-		url = Objects.toString(url, "");
-
-		FinderPath finderPath = _finderPathCountByC_U;
-
-		Object[] finderArgs = new Object[] {companyId, url};
-
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
-
-		if (count == null) {
-			StringBundler sb = new StringBundler(3);
-
-			sb.append(_SQL_COUNT_REMOTEAPPENTRY_WHERE);
-
-			sb.append(_FINDER_COLUMN_C_U_COMPANYID_2);
-
-			boolean bindUrl = false;
-
-			if (url.isEmpty()) {
-				sb.append(_FINDER_COLUMN_C_U_URL_3);
-			}
-			else {
-				bindUrl = true;
-
-				sb.append(_FINDER_COLUMN_C_U_URL_2);
-			}
-
-			String sql = sb.toString();
-
-			Session session = null;
-
-			try {
-				session = openSession();
-
-				Query query = session.createQuery(sql);
-
-				QueryPos queryPos = QueryPos.getInstance(query);
-
-				queryPos.add(companyId);
-
-				if (bindUrl) {
-					queryPos.add(url);
-				}
-
-				count = (Long)query.uniqueResult();
-
-				finderCache.putResult(finderPath, finderArgs, count);
-			}
-			catch (Exception exception) {
-				throw processException(exception);
-			}
-			finally {
-				closeSession(session);
-			}
-		}
-
-		return count.intValue();
-	}
-
-	private static final String _FINDER_COLUMN_C_U_COMPANYID_2 =
-		"remoteAppEntry.companyId = ? AND ";
-
-	private static final String _FINDER_COLUMN_C_U_URL_2 =
-		"remoteAppEntry.url = ?";
-
-	private static final String _FINDER_COLUMN_C_U_URL_3 =
-		"(remoteAppEntry.url IS NULL OR remoteAppEntry.url = '')";
 
 	public RemoteAppEntryPersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
+		dbColumnNames.put("type", "type_");
 
 		setDBColumnNames(dbColumnNames);
 
@@ -1491,13 +2116,6 @@ public class RemoteAppEntryPersistenceImpl
 	public void cacheResult(RemoteAppEntry remoteAppEntry) {
 		entityCache.putResult(
 			RemoteAppEntryImpl.class, remoteAppEntry.getPrimaryKey(),
-			remoteAppEntry);
-
-		finderCache.putResult(
-			_finderPathFetchByC_U,
-			new Object[] {
-				remoteAppEntry.getCompanyId(), remoteAppEntry.getUrl()
-			},
 			remoteAppEntry);
 	}
 
@@ -1539,9 +2157,7 @@ public class RemoteAppEntryPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(RemoteAppEntryImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(RemoteAppEntryImpl.class);
 	}
 
 	/**
@@ -1565,27 +2181,11 @@ public class RemoteAppEntryPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(RemoteAppEntryImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(RemoteAppEntryImpl.class, primaryKey);
 		}
-	}
-
-	protected void cacheUniqueFindersCache(
-		RemoteAppEntryModelImpl remoteAppEntryModelImpl) {
-
-		Object[] args = new Object[] {
-			remoteAppEntryModelImpl.getCompanyId(),
-			remoteAppEntryModelImpl.getUrl()
-		};
-
-		finderCache.putResult(
-			_finderPathCountByC_U, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByC_U, args, remoteAppEntryModelImpl, false);
 	}
 
 	/**
@@ -1615,11 +2215,11 @@ public class RemoteAppEntryPersistenceImpl
 	 *
 	 * @param remoteAppEntryId the primary key of the remote app entry
 	 * @return the remote app entry that was removed
-	 * @throws NoSuchEntryException if a remote app entry with the primary key could not be found
+	 * @throws NoSuchRemoteAppEntryException if a remote app entry with the primary key could not be found
 	 */
 	@Override
 	public RemoteAppEntry remove(long remoteAppEntryId)
-		throws NoSuchEntryException {
+		throws NoSuchRemoteAppEntryException {
 
 		return remove((Serializable)remoteAppEntryId);
 	}
@@ -1629,11 +2229,11 @@ public class RemoteAppEntryPersistenceImpl
 	 *
 	 * @param primaryKey the primary key of the remote app entry
 	 * @return the remote app entry that was removed
-	 * @throws NoSuchEntryException if a remote app entry with the primary key could not be found
+	 * @throws NoSuchRemoteAppEntryException if a remote app entry with the primary key could not be found
 	 */
 	@Override
 	public RemoteAppEntry remove(Serializable primaryKey)
-		throws NoSuchEntryException {
+		throws NoSuchRemoteAppEntryException {
 
 		Session session = null;
 
@@ -1648,13 +2248,13 @@ public class RemoteAppEntryPersistenceImpl
 					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
-				throw new NoSuchEntryException(
+				throw new NoSuchRemoteAppEntryException(
 					_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			return remove(remoteAppEntry);
 		}
-		catch (NoSuchEntryException noSuchEntityException) {
+		catch (NoSuchRemoteAppEntryException noSuchEntityException) {
 			throw noSuchEntityException;
 		}
 		catch (Exception exception) {
@@ -1751,6 +2351,32 @@ public class RemoteAppEntryPersistenceImpl
 			}
 		}
 
+		long userId = GetterUtil.getLong(PrincipalThreadLocal.getName());
+
+		if (userId > 0) {
+			long companyId = remoteAppEntry.getCompanyId();
+
+			long groupId = 0;
+
+			long remoteAppEntryId = 0;
+
+			if (!isNew) {
+				remoteAppEntryId = remoteAppEntry.getPrimaryKey();
+			}
+
+			try {
+				remoteAppEntry.setDescription(
+					SanitizerUtil.sanitize(
+						companyId, groupId, userId,
+						RemoteAppEntry.class.getName(), remoteAppEntryId,
+						ContentTypes.TEXT_HTML, Sanitizer.MODE_ALL,
+						remoteAppEntry.getDescription(), null));
+			}
+			catch (SanitizerException sanitizerException) {
+				throw new SystemException(sanitizerException);
+			}
+		}
+
 		Session session = null;
 
 		try {
@@ -1773,8 +2399,6 @@ public class RemoteAppEntryPersistenceImpl
 		entityCache.putResult(
 			RemoteAppEntryImpl.class, remoteAppEntryModelImpl, false, true);
 
-		cacheUniqueFindersCache(remoteAppEntryModelImpl);
-
 		if (isNew) {
 			remoteAppEntry.setNew(false);
 		}
@@ -1789,11 +2413,11 @@ public class RemoteAppEntryPersistenceImpl
 	 *
 	 * @param primaryKey the primary key of the remote app entry
 	 * @return the remote app entry
-	 * @throws NoSuchEntryException if a remote app entry with the primary key could not be found
+	 * @throws NoSuchRemoteAppEntryException if a remote app entry with the primary key could not be found
 	 */
 	@Override
 	public RemoteAppEntry findByPrimaryKey(Serializable primaryKey)
-		throws NoSuchEntryException {
+		throws NoSuchRemoteAppEntryException {
 
 		RemoteAppEntry remoteAppEntry = fetchByPrimaryKey(primaryKey);
 
@@ -1802,7 +2426,7 @@ public class RemoteAppEntryPersistenceImpl
 				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
-			throw new NoSuchEntryException(
+			throw new NoSuchRemoteAppEntryException(
 				_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 		}
 
@@ -1810,15 +2434,15 @@ public class RemoteAppEntryPersistenceImpl
 	}
 
 	/**
-	 * Returns the remote app entry with the primary key or throws a <code>NoSuchEntryException</code> if it could not be found.
+	 * Returns the remote app entry with the primary key or throws a <code>NoSuchRemoteAppEntryException</code> if it could not be found.
 	 *
 	 * @param remoteAppEntryId the primary key of the remote app entry
 	 * @return the remote app entry
-	 * @throws NoSuchEntryException if a remote app entry with the primary key could not be found
+	 * @throws NoSuchRemoteAppEntryException if a remote app entry with the primary key could not be found
 	 */
 	@Override
 	public RemoteAppEntry findByPrimaryKey(long remoteAppEntryId)
-		throws NoSuchEntryException {
+		throws NoSuchRemoteAppEntryException {
 
 		return findByPrimaryKey((Serializable)remoteAppEntryId);
 	}
@@ -1918,7 +2542,7 @@ public class RemoteAppEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<RemoteAppEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1988,7 +2612,7 @@ public class RemoteAppEntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -2043,30 +2667,23 @@ public class RemoteAppEntryPersistenceImpl
 	 * Initializes the remote app entry persistence.
 	 */
 	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class, new RemoteAppEntryModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", RemoteAppEntry.class.getName()));
-
+	public void activate() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByUuid = _createFinderPath(
+		_finderPathWithPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
@@ -2074,17 +2691,17 @@ public class RemoteAppEntryPersistenceImpl
 			},
 			new String[] {"uuid_"}, true);
 
-		_finderPathWithoutPaginationFindByUuid = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			true);
 
-		_finderPathCountByUuid = _createFinderPath(
+		_finderPathCountByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			false);
 
-		_finderPathWithPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -2093,25 +2710,15 @@ public class RemoteAppEntryPersistenceImpl
 			},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathWithoutPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathCountByUuid_C = _createFinderPath(
+		_finderPathCountByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
-
-		_finderPathFetchByC_U = _createFinderPath(
-			FINDER_CLASS_NAME_ENTITY, "fetchByC_U",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"companyId", "url"}, true);
-
-		_finderPathCountByC_U = _createFinderPath(
-			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_U",
-			new String[] {Long.class.getName(), String.class.getName()},
-			new String[] {"companyId", "url"}, false);
 
 		_setRemoteAppEntryUtilPersistence(this);
 	}
@@ -2121,14 +2728,6 @@ public class RemoteAppEntryPersistenceImpl
 		_setRemoteAppEntryUtilPersistence(null);
 
 		entityCache.removeCache(RemoteAppEntryImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setRemoteAppEntryUtilPersistence(
@@ -2173,8 +2772,6 @@ public class RemoteAppEntryPersistenceImpl
 		super.setSessionFactory(sessionFactory);
 	}
 
-	private BundleContext _bundleContext;
-
 	@Reference
 	protected EntityCache entityCache;
 
@@ -2193,7 +2790,30 @@ public class RemoteAppEntryPersistenceImpl
 	private static final String _SQL_COUNT_REMOTEAPPENTRY_WHERE =
 		"SELECT COUNT(remoteAppEntry) FROM RemoteAppEntry remoteAppEntry WHERE ";
 
+	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN =
+		"remoteAppEntry.remoteAppEntryId";
+
+	private static final String _FILTER_SQL_SELECT_REMOTEAPPENTRY_WHERE =
+		"SELECT DISTINCT {remoteAppEntry.*} FROM RemoteAppEntry remoteAppEntry WHERE ";
+
+	private static final String
+		_FILTER_SQL_SELECT_REMOTEAPPENTRY_NO_INLINE_DISTINCT_WHERE_1 =
+			"SELECT {RemoteAppEntry.*} FROM (SELECT DISTINCT remoteAppEntry.remoteAppEntryId FROM RemoteAppEntry remoteAppEntry WHERE ";
+
+	private static final String
+		_FILTER_SQL_SELECT_REMOTEAPPENTRY_NO_INLINE_DISTINCT_WHERE_2 =
+			") TEMP_TABLE INNER JOIN RemoteAppEntry ON TEMP_TABLE.remoteAppEntryId = RemoteAppEntry.remoteAppEntryId";
+
+	private static final String _FILTER_SQL_COUNT_REMOTEAPPENTRY_WHERE =
+		"SELECT COUNT(DISTINCT remoteAppEntry.remoteAppEntryId) AS COUNT_VALUE FROM RemoteAppEntry remoteAppEntry WHERE ";
+
+	private static final String _FILTER_ENTITY_ALIAS = "remoteAppEntry";
+
+	private static final String _FILTER_ENTITY_TABLE = "RemoteAppEntry";
+
 	private static final String _ORDER_BY_ENTITY_ALIAS = "remoteAppEntry.";
+
+	private static final String _ORDER_BY_ENTITY_TABLE = "RemoteAppEntry.";
 
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY =
 		"No RemoteAppEntry exists with the primary key ";
@@ -2205,126 +2825,15 @@ public class RemoteAppEntryPersistenceImpl
 		RemoteAppEntryPersistenceImpl.class);
 
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
-		new String[] {"uuid"});
+		new String[] {"uuid", "type"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class RemoteAppEntryModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			RemoteAppEntryModelImpl remoteAppEntryModelImpl =
-				(RemoteAppEntryModelImpl)baseModel;
-
-			long columnBitmask = remoteAppEntryModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					remoteAppEntryModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						remoteAppEntryModelImpl.getColumnBitmask(columnName);
-				}
-
-				if (finderPath.isBaseModelResult() &&
-					(RemoteAppEntryPersistenceImpl.
-						FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION ==
-							finderPath.getCacheName())) {
-
-					finderPathColumnBitmask |= _ORDER_BY_COLUMNS_BITMASK;
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					remoteAppEntryModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			RemoteAppEntryModelImpl remoteAppEntryModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						remoteAppEntryModelImpl.getColumnOriginalValue(
-							columnName);
-				}
-				else {
-					arguments[i] = remoteAppEntryModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-		private static final long _ORDER_BY_COLUMNS_BITMASK;
-
-		static {
-			long orderByColumnsBitmask = 0;
-
-			orderByColumnsBitmask |= RemoteAppEntryModelImpl.getColumnBitmask(
-				"name");
-
-			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
-		}
-
-	}
+	@Reference
+	private RemoteAppEntryModelArgumentsResolver
+		_remoteAppEntryModelArgumentsResolver;
 
 }

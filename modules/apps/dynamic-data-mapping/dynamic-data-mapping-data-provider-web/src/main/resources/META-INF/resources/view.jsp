@@ -20,9 +20,12 @@
 String backURL = ParamUtil.getString(request, "backURL");
 
 String displayStyle = ddmDataProviderDisplayContext.getDisplayStyle();
-PortletURL portletURL = ddmDataProviderDisplayContext.getPortletURL();
 
-portletURL.setParameter("displayStyle", displayStyle);
+PortletURL portletURL = PortletURLBuilder.create(
+	ddmDataProviderDisplayContext.getPortletURL()
+).setParameter(
+	"displayStyle", displayStyle
+).buildPortletURL();
 
 portletDisplay.setShowBackIcon(ddmDataProviderDisplayContext.isShowBackIcon());
 portletDisplay.setURLBack(backURL);
@@ -52,7 +55,6 @@ renderResponse.setTitle(ddmDataProviderDisplayContext.getTitle());
 				>
 					<liferay-ui:search-container-row
 						className="com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance"
-						cssClass="entry-display-style"
 						keyProperty="dataProviderInstanceId"
 						modelVar="dataProviderInstance"
 					>
@@ -82,14 +84,14 @@ renderResponse.setTitle(ddmDataProviderDisplayContext.getTitle());
 							</c:when>
 							<c:otherwise>
 								<liferay-ui:search-container-column-text
-									cssClass="table-cell-content"
+									cssClass="table-cell-expand"
 									href="<%= rowURL %>"
 									name="name"
 									value="<%= HtmlUtil.escape(dataProviderInstance.getName(locale)) %>"
 								/>
 
 								<liferay-ui:search-container-column-text
-									cssClass="table-cell-content"
+									cssClass="table-cell-expand"
 									name="description"
 									value="<%= HtmlUtil.escape(dataProviderInstance.getDescription(locale)) %>"
 								/>

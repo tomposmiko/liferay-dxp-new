@@ -153,6 +153,20 @@ public class AccountEntryOrganizationRelLocalServiceUtil {
 			accountEntryId, organizationIds);
 	}
 
+	public static void deleteAccountEntryOrganizationRelsByAccountEntryId(
+		long accountEntryId) {
+
+		getService().deleteAccountEntryOrganizationRelsByAccountEntryId(
+			accountEntryId);
+	}
+
+	public static void deleteAccountEntryOrganizationRelsByOrganizationId(
+		long organizationId) {
+
+		getService().deleteAccountEntryOrganizationRelsByOrganizationId(
+			organizationId);
+	}
+
 	/**
 	 * @throws PortalException
 	 */
@@ -255,6 +269,13 @@ public class AccountEntryOrganizationRelLocalServiceUtil {
 			accountEntryOrganizationRelId);
 	}
 
+	public static AccountEntryOrganizationRel fetchAccountEntryOrganizationRel(
+		long accountEntryId, long organizationId) {
+
+		return getService().fetchAccountEntryOrganizationRel(
+			accountEntryId, organizationId);
+	}
+
 	/**
 	 * Returns the account entry organization rel with the primary key.
 	 *
@@ -268,6 +289,14 @@ public class AccountEntryOrganizationRelLocalServiceUtil {
 
 		return getService().getAccountEntryOrganizationRel(
 			accountEntryOrganizationRelId);
+	}
+
+	public static AccountEntryOrganizationRel getAccountEntryOrganizationRel(
+			long accountEntryId, long organizationId)
+		throws PortalException {
+
+		return getService().getAccountEntryOrganizationRel(
+			accountEntryId, organizationId);
 	}
 
 	/**
@@ -294,10 +323,34 @@ public class AccountEntryOrganizationRelLocalServiceUtil {
 	}
 
 	public static List<AccountEntryOrganizationRel>
+		getAccountEntryOrganizationRels(
+			long accountEntryId, int start, int end) {
+
+		return getService().getAccountEntryOrganizationRels(
+			accountEntryId, start, end);
+	}
+
+	public static List<AccountEntryOrganizationRel>
 		getAccountEntryOrganizationRelsByOrganizationId(long organizationId) {
 
 		return getService().getAccountEntryOrganizationRelsByOrganizationId(
 			organizationId);
+	}
+
+	public static List<AccountEntryOrganizationRel>
+		getAccountEntryOrganizationRelsByOrganizationId(
+			long organizationId, int start, int end) {
+
+		return getService().getAccountEntryOrganizationRelsByOrganizationId(
+			organizationId, start, end);
+	}
+
+	public static int getAccountEntryOrganizationRelsByOrganizationIdCount(
+		long organizationId) {
+
+		return getService().
+			getAccountEntryOrganizationRelsByOrganizationIdCount(
+				organizationId);
 	}
 
 	/**

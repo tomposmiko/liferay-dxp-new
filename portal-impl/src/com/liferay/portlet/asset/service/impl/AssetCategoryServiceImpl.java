@@ -65,8 +65,8 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 			ActionKeys.ADD_CATEGORY);
 
 		return assetCategoryLocalService.addCategory(
-			getUserId(), groupId, parentCategoryId, titleMap, descriptionMap,
-			vocabularyId, categoryProperties, serviceContext);
+			null, getUserId(), groupId, parentCategoryId, titleMap,
+			descriptionMap, vocabularyId, categoryProperties, serviceContext);
 	}
 
 	@Override
@@ -82,6 +82,24 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 
 		return assetCategoryLocalService.addCategory(
 			getUserId(), groupId, title, vocabularyId, serviceContext);
+	}
+
+	@Override
+	public AssetCategory addCategory(
+			String externalReferenceCode, long groupId, long parentCategoryId,
+			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
+			long vocabularyId, String[] categoryProperties,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		AssetCategoryPermission.check(
+			getPermissionChecker(), groupId, parentCategoryId,
+			ActionKeys.ADD_CATEGORY);
+
+		return assetCategoryLocalService.addCategory(
+			externalReferenceCode, getUserId(), groupId, parentCategoryId,
+			titleMap, descriptionMap, vocabularyId, categoryProperties,
+			serviceContext);
 	}
 
 	@Override
@@ -416,25 +434,17 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 			int end)
 		throws PortalException {
 
-		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+		JSONArray jsonArray = null;
 
-		for (long groupId : groupIds) {
-			JSONArray categoriesJSONArray = null;
-
-			if (Validator.isNull(name)) {
-				categoriesJSONArray = toJSONArray(
-					assetCategoryPersistence.filterFindByG_V(
-						groupId, vocabularyIds));
-			}
-			else {
-				categoriesJSONArray = toJSONArray(
-					assetCategoryPersistence.filterFindByG_LikeN_V(
-						groupId, name, vocabularyIds));
-			}
-
-			for (int j = 0; j < categoriesJSONArray.length(); j++) {
-				jsonArray.put(categoriesJSONArray.getJSONObject(j));
-			}
+		if (Validator.isNull(name)) {
+			jsonArray = toJSONArray(
+				assetCategoryPersistence.filterFindByG_V(
+					groupIds, vocabularyIds, start, end));
+		}
+		else {
+			jsonArray = toJSONArray(
+				assetCategoryPersistence.filterFindByG_LikeN_V(
+					groupIds, name, vocabularyIds, start, end));
 		}
 
 		return jsonArray;

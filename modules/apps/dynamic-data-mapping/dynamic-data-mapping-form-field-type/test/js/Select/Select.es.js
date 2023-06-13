@@ -20,7 +20,7 @@ import {
 	render,
 	waitForElement,
 } from '@testing-library/react';
-import {PageProvider} from 'dynamic-data-mapping-form-renderer';
+import {PageProvider} from 'data-engine-js-components-web';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -541,41 +541,6 @@ describe('Select', () => {
 		expect(handleFieldEdited).toHaveBeenCalledWith(expect.any(Object), [
 			'item11',
 		]);
-	});
-
-	it('adjusts dropdown menu position during scroll', async () => {
-		const {container} = render(
-			<SelectWithProvider
-				dataSourceType="manual"
-				options={createOptions(12)}
-				spritemap={spritemap}
-			/>
-		);
-
-		const dropdownTrigger = container.querySelector(
-			'.form-builder-select-field.input-group-container'
-		);
-
-		jest.spyOn(dropdownTrigger, 'getBoundingClientRect').mockImplementation(
-			() => {
-				return {
-					height: 40,
-					top: 50,
-				};
-			}
-		);
-
-		window.pageYOffset = 100;
-
-		fireEvent.scroll(container);
-
-		act(() => {
-			jest.runAllTimers();
-		});
-
-		const dropdownMenu = container.querySelector('.ddm-select-dropdown');
-
-		expect(dropdownMenu.style).toHaveProperty('top', '190px');
 	});
 
 	it('shows the options value if there are values', async () => {

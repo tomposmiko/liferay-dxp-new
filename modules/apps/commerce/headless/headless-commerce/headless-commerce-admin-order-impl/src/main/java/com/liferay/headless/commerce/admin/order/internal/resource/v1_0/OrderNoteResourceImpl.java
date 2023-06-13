@@ -55,11 +55,11 @@ public class OrderNoteResourceImpl extends BaseOrderNoteResourceImpl {
 
 		CommerceOrderNote commerceOrderNote =
 			_commerceOrderNoteService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (commerceOrderNote == null) {
 			throw new NoSuchOrderNoteException(
-				"Unable to find OrderNote with externalReferenceCode: " +
+				"Unable to find order note with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -75,11 +75,11 @@ public class OrderNoteResourceImpl extends BaseOrderNoteResourceImpl {
 
 		CommerceOrder commerceOrder =
 			_commerceOrderService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (commerceOrder == null) {
 			throw new NoSuchOrderException(
-				"Unable to find Order with externalReferenceCode: " +
+				"Unable to find order with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -126,11 +126,11 @@ public class OrderNoteResourceImpl extends BaseOrderNoteResourceImpl {
 
 		CommerceOrderNote commerceOrderNote =
 			_commerceOrderNoteService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (commerceOrderNote == null) {
 			throw new NoSuchOrderNoteException(
-				"Unable to find OrderNote with externalReferenceCode: " +
+				"Unable to find order note with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -159,11 +159,11 @@ public class OrderNoteResourceImpl extends BaseOrderNoteResourceImpl {
 
 		CommerceOrderNote commerceOrderNote =
 			_commerceOrderNoteService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (commerceOrderNote == null) {
 			throw new NoSuchOrderNoteException(
-				"Unable to find OrderNote with externalReferenceCode: " +
+				"Unable to find order note with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -181,11 +181,11 @@ public class OrderNoteResourceImpl extends BaseOrderNoteResourceImpl {
 
 		CommerceOrder commerceOrder =
 			_commerceOrderService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (commerceOrder == null) {
 			throw new NoSuchOrderException(
-				"Unable to find Order with externalReferenceCode: " +
+				"Unable to find order with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -205,11 +205,11 @@ public class OrderNoteResourceImpl extends BaseOrderNoteResourceImpl {
 		throws Exception {
 
 		CommerceOrderNote commerceOrderNote =
-			_commerceOrderNoteService.upsertCommerceOrderNote(
+			_commerceOrderNoteService.addOrUpdateCommerceOrderNote(
+				orderNote.getExternalReferenceCode(),
 				GetterUtil.get(orderNote.getId(), 0L),
 				commerceOrder.getCommerceOrderId(), orderNote.getContent(),
 				GetterUtil.get(orderNote.getRestricted(), false),
-				orderNote.getExternalReferenceCode(),
 				_serviceContextHelper.getServiceContext(
 					commerceOrder.getGroupId()));
 

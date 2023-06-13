@@ -15,6 +15,7 @@
 package com.liferay.dynamic.data.mapping.form.field.type.internal.fieldset;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
+import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.form.field.type.internal.util.DDMFormFieldTypeUtil;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMStructureLayout;
@@ -50,7 +51,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Carlos Lancha
  */
 @Component(
-	immediate = true, property = "ddm.form.field.type.name=fieldset",
+	immediate = true,
+	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.FIELDSET,
 	service = {
 		DDMFormFieldTemplateContextContributor.class,
 		FieldSetDDMFormFieldTemplateContextContributor.class
@@ -158,48 +160,6 @@ public class FieldSetDDMFormFieldTemplateContextContributor
 		}
 
 		return jsonFactory.createJSONArray();
-	}
-
-	/**
-	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
-	 */
-	@Deprecated
-	protected JSONArray getRowsJSONArray(
-		DDMFormField ddmFormField, List<Object> nestedFields) {
-
-		String rows = GetterUtil.getString(ddmFormField.getProperty("rows"));
-
-		if (Validator.isNotNull(rows) || nestedFields.isEmpty()) {
-			return getJSONArray(rows);
-		}
-
-		JSONArray rowsJSONArray = jsonFactory.createJSONArray();
-
-		Stream<Object> visibleFieldsStream = nestedFields.stream();
-
-		List<Object> visibleNestedFields = visibleFieldsStream.filter(
-			this::isNestedFieldVisible
-		).collect(
-			Collectors.toList()
-		);
-
-		if (!visibleNestedFields.isEmpty()) {
-			rowsJSONArray.put(createRowJSONObject(visibleNestedFields));
-		}
-
-		Stream<Object> invisibleFieldsStream = nestedFields.stream();
-
-		List<Object> invisibleNestedFields = invisibleFieldsStream.filter(
-			nestedFieldContext -> !isNestedFieldVisible(nestedFieldContext)
-		).collect(
-			Collectors.toList()
-		);
-
-		if (!invisibleNestedFields.isEmpty()) {
-			rowsJSONArray.put(createRowJSONObject(invisibleNestedFields));
-		}
-
-		return rowsJSONArray;
 	}
 
 	protected JSONArray getRowsJSONArray(List<Object> nestedFields) {

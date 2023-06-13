@@ -26,6 +26,10 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class CPOptionLocalServiceWrapper
 	implements CPOptionLocalService, ServiceWrapper<CPOptionLocalService> {
 
+	public CPOptionLocalServiceWrapper() {
+		this(null);
+	}
+
 	public CPOptionLocalServiceWrapper(
 		CPOptionLocalService cpOptionLocalService) {
 
@@ -51,16 +55,33 @@ public class CPOptionLocalServiceWrapper
 
 	@Override
 	public com.liferay.commerce.product.model.CPOption addCPOption(
-			long userId, java.util.Map<java.util.Locale, String> nameMap,
+			String externalReferenceCode, long userId,
+			java.util.Map<java.util.Locale, String> nameMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
 			String ddmFormFieldTypeName, boolean facetable, boolean required,
-			boolean skuContributor, String key, String externalReferenceCode,
+			boolean skuContributor, String key,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpOptionLocalService.addCPOption(
-			userId, nameMap, descriptionMap, ddmFormFieldTypeName, facetable,
-			required, skuContributor, key, externalReferenceCode,
+			externalReferenceCode, userId, nameMap, descriptionMap,
+			ddmFormFieldTypeName, facetable, required, skuContributor, key,
+			serviceContext);
+	}
+
+	@Override
+	public com.liferay.commerce.product.model.CPOption addOrUpdateCPOption(
+			String externalReferenceCode, long userId,
+			java.util.Map<java.util.Locale, String> nameMap,
+			java.util.Map<java.util.Locale, String> descriptionMap,
+			String ddmFormFieldTypeName, boolean facetable, boolean required,
+			boolean skuContributor, String key,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _cpOptionLocalService.addOrUpdateCPOption(
+			externalReferenceCode, userId, nameMap, descriptionMap,
+			ddmFormFieldTypeName, facetable, required, skuContributor, key,
 			serviceContext);
 	}
 
@@ -249,10 +270,10 @@ public class CPOptionLocalServiceWrapper
 	@Override
 	public com.liferay.commerce.product.model.CPOption
 		fetchByExternalReferenceCode(
-			long companyId, String externalReferenceCode) {
+			String externalReferenceCode, long companyId) {
 
 		return _cpOptionLocalService.fetchByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	@Override
@@ -264,12 +285,19 @@ public class CPOptionLocalServiceWrapper
 
 	@Override
 	public com.liferay.commerce.product.model.CPOption fetchCPOption(
-		long companyId, String key) {
+			long companyId, String key)
+		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpOptionLocalService.fetchCPOption(companyId, key);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option's external reference code
+	 * @return the matching cp option, or <code>null</code> if a matching cp option could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CPOption
 		fetchCPOptionByExternalReferenceCode(
@@ -279,6 +307,9 @@ public class CPOptionLocalServiceWrapper
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCPOptionByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.product.model.CPOption
@@ -346,7 +377,14 @@ public class CPOptionLocalServiceWrapper
 		return _cpOptionLocalService.getCPOption(companyId, key);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the cp option with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the cp option's external reference code
+	 * @return the matching cp option
+	 * @throws PortalException if a matching cp option could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CPOption
 			getCPOptionByExternalReferenceCode(
@@ -488,18 +526,13 @@ public class CPOptionLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.commerce.product.model.CPOption upsertCPOption(
-			long userId, java.util.Map<java.util.Locale, String> nameMap,
-			java.util.Map<java.util.Locale, String> descriptionMap,
-			String ddmFormFieldTypeName, boolean facetable, boolean required,
-			boolean skuContributor, String key, String externalReferenceCode,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public com.liferay.commerce.product.model.CPOption
+			updateCPOptionExternalReferenceCode(
+				String externalReferenceCode, long cpOptionId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _cpOptionLocalService.upsertCPOption(
-			userId, nameMap, descriptionMap, ddmFormFieldTypeName, facetable,
-			required, skuContributor, key, externalReferenceCode,
-			serviceContext);
+		return _cpOptionLocalService.updateCPOptionExternalReferenceCode(
+			externalReferenceCode, cpOptionId);
 	}
 
 	@Override

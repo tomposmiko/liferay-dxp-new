@@ -82,16 +82,10 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 
 			String image = emoticon[0];
 
-			StringBuilder sb = new StringBuilder(6);
-
-			sb.append("<img alt=\"emoticon\" src=\"");
-			sb.append(ThemeConstants.TOKEN_THEME_IMAGES_PATH);
-			sb.append(MBUtil.EMOTICONS);
-			sb.append("/");
-			sb.append(image);
-			sb.append("\" >");
-
-			emoticon[0] = sb.toString();
+			emoticon[0] = StringBundler.concat(
+				"<img alt=\"emoticon\" src=\"",
+				ThemeConstants.TOKEN_THEME_IMAGES_PATH, MBUtil.EMOTICONS, "/",
+				image, "\" >");
 		}
 
 		_excludeNewLineTypes = HashMapBuilder.put(
@@ -196,7 +190,7 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 	}
 
 	protected String escapeQuote(String quote) {
-		StringBuilder sb = new StringBuilder();
+		StringBundler sb = new StringBundler();
 
 		int index = 0;
 
@@ -422,7 +416,7 @@ public class HtmlBBCodeTranslatorImpl implements BBCodeTranslator {
 
 		Matcher matcher = _imagePattern.matcher(src);
 
-		if (src.startsWith("data:image/") || matcher.matches()) {
+		if (matcher.matches()) {
 			sb.append(HtmlUtil.escapeAttribute(src));
 		}
 

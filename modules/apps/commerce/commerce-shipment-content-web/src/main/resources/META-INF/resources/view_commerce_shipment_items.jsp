@@ -41,10 +41,10 @@ if (commerceAddress != null) {
 	zip = commerceAddress.getZip();
 	phoneNumber = commerceAddress.getPhoneNumber();
 
-	CommerceRegion commerceRegion = commerceAddress.getCommerceRegion();
+	Region region = commerceAddress.getRegion();
 
-	if (commerceRegion != null) {
-		regionCode = commerceRegion.getCode();
+	if (region != null) {
+		regionCode = region.getRegionCode();
 	}
 }
 %>
@@ -214,7 +214,6 @@ if (commerceAddress != null) {
 >
 	<liferay-ui:search-container-row
 		className="com.liferay.commerce.model.CommerceShipmentItem"
-		cssClass="entry-display-style"
 		escapedModel="<%= true %>"
 		keyProperty="commerceShipmentItemId"
 		modelVar="commerceShipmentItem"
@@ -225,24 +224,24 @@ if (commerceAddress != null) {
 		%>
 
 		<liferay-ui:search-container-column-text
-			cssClass="table-cell-content"
+			cssClass="table-cell-expand"
 			name="sku"
 			value="<%= (commerceOrderItem == null) ? StringPool.BLANK : HtmlUtil.escape(commerceOrderItem.getSku()) %>"
 		/>
 
 		<liferay-ui:search-container-column-text
-			cssClass="table-cell-content"
+			cssClass="table-cell-expand"
 			name="name"
 			value="<%= (commerceOrderItem == null) ? StringPool.BLANK : commerceOrderItem.getName(languageId) %>"
 		/>
 
 		<liferay-ui:search-container-column-text
-			cssClass="table-cell-content"
+			cssClass="table-cell-expand"
 			property="quantity"
 		/>
 
 		<liferay-ui:search-container-column-text
-			cssClass="table-cell-content"
+			cssClass="table-cell-expand"
 		>
 
 			<%

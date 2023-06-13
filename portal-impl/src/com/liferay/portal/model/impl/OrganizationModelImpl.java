@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -374,109 +375,131 @@ public class OrganizationModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Organization, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Organization>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Organization, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Organization, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Organization.class.getClassLoader(), Organization.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", Organization::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", Organization::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", Organization::getUuid);
-		attributeGetterFunctions.put(
-			"externalReferenceCode", Organization::getExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"organizationId", Organization::getOrganizationId);
-		attributeGetterFunctions.put("companyId", Organization::getCompanyId);
-		attributeGetterFunctions.put("userId", Organization::getUserId);
-		attributeGetterFunctions.put("userName", Organization::getUserName);
-		attributeGetterFunctions.put("createDate", Organization::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", Organization::getModifiedDate);
-		attributeGetterFunctions.put(
-			"parentOrganizationId", Organization::getParentOrganizationId);
-		attributeGetterFunctions.put("treePath", Organization::getTreePath);
-		attributeGetterFunctions.put("name", Organization::getName);
-		attributeGetterFunctions.put("type", Organization::getType);
-		attributeGetterFunctions.put("recursable", Organization::getRecursable);
-		attributeGetterFunctions.put("regionId", Organization::getRegionId);
-		attributeGetterFunctions.put("countryId", Organization::getCountryId);
-		attributeGetterFunctions.put("statusId", Organization::getStatusId);
-		attributeGetterFunctions.put("comments", Organization::getComments);
-		attributeGetterFunctions.put("logoId", Organization::getLogoId);
+		try {
+			Constructor<Organization> constructor =
+				(Constructor<Organization>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Organization, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Organization, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Organization, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Organization, Object>>();
 		Map<String, BiConsumer<Organization, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Organization, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", Organization::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<Organization, Long>)Organization::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", Organization::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<Organization, Long>)Organization::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", Organization::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<Organization, String>)Organization::setUuid);
+		attributeGetterFunctions.put(
+			"externalReferenceCode", Organization::getExternalReferenceCode);
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<Organization, String>)
 				Organization::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"organizationId", Organization::getOrganizationId);
 		attributeSetterBiConsumers.put(
 			"organizationId",
 			(BiConsumer<Organization, Long>)Organization::setOrganizationId);
+		attributeGetterFunctions.put("companyId", Organization::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<Organization, Long>)Organization::setCompanyId);
+		attributeGetterFunctions.put("userId", Organization::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<Organization, Long>)Organization::setUserId);
+		attributeGetterFunctions.put("userName", Organization::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<Organization, String>)Organization::setUserName);
+		attributeGetterFunctions.put("createDate", Organization::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<Organization, Date>)Organization::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", Organization::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<Organization, Date>)Organization::setModifiedDate);
+		attributeGetterFunctions.put(
+			"parentOrganizationId", Organization::getParentOrganizationId);
 		attributeSetterBiConsumers.put(
 			"parentOrganizationId",
 			(BiConsumer<Organization, Long>)
 				Organization::setParentOrganizationId);
+		attributeGetterFunctions.put("treePath", Organization::getTreePath);
 		attributeSetterBiConsumers.put(
 			"treePath",
 			(BiConsumer<Organization, String>)Organization::setTreePath);
+		attributeGetterFunctions.put("name", Organization::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<Organization, String>)Organization::setName);
+		attributeGetterFunctions.put("type", Organization::getType);
 		attributeSetterBiConsumers.put(
 			"type", (BiConsumer<Organization, String>)Organization::setType);
+		attributeGetterFunctions.put("recursable", Organization::getRecursable);
 		attributeSetterBiConsumers.put(
 			"recursable",
 			(BiConsumer<Organization, Boolean>)Organization::setRecursable);
+		attributeGetterFunctions.put("regionId", Organization::getRegionId);
 		attributeSetterBiConsumers.put(
 			"regionId",
 			(BiConsumer<Organization, Long>)Organization::setRegionId);
+		attributeGetterFunctions.put("countryId", Organization::getCountryId);
 		attributeSetterBiConsumers.put(
 			"countryId",
 			(BiConsumer<Organization, Long>)Organization::setCountryId);
+		attributeGetterFunctions.put("statusId", Organization::getStatusId);
 		attributeSetterBiConsumers.put(
 			"statusId",
 			(BiConsumer<Organization, Long>)Organization::setStatusId);
+		attributeGetterFunctions.put("comments", Organization::getComments);
 		attributeSetterBiConsumers.put(
 			"comments",
 			(BiConsumer<Organization, String>)Organization::setComments);
+		attributeGetterFunctions.put("logoId", Organization::getLogoId);
 		attributeSetterBiConsumers.put(
 			"logoId", (BiConsumer<Organization, Long>)Organization::setLogoId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -999,6 +1022,49 @@ public class OrganizationModelImpl
 	}
 
 	@Override
+	public Organization cloneWithOriginalValues() {
+		OrganizationImpl organizationImpl = new OrganizationImpl();
+
+		organizationImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		organizationImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		organizationImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		organizationImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
+		organizationImpl.setOrganizationId(
+			this.<Long>getColumnOriginalValue("organizationId"));
+		organizationImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		organizationImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		organizationImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		organizationImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		organizationImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		organizationImpl.setParentOrganizationId(
+			this.<Long>getColumnOriginalValue("parentOrganizationId"));
+		organizationImpl.setTreePath(
+			this.<String>getColumnOriginalValue("treePath"));
+		organizationImpl.setName(this.<String>getColumnOriginalValue("name"));
+		organizationImpl.setType(this.<String>getColumnOriginalValue("type_"));
+		organizationImpl.setRecursable(
+			this.<Boolean>getColumnOriginalValue("recursable"));
+		organizationImpl.setRegionId(
+			this.<Long>getColumnOriginalValue("regionId"));
+		organizationImpl.setCountryId(
+			this.<Long>getColumnOriginalValue("countryId"));
+		organizationImpl.setStatusId(
+			this.<Long>getColumnOriginalValue("statusId"));
+		organizationImpl.setComments(
+			this.<String>getColumnOriginalValue("comments"));
+		organizationImpl.setLogoId(this.<Long>getColumnOriginalValue("logoId"));
+
+		return organizationImpl;
+	}
+
+	@Override
 	public int compareTo(Organization organization) {
 		int value = 0;
 
@@ -1256,9 +1322,7 @@ public class OrganizationModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Organization>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Organization.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

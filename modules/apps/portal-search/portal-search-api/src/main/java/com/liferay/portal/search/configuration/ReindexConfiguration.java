@@ -32,7 +32,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface ReindexConfiguration {
 
 	@Meta.AD(
-		deflt = "com.liferay.document.library.kernel.model.DLFileEntry=500",
+		deflt = "com.liferay.journal.model.JournalArticle=10000",
 		description = "indexing-batch-sizes-help",
 		name = "indexing-batch-sizes", required = false
 	)

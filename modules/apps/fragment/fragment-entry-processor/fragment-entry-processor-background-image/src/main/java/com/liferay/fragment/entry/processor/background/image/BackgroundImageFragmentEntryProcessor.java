@@ -22,12 +22,14 @@ import com.liferay.fragment.processor.FragmentEntryProcessor;
 import com.liferay.fragment.processor.FragmentEntryProcessorContext;
 import com.liferay.info.item.InfoItemFieldValues;
 import com.liferay.info.type.WebImage;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -128,17 +130,62 @@ public class BackgroundImageFragmentEntryProcessor
 			}
 
 			if (Validator.isNotNull(value)) {
+				long fileEntryId = 0;
+
 				if (JSONUtil.isValid(value)) {
 					JSONObject valueJSONObject =
 						JSONFactoryUtil.createJSONObject(value);
 
+					fileEntryId = valueJSONObject.getLong("fileEntryId");
+
+					if (fileEntryId == 0) {
+						fileEntryId =
+							_fragmentEntryProcessorHelper.getFileEntryId(
+								valueJSONObject.getString("className"),
+								valueJSONObject.getLong("classPK"));
+					}
+
 					value = valueJSONObject.getString("url", value);
 				}
 
-				element.attr(
-					"style",
-					"background-image: url(" + value +
-						"); background-size: cover");
+				StringBundler sb = new StringBundler(6);
+
+				sb.append("background-image: url(");
+				sb.append(value);
+				sb.append("); background-size: cover;");
+
+				if (fileEntryId == 0) {
+					fileEntryId = _fragmentEntryProcessorHelper.getFileEntryId(
+						editableValueJSONObject.getLong("classNameId"),
+						editableValueJSONObject.getLong("classPK"),
+						editableValueJSONObject.getString("fieldId"),
+						fragmentEntryProcessorContext.getLocale());
+				}
+
+				Optional<Object> displayObjectOptional =
+					fragmentEntryProcessorContext.getDisplayObjectOptional();
+
+				if ((fileEntryId == 0) && displayObjectOptional.isPresent()) {
+					fileEntryId = _fragmentEntryProcessorHelper.getFileEntryId(
+						displayObjectOptional.get(),
+						editableValueJSONObject.getString("collectionFieldId"),
+						fragmentEntryProcessorContext.getLocale());
+				}
+
+				if ((fileEntryId == 0) && displayObjectOptional.isPresent()) {
+					fileEntryId = _fragmentEntryProcessorHelper.getFileEntryId(
+						displayObjectOptional.get(),
+						editableValueJSONObject.getString("mappedField"),
+						fragmentEntryProcessorContext.getLocale());
+				}
+
+				if (fileEntryId > 0) {
+					sb.append(" --background-image-file-entry-id: ");
+					sb.append(fileEntryId);
+					sb.append(StringPool.SEMICOLON);
+				}
+
+				element.attr("style", sb.toString());
 			}
 		}
 
@@ -254,5 +301,8 @@ public class BackgroundImageFragmentEntryProcessor
 
 	@Reference
 	private FragmentEntryProcessorHelper _fragmentEntryProcessorHelper;
+
+	@Reference
+	private Portal _portal;
 
 }

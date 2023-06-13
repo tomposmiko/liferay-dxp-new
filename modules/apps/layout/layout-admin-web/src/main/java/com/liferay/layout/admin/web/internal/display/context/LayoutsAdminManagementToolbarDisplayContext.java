@@ -19,7 +19,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
-import com.liferay.layout.admin.web.internal.configuration.LayoutConverterConfiguration;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -37,9 +37,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
 import java.util.Objects;
-
-import javax.portlet.ActionRequest;
-import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -69,30 +66,18 @@ public class LayoutsAdminManagementToolbarDisplayContext
 	@Override
 	public List<DropdownItem> getActionDropdownItems() {
 		return DropdownItemListBuilder.add(
-			() -> {
-				LayoutConverterConfiguration layoutConverterConfiguration =
-					_layoutsAdminDisplayContext.
-						getLayoutConverterConfiguration();
-
-				if (layoutConverterConfiguration.enabled()) {
-					return true;
-				}
-
-				return false;
-			},
 			dropdownItem -> {
 				dropdownItem.putData("action", "convertSelectedPages");
 
-				PortletURL convertLayoutURL =
-					liferayPortletResponse.createActionURL();
-
-				convertLayoutURL.setParameter(
-					ActionRequest.ACTION_NAME, "/layout_admin/convert_layout");
-				convertLayoutURL.setParameter(
-					"redirect", _themeDisplay.getURLCurrent());
-
 				dropdownItem.putData(
-					"convertLayoutURL", convertLayoutURL.toString());
+					"convertLayoutURL",
+					PortletURLBuilder.createActionURL(
+						liferayPortletResponse
+					).setActionName(
+						"/layout_admin/convert_layout"
+					).setRedirect(
+						_themeDisplay.getURLCurrent()
+					).buildString());
 
 				dropdownItem.setIcon("change");
 				dropdownItem.setLabel(
@@ -104,16 +89,15 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			dropdownItem -> {
 				dropdownItem.putData("action", "deleteSelectedPages");
 
-				PortletURL deleteLayoutURL =
-					liferayPortletResponse.createActionURL();
-
-				deleteLayoutURL.setParameter(
-					ActionRequest.ACTION_NAME, "/layout_admin/delete_layout");
-				deleteLayoutURL.setParameter(
-					"redirect", _themeDisplay.getURLCurrent());
-
 				dropdownItem.putData(
-					"deleteLayoutURL", deleteLayoutURL.toString());
+					"deleteLayoutURL",
+					PortletURLBuilder.createActionURL(
+						liferayPortletResponse
+					).setActionName(
+						"/layout_admin/delete_layout"
+					).setRedirect(
+						_themeDisplay.getURLCurrent()
+					).buildString());
 
 				dropdownItem.setIcon("times-circle");
 				dropdownItem.setLabel(
@@ -125,11 +109,11 @@ public class LayoutsAdminManagementToolbarDisplayContext
 
 	@Override
 	public String getClearResultsURL() {
-		PortletURL clearResultsURL = getPortletURL();
-
-		clearResultsURL.setParameter("keywords", StringPool.BLANK);
-
-		return clearResultsURL.toString();
+		return PortletURLBuilder.create(
+			getPortletURL()
+		).setKeywords(
+			StringPool.BLANK
+		).buildString();
 	}
 
 	@Override
@@ -147,7 +131,7 @@ public class LayoutsAdminManagementToolbarDisplayContext
 
 		return CreationMenuBuilder.addPrimaryDropdownItem(
 			() ->
-				_layoutsAdminDisplayContext.isShowPublicPages() &&
+				_layoutsAdminDisplayContext.isShowPublicLayouts() &&
 				_layoutsAdminDisplayContext.isShowAddChildPageAction(
 					selLayout) &&
 				(!_layoutsAdminDisplayContext.isPrivateLayout() ||
@@ -163,7 +147,7 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			}
 		).addPrimaryDropdownItem(
 			() ->
-				_layoutsAdminDisplayContext.isShowPublicPages() &&
+				_layoutsAdminDisplayContext.isShowPublicLayouts() &&
 				_layoutsAdminDisplayContext.isShowAddChildPageAction(
 					selLayout) &&
 				(!_layoutsAdminDisplayContext.isPrivateLayout() ||
@@ -177,7 +161,7 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			}
 		).addPrimaryDropdownItem(
 			() ->
-				_layoutsAdminDisplayContext.isShowPrivatePages() &&
+				_layoutsAdminDisplayContext.isShowUserPrivateLayouts() &&
 				((_layoutsAdminDisplayContext.isShowAddChildPageAction(
 					selLayout) &&
 				  _layoutsAdminDisplayContext.isPrivateLayout()) ||
@@ -193,7 +177,7 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			}
 		).addPrimaryDropdownItem(
 			() ->
-				_layoutsAdminDisplayContext.isShowPrivatePages() &&
+				_layoutsAdminDisplayContext.isShowUserPrivateLayouts() &&
 				(_layoutsAdminDisplayContext.isPrivateLayout() ||
 				 _layoutsAdminDisplayContext.isFirstColumn() ||
 				 !_layoutsAdminDisplayContext.hasLayouts()),
@@ -207,19 +191,12 @@ public class LayoutsAdminManagementToolbarDisplayContext
 	}
 
 	@Override
-	public String getDefaultEventHandler() {
-		return "LAYOUTS_MANAGEMENT_TOOLBAR_DEFAULT_EVENT_HANDLER";
-	}
-
-	@Override
 	public String getSearchActionURL() {
-		PortletURL portletURL = liferayPortletResponse.createRenderURL();
-
-		portletURL.setParameter(
-			"privateLayout",
-			String.valueOf(_layoutsAdminDisplayContext.isPrivateLayout()));
-
-		return portletURL.toString();
+		return PortletURLBuilder.createRenderURL(
+			liferayPortletResponse
+		).setParameter(
+			"privateLayout", _layoutsAdminDisplayContext.isPrivateLayout()
+		).buildString();
 	}
 
 	@Override
@@ -320,7 +297,12 @@ public class LayoutsAdminManagementToolbarDisplayContext
 				httpServletRequest, "private-collection-page");
 		}
 
-		return LanguageUtil.get(httpServletRequest, "public-collection-page");
+		if (_layoutsAdminDisplayContext.isPrivateLayoutsEnabled()) {
+			return LanguageUtil.get(
+				httpServletRequest, "public-collection-page");
+		}
+
+		return LanguageUtil.get(httpServletRequest, "collection-page");
 	}
 
 	private String _getLabel(boolean privateLayout) {
@@ -341,7 +323,11 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			return LanguageUtil.get(httpServletRequest, "private-page");
 		}
 
-		return LanguageUtil.get(httpServletRequest, "public-page");
+		if (_layoutsAdminDisplayContext.isPrivateLayoutsEnabled()) {
+			return LanguageUtil.get(httpServletRequest, "public-page");
+		}
+
+		return LanguageUtil.get(httpServletRequest, "page");
 	}
 
 	private boolean _isSiteTemplate() {

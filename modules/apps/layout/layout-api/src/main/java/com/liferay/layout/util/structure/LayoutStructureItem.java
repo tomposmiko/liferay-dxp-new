@@ -153,7 +153,7 @@ public abstract class LayoutStructureItem {
 	public String toString() {
 		JSONObject jsonObject = toJSONObject();
 
-		return jsonObject.toString();
+		return jsonObject.toJSONString();
 	}
 
 	public abstract void updateItemConfig(JSONObject itemConfigJSONObject);

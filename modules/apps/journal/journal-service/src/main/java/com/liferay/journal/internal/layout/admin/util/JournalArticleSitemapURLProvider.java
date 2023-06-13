@@ -233,7 +233,7 @@ public class JournalArticleSitemapURLProvider implements SitemapURLProvider {
 			String groupFriendlyURL = _portal.getGroupFriendlyURL(
 				_layoutSetLocalService.getLayoutSet(
 					journalArticle.getGroupId(), false),
-				themeDisplay);
+				themeDisplay, false, false);
 
 			StringBundler sb = new StringBundler(4);
 
@@ -242,14 +242,7 @@ public class JournalArticleSitemapURLProvider implements SitemapURLProvider {
 			}
 
 			sb.append(groupFriendlyURL);
-
-			if (Validator.isNotNull(journalArticle.getLayoutUuid())) {
-				sb.append(JournalArticleConstants.CANONICAL_URL_SEPARATOR);
-			}
-			else {
-				sb.append("/w/");
-			}
-
+			sb.append(JournalArticleConstants.CANONICAL_URL_SEPARATOR);
 			sb.append(journalArticle.getUrlTitle());
 
 			String articleURL = _portal.getCanonicalURL(

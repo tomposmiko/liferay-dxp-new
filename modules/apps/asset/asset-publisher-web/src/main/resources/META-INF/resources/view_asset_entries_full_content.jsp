@@ -61,14 +61,12 @@ for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
 	request.setAttribute("view.jsp-assetRendererFactory", assetRendererFactory);
 %>
 
-	<liferay-util:include page="/view_asset_entry_full_content.jsp" servletContext="<%= application %>">
-		<liferay-util:param name="viewSingleAsset" value="false" />
-	</liferay-util:include>
+	<liferay-util:include page="/view_asset_entry_full_content.jsp" servletContext="<%= application %>" />
 
 <%
 }
 %>
 
 <%!
-private static Log _log = LogFactoryUtil.getLog("com_liferay_asset_publisher_web.view_asset_entries_full_content_jsp");
+private static final Log _log = LogFactoryUtil.getLog("com_liferay_asset_publisher_web.view_asset_entries_full_content_jsp");
 %>

@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -327,105 +328,127 @@ public class BackgroundTaskModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<BackgroundTask, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, BackgroundTask>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<BackgroundTask, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<BackgroundTask, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			BackgroundTask.class.getClassLoader(), BackgroundTask.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", BackgroundTask::getMvccVersion);
-		attributeGetterFunctions.put(
-			"backgroundTaskId", BackgroundTask::getBackgroundTaskId);
-		attributeGetterFunctions.put("groupId", BackgroundTask::getGroupId);
-		attributeGetterFunctions.put("companyId", BackgroundTask::getCompanyId);
-		attributeGetterFunctions.put("userId", BackgroundTask::getUserId);
-		attributeGetterFunctions.put("userName", BackgroundTask::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", BackgroundTask::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", BackgroundTask::getModifiedDate);
-		attributeGetterFunctions.put("name", BackgroundTask::getName);
-		attributeGetterFunctions.put(
-			"servletContextNames", BackgroundTask::getServletContextNames);
-		attributeGetterFunctions.put(
-			"taskExecutorClassName", BackgroundTask::getTaskExecutorClassName);
-		attributeGetterFunctions.put(
-			"taskContextMap", BackgroundTask::getTaskContextMap);
-		attributeGetterFunctions.put("completed", BackgroundTask::getCompleted);
-		attributeGetterFunctions.put(
-			"completionDate", BackgroundTask::getCompletionDate);
-		attributeGetterFunctions.put("status", BackgroundTask::getStatus);
-		attributeGetterFunctions.put(
-			"statusMessage", BackgroundTask::getStatusMessage);
+		try {
+			Constructor<BackgroundTask> constructor =
+				(Constructor<BackgroundTask>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<BackgroundTask, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<BackgroundTask, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<BackgroundTask, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<BackgroundTask, Object>>();
 		Map<String, BiConsumer<BackgroundTask, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<BackgroundTask, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", BackgroundTask::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<BackgroundTask, Long>)BackgroundTask::setMvccVersion);
+		attributeGetterFunctions.put(
+			"backgroundTaskId", BackgroundTask::getBackgroundTaskId);
 		attributeSetterBiConsumers.put(
 			"backgroundTaskId",
 			(BiConsumer<BackgroundTask, Long>)
 				BackgroundTask::setBackgroundTaskId);
+		attributeGetterFunctions.put("groupId", BackgroundTask::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<BackgroundTask, Long>)BackgroundTask::setGroupId);
+		attributeGetterFunctions.put("companyId", BackgroundTask::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<BackgroundTask, Long>)BackgroundTask::setCompanyId);
+		attributeGetterFunctions.put("userId", BackgroundTask::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<BackgroundTask, Long>)BackgroundTask::setUserId);
+		attributeGetterFunctions.put("userName", BackgroundTask::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<BackgroundTask, String>)BackgroundTask::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", BackgroundTask::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<BackgroundTask, Date>)BackgroundTask::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", BackgroundTask::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<BackgroundTask, Date>)BackgroundTask::setModifiedDate);
+		attributeGetterFunctions.put("name", BackgroundTask::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<BackgroundTask, String>)BackgroundTask::setName);
+		attributeGetterFunctions.put(
+			"servletContextNames", BackgroundTask::getServletContextNames);
 		attributeSetterBiConsumers.put(
 			"servletContextNames",
 			(BiConsumer<BackgroundTask, String>)
 				BackgroundTask::setServletContextNames);
+		attributeGetterFunctions.put(
+			"taskExecutorClassName", BackgroundTask::getTaskExecutorClassName);
 		attributeSetterBiConsumers.put(
 			"taskExecutorClassName",
 			(BiConsumer<BackgroundTask, String>)
 				BackgroundTask::setTaskExecutorClassName);
+		attributeGetterFunctions.put(
+			"taskContextMap", BackgroundTask::getTaskContextMap);
 		attributeSetterBiConsumers.put(
 			"taskContextMap",
 			(BiConsumer<BackgroundTask, Map<String, Serializable>>)
 				BackgroundTask::setTaskContextMap);
+		attributeGetterFunctions.put("completed", BackgroundTask::getCompleted);
 		attributeSetterBiConsumers.put(
 			"completed",
 			(BiConsumer<BackgroundTask, Boolean>)BackgroundTask::setCompleted);
+		attributeGetterFunctions.put(
+			"completionDate", BackgroundTask::getCompletionDate);
 		attributeSetterBiConsumers.put(
 			"completionDate",
 			(BiConsumer<BackgroundTask, Date>)
 				BackgroundTask::setCompletionDate);
+		attributeGetterFunctions.put("status", BackgroundTask::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<BackgroundTask, Integer>)BackgroundTask::setStatus);
+		attributeGetterFunctions.put(
+			"statusMessage", BackgroundTask::getStatusMessage);
 		attributeSetterBiConsumers.put(
 			"statusMessage",
 			(BiConsumer<BackgroundTask, String>)
 				BackgroundTask::setStatusMessage);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -859,6 +882,45 @@ public class BackgroundTaskModelImpl
 	}
 
 	@Override
+	public BackgroundTask cloneWithOriginalValues() {
+		BackgroundTaskImpl backgroundTaskImpl = new BackgroundTaskImpl();
+
+		backgroundTaskImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		backgroundTaskImpl.setBackgroundTaskId(
+			this.<Long>getColumnOriginalValue("backgroundTaskId"));
+		backgroundTaskImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		backgroundTaskImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		backgroundTaskImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		backgroundTaskImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		backgroundTaskImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		backgroundTaskImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		backgroundTaskImpl.setName(this.<String>getColumnOriginalValue("name"));
+		backgroundTaskImpl.setServletContextNames(
+			this.<String>getColumnOriginalValue("servletContextNames"));
+		backgroundTaskImpl.setTaskExecutorClassName(
+			this.<String>getColumnOriginalValue("taskExecutorClassName"));
+		backgroundTaskImpl.setTaskContextMap(
+			this.<Map>getColumnOriginalValue("taskContextMap"));
+		backgroundTaskImpl.setCompleted(
+			this.<Boolean>getColumnOriginalValue("completed"));
+		backgroundTaskImpl.setCompletionDate(
+			this.<Date>getColumnOriginalValue("completionDate"));
+		backgroundTaskImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
+		backgroundTaskImpl.setStatusMessage(
+			this.<String>getColumnOriginalValue("statusMessage"));
+
+		return backgroundTaskImpl;
+	}
+
+	@Override
 	public int compareTo(BackgroundTask backgroundTask) {
 		int value = 0;
 
@@ -1107,9 +1169,7 @@ public class BackgroundTaskModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, BackgroundTask>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					BackgroundTask.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

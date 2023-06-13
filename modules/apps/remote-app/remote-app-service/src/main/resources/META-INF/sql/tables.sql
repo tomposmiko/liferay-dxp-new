@@ -7,6 +7,20 @@ create table RemoteAppEntry (
 	userName VARCHAR(75) null,
 	createDate DATE null,
 	modifiedDate DATE null,
+	customElementCSSURLs TEXT null,
+	customElementHTMLElementName VARCHAR(255) null,
+	customElementURLs TEXT null,
+	description TEXT null,
+	friendlyURLMapping VARCHAR(75) null,
+	iFrameURL STRING null,
+	instanceable BOOLEAN,
 	name STRING null,
-	url VARCHAR(75) null
+	portletCategoryName VARCHAR(75) null,
+	properties TEXT null,
+	sourceCodeURL STRING null,
+	type_ VARCHAR(75) null,
+	status INTEGER,
+	statusByUserId LONG,
+	statusByUserName VARCHAR(75) null,
+	statusDate DATE null
 );

@@ -22,7 +22,6 @@ import com.liferay.commerce.machine.learning.forecast.alert.model.impl.CommerceM
 import com.liferay.commerce.machine.learning.forecast.alert.service.persistence.CommerceMLForecastAlertEntryPersistence;
 import com.liferay.commerce.machine.learning.forecast.alert.service.persistence.CommerceMLForecastAlertEntryUtil;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -32,14 +31,12 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -60,17 +57,10 @@ import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * The persistence implementation for the commerce ml forecast alert entry service.
@@ -200,7 +190,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceMLForecastAlertEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceMLForecastAlertEntry commerceMLForecastAlertEntry :
@@ -596,7 +586,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -757,7 +747,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceMLForecastAlertEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceMLForecastAlertEntry commerceMLForecastAlertEntry :
@@ -1180,7 +1170,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1327,8 +1317,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
-			result = finderCache.getResult(
-				_finderPathFetchByC_C_T, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByC_C_T, finderArgs);
 		}
 
 		if (result instanceof CommerceMLForecastAlertEntry) {
@@ -1472,7 +1461,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			companyId, commerceAccountId, _getTime(timestamp)
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -1657,7 +1646,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceMLForecastAlertEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceMLForecastAlertEntry commerceMLForecastAlertEntry :
@@ -2128,7 +2117,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param companyId the company ID
-	 * @param commerceAccountIds the commerce account IDs
+	 * @param commerceAccountId the commerce account ID
 	 * @param status the status
 	 * @param start the lower bound of the range of commerce ml forecast alert entries
 	 * @param end the upper bound of the range of commerce ml forecast alert entries (not inclusive)
@@ -2178,7 +2167,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceMLForecastAlertEntry>)finderCache.getResult(
-				_finderPathWithPaginationFindByC_C_S, finderArgs, this);
+				_finderPathWithPaginationFindByC_C_S, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceMLForecastAlertEntry commerceMLForecastAlertEntry :
@@ -2308,7 +2297,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			companyId, commerceAccountId, status
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -2377,7 +2366,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByC_C_S, finderArgs, this);
+			_finderPathWithPaginationCountByC_C_S, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -2559,7 +2548,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceMLForecastAlertEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceMLForecastAlertEntry commerceMLForecastAlertEntry :
@@ -3067,7 +3056,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param companyId the company ID
-	 * @param commerceAccountIds the commerce account IDs
+	 * @param commerceAccountId the commerce account ID
 	 * @param relativeChange the relative change
 	 * @param status the status
 	 * @param start the lower bound of the range of commerce ml forecast alert entries
@@ -3119,7 +3108,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceMLForecastAlertEntry>)finderCache.getResult(
-				_finderPathWithPaginationFindByC_C_GtRc_S, finderArgs, this);
+				_finderPathWithPaginationFindByC_C_GtRc_S, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceMLForecastAlertEntry commerceMLForecastAlertEntry :
@@ -3260,7 +3249,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			companyId, commerceAccountId, relativeChange, status
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(5);
@@ -3336,7 +3325,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByC_C_GtRc_S, finderArgs, this);
+			_finderPathWithPaginationCountByC_C_GtRc_S, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -3526,7 +3515,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceMLForecastAlertEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceMLForecastAlertEntry commerceMLForecastAlertEntry :
@@ -4034,7 +4023,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 	 * </p>
 	 *
 	 * @param companyId the company ID
-	 * @param commerceAccountIds the commerce account IDs
+	 * @param commerceAccountId the commerce account ID
 	 * @param relativeChange the relative change
 	 * @param status the status
 	 * @param start the lower bound of the range of commerce ml forecast alert entries
@@ -4086,7 +4075,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceMLForecastAlertEntry>)finderCache.getResult(
-				_finderPathWithPaginationFindByC_C_LtRc_S, finderArgs, this);
+				_finderPathWithPaginationFindByC_C_LtRc_S, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (CommerceMLForecastAlertEntry commerceMLForecastAlertEntry :
@@ -4227,7 +4216,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			companyId, commerceAccountId, relativeChange, status
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(5);
@@ -4303,7 +4292,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
-			_finderPathWithPaginationCountByC_C_LtRc_S, finderArgs, this);
+			_finderPathWithPaginationCountByC_C_LtRc_S, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -4463,9 +4452,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(CommerceMLForecastAlertEntryImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(CommerceMLForecastAlertEntryImpl.class);
 	}
 
 	/**
@@ -4499,9 +4486,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(CommerceMLForecastAlertEntryImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(
@@ -4519,11 +4504,10 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			_getTime(commerceMLForecastAlertEntryModelImpl.getTimestamp())
 		};
 
-		finderCache.putResult(
-			_finderPathCountByC_C_T, args, Long.valueOf(1), false);
+		finderCache.putResult(_finderPathCountByC_C_T, args, Long.valueOf(1));
 		finderCache.putResult(
 			_finderPathFetchByC_C_T, args,
-			commerceMLForecastAlertEntryModelImpl, false);
+			commerceMLForecastAlertEntryModelImpl);
 	}
 
 	/**
@@ -4883,7 +4867,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<CommerceMLForecastAlertEntry>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -4956,7 +4940,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -5012,34 +4996,22 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 	 * Initializes the commerce ml forecast alert entry persistence.
 	 */
 	public void afterPropertiesSet() {
-		Bundle bundle = FrameworkUtil.getBundle(
-			CommerceMLForecastAlertEntryPersistenceImpl.class);
-
-		_bundleContext = bundle.getBundleContext();
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class,
-			new CommerceMLForecastAlertEntryModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name",
-				CommerceMLForecastAlertEntry.class.getName()));
-
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByUuid = _createFinderPath(
+		_finderPathWithPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
@@ -5047,17 +5019,17 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			},
 			new String[] {"uuid_"}, true);
 
-		_finderPathWithoutPaginationFindByUuid = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			true);
 
-		_finderPathCountByUuid = _createFinderPath(
+		_finderPathCountByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			false);
 
-		_finderPathWithPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -5066,24 +5038,24 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathWithoutPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathCountByUuid_C = _createFinderPath(
+		_finderPathCountByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
 
-		_finderPathFetchByC_C_T = _createFinderPath(
+		_finderPathFetchByC_C_T = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_C_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Date.class.getName()
 			},
 			new String[] {"companyId", "commerceAccountId", "timestamp"}, true);
 
-		_finderPathCountByC_C_T = _createFinderPath(
+		_finderPathCountByC_C_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Date.class.getName()
@@ -5091,7 +5063,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			new String[] {"companyId", "commerceAccountId", "timestamp"},
 			false);
 
-		_finderPathWithPaginationFindByC_C_S = _createFinderPath(
+		_finderPathWithPaginationFindByC_C_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5100,7 +5072,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			},
 			new String[] {"companyId", "commerceAccountId", "status"}, true);
 
-		_finderPathWithoutPaginationFindByC_C_S = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_C_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5108,7 +5080,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			},
 			new String[] {"companyId", "commerceAccountId", "status"}, true);
 
-		_finderPathCountByC_C_S = _createFinderPath(
+		_finderPathCountByC_C_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5116,7 +5088,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			},
 			new String[] {"companyId", "commerceAccountId", "status"}, false);
 
-		_finderPathWithPaginationCountByC_C_S = _createFinderPath(
+		_finderPathWithPaginationCountByC_C_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5124,7 +5096,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			},
 			new String[] {"companyId", "commerceAccountId", "status"}, false);
 
-		_finderPathWithPaginationFindByC_C_GtRc_S = _createFinderPath(
+		_finderPathWithPaginationFindByC_C_GtRc_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_GtRc_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5137,7 +5109,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			},
 			true);
 
-		_finderPathWithPaginationCountByC_C_GtRc_S = _createFinderPath(
+		_finderPathWithPaginationCountByC_C_GtRc_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_C_GtRc_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5148,7 +5120,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			},
 			false);
 
-		_finderPathWithPaginationFindByC_C_LtRc_S = _createFinderPath(
+		_finderPathWithPaginationFindByC_C_LtRc_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_LtRc_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5161,7 +5133,7 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			},
 			true);
 
-		_finderPathWithPaginationCountByC_C_LtRc_S = _createFinderPath(
+		_finderPathWithPaginationCountByC_C_LtRc_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_C_LtRc_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5180,14 +5152,6 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 
 		entityCache.removeCache(
 			CommerceMLForecastAlertEntryImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setCommerceMLForecastAlertEntryUtilPersistence(
@@ -5207,8 +5171,6 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 			throw new RuntimeException(reflectiveOperationException);
 		}
 	}
-
-	private BundleContext _bundleContext;
 
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
@@ -5251,132 +5213,9 @@ public class CommerceMLForecastAlertEntryPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"uuid"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
-	}
-
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class CommerceMLForecastAlertEntryModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			CommerceMLForecastAlertEntryModelImpl
-				commerceMLForecastAlertEntryModelImpl =
-					(CommerceMLForecastAlertEntryModelImpl)baseModel;
-
-			long columnBitmask =
-				commerceMLForecastAlertEntryModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					commerceMLForecastAlertEntryModelImpl, columnNames,
-					original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						commerceMLForecastAlertEntryModelImpl.getColumnBitmask(
-							columnName);
-				}
-
-				if (finderPath.isBaseModelResult() &&
-					(CommerceMLForecastAlertEntryPersistenceImpl.
-						FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION ==
-							finderPath.getCacheName())) {
-
-					finderPathColumnBitmask |= _ORDER_BY_COLUMNS_BITMASK;
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					commerceMLForecastAlertEntryModelImpl, columnNames,
-					original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			CommerceMLForecastAlertEntryModelImpl
-				commerceMLForecastAlertEntryModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						commerceMLForecastAlertEntryModelImpl.
-							getColumnOriginalValue(columnName);
-				}
-				else {
-					arguments[i] =
-						commerceMLForecastAlertEntryModelImpl.getColumnValue(
-							columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-		private static final long _ORDER_BY_COLUMNS_BITMASK;
-
-		static {
-			long orderByColumnsBitmask = 0;
-
-			orderByColumnsBitmask |=
-				CommerceMLForecastAlertEntryModelImpl.getColumnBitmask(
-					"timestamp");
-
-			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
-		}
-
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
 }

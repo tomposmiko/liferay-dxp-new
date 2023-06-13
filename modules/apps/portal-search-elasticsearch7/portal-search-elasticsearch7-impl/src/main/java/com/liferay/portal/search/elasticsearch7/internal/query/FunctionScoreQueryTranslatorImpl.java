@@ -75,11 +75,6 @@ public class FunctionScoreQueryTranslatorImpl
 				functionScoreQuery.getMaxBoost());
 		}
 
-		if (functionScoreQuery.getMaxBoost() != null) {
-			functionScoreQueryBuilder.maxBoost(
-				functionScoreQuery.getMaxBoost());
-		}
-
 		if (functionScoreQuery.getScoreMode() != null) {
 			functionScoreQueryBuilder.scoreMode(
 				translate(functionScoreQuery.getScoreMode()));
@@ -122,9 +117,10 @@ public class FunctionScoreQueryTranslatorImpl
 			return org.elasticsearch.common.lucene.search.function.
 				FunctionScoreQuery.ScoreMode.SUM;
 		}
-
-		throw new IllegalArgumentException(
-			"Invalid FunctionScoreQuery.ScoreMode: " + scoreMode);
+		else {
+			throw new IllegalArgumentException(
+				"Invalid FunctionScoreQuery.ScoreMode: " + scoreMode);
+		}
 	}
 
 	protected FilterFunctionBuilder translateFilterFunction(

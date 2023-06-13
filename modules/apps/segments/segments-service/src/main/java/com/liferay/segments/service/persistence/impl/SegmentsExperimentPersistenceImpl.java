@@ -17,7 +17,6 @@ package com.liferay.segments.service.persistence.impl;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -29,16 +28,15 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -72,12 +70,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -93,7 +88,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo Garcia
  * @generated
  */
-@Component(service = SegmentsExperimentPersistence.class)
+@Component(
+	service = {SegmentsExperimentPersistence.class, BasePersistence.class}
+)
 public class SegmentsExperimentPersistenceImpl
 	extends BasePersistenceImpl<SegmentsExperiment>
 	implements SegmentsExperimentPersistence {
@@ -215,7 +212,7 @@ public class SegmentsExperimentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsExperiment>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsExperiment segmentsExperiment : list) {
@@ -612,7 +609,7 @@ public class SegmentsExperimentPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -748,7 +745,7 @@ public class SegmentsExperimentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
-				_finderPathFetchByUUID_G, finderArgs, this);
+				_finderPathFetchByUUID_G, finderArgs);
 		}
 
 		if (result instanceof SegmentsExperiment) {
@@ -868,7 +865,7 @@ public class SegmentsExperimentPersistenceImpl
 
 			finderArgs = new Object[] {uuid, groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1040,7 +1037,7 @@ public class SegmentsExperimentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsExperiment>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsExperiment segmentsExperiment : list) {
@@ -1466,7 +1463,7 @@ public class SegmentsExperimentPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1629,7 +1626,7 @@ public class SegmentsExperimentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsExperiment>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsExperiment segmentsExperiment : list) {
@@ -2336,7 +2333,7 @@ public class SegmentsExperimentPersistenceImpl
 
 			finderArgs = new Object[] {groupId};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2535,7 +2532,7 @@ public class SegmentsExperimentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsExperiment>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsExperiment segmentsExperiment : list) {
@@ -2947,7 +2944,7 @@ public class SegmentsExperimentPersistenceImpl
 
 			finderArgs = new Object[] {segmentsExperimentKey};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3090,8 +3087,7 @@ public class SegmentsExperimentPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache && productionMode) {
-			result = finderCache.getResult(
-				_finderPathFetchByG_S, finderArgs, this);
+			result = finderCache.getResult(_finderPathFetchByG_S, finderArgs);
 		}
 
 		if (result instanceof SegmentsExperiment) {
@@ -3215,7 +3211,7 @@ public class SegmentsExperimentPersistenceImpl
 
 			finderArgs = new Object[] {groupId, segmentsExperimentKey};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3392,7 +3388,7 @@ public class SegmentsExperimentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsExperiment>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsExperiment segmentsExperiment : list) {
@@ -4185,7 +4181,7 @@ public class SegmentsExperimentPersistenceImpl
 
 			finderArgs = new Object[] {groupId, classNameId, classPK};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4421,7 +4417,7 @@ public class SegmentsExperimentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsExperiment>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsExperiment segmentsExperiment : list) {
@@ -4854,7 +4850,7 @@ public class SegmentsExperimentPersistenceImpl
 				segmentsExperienceId, classNameId, classPK
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5038,7 +5034,7 @@ public class SegmentsExperimentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsExperiment>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsExperiment segmentsExperiment : list) {
@@ -5529,10 +5525,10 @@ public class SegmentsExperimentPersistenceImpl
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>SegmentsExperimentModelImpl</code>.
 	 * </p>
 	 *
-	 * @param segmentsExperienceIds the segments experience IDs
+	 * @param segmentsExperienceId the segments experience ID
 	 * @param classNameId the class name ID
 	 * @param classPK the class pk
-	 * @param statuses the statuses
+	 * @param status the status
 	 * @param start the lower bound of the range of segments experiments
 	 * @param end the upper bound of the range of segments experiments (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -5593,7 +5589,7 @@ public class SegmentsExperimentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsExperiment>)finderCache.getResult(
-				_finderPathWithPaginationFindByS_C_C_S, finderArgs, this);
+				_finderPathWithPaginationFindByS_C_C_S, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SegmentsExperiment segmentsExperiment : list) {
@@ -5745,7 +5741,7 @@ public class SegmentsExperimentPersistenceImpl
 				segmentsExperienceId, classNameId, classPK, status
 			};
 
-			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5840,7 +5836,7 @@ public class SegmentsExperimentPersistenceImpl
 			};
 
 			count = (Long)finderCache.getResult(
-				_finderPathWithPaginationCountByS_C_C_S, finderArgs, this);
+				_finderPathWithPaginationCountByS_C_C_S, finderArgs);
 		}
 
 		if (count == null) {
@@ -6021,9 +6017,7 @@ public class SegmentsExperimentPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(SegmentsExperimentImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(SegmentsExperimentImpl.class);
 	}
 
 	/**
@@ -6049,9 +6043,7 @@ public class SegmentsExperimentPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(SegmentsExperimentImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(SegmentsExperimentImpl.class, primaryKey);
@@ -6066,20 +6058,18 @@ public class SegmentsExperimentPersistenceImpl
 			segmentsExperimentModelImpl.getGroupId()
 		};
 
+		finderCache.putResult(_finderPathCountByUUID_G, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathCountByUUID_G, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByUUID_G, args, segmentsExperimentModelImpl, false);
+			_finderPathFetchByUUID_G, args, segmentsExperimentModelImpl);
 
 		args = new Object[] {
 			segmentsExperimentModelImpl.getGroupId(),
 			segmentsExperimentModelImpl.getSegmentsExperimentKey()
 		};
 
+		finderCache.putResult(_finderPathCountByG_S, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathCountByG_S, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByG_S, args, segmentsExperimentModelImpl, false);
+			_finderPathFetchByG_S, args, segmentsExperimentModelImpl);
 	}
 
 	/**
@@ -6350,9 +6340,7 @@ public class SegmentsExperimentPersistenceImpl
 	 */
 	@Override
 	public SegmentsExperiment fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(
-				SegmentsExperiment.class, primaryKey)) {
-
+		if (ctPersistenceHelper.isProductionMode(SegmentsExperiment.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -6574,7 +6562,7 @@ public class SegmentsExperimentPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SegmentsExperiment>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -6650,7 +6638,7 @@ public class SegmentsExperimentPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)finderCache.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -6780,31 +6768,23 @@ public class SegmentsExperimentPersistenceImpl
 	 * Initializes the segments experiment persistence.
 	 */
 	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class,
-			new SegmentsExperimentModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", SegmentsExperiment.class.getName()));
-
+	public void activate() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByUuid = _createFinderPath(
+		_finderPathWithPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
@@ -6812,27 +6792,27 @@ public class SegmentsExperimentPersistenceImpl
 			},
 			new String[] {"uuid_"}, true);
 
-		_finderPathWithoutPaginationFindByUuid = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			true);
 
-		_finderPathCountByUuid = _createFinderPath(
+		_finderPathCountByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			false);
 
-		_finderPathFetchByUUID_G = _createFinderPath(
+		_finderPathFetchByUUID_G = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "groupId"}, true);
 
-		_finderPathCountByUUID_G = _createFinderPath(
+		_finderPathCountByUUID_G = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "groupId"}, false);
 
-		_finderPathWithPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -6841,17 +6821,17 @@ public class SegmentsExperimentPersistenceImpl
 			},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathWithoutPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathCountByUuid_C = _createFinderPath(
+		_finderPathCountByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
 
-		_finderPathWithPaginationFindByGroupId = _createFinderPath(
+		_finderPathWithPaginationFindByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -6859,50 +6839,49 @@ public class SegmentsExperimentPersistenceImpl
 			},
 			new String[] {"groupId"}, true);
 
-		_finderPathWithoutPaginationFindByGroupId = _createFinderPath(
+		_finderPathWithoutPaginationFindByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			true);
 
-		_finderPathCountByGroupId = _createFinderPath(
+		_finderPathCountByGroupId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByGroupId",
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			false);
 
-		_finderPathWithPaginationFindBySegmentsExperimentKey =
-			_createFinderPath(
-				FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
-				"findBySegmentsExperimentKey",
-				new String[] {
-					String.class.getName(), Integer.class.getName(),
-					Integer.class.getName(), OrderByComparator.class.getName()
-				},
-				new String[] {"segmentsExperimentKey"}, true);
+		_finderPathWithPaginationFindBySegmentsExperimentKey = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findBySegmentsExperimentKey",
+			new String[] {
+				String.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			},
+			new String[] {"segmentsExperimentKey"}, true);
 
 		_finderPathWithoutPaginationFindBySegmentsExperimentKey =
-			_createFinderPath(
+			new FinderPath(
 				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
 				"findBySegmentsExperimentKey",
 				new String[] {String.class.getName()},
 				new String[] {"segmentsExperimentKey"}, true);
 
-		_finderPathCountBySegmentsExperimentKey = _createFinderPath(
+		_finderPathCountBySegmentsExperimentKey = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
 			"countBySegmentsExperimentKey",
 			new String[] {String.class.getName()},
 			new String[] {"segmentsExperimentKey"}, false);
 
-		_finderPathFetchByG_S = _createFinderPath(
+		_finderPathFetchByG_S = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByG_S",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "segmentsExperimentKey"}, true);
 
-		_finderPathCountByG_S = _createFinderPath(
+		_finderPathCountByG_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_S",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "segmentsExperimentKey"}, false);
 
-		_finderPathWithPaginationFindByG_C_C = _createFinderPath(
+		_finderPathWithPaginationFindByG_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -6911,21 +6890,21 @@ public class SegmentsExperimentPersistenceImpl
 			},
 			new String[] {"groupId", "classNameId", "classPK"}, true);
 
-		_finderPathWithoutPaginationFindByG_C_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			},
 			new String[] {"groupId", "classNameId", "classPK"}, true);
 
-		_finderPathCountByG_C_C = _createFinderPath(
+		_finderPathCountByG_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			},
 			new String[] {"groupId", "classNameId", "classPK"}, false);
 
-		_finderPathWithPaginationFindByS_C_C = _createFinderPath(
+		_finderPathWithPaginationFindByS_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByS_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -6935,7 +6914,7 @@ public class SegmentsExperimentPersistenceImpl
 			new String[] {"segmentsExperienceId", "classNameId", "classPK"},
 			true);
 
-		_finderPathWithoutPaginationFindByS_C_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByS_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByS_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
@@ -6943,7 +6922,7 @@ public class SegmentsExperimentPersistenceImpl
 			new String[] {"segmentsExperienceId", "classNameId", "classPK"},
 			true);
 
-		_finderPathCountByS_C_C = _createFinderPath(
+		_finderPathCountByS_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByS_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
@@ -6951,7 +6930,7 @@ public class SegmentsExperimentPersistenceImpl
 			new String[] {"segmentsExperienceId", "classNameId", "classPK"},
 			false);
 
-		_finderPathWithPaginationFindByS_C_C_S = _createFinderPath(
+		_finderPathWithPaginationFindByS_C_C_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByS_C_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -6964,7 +6943,7 @@ public class SegmentsExperimentPersistenceImpl
 			},
 			true);
 
-		_finderPathWithoutPaginationFindByS_C_C_S = _createFinderPath(
+		_finderPathWithoutPaginationFindByS_C_C_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByS_C_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -6975,7 +6954,7 @@ public class SegmentsExperimentPersistenceImpl
 			},
 			true);
 
-		_finderPathCountByS_C_C_S = _createFinderPath(
+		_finderPathCountByS_C_C_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByS_C_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -6986,7 +6965,7 @@ public class SegmentsExperimentPersistenceImpl
 			},
 			false);
 
-		_finderPathWithPaginationCountByS_C_C_S = _createFinderPath(
+		_finderPathWithPaginationCountByS_C_C_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByS_C_C_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -7005,14 +6984,6 @@ public class SegmentsExperimentPersistenceImpl
 		_setSegmentsExperimentUtilPersistence(null);
 
 		entityCache.removeCache(SegmentsExperimentImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setSegmentsExperimentUtilPersistence(
@@ -7056,8 +7027,6 @@ public class SegmentsExperimentPersistenceImpl
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		super.setSessionFactory(sessionFactory);
 	}
-
-	private BundleContext _bundleContext;
 
 	@Reference
 	protected CTPersistenceHelper ctPersistenceHelper;
@@ -7117,125 +7086,13 @@ public class SegmentsExperimentPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"uuid"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class SegmentsExperimentModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			SegmentsExperimentModelImpl segmentsExperimentModelImpl =
-				(SegmentsExperimentModelImpl)baseModel;
-
-			long columnBitmask = segmentsExperimentModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					segmentsExperimentModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						segmentsExperimentModelImpl.getColumnBitmask(
-							columnName);
-				}
-
-				if (finderPath.isBaseModelResult() &&
-					(SegmentsExperimentPersistenceImpl.
-						FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION ==
-							finderPath.getCacheName())) {
-
-					finderPathColumnBitmask |= _ORDER_BY_COLUMNS_BITMASK;
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					segmentsExperimentModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			SegmentsExperimentModelImpl segmentsExperimentModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						segmentsExperimentModelImpl.getColumnOriginalValue(
-							columnName);
-				}
-				else {
-					arguments[i] = segmentsExperimentModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-		private static final long _ORDER_BY_COLUMNS_BITMASK;
-
-		static {
-			long orderByColumnsBitmask = 0;
-
-			orderByColumnsBitmask |=
-				SegmentsExperimentModelImpl.getColumnBitmask("createDate");
-
-			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
-		}
-
-	}
+	@Reference
+	private SegmentsExperimentModelArgumentsResolver
+		_segmentsExperimentModelArgumentsResolver;
 
 }

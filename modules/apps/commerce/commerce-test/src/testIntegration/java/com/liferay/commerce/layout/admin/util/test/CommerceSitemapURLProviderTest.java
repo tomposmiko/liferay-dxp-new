@@ -24,7 +24,6 @@ import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.test.util.CommerceAccountTestUtil;
 import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.test.util.CommerceCurrencyTestUtil;
-import com.liferay.commerce.product.constants.CPConstants;
 import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.importer.CPFileImporter;
 import com.liferay.commerce.product.model.CPDefinition;
@@ -33,6 +32,7 @@ import com.liferay.commerce.product.model.CProduct;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.test.util.CPTestUtil;
+import com.liferay.commerce.product.url.CPFriendlyURL;
 import com.liferay.commerce.test.util.CommerceTestUtil;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
@@ -46,12 +46,12 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
-import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -81,7 +81,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -102,17 +101,13 @@ public class CommerceSitemapURLProviderTest {
 		new LiferayIntegrationTestRule(),
 		PermissionCheckerMethodTestRule.INSTANCE);
 
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-		_company = CompanyTestUtil.addCompany();
-
-		_user = UserTestUtil.addUser(_company);
-	}
-
 	@Before
 	public void setUp() throws Exception {
-		_group = GroupTestUtil.addGroup(
-			_company.getCompanyId(), _user.getUserId(), 0);
+		_group = GroupTestUtil.addGroup();
+
+		_company = CompanyLocalServiceUtil.getCompany(_group.getCompanyId());
+
+		_user = UserTestUtil.addUser();
 
 		_httpServletRequest = new MockHttpServletRequest();
 
@@ -121,9 +116,9 @@ public class CommerceSitemapURLProviderTest {
 		_themeDisplay.setCompany(_company);
 		_themeDisplay.setPermissionChecker(
 			PermissionCheckerFactoryUtil.create(_user));
-		_themeDisplay.setScopeGroupId(_group.getGroupId());
 		_themeDisplay.setSignedIn(true);
 		_themeDisplay.setSiteGroupId(_group.getGroupId());
+		_themeDisplay.setScopeGroupId(_group.getGroupId());
 		_themeDisplay.setUser(_user);
 
 		_commerceCurrency = CommerceCurrencyTestUtil.addCommerceCurrency(
@@ -175,7 +170,7 @@ public class CommerceSitemapURLProviderTest {
 				_group.getName(_themeDisplay.getLocale()), _serviceContext);
 
 		AssetCategory assetCategory = _assetCategoryLocalService.addCategory(
-			_serviceContext.getUserId(), assetVocabulary.getGroupId(),
+			null, _serviceContext.getUserId(), assetVocabulary.getGroupId(),
 			AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID, titleMap, null,
 			assetVocabulary.getVocabularyId(), new String[0], _serviceContext);
 
@@ -227,10 +222,13 @@ public class CommerceSitemapURLProviderTest {
 		Node node = nodes.get(0);
 
 		String currentSiteURL = _portal.getGroupFriendlyURL(
-			layout.getLayoutSet(), _themeDisplay);
+			layout.getLayoutSet(), _themeDisplay, false, false);
+
+		String urlSeparator = _cpFriendlyURL.getAssetCategoryURLSeparator(
+			_themeDisplay.getCompanyId());
 
 		String categoryFriendlyURL =
-			currentSiteURL + CPConstants.SEPARATOR_ASSET_CATEGORY_URL +
+			currentSiteURL + urlSeparator +
 				friendlyURLEntry.getUrlTitle(_themeDisplay.getLanguageId());
 
 		Assert.assertTrue(node.hasContent());
@@ -299,10 +297,13 @@ public class CommerceSitemapURLProviderTest {
 				cpDefinition.getCProductId());
 
 		String currentSiteURL = _portal.getGroupFriendlyURL(
-			layout.getLayoutSet(), _themeDisplay);
+			layout.getLayoutSet(), _themeDisplay, false, false);
+
+		String urlSeparator = _cpFriendlyURL.getProductURLSeparator(
+			_themeDisplay.getCompanyId());
 
 		String productFriendlyURL =
-			currentSiteURL + CPConstants.SEPARATOR_PRODUCT_URL +
+			currentSiteURL + urlSeparator +
 				friendlyURLEntry.getUrlTitle(_themeDisplay.getLanguageId());
 
 		Assert.assertTrue(node.hasContent());
@@ -325,6 +326,9 @@ public class CommerceSitemapURLProviderTest {
 
 	@Inject
 	private CPFileImporter _cpFileImporter;
+
+	@Inject
+	private CPFriendlyURL _cpFriendlyURL;
 
 	@Inject
 	private FriendlyURLEntryLocalService _friendlyURLEntryLocalService;

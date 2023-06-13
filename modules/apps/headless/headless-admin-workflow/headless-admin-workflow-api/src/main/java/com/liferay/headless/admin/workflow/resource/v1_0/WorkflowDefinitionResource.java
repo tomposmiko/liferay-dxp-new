@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
@@ -54,11 +53,16 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface WorkflowDefinitionResource {
 
+	public static Builder builder() {
+		return FactoryHolder.factory.create();
+	}
+
 	public Page<WorkflowDefinition> getWorkflowDefinitionsPage(
-			Pagination pagination)
+			Boolean active, Pagination pagination, Sort[] sorts)
 		throws Exception;
 
-	public WorkflowDefinition getWorkflowDefinitionByName(String name)
+	public WorkflowDefinition getWorkflowDefinitionByName(
+			String name, Integer version)
 		throws Exception;
 
 	public WorkflowDefinition postWorkflowDefinitionDeploy(
@@ -113,8 +117,6 @@ public interface WorkflowDefinitionResource {
 
 	public void setRoleLocalService(RoleLocalService roleLocalService);
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider);
-
 	public default Filter toFilter(String filterString) {
 		return toFilter(
 			filterString, Collections.<String, List<String>>emptyMap());
@@ -126,8 +128,10 @@ public interface WorkflowDefinitionResource {
 		return null;
 	}
 
-	public default Sort[] toSorts(String sortsString) {
-		return new Sort[0];
+	public static class FactoryHolder {
+
+		public static volatile Factory factory;
+
 	}
 
 	@ProviderType

@@ -18,11 +18,11 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(
+		PagesAdmin.addPublicPage(
 			pageName = "Calendar Page",
 			sitePageType = "Widget Page");
 
-		SitePages.configurePage(
+		PagesAdmin.configurePage(
 			columnName = "1 Column",
 			pageName = "Calendar Page",
 			privacy = "Public Pages",
@@ -38,7 +38,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -52,12 +52,12 @@ definition {
 
 			CalendarConfiguration.tearDown();
 
-			Page.tearDownCP();
+			PagesAdmin.tearDownCP();
 		}
 	}
 
 	@description = "This is a use case for LPS-58649."
-	@priority = 3
+	@priority = "3"
 	test EditLanguageSelectorAndViewEvent {
 		property test.name.skip.portal.instance = "CalendarLocalization#EditLanguageSelectorAndViewEvent";
 
@@ -90,7 +90,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-54786."
-	@priority = 3
+	@priority = "3"
 	test ViewShowMoreLocalization {
 		for (var eventNumber : list "1,2,3,4,5,6") {
 			CalendarNavigator.gotoAddEvent();
@@ -120,7 +120,7 @@ definition {
 		Click(locator1 = "UserBar#USER_AVATAR_IMAGE");
 
 		Click(
-			key_dropdownItem = "Configuración de la cuenta",
+			key_dropdownItem = "Mi cuenta",
 			locator1 = "UserBar#USER_AVATAR_DROPDOWN_ITEM");
 
 		MyAccount.changeUserLanguage(

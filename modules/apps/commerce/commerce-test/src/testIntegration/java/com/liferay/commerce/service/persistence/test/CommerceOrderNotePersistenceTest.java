@@ -15,7 +15,6 @@
 package com.liferay.commerce.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.exception.DuplicateCommerceOrderNoteExternalReferenceCodeException;
 import com.liferay.commerce.exception.NoSuchOrderNoteException;
 import com.liferay.commerce.model.CommerceOrderNote;
 import com.liferay.commerce.service.CommerceOrderNoteLocalServiceUtil;
@@ -126,6 +125,8 @@ public class CommerceOrderNotePersistenceTest {
 
 		CommerceOrderNote newCommerceOrderNote = _persistence.create(pk);
 
+		newCommerceOrderNote.setMvccVersion(RandomTestUtil.nextLong());
+
 		newCommerceOrderNote.setExternalReferenceCode(
 			RandomTestUtil.randomString());
 
@@ -152,6 +153,9 @@ public class CommerceOrderNotePersistenceTest {
 		CommerceOrderNote existingCommerceOrderNote =
 			_persistence.findByPrimaryKey(newCommerceOrderNote.getPrimaryKey());
 
+		Assert.assertEquals(
+			existingCommerceOrderNote.getMvccVersion(),
+			newCommerceOrderNote.getMvccVersion());
 		Assert.assertEquals(
 			existingCommerceOrderNote.getExternalReferenceCode(),
 			newCommerceOrderNote.getExternalReferenceCode());
@@ -185,28 +189,6 @@ public class CommerceOrderNotePersistenceTest {
 		Assert.assertEquals(
 			existingCommerceOrderNote.isRestricted(),
 			newCommerceOrderNote.isRestricted());
-	}
-
-	@Test(
-		expected = DuplicateCommerceOrderNoteExternalReferenceCodeException.class
-	)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CommerceOrderNote commerceOrderNote = addCommerceOrderNote();
-
-		CommerceOrderNote newCommerceOrderNote = addCommerceOrderNote();
-
-		newCommerceOrderNote.setCompanyId(commerceOrderNote.getCompanyId());
-
-		newCommerceOrderNote = _persistence.update(newCommerceOrderNote);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCommerceOrderNote);
-
-		newCommerceOrderNote.setExternalReferenceCode(
-			commerceOrderNote.getExternalReferenceCode());
-
-		_persistence.update(newCommerceOrderNote);
 	}
 
 	@Test
@@ -258,9 +240,9 @@ public class CommerceOrderNotePersistenceTest {
 
 	protected OrderByComparator<CommerceOrderNote> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CommerceOrderNote", "externalReferenceCode", true,
-			"commerceOrderNoteId", true, "groupId", true, "companyId", true,
-			"userId", true, "userName", true, "createDate", true,
+			"CommerceOrderNote", "mvccVersion", true, "externalReferenceCode",
+			true, "commerceOrderNoteId", true, "groupId", true, "companyId",
+			true, "userId", true, "userName", true, "createDate", true,
 			"modifiedDate", true, "commerceOrderId", true, "content", true,
 			"restricted", true);
 	}
@@ -554,6 +536,8 @@ public class CommerceOrderNotePersistenceTest {
 		long pk = RandomTestUtil.nextLong();
 
 		CommerceOrderNote commerceOrderNote = _persistence.create(pk);
+
+		commerceOrderNote.setMvccVersion(RandomTestUtil.nextLong());
 
 		commerceOrderNote.setExternalReferenceCode(
 			RandomTestUtil.randomString());

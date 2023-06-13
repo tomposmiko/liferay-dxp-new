@@ -433,7 +433,7 @@ public class CommonSearchSourceBuilderAssemblerImpl
 
 		List<StatsRequest> statsRequests = baseSearchRequest.getStatsRequests();
 
-		if (ListUtil.isNotEmpty(statsRequests)) {
+		if (!ListUtil.isEmpty(statsRequests)) {
 			statsRequests.forEach(
 				statsRequest -> _statsTranslator.populateRequest(
 					searchSourceBuilder, statsRequest));
@@ -515,9 +515,10 @@ public class CommonSearchSourceBuilderAssemblerImpl
 		else if (scoreMode == Rescore.ScoreMode.TOTAL) {
 			return QueryRescoreMode.Total;
 		}
-
-		throw new IllegalArgumentException(
-			"Invalid Rescore.ScoreMode: " + scoreMode);
+		else {
+			throw new IllegalArgumentException(
+				"Invalid Rescore.ScoreMode: " + scoreMode);
+		}
 	}
 
 	protected QueryBuilder translateQuery(

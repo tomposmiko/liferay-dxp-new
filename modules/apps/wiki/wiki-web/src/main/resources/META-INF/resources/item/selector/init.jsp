@@ -26,6 +26,7 @@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
 <%@ page import="com.liferay.document.library.kernel.model.DLFolderConstants" %><%@
+page import="com.liferay.petra.portlet.url.builder.PortletURLBuilder" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchPaginationUtil" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
@@ -63,8 +64,6 @@ page import="com.liferay.wiki.web.internal.item.selector.view.display.context.Wi
 <%@ page import="java.util.ArrayList" %><%@
 page import="java.util.Date" %><%@
 page import="java.util.List" %>
-
-<%@ page import="javax.portlet.PortletURL" %>
 
 <liferay-frontend:defineObjects />
 

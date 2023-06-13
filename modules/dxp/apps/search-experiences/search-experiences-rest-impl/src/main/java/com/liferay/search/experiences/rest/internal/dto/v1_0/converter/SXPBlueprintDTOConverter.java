@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bryan Engler
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.search.experiences.model.SXPBlueprint",
 	service = {DTOConverter.class, SXPBlueprintDTOConverter.class}
 )
@@ -74,16 +75,13 @@ public class SXPBlueprintDTOConverter
 					sxpBlueprint.getDescriptionMap());
 				elementInstances = _toElementInstances(
 					sxpBlueprint.getElementInstancesJSON());
-				externalReferenceCode = sxpBlueprint.getExternalReferenceCode();
 				id = sxpBlueprint.getSXPBlueprintId();
 				modifiedDate = sxpBlueprint.getModifiedDate();
-				schemaVersion = sxpBlueprint.getSchemaVersion();
 				title = sxpBlueprint.getTitle(dtoConverterContext.getLocale());
 				title_i18n = LocalizedMapUtil.getI18nMap(
 					dtoConverterContext.isAcceptAllLanguages(),
 					sxpBlueprint.getTitleMap());
 				userName = sxpBlueprint.getUserName();
-				version = sxpBlueprint.getVersion();
 			}
 		};
 	}
@@ -102,15 +100,12 @@ public class SXPBlueprintDTOConverter
 					true, sxpBlueprint.getDescriptionMap());
 				elementInstances = _toElementInstances(
 					sxpBlueprint.getElementInstancesJSON());
-				externalReferenceCode = sxpBlueprint.getExternalReferenceCode();
 				id = sxpBlueprint.getSXPBlueprintId();
 				modifiedDate = sxpBlueprint.getModifiedDate();
-				schemaVersion = sxpBlueprint.getSchemaVersion();
 				title = sxpBlueprint.getTitle();
 				title_i18n = LocalizedMapUtil.getI18nMap(
 					true, sxpBlueprint.getTitleMap());
 				userName = sxpBlueprint.getUserName();
-				version = sxpBlueprint.getVersion();
 			}
 		};
 	}

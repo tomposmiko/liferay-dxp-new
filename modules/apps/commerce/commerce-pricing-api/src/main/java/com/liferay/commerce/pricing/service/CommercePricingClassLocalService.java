@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
@@ -32,6 +33,7 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -91,9 +93,15 @@ public interface CommercePricingClassLocalService
 
 	@Indexable(type = IndexableType.REINDEX)
 	public CommercePricingClass addCommercePricingClass(
-			long userId, Map<Locale, String> titleMap,
-			Map<Locale, String> descriptionMap, String externalReferenceCode,
+			String externalReferenceCode, long userId,
+			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
 			ServiceContext serviceContext)
+		throws PortalException;
+
+	public CommercePricingClass addOrUpdateCommercePricingClass(
+			String externalReferenceCode, long commercePricingClassId,
+			long userId, Map<Locale, String> titleMap,
+			Map<Locale, String> descriptionMap, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -124,6 +132,7 @@ public interface CommercePricingClassLocalService
 	 * @throws PortalException
 	 */
 	@Indexable(type = IndexableType.DELETE)
+	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public CommercePricingClass deleteCommercePricingClass(
 			CommercePricingClass commercePricingClass)
 		throws PortalException;
@@ -228,18 +237,27 @@ public interface CommercePricingClassLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommercePricingClass fetchByExternalReferenceCode(
-		long companyId, String externalReferenceCode);
+		String externalReferenceCode, long companyId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommercePricingClass fetchCommercePricingClass(
 		long commercePricingClassId);
 
-	@Deprecated
+	/**
+	 * Returns the commerce pricing class with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce pricing class's external reference code
+	 * @return the matching commerce pricing class, or <code>null</code> if a matching commerce pricing class could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommercePricingClass
 		fetchCommercePricingClassByExternalReferenceCode(
 			long companyId, String externalReferenceCode);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommercePricingClassByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommercePricingClass fetchCommercePricingClassByReferenceCode(
@@ -274,7 +292,14 @@ public interface CommercePricingClassLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long[] getCommercePricingClassByCPDefinition(long cpDefinitionId);
 
-	@Deprecated
+	/**
+	 * Returns the commerce pricing class with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce pricing class's external reference code
+	 * @return the matching commerce pricing class
+	 * @throws PortalException if a matching commerce pricing class could not be found
+	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public CommercePricingClass getCommercePricingClassByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -355,15 +380,14 @@ public interface CommercePricingClassLocalService
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<CommercePricingClass> searchByCPDefinitionId(
+		long cpDefinitionId, String title, int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BaseModelSearchResult<CommercePricingClass>
 			searchCommercePricingClasses(
 				long companyId, String keywords, int start, int end, Sort sort)
 		throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CommercePricingClass>
-		searchCommercePricingClassesByCPDefinitionId(
-			long cpDefinitionId, String title, int start, int end);
 
 	/**
 	 * Updates the commerce pricing class in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
@@ -388,13 +412,7 @@ public interface CommercePricingClassLocalService
 
 	@Indexable(type = IndexableType.REINDEX)
 	public CommercePricingClass updateCommercePricingClassExternalReferenceCode(
-			long commercePricingClassId, String externalReferenceCode)
-		throws PortalException;
-
-	public CommercePricingClass upsertCommercePricingClass(
-			long commercePricingClassId, long userId,
-			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
-			String externalReferenceCode, ServiceContext serviceContext)
+			String externalReferenceCode, long commercePricingClassId)
 		throws PortalException;
 
 }

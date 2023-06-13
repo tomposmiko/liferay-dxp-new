@@ -25,6 +25,7 @@ import com.liferay.exportimport.kernel.service.ExportImportService;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.LayoutLocalService;
@@ -34,9 +35,9 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.SessionTreeJSClicks;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.taglib.ui.util.SessionTreeJSClicks;
 
 import java.io.Serializable;
 
@@ -59,7 +60,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ExportImportPortletKeys.EXPORT,
-		"mvc.command.name=exportLayouts"
+		"mvc.command.name=/export_import/export_layouts"
 	},
 	service = MVCActionCommand.class
 )
@@ -143,13 +144,20 @@ public class ExportLayoutsMVCActionCommand extends BaseMVCActionCommand {
 		String taskName = ParamUtil.getString(actionRequest, "name");
 
 		if (Validator.isNull(taskName)) {
-			if (privateLayout) {
-				taskName = LanguageUtil.get(
-					actionRequest.getLocale(), "private-pages");
+			Group group = themeDisplay.getScopeGroup();
+
+			if (group.isPrivateLayoutsEnabled()) {
+				if (privateLayout) {
+					taskName = LanguageUtil.get(
+						actionRequest.getLocale(), "private-pages");
+				}
+				else {
+					taskName = LanguageUtil.get(
+						actionRequest.getLocale(), "public-pages");
+				}
 			}
 			else {
-				taskName = LanguageUtil.get(
-					actionRequest.getLocale(), "public-pages");
+				taskName = LanguageUtil.get(actionRequest.getLocale(), "pages");
 			}
 		}
 

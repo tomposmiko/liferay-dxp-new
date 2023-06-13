@@ -20,9 +20,7 @@ import com.liferay.mobile.device.rules.constants.MDRPortletKeys;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermissionFactory;
 import com.liferay.portal.kernel.security.permission.resource.StagedPortletPermissionLogic;
-import com.liferay.portal.kernel.util.HashMapDictionary;
-
-import java.util.Dictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -39,17 +37,15 @@ public class MDRPortletResourcePermissionRegistrar {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-		properties.put("resource.name", MDRConstants.RESOURCE_NAME);
-
 		_serviceRegistration = bundleContext.registerService(
 			PortletResourcePermission.class,
 			PortletResourcePermissionFactory.create(
 				MDRConstants.RESOURCE_NAME,
 				new StagedPortletPermissionLogic(
 					_stagingPermission, MDRPortletKeys.MOBILE_DEVICE_RULES)),
-			properties);
+			HashMapDictionaryBuilder.<String, Object>put(
+				"resource.name", MDRConstants.RESOURCE_NAME
+			).build());
 	}
 
 	@Deactivate

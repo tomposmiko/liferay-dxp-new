@@ -14,10 +14,9 @@
 
 package com.liferay.data.cleanup.internal.upgrade;
 
-import com.liferay.change.tracking.service.CTCollectionLocalService;
-import com.liferay.change.tracking.service.CTEntryLocalService;
-import com.liferay.change.tracking.store.service.CTSContentLocalService;
 import com.liferay.data.cleanup.internal.configuration.DataRemovalConfiguration;
+import com.liferay.data.cleanup.internal.upgrade.util.ConfigurationUtil;
+import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
@@ -25,18 +24,19 @@ import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.service.ReleaseLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
 import java.util.Map;
 import java.util.function.Supplier;
+
+import org.apache.felix.cm.PersistenceManager;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Preston Crary
+ * @author Kevin Lee
  */
 @Component(
 	configurationPid = "com.liferay.data.cleanup.internal.configuration.DataRemovalConfiguration",
@@ -47,20 +47,17 @@ public class DataRemoval implements UpgradeStepRegistrator {
 	@Override
 	public void register(Registry registry) {
 		try {
-			_removeModuleData(
-				_dataRemovalConfiguration::removeDLPreviewCTSContentData,
-				"com.liferay.change.tracking.service",
-				() -> new UpgradeDLPreviewCTSContentData(
-					_ctCollectionLocalService, _ctEntryLocalService, _portal));
+			ConfigurationUtil.resetConfiguration(
+				_persistenceManager, DataRemovalConfiguration.class);
 
 			_removeModuleData(
-				_dataRemovalConfiguration::removePublishedCTSContentData,
-				"com.liferay.change.tracking.store.service",
-				() -> new UpgradePublishedCTSContentData(
-					_ctsContentLocalService, _portal));
+				_dataRemovalConfiguration::removeExpiredJournalArticles,
+				"com.liferay.journal.service",
+				() -> new ExpiredJournalArticleUpgradeProcess(
+					_journalArticleLocalService));
 		}
-		catch (UpgradeException upgradeException) {
-			ReflectionUtil.throwException(upgradeException);
+		catch (Exception exception) {
+			ReflectionUtil.throwException(exception);
 		}
 	}
 
@@ -89,19 +86,13 @@ public class DataRemoval implements UpgradeStepRegistrator {
 		}
 	}
 
-	@Reference
-	private CTCollectionLocalService _ctCollectionLocalService;
-
-	@Reference
-	private CTEntryLocalService _ctEntryLocalService;
-
-	@Reference
-	private CTSContentLocalService _ctsContentLocalService;
-
 	private DataRemovalConfiguration _dataRemovalConfiguration;
 
 	@Reference
-	private Portal _portal;
+	private JournalArticleLocalService _journalArticleLocalService;
+
+	@Reference
+	private PersistenceManager _persistenceManager;
 
 	@Reference
 	private ReleaseLocalService _releaseLocalService;

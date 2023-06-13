@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -266,93 +267,115 @@ public class SystemEventModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<SystemEvent, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, SystemEvent>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<SystemEvent, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<SystemEvent, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			SystemEvent.class.getClassLoader(), SystemEvent.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", SystemEvent::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", SystemEvent::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"systemEventId", SystemEvent::getSystemEventId);
-		attributeGetterFunctions.put("groupId", SystemEvent::getGroupId);
-		attributeGetterFunctions.put("companyId", SystemEvent::getCompanyId);
-		attributeGetterFunctions.put("userId", SystemEvent::getUserId);
-		attributeGetterFunctions.put("userName", SystemEvent::getUserName);
-		attributeGetterFunctions.put("createDate", SystemEvent::getCreateDate);
-		attributeGetterFunctions.put(
-			"classNameId", SystemEvent::getClassNameId);
-		attributeGetterFunctions.put("classPK", SystemEvent::getClassPK);
-		attributeGetterFunctions.put("classUuid", SystemEvent::getClassUuid);
-		attributeGetterFunctions.put(
-			"referrerClassNameId", SystemEvent::getReferrerClassNameId);
-		attributeGetterFunctions.put(
-			"parentSystemEventId", SystemEvent::getParentSystemEventId);
-		attributeGetterFunctions.put(
-			"systemEventSetKey", SystemEvent::getSystemEventSetKey);
-		attributeGetterFunctions.put("type", SystemEvent::getType);
-		attributeGetterFunctions.put("extraData", SystemEvent::getExtraData);
+		try {
+			Constructor<SystemEvent> constructor =
+				(Constructor<SystemEvent>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<SystemEvent, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<SystemEvent, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<SystemEvent, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<SystemEvent, Object>>();
 		Map<String, BiConsumer<SystemEvent, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<SystemEvent, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", SystemEvent::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<SystemEvent, Long>)SystemEvent::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", SystemEvent::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<SystemEvent, Long>)SystemEvent::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"systemEventId", SystemEvent::getSystemEventId);
 		attributeSetterBiConsumers.put(
 			"systemEventId",
 			(BiConsumer<SystemEvent, Long>)SystemEvent::setSystemEventId);
+		attributeGetterFunctions.put("groupId", SystemEvent::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<SystemEvent, Long>)SystemEvent::setGroupId);
+		attributeGetterFunctions.put("companyId", SystemEvent::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<SystemEvent, Long>)SystemEvent::setCompanyId);
+		attributeGetterFunctions.put("userId", SystemEvent::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<SystemEvent, Long>)SystemEvent::setUserId);
+		attributeGetterFunctions.put("userName", SystemEvent::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<SystemEvent, String>)SystemEvent::setUserName);
+		attributeGetterFunctions.put("createDate", SystemEvent::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<SystemEvent, Date>)SystemEvent::setCreateDate);
+		attributeGetterFunctions.put(
+			"classNameId", SystemEvent::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<SystemEvent, Long>)SystemEvent::setClassNameId);
+		attributeGetterFunctions.put("classPK", SystemEvent::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK", (BiConsumer<SystemEvent, Long>)SystemEvent::setClassPK);
+		attributeGetterFunctions.put("classUuid", SystemEvent::getClassUuid);
 		attributeSetterBiConsumers.put(
 			"classUuid",
 			(BiConsumer<SystemEvent, String>)SystemEvent::setClassUuid);
+		attributeGetterFunctions.put(
+			"referrerClassNameId", SystemEvent::getReferrerClassNameId);
 		attributeSetterBiConsumers.put(
 			"referrerClassNameId",
 			(BiConsumer<SystemEvent, Long>)SystemEvent::setReferrerClassNameId);
+		attributeGetterFunctions.put(
+			"parentSystemEventId", SystemEvent::getParentSystemEventId);
 		attributeSetterBiConsumers.put(
 			"parentSystemEventId",
 			(BiConsumer<SystemEvent, Long>)SystemEvent::setParentSystemEventId);
+		attributeGetterFunctions.put(
+			"systemEventSetKey", SystemEvent::getSystemEventSetKey);
 		attributeSetterBiConsumers.put(
 			"systemEventSetKey",
 			(BiConsumer<SystemEvent, Long>)SystemEvent::setSystemEventSetKey);
+		attributeGetterFunctions.put("type", SystemEvent::getType);
 		attributeSetterBiConsumers.put(
 			"type", (BiConsumer<SystemEvent, Integer>)SystemEvent::setType);
+		attributeGetterFunctions.put("extraData", SystemEvent::getExtraData);
 		attributeSetterBiConsumers.put(
 			"extraData",
 			(BiConsumer<SystemEvent, String>)SystemEvent::setExtraData);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -759,6 +782,44 @@ public class SystemEventModelImpl
 	}
 
 	@Override
+	public SystemEvent cloneWithOriginalValues() {
+		SystemEventImpl systemEventImpl = new SystemEventImpl();
+
+		systemEventImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		systemEventImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		systemEventImpl.setSystemEventId(
+			this.<Long>getColumnOriginalValue("systemEventId"));
+		systemEventImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		systemEventImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		systemEventImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		systemEventImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		systemEventImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		systemEventImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		systemEventImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		systemEventImpl.setClassUuid(
+			this.<String>getColumnOriginalValue("classUuid"));
+		systemEventImpl.setReferrerClassNameId(
+			this.<Long>getColumnOriginalValue("referrerClassNameId"));
+		systemEventImpl.setParentSystemEventId(
+			this.<Long>getColumnOriginalValue("parentSystemEventId"));
+		systemEventImpl.setSystemEventSetKey(
+			this.<Long>getColumnOriginalValue("systemEventSetKey"));
+		systemEventImpl.setType(this.<Integer>getColumnOriginalValue("type_"));
+		systemEventImpl.setExtraData(
+			this.<String>getColumnOriginalValue("extraData"));
+
+		return systemEventImpl;
+	}
+
+	@Override
 	public int compareTo(SystemEvent systemEvent) {
 		int value = 0;
 
@@ -974,9 +1035,7 @@ public class SystemEventModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, SystemEvent>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					SystemEvent.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

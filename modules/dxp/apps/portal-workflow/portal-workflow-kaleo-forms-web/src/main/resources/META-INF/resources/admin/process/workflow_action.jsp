@@ -55,7 +55,7 @@ String backURL = (String)row.getParameter("backURL");
 	/>
 
 	<c:if test="<%= permissionChecker.isCompanyAdmin() %>">
-		<portlet:actionURL name="/kaleo_forms/deactivate_workflow_definition" var="deactivateWorkflowDefinition">
+		<portlet:actionURL name="/kaleo_forms_admin/deactivate_workflow_definition" var="deactivateWorkflowDefinition">
 			<portlet:param name="tabs1" value="published" />
 			<portlet:param name="redirect" value="<%= backURL %>" />
 			<portlet:param name="historyKey" value="workflow" />

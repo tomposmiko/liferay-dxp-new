@@ -87,11 +87,9 @@ public class SAPAccessControlPolicy extends BaseAccessControlPolicy {
 		Set<String> allowedServiceSignatures, String className,
 		String methodName) {
 
-		if (allowedServiceSignatures.contains(StringPool.STAR)) {
-			return;
-		}
+		if (allowedServiceSignatures.contains(StringPool.STAR) ||
+			allowedServiceSignatures.contains(className)) {
 
-		if (allowedServiceSignatures.contains(className)) {
 			return;
 		}
 
@@ -164,8 +162,6 @@ public class SAPAccessControlPolicy extends BaseAccessControlPolicy {
 	}
 
 	protected List<String> getSystemServiceAccessPolicyNames(long companyId) {
-		List<String> systemServiceAccessPolicyNames = new ArrayList<>(2);
-
 		SAPConfiguration sapConfiguration = null;
 
 		try {
@@ -179,6 +175,8 @@ public class SAPAccessControlPolicy extends BaseAccessControlPolicy {
 				"Unable to get service access policy configuration",
 				configurationException);
 		}
+
+		List<String> systemServiceAccessPolicyNames = new ArrayList<>(2);
 
 		if (!sapConfiguration.useSystemSAPEntries()) {
 			return systemServiceAccessPolicyNames;

@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -305,76 +306,98 @@ public class MDRRuleGroupModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<MDRRuleGroup, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, MDRRuleGroup>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<MDRRuleGroup, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<MDRRuleGroup, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			MDRRuleGroup.class.getClassLoader(), MDRRuleGroup.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", MDRRuleGroup::getMvccVersion);
-		attributeGetterFunctions.put("uuid", MDRRuleGroup::getUuid);
-		attributeGetterFunctions.put(
-			"ruleGroupId", MDRRuleGroup::getRuleGroupId);
-		attributeGetterFunctions.put("groupId", MDRRuleGroup::getGroupId);
-		attributeGetterFunctions.put("companyId", MDRRuleGroup::getCompanyId);
-		attributeGetterFunctions.put("userId", MDRRuleGroup::getUserId);
-		attributeGetterFunctions.put("userName", MDRRuleGroup::getUserName);
-		attributeGetterFunctions.put("createDate", MDRRuleGroup::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", MDRRuleGroup::getModifiedDate);
-		attributeGetterFunctions.put("name", MDRRuleGroup::getName);
-		attributeGetterFunctions.put(
-			"description", MDRRuleGroup::getDescription);
-		attributeGetterFunctions.put(
-			"lastPublishDate", MDRRuleGroup::getLastPublishDate);
+		try {
+			Constructor<MDRRuleGroup> constructor =
+				(Constructor<MDRRuleGroup>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<MDRRuleGroup, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<MDRRuleGroup, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<MDRRuleGroup, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<MDRRuleGroup, Object>>();
 		Map<String, BiConsumer<MDRRuleGroup, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<MDRRuleGroup, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", MDRRuleGroup::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<MDRRuleGroup, Long>)MDRRuleGroup::setMvccVersion);
+		attributeGetterFunctions.put("uuid", MDRRuleGroup::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<MDRRuleGroup, String>)MDRRuleGroup::setUuid);
+		attributeGetterFunctions.put(
+			"ruleGroupId", MDRRuleGroup::getRuleGroupId);
 		attributeSetterBiConsumers.put(
 			"ruleGroupId",
 			(BiConsumer<MDRRuleGroup, Long>)MDRRuleGroup::setRuleGroupId);
+		attributeGetterFunctions.put("groupId", MDRRuleGroup::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<MDRRuleGroup, Long>)MDRRuleGroup::setGroupId);
+		attributeGetterFunctions.put("companyId", MDRRuleGroup::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<MDRRuleGroup, Long>)MDRRuleGroup::setCompanyId);
+		attributeGetterFunctions.put("userId", MDRRuleGroup::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<MDRRuleGroup, Long>)MDRRuleGroup::setUserId);
+		attributeGetterFunctions.put("userName", MDRRuleGroup::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<MDRRuleGroup, String>)MDRRuleGroup::setUserName);
+		attributeGetterFunctions.put("createDate", MDRRuleGroup::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<MDRRuleGroup, Date>)MDRRuleGroup::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", MDRRuleGroup::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<MDRRuleGroup, Date>)MDRRuleGroup::setModifiedDate);
+		attributeGetterFunctions.put("name", MDRRuleGroup::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<MDRRuleGroup, String>)MDRRuleGroup::setName);
+		attributeGetterFunctions.put(
+			"description", MDRRuleGroup::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<MDRRuleGroup, String>)MDRRuleGroup::setDescription);
+		attributeGetterFunctions.put(
+			"lastPublishDate", MDRRuleGroup::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<MDRRuleGroup, Date>)MDRRuleGroup::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -977,6 +1000,35 @@ public class MDRRuleGroupModelImpl
 	}
 
 	@Override
+	public MDRRuleGroup cloneWithOriginalValues() {
+		MDRRuleGroupImpl mdrRuleGroupImpl = new MDRRuleGroupImpl();
+
+		mdrRuleGroupImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		mdrRuleGroupImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		mdrRuleGroupImpl.setRuleGroupId(
+			this.<Long>getColumnOriginalValue("ruleGroupId"));
+		mdrRuleGroupImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		mdrRuleGroupImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		mdrRuleGroupImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		mdrRuleGroupImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		mdrRuleGroupImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		mdrRuleGroupImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		mdrRuleGroupImpl.setName(this.<String>getColumnOriginalValue("name"));
+		mdrRuleGroupImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		mdrRuleGroupImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+
+		return mdrRuleGroupImpl;
+	}
+
+	@Override
 	public int compareTo(MDRRuleGroup mdrRuleGroup) {
 		int value = 0;
 
@@ -1204,9 +1256,7 @@ public class MDRRuleGroupModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, MDRRuleGroup>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					MDRRuleGroup.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

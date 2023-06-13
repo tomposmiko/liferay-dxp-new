@@ -13,7 +13,7 @@
  */
 
 import {CONJUNCTIONS, SUPPORTED_CONJUNCTIONS} from './constants.es';
-import {buildQueryString} from './odata.es';
+import {buildQueryString, translateQueryToCriteria} from './odata.es';
 
 /**
  * Produces a list of Contributors
@@ -72,19 +72,15 @@ export function initialContributorsToContributors(
 			conjunctionId:
 				initialContributor.conjunctionId || initialConjunction,
 			conjunctionInputId: initialContributor.conjunctionInputId,
-			criteriaMap: initialContributor.initialQuery || null,
+			criteriaMap: initialContributor.initialQuery
+				? translateQueryToCriteria(initialContributor.initialQuery)
+				: null,
 			entityName: propertyGroup && propertyGroup.entityName,
 			inputId: initialContributor.inputId,
 			modelLabel: propertyGroup && propertyGroup.name,
 			properties: propertyGroup && propertyGroup.properties,
 			propertyKey: initialContributor.propertyKey,
-			query: initialContributor.initialQuery
-				? buildQueryString(
-						[initialContributor.initialQuery],
-						initialContributor.conjunctionId || initialConjunction,
-						propertyGroup && propertyGroup.properties
-				  )
-				: '',
+			query: initialContributor.initialQuery,
 		};
 	});
 }

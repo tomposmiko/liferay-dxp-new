@@ -16,8 +16,6 @@ package com.liferay.commerce.shipping.engine.fixed.web.internal.frontend;
 
 import com.liferay.commerce.constants.CommercePortletKeys;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouse;
-import com.liferay.commerce.model.CommerceCountry;
-import com.liferay.commerce.model.CommerceRegion;
 import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.commerce.shipping.engine.fixed.model.CommerceShippingFixedOption;
@@ -36,9 +34,12 @@ import com.liferay.frontend.taglib.clay.data.set.view.table.ClayTableSchemaBuild
 import com.liferay.frontend.taglib.clay.data.set.view.table.ClayTableSchemaField;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Country;
+import com.liferay.portal.kernel.model.Region;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
@@ -53,7 +54,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.portlet.ActionRequest;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
@@ -207,52 +207,48 @@ public class CommerceShippingFixedOptionSettingClayTable
 			ThemeDisplay themeDisplay)
 		throws PortalException {
 
-		CommerceCountry commerceCountry =
-			commerceShippingFixedOptionRel.getCommerceCountry();
+		Country country = commerceShippingFixedOptionRel.getCountry();
 
-		if (commerceCountry == null) {
+		if (country == null) {
 			return StringPool.STAR;
 		}
 
-		return commerceCountry.getName(themeDisplay.getLanguageId());
+		return country.getTitle(themeDisplay.getLanguageId());
 	}
 
 	private String _getRegion(
 			CommerceShippingFixedOptionRel commerceShippingFixedOptionRel)
 		throws PortalException {
 
-		CommerceRegion commerceRegion =
-			commerceShippingFixedOptionRel.getCommerceRegion();
+		Region region = commerceShippingFixedOptionRel.getRegion();
 
-		if (commerceRegion == null) {
+		if (region == null) {
 			return StringPool.STAR;
 		}
 
-		return commerceRegion.getName();
+		return region.getName();
 	}
 
 	private String _getShippingFixedOptionSettingDeleteURL(
 		HttpServletRequest httpServletRequest,
 		long shippingFixedOptionSettingId) {
 
-		PortletURL portletURL = _portal.getControlPanelPortletURL(
-			httpServletRequest, CommercePortletKeys.COMMERCE_SHIPPING_METHODS,
-			PortletRequest.ACTION_PHASE);
-
-		String redirect = ParamUtil.getString(
-			httpServletRequest, "currentUrl",
-			_portal.getCurrentURL(httpServletRequest));
-
-		portletURL.setParameter(
-			ActionRequest.ACTION_NAME,
-			"/commerce_shipping_methods/edit_commerce_shipping_fixed_option_rel");
-		portletURL.setParameter(Constants.CMD, Constants.DELETE);
-		portletURL.setParameter("redirect", redirect);
-		portletURL.setParameter(
-			"commerceShippingFixedOptionRelId",
-			String.valueOf(shippingFixedOptionSettingId));
-
-		return portletURL.toString();
+		return PortletURLBuilder.create(
+			_portal.getControlPanelPortletURL(
+				httpServletRequest,
+				CommercePortletKeys.COMMERCE_SHIPPING_METHODS,
+				PortletRequest.ACTION_PHASE)
+		).setActionName(
+			"/commerce_shipping_methods/edit_commerce_shipping_fixed_option_rel"
+		).setCMD(
+			Constants.DELETE
+		).setRedirect(
+			ParamUtil.getString(
+				httpServletRequest, "currentUrl",
+				_portal.getCurrentURL(httpServletRequest))
+		).setParameter(
+			"commerceShippingFixedOptionRelId", shippingFixedOptionSettingId
+		).buildString();
 	}
 
 	private String _getShippingFixedOptionSettingEditURL(
@@ -260,13 +256,13 @@ public class CommerceShippingFixedOptionSettingClayTable
 			long shippingFixedOptionSettingId)
 		throws Exception {
 
-		PortletURL portletURL = PortletProviderUtil.getPortletURL(
-			httpServletRequest, CommerceShippingMethod.class.getName(),
-			PortletProvider.Action.EDIT);
-
-		portletURL.setParameter(
-			"mvcRenderCommandName",
-			"/commerce_shipping_methods/edit_commerce_shipping_fixed_option_rel");
+		PortletURL portletURL = PortletURLBuilder.create(
+			PortletProviderUtil.getPortletURL(
+				httpServletRequest, CommerceShippingMethod.class.getName(),
+				PortletProvider.Action.EDIT)
+		).setMVCRenderCommandName(
+			"/commerce_shipping_methods/edit_commerce_shipping_fixed_option_rel"
+		).buildPortletURL();
 
 		long commerceShippingMethodId = ParamUtil.getLong(
 			httpServletRequest, "commerceShippingMethodId");

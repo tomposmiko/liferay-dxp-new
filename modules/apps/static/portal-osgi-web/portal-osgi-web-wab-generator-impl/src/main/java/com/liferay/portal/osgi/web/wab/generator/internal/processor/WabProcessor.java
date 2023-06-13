@@ -34,7 +34,6 @@ import aQute.lib.filter.Filter;
 import com.liferay.ant.bnd.jsp.JspAnalyzerPlugin;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.events.GlobalStartupAction;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.deploy.auto.AutoDeployException;
@@ -52,6 +51,7 @@ import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -252,8 +252,7 @@ public class WabProcessor {
 			DependencyManagementThreadLocal.setEnabled(false);
 
 			AutoDeployListener autoDeployListener = getAutoDeployListener(
-				autoDeploymentContext,
-				GlobalStartupAction.getAutoDeployListeners(false));
+				autoDeploymentContext, _autoDeployListeners);
 
 			autoDeployListener.deploy(autoDeploymentContext);
 		}
@@ -333,6 +332,10 @@ public class WabProcessor {
 			return PropertiesUtil.load(FileUtil.read(file));
 		}
 		catch (IOException ioException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(ioException, ioException);
+			}
+
 			return new Properties();
 		}
 	}
@@ -497,17 +500,9 @@ public class WabProcessor {
 			Matcher matcher = _versionMavenPattern.matcher(_bundleVersion);
 
 			if (matcher.matches()) {
-				StringBuilder sb = new StringBuilder();
-
-				sb.append(matcher.group(1));
-				sb.append(".");
-				sb.append(matcher.group(3));
-				sb.append(".");
-				sb.append(matcher.group(5));
-				sb.append(".");
-				sb.append(matcher.group(7));
-
-				_bundleVersion = sb.toString();
+				_bundleVersion = StringBundler.concat(
+					matcher.group(1), ".", matcher.group(3), ".",
+					matcher.group(5), ".", matcher.group(7));
 			}
 			else {
 				_bundleVersion =
@@ -863,6 +858,9 @@ public class WabProcessor {
 			}
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 
 			// Ignore this case
 
@@ -1218,6 +1216,10 @@ public class WabProcessor {
 			return UnsecureSAXReaderUtil.read(content);
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return SAXReaderUtil.createDocument();
 		}
 	}
@@ -1226,7 +1228,7 @@ public class WabProcessor {
 		try (Builder analyzer = new Builder()) {
 			analyzer.setBase(_pluginDir);
 			analyzer.setJar(jar);
-			analyzer.setProperty("-jsp", "*.jsp,*.jspf");
+			analyzer.setProperty("-jsp", "*.jsp,*.jspf,*.jspx");
 			analyzer.setProperty("Web-ContextPath", getWebContextPath());
 
 			List<Object> disabledPlugins = new ArrayList<>();
@@ -1523,6 +1525,7 @@ public class WabProcessor {
 
 	private static final Log _log = LogFactoryUtil.getLog(WabProcessor.class);
 
+	private static final List<AutoDeployListener> _autoDeployListeners;
 	private static final Attrs _optionalAttrs = new Attrs() {
 		{
 			put("resolution:", "optional");
@@ -1575,6 +1578,36 @@ public class WabProcessor {
 		).put(
 			"xsl", "http://www.w3.org/1999/XSL/Transform"
 		).build();
+
+	static {
+		List<AutoDeployListener> autoDeployListeners = new ArrayList<>();
+
+		String[] autoDeployListenerClassNames =
+			com.liferay.portal.util.PropsUtil.getArray(
+				PropsKeys.AUTO_DEPLOY_LISTENERS);
+
+		for (String autoDeployListenerClassName :
+				autoDeployListenerClassNames) {
+
+			try {
+				if (_log.isDebugEnabled()) {
+					_log.debug("Instantiating " + autoDeployListenerClassName);
+				}
+
+				AutoDeployListener autoDeployListener =
+					(AutoDeployListener)InstanceFactory.newInstance(
+						autoDeployListenerClassName);
+
+				autoDeployListeners.add(autoDeployListener);
+			}
+			catch (Exception exception) {
+				_log.error(
+					"Unable to initialiaze auto deploy listener", exception);
+			}
+		}
+
+		_autoDeployListeners = autoDeployListeners;
+	}
 
 	private String _bundleVersion;
 	private String _context;

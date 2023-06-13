@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -76,6 +77,7 @@ public class CommerceDiscountCommerceAccountGroupRelModelImpl
 	public static final String TABLE_NAME = "CDiscountCAccountGroupRel";
 
 	public static final Object[][] TABLE_COLUMNS = {
+		{"mvccVersion", Types.BIGINT},
 		{"CDiscountCAccountGroupRelId", Types.BIGINT},
 		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
 		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
@@ -87,6 +89,7 @@ public class CommerceDiscountCommerceAccountGroupRelModelImpl
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("CDiscountCAccountGroupRelId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
@@ -98,7 +101,7 @@ public class CommerceDiscountCommerceAccountGroupRelModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CDiscountCAccountGroupRel (CDiscountCAccountGroupRelId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commerceDiscountId LONG,commerceAccountGroupId LONG)";
+		"create table CDiscountCAccountGroupRel (mvccVersion LONG default 0 not null,CDiscountCAccountGroupRelId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commerceDiscountId LONG,commerceAccountGroupId LONG)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table CDiscountCAccountGroupRel";
@@ -170,6 +173,7 @@ public class CommerceDiscountCommerceAccountGroupRelModelImpl
 		CommerceDiscountCommerceAccountGroupRel model =
 			new CommerceDiscountCommerceAccountGroupRelImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setCommerceDiscountCommerceAccountGroupRelId(
 			soapModel.getCommerceDiscountCommerceAccountGroupRelId());
 		model.setCompanyId(soapModel.getCompanyId());
@@ -307,9 +311,41 @@ public class CommerceDiscountCommerceAccountGroupRelModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function
+		<InvocationHandler, CommerceDiscountCommerceAccountGroupRel>
+			_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceDiscountCommerceAccountGroupRel.class.getClassLoader(),
+			CommerceDiscountCommerceAccountGroupRel.class, ModelWrapper.class);
+
+		try {
+			Constructor<CommerceDiscountCommerceAccountGroupRel> constructor =
+				(Constructor<CommerceDiscountCommerceAccountGroupRel>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map
 		<String, Function<CommerceDiscountCommerceAccountGroupRel, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommerceDiscountCommerceAccountGroupRel, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceDiscountCommerceAccountGroupRel, Object>>
@@ -318,82 +354,95 @@ public class CommerceDiscountCommerceAccountGroupRelModelImpl
 					<String,
 					 Function
 						 <CommerceDiscountCommerceAccountGroupRel, Object>>();
-
-		attributeGetterFunctions.put(
-			"commerceDiscountCommerceAccountGroupRelId",
-			CommerceDiscountCommerceAccountGroupRel::
-				getCommerceDiscountCommerceAccountGroupRelId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceDiscountCommerceAccountGroupRel::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceDiscountCommerceAccountGroupRel::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceDiscountCommerceAccountGroupRel::getUserName);
-		attributeGetterFunctions.put(
-			"createDate",
-			CommerceDiscountCommerceAccountGroupRel::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate",
-			CommerceDiscountCommerceAccountGroupRel::getModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceDiscountId",
-			CommerceDiscountCommerceAccountGroupRel::getCommerceDiscountId);
-		attributeGetterFunctions.put(
-			"commerceAccountGroupId",
-			CommerceDiscountCommerceAccountGroupRel::getCommerceAccountGroupId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CommerceDiscountCommerceAccountGroupRel, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceDiscountCommerceAccountGroupRel, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String,
 					 BiConsumer<CommerceDiscountCommerceAccountGroupRel, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion",
+			CommerceDiscountCommerceAccountGroupRel::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CommerceDiscountCommerceAccountGroupRel, Long>)
+				CommerceDiscountCommerceAccountGroupRel::setMvccVersion);
+		attributeGetterFunctions.put(
+			"commerceDiscountCommerceAccountGroupRelId",
+			CommerceDiscountCommerceAccountGroupRel::
+				getCommerceDiscountCommerceAccountGroupRelId);
 		attributeSetterBiConsumers.put(
 			"commerceDiscountCommerceAccountGroupRelId",
 			(BiConsumer<CommerceDiscountCommerceAccountGroupRel, Long>)
 				CommerceDiscountCommerceAccountGroupRel::
 					setCommerceDiscountCommerceAccountGroupRelId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceDiscountCommerceAccountGroupRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceDiscountCommerceAccountGroupRel, Long>)
 				CommerceDiscountCommerceAccountGroupRel::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceDiscountCommerceAccountGroupRel::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceDiscountCommerceAccountGroupRel, Long>)
 				CommerceDiscountCommerceAccountGroupRel::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceDiscountCommerceAccountGroupRel::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceDiscountCommerceAccountGroupRel, String>)
 				CommerceDiscountCommerceAccountGroupRel::setUserName);
+		attributeGetterFunctions.put(
+			"createDate",
+			CommerceDiscountCommerceAccountGroupRel::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceDiscountCommerceAccountGroupRel, Date>)
 				CommerceDiscountCommerceAccountGroupRel::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate",
+			CommerceDiscountCommerceAccountGroupRel::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceDiscountCommerceAccountGroupRel, Date>)
 				CommerceDiscountCommerceAccountGroupRel::setModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceDiscountId",
+			CommerceDiscountCommerceAccountGroupRel::getCommerceDiscountId);
 		attributeSetterBiConsumers.put(
 			"commerceDiscountId",
 			(BiConsumer<CommerceDiscountCommerceAccountGroupRel, Long>)
 				CommerceDiscountCommerceAccountGroupRel::setCommerceDiscountId);
+		attributeGetterFunctions.put(
+			"commerceAccountGroupId",
+			CommerceDiscountCommerceAccountGroupRel::getCommerceAccountGroupId);
 		attributeSetterBiConsumers.put(
 			"commerceAccountGroupId",
 			(BiConsumer<CommerceDiscountCommerceAccountGroupRel, Long>)
 				CommerceDiscountCommerceAccountGroupRel::
 					setCommerceAccountGroupId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@JSON
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@JSON
@@ -626,6 +675,8 @@ public class CommerceDiscountCommerceAccountGroupRelModelImpl
 			commerceDiscountCommerceAccountGroupRelImpl =
 				new CommerceDiscountCommerceAccountGroupRelImpl();
 
+		commerceDiscountCommerceAccountGroupRelImpl.setMvccVersion(
+			getMvccVersion());
 		commerceDiscountCommerceAccountGroupRelImpl.
 			setCommerceDiscountCommerceAccountGroupRelId(
 				getCommerceDiscountCommerceAccountGroupRelId());
@@ -643,6 +694,36 @@ public class CommerceDiscountCommerceAccountGroupRelModelImpl
 			getCommerceAccountGroupId());
 
 		commerceDiscountCommerceAccountGroupRelImpl.resetOriginalValues();
+
+		return commerceDiscountCommerceAccountGroupRelImpl;
+	}
+
+	@Override
+	public CommerceDiscountCommerceAccountGroupRel cloneWithOriginalValues() {
+		CommerceDiscountCommerceAccountGroupRelImpl
+			commerceDiscountCommerceAccountGroupRelImpl =
+				new CommerceDiscountCommerceAccountGroupRelImpl();
+
+		commerceDiscountCommerceAccountGroupRelImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		commerceDiscountCommerceAccountGroupRelImpl.
+			setCommerceDiscountCommerceAccountGroupRelId(
+				this.<Long>getColumnOriginalValue(
+					"CDiscountCAccountGroupRelId"));
+		commerceDiscountCommerceAccountGroupRelImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commerceDiscountCommerceAccountGroupRelImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commerceDiscountCommerceAccountGroupRelImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commerceDiscountCommerceAccountGroupRelImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commerceDiscountCommerceAccountGroupRelImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commerceDiscountCommerceAccountGroupRelImpl.setCommerceDiscountId(
+			this.<Long>getColumnOriginalValue("commerceDiscountId"));
+		commerceDiscountCommerceAccountGroupRelImpl.setCommerceAccountGroupId(
+			this.<Long>getColumnOriginalValue("commerceAccountGroupId"));
 
 		return commerceDiscountCommerceAccountGroupRelImpl;
 	}
@@ -729,6 +810,9 @@ public class CommerceDiscountCommerceAccountGroupRelModelImpl
 		CommerceDiscountCommerceAccountGroupRelCacheModel
 			commerceDiscountCommerceAccountGroupRelCacheModel =
 				new CommerceDiscountCommerceAccountGroupRelCacheModel();
+
+		commerceDiscountCommerceAccountGroupRelCacheModel.mvccVersion =
+			getMvccVersion();
 
 		commerceDiscountCommerceAccountGroupRelCacheModel.
 			commerceDiscountCommerceAccountGroupRelId =
@@ -872,12 +956,11 @@ public class CommerceDiscountCommerceAccountGroupRelModelImpl
 		private static final Function
 			<InvocationHandler, CommerceDiscountCommerceAccountGroupRel>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						CommerceDiscountCommerceAccountGroupRel.class,
-						ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private long _commerceDiscountCommerceAccountGroupRelId;
 	private long _companyId;
 	private long _userId;
@@ -917,6 +1000,7 @@ public class CommerceDiscountCommerceAccountGroupRelModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put(
 			"CDiscountCAccountGroupRelId",
 			_commerceDiscountCommerceAccountGroupRelId);
@@ -953,21 +1037,23 @@ public class CommerceDiscountCommerceAccountGroupRelModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("CDiscountCAccountGroupRelId", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("companyId", 2L);
+		columnBitmasks.put("CDiscountCAccountGroupRelId", 2L);
 
-		columnBitmasks.put("userId", 4L);
+		columnBitmasks.put("companyId", 4L);
 
-		columnBitmasks.put("userName", 8L);
+		columnBitmasks.put("userId", 8L);
 
-		columnBitmasks.put("createDate", 16L);
+		columnBitmasks.put("userName", 16L);
 
-		columnBitmasks.put("modifiedDate", 32L);
+		columnBitmasks.put("createDate", 32L);
 
-		columnBitmasks.put("commerceDiscountId", 64L);
+		columnBitmasks.put("modifiedDate", 64L);
 
-		columnBitmasks.put("commerceAccountGroupId", 128L);
+		columnBitmasks.put("commerceDiscountId", 128L);
+
+		columnBitmasks.put("commerceAccountGroupId", 256L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

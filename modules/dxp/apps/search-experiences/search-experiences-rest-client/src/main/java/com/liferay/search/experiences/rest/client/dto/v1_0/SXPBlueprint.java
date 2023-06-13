@@ -36,28 +36,6 @@ public class SXPBlueprint implements Cloneable, Serializable {
 		return SXPBlueprintSerDes.toDTO(json);
 	}
 
-	public Map<String, Map<String, String>> getActions() {
-		return actions;
-	}
-
-	public void setActions(Map<String, Map<String, String>> actions) {
-		this.actions = actions;
-	}
-
-	public void setActions(
-		UnsafeSupplier<Map<String, Map<String, String>>, Exception>
-			actionsUnsafeSupplier) {
-
-		try {
-			actions = actionsUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected Map<String, Map<String, String>> actions;
-
 	public Configuration getConfiguration() {
 		return configuration;
 	}
@@ -165,27 +143,6 @@ public class SXPBlueprint implements Cloneable, Serializable {
 
 	protected ElementInstance[] elementInstances;
 
-	public String getExternalReferenceCode() {
-		return externalReferenceCode;
-	}
-
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		this.externalReferenceCode = externalReferenceCode;
-	}
-
-	public void setExternalReferenceCode(
-		UnsafeSupplier<String, Exception> externalReferenceCodeUnsafeSupplier) {
-
-		try {
-			externalReferenceCode = externalReferenceCodeUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String externalReferenceCode;
-
 	public Long getId() {
 		return id;
 	}
@@ -225,27 +182,6 @@ public class SXPBlueprint implements Cloneable, Serializable {
 	}
 
 	protected Date modifiedDate;
-
-	public String getSchemaVersion() {
-		return schemaVersion;
-	}
-
-	public void setSchemaVersion(String schemaVersion) {
-		this.schemaVersion = schemaVersion;
-	}
-
-	public void setSchemaVersion(
-		UnsafeSupplier<String, Exception> schemaVersionUnsafeSupplier) {
-
-		try {
-			schemaVersion = schemaVersionUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String schemaVersion;
 
 	public String getTitle() {
 		return title;
@@ -310,27 +246,6 @@ public class SXPBlueprint implements Cloneable, Serializable {
 	}
 
 	protected String userName;
-
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
-	public void setVersion(
-		UnsafeSupplier<String, Exception> versionUnsafeSupplier) {
-
-		try {
-			version = versionUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected String version;
 
 	@Override
 	public SXPBlueprint clone() throws CloneNotSupportedException {

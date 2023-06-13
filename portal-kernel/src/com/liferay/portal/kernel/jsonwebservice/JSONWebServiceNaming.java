@@ -18,6 +18,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.annotation.ImplementationClassName;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.util.CamelCaseUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -165,6 +166,12 @@ public class JSONWebServiceNaming {
 	}
 
 	public boolean isIncludedPath(String contextPath, String path) {
+		String portalContextPath = PortalUtil.getPathContext();
+
+		if (!contextPath.equals(portalContextPath)) {
+			path = contextPath + StringPool.PERIOD + path.substring(1);
+		}
+
 		for (String excludedPath : excludedPaths) {
 			if (StringUtil.wildcardMatches(
 					path, excludedPath, '?', '*', '\\', false)) {
@@ -221,7 +228,6 @@ public class JSONWebServiceNaming {
 		PropsKeys.JSONWS_WEB_SERVICE_PATHS_INCLUDES);
 	protected Set<String> invalidHttpMethods = SetUtil.fromArray(
 		PropsUtil.getArray(PropsKeys.JSONWS_WEB_SERVICE_INVALID_HTTP_METHODS));
-	protected Set<String> prefixes = SetUtil.fromArray(
-		new String[] {"get", "has", "is"});
+	protected Set<String> prefixes = SetUtil.fromArray("get", "has", "is");
 
 }

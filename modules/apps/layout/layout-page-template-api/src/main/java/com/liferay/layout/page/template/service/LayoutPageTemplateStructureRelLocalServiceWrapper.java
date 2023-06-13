@@ -30,6 +30,10 @@ public class LayoutPageTemplateStructureRelLocalServiceWrapper
 	implements LayoutPageTemplateStructureRelLocalService,
 			   ServiceWrapper<LayoutPageTemplateStructureRelLocalService> {
 
+	public LayoutPageTemplateStructureRelLocalServiceWrapper() {
+		this(null);
+	}
+
 	public LayoutPageTemplateStructureRelLocalServiceWrapper(
 		LayoutPageTemplateStructureRelLocalService
 			layoutPageTemplateStructureRelLocalService) {
@@ -514,6 +518,18 @@ public class LayoutPageTemplateStructureRelLocalServiceWrapper
 		return _layoutPageTemplateStructureRelLocalService.
 			updateLayoutPageTemplateStructureRel(
 				layoutPageTemplateStructureId, segmentsExperienceId, data);
+	}
+
+	@Override
+	public LayoutPageTemplateStructureRel updateStatus(
+			long userId, long layoutPageTemplateStructureId,
+			long segmentsExperienceId, int status,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _layoutPageTemplateStructureRelLocalService.updateStatus(
+			userId, layoutPageTemplateStructureId, segmentsExperienceId, status,
+			serviceContext);
 	}
 
 	@Override

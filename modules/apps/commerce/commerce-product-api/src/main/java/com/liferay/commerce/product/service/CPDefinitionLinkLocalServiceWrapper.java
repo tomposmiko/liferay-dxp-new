@@ -27,6 +27,10 @@ public class CPDefinitionLinkLocalServiceWrapper
 	implements CPDefinitionLinkLocalService,
 			   ServiceWrapper<CPDefinitionLinkLocalService> {
 
+	public CPDefinitionLinkLocalServiceWrapper() {
+		this(null);
+	}
+
 	public CPDefinitionLinkLocalServiceWrapper(
 		CPDefinitionLinkLocalService cpDefinitionLinkLocalService) {
 
@@ -297,6 +301,15 @@ public class CPDefinitionLinkLocalServiceWrapper
 
 		return _cpDefinitionLinkLocalService.fetchCPDefinitionLink(
 			CPDefinitionLinkId);
+	}
+
+	@Override
+	public com.liferay.commerce.product.model.CPDefinitionLink
+		fetchCPDefinitionLink(
+			long cpDefinitionId, long cProductId, String type) {
+
+		return _cpDefinitionLinkLocalService.fetchCPDefinitionLink(
+			cpDefinitionId, cProductId, type);
 	}
 
 	/**

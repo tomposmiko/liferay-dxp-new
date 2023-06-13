@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -278,60 +279,82 @@ public class AccountEntryUserRelModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, AccountEntryUserRel>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AccountEntryUserRel.class.getClassLoader(),
+			AccountEntryUserRel.class, ModelWrapper.class);
+
+		try {
+			Constructor<AccountEntryUserRel> constructor =
+				(Constructor<AccountEntryUserRel>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<AccountEntryUserRel, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AccountEntryUserRel, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<AccountEntryUserRel, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<AccountEntryUserRel, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", AccountEntryUserRel::getMvccVersion);
-		attributeGetterFunctions.put(
-			"accountEntryUserRelId",
-			AccountEntryUserRel::getAccountEntryUserRelId);
-		attributeGetterFunctions.put(
-			"companyId", AccountEntryUserRel::getCompanyId);
-		attributeGetterFunctions.put(
-			"accountEntryId", AccountEntryUserRel::getAccountEntryId);
-		attributeGetterFunctions.put(
-			"accountUserId", AccountEntryUserRel::getAccountUserId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<AccountEntryUserRel, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<AccountEntryUserRel, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<AccountEntryUserRel, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", AccountEntryUserRel::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AccountEntryUserRel, Long>)
 				AccountEntryUserRel::setMvccVersion);
+		attributeGetterFunctions.put(
+			"accountEntryUserRelId",
+			AccountEntryUserRel::getAccountEntryUserRelId);
 		attributeSetterBiConsumers.put(
 			"accountEntryUserRelId",
 			(BiConsumer<AccountEntryUserRel, Long>)
 				AccountEntryUserRel::setAccountEntryUserRelId);
+		attributeGetterFunctions.put(
+			"companyId", AccountEntryUserRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AccountEntryUserRel, Long>)
 				AccountEntryUserRel::setCompanyId);
+		attributeGetterFunctions.put(
+			"accountEntryId", AccountEntryUserRel::getAccountEntryId);
 		attributeSetterBiConsumers.put(
 			"accountEntryId",
 			(BiConsumer<AccountEntryUserRel, Long>)
 				AccountEntryUserRel::setAccountEntryId);
+		attributeGetterFunctions.put(
+			"accountUserId", AccountEntryUserRel::getAccountUserId);
 		attributeSetterBiConsumers.put(
 			"accountUserId",
 			(BiConsumer<AccountEntryUserRel, Long>)
 				AccountEntryUserRel::setAccountUserId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -518,6 +541,25 @@ public class AccountEntryUserRelModelImpl
 	}
 
 	@Override
+	public AccountEntryUserRel cloneWithOriginalValues() {
+		AccountEntryUserRelImpl accountEntryUserRelImpl =
+			new AccountEntryUserRelImpl();
+
+		accountEntryUserRelImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		accountEntryUserRelImpl.setAccountEntryUserRelId(
+			this.<Long>getColumnOriginalValue("accountEntryUserRelId"));
+		accountEntryUserRelImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		accountEntryUserRelImpl.setAccountEntryId(
+			this.<Long>getColumnOriginalValue("accountEntryId"));
+		accountEntryUserRelImpl.setAccountUserId(
+			this.<Long>getColumnOriginalValue("accountUserId"));
+
+		return accountEntryUserRelImpl;
+	}
+
+	@Override
 	public int compareTo(AccountEntryUserRel accountEntryUserRel) {
 		long primaryKey = accountEntryUserRel.getPrimaryKey();
 
@@ -687,9 +729,7 @@ public class AccountEntryUserRelModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AccountEntryUserRel>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AccountEntryUserRel.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

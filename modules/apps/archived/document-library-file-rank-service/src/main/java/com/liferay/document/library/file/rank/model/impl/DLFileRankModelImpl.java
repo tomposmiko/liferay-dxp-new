@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -242,55 +243,77 @@ public class DLFileRankModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<DLFileRank, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, DLFileRank>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<DLFileRank, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<DLFileRank, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DLFileRank.class.getClassLoader(), DLFileRank.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", DLFileRank::getMvccVersion);
-		attributeGetterFunctions.put("fileRankId", DLFileRank::getFileRankId);
-		attributeGetterFunctions.put("groupId", DLFileRank::getGroupId);
-		attributeGetterFunctions.put("companyId", DLFileRank::getCompanyId);
-		attributeGetterFunctions.put("userId", DLFileRank::getUserId);
-		attributeGetterFunctions.put("createDate", DLFileRank::getCreateDate);
-		attributeGetterFunctions.put("fileEntryId", DLFileRank::getFileEntryId);
-		attributeGetterFunctions.put("active", DLFileRank::getActive);
+		try {
+			Constructor<DLFileRank> constructor =
+				(Constructor<DLFileRank>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<DLFileRank, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<DLFileRank, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<DLFileRank, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DLFileRank, Object>>();
 		Map<String, BiConsumer<DLFileRank, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<DLFileRank, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", DLFileRank::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DLFileRank, Long>)DLFileRank::setMvccVersion);
+		attributeGetterFunctions.put("fileRankId", DLFileRank::getFileRankId);
 		attributeSetterBiConsumers.put(
 			"fileRankId",
 			(BiConsumer<DLFileRank, Long>)DLFileRank::setFileRankId);
+		attributeGetterFunctions.put("groupId", DLFileRank::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<DLFileRank, Long>)DLFileRank::setGroupId);
+		attributeGetterFunctions.put("companyId", DLFileRank::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DLFileRank, Long>)DLFileRank::setCompanyId);
+		attributeGetterFunctions.put("userId", DLFileRank::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<DLFileRank, Long>)DLFileRank::setUserId);
+		attributeGetterFunctions.put("createDate", DLFileRank::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<DLFileRank, Date>)DLFileRank::setCreateDate);
+		attributeGetterFunctions.put("fileEntryId", DLFileRank::getFileEntryId);
 		attributeSetterBiConsumers.put(
 			"fileEntryId",
 			(BiConsumer<DLFileRank, Long>)DLFileRank::setFileEntryId);
+		attributeGetterFunctions.put("active", DLFileRank::getActive);
 		attributeSetterBiConsumers.put(
 			"active", (BiConsumer<DLFileRank, Boolean>)DLFileRank::setActive);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -547,6 +570,28 @@ public class DLFileRankModelImpl
 	}
 
 	@Override
+	public DLFileRank cloneWithOriginalValues() {
+		DLFileRankImpl dlFileRankImpl = new DLFileRankImpl();
+
+		dlFileRankImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		dlFileRankImpl.setFileRankId(
+			this.<Long>getColumnOriginalValue("fileRankId"));
+		dlFileRankImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		dlFileRankImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		dlFileRankImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		dlFileRankImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		dlFileRankImpl.setFileEntryId(
+			this.<Long>getColumnOriginalValue("fileEntryId"));
+		dlFileRankImpl.setActive(
+			this.<Boolean>getColumnOriginalValue("active_"));
+
+		return dlFileRankImpl;
+	}
+
+	@Override
 	public int compareTo(DLFileRank dlFileRank) {
 		int value = 0;
 
@@ -726,9 +771,7 @@ public class DLFileRankModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DLFileRank>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DLFileRank.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

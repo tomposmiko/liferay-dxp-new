@@ -77,13 +77,11 @@ import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.util.PortalImpl;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceTracker;
 
 import java.io.File;
 import java.io.InputStream;
@@ -107,7 +105,6 @@ import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -126,22 +123,6 @@ public class DefaultExportImportContentProcessorTest {
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
-
-	@BeforeClass
-	public static void setUpClass() {
-		Registry registry = RegistryUtil.getRegistry();
-
-		StringBundler sb = new StringBundler(3);
-
-		sb.append("(&(content.processor.type=LayoutReferences)(objectClass=");
-		sb.append(ExportImportContentProcessor.class.getName());
-		sb.append("))");
-
-		_serviceTracker = registry.trackServices(
-			registry.getFilter(sb.toString()));
-
-		_serviceTracker.open();
-	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -168,10 +149,10 @@ public class DefaultExportImportContentProcessorTest {
 				_stagingGroup.getGroupId(), TestPropsValues.getUserId());
 
 		_fileEntry = DLAppLocalServiceUtil.addFileEntry(
-			TestPropsValues.getUserId(), _stagingGroup.getGroupId(),
+			null, TestPropsValues.getUserId(), _stagingGroup.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString() + ".txt", ContentTypes.TEXT_PLAIN,
-			TestDataConstants.TEST_BYTE_ARRAY, serviceContext);
+			TestDataConstants.TEST_BYTE_ARRAY, null, null, serviceContext);
 
 		ThumbnailCapability thumbnailCapability =
 			_fileEntry.getRepositoryCapability(ThumbnailCapability.class);
@@ -250,9 +231,6 @@ public class DefaultExportImportContentProcessorTest {
 		_exportImportContentProcessor =
 			ExportImportContentProcessorRegistryUtil.
 				getExportImportContentProcessor(String.class.getName());
-
-		_layoutReferencesExportImportContentProcessor =
-			_serviceTracker.getService();
 	}
 
 	@Test
@@ -310,20 +288,13 @@ public class DefaultExportImportContentProcessorTest {
 	public void testExportDLReferencesInvalidReference() throws Exception {
 		_portletDataContextExport.setZipWriter(new TestReaderWriter());
 
-		StringBundler sb = new StringBundler(9);
-
-		sb.append("{{/documents/}}");
-		sb.append(StringPool.NEW_LINE);
-		sb.append("[[/documents/]]");
-		sb.append(StringPool.NEW_LINE);
-		sb.append("<a href=/documents/>Link</a>");
-		sb.append(StringPool.NEW_LINE);
-		sb.append("<a href=\"/documents/\">Link</a>");
-		sb.append(StringPool.NEW_LINE);
-		sb.append("<a href='/documents/'>Link</a>");
-
 		_exportImportContentProcessor.replaceExportContentReferences(
-			_portletDataContextExport, _referrerStagedModel, sb.toString(),
+			_portletDataContextExport, _referrerStagedModel,
+			StringBundler.concat(
+				"{{/documents/}}", StringPool.NEW_LINE, "[[/documents/]]",
+				StringPool.NEW_LINE, "<a href=/documents/>Link</a>",
+				StringPool.NEW_LINE, "<a href=\"/documents/\">Link</a>",
+				StringPool.NEW_LINE, "<a href='/documents/'>Link</a>"),
 			true, true);
 	}
 
@@ -811,7 +782,7 @@ public class DefaultExportImportContentProcessorTest {
 		throws Exception {
 
 		Map<Locale, String> nameMap = new HashMap<>();
-		Map<Locale, String> friendlyURLMap = new HashMap<>();
+		Map<Locale, String> firendlyURLMap = new HashMap<>();
 
 		for (Locale locale : new Locale[] {_defaultLocale, _nondefaultLocale}) {
 			String name = RandomTestUtil.randomString(
@@ -824,11 +795,11 @@ public class DefaultExportImportContentProcessorTest {
 
 			nameMap.put(locale, name);
 
-			friendlyURLMap.put(locale, friendlyURL);
+			firendlyURLMap.put(locale, friendlyURL);
 		}
 
 		return LayoutTestUtil.addLayout(
-			group.getGroupId(), privateLayout, nameMap, friendlyURLMap);
+			group.getGroupId(), privateLayout, nameMap, firendlyURLMap);
 	}
 
 	protected void assertLinksToLayouts(
@@ -1292,9 +1263,6 @@ public class DefaultExportImportContentProcessorTest {
 	};
 	private static String _oldLayoutFriendlyURLPrivateUserServletMapping;
 	private static final Pattern _pattern = Pattern.compile("href=|\\{|\\[");
-	private static ServiceTracker
-		<ExportImportContentProcessor<String>,
-		 ExportImportContentProcessor<String>> _serviceTracker;
 
 	private Locale _defaultLocale;
 	private ExportImportContentProcessor<String> _exportImportContentProcessor;
@@ -1305,6 +1273,8 @@ public class DefaultExportImportContentProcessorTest {
 	private Layout _externalPrivateLayout;
 	private Layout _externalPublicLayout;
 	private FileEntry _fileEntry;
+
+	@Inject(filter = "content.processor.type=LayoutReferences")
 	private ExportImportContentProcessor<String>
 		_layoutReferencesExportImportContentProcessor;
 

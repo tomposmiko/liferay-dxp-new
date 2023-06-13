@@ -31,7 +31,8 @@ renderResponse.setTitle(LanguageUtil.get(request, "orphan-widgets"));
 %>
 
 <clay:management-toolbar
-	displayContext="<%= orphanPortletsManagementToolbarDisplayContext %>"
+	managementToolbarDisplayContext="<%= orphanPortletsManagementToolbarDisplayContext %>"
+	propsTransformer="js/OrphanPortletsManagementToolbarPropsTransformer"
 />
 
 <portlet:actionURL name="/layout_admin/delete_orphan_portlets" var="deleteOrphanPortletsURL">
@@ -40,7 +41,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "orphan-widgets"));
 	<portlet:param name="selPlid" value="<%= String.valueOf(orphanPortletsDisplayContext.getSelPlid()) %>" />
 </portlet:actionURL>
 
-<aui:form action="<%= deleteOrphanPortletsURL %>" cssClass="container-fluid-1280" name="fm">
+<aui:form action="<%= deleteOrphanPortletsURL %>" cssClass="container-fluid container-fluid-max-xl" name="fm">
 	<div class="alert alert-warning" role="alert">
 		<span class="alert-indicator">
 			<aui:icon image="warning-full" markupView="lexicon" />
@@ -130,8 +131,3 @@ renderResponse.setTitle(LanguageUtil.get(request, "orphan-widgets"));
 		/>
 	</liferay-ui:search-container>
 </aui:form>
-
-<liferay-frontend:component
-	componentId="<%= orphanPortletsManagementToolbarDisplayContext.getDefaultEventHandler() %>"
-	module="js/OrphanPortletsManagementToolbarDefaultEventHandler.es"
-/>

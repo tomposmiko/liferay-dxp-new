@@ -34,6 +34,7 @@ import com.liferay.portal.tools.service.builder.test.service.LVEntryLocalService
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -279,54 +280,75 @@ public class LVEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<LVEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, LVEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<LVEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<LVEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			LVEntry.class.getClassLoader(), LVEntry.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", LVEntry::getMvccVersion);
-		attributeGetterFunctions.put("uuid", LVEntry::getUuid);
-		attributeGetterFunctions.put("headId", LVEntry::getHeadId);
-		attributeGetterFunctions.put(
-			"defaultLanguageId", LVEntry::getDefaultLanguageId);
-		attributeGetterFunctions.put("lvEntryId", LVEntry::getLvEntryId);
-		attributeGetterFunctions.put("companyId", LVEntry::getCompanyId);
-		attributeGetterFunctions.put("groupId", LVEntry::getGroupId);
-		attributeGetterFunctions.put(
-			"uniqueGroupKey", LVEntry::getUniqueGroupKey);
+		try {
+			Constructor<LVEntry> constructor =
+				(Constructor<LVEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<LVEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<LVEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<LVEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<LVEntry, Object>>();
 		Map<String, BiConsumer<LVEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<LVEntry, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", LVEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion", (BiConsumer<LVEntry, Long>)LVEntry::setMvccVersion);
+		attributeGetterFunctions.put("uuid", LVEntry::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<LVEntry, String>)LVEntry::setUuid);
+		attributeGetterFunctions.put("headId", LVEntry::getHeadId);
 		attributeSetterBiConsumers.put(
 			"headId", (BiConsumer<LVEntry, Long>)LVEntry::setHeadId);
+		attributeGetterFunctions.put(
+			"defaultLanguageId", LVEntry::getDefaultLanguageId);
 		attributeSetterBiConsumers.put(
 			"defaultLanguageId",
 			(BiConsumer<LVEntry, String>)LVEntry::setDefaultLanguageId);
+		attributeGetterFunctions.put("lvEntryId", LVEntry::getLvEntryId);
 		attributeSetterBiConsumers.put(
 			"lvEntryId", (BiConsumer<LVEntry, Long>)LVEntry::setLvEntryId);
+		attributeGetterFunctions.put("companyId", LVEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<LVEntry, Long>)LVEntry::setCompanyId);
+		attributeGetterFunctions.put("groupId", LVEntry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<LVEntry, Long>)LVEntry::setGroupId);
+		attributeGetterFunctions.put(
+			"uniqueGroupKey", LVEntry::getUniqueGroupKey);
 		attributeSetterBiConsumers.put(
 			"uniqueGroupKey",
 			(BiConsumer<LVEntry, String>)LVEntry::setUniqueGroupKey);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -761,6 +783,27 @@ public class LVEntryModelImpl
 	}
 
 	@Override
+	public LVEntry cloneWithOriginalValues() {
+		LVEntryImpl lvEntryImpl = new LVEntryImpl();
+
+		lvEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		lvEntryImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		lvEntryImpl.setHeadId(this.<Long>getColumnOriginalValue("headId"));
+		lvEntryImpl.setDefaultLanguageId(
+			this.<String>getColumnOriginalValue("defaultLanguageId"));
+		lvEntryImpl.setLvEntryId(
+			this.<Long>getColumnOriginalValue("lvEntryId"));
+		lvEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		lvEntryImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		lvEntryImpl.setUniqueGroupKey(
+			this.<String>getColumnOriginalValue("uniqueGroupKey"));
+
+		return lvEntryImpl;
+	}
+
+	@Override
 	public int compareTo(LVEntry lvEntry) {
 		long primaryKey = lvEntry.getPrimaryKey();
 
@@ -953,9 +996,7 @@ public class LVEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, LVEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					LVEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

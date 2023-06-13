@@ -68,7 +68,7 @@ if (organizationId > 0) {
 
 					<portlet:namespace />selectOrganizationButton.addEventListener(
 						'click',
-						function (event) {
+						(event) => {
 							Liferay.Util.openSelectionModal({
 								onSelect: function (event) {
 									var form = document.getElementById('<portlet:namespace />fm');
@@ -111,10 +111,13 @@ if (organizationId > 0) {
 									'<liferay-ui:message arguments="organization" key="select-x" />',
 
 								<%
-								PortletURL selectOrganizationURL = PortletProviderUtil.getPortletURL(request, Organization.class.getName(), PortletProvider.Action.BROWSE);
-
-								selectOrganizationURL.setParameter("tabs1", "organizations");
-								selectOrganizationURL.setWindowState(LiferayWindowState.POP_UP);
+								PortletURL selectOrganizationURL = PortletURLBuilder.create(
+									PortletProviderUtil.getPortletURL(request, Organization.class.getName(), PortletProvider.Action.BROWSE)
+								).setTabs1(
+									"organizations"
+								).setWindowState(
+									LiferayWindowState.POP_UP
+								).buildPortletURL();
 								%>
 
 								url: '<%= selectOrganizationURL.toString() %>',
@@ -123,32 +126,26 @@ if (organizationId > 0) {
 					);
 				</aui:script>
 
-				<aui:script require="metal-dom/src/dom">
-					var dom = metalDomSrcDom.default;
-
-					var <portlet:namespace />selectionMethod = document.getElementById(
+				<aui:script sandbox="<%= true %>">
+					var selectionMethodElement = document.getElementById(
 						'<portlet:namespace />selectionMethod'
 					);
 
-					if (<portlet:namespace />selectionMethod) {
-						<portlet:namespace />selectionMethod.addEventListener('change', function (
-							event
-						) {
+					if (selectionMethodElement) {
+						selectionMethodElement.addEventListener('change', (event) => {
 							var usersSelectionOptions = document.getElementById(
 								'<portlet:namespace />usersSelectionOptions'
 							);
 
 							if (usersSelectionOptions) {
 								var showUsersSelectionOptions = !(
-									<portlet:namespace />selectionMethod.val() === 'users'
+									selectionMethodElement.value === 'users'
 								);
 
-								if (showUsersSelectionOptions) {
-									dom.addClasses(usersSelectionOptions, 'hide');
-								}
-								else {
-									dom.removeClasses(usersSelectionOptions, 'hide');
-								}
+								usersSelectionOptions.classList.toggle(
+									'hide',
+									showUsersSelectionOptions
+								);
 							}
 						});
 					}

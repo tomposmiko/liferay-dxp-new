@@ -13,9 +13,9 @@
  */
 
 import ClayIcon from '@clayui/icon';
+import {usePrevious} from '@liferay/frontend-js-react-web';
 import classNames from 'classnames';
-import {RulesSupport} from 'dynamic-data-mapping-form-builder';
-import {usePage} from 'dynamic-data-mapping-form-renderer';
+import {RulesSupport, useFormState} from 'data-engine-js-components-web';
 import {openModal} from 'frontend-js-web';
 import React, {useEffect, useRef, useState} from 'react';
 import {DndProvider} from 'react-dnd';
@@ -133,7 +133,7 @@ const Options = ({
 	onChange,
 	value = {},
 }) => {
-	const {builderRules} = usePage();
+	const {builderRules} = useFormState();
 
 	const initialOptionRef = useRef(
 		getInitialOption(generateOptionValueUsingOptionLabel)
@@ -149,8 +149,8 @@ const Options = ({
 				);
 			}
 
-			formattedValue[languageId] = formattedValue[languageId].map(
-				(option) => {
+			formattedValue[languageId] = normalizeFields(
+				formattedValue[languageId].map((option) => {
 					let newOption = {
 						id: random(),
 						...option,
@@ -174,7 +174,8 @@ const Options = ({
 					}
 
 					return newOption;
-				}
+				}),
+				generateOptionValueUsingOptionLabel
 			);
 		});
 
@@ -198,26 +199,62 @@ const Options = ({
 		);
 	});
 
-	useEffect(() => {
-		const options =
-			normalizedValue[editingLanguageId] ||
-			normalizedValue[defaultLanguageId] ||
-			[];
+	const prevEditingLanguageId = usePrevious(editingLanguageId);
 
-		setFields(
-			refreshFields(
-				defaultLanguageId,
-				editingLanguageId,
-				generateOptionValueUsingOptionLabel,
-				initialOptionRef.current,
-				options
-			)
-		);
+	useEffect(() => {
+		const hasOwnProperty = Object.prototype.hasOwnProperty;
+
+		if (
+			prevEditingLanguageId !== editingLanguageId ||
+			(!hasOwnProperty.call(normalizedValue, editingLanguageId) &&
+				hasOwnProperty.call(value, editingLanguageId))
+		) {
+			const availableLanguageIds = Object.getOwnPropertyNames(value);
+
+			availableLanguageIds.forEach((languageId) => {
+				normalizedValue[languageId] = normalizeFields(
+					value[languageId].map((option) => {
+						if (option.edited) {
+							return {
+								id: random(),
+								...option,
+							};
+						}
+
+						const {label} = value[languageId].find(
+							(defaultOption) =>
+								defaultOption.value === option.value
+						);
+
+						return {
+							id: random(),
+							...option,
+							label,
+						};
+					}),
+					generateOptionValueUsingOptionLabel
+				);
+			});
+
+			const options = normalizedValue[editingLanguageId] || [];
+
+			setFields(
+				refreshFields(
+					defaultLanguageId,
+					editingLanguageId,
+					generateOptionValueUsingOptionLabel,
+					initialOptionRef.current,
+					options
+				)
+			);
+		}
 	}, [
 		defaultLanguageId,
 		editingLanguageId,
 		generateOptionValueUsingOptionLabel,
 		normalizedValue,
+		prevEditingLanguageId,
+		value,
 	]);
 
 	const defaultOptionRef = useRef(
@@ -239,19 +276,34 @@ const Options = ({
 			if (existingValue) {
 				const {copyFrom} = existingValue;
 
-				if (copyFrom && copyFrom === editingLanguageId) {
+				if (
+					copyFrom &&
+					copyFrom === editingLanguageId &&
+					!existingValue.edited
+				) {
 					return {
 						...existingValue,
 						label: field.label,
+						reference: field.reference,
 					};
 				}
 
-				return existingValue;
+				return {
+					...existingValue,
+					reference: field.reference,
+				};
+			}
+
+			let copyFrom = editingLanguageId;
+
+			if (languageId !== defaultLanguageId) {
+				copyFrom = defaultLanguageId;
 			}
 
 			return {
 				...field,
-				copyFrom: editingLanguageId,
+				copyFrom,
+				edited: false,
 				label: field.label,
 			};
 		});
@@ -305,7 +357,7 @@ const Options = ({
 				generateOptionValueUsingOptionLabel
 			);
 		}
-		else if (property == 'reference') {
+		else if (property === 'reference') {
 			setFieldError(
 				checkValidReference(fields, value, fields[index].value)
 			);
@@ -324,6 +376,10 @@ const Options = ({
 
 	const add = (fields, index, property, value) => {
 		fields[index][property] = value;
+
+		if (defaultLanguageId !== editingLanguageId) {
+			fields[index]['edited'] = true;
+		}
 
 		const initialOption = getInitialOption(
 			generateOptionValueUsingOptionLabel
@@ -344,7 +400,9 @@ const Options = ({
 
 		fields[index][property] = value;
 		fields[index]['edited'] =
-			edited || (value && value !== label && property === 'value');
+			edited ||
+			(value && value !== label && property === 'value') ||
+			property === 'label';
 
 		if (property === 'label') {
 			fields[index]['copyFrom'] = undefined;
@@ -430,6 +488,7 @@ const Options = ({
 	return (
 		<div className="ddm-field-options-container">
 			<DragPreview component={Option}>{children}</DragPreview>
+
 			{fields.map((option, index) => (
 				<DnD
 					index={index}
@@ -462,8 +521,8 @@ const Options = ({
 };
 
 const Main = ({
-	defaultLanguageId = themeDisplay.getLanguageId(),
-	editingLanguageId = themeDisplay.getLanguageId(),
+	defaultLanguageId = themeDisplay.getDefaultLanguageId(),
+	editingLanguageId = themeDisplay.getDefaultLanguageId(),
 	generateOptionValueUsingOptionLabel = false,
 	onChange,
 	keywordReadOnly,
@@ -500,6 +559,7 @@ const Main = ({
 							displayErrors={
 								fieldError && fieldError === option.value
 							}
+							editingLanguageId={editingLanguageId}
 							errorMessage={Liferay.Language.get(
 								'this-reference-is-already-being-used'
 							)}

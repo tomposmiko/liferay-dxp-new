@@ -24,7 +24,7 @@ TrashContainerModelDisplayContext trashContainerModelDisplayContext = new TrashC
 	<liferay-ui:message arguments="<%= trashContainerModelDisplayContext.getMissingContainerMessageArguments() %>" key="the-original-x-does-not-exist-anymore" translateArguments="<%= false %>" />
 </div>
 
-<aui:form cssClass="container-fluid-1280" method="post" name="selectContainerFm">
+<aui:form cssClass="container-fluid container-fluid-max-xl" method="post" name="selectContainerFm">
 	<liferay-site-navigation:breadcrumb
 		breadcrumbEntries="<%= trashDisplayContext.getContainerModelBreadcrumbEntries(trashContainerModelDisplayContext.getContainerModelClassName(), trashContainerModelDisplayContext.getContainerModelId(), trashContainerModelDisplayContext.getContainerURL()) %>"
 	/>
@@ -64,9 +64,11 @@ TrashContainerModelDisplayContext trashContainerModelDisplayContext = new TrashC
 			<%
 			long curContainerModelId = curContainerModel.getContainerModelId();
 
-			PortletURL containerURL = trashContainerModelDisplayContext.getContainerURL();
-
-			containerURL.setParameter("containerModelId", String.valueOf(curContainerModelId));
+			PortletURL containerURL = PortletURLBuilder.create(
+				trashContainerModelDisplayContext.getContainerURL()
+			).setParameter(
+				"containerModelId", curContainerModelId
+			).buildPortletURL();
 
 			TrashHandler curContainerTrashHandler = TrashHandlerRegistryUtil.getTrashHandler(curContainerModel.getModelClassName());
 			%>
@@ -118,10 +120,3 @@ TrashContainerModelDisplayContext trashContainerModelDisplayContext = new TrashC
 		/>
 	</liferay-ui:search-container>
 </aui:form>
-
-<aui:script>
-	Liferay.Util.selectEntityHandler(
-		'#<portlet:namespace />selectContainerFm',
-		'<%= HtmlUtil.escapeJS(trashContainerModelDisplayContext.getEventName()) %>'
-	);
-</aui:script>

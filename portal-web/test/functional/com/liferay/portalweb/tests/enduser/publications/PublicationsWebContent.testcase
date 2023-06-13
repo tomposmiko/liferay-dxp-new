@@ -1,7 +1,6 @@
 @component-name = "portal-publications"
 definition {
 
-	property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Publications";
@@ -17,57 +16,17 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			ApplicationsMenu.gotoPortlet(
-				category = "Publications",
-				panel = "Applications",
-				portlet = "Settings");
-
 			Publications.disablePublications();
 		}
 	}
 
-	@description = "This is the use case for LPS-165437."
-	@priority = 3
-	test CanPublishPublicationWithDeletedWCFolder {
-		JSONWebcontent.addFolder(
-			folderName = "WC Folder Name",
-			groupName = "Global");
-
-		JSONPublications.addPublication(publicationName = "Publication Name");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name");
-
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "Global");
-
-		WebContent.moveToRecycleBinCP(
-			assetType = "Web Content Article",
-			webContentTitle = "WC Folder Name");
-
-		Publications.gotoPublish(publicationName = "Publication Name");
-
-		Publications.publishPublication(publicationName = "Publication Name");
-
-		Publications.viewPublicationPublished(publicationName = "Publication Name");
-
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "Global");
-
-		AssertElementNotPresent(
-			key_webContentTitle = "WC Folder Name",
-			locator1 = "WC#ENTRY_LIST_TITLE");
-	}
-
 	@description = "Manage Conflicting Web Content Folder changes and discard the changes."
-	@priority = 4
+	@priority = "4"
 	test ManageConflictingWebContentFolderchanges {
-
-		// Wrokaround LPS-127348
-
-		property database.types = "hypersonic,mariadb,mysql,oracle,postgresql,sqlserver";
-
 		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONWebcontent.addFolder(
@@ -99,9 +58,9 @@ definition {
 
 		PortletEntry.save();
 
-		Publications.gotoReviewChanges();
+		PublicationsNavigator.gotoReviewChanges();
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Web Content Folder",
 			changeSite = "Site Name",
 			changeTitle = "WC Folder Name Edited",
@@ -124,9 +83,9 @@ definition {
 			assetName = "WC Folder Name",
 			assetType = "Web Content Folder");
 
-		Publications.gotoReviewChanges();
+		PublicationsNavigator.gotoReviewChanges();
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Web Content Folder",
 			changeSite = "Site Name",
 			changeTitle = "WC Folder Name",
@@ -137,9 +96,7 @@ definition {
 
 		Publications.viewPublicationPublished(publicationName = "Publication 2 Name");
 
-		Publications.selectPublication(
-			gotoManagePublications = "true",
-			publicationName = "Publication 1 Name");
+		JSONPublications.selectPublication(publicationName = "Publication 1 Name");
 
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
@@ -149,15 +106,17 @@ definition {
 			locator1 = "WC#ENTRY_LIST_TITLE",
 			value1 = "Web Content Folder");
 
-		Publications.gotoPublish(publicationName = "Publication 1 Name");
+		PublicationsNavigator.gotoPublish(publicationName = "Publication 1 Name");
 
-		Publications.discardChanges(
+		PublicationsChanges.discardChanges(
 			changeCategory = "WC Folder Name",
 			changeTitle = "WC Folder Name Edited",
 			conflictingChanges = "true",
 			entryTitle = "WC Folder Name Edited");
 
-		Publications.publishPublication(publicationName = "Publication 1 Name");
+		JSONPublications.publishPublication(publicationName = "Publication 1 Name");
+
+		Publications.viewPublicationPublished(publicationName = "Publication 1 Name");
 
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
@@ -168,42 +127,25 @@ definition {
 			value1 = "Web Content Folder");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test PublishExpiredWebContentViaWCD {
-
-		// Wrokaround LPS-127348
-
-		property database.types = "hypersonic,mariadb,mysql,oracle,postgresql,sqlserver";
-
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
 		JSONPublications.selectPublication(publicationName = "Publication Name");
 
-		Navigator.openURL();
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Test Page");
 
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			portlet = "Pages");
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Guest",
+			layoutName = "Test Page",
+			widgetName = "Web Content Display");
 
-		SitePages.addPublicPage(pageName = "Test Page");
-
-		Navigator.gotoPage(pageName = "Test Page");
-
-		Portlet.addPG(portletName = "Web Content Display");
-
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content & Data",
-			portlet = "Web Content");
-
-		WebContentNavigator.gotoAddCP();
-
-		WebContent.addCP(
-			webContentContent = "WC WebContent Content",
-			webContentTitle = "WC WebContent Title");
-
-		PortletEntry.publish();
+		JSONWebcontent.addWebContent(
+			content = "WC WebContent Content",
+			groupName = "Guest",
+			title = "WC WebContent Title");
 
 		Navigator.gotoPage(pageName = "Test Page");
 
@@ -213,11 +155,7 @@ definition {
 
 		WebContent.viewPGViaWCD(webContentContent = "WC WebContent Content");
 
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content & Data",
-			portlet = "Web Content");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		WebContent.expireSpecificVersionCP(webContentTitle = "WC WebContent Title");
 
@@ -238,34 +176,40 @@ definition {
 			webContentTitle = "WC WebContent Title");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test PublishWebContentWithCategory {
-
-		// Wrokaround LPS-127348
-
-		property database.types = "hypersonic,mariadb,mysql,oracle,postgresql,sqlserver";
-
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
 		JSONPublications.selectPublication(publicationName = "Publication Name");
 
-		Navigator.openURL();
+		JSONCategory.addVocabulary(
+			groupName = "Guest",
+			title = "Vocabulary Name");
 
-		ProductMenu.gotoPortlet(
-			category = "Categorization",
-			portlet = "Categories");
-
-		Vocabulary.addCP(vocabularyName = "Vocabulary Name");
-
-		Category.addCP(
-			categoryName = "Category Name",
+		JSONCategory.addCategory(
+			groupName = "Guest",
+			title = "Category Name",
 			vocabularyName = "Vocabulary Name");
 
-		Navigator.openURL();
+		PublicationsNavigator.openPublicationsAdmin();
 
-		ProductMenu.gotoPortlet(
-			category = "Content & Data",
-			portlet = "Web Content");
+		PublicationsNavigator.gotoReviewChanges();
+
+		PublicationsChanges.viewChanges(
+			changeCategory = "Category Vocabulary",
+			changeSite = "Guest",
+			changeTitle = "Vocabulary Name",
+			changeType = "Added",
+			changeUser = "Test Test");
+
+		PublicationsChanges.viewChanges(
+			changeCategory = "Category",
+			changeSite = "Guest",
+			changeTitle = "Category Name",
+			changeType = "Added",
+			changeUser = "Test Test");
+
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		WebContentNavigator.gotoAddCP();
 
@@ -283,10 +227,6 @@ definition {
 			searchAssetTitle = "WC WebContent Title",
 			searchAssetType = "Web Content");
 
-		Publications.gotoPublish(
-			gotoManagePublications = "true",
-			publicationName = "Publication Name");
-
 		JSONPublications.publishPublication(publicationName = "Publication Name");
 
 		Publications.viewPublicationPublished(publicationName = "Publication Name");
@@ -300,77 +240,54 @@ definition {
 			searchAssetType = "Web Content");
 	}
 
-	@priority = 4
+	@ignore = "true"
+	@priority = "4"
 	test PublishWebContentWithDMAndImageFields {
-
-		// Workaround LPS-121020
-
-		//property test.assert.warning.exceptions = "true";
+		property test.assert.warning.exceptions = "true";
 
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
 		JSONPublications.selectPublication(publicationName = "Publication Name");
 
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content & Data",
-			portlet = "Documents and Media");
-
-		DMDocument.addCP(
+		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.txt",
-			dmDocumentTitle = "DM Document Title");
+			dmDocumentTitle = "DM Document Title",
+			groupName = "Guest",
+			mimeType = "text/plain",
+			sourceFileName = "Document_1.txt");
 
-		ProductMenu.gotoPortlet(
-			category = "Content & Data",
-			portlet = "Web Content");
-
-		NavItem.gotoStructures();
+		WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "guest");
 
 		WebContentStructures.addCP(
 			structureDescription = "WC Structure Description",
 			structureName = "WC Structure Name");
 
-		for (var structureFieldName : list "Documents and Media,Image,Text") {
-			DynamicDataMapping.addField(
-				field = ${structureFieldName},
-				fieldFieldLabel = ${structureFieldName},
-				fieldName = StringUtil.replace(${structureFieldName}, " ", ""));
-		}
+		DataEngine.addFields(fieldNameList = "Upload,Image,Text");
 
 		WebContentStructures.saveCP(structureName = "WC Structure Name");
 
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content & Data",
-			portlet = "Web Content");
-
-		NavItem.gotoTemplates();
+		WebContentNavigator.openWebContentTemplatesAdmin(siteURLKey = "guest");
 
 		WebContentTemplates.addCP(
 			structureName = "WC Structure Name",
 			templateDescription = "WC Template Description",
-			templateFieldNames = "Documents and Media,Image,Text",
+			templateFieldNames = "Upload,Image,Text",
 			templateName = "WC Template Name");
 
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content & Data",
-			portlet = "Web Content");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
 
 		WebContent.addWithStructureCP(
-			fieldName = "DocumentsandMedia",
+			dmDocumentTitle = "DM Document Title",
+			dmNavTab = "Documents and Media",
+			navTab = "Web Content Images",
 			structureName = "WC Structure Name",
 			templateName = "WC Template Name",
-			webContentDocumentsAndMedia = "DM Document Title",
 			webContentImage = "Document_1.jpg",
 			webContentText = "WC WebContent Text",
-			webContentTitle = "WC WebContent Title");
+			webContentTitle = "WC WebContent Title",
+			webContentUpload = "DM Document Title");
 
 		PortletEntry.publish();
 
@@ -378,32 +295,32 @@ definition {
 			key_webContentTitle = "WC WebContent Title",
 			locator1 = "WC#ENTRY_LIST_TITLE");
 
-		Publications.gotoReviewChanges();
+		PublicationsNavigator.gotoReviewChanges();
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Dynamic Data Mapping Structure",
 			changeSite = "Guest",
 			changeTitle = "WC Structure Name",
 			changeType = "Added",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Dynamic Data Mapping Template",
 			changeSite = "Guest",
 			changeTitle = "WC Template Name",
 			changeType = "Added",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Document",
 			changeSite = "Guest",
 			changeTitle = "DM Document Title",
 			changeType = "Added",
 			changeUser = "Test Test");
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Document",
-			changeOrder = 2,
+			changeOrder = "2",
 			changeSite = "Guest",
 			changeTitle = "Document_1.jpg",
 			changeType = "Added",
@@ -413,47 +330,37 @@ definition {
 
 		Publications.viewPublicationPublished(publicationName = "Publication Name");
 
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content & Data",
-			portlet = "Web Content");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
 		AssertElementPresent(
 			key_webContentTitle = "WC WebContent Title",
 			locator1 = "WC#ENTRY_LIST_TITLE");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test PublishWebContentWithFriendlyURL {
-
-		// Wrokaround LPS-129638
-
-		property database.types = "hypersonic,mariadb,mysql,oracle,postgresql,sqlserver";
-
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
 		JSONPublications.selectPublication(publicationName = "Publication Name");
 
-		Navigator.openURL();
+		JSONGroup.addGroup(groupName = "Site Name");
 
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			portlet = "Pages");
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page");
 
-		SitePages.addPublicPage(pageName = "Test Page");
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page",
+			widgetName = "Asset Publisher");
 
-		Navigator.gotoPage(pageName = "Test Page");
-
-		Portlet.addPG(portletName = "Asset Publisher");
+		Navigator.openSitePage(
+			pageName = "Test Page",
+			siteName = "Site Name");
 
 		AssetPublisherPortlet.configureDisplaySettings(displaySettings = "Set as the Default Asset Publisher for This Page");
 
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content & Data",
-			portlet = "Web Content");
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 
 		WebContentNavigator.gotoAddCP();
 
@@ -472,18 +379,18 @@ definition {
 
 		var portalURL = PropsUtil.get("portal.url");
 
-		Navigator.openSpecificURL(url = "${portalURL}/web/guest/-/friendlyUrl");
+		Navigator.openSpecificURL(url = "${portalURL}/web/site-name/-/friendlyUrl");
 
 		AssertTextEquals.assertPartialText(
 			key_assetTitle = "WC WebContent Title",
 			locator1 = "AP#ASSET_ABSTRACT_TITLE",
 			value1 = "WC WebContent Title");
 
-		Publications.gotoReviewChanges();
+		PublicationsNavigator.gotoReviewChanges();
 
-		PublicationsChanges.viewChangesViaChangesStyle(
+		PublicationsChanges.viewChanges(
 			changeCategory = "Widget",
-			changeSite = "Guest",
+			changeSite = "Site Name",
 			changeTitle = "Asset Publisher on Test Page",
 			changeType = "Added",
 			changeUser = "Test Test");
@@ -492,160 +399,12 @@ definition {
 
 		Publications.viewPublicationPublished(publicationName = "Publication Name");
 
-		Navigator.openSpecificURL(url = "${portalURL}/web/guest/-/friendlyUrl");
+		Navigator.openSpecificURL(url = "${portalURL}/web/site-name/-/friendlyUrl");
 
 		AssertTextEquals.assertPartialText(
 			key_assetTitle = "WC WebContent Title",
 			locator1 = "AP#ASSET_ABSTRACT_TITLE",
 			value1 = "WC WebContent Title");
-	}
-
-	@priority = 3
-	test ReviewChangesCanProcessWebContentsWithThemeDisplayInTemplate {
-		JSONPublications.addPublication(publicationName = "Publication Name");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name");
-
-		JSONGroup.addGroup(groupName = "Site Name");
-
-		WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "site-name");
-
-		WebContentStructures.addCP(
-			structureDescription = "WC Structure Description",
-			structureName = "WC Structure Name");
-
-		DynamicDataMapping.addField(
-			field = "Text",
-			fieldFieldLabel = "Text",
-			fieldName = "Text");
-
-		DynamicDataMapping.editFieldLocalizable(fieldFieldLabel = "Text");
-
-		WebContentStructures.saveCP(structureName = "WC Structure Name");
-
-		Navigator.gotoNavItem(navItem = "Templates");
-
-		LexiconEntry.gotoAdd();
-
-		WebContentTemplates.inputTemplateAddScreenFields(
-			structureName = "WC Structure Name",
-			templateDescription = "WC Template Description",
-			templateName = "WC Template Name",
-			templateScript = "themeDisplay.getScopeGroupId()");
-
-		Uncheck(
-			checkboxName = "Cacheable",
-			locator1 = "Checkbox#ANY_CHECKBOX");
-
-		DDLDataDefinition.save();
-
-		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
-
-		WebContentNavigator.gotoAddWithStructureCP(structureName = "WC Structure Name");
-
-		WebContent.addWithStructureCP(
-			structureName = "WC Structure Name",
-			templateName = "WC Template Name",
-			webContentText = "WC Web Content Text",
-			webContentTitle = "WC Web Content Title");
-
-		PortletEntry.publish();
-
-		WebContentNavigator.gotoEditCP(webContentTitle = "WC Web Content Title");
-
-		WebContent.addCP(webContentTitle = "WC Web Content Title Edited");
-
-		PortletEntry.publish();
-
-		Publications.gotoReviewChanges();
-
-		Click(
-			changeOrder = 2,
-			key_changeCategory = "Web Content Article",
-			key_changeTitle = "WC Web Content Title Edited",
-			locator1 = "PublicationsChanges#PUBLICATIONS_CHANGE_TITLE");
-
-		AssertConsoleTextNotPresent(value1 = "Error executing FreeMarker template");
-	}
-
-	@description = "This is the use case for LPS-161841. The order of the versions is not reversed When resolving web content article version conflicts during publication."
-	@priority = 4
-	test WebContentArticleVersionCannotBeReversedWhenResolvingTheConflicts {
-		task ("Add new web content on new added site") {
-			JSONGroup.addGroup(groupName = "Site Name");
-
-			JSONWebcontent.addWebContent(
-				content = "Web Content Content",
-				groupName = "Site Name",
-				title = "Web Content Title");
-		}
-
-		task ("Add a new Publication") {
-			JSONPublications.addPublication(publicationName = "Publication Name");
-
-			JSONPublications.selectPublication(publicationName = "Publication Name");
-		}
-
-		task ("Edit the web content 3 times") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
-
-			WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
-
-			WebContent.editCP(
-				webContentContentEdit = "Web Content Content Edit 1",
-				webContentTitle = "Web Content Title",
-				webContentTitleEdit = "Web Content Title Edit 1");
-
-			WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title Edit 1");
-
-			WebContent.editCP(
-				webContentContentEdit = "Web Content Content Edit 2",
-				webContentTitle = "Web Content Title Edit 1",
-				webContentTitleEdit = "Web Content Title Edit 2");
-
-			WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title Edit 2");
-
-			WebContent.editCP(
-				webContentContentEdit = "Web Content Content Edit 3",
-				webContentTitle = "Web Content Title Edit 2",
-				webContentTitleEdit = "Web Content Title Edit 3");
-		}
-
-		task ("Edit the web content on Production mode") {
-			ApplicationsMenu.gotoPortlet(
-				category = "Publications",
-				panel = "Applications",
-				portlet = "Publications");
-
-			Publications.workOnProduction();
-
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
-
-			WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title");
-
-			WebContent.editCP(
-				webContentContentEdit = "Web Content Content Edit 1",
-				webContentTitle = "Web Content Title",
-				webContentTitleEdit = "Web Content Title Edit 1");
-		}
-
-		task ("Publish the publication") {
-			JSONPublications.selectPublication(publicationName = "Publication Name");
-
-			JSONPublications.publishPublication(publicationName = "Publication Name");
-
-			Publications.viewPublicationPublished(publicationName = "Publication Name");
-		}
-
-		task ("View the web content version 1.3 displays on Production") {
-			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
-
-			WebContentNavigator.gotoEditCP(webContentTitle = "Web Content Title Edit 3");
-
-			WebContent.viewCP(
-				webContentContent = "Web Content Content Edit 3",
-				webContentTitle = "Web Content Title Edit 3");
-		}
 	}
 
 }

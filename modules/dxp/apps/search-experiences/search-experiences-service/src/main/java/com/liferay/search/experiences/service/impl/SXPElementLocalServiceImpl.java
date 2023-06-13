@@ -14,7 +14,6 @@
 
 package com.liferay.search.experiences.service.impl;
 
-import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.ResourceConstants;
@@ -27,9 +26,8 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.search.experiences.exception.DuplicateSXPElementExternalReferenceCodeException;
+import com.liferay.search.experiences.exception.SXPElementElementDefinitionJSONException;
 import com.liferay.search.experiences.exception.SXPElementTitleException;
 import com.liferay.search.experiences.model.SXPElement;
 import com.liferay.search.experiences.service.base.SXPElementLocalServiceBaseImpl;
@@ -46,6 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  */
 @Component(
+	enabled = false,
 	property = "model.class.name=com.liferay.search.experiences.model.SXPElement",
 	service = AopService.class
 )
@@ -54,38 +53,29 @@ public class SXPElementLocalServiceImpl extends SXPElementLocalServiceBaseImpl {
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public SXPElement addSXPElement(
-			String externalReferenceCode, long userId,
-			Map<Locale, String> descriptionMap, String elementDefinitionJSON,
-			boolean readOnly, String schemaVersion,
+			long userId, Map<Locale, String> descriptionMap,
+			String elementDefinitionJSON, boolean readOnly,
 			Map<Locale, String> titleMap, int type,
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(userId);
-
-		_validateExternalReferenceCode(
-			user.getCompanyId(), externalReferenceCode);
-
-		_validate(titleMap, type, serviceContext);
+		_validate(elementDefinitionJSON, titleMap, type, serviceContext);
 
 		SXPElement sxpElement = createSXPElement(
 			counterLocalService.increment(SXPElement.class.getName()));
 
-		sxpElement.setExternalReferenceCode(externalReferenceCode);
+		User user = _userLocalService.getUser(userId);
+
 		sxpElement.setCompanyId(user.getCompanyId());
 		sxpElement.setUserId(user.getUserId());
 		sxpElement.setUserName(user.getFullName());
+
 		sxpElement.setDescriptionMap(descriptionMap);
 		sxpElement.setElementDefinitionJSON(elementDefinitionJSON);
 		sxpElement.setHidden(false);
 		sxpElement.setReadOnly(readOnly);
-		sxpElement.setSchemaVersion(schemaVersion);
 		sxpElement.setTitleMap(titleMap);
 		sxpElement.setType(type);
-		sxpElement.setVersion(
-			String.format(
-				"%.1f",
-				GetterUtil.getFloat(sxpElement.getVersion(), 0.9F) + 0.1));
 		sxpElement.setStatus(WorkflowConstants.STATUS_APPROVED);
 
 		sxpElement = sxpElementPersistence.update(sxpElement);
@@ -157,57 +147,37 @@ public class SXPElementLocalServiceImpl extends SXPElementLocalServiceBaseImpl {
 	@Override
 	public SXPElement updateSXPElement(
 			long userId, long sxpElementId, Map<Locale, String> descriptionMap,
-			String elementDefinitionJSON, boolean hidden, String schemaVersion,
+			String elementDefinitionJSON, boolean hidden,
 			Map<Locale, String> titleMap, ServiceContext serviceContext)
 		throws PortalException {
 
 		SXPElement sxpElement = getSXPElement(sxpElementId);
 
-		_validate(titleMap, sxpElement.getType(), serviceContext);
+		_validate(
+			elementDefinitionJSON, titleMap, sxpElement.getType(),
+			serviceContext);
 
 		sxpElement.setDescriptionMap(descriptionMap);
 		sxpElement.setElementDefinitionJSON(elementDefinitionJSON);
 		sxpElement.setHidden(hidden);
-		sxpElement.setSchemaVersion(schemaVersion);
 		sxpElement.setTitleMap(titleMap);
-		sxpElement.setVersion(
-			String.format(
-				"%.1f",
-				GetterUtil.getFloat(sxpElement.getVersion(), 0.9F) + 0.1));
 
 		return updateSXPElement(sxpElement);
 	}
 
 	private void _validate(
-			Map<Locale, String> titleMap, int type,
-			ServiceContext serviceContext)
-		throws SXPElementTitleException {
+			String elementDefinitionJSON, Map<Locale, String> titleMap,
+			int type, ServiceContext serviceContext)
+		throws SXPElementElementDefinitionJSONException,
+			   SXPElementTitleException {
 
 		if (!GetterUtil.getBoolean(
 				serviceContext.getAttribute(
 					SXPElementLocalServiceImpl.class.getName() + "#_validate"),
 				true)) {
 
-			_sxpElementValidator.validate(titleMap, type);
-		}
-	}
-
-	private void _validateExternalReferenceCode(
-			long companyId, String externalReferenceCode)
-		throws PortalException {
-
-		if (Validator.isNull(externalReferenceCode)) {
-			return;
-		}
-
-		SXPElement sxpElement = fetchSXPElementByExternalReferenceCode(
-			companyId, externalReferenceCode);
-
-		if (sxpElement != null) {
-			throw new DuplicateSXPElementExternalReferenceCodeException(
-				StringBundler.concat(
-					"Duplicate element external reference code ",
-					externalReferenceCode, " in company ", companyId));
+			_sxpElementValidator.validate(
+				elementDefinitionJSON, titleMap, type);
 		}
 	}
 

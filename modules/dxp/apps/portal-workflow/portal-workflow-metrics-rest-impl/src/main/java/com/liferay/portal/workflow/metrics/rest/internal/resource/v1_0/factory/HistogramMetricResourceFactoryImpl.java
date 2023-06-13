@@ -32,20 +32,15 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.workflow.metrics.rest.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.HistogramMetricResource;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -53,7 +48,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +58,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Rafael Praxedes
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/portal-workflow-metrics/v1.0/HistogramMetric",
-	service = HistogramMetricResource.Factory.class
-)
+@Component(immediate = true, service = HistogramMetricResource.Factory.class)
 @Generated("")
 public class HistogramMetricResourceFactoryImpl
 	implements HistogramMetricResource.Factory {
@@ -79,7 +73,9 @@ public class HistogramMetricResourceFactoryImpl
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return _histogramMetricResourceProxyProviderFunction.apply(
+				return (HistogramMetricResource)ProxyUtil.newProxyInstance(
+					HistogramMetricResource.class.getClassLoader(),
+					new Class<?>[] {HistogramMetricResource.class},
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -138,32 +134,14 @@ public class HistogramMetricResourceFactoryImpl
 		};
 	}
 
-	private static Function<InvocationHandler, HistogramMetricResource>
-		_getProxyProviderFunction() {
+	@Activate
+	protected void activate() {
+		HistogramMetricResource.FactoryHolder.factory = this;
+	}
 
-		Class<?> proxyClass = ProxyUtil.getProxyClass(
-			HistogramMetricResource.class.getClassLoader(),
-			HistogramMetricResource.class);
-
-		try {
-			Constructor<HistogramMetricResource> constructor =
-				(Constructor<HistogramMetricResource>)proxyClass.getConstructor(
-					InvocationHandler.class);
-
-			return invocationHandler -> {
-				try {
-					return constructor.newInstance(invocationHandler);
-				}
-				catch (ReflectiveOperationException
-							reflectiveOperationException) {
-
-					throw new InternalError(reflectiveOperationException);
-				}
-			};
-		}
-		catch (NoSuchMethodException noSuchMethodException) {
-			throw new InternalError(noSuchMethodException);
-		}
+	@Deactivate
+	protected void deactivate() {
+		HistogramMetricResource.FactoryHolder.factory = null;
 	}
 
 	private Object _invoke(
@@ -186,7 +164,7 @@ public class HistogramMetricResourceFactoryImpl
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		HistogramMetricResource histogramMetricResource =
@@ -212,7 +190,6 @@ public class HistogramMetricResourceFactoryImpl
 		histogramMetricResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		histogramMetricResource.setRoleLocalService(_roleLocalService);
-		histogramMetricResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(histogramMetricResource, arguments);
@@ -228,10 +205,6 @@ public class HistogramMetricResourceFactoryImpl
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
-
-	private static final Function<InvocationHandler, HistogramMetricResource>
-		_histogramMetricResourceProxyProviderFunction =
-			_getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
@@ -254,6 +227,9 @@ public class HistogramMetricResourceFactoryImpl
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -262,9 +238,6 @@ public class HistogramMetricResourceFactoryImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

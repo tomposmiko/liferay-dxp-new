@@ -15,10 +15,9 @@
 package com.liferay.batch.engine.internal.reader;
 
 import com.liferay.batch.engine.BatchEngineTaskContentType;
+import com.liferay.batch.engine.internal.util.ZipInputStreamUtil;
 
 import java.io.InputStream;
-
-import java.util.zip.ZipInputStream;
 
 /**
  * @author Shuyang Zhou
@@ -37,40 +36,30 @@ public class BatchEngineImportTaskItemReaderFactory {
 			InputStream inputStream)
 		throws Exception {
 
-		inputStream = _getZipInputStream(inputStream);
+		inputStream = ZipInputStreamUtil.asZipInputStream(inputStream);
 
 		if (batchEngineTaskContentType == BatchEngineTaskContentType.CSV) {
-			return new CSVBatchEngineImportTaskItemReader(
+			return new CSVBatchEngineImportTaskItemReaderImpl(
 				_csvFileColumnDelimiter, inputStream);
 		}
 
 		if (batchEngineTaskContentType == BatchEngineTaskContentType.JSON) {
-			return new JSONBatchEngineImportTaskItemReader(inputStream);
+			return new JSONBatchEngineImportTaskItemReaderImpl(inputStream);
 		}
 
 		if (batchEngineTaskContentType == BatchEngineTaskContentType.JSONL) {
-			return new JSONLBatchEngineImportTaskItemReader(inputStream);
+			return new JSONLBatchEngineImportTaskItemReaderImpl(inputStream);
 		}
 
 		if ((batchEngineTaskContentType == BatchEngineTaskContentType.XLS) ||
 			(batchEngineTaskContentType == BatchEngineTaskContentType.XLSX)) {
 
-			return new XLSBatchEngineImportTaskItemReader(inputStream);
+			return new XLSBatchEngineImportTaskItemReaderImpl(inputStream);
 		}
 
 		throw new IllegalArgumentException(
 			"Unknown batch engine task content type " +
 				batchEngineTaskContentType);
-	}
-
-	private InputStream _getZipInputStream(InputStream inputStream)
-		throws Exception {
-
-		ZipInputStream zipInputStream = new ZipInputStream(inputStream);
-
-		zipInputStream.getNextEntry();
-
-		return zipInputStream;
 	}
 
 	private final String _csvFileColumnDelimiter;

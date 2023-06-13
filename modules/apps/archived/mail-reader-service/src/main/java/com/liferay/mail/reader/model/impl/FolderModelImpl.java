@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -215,58 +216,79 @@ public class FolderModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Folder, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Folder>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Folder, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Folder, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Folder.class.getClassLoader(), Folder.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("folderId", Folder::getFolderId);
-		attributeGetterFunctions.put("companyId", Folder::getCompanyId);
-		attributeGetterFunctions.put("userId", Folder::getUserId);
-		attributeGetterFunctions.put("userName", Folder::getUserName);
-		attributeGetterFunctions.put("createDate", Folder::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", Folder::getModifiedDate);
-		attributeGetterFunctions.put("accountId", Folder::getAccountId);
-		attributeGetterFunctions.put("fullName", Folder::getFullName);
-		attributeGetterFunctions.put("displayName", Folder::getDisplayName);
-		attributeGetterFunctions.put(
-			"remoteMessageCount", Folder::getRemoteMessageCount);
+		try {
+			Constructor<Folder> constructor =
+				(Constructor<Folder>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Folder, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Folder, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Folder, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Folder, Object>>();
 		Map<String, BiConsumer<Folder, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Folder, ?>>();
 
+		attributeGetterFunctions.put("folderId", Folder::getFolderId);
 		attributeSetterBiConsumers.put(
 			"folderId", (BiConsumer<Folder, Long>)Folder::setFolderId);
+		attributeGetterFunctions.put("companyId", Folder::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<Folder, Long>)Folder::setCompanyId);
+		attributeGetterFunctions.put("userId", Folder::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<Folder, Long>)Folder::setUserId);
+		attributeGetterFunctions.put("userName", Folder::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<Folder, String>)Folder::setUserName);
+		attributeGetterFunctions.put("createDate", Folder::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<Folder, Date>)Folder::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", Folder::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate", (BiConsumer<Folder, Date>)Folder::setModifiedDate);
+		attributeGetterFunctions.put("accountId", Folder::getAccountId);
 		attributeSetterBiConsumers.put(
 			"accountId", (BiConsumer<Folder, Long>)Folder::setAccountId);
+		attributeGetterFunctions.put("fullName", Folder::getFullName);
 		attributeSetterBiConsumers.put(
 			"fullName", (BiConsumer<Folder, String>)Folder::setFullName);
+		attributeGetterFunctions.put("displayName", Folder::getDisplayName);
 		attributeSetterBiConsumers.put(
 			"displayName", (BiConsumer<Folder, String>)Folder::setDisplayName);
+		attributeGetterFunctions.put(
+			"remoteMessageCount", Folder::getRemoteMessageCount);
 		attributeSetterBiConsumers.put(
 			"remoteMessageCount",
 			(BiConsumer<Folder, Integer>)Folder::setRemoteMessageCount);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -540,6 +562,28 @@ public class FolderModelImpl
 	}
 
 	@Override
+	public Folder cloneWithOriginalValues() {
+		FolderImpl folderImpl = new FolderImpl();
+
+		folderImpl.setFolderId(this.<Long>getColumnOriginalValue("folderId"));
+		folderImpl.setCompanyId(this.<Long>getColumnOriginalValue("companyId"));
+		folderImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		folderImpl.setUserName(this.<String>getColumnOriginalValue("userName"));
+		folderImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		folderImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		folderImpl.setAccountId(this.<Long>getColumnOriginalValue("accountId"));
+		folderImpl.setFullName(this.<String>getColumnOriginalValue("fullName"));
+		folderImpl.setDisplayName(
+			this.<String>getColumnOriginalValue("displayName"));
+		folderImpl.setRemoteMessageCount(
+			this.<Integer>getColumnOriginalValue("remoteMessageCount"));
+
+		return folderImpl;
+	}
+
+	@Override
 	public int compareTo(Folder folder) {
 		int value = 0;
 
@@ -746,9 +790,7 @@ public class FolderModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Folder>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Folder.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

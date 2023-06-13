@@ -23,23 +23,19 @@ import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.search.asset.SearchableAssetClassNamesProvider;
 import com.liferay.portal.search.constants.SearchContextAttributes;
-import com.liferay.portal.search.internal.expando.ExpandoQueryContributorHelper;
-import com.liferay.portal.search.internal.indexer.AddSearchKeywordsQueryContributorHelper;
-import com.liferay.portal.search.internal.indexer.PostProcessSearchQueryContributorHelper;
-import com.liferay.portal.search.internal.indexer.PreFilterContributorHelper;
+import com.liferay.portal.search.internal.expando.helper.ExpandoQueryContributorHelper;
+import com.liferay.portal.search.internal.indexer.helper.AddSearchKeywordsQueryContributorHelper;
+import com.liferay.portal.search.internal.indexer.helper.PostProcessSearchQueryContributorHelper;
+import com.liferay.portal.search.internal.indexer.helper.PreFilterContributorHelper;
 import com.liferay.portal.search.internal.legacy.searcher.SearchRequestBuilderFactoryImpl;
+import com.liferay.portal.search.internal.searcher.helper.IndexSearcherHelper;
 import com.liferay.portal.search.internal.test.util.DocumentFixture;
 import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.registry.BasicRegistryImpl;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,18 +53,6 @@ public class FacetedSearcherImplTest {
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-		Registry registry = new BasicRegistryImpl();
-
-		RegistryUtil.setRegistry(registry);
-	}
-
-	@AfterClass
-	public static void tearDownClass() {
-		RegistryUtil.setRegistry(null);
-	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -97,9 +81,7 @@ public class FacetedSearcherImplTest {
 
 	@Test
 	public void testEmptySearchDisabledByDefault() throws Exception {
-		SearchContext searchContext = new SearchContext();
-
-		assertSearchSkipped(searchContext);
+		assertSearchSkipped(new SearchContext());
 	}
 
 	@Test

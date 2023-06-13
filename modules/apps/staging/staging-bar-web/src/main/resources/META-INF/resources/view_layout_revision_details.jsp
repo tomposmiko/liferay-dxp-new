@@ -23,6 +23,8 @@ if ((layoutRevision == null) && (layout != null)) {
 	layoutRevision = LayoutStagingUtil.getLayoutRevision(layout);
 }
 
+layoutRevision = stagingBarDisplayContext.updateLayoutRevision(layoutRevision);
+
 LayoutSetBranch layoutSetBranch = (LayoutSetBranch)request.getAttribute(StagingProcessesWebKeys.LAYOUT_SET_BRANCH);
 
 if (layoutSetBranch == null) {
@@ -71,7 +73,7 @@ else {
 				<c:choose>
 					<c:when test="<%= !layout.isTypeContent() && !layoutRevision.isIncomplete() && !workflowEnabled %>">
 						<span class="staging-bar-control-toggle">
-							<aui:input id="readyToggle" label="<%= StringPool.BLANK %>" labelOff="ready-for-publication" labelOn="ready-for-publication" name="readyToggle" onChange='<%= liferayPortletResponse.getNamespace() + "submitLayoutRevision('" + publishURL + "')" %>' type="toggle-switch" value="<%= false %>" />
+							<aui:input id="readyToggle" label="<%= StringPool.BLANK %>" labelOff="ready-for-publish-process" labelOn="ready-for-publish-process" name="readyToggle" onChange='<%= liferayPortletResponse.getNamespace() + "submitLayoutRevision('" + publishURL + "')" %>' type="toggle-switch" value="<%= false %>" />
 						</span>
 					</c:when>
 					<c:when test="<%= !workflowEnabled || pendingLayoutRevisions.isEmpty() %>">
@@ -88,7 +90,7 @@ else {
 						%>
 
 						<div class="btn-group-item">
-							<a class="btn btn-secondary btn-sm" href="javascript:Liferay.fire('<portlet:namespace />submit', {incomplete: <%= layoutRevision.isIncomplete() %>, publishURL: '<%= publishURL %>', currentURL: '<%= currentURL %>'}); void(0);" id="submitLink">
+							<a class="btn btn-secondary btn-sm" href="javascript:Liferay.fire('<%= liferayPortletResponse.getNamespace() %>submit', {incomplete: <%= layoutRevision.isIncomplete() %>, publishURL: '<%= publishURL %>', currentURL: '<%= currentURL %>'}); void(0);" id="submitLink">
 								<liferay-ui:message key="<%= label %>" />
 							</a>
 						</div>
@@ -102,30 +104,19 @@ else {
 		<li class="control-menu-nav-item">
 			<c:if test="<%= !layout.isTypeContent() && layoutRevision.isHead() %>">
 				<span class="staging-bar-control-toggle">
-					<aui:input disabled="<%= true %>" id="readyToggle" label="<%= StringPool.BLANK %>" labelOn="ready-for-publication" name="readyToggle" type="toggle-switch" value="<%= true %>" />
+					<aui:input disabled="<%= true %>" id="readyToggle" label="<%= StringPool.BLANK %>" labelOn="ready-for-publish-process" name="readyToggle" type="toggle-switch" value="<%= true %>" />
 				</span>
 			</c:if>
 
 			<c:if test="<%= hasWorkflowTask %>">
 
 				<%
-				PortletURL portletURL = PortalUtil.getControlPanelPortletURL(request, PortletKeys.MY_WORKFLOW_TASK, PortletRequest.RENDER_PHASE);
-
-				portletURL.setParameter("mvcPath", "/edit_workflow_task.jsp");
-
 				WorkflowTask workflowTask = StagingUtil.getWorkflowTask(user.getUserId(), layoutRevision);
-
-				portletURL.setParameter("workflowTaskId", String.valueOf(workflowTask.getWorkflowTaskId()));
-
-				portletURL.setPortletMode(PortletMode.VIEW);
-				portletURL.setWindowState(LiferayWindowState.POP_UP);
 
 				String layoutURL = PortalUtil.getLayoutFriendlyURL(layout, themeDisplay);
 
 				layoutURL = HttpUtil.addParameter(layoutURL, "layoutSetBranchId", layoutRevision.getLayoutSetBranchId());
 				layoutURL = HttpUtil.addParameter(layoutURL, "layoutRevisionId", layoutRevision.getLayoutRevisionId());
-
-				portletURL.setParameter("closeRedirect", layoutURL);
 				%>
 
 				<liferay-ui:icon
@@ -134,7 +125,21 @@ else {
 					id="reviewTaskIcon"
 					message="workflow"
 					method="get"
-					url="<%= portletURL.toString() %>"
+					url='<%=
+						PortletURLBuilder.create(
+							PortalUtil.getControlPanelPortletURL(request, PortletKeys.MY_WORKFLOW_TASK, PortletRequest.RENDER_PHASE)
+						).setMVCPath(
+							"/edit_workflow_task.jsp"
+						).setParameter(
+							"closeRedirect", layoutURL
+						).setParameter(
+							"workflowTaskId", workflowTask.getWorkflowTaskId()
+						).setPortletMode(
+							PortletMode.VIEW
+						).setWindowState(
+							LiferayWindowState.POP_UP
+						).buildString()
+					%>'
 					useDialog="<%= true %>"
 				/>
 			</c:if>
@@ -155,8 +160,8 @@ else {
 
 	<li class="control-menu-nav-item">
 		<div class="d-none d-sm-block dropdown">
-			<a class="dropdown-toggle taglib-icon" data-toggle="liferay-dropdown" href="javascript:;">
-				<aui:icon cssClass="icon-monospaced" image="ellipsis-v" markupView="lexicon" />
+			<a class="component-action dropdown-toggle taglib-icon" data-toggle="liferay-dropdown" href="javascript:;">
+				<aui:icon cssClass="<%= StringPool.BLANK %>" image="ellipsis-v" markupView="lexicon" />
 
 				<span class="sr-only">
 					<liferay-ui:message key="options" />
@@ -165,19 +170,19 @@ else {
 
 			<ul class="dropdown-menu dropdown-menu-right" role="menu">
 				<li>
-					<a class="dropdown-item" href="javascript:;" id="manageLayoutSetRevisions" onclick="<portlet:namespace />openSitePagesVariationsDialog();">
+					<a class="dropdown-item" href="javascript:;" id="manageLayoutSetRevisions" onclick="<%= liferayPortletResponse.getNamespace() + "openSitePagesVariationsDialog();" %>">
 						<liferay-ui:message key="site-pages-variation" />
 					</a>
 				</li>
 
 				<c:if test="<%= !layoutRevision.isIncomplete() && !layout.isTypeContent() %>">
 					<li>
-						<a class="dropdown-item" href="javascript:;" id="manageLayoutRevisions" onclick="<portlet:namespace />openPageVariationsDialog();">
+						<a class="dropdown-item" href="javascript:;" id="manageLayoutRevisions" onclick="<%= liferayPortletResponse.getNamespace() + "openPageVariationsDialog();" %>">
 							<liferay-ui:message key="page-variations" />
 						</a>
 					</li>
 					<li>
-						<a class="dropdown-item" href="javascript:Liferay.fire('<portlet:namespace />viewHistory', {layoutRevisionId: '<%= layoutRevision.getLayoutRevisionId() %>', layoutSetBranchId: '<%= layoutRevision.getLayoutSetBranchId() %>'}); void(0);" id="viewHistoryLink">
+						<a class="dropdown-item" href="javascript:Liferay.fire('<%= liferayPortletResponse.getNamespace() %>viewHistory', {layoutRevisionId: '<%= layoutRevision.getLayoutRevisionId() %>', layoutSetBranchId: '<%= layoutRevision.getLayoutSetBranchId() %>'}); void(0);" id="viewHistoryLink">
 							<liferay-ui:message key="history" />
 						</a>
 					</li>
@@ -186,7 +191,7 @@ else {
 				<c:if test="<%= !hasWorkflowTask && !layout.isTypeContent() %>">
 					<c:if test="<%= !layoutRevision.isMajor() && (layoutRevision.getParentLayoutRevisionId() != LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID) %>">
 						<li>
-							<a class="dropdown-item" href="javascript:Liferay.fire('<portlet:namespace />undo', {layoutRevisionId: '<%= layoutRevision.getLayoutRevisionId() %>', layoutSetBranchId: '<%= layoutRevision.getLayoutSetBranchId() %>'}); void(0);" id="undoLink">
+							<a class="dropdown-item" href="javascript:Liferay.fire('<%= liferayPortletResponse.getNamespace() %>undo', {layoutRevisionId: '<%= layoutRevision.getLayoutRevisionId() %>', layoutSetBranchId: '<%= layoutRevision.getLayoutSetBranchId() %>'}); void(0);" id="undoLink">
 								<liferay-ui:message key="undo" />
 							</a>
 						</li>
@@ -201,19 +206,18 @@ else {
 						%>
 
 						<c:if test="<%= firstChildLayoutRevision.isInactive() %>">
-
-						<li>
-							<a class="dropdown-item" href="javascript:Liferay.fire('<portlet:namespace />redo', {layoutRevisionId: '<%= firstChildLayoutRevision.getLayoutRevisionId() %>', layoutSetBranchId: '<%= firstChildLayoutRevision.getLayoutSetBranchId() %>'}); void(0);" id="redoLink">
-								<liferay-ui:message key="redo" />
-							</a>
-						</li>
-
+							<li>
+								<a class="dropdown-item" href="javascript:Liferay.fire('<%= liferayPortletResponse.getNamespace() %>redo', {layoutRevisionId: '<%= firstChildLayoutRevision.getLayoutRevisionId() %>', layoutSetBranchId: '<%= firstChildLayoutRevision.getLayoutSetBranchId() %>'}); void(0);" id="redoLink">
+									<liferay-ui:message key="redo" />
+								</a>
+							</li>
 						</c:if>
 					</c:if>
 				</c:if>
 			</ul>
 		</div>
 	</li>
+</ul>
 
 <portlet:renderURL var="layoutRevisionStatusURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
 	<portlet:param name="mvcPath" value="/view_layout_revision_status.jsp" />

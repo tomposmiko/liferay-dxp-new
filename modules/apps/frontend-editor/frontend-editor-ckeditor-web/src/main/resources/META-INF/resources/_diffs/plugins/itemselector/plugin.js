@@ -16,6 +16,9 @@
 	var STR_FILE_ENTRY_RETURN_TYPE =
 		'com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType';
 
+	var STR_VIDEO_HTML_RETURN_TYPE =
+		'com.liferay.item.selector.criteria.VideoEmbeddableHTMLItemSelectorReturnType';
+
 	var TPL_AUDIO_SCRIPT =
 		'boundingBox: "#" + mediaId,' + 'oggUrl: "{oggUrl}",' + 'url: "{url}"';
 
@@ -102,6 +105,17 @@
 			}
 		},
 
+		_commitVideoHtmlValue(editor, html) {
+			const parsedHTML = new DOMParser().parseFromString(
+				html,
+				'text/html'
+			);
+			const iFrame = parsedHTML.getElementsByTagName('iframe');
+			const url = iFrame[0].src;
+
+			editor.plugins.videoembed.onOkVideoHtml(editor, html, url);
+		},
+
 		_commitVideoValue(value, node, extraStyles) {
 			var instance = this;
 
@@ -178,7 +192,24 @@
 		},
 
 		_getItemSrc(editor, selectedItem) {
-			var itemSrc = selectedItem.value;
+			var itemSrc;
+
+			try {
+				itemSrc = JSON.parse(selectedItem.value);
+			}
+			catch (error) {
+				itemSrc = selectedItem;
+			}
+
+			if (itemSrc.value && itemSrc.value.html) {
+				itemSrc = selectedItem.value.html;
+			}
+			else if (itemSrc.html) {
+				itemSrc = itemSrc.html;
+			}
+			else if (itemSrc.value) {
+				itemSrc = itemSrc.value;
+			}
 
 			if (selectedItem.returnType === STR_FILE_ENTRY_RETURN_TYPE) {
 				try {
@@ -189,7 +220,7 @@
 						  encodeURIComponent(itemValue.title)
 						: itemValue.url;
 				}
-				catch (e) {}
+				catch (error) {}
 			}
 
 			return itemSrc;
@@ -269,7 +300,18 @@
 						callback(videoSrc);
 					}
 					else {
-						instance._commitMediaValue(videoSrc, editor, 'video');
+						if (
+							selectedItem.returnType ===
+							STR_VIDEO_HTML_RETURN_TYPE
+						) {
+							instance._commitVideoHtmlValue(editor, videoSrc);
+						}
+						else {
+							editor.plugins.videoembed.onOkVideo(editor, {
+								type: 'video',
+								url: videoSrc,
+							});
+						}
 					}
 				}
 			}

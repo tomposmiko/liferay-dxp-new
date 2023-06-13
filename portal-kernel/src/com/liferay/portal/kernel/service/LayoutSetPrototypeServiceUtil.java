@@ -43,6 +43,18 @@ public class LayoutSetPrototypeServiceUtil {
 	public static LayoutSetPrototype addLayoutSetPrototype(
 			Map<java.util.Locale, String> nameMap,
 			Map<java.util.Locale, String> descriptionMap, boolean active,
+			boolean layoutsUpdateable, boolean readyForPropagation,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addLayoutSetPrototype(
+			nameMap, descriptionMap, active, layoutsUpdateable,
+			readyForPropagation, serviceContext);
+	}
+
+	public static LayoutSetPrototype addLayoutSetPrototype(
+			Map<java.util.Locale, String> nameMap,
+			Map<java.util.Locale, String> descriptionMap, boolean active,
 			boolean layoutsUpdateable, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -50,10 +62,27 @@ public class LayoutSetPrototypeServiceUtil {
 			nameMap, descriptionMap, active, layoutsUpdateable, serviceContext);
 	}
 
+	public static LayoutSetPrototype addLayoutSetPrototype(
+			String name, String description, boolean active,
+			boolean layoutsUpdateable, boolean readyForPropagation,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addLayoutSetPrototype(
+			name, description, active, layoutsUpdateable, readyForPropagation,
+			serviceContext);
+	}
+
 	public static void deleteLayoutSetPrototype(long layoutSetPrototypeId)
 		throws PortalException {
 
 		getService().deleteLayoutSetPrototype(layoutSetPrototypeId);
+	}
+
+	public static void deleteNondefaultLayoutSetPrototypes(long companyId)
+		throws PortalException {
+
+		getService().deleteNondefaultLayoutSetPrototypes(companyId);
 	}
 
 	public static LayoutSetPrototype fetchLayoutSetPrototype(
@@ -68,6 +97,13 @@ public class LayoutSetPrototypeServiceUtil {
 		throws PortalException {
 
 		return getService().getLayoutSetPrototype(layoutSetPrototypeId);
+	}
+
+	public static List<LayoutSetPrototype> getLayoutSetPrototypes(
+			long companyId)
+		throws PortalException {
+
+		return getService().getLayoutSetPrototypes(companyId);
 	}
 
 	/**
@@ -85,6 +121,18 @@ public class LayoutSetPrototypeServiceUtil {
 		throws PortalException {
 
 		return getService().search(companyId, active, orderByComparator);
+	}
+
+	public static LayoutSetPrototype updateLayoutSetPrototype(
+			long layoutSetPrototypeId, Map<java.util.Locale, String> nameMap,
+			Map<java.util.Locale, String> descriptionMap, boolean active,
+			boolean layoutsUpdateable, boolean readyForPropagation,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().updateLayoutSetPrototype(
+			layoutSetPrototypeId, nameMap, descriptionMap, active,
+			layoutsUpdateable, readyForPropagation, serviceContext);
 	}
 
 	public static LayoutSetPrototype updateLayoutSetPrototype(

@@ -17,14 +17,11 @@ package com.liferay.portal.kernel.util;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.PropsImpl;
 
 import java.lang.reflect.Field;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -35,14 +32,8 @@ import org.springframework.mock.web.MockHttpServletRequest;
 public class CookieKeysTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
-
-	@Before
-	public void setUp() {
-		PropsUtil.setProps(new PropsImpl());
-	}
 
 	@Test
 	public void testDomain1() throws Exception {

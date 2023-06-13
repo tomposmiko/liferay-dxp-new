@@ -337,10 +337,10 @@ public class WikiAttachmentsTest {
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
 		_dlAppLocalService.addFileEntry(
-			serviceContext.getUserId(), _group.getGroupId(),
+			null, serviceContext.getUserId(), _group.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			StringUtil.randomString(), ContentTypes.TEXT_PLAIN, title,
-			StringPool.BLANK, StringPool.BLANK, _CONTENT.getBytes(),
+			StringPool.BLANK, StringPool.BLANK, _CONTENT.getBytes(), null, null,
 			serviceContext);
 	}
 
@@ -403,7 +403,7 @@ public class WikiAttachmentsTest {
 		if (restore) {
 			_wikiPageLocalService.restorePageAttachmentFromTrash(
 				TestPropsValues.getUserId(), _page.getNodeId(),
-				_page.getTitle(), fileName);
+				_page.getTitle(), fileEntry.getFileName());
 
 			Assert.assertEquals(
 				initialNotInTrashCount + 1,

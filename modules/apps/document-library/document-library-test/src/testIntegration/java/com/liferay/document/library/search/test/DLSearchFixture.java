@@ -70,7 +70,7 @@ public class DLSearchFixture {
 			search(getSearchContext(keywords, locale)));
 	}
 
-	public SearchResponse searchOnlyOneSearchResponse(
+	public com.liferay.portal.search.document.Document searchOnlyOneSearchHit(
 			String keywords, Locale locale)
 		throws Exception {
 
@@ -88,9 +88,7 @@ public class DLSearchFixture {
 		SearchResponse searchResponse =
 			(SearchResponse)searchContext.getAttribute("search.response");
 
-		HitsAssert.assertOnlyOne(searchResponse.getSearchHits());
-
-		return searchResponse;
+		return HitsAssert.assertOnlyOne(searchResponse.getSearchHits());
 	}
 
 	public void setGroup(Group group) {

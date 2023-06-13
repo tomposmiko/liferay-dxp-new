@@ -15,6 +15,7 @@
 package com.liferay.portal.bundle.blacklist.internal;
 
 import com.liferay.osgi.util.BundleUtil;
+import com.liferay.portal.bundle.blacklist.internal.configuration.BundleBlacklistConfiguration;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -54,7 +55,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Matthew Tambara
  */
 @Component(
-	configurationPid = "com.liferay.portal.bundle.blacklist.internal.BundleBlacklistConfiguration",
+	configurationPid = "com.liferay.portal.bundle.blacklist.internal.configuration.BundleBlacklistConfiguration",
 	immediate = true, service = BundleBlacklist.class
 )
 public class BundleBlacklist {
@@ -258,8 +259,8 @@ public class BundleBlacklist {
 	private static final Pattern _pattern = Pattern.compile(
 		"\\{location=([^,]+), startLevel=(\\d+)\\}");
 
-	private Set<String> _blacklistBundleSymbolicNames;
-	private File _blacklistFile;
+	private volatile Set<String> _blacklistBundleSymbolicNames;
+	private volatile File _blacklistFile;
 
 	private final BundleListener _bundleListener =
 		new SynchronousBundleListener() {
@@ -276,7 +277,7 @@ public class BundleBlacklist {
 	@Reference
 	private LPKGDeployer _lpkgDeployer;
 
-	private BundleListener _selfMonitorBundleListener;
+	private volatile BundleListener _selfMonitorBundleListener;
 	private final Map<String, UninstalledBundleData> _uninstalledBundles =
 		new ConcurrentHashMap<>();
 

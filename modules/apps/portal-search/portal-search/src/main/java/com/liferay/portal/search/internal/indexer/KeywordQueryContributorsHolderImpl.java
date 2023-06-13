@@ -36,13 +36,13 @@ public class KeywordQueryContributorsHolderImpl
 
 	@Override
 	public Stream<KeywordQueryContributor> stream(
-		Collection<String> excludes, Collection<String> includes) {
+		Collection<String> includeIds, Collection<String> excludeIds) {
 
 		Stream<KeywordQueryContributor> stream = StreamSupport.stream(
 			_serviceTrackerList.spliterator(), false);
 
 		return IncludeExcludeUtil.stream(
-			stream, includes, excludes,
+			stream, includeIds, excludeIds,
 			keywordQueryContributor -> getClassName(keywordQueryContributor));
 	}
 
@@ -64,7 +64,6 @@ public class KeywordQueryContributorsHolderImpl
 		return clazz.getName();
 	}
 
-	private ServiceTrackerList<KeywordQueryContributor, KeywordQueryContributor>
-		_serviceTrackerList;
+	private ServiceTrackerList<KeywordQueryContributor> _serviceTrackerList;
 
 }

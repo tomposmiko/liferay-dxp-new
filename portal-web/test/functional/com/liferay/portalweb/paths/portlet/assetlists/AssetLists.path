@@ -11,13 +11,18 @@
 
 <tbody>
 <tr>
+	<td>ADD_VARIATION_ICON</td>
+	<td>//*[@class='navbar-nav'] //*[contains(@class, 'btn-sm')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ASSET_LIST_ELLIPSIS</td>
 	<td>//div[contains(@class,'dropdown')]//a[span/*[name()='svg'][contains(@class,'lexicon-icon-ellipsis')]]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ASSET_LIST_ENTRY_TITLE</td>
-	<td>//*[contains(@class,'list-group-item')]//a[contains(.,'${key_title}')] | //*[contains(@class,'list-group-item')]//p[contains(.,'${key_title}')]</td>
+	<td>//li[contains(@class,'list-group-item')]//a[contains(.,'${key_title}')] | //li[contains(@class,'list-group-item')]//p[contains(.,'${key_title}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -27,7 +32,7 @@
 </tr>
 <tr>
 	<td>ASSET_LIST_ENTRY_TYPE</td>
-	<td>//*[contains(@class,'list-group-item')]//h6[contains(.,'${key_type}')]</td>
+	<td>//li[contains(@class,'list-group-item')]//h6[contains(.,'${key_type}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -70,9 +75,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--VIEW_CONTENT-->
-
 <tr>
 	<td>ASSET_TITLE_ROW</td>
 	<td>//tr[contains(@data-qa-id,'row')][contains(.,'${key_assetTitle}')]//td[contains(@class,'lfr-title-column')]</td>
@@ -81,11 +84,6 @@
 <tr>
 	<td>ASSET_TYPE_ROW</td>
 	<td>//tr[contains(@data-qa-id,'row')][contains(.,'${key_assetTitle}')]//td[contains(@class,'lfr-type-column')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>PERSONALIZATION_DROPDOWN</td>
-	<td>//div[contains(.,'Anyone')]//*[contains(@class,'dropdown-toggle')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -98,9 +96,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--VIEW_USAGES-->
-
 <tr>
 	<td>ASSET_LIST_USAGES</td>
 	<td>//li[contains(@class,'nav-item')][contains(.,'${usageType} (${usageAmount})')]</td>

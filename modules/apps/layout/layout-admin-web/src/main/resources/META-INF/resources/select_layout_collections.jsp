@@ -35,7 +35,8 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-collection"));
 
 <c:if test="<%= selectLayoutCollectionDisplayContext.isCollections() %>">
 	<clay:management-toolbar
-		displayContext="<%= selectCollectionManagementToolbarDisplayContext %>"
+		managementToolbarDisplayContext="<%= selectCollectionManagementToolbarDisplayContext %>"
+		propsTransformer="js/SelectLayoutCollectionManagementToolbarPropsTransformer"
 	/>
 </c:if>
 
@@ -52,21 +53,16 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-collection"));
 	</c:choose>
 </clay:container-fluid>
 
-<c:if test="<%= selectLayoutCollectionDisplayContext.isCollections() %>">
-	<liferay-frontend:component
-		componentId="<%= selectCollectionManagementToolbarDisplayContext.getDefaultEventHandler() %>"
-		module="js/SelectCollectionManagementToolbarDefaultEventHandler.es"
-	/>
-</c:if>
-
-<aui:script require="metal-dom/src/all/dom as dom">
+<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
 	var collections = document.getElementById('<portlet:namespace />collections');
 
-	var selectLayoutMasterLayoutActionOptionQueryClickHandler = dom.delegate(
+	var delegate = delegateModule.default;
+
+	var selectLayoutMasterLayoutActionOptionQueryClickHandler = delegate(
 		collections,
 		'click',
 		'.select-collection-action-option',
-		function (event) {
+		(event) => {
 			Liferay.Util.navigate(
 				event.delegateTarget.dataset.selectLayoutMasterLayoutUrl
 			);
@@ -74,7 +70,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-collection"));
 	);
 
 	function handleDestroyPortlet() {
-		selectLayoutMasterLayoutActionOptionQueryClickHandler.removeListener();
+		selectLayoutMasterLayoutActionOptionQueryClickHandler.dispose();
 
 		Liferay.detach('destroyPortlet', handleDestroyPortlet);
 	}

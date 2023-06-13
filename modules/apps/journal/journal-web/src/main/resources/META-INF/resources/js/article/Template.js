@@ -57,7 +57,9 @@ export default function ({
 						(newDDMTemplate && newDDMTemplate.name) || '',
 				});
 
-				submitForm(form, url, false, false);
+				form.action = url;
+
+				form.submit();
 			}
 		}
 	};
@@ -81,6 +83,7 @@ export default function ({
 			);
 
 			openSelectionModal({
+				iframeBodyCssClass: '',
 				onSelect: (selectedItem) => changeDDMTemplate(selectedItem),
 				selectEventName: namespaceId('preview'),
 				title: Liferay.Language.get('title'),

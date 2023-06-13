@@ -378,6 +378,9 @@ public class SiteBrowserDisplayContext {
 			}
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 
 		return false;
@@ -470,11 +473,16 @@ public class SiteBrowserDisplayContext {
 
 		_groupParams = LinkedHashMapBuilder.<String, Object>put(
 			"active", Boolean.TRUE
-		).build();
+		).put(
+			"manualMembership",
+			() -> {
+				if (_isManualMembership()) {
+					return Boolean.TRUE;
+				}
 
-		if (_isManualMembership()) {
-			_groupParams.put("manualMembership", Boolean.TRUE);
-		}
+				return null;
+			}
+		).build();
 
 		if (Objects.equals(type, "child-sites")) {
 			Group parentGroup = GroupLocalServiceUtil.getGroup(groupId);

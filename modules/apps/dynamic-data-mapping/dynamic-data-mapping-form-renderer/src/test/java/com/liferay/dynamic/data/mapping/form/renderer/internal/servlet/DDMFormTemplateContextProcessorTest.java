@@ -19,6 +19,7 @@ import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidationExpression;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
+import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -29,6 +30,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -166,6 +168,30 @@ public class DDMFormTemplateContextProcessorTest extends PowerMockito {
 	}
 
 	@Test
+	public void testGetDDMFormFieldValue() {
+		String instanceId = RandomTestUtil.randomString();
+
+		DDMFormFieldValue ddmFormFieldValue =
+			_ddmFormTemplateContextProcessor.getDDMFormFieldValue(
+				JSONUtil.put(
+					"confirmationValue", "Confirmation Value"
+				).put(
+					"fieldName", "Text12345678"
+				).put(
+					"fieldReference", "TextFieldReference"
+				).put(
+					"instanceId", instanceId
+				));
+
+		Assert.assertEquals(
+			"Confirmation Value", ddmFormFieldValue.getConfirmationValue());
+		Assert.assertEquals(
+			"TextFieldReference", ddmFormFieldValue.getFieldReference());
+		Assert.assertEquals(instanceId, ddmFormFieldValue.getInstanceId());
+		Assert.assertEquals("Text12345678", ddmFormFieldValue.getName());
+	}
+
+	@Test
 	public void testGetDDMFormMultipleSelectionField() {
 		DDMFormField ddmFormField =
 			_ddmFormTemplateContextProcessor.getDDMFormField(
@@ -235,10 +261,37 @@ public class DDMFormTemplateContextProcessorTest extends PowerMockito {
 	}
 
 	@Test
+	public void testGetDDMFormSearchLocationField() {
+		DDMFormField ddmFormField =
+			_ddmFormTemplateContextProcessor.getDDMFormField(
+				JSONUtil.put(
+					"layout", Arrays.toString(new String[] {"one-column"})
+				).put(
+					"visibleFields",
+					Arrays.toString(new String[] {"city", "country"})
+				));
+
+		Assert.assertEquals(
+			DDMFormValuesTestUtil.createLocalizedValue(
+				Arrays.toString(new String[] {"one-column"}), _defaultLocale),
+			ddmFormField.getProperty("layout"));
+		Assert.assertEquals(
+			DDMFormValuesTestUtil.createLocalizedValue(
+				Arrays.toString(new String[] {"city", "country"}),
+				_defaultLocale),
+			ddmFormField.getProperty("visibleFields"));
+	}
+
+	@Test
 	public void testGetDDMFormTextField() {
 		DDMFormField ddmFormField =
 			_ddmFormTemplateContextProcessor.getDDMFormField(
 				JSONUtil.put(
+					"confirmationErrorMessage",
+					"The information does not match."
+				).put(
+					"confirmationLabel", "Confirm Field"
+				).put(
 					"dataType", "string"
 				).put(
 					"fieldName", "Text12345678"
@@ -256,6 +309,8 @@ public class DDMFormTemplateContextProcessorTest extends PowerMockito {
 					"repeatable", true
 				).put(
 					"required", false
+				).put(
+					"requiredErrorMessage", "Custom required error message."
 				).put(
 					"tooltip", "Tooltip"
 				).put(
@@ -305,14 +360,31 @@ public class DDMFormTemplateContextProcessorTest extends PowerMockito {
 		Assert.assertEquals(
 			"TextFieldReference", ddmFormField.getFieldReference());
 		Assert.assertEquals(
-			_getLocalizedValue("Text Field"), ddmFormField.getLabel());
+			DDMFormValuesTestUtil.createLocalizedValue(
+				"Text Field", _defaultLocale),
+			ddmFormField.getLabel());
 		Assert.assertEquals("Text12345678", ddmFormField.getName());
 		Assert.assertEquals(
-			_getLocalizedValue("Placeholder"),
+			DDMFormValuesTestUtil.createLocalizedValue(
+				"The information does not match.", _defaultLocale),
+			ddmFormField.getProperty("confirmationErrorMessage"));
+		Assert.assertEquals(
+			DDMFormValuesTestUtil.createLocalizedValue(
+				"Confirm Field", _defaultLocale),
+			ddmFormField.getProperty("confirmationLabel"));
+		Assert.assertEquals(
+			DDMFormValuesTestUtil.createLocalizedValue(
+				"Placeholder", _defaultLocale),
 			ddmFormField.getProperty("placeholder"));
 		Assert.assertEquals(
-			_getLocalizedValue("Tooltip"), ddmFormField.getProperty("tooltip"));
+			DDMFormValuesTestUtil.createLocalizedValue(
+				"Tooltip", _defaultLocale),
+			ddmFormField.getProperty("tooltip"));
 		Assert.assertFalse((boolean)ddmFormField.getProperty("valid"));
+		Assert.assertEquals(
+			DDMFormValuesTestUtil.createLocalizedValue(
+				"Custom required error message.", _defaultLocale),
+			ddmFormField.getRequiredErrorMessage());
 		Assert.assertEquals("text", ddmFormField.getType());
 		Assert.assertEquals("", ddmFormField.getVisibilityExpression());
 		Assert.assertTrue(ddmFormField.isLocalizable());
@@ -360,14 +432,6 @@ public class DDMFormTemplateContextProcessorTest extends PowerMockito {
 		Assert.assertFalse(ddmFormField.isReadOnly());
 		Assert.assertFalse(ddmFormField.isRepeatable());
 		Assert.assertFalse(ddmFormField.isRequired());
-	}
-
-	private LocalizedValue _getLocalizedValue(String value) {
-		LocalizedValue localizedValue = new LocalizedValue(_defaultLocale);
-
-		localizedValue.addString(_defaultLocale, value);
-
-		return localizedValue;
 	}
 
 	private void _setUpJSONFactoryUtil() {

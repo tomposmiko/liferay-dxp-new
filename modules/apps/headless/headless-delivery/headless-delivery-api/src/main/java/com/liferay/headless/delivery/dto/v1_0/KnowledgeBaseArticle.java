@@ -73,7 +73,9 @@ public class KnowledgeBaseArticle implements Serializable {
 			KnowledgeBaseArticle.class, json);
 	}
 
-	@Schema
+	@Schema(
+		description = "Block of actions allowed by the user making the request."
+	)
 	@Valid
 	public Map<String, Map<String, String>> getActions() {
 		return actions;
@@ -99,7 +101,9 @@ public class KnowledgeBaseArticle implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "Block of actions allowed by the user making the request."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, Map<String, String>> actions;
 
@@ -191,7 +195,9 @@ public class KnowledgeBaseArticle implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
-	@Schema
+	@Schema(
+		description = "A list of the custom fields associated with the article."
+	)
 	@Valid
 	public CustomField[] getCustomFields() {
 		return customFields;
@@ -216,7 +222,9 @@ public class KnowledgeBaseArticle implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A list of the custom fields associated with the article."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected CustomField[] customFields;
 
@@ -339,6 +347,34 @@ public class KnowledgeBaseArticle implements Serializable {
 	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String encodingFormat;
+
+	@Schema(description = "The article's external reference code.")
+	public String getExternalReferenceCode() {
+		return externalReferenceCode;
+	}
+
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		this.externalReferenceCode = externalReferenceCode;
+	}
+
+	@JsonIgnore
+	public void setExternalReferenceCode(
+		UnsafeSupplier<String, Exception> externalReferenceCodeUnsafeSupplier) {
+
+		try {
+			externalReferenceCode = externalReferenceCodeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(description = "The article's external reference code.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String externalReferenceCode;
 
 	@Schema(description = "The article's relative URL.")
 	public String getFriendlyUrlPath() {
@@ -482,6 +518,38 @@ public class KnowledgeBaseArticle implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfKnowledgeBaseArticles;
 
+	@Schema(description = "The ID of the article's parent, if it exists.")
+	public Long getParentKnowledgeBaseArticleId() {
+		return parentKnowledgeBaseArticleId;
+	}
+
+	public void setParentKnowledgeBaseArticleId(
+		Long parentKnowledgeBaseArticleId) {
+
+		this.parentKnowledgeBaseArticleId = parentKnowledgeBaseArticleId;
+	}
+
+	@JsonIgnore
+	public void setParentKnowledgeBaseArticleId(
+		UnsafeSupplier<Long, Exception>
+			parentKnowledgeBaseArticleIdUnsafeSupplier) {
+
+		try {
+			parentKnowledgeBaseArticleId =
+				parentKnowledgeBaseArticleIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(description = "The ID of the article's parent, if it exists.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long parentKnowledgeBaseArticleId;
+
 	@Schema(description = "The article's parent folder, if it exists.")
 	@Valid
 	public ParentKnowledgeBaseFolder getParentKnowledgeBaseFolder() {
@@ -551,7 +619,7 @@ public class KnowledgeBaseArticle implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Long parentKnowledgeBaseFolderId;
 
-	@Schema
+	@Schema(description = "A list of related contents to this article.")
 	@Valid
 	public RelatedContent[] getRelatedContents() {
 		return relatedContents;
@@ -577,7 +645,7 @@ public class KnowledgeBaseArticle implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A list of related contents to this article.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected RelatedContent[] relatedContents;
 
@@ -611,7 +679,9 @@ public class KnowledgeBaseArticle implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
-	@Schema
+	@Schema(
+		description = "A flag that indicates whether the user making the requests is subscribed to this article."
+	)
 	public Boolean getSubscribed() {
 		return subscribed;
 	}
@@ -635,7 +705,9 @@ public class KnowledgeBaseArticle implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether the user making the requests is subscribed to this article."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean subscribed;
 
@@ -672,7 +744,7 @@ public class KnowledgeBaseArticle implements Serializable {
 	protected TaxonomyCategoryBrief[] taxonomyCategoryBriefs;
 
 	@Schema(
-		description = "A write-only field that adds taxonomy categories to this article."
+		description = "A write-only field that adds `TaxonomyCategory` instances to the article."
 	)
 	public Long[] getTaxonomyCategoryIds() {
 		return taxonomyCategoryIds;
@@ -698,7 +770,7 @@ public class KnowledgeBaseArticle implements Serializable {
 	}
 
 	@GraphQLField(
-		description = "A write-only field that adds taxonomy categories to this article."
+		description = "A write-only field that adds `TaxonomyCategory` instances to the article."
 	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Long[] taxonomyCategoryIds;
@@ -925,6 +997,20 @@ public class KnowledgeBaseArticle implements Serializable {
 			sb.append("\"");
 		}
 
+		if (externalReferenceCode != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"externalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(externalReferenceCode));
+
+			sb.append("\"");
+		}
+
 		if (friendlyUrlPath != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -991,6 +1077,16 @@ public class KnowledgeBaseArticle implements Serializable {
 			sb.append("\"numberOfKnowledgeBaseArticles\": ");
 
 			sb.append(numberOfKnowledgeBaseArticles);
+		}
+
+		if (parentKnowledgeBaseArticleId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"parentKnowledgeBaseArticleId\": ");
+
+			sb.append(parentKnowledgeBaseArticleId);
 		}
 
 		if (parentKnowledgeBaseFolder != null) {

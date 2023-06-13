@@ -14,6 +14,8 @@
 
 package com.liferay.headless.admin.workflow.client.serdes.v1_0;
 
+import com.liferay.headless.admin.workflow.client.dto.v1_0.Node;
+import com.liferay.headless.admin.workflow.client.dto.v1_0.Transition;
 import com.liferay.headless.admin.workflow.client.dto.v1_0.WorkflowDefinition;
 import com.liferay.headless.admin.workflow.client.json.BaseJSONParser;
 
@@ -25,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -59,7 +62,7 @@ public class WorkflowDefinitionSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (workflowDefinition.getActive() != null) {
 			if (sb.length() > 1) {
@@ -81,6 +84,22 @@ public class WorkflowDefinitionSerDes {
 			sb.append("\"");
 
 			sb.append(_escape(workflowDefinition.getContent()));
+
+			sb.append("\"");
+		}
+
+		if (workflowDefinition.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateCreated\": ");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					workflowDefinition.getDateCreated()));
 
 			sb.append("\"");
 		}
@@ -129,6 +148,26 @@ public class WorkflowDefinitionSerDes {
 			sb.append("\"");
 		}
 
+		if (workflowDefinition.getNodes() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"nodes\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < workflowDefinition.getNodes().length; i++) {
+				sb.append(String.valueOf(workflowDefinition.getNodes()[i]));
+
+				if ((i + 1) < workflowDefinition.getNodes().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		if (workflowDefinition.getTitle() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -141,6 +180,39 @@ public class WorkflowDefinitionSerDes {
 			sb.append(_escape(workflowDefinition.getTitle()));
 
 			sb.append("\"");
+		}
+
+		if (workflowDefinition.getTitle_i18n() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"title_i18n\": ");
+
+			sb.append(_toJSON(workflowDefinition.getTitle_i18n()));
+		}
+
+		if (workflowDefinition.getTransitions() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"transitions\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < workflowDefinition.getTransitions().length;
+				 i++) {
+
+				sb.append(
+					String.valueOf(workflowDefinition.getTransitions()[i]));
+
+				if ((i + 1) < workflowDefinition.getTransitions().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
 
 		if (workflowDefinition.getVersion() != null) {
@@ -179,7 +251,7 @@ public class WorkflowDefinitionSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (workflowDefinition.getActive() == null) {
 			map.put("active", null);
@@ -193,6 +265,16 @@ public class WorkflowDefinitionSerDes {
 		}
 		else {
 			map.put("content", String.valueOf(workflowDefinition.getContent()));
+		}
+
+		if (workflowDefinition.getDateCreated() == null) {
+			map.put("dateCreated", null);
+		}
+		else {
+			map.put(
+				"dateCreated",
+				liferayToJSONDateFormat.format(
+					workflowDefinition.getDateCreated()));
 		}
 
 		if (workflowDefinition.getDateModified() == null) {
@@ -221,11 +303,36 @@ public class WorkflowDefinitionSerDes {
 			map.put("name", String.valueOf(workflowDefinition.getName()));
 		}
 
+		if (workflowDefinition.getNodes() == null) {
+			map.put("nodes", null);
+		}
+		else {
+			map.put("nodes", String.valueOf(workflowDefinition.getNodes()));
+		}
+
 		if (workflowDefinition.getTitle() == null) {
 			map.put("title", null);
 		}
 		else {
 			map.put("title", String.valueOf(workflowDefinition.getTitle()));
+		}
+
+		if (workflowDefinition.getTitle_i18n() == null) {
+			map.put("title_i18n", null);
+		}
+		else {
+			map.put(
+				"title_i18n",
+				String.valueOf(workflowDefinition.getTitle_i18n()));
+		}
+
+		if (workflowDefinition.getTransitions() == null) {
+			map.put("transitions", null);
+		}
+		else {
+			map.put(
+				"transitions",
+				String.valueOf(workflowDefinition.getTransitions()));
 		}
 
 		if (workflowDefinition.getVersion() == null) {
@@ -266,6 +373,12 @@ public class WorkflowDefinitionSerDes {
 					workflowDefinition.setContent((String)jsonParserFieldValue);
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
+				if (jsonParserFieldValue != null) {
+					workflowDefinition.setDateCreated(
+						toDate((String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
 					workflowDefinition.setDateModified(
@@ -283,9 +396,40 @@ public class WorkflowDefinitionSerDes {
 					workflowDefinition.setName((String)jsonParserFieldValue);
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "nodes")) {
+				if (jsonParserFieldValue != null) {
+					workflowDefinition.setNodes(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> NodeSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Node[size]
+						));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "title")) {
 				if (jsonParserFieldValue != null) {
 					workflowDefinition.setTitle((String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "title_i18n")) {
+				if (jsonParserFieldValue != null) {
+					workflowDefinition.setTitle_i18n(
+						(Map)WorkflowDefinitionSerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "transitions")) {
+				if (jsonParserFieldValue != null) {
+					workflowDefinition.setTransitions(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> TransitionSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Transition[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "version")) {

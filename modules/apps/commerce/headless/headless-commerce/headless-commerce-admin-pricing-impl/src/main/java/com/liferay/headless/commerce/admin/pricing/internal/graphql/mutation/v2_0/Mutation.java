@@ -19,15 +19,18 @@ import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountAccount;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountAccountGroup;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountCategory;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountChannel;
+import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountOrderType;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountProduct;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountProductGroup;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountRule;
+import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountSku;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceEntry;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceList;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceListAccount;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceListAccountGroup;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceListChannel;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceListDiscount;
+import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceListOrderType;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceModifier;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceModifierCategory;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceModifierProduct;
@@ -37,15 +40,18 @@ import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountAccount
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountAccountResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountCategoryResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountChannelResource;
+import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountOrderTypeResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountProductGroupResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountProductResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountRuleResource;
+import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountSkuResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.PriceEntryResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.PriceListAccountGroupResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.PriceListAccountResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.PriceListChannelResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.PriceListDiscountResource;
+import com.liferay.headless.commerce.admin.pricing.resource.v2_0.PriceListOrderTypeResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.PriceListResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.PriceModifierCategoryResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.PriceModifierProductGroupResource;
@@ -58,7 +64,6 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 
@@ -121,6 +126,14 @@ public class Mutation {
 			discountChannelResourceComponentServiceObjects;
 	}
 
+	public static void setDiscountOrderTypeResourceComponentServiceObjects(
+		ComponentServiceObjects<DiscountOrderTypeResource>
+			discountOrderTypeResourceComponentServiceObjects) {
+
+		_discountOrderTypeResourceComponentServiceObjects =
+			discountOrderTypeResourceComponentServiceObjects;
+	}
+
 	public static void setDiscountProductResourceComponentServiceObjects(
 		ComponentServiceObjects<DiscountProductResource>
 			discountProductResourceComponentServiceObjects) {
@@ -143,6 +156,14 @@ public class Mutation {
 
 		_discountRuleResourceComponentServiceObjects =
 			discountRuleResourceComponentServiceObjects;
+	}
+
+	public static void setDiscountSkuResourceComponentServiceObjects(
+		ComponentServiceObjects<DiscountSkuResource>
+			discountSkuResourceComponentServiceObjects) {
+
+		_discountSkuResourceComponentServiceObjects =
+			discountSkuResourceComponentServiceObjects;
 	}
 
 	public static void setPriceEntryResourceComponentServiceObjects(
@@ -191,6 +212,14 @@ public class Mutation {
 
 		_priceListDiscountResourceComponentServiceObjects =
 			priceListDiscountResourceComponentServiceObjects;
+	}
+
+	public static void setPriceListOrderTypeResourceComponentServiceObjects(
+		ComponentServiceObjects<PriceListOrderTypeResource>
+			priceListOrderTypeResourceComponentServiceObjects) {
+
+		_priceListOrderTypeResourceComponentServiceObjects =
+			priceListOrderTypeResourceComponentServiceObjects;
 	}
 
 	public static void setPriceModifierResourceComponentServiceObjects(
@@ -298,6 +327,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response deleteDiscountBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -306,7 +336,7 @@ public class Mutation {
 			_discountResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			discountResource -> discountResource.deleteDiscountBatch(
-				callbackURL, object));
+				id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -381,6 +411,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createDiscountIdDiscountAccountBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -390,7 +421,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			discountAccountResource ->
 				discountAccountResource.postDiscountIdDiscountAccountBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -457,6 +488,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createDiscountIdDiscountAccountGroupBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -467,7 +499,7 @@ public class Mutation {
 			discountAccountGroupResource ->
 				discountAccountGroupResource.
 					postDiscountIdDiscountAccountGroupBatch(
-						callbackURL, object));
+						id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -533,6 +565,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createDiscountIdDiscountCategoryBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -542,7 +575,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			discountCategoryResource ->
 				discountCategoryResource.postDiscountIdDiscountCategoryBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -605,6 +638,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createDiscountIdDiscountChannelBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -614,7 +648,84 @@ public class Mutation {
 			this::_populateResourceContext,
 			discountChannelResource ->
 				discountChannelResource.postDiscountIdDiscountChannelBatch(
+					id, callbackURL, object));
+	}
+
+	@GraphQLField
+	public boolean deleteDiscountOrderType(
+			@GraphQLName("discountOrderTypeId") Long discountOrderTypeId)
+		throws Exception {
+
+		_applyVoidComponentServiceObjects(
+			_discountOrderTypeResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			discountOrderTypeResource ->
+				discountOrderTypeResource.deleteDiscountOrderType(
+					discountOrderTypeId));
+
+		return true;
+	}
+
+	@GraphQLField
+	public Response deleteDiscountOrderTypeBatch(
+			@GraphQLName("callbackURL") String callbackURL,
+			@GraphQLName("object") Object object)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_discountOrderTypeResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			discountOrderTypeResource ->
+				discountOrderTypeResource.deleteDiscountOrderTypeBatch(
 					callbackURL, object));
+	}
+
+	@GraphQLField
+	public DiscountOrderType
+			createDiscountByExternalReferenceCodeDiscountOrderType(
+				@GraphQLName("externalReferenceCode") String
+					externalReferenceCode,
+				@GraphQLName("discountOrderType") DiscountOrderType
+					discountOrderType)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_discountOrderTypeResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			discountOrderTypeResource ->
+				discountOrderTypeResource.
+					postDiscountByExternalReferenceCodeDiscountOrderType(
+						externalReferenceCode, discountOrderType));
+	}
+
+	@GraphQLField
+	public DiscountOrderType createDiscountIdDiscountOrderType(
+			@GraphQLName("id") Long id,
+			@GraphQLName("discountOrderType") DiscountOrderType
+				discountOrderType)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_discountOrderTypeResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			discountOrderTypeResource ->
+				discountOrderTypeResource.postDiscountIdDiscountOrderType(
+					id, discountOrderType));
+	}
+
+	@GraphQLField
+	public Response createDiscountIdDiscountOrderTypeBatch(
+			@GraphQLName("id") Long id,
+			@GraphQLName("callbackURL") String callbackURL,
+			@GraphQLName("object") Object object)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_discountOrderTypeResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			discountOrderTypeResource ->
+				discountOrderTypeResource.postDiscountIdDiscountOrderTypeBatch(
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -677,6 +788,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createDiscountIdDiscountProductBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -686,7 +798,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			discountProductResource ->
 				discountProductResource.postDiscountIdDiscountProductBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -753,6 +865,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createDiscountIdDiscountProductGroupBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -763,7 +876,7 @@ public class Mutation {
 			discountProductGroupResource ->
 				discountProductGroupResource.
 					postDiscountIdDiscountProductGroupBatch(
-						callbackURL, object));
+						id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -781,6 +894,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response deleteDiscountRuleBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -790,7 +904,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			discountRuleResource ->
 				discountRuleResource.deleteDiscountRuleBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -837,6 +951,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createDiscountIdDiscountRuleBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -846,7 +961,77 @@ public class Mutation {
 			this::_populateResourceContext,
 			discountRuleResource ->
 				discountRuleResource.postDiscountIdDiscountRuleBatch(
-					callbackURL, object));
+					id, callbackURL, object));
+	}
+
+	@GraphQLField
+	public boolean deleteDiscountSku(
+			@GraphQLName("discountSkuId") Long discountSkuId)
+		throws Exception {
+
+		_applyVoidComponentServiceObjects(
+			_discountSkuResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			discountSkuResource -> discountSkuResource.deleteDiscountSku(
+				discountSkuId));
+
+		return true;
+	}
+
+	@GraphQLField
+	public Response deleteDiscountSkuBatch(
+			@GraphQLName("callbackURL") String callbackURL,
+			@GraphQLName("object") Object object)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_discountSkuResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			discountSkuResource -> discountSkuResource.deleteDiscountSkuBatch(
+				callbackURL, object));
+	}
+
+	@GraphQLField
+	public DiscountSku createDiscountByExternalReferenceCodeDiscountSku(
+			@GraphQLName("externalReferenceCode") String externalReferenceCode,
+			@GraphQLName("discountSku") DiscountSku discountSku)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_discountSkuResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			discountSkuResource ->
+				discountSkuResource.
+					postDiscountByExternalReferenceCodeDiscountSku(
+						externalReferenceCode, discountSku));
+	}
+
+	@GraphQLField
+	public DiscountSku createDiscountIdDiscountSku(
+			@GraphQLName("id") Long id,
+			@GraphQLName("discountSku") DiscountSku discountSku)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_discountSkuResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			discountSkuResource ->
+				discountSkuResource.postDiscountIdDiscountSku(id, discountSku));
+	}
+
+	@GraphQLField
+	public Response createDiscountIdDiscountSkuBatch(
+			@GraphQLName("id") Long id,
+			@GraphQLName("callbackURL") String callbackURL,
+			@GraphQLName("object") Object object)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_discountSkuResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			discountSkuResource ->
+				discountSkuResource.postDiscountIdDiscountSkuBatch(
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -948,6 +1133,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createPriceListIdPriceEntryBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -957,7 +1143,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			priceEntryResource ->
 				priceEntryResource.postPriceListIdPriceEntryBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -1027,6 +1213,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response deletePriceListBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -1035,7 +1222,7 @@ public class Mutation {
 			_priceListResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			priceListResource -> priceListResource.deletePriceListBatch(
-				callbackURL, object));
+				id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -1114,6 +1301,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createPriceListIdPriceListAccountBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -1123,7 +1311,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			priceListAccountResource ->
 				priceListAccountResource.postPriceListIdPriceListAccountBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -1192,6 +1380,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createPriceListIdPriceListAccountGroupBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -1202,7 +1391,7 @@ public class Mutation {
 			priceListAccountGroupResource ->
 				priceListAccountGroupResource.
 					postPriceListIdPriceListAccountGroupBatch(
-						callbackURL, object));
+						id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -1268,6 +1457,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createPriceListIdPriceListChannelBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -1277,7 +1467,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			priceListChannelResource ->
 				priceListChannelResource.postPriceListIdPriceListChannelBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -1344,6 +1534,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createPriceListIdPriceListDiscountBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -1353,7 +1544,85 @@ public class Mutation {
 			this::_populateResourceContext,
 			priceListDiscountResource ->
 				priceListDiscountResource.postPriceListIdPriceListDiscountBatch(
+					id, callbackURL, object));
+	}
+
+	@GraphQLField
+	public boolean deletePriceListOrderType(
+			@GraphQLName("priceListOrderTypeId") Long priceListOrderTypeId)
+		throws Exception {
+
+		_applyVoidComponentServiceObjects(
+			_priceListOrderTypeResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			priceListOrderTypeResource ->
+				priceListOrderTypeResource.deletePriceListOrderType(
+					priceListOrderTypeId));
+
+		return true;
+	}
+
+	@GraphQLField
+	public Response deletePriceListOrderTypeBatch(
+			@GraphQLName("callbackURL") String callbackURL,
+			@GraphQLName("object") Object object)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_priceListOrderTypeResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			priceListOrderTypeResource ->
+				priceListOrderTypeResource.deletePriceListOrderTypeBatch(
 					callbackURL, object));
+	}
+
+	@GraphQLField
+	public PriceListOrderType
+			createPriceListByExternalReferenceCodePriceListOrderType(
+				@GraphQLName("externalReferenceCode") String
+					externalReferenceCode,
+				@GraphQLName("priceListOrderType") PriceListOrderType
+					priceListOrderType)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_priceListOrderTypeResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			priceListOrderTypeResource ->
+				priceListOrderTypeResource.
+					postPriceListByExternalReferenceCodePriceListOrderType(
+						externalReferenceCode, priceListOrderType));
+	}
+
+	@GraphQLField
+	public PriceListOrderType createPriceListIdPriceListOrderType(
+			@GraphQLName("id") Long id,
+			@GraphQLName("priceListOrderType") PriceListOrderType
+				priceListOrderType)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_priceListOrderTypeResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			priceListOrderTypeResource ->
+				priceListOrderTypeResource.postPriceListIdPriceListOrderType(
+					id, priceListOrderType));
+	}
+
+	@GraphQLField
+	public Response createPriceListIdPriceListOrderTypeBatch(
+			@GraphQLName("id") Long id,
+			@GraphQLName("callbackURL") String callbackURL,
+			@GraphQLName("object") Object object)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_priceListOrderTypeResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			priceListOrderTypeResource ->
+				priceListOrderTypeResource.
+					postPriceListIdPriceListOrderTypeBatch(
+						id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -1387,6 +1656,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createPriceListIdPriceModifierBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -1396,7 +1666,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			priceModifierResource ->
 				priceModifierResource.postPriceListIdPriceModifierBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -1444,6 +1714,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response deletePriceModifierBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -1453,7 +1724,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			priceModifierResource ->
 				priceModifierResource.deletePriceModifierBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -1535,6 +1806,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createPriceModifierIdPriceModifierCategoryBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -1545,7 +1817,7 @@ public class Mutation {
 			priceModifierCategoryResource ->
 				priceModifierCategoryResource.
 					postPriceModifierIdPriceModifierCategoryBatch(
-						callbackURL, object));
+						id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -1613,6 +1885,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createPriceModifierIdPriceModifierProductBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -1623,7 +1896,7 @@ public class Mutation {
 			priceModifierProductResource ->
 				priceModifierProductResource.
 					postPriceModifierIdPriceModifierProductBatch(
-						callbackURL, object));
+						id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -1694,6 +1967,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createPriceModifierIdPriceModifierProductGroupBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -1704,7 +1978,7 @@ public class Mutation {
 			priceModifierProductGroupResource ->
 				priceModifierProductGroupResource.
 					postPriceModifierIdPriceModifierProductGroupBatch(
-						callbackURL, object));
+						id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -1793,6 +2067,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response deleteTierPriceBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -1801,7 +2076,7 @@ public class Mutation {
 			_tierPriceResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			tierPriceResource -> tierPriceResource.deleteTierPriceBatch(
-				callbackURL, object));
+				id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -1866,9 +2141,6 @@ public class Mutation {
 		discountResource.setContextUser(_user);
 		discountResource.setGroupLocalService(_groupLocalService);
 		discountResource.setRoleLocalService(_roleLocalService);
-
-		discountResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -1885,9 +2157,6 @@ public class Mutation {
 		discountAccountResource.setContextUser(_user);
 		discountAccountResource.setGroupLocalService(_groupLocalService);
 		discountAccountResource.setRoleLocalService(_roleLocalService);
-
-		discountAccountResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -1904,9 +2173,6 @@ public class Mutation {
 		discountAccountGroupResource.setContextUser(_user);
 		discountAccountGroupResource.setGroupLocalService(_groupLocalService);
 		discountAccountGroupResource.setRoleLocalService(_roleLocalService);
-
-		discountAccountGroupResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -1923,9 +2189,6 @@ public class Mutation {
 		discountCategoryResource.setContextUser(_user);
 		discountCategoryResource.setGroupLocalService(_groupLocalService);
 		discountCategoryResource.setRoleLocalService(_roleLocalService);
-
-		discountCategoryResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -1942,9 +2205,22 @@ public class Mutation {
 		discountChannelResource.setContextUser(_user);
 		discountChannelResource.setGroupLocalService(_groupLocalService);
 		discountChannelResource.setRoleLocalService(_roleLocalService);
+	}
 
-		discountChannelResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
+	private void _populateResourceContext(
+			DiscountOrderTypeResource discountOrderTypeResource)
+		throws Exception {
+
+		discountOrderTypeResource.setContextAcceptLanguage(_acceptLanguage);
+		discountOrderTypeResource.setContextCompany(_company);
+		discountOrderTypeResource.setContextHttpServletRequest(
+			_httpServletRequest);
+		discountOrderTypeResource.setContextHttpServletResponse(
+			_httpServletResponse);
+		discountOrderTypeResource.setContextUriInfo(_uriInfo);
+		discountOrderTypeResource.setContextUser(_user);
+		discountOrderTypeResource.setGroupLocalService(_groupLocalService);
+		discountOrderTypeResource.setRoleLocalService(_roleLocalService);
 	}
 
 	private void _populateResourceContext(
@@ -1961,9 +2237,6 @@ public class Mutation {
 		discountProductResource.setContextUser(_user);
 		discountProductResource.setGroupLocalService(_groupLocalService);
 		discountProductResource.setRoleLocalService(_roleLocalService);
-
-		discountProductResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -1980,9 +2253,6 @@ public class Mutation {
 		discountProductGroupResource.setContextUser(_user);
 		discountProductGroupResource.setGroupLocalService(_groupLocalService);
 		discountProductGroupResource.setRoleLocalService(_roleLocalService);
-
-		discountProductGroupResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -1998,9 +2268,20 @@ public class Mutation {
 		discountRuleResource.setContextUser(_user);
 		discountRuleResource.setGroupLocalService(_groupLocalService);
 		discountRuleResource.setRoleLocalService(_roleLocalService);
+	}
 
-		discountRuleResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
+	private void _populateResourceContext(
+			DiscountSkuResource discountSkuResource)
+		throws Exception {
+
+		discountSkuResource.setContextAcceptLanguage(_acceptLanguage);
+		discountSkuResource.setContextCompany(_company);
+		discountSkuResource.setContextHttpServletRequest(_httpServletRequest);
+		discountSkuResource.setContextHttpServletResponse(_httpServletResponse);
+		discountSkuResource.setContextUriInfo(_uriInfo);
+		discountSkuResource.setContextUser(_user);
+		discountSkuResource.setGroupLocalService(_groupLocalService);
+		discountSkuResource.setRoleLocalService(_roleLocalService);
 	}
 
 	private void _populateResourceContext(PriceEntryResource priceEntryResource)
@@ -2014,9 +2295,6 @@ public class Mutation {
 		priceEntryResource.setContextUser(_user);
 		priceEntryResource.setGroupLocalService(_groupLocalService);
 		priceEntryResource.setRoleLocalService(_roleLocalService);
-
-		priceEntryResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(PriceListResource priceListResource)
@@ -2030,9 +2308,6 @@ public class Mutation {
 		priceListResource.setContextUser(_user);
 		priceListResource.setGroupLocalService(_groupLocalService);
 		priceListResource.setRoleLocalService(_roleLocalService);
-
-		priceListResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -2049,9 +2324,6 @@ public class Mutation {
 		priceListAccountResource.setContextUser(_user);
 		priceListAccountResource.setGroupLocalService(_groupLocalService);
 		priceListAccountResource.setRoleLocalService(_roleLocalService);
-
-		priceListAccountResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -2068,9 +2340,6 @@ public class Mutation {
 		priceListAccountGroupResource.setContextUser(_user);
 		priceListAccountGroupResource.setGroupLocalService(_groupLocalService);
 		priceListAccountGroupResource.setRoleLocalService(_roleLocalService);
-
-		priceListAccountGroupResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -2087,9 +2356,6 @@ public class Mutation {
 		priceListChannelResource.setContextUser(_user);
 		priceListChannelResource.setGroupLocalService(_groupLocalService);
 		priceListChannelResource.setRoleLocalService(_roleLocalService);
-
-		priceListChannelResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -2106,9 +2372,22 @@ public class Mutation {
 		priceListDiscountResource.setContextUser(_user);
 		priceListDiscountResource.setGroupLocalService(_groupLocalService);
 		priceListDiscountResource.setRoleLocalService(_roleLocalService);
+	}
 
-		priceListDiscountResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
+	private void _populateResourceContext(
+			PriceListOrderTypeResource priceListOrderTypeResource)
+		throws Exception {
+
+		priceListOrderTypeResource.setContextAcceptLanguage(_acceptLanguage);
+		priceListOrderTypeResource.setContextCompany(_company);
+		priceListOrderTypeResource.setContextHttpServletRequest(
+			_httpServletRequest);
+		priceListOrderTypeResource.setContextHttpServletResponse(
+			_httpServletResponse);
+		priceListOrderTypeResource.setContextUriInfo(_uriInfo);
+		priceListOrderTypeResource.setContextUser(_user);
+		priceListOrderTypeResource.setGroupLocalService(_groupLocalService);
+		priceListOrderTypeResource.setRoleLocalService(_roleLocalService);
 	}
 
 	private void _populateResourceContext(
@@ -2124,9 +2403,6 @@ public class Mutation {
 		priceModifierResource.setContextUser(_user);
 		priceModifierResource.setGroupLocalService(_groupLocalService);
 		priceModifierResource.setRoleLocalService(_roleLocalService);
-
-		priceModifierResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -2143,9 +2419,6 @@ public class Mutation {
 		priceModifierCategoryResource.setContextUser(_user);
 		priceModifierCategoryResource.setGroupLocalService(_groupLocalService);
 		priceModifierCategoryResource.setRoleLocalService(_roleLocalService);
-
-		priceModifierCategoryResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -2162,9 +2435,6 @@ public class Mutation {
 		priceModifierProductResource.setContextUser(_user);
 		priceModifierProductResource.setGroupLocalService(_groupLocalService);
 		priceModifierProductResource.setRoleLocalService(_roleLocalService);
-
-		priceModifierProductResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -2184,10 +2454,6 @@ public class Mutation {
 			_groupLocalService);
 		priceModifierProductGroupResource.setRoleLocalService(
 			_roleLocalService);
-
-		priceModifierProductGroupResource.
-			setVulcanBatchEngineImportTaskResource(
-				_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(TierPriceResource tierPriceResource)
@@ -2201,9 +2467,6 @@ public class Mutation {
 		tierPriceResource.setContextUser(_user);
 		tierPriceResource.setGroupLocalService(_groupLocalService);
 		tierPriceResource.setRoleLocalService(_roleLocalService);
-
-		tierPriceResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private static ComponentServiceObjects<DiscountResource>
@@ -2216,12 +2479,16 @@ public class Mutation {
 		_discountCategoryResourceComponentServiceObjects;
 	private static ComponentServiceObjects<DiscountChannelResource>
 		_discountChannelResourceComponentServiceObjects;
+	private static ComponentServiceObjects<DiscountOrderTypeResource>
+		_discountOrderTypeResourceComponentServiceObjects;
 	private static ComponentServiceObjects<DiscountProductResource>
 		_discountProductResourceComponentServiceObjects;
 	private static ComponentServiceObjects<DiscountProductGroupResource>
 		_discountProductGroupResourceComponentServiceObjects;
 	private static ComponentServiceObjects<DiscountRuleResource>
 		_discountRuleResourceComponentServiceObjects;
+	private static ComponentServiceObjects<DiscountSkuResource>
+		_discountSkuResourceComponentServiceObjects;
 	private static ComponentServiceObjects<PriceEntryResource>
 		_priceEntryResourceComponentServiceObjects;
 	private static ComponentServiceObjects<PriceListResource>
@@ -2234,6 +2501,8 @@ public class Mutation {
 		_priceListChannelResourceComponentServiceObjects;
 	private static ComponentServiceObjects<PriceListDiscountResource>
 		_priceListDiscountResourceComponentServiceObjects;
+	private static ComponentServiceObjects<PriceListOrderTypeResource>
+		_priceListOrderTypeResourceComponentServiceObjects;
 	private static ComponentServiceObjects<PriceModifierResource>
 		_priceModifierResourceComponentServiceObjects;
 	private static ComponentServiceObjects<PriceModifierCategoryResource>
@@ -2254,7 +2523,5 @@ public class Mutation {
 	private BiFunction<Object, String, Sort[]> _sortsBiFunction;
 	private UriInfo _uriInfo;
 	private com.liferay.portal.kernel.model.User _user;
-	private VulcanBatchEngineImportTaskResource
-		_vulcanBatchEngineImportTaskResource;
 
 }

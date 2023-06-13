@@ -178,7 +178,7 @@ public class LayoutFriendlyURLStagedModelDataHandler
 
 		String friendlyURL = layoutFriendlyURL.getFriendlyURL();
 
-		boolean privateLayout = portletDataContext.isPrivateLayout();
+		boolean privateLayout = layoutFriendlyURL.isPrivateLayout();
 
 		if (existingLayoutFriendlyURL != null) {
 			privateLayout = existingLayoutFriendlyURL.isPrivateLayout();

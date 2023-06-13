@@ -20,8 +20,7 @@ definition {
 			structureDescription = "WC Structure Description",
 			structureName = "WC Structure Name");
 
-		DynamicDataMapping.addField(
-			field = "Image",
+		DataEngine.addField(
 			fieldFieldLabel = "Image",
 			fieldName = "Image");
 
@@ -47,7 +46,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -60,7 +59,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-69593 and LRQA-61632. Assert the selected image is kept in Image field under localized."
-	@priority = 4
+	@priority = "4"
 	test ViewFieldTranslations {
 		property test.name.skip.portal.instance = "DDMStructureWithImageField#ViewFieldTranslations";
 
@@ -68,13 +67,16 @@ definition {
 
 		WebContent.addCP(webContentTitle = "English (United States) Title");
 
-		Click(locator1 = "WCEditWebContent#IMAGE_FIELD_SELECT");
+		Click(
+			fieldLabel = "Image",
+			locator1 = "Button#BUTTON_LABEL",
+			text = "Select");
 
-		ItemSelector.uploadFile(
+		ItemSelector.uploadFileWithSelectFrameNoLoading(
 			navTab = "Web Content Images",
 			uploadFileName = "Document_3.png");
 
-		FormFields.editTextAlt(
+		FormFields.editTextDescription(
 			fieldName = "Image",
 			fieldValue = "English (United States) Image Description");
 
@@ -84,7 +86,7 @@ definition {
 			fieldName = "title",
 			fieldValue = "Spanish (Spain) Title");
 
-		FormFields.editTextAlt(
+		FormFields.editTextDescription(
 			fieldName = "Image",
 			fieldValue = "Spanish (Spain) Image Description");
 
@@ -94,7 +96,7 @@ definition {
 			fieldName = "title",
 			fieldValue = "Portuguese (Brazil) Title");
 
-		FormFields.editTextAlt(
+		FormFields.editTextDescription(
 			fieldName = "Image",
 			fieldValue = "Portuguese (Brazil) Image Description");
 
@@ -108,11 +110,11 @@ definition {
 
 		AssertAttributeValue(
 			attribute1 = "value",
-			key_fieldName = "Image",
+			key_fieldFieldLabel = "Image",
 			locator1 = "TextInput#SELECTOR_INPUT",
 			value1 = "Document_3.png");
 
-		FormFields.viewTextValueAlt(
+		FormFields.viewTextValueDescription(
 			fieldName = "Image",
 			fieldValue = "English (United States) Image Description");
 
@@ -124,11 +126,11 @@ definition {
 
 		AssertAttributeValue(
 			attribute1 = "value",
-			key_fieldName = "Image",
+			key_fieldFieldLabel = "Image",
 			locator1 = "TextInput#SELECTOR_INPUT",
 			value1 = "Document_3.png");
 
-		FormFields.viewTextValueAlt(
+		FormFields.viewTextValueDescription(
 			fieldName = "Image",
 			fieldValue = "Spanish (Spain) Image Description");
 
@@ -140,11 +142,11 @@ definition {
 
 		AssertAttributeValue(
 			attribute1 = "value",
-			key_fieldName = "Image",
+			key_fieldFieldLabel = "Image",
 			locator1 = "TextInput#SELECTOR_INPUT",
 			value1 = "Document_3.png");
 
-		FormFields.viewTextValueAlt(
+		FormFields.viewTextValueDescription(
 			fieldName = "Image",
 			fieldValue = "Portuguese (Brazil) Image Description");
 	}

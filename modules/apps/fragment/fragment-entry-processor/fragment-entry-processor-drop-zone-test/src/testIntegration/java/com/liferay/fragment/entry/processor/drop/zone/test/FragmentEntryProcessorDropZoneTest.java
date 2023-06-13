@@ -58,8 +58,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.springframework.mock.web.MockHttpServletRequest;
-
 /**
  * @author Eudaldo Alonso
  */
@@ -128,8 +126,7 @@ public class FragmentEntryProcessorDropZoneTest {
 			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
 				fragmentEntryLink,
 				new DefaultFragmentEntryProcessorContext(
-					new MockHttpServletRequest(), null,
-					FragmentEntryLinkConstants.EDIT,
+					null, null, FragmentEntryLinkConstants.EDIT,
 					LocaleUtil.getMostRelevantLocale())));
 	}
 
@@ -144,8 +141,8 @@ public class FragmentEntryProcessorDropZoneTest {
 				TestPropsValues.getUserId(), _group.getGroupId(),
 				fragmentCollection.getFragmentCollectionId(), "fragment-entry",
 				"Fragment Entry", null,
-				_getFileAsString("drop_zone_fragment_entry.html"), null, null,
-				0, FragmentConstants.TYPE_SECTION,
+				_readFileToString("drop_zone_fragment_entry.html"), null, false,
+				null, null, 0, FragmentConstants.TYPE_SECTION,
 				WorkflowConstants.STATUS_APPROVED, _serviceContext);
 
 		return _fragmentEntryLinkLocalService.addFragmentEntryLink(
@@ -156,17 +153,9 @@ public class FragmentEntryProcessorDropZoneTest {
 			StringPool.BLANK, StringPool.BLANK, 0, null, _serviceContext);
 	}
 
-	private String _getFileAsString(String fileName) throws Exception {
-		Class<?> clazz = getClass();
-
-		return StringUtil.read(
-			clazz.getClassLoader(),
-			"com/liferay/fragment/entry/processor/drop/zone/test/dependencies" +
-				"/" + fileName);
-	}
-
 	private String _getProcessedHTML(String fileName) throws Exception {
-		Document document = Jsoup.parseBodyFragment(_getFileAsString(fileName));
+		Document document = Jsoup.parseBodyFragment(
+			_readFileToString(fileName));
 
 		document.outputSettings(
 			new Document.OutputSettings() {
@@ -178,6 +167,15 @@ public class FragmentEntryProcessorDropZoneTest {
 		Element bodyElement = document.body();
 
 		return bodyElement.html();
+	}
+
+	private String _readFileToString(String fileName) throws Exception {
+		Class<?> clazz = getClass();
+
+		return StringUtil.read(
+			clazz.getClassLoader(),
+			"com/liferay/fragment/entry/processor/drop/zone/test/dependencies" +
+				"/" + fileName);
 	}
 
 	@Inject

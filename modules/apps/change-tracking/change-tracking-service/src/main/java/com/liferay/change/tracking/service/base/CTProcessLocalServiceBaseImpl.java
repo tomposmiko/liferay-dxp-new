@@ -17,7 +17,6 @@ package com.liferay.change.tracking.service.base;
 import com.liferay.change.tracking.model.CTProcess;
 import com.liferay.change.tracking.service.CTProcessLocalService;
 import com.liferay.change.tracking.service.CTProcessLocalServiceUtil;
-import com.liferay.change.tracking.service.persistence.CTCollectionPersistence;
 import com.liferay.change.tracking.service.persistence.CTProcessPersistence;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
@@ -33,8 +32,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -302,6 +299,7 @@ public abstract class CTProcessLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -318,6 +316,7 @@ public abstract class CTProcessLocalServiceBaseImpl
 		return ctProcessLocalService.deleteCTProcess((CTProcess)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<CTProcess> getBasePersistence() {
 		return ctProcessPersistence;
 	}
@@ -458,17 +457,7 @@ public abstract class CTProcessLocalServiceBaseImpl
 	protected CTProcessPersistence ctProcessPersistence;
 
 	@Reference
-	protected CTCollectionPersistence ctCollectionPersistence;
-
-	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.CompanyLocalService
-		companyLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CTProcessLocalServiceBaseImpl.class);
 
 }

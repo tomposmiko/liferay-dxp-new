@@ -20,7 +20,6 @@ import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortlet
 import com.liferay.layout.content.page.editor.web.internal.util.StyleBookEntryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -48,7 +47,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
-		"mvc.command.name=/content_layout/change_style_book_entry"
+		"mvc.command.name=/layout_content_page_editor/change_style_book_entry"
 	},
 	service = MVCActionCommand.class
 )
@@ -75,10 +74,8 @@ public class ChangeStyleBookEntryMVCActionCommand
 			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
 			styleBookEntryId);
 
-		Group group = themeDisplay.getScopeGroup();
-
 		LayoutSet layoutSet = _layoutSetLocalService.fetchLayoutSet(
-			themeDisplay.getSiteGroupId(), group.isLayoutSetPrototype());
+			themeDisplay.getSiteGroupId(), false);
 
 		FrontendTokenDefinition frontendTokenDefinition =
 			_frontendTokenDefinitionRegistry.getFrontendTokenDefinition(

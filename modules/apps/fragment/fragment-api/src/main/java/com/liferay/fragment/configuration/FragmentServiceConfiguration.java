@@ -24,7 +24,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Pavel Savinov
  */
 @ExtendedObjectClassDefinition(
-	category = "page-fragments", generateUI = false,
+	category = "page-fragments",
 	scope = ExtendedObjectClassDefinition.Scope.COMPANY
 )
 @Meta.OCD(
@@ -40,23 +40,5 @@ public interface FragmentServiceConfiguration {
 		name = "propagate-fragment-changes-automatically", required = false
 	)
 	public boolean propagateChanges();
-
-	@Meta.AD(
-		deflt = "true",
-		description = "propagate-contributed-fragment-changes-automatically-description",
-		name = "propagate-contributed-fragment-changes-automatically",
-		required = false
-	)
-	public boolean propagateContributedFragmentChanges();
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	@Meta.AD(
-		deflt = "false", description = "enable-configuration-help",
-		name = "enable-configuration", required = false
-	)
-	public boolean enableConfiguration();
 
 }

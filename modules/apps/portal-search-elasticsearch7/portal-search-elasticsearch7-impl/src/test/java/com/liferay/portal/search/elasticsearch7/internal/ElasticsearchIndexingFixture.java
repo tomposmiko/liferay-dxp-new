@@ -26,9 +26,9 @@ import com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfi
 import com.liferay.portal.search.elasticsearch7.internal.configuration.ElasticsearchConfigurationWrapper;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
-import com.liferay.portal.search.elasticsearch7.internal.connection.IndexCreationHelper;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexCreator;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexName;
+import com.liferay.portal.search.elasticsearch7.internal.connection.helper.IndexCreationHelper;
 import com.liferay.portal.search.elasticsearch7.internal.facet.CompositeFacetProcessor;
 import com.liferay.portal.search.elasticsearch7.internal.facet.DefaultFacetProcessor;
 import com.liferay.portal.search.elasticsearch7.internal.facet.FacetProcessor;
@@ -269,7 +269,6 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 		return new CompositeFacetProcessor() {
 			{
 				defaultFacetProcessor = new DefaultFacetProcessor();
-
 				setFacetProcessor(
 					new ModifiedFacetProcessor(),
 					Collections.singletonMap(

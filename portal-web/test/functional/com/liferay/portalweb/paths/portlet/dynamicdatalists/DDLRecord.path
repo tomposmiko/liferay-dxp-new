@@ -36,13 +36,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>FIELD_1_VALUE</td>
+	<td>//div[@class='lfr-ddm-container']/div[not(contains(@class,'hide'))][1]//input[@value='${key_value}']</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
 </tr>
-
 <!--NESTED_FIELDS-->
-
 <tr>
 	<td>NESTED_PARENT_FIELD</td>
 	<td>//div[@data-fieldname='${key_nestedParentFieldFieldName}']</td>
@@ -68,9 +71,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--INFO_SIDEBAR-->
-
 <tr>
 	<td>INFO_SIDEBAR_EXPANDED</td>
 	<td>//div[@class='sidenav-menu-slider' and contains(@style,'width: 320px')]</td>

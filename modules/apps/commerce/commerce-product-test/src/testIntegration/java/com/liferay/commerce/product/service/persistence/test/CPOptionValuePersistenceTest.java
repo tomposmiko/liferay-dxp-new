@@ -15,7 +15,6 @@
 package com.liferay.commerce.product.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.product.exception.DuplicateCPOptionValueExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCPOptionValueException;
 import com.liferay.commerce.product.model.CPOptionValue;
 import com.liferay.commerce.product.service.CPOptionValueLocalServiceUtil;
@@ -126,6 +125,8 @@ public class CPOptionValuePersistenceTest {
 
 		CPOptionValue newCPOptionValue = _persistence.create(pk);
 
+		newCPOptionValue.setMvccVersion(RandomTestUtil.nextLong());
+
 		newCPOptionValue.setUuid(RandomTestUtil.randomString());
 
 		newCPOptionValue.setExternalReferenceCode(
@@ -156,6 +157,9 @@ public class CPOptionValuePersistenceTest {
 		CPOptionValue existingCPOptionValue = _persistence.findByPrimaryKey(
 			newCPOptionValue.getPrimaryKey());
 
+		Assert.assertEquals(
+			existingCPOptionValue.getMvccVersion(),
+			newCPOptionValue.getMvccVersion());
 		Assert.assertEquals(
 			existingCPOptionValue.getUuid(), newCPOptionValue.getUuid());
 		Assert.assertEquals(
@@ -191,26 +195,6 @@ public class CPOptionValuePersistenceTest {
 		Assert.assertEquals(
 			Time.getShortTimestamp(existingCPOptionValue.getLastPublishDate()),
 			Time.getShortTimestamp(newCPOptionValue.getLastPublishDate()));
-	}
-
-	@Test(expected = DuplicateCPOptionValueExternalReferenceCodeException.class)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CPOptionValue cpOptionValue = addCPOptionValue();
-
-		CPOptionValue newCPOptionValue = addCPOptionValue();
-
-		newCPOptionValue.setCompanyId(cpOptionValue.getCompanyId());
-
-		newCPOptionValue = _persistence.update(newCPOptionValue);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCPOptionValue);
-
-		newCPOptionValue.setExternalReferenceCode(
-			cpOptionValue.getExternalReferenceCode());
-
-		_persistence.update(newCPOptionValue);
 	}
 
 	@Test
@@ -288,11 +272,11 @@ public class CPOptionValuePersistenceTest {
 
 	protected OrderByComparator<CPOptionValue> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CPOptionValue", "uuid", true, "externalReferenceCode", true,
-			"CPOptionValueId", true, "companyId", true, "userId", true,
-			"userName", true, "createDate", true, "modifiedDate", true,
-			"CPOptionId", true, "name", true, "priority", true, "key", true,
-			"lastPublishDate", true);
+			"CPOptionValue", "mvccVersion", true, "uuid", true,
+			"externalReferenceCode", true, "CPOptionValueId", true, "companyId",
+			true, "userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "CPOptionId", true, "name", true, "priority",
+			true, "key", true, "lastPublishDate", true);
 	}
 
 	@Test
@@ -586,6 +570,8 @@ public class CPOptionValuePersistenceTest {
 		long pk = RandomTestUtil.nextLong();
 
 		CPOptionValue cpOptionValue = _persistence.create(pk);
+
+		cpOptionValue.setMvccVersion(RandomTestUtil.nextLong());
 
 		cpOptionValue.setUuid(RandomTestUtil.randomString());
 

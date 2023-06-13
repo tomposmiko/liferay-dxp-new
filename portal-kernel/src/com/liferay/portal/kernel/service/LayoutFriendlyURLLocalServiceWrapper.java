@@ -29,6 +29,10 @@ public class LayoutFriendlyURLLocalServiceWrapper
 	implements LayoutFriendlyURLLocalService,
 			   ServiceWrapper<LayoutFriendlyURLLocalService> {
 
+	public LayoutFriendlyURLLocalServiceWrapper() {
+		this(null);
+	}
+
 	public LayoutFriendlyURLLocalServiceWrapper(
 		LayoutFriendlyURLLocalService layoutFriendlyURLLocalService) {
 
@@ -357,6 +361,17 @@ public class LayoutFriendlyURLLocalServiceWrapper
 
 		return _layoutFriendlyURLLocalService.getLayoutFriendlyURL(
 			layoutFriendlyURLId);
+	}
+
+	@Override
+	public LayoutFriendlyURL getLayoutFriendlyURL(
+			long groupId, boolean privateLayout, String friendlyURL,
+			String languageId)
+		throws com.liferay.portal.kernel.exception.
+			NoSuchLayoutFriendlyURLException {
+
+		return _layoutFriendlyURLLocalService.getLayoutFriendlyURL(
+			groupId, privateLayout, friendlyURL, languageId);
 	}
 
 	@Override

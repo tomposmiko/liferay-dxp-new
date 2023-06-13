@@ -38,9 +38,9 @@
 		function init() {
 			var hash = document.location.hash.replace('#', '');
 
-			var hashSearch = new URLSearchParams(hash);
+			var hashObj = A.QueryString.parse(hash);
 
-			hash = hashSearch.get('<portlet:namespace />');
+			hash = hashObj['<portlet:namespace />'];
 
 			if (hash) {
 				hash = String(hash);
@@ -104,11 +104,11 @@
 
 			var hash = document.location.hash.replace('#', '');
 
-			var hashSearch = new URLSearchParams(hash);
+			var hashObj = A.QueryString.parse(hash);
 
-			hashSearch.set('<portlet:namespace />', url);
+			hashObj['<portlet:namespace />'] = url;
 
-			hash = hashSearch.toString();
+			hash = A.QueryString.stringify(hashObj);
 
 			var maximize = A.one(
 				'#p_p_id<portlet:namespace /> .portlet-maximize-icon a'
@@ -142,35 +142,17 @@
 <aui:script use="aui-autosize-iframe">
 	var iframe = A.one('#<portlet:namespace />iframe');
 
-	function isNested(initial, parentUrls) {
-		var isTop = initial === initial.Liferay.Util.getTop();
-
-		if (isTop) {
-			return false;
-		}
-
-		var href = initial.location.href;
-
-		if (parentUrls.length > 2 && parentUrls.includes(href)) {
-			return true;
-		}
-
-		return isNested(initial.Liferay.Util.getTop(), parentUrls.concat([href]));
-	}
-
 	if (iframe) {
-		if (!isNested(window, [])) {
-			iframe.set(
-				'src',
-				'<%= HtmlUtil.escapeJS(iFrameDisplayContext.getIframeSrc()) %>'
-			);
-		}
+		iframe.set(
+			'src',
+			'<%= HtmlUtil.escapeJS(iFrameDisplayContext.getIframeSrc()) %>'
+		);
 
 		iframe.plug(A.Plugin.AutosizeIframe, {
 			monitorHeight: <%= iFramePortletInstanceConfiguration.resizeAutomatically() %>,
 		});
 
-		iframe.on('load', function () {
+		iframe.on('load', () => {
 			var height = A.Plugin.AutosizeIframe.getContentHeight(iframe);
 
 			if (height == null) {

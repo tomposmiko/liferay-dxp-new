@@ -33,6 +33,7 @@ import com.liferay.portal.workflow.kaleo.model.KaleoNotificationModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -260,138 +261,160 @@ public class KaleoNotificationModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, KaleoNotification>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			KaleoNotification.class.getClassLoader(), KaleoNotification.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<KaleoNotification> constructor =
+				(Constructor<KaleoNotification>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<KaleoNotification, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<KaleoNotification, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<KaleoNotification, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<KaleoNotification, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", KaleoNotification::getMvccVersion);
-		attributeGetterFunctions.put(
-			"kaleoNotificationId", KaleoNotification::getKaleoNotificationId);
-		attributeGetterFunctions.put("groupId", KaleoNotification::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", KaleoNotification::getCompanyId);
-		attributeGetterFunctions.put("userId", KaleoNotification::getUserId);
-		attributeGetterFunctions.put(
-			"userName", KaleoNotification::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", KaleoNotification::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", KaleoNotification::getModifiedDate);
-		attributeGetterFunctions.put(
-			"kaleoClassName", KaleoNotification::getKaleoClassName);
-		attributeGetterFunctions.put(
-			"kaleoClassPK", KaleoNotification::getKaleoClassPK);
-		attributeGetterFunctions.put(
-			"kaleoDefinitionId", KaleoNotification::getKaleoDefinitionId);
-		attributeGetterFunctions.put(
-			"kaleoDefinitionVersionId",
-			KaleoNotification::getKaleoDefinitionVersionId);
-		attributeGetterFunctions.put(
-			"kaleoNodeName", KaleoNotification::getKaleoNodeName);
-		attributeGetterFunctions.put("name", KaleoNotification::getName);
-		attributeGetterFunctions.put(
-			"description", KaleoNotification::getDescription);
-		attributeGetterFunctions.put(
-			"executionType", KaleoNotification::getExecutionType);
-		attributeGetterFunctions.put(
-			"template", KaleoNotification::getTemplate);
-		attributeGetterFunctions.put(
-			"templateLanguage", KaleoNotification::getTemplateLanguage);
-		attributeGetterFunctions.put(
-			"notificationTypes", KaleoNotification::getNotificationTypes);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<KaleoNotification, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<KaleoNotification, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<KaleoNotification, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", KaleoNotification::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<KaleoNotification, Long>)
 				KaleoNotification::setMvccVersion);
+		attributeGetterFunctions.put(
+			"kaleoNotificationId", KaleoNotification::getKaleoNotificationId);
 		attributeSetterBiConsumers.put(
 			"kaleoNotificationId",
 			(BiConsumer<KaleoNotification, Long>)
 				KaleoNotification::setKaleoNotificationId);
+		attributeGetterFunctions.put("groupId", KaleoNotification::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<KaleoNotification, Long>)KaleoNotification::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", KaleoNotification::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<KaleoNotification, Long>)
 				KaleoNotification::setCompanyId);
+		attributeGetterFunctions.put("userId", KaleoNotification::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<KaleoNotification, Long>)KaleoNotification::setUserId);
+		attributeGetterFunctions.put(
+			"userName", KaleoNotification::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<KaleoNotification, String>)
 				KaleoNotification::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", KaleoNotification::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<KaleoNotification, Date>)
 				KaleoNotification::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", KaleoNotification::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<KaleoNotification, Date>)
 				KaleoNotification::setModifiedDate);
+		attributeGetterFunctions.put(
+			"kaleoClassName", KaleoNotification::getKaleoClassName);
 		attributeSetterBiConsumers.put(
 			"kaleoClassName",
 			(BiConsumer<KaleoNotification, String>)
 				KaleoNotification::setKaleoClassName);
+		attributeGetterFunctions.put(
+			"kaleoClassPK", KaleoNotification::getKaleoClassPK);
 		attributeSetterBiConsumers.put(
 			"kaleoClassPK",
 			(BiConsumer<KaleoNotification, Long>)
 				KaleoNotification::setKaleoClassPK);
+		attributeGetterFunctions.put(
+			"kaleoDefinitionId", KaleoNotification::getKaleoDefinitionId);
 		attributeSetterBiConsumers.put(
 			"kaleoDefinitionId",
 			(BiConsumer<KaleoNotification, Long>)
 				KaleoNotification::setKaleoDefinitionId);
+		attributeGetterFunctions.put(
+			"kaleoDefinitionVersionId",
+			KaleoNotification::getKaleoDefinitionVersionId);
 		attributeSetterBiConsumers.put(
 			"kaleoDefinitionVersionId",
 			(BiConsumer<KaleoNotification, Long>)
 				KaleoNotification::setKaleoDefinitionVersionId);
+		attributeGetterFunctions.put(
+			"kaleoNodeName", KaleoNotification::getKaleoNodeName);
 		attributeSetterBiConsumers.put(
 			"kaleoNodeName",
 			(BiConsumer<KaleoNotification, String>)
 				KaleoNotification::setKaleoNodeName);
+		attributeGetterFunctions.put("name", KaleoNotification::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<KaleoNotification, String>)KaleoNotification::setName);
+		attributeGetterFunctions.put(
+			"description", KaleoNotification::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<KaleoNotification, String>)
 				KaleoNotification::setDescription);
+		attributeGetterFunctions.put(
+			"executionType", KaleoNotification::getExecutionType);
 		attributeSetterBiConsumers.put(
 			"executionType",
 			(BiConsumer<KaleoNotification, String>)
 				KaleoNotification::setExecutionType);
+		attributeGetterFunctions.put(
+			"template", KaleoNotification::getTemplate);
 		attributeSetterBiConsumers.put(
 			"template",
 			(BiConsumer<KaleoNotification, String>)
 				KaleoNotification::setTemplate);
+		attributeGetterFunctions.put(
+			"templateLanguage", KaleoNotification::getTemplateLanguage);
 		attributeSetterBiConsumers.put(
 			"templateLanguage",
 			(BiConsumer<KaleoNotification, String>)
 				KaleoNotification::setTemplateLanguage);
+		attributeGetterFunctions.put(
+			"notificationTypes", KaleoNotification::getNotificationTypes);
 		attributeSetterBiConsumers.put(
 			"notificationTypes",
 			(BiConsumer<KaleoNotification, String>)
 				KaleoNotification::setNotificationTypes);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -861,6 +884,53 @@ public class KaleoNotificationModelImpl
 	}
 
 	@Override
+	public KaleoNotification cloneWithOriginalValues() {
+		KaleoNotificationImpl kaleoNotificationImpl =
+			new KaleoNotificationImpl();
+
+		kaleoNotificationImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		kaleoNotificationImpl.setKaleoNotificationId(
+			this.<Long>getColumnOriginalValue("kaleoNotificationId"));
+		kaleoNotificationImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		kaleoNotificationImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		kaleoNotificationImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		kaleoNotificationImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		kaleoNotificationImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		kaleoNotificationImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		kaleoNotificationImpl.setKaleoClassName(
+			this.<String>getColumnOriginalValue("kaleoClassName"));
+		kaleoNotificationImpl.setKaleoClassPK(
+			this.<Long>getColumnOriginalValue("kaleoClassPK"));
+		kaleoNotificationImpl.setKaleoDefinitionId(
+			this.<Long>getColumnOriginalValue("kaleoDefinitionId"));
+		kaleoNotificationImpl.setKaleoDefinitionVersionId(
+			this.<Long>getColumnOriginalValue("kaleoDefinitionVersionId"));
+		kaleoNotificationImpl.setKaleoNodeName(
+			this.<String>getColumnOriginalValue("kaleoNodeName"));
+		kaleoNotificationImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		kaleoNotificationImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		kaleoNotificationImpl.setExecutionType(
+			this.<String>getColumnOriginalValue("executionType"));
+		kaleoNotificationImpl.setTemplate(
+			this.<String>getColumnOriginalValue("template"));
+		kaleoNotificationImpl.setTemplateLanguage(
+			this.<String>getColumnOriginalValue("templateLanguage"));
+		kaleoNotificationImpl.setNotificationTypes(
+			this.<String>getColumnOriginalValue("notificationTypes"));
+
+		return kaleoNotificationImpl;
+	}
+
+	@Override
 	public int compareTo(KaleoNotification kaleoNotification) {
 		int value = 0;
 
@@ -1140,9 +1210,7 @@ public class KaleoNotificationModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, KaleoNotification>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					KaleoNotification.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

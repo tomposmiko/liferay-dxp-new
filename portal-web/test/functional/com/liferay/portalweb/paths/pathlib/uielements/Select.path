@@ -11,18 +11,13 @@
 
 <tbody>
 <tr>
+	<td>ADDRESS_TYPE</td>
+	<td>//div[label[contains(.,'Type')]]/select[contains(@name,'addressType')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ANY</td>
 	<td>//div[not(contains(@class,'hide'))]/div[contains(@class,'input-select-wrapper')][label[contains(.,'${key_selectFieldLabel}')]]/select</td>
-	<td></td>
-</tr>
-<tr>
-	<td>ANY_2</td>
-	<td>xpath=(//div[not(contains(@class,'hide'))]/div[contains(@class,'input-select-wrapper')][label[contains(.,'${key_selectFieldLabel}')]]/select)[2]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>APPLICATION_DECORATORS</td>
-	<td>//div[label[contains(.,'Application Decorators')]]/select[contains(@id,'portletDecorator')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -117,17 +112,27 @@
 </tr>
 <tr>
 	<td>GENERIC_SELECT_FIELD</td>
-	<td>//div[label[contains(.,'${key_fieldLabel}')]]/select</td>
+	<td>//div[label[normalize-space(text())='${key_fieldLabel}']]/select</td>
 	<td></td>
 </tr>
 <tr>
 	<td>GENERIC_SELECT_VALUE</td>
-	<td>//div[label[contains(.,'${key_fieldLabel}')]]/select//option[normalize-space(text())='${key_value}']</td>
+	<td>//div[label[normalize-space(text())='${key_fieldLabel}']]/select//option[normalize-space(text())='${key_value}']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>GROUPED_SELECT_VALUE</td>
-	<td>//div[label[contains(.,'${key_fieldLabel}')]]/select/optgroup[@label='${key_groupLabel}']/option[normalize-space(text())='${key_value}']</td>
+	<td>//div[label[normalize-space(text())='${key_fieldLabel}']]/select/optgroup[@label='${key_groupLabel}']/option[normalize-space(text())='${key_value}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>GROUPED_SELECT_VALUE_ANY</td>
+	<td>//div[label[normalize-space(text())='${key_fieldLabel}']]/select/optgroup[@label='${key_groupLabel}']/option[${key_index}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>IMAGE_RATIO</td>
+	<td>//div[contains(@class,'image-editor')]//select[contains(@class,'form-control')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -138,11 +143,6 @@
 <tr>
 	<td>LOS_ANGELES_TIME_ZONE</td>
 	<td>//select[contains(@id,'timeZoneId')]/option[@value='America/Los_Angeles']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>MINIMUM_AGE</td>
-	<td>//select[contains(@id,'maxAge')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -201,11 +201,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>SELECT</td>
-	<td>//select</td>
-	<td></td>
-</tr>
-<tr>
 	<td>SITES</td>
 	<td>//div[label[contains(.,'Sites')]]/select</td>
 	<td></td>
@@ -238,11 +233,6 @@
 <tr>
 	<td>TYPE_SELECTED</td>
 	<td>//div[label[contains(.,'Type')]]//option[contains(.,'${key_typeName}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>WARNING_TIME</td>
-	<td>//select[contains(@id,'warningTime')]</td>
 	<td></td>
 </tr>
 <tr>

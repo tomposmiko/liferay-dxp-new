@@ -877,8 +877,8 @@ public class CalendarBookingLocalServiceTest {
 
 		assertMailBody(
 			mailSubject,
-			"mySubject #123 &amp; 412, firstN@m&amp; #124 &amp; 423, " +
-				"myLocation #123 &amp; 321");
+			"mySubject #123 &amp; 412, firstN@m&amp; #124 &amp;" +
+				" 423, myLocation #123 &amp; 321");
 	}
 
 	@Test
@@ -1748,9 +1748,9 @@ public class CalendarBookingLocalServiceTest {
 		_calendarBookingLocalService.moveCalendarBookingToTrash(
 			_user.getUserId(), calendarBooking);
 
-		childCalendarBooking = getChildCalendarBooking(calendarBooking);
-
-		assertStatus(childCalendarBooking, WorkflowConstants.STATUS_IN_TRASH);
+		assertStatus(
+			getChildCalendarBooking(calendarBooking),
+			WorkflowConstants.STATUS_IN_TRASH);
 	}
 
 	@Test
@@ -1881,9 +1881,9 @@ public class CalendarBookingLocalServiceTest {
 			startTime + (Time.HOUR * 10), false, null, 0, null, 0, null,
 			serviceContext);
 
-		childCalendarBooking = getChildCalendarBooking(calendarBooking);
-
-		assertStatus(childCalendarBooking, WorkflowConstants.STATUS_PENDING);
+		assertStatus(
+			getChildCalendarBooking(calendarBooking),
+			WorkflowConstants.STATUS_PENDING);
 	}
 
 	@Test
@@ -1912,16 +1912,16 @@ public class CalendarBookingLocalServiceTest {
 		_calendarBookingLocalService.moveCalendarBookingToTrash(
 			_user.getUserId(), calendarBooking);
 
-		childCalendarBooking = getChildCalendarBooking(calendarBooking);
-
-		assertStatus(childCalendarBooking, WorkflowConstants.STATUS_IN_TRASH);
+		assertStatus(
+			getChildCalendarBooking(calendarBooking),
+			WorkflowConstants.STATUS_IN_TRASH);
 
 		_calendarBookingLocalService.restoreCalendarBookingFromTrash(
 			_user.getUserId(), calendarBooking.getCalendarBookingId());
 
-		childCalendarBooking = getChildCalendarBooking(calendarBooking);
-
-		assertStatus(childCalendarBooking, WorkflowConstants.STATUS_PENDING);
+		assertStatus(
+			getChildCalendarBooking(calendarBooking),
+			WorkflowConstants.STATUS_PENDING);
 	}
 
 	@Test
@@ -2728,10 +2728,8 @@ public class CalendarBookingLocalServiceTest {
 			calendarBooking.getSecondReminder(),
 			calendarBooking.getSecondReminderType(), serviceContext);
 
-		childCalendarBooking = getChildCalendarBooking(calendarBooking);
-
 		assertStatus(
-			childCalendarBooking,
+			getChildCalendarBooking(calendarBooking),
 			CalendarBookingWorkflowConstants.STATUS_MAYBE);
 	}
 
@@ -2901,10 +2899,8 @@ public class CalendarBookingLocalServiceTest {
 			childCalendarBooking.getSecondReminder(),
 			childCalendarBooking.getSecondReminderType(), serviceContext);
 
-		childCalendarBooking = getChildCalendarBooking(calendarBooking);
-
 		assertStatus(
-			childCalendarBooking,
+			getChildCalendarBooking(calendarBooking),
 			CalendarBookingWorkflowConstants.STATUS_MAYBE);
 	}
 

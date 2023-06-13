@@ -25,7 +25,6 @@ import com.liferay.oauth2.provider.service.persistence.OAuth2ScopeGrantUtil;
 import com.liferay.oauth2.provider.service.persistence.impl.constants.OAuthTwoPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -36,15 +35,14 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.service.persistence.impl.TableMapper;
 import com.liferay.portal.kernel.service.persistence.impl.TableMapperFactory;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -64,12 +62,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -85,7 +80,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = OAuth2ScopeGrantPersistence.class)
+@Component(service = {OAuth2ScopeGrantPersistence.class, BasePersistence.class})
 public class OAuth2ScopeGrantPersistenceImpl
 	extends BasePersistenceImpl<OAuth2ScopeGrant>
 	implements OAuth2ScopeGrantPersistence {
@@ -215,7 +210,7 @@ public class OAuth2ScopeGrantPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<OAuth2ScopeGrant>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (OAuth2ScopeGrant oAuth2ScopeGrant : list) {
@@ -598,7 +593,7 @@ public class OAuth2ScopeGrantPersistenceImpl
 
 		Object[] finderArgs = new Object[] {oAuth2ApplicationScopeAliasesId};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -750,7 +745,7 @@ public class OAuth2ScopeGrantPersistenceImpl
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByC_O_A_B_S, finderArgs, this);
+				_finderPathFetchByC_O_A_B_S, finderArgs);
 		}
 
 		if (result instanceof OAuth2ScopeGrant) {
@@ -939,7 +934,7 @@ public class OAuth2ScopeGrantPersistenceImpl
 			bundleSymbolicName, scope
 		};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(6);
@@ -1128,9 +1123,7 @@ public class OAuth2ScopeGrantPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(OAuth2ScopeGrantImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(OAuth2ScopeGrantImpl.class);
 	}
 
 	/**
@@ -1155,9 +1148,7 @@ public class OAuth2ScopeGrantPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(OAuth2ScopeGrantImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(OAuth2ScopeGrantImpl.class, primaryKey);
@@ -1176,10 +1167,9 @@ public class OAuth2ScopeGrantPersistenceImpl
 		};
 
 		finderCache.putResult(
-			_finderPathCountByC_O_A_B_S, args, Long.valueOf(1), false);
+			_finderPathCountByC_O_A_B_S, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathFetchByC_O_A_B_S, args, oAuth2ScopeGrantModelImpl,
-			false);
+			_finderPathFetchByC_O_A_B_S, args, oAuth2ScopeGrantModelImpl);
 	}
 
 	/**
@@ -1482,7 +1472,7 @@ public class OAuth2ScopeGrantPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<OAuth2ScopeGrant>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1552,7 +1542,7 @@ public class OAuth2ScopeGrantPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1946,15 +1936,7 @@ public class OAuth2ScopeGrantPersistenceImpl
 	 * Initializes the o auth2 scope grant persistence.
 	 */
 	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class,
-			new OAuth2ScopeGrantModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", OAuth2ScopeGrant.class.getName()));
-
+	public void activate() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
@@ -1964,20 +1946,20 @@ public class OAuth2ScopeGrantPersistenceImpl
 				"OA2Auths_OA2ScopeGrants", "companyId", "oAuth2ScopeGrantId",
 				"oAuth2AuthorizationId", this, OAuth2Authorization.class);
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
 		_finderPathWithPaginationFindByOAuth2ApplicationScopeAliasesId =
-			_createFinderPath(
+			new FinderPath(
 				FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
 				"findByOAuth2ApplicationScopeAliasesId",
 				new String[] {
@@ -1987,19 +1969,19 @@ public class OAuth2ScopeGrantPersistenceImpl
 				new String[] {"oA2AScopeAliasesId"}, true);
 
 		_finderPathWithoutPaginationFindByOAuth2ApplicationScopeAliasesId =
-			_createFinderPath(
+			new FinderPath(
 				FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
 				"findByOAuth2ApplicationScopeAliasesId",
 				new String[] {Long.class.getName()},
 				new String[] {"oA2AScopeAliasesId"}, true);
 
-		_finderPathCountByOAuth2ApplicationScopeAliasesId = _createFinderPath(
+		_finderPathCountByOAuth2ApplicationScopeAliasesId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
 			"countByOAuth2ApplicationScopeAliasesId",
 			new String[] {Long.class.getName()},
 			new String[] {"oA2AScopeAliasesId"}, false);
 
-		_finderPathFetchByC_O_A_B_S = _createFinderPath(
+		_finderPathFetchByC_O_A_B_S = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_O_A_B_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -2012,7 +1994,7 @@ public class OAuth2ScopeGrantPersistenceImpl
 			},
 			true);
 
-		_finderPathCountByC_O_A_B_S = _createFinderPath(
+		_finderPathCountByC_O_A_B_S = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_O_A_B_S",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -2033,14 +2015,6 @@ public class OAuth2ScopeGrantPersistenceImpl
 		_setOAuth2ScopeGrantUtilPersistence(null);
 
 		entityCache.removeCache(OAuth2ScopeGrantImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 
 		TableMapperFactory.removeTableMapper(
 			"OA2Auths_OA2ScopeGrants#oAuth2ScopeGrantId");
@@ -2088,8 +2062,6 @@ public class OAuth2ScopeGrantPersistenceImpl
 		super.setSessionFactory(sessionFactory);
 	}
 
-	private BundleContext _bundleContext;
-
 	@Reference
 	protected EntityCache entityCache;
 
@@ -2125,105 +2097,13 @@ public class OAuth2ScopeGrantPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"oAuth2ApplicationScopeAliasesId"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class OAuth2ScopeGrantModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			OAuth2ScopeGrantModelImpl oAuth2ScopeGrantModelImpl =
-				(OAuth2ScopeGrantModelImpl)baseModel;
-
-			long columnBitmask = oAuth2ScopeGrantModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					oAuth2ScopeGrantModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						oAuth2ScopeGrantModelImpl.getColumnBitmask(columnName);
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					oAuth2ScopeGrantModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			OAuth2ScopeGrantModelImpl oAuth2ScopeGrantModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						oAuth2ScopeGrantModelImpl.getColumnOriginalValue(
-							columnName);
-				}
-				else {
-					arguments[i] = oAuth2ScopeGrantModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-	}
+	@Reference
+	private OAuth2ScopeGrantModelArgumentsResolver
+		_oAuth2ScopeGrantModelArgumentsResolver;
 
 }

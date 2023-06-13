@@ -327,7 +327,7 @@ public class IndexerClauseContributorsTest {
 
 	protected MBMessage addMessage(String title) throws Exception {
 		return mbMessageLocalService.addMessage(
-			_user.getUserId(), RandomTestUtil.randomString(),
+			null, _user.getUserId(), RandomTestUtil.randomString(),
 			_group.getGroupId(), MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID,
 			0L, MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID, title,
 			RandomTestUtil.randomString(), MBMessageConstants.DEFAULT_FORMAT,

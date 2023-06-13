@@ -16,10 +16,10 @@ package com.liferay.account.internal.search.spi.model.index.contributor;
 
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountEntryOrganizationRelModel;
-import com.liferay.account.model.AccountGroupAccountEntryRel;
+import com.liferay.account.model.AccountGroupRel;
 import com.liferay.account.retriever.AccountUserRetriever;
 import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
-import com.liferay.account.service.AccountGroupAccountEntryRelLocalService;
+import com.liferay.account.service.AccountGroupRelLocalService;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.model.User;
@@ -49,22 +49,26 @@ public class AccountEntryModelDocumentContributor
 		document.addText(Field.NAME, accountEntry.getName());
 		document.addKeyword(Field.STATUS, accountEntry.getStatus());
 		document.addKeyword(Field.TYPE, accountEntry.getType());
+		document.addKeyword("accountEntryId", accountEntry.getAccountEntryId());
 		document.addKeyword(
 			"accountGroupIds", _getAccountGroupIds(accountEntry));
 		document.addKeyword("accountUserIds", _getAccountUserIds(accountEntry));
 		document.addKeyword("domains", _getDomains(accountEntry));
 		document.addKeyword(
+			"externalReferenceCode", accountEntry.getExternalReferenceCode());
+		document.addKeyword(
 			"organizationIds", _getOrganizationIds(accountEntry));
 		document.addKeyword(
 			"parentAccountEntryId", accountEntry.getParentAccountEntryId());
+		document.addText("taxIdNumber", accountEntry.getTaxIdNumber());
+		document.remove(Field.USER_NAME);
 	}
 
 	private long[] _getAccountGroupIds(AccountEntry accountEntry) {
 		return ListUtil.toLongArray(
-			_accountGroupAccountEntryRelLocalService.
-				getAccountGroupAccountEntryRelsByAccountEntryId(
-					accountEntry.getAccountEntryId()),
-			AccountGroupAccountEntryRel::getAccountGroupId);
+			_accountGroupRelLocalService.getAccountGroupRels(
+				AccountEntry.class.getName(), accountEntry.getAccountEntryId()),
+			AccountGroupRel::getAccountGroupId);
 	}
 
 	private long[] _getAccountUserIds(AccountEntry accountEntry) {
@@ -92,8 +96,7 @@ public class AccountEntryModelDocumentContributor
 		_accountEntryOrganizationRelLocalService;
 
 	@Reference
-	private AccountGroupAccountEntryRelLocalService
-		_accountGroupAccountEntryRelLocalService;
+	private AccountGroupRelLocalService _accountGroupRelLocalService;
 
 	@Reference
 	private AccountUserRetriever _accountUserRetriever;

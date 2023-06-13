@@ -76,27 +76,11 @@ public class UserLocalServiceUtil {
 	 * <code>admin.default.group.names</code>.
 	 *
 	 * @param userId the primary key of the user
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static void addDefaultGroups(long userId) throws PortalException {
-		getService().addDefaultGroups(userId);
-	}
-
-	/**
-	 * Adds the user to the default groups, unless the user is already in these
-	 * groups. The default groups can be specified in
-	 * <code>portal.properties</code> with the key
-	 * <code>admin.default.group.names</code>.
-	 *
-	 * @param user the user
 	 * @return <code>true</code> if user was added to default groups;
 	 <code>false</code> if user was already a member
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
-	@Deprecated
-	public static boolean addDefaultGroups(User user) throws PortalException {
-		return getService().addDefaultGroups(user);
+	public static boolean addDefaultGroups(long userId) throws PortalException {
+		return getService().addDefaultGroups(userId);
 	}
 
 	/**
@@ -106,27 +90,11 @@ public class UserLocalServiceUtil {
 	 * <code>admin.default.role.names</code>.
 	 *
 	 * @param userId the primary key of the user
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static void addDefaultRoles(long userId) throws PortalException {
-		getService().addDefaultRoles(userId);
-	}
-
-	/**
-	 * Adds the user to the default regular roles, unless the user already has
-	 * these regular roles. The default regular roles can be specified in
-	 * <code>portal.properties</code> with the key
-	 * <code>admin.default.role.names</code>.
-	 *
-	 * @param user the user
 	 * @return <code>true</code> if user was given default roles;
 	 <code>false</code> if user already has default roles
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
-	@Deprecated
-	public static boolean addDefaultRoles(User user) throws PortalException {
-		return getService().addDefaultRoles(user);
+	public static boolean addDefaultRoles(long userId) throws PortalException {
+		return getService().addDefaultRoles(userId);
 	}
 
 	/**
@@ -136,31 +104,13 @@ public class UserLocalServiceUtil {
 	 * <code>admin.default.user.group.names</code>.
 	 *
 	 * @param userId the primary key of the user
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static void addDefaultUserGroups(long userId)
-		throws PortalException {
-
-		getService().addDefaultUserGroups(userId);
-	}
-
-	/**
-	 * Adds the user to the default user groups, unless the user is already in
-	 * these user groups. The default user groups can be specified in
-	 * <code>portal.properties</code> with the property
-	 * <code>admin.default.user.group.names</code>.
-	 *
-	 * @param user the user
 	 * @return <code>true</code> if user was added to default user groups;
 	 <code>false</code> if user is already a user group member
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
-	@Deprecated
-	public static boolean addDefaultUserGroups(User user)
+	public static boolean addDefaultUserGroups(long userId)
 		throws PortalException {
 
-		return getService().addDefaultUserGroups(user);
+		return getService().addDefaultUserGroups(userId);
 	}
 
 	public static void addGroupUser(long groupId, long userId) {
@@ -214,6 +164,24 @@ public class UserLocalServiceUtil {
 		throws PortalException {
 
 		getService().addOrganizationUsers(organizationId, userIds);
+	}
+
+	public static User addOrUpdateUser(
+			String externalReferenceCode, long creatorUserId, long companyId,
+			boolean autoPassword, String password1, String password2,
+			boolean autoScreenName, String screenName, String emailAddress,
+			java.util.Locale locale, String firstName, String middleName,
+			String lastName, long prefixId, long suffixId, boolean male,
+			int birthdayMonth, int birthdayDay, int birthdayYear,
+			String jobTitle, boolean sendEmail, ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addOrUpdateUser(
+			externalReferenceCode, creatorUserId, companyId, autoPassword,
+			password1, password2, autoScreenName, screenName, emailAddress,
+			locale, firstName, middleName, lastName, prefixId, suffixId, male,
+			birthdayMonth, birthdayDay, birthdayYear, jobTitle, sendEmail,
+			serviceContext);
 	}
 
 	/**
@@ -726,6 +694,7 @@ public class UserLocalServiceUtil {
 	 * authentication, without using the AuthPipeline. Primarily used for
 	 * authenticating users of <code>tunnel-web</code>.
 	 *
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
 	 * @param companyId the primary key of the user's company
 	 * @param realm unused
 	 * @param nonce the number used once
@@ -735,6 +704,7 @@ public class UserLocalServiceUtil {
 	 * @return the user's primary key if authentication is successful;
 	 <code>0</code> otherwise
 	 */
+	@Deprecated
 	public static long authenticateForDigest(
 			long companyId, String userName, String realm, String nonce,
 			String method, String uri, String response)
@@ -752,7 +722,9 @@ public class UserLocalServiceUtil {
 	 * @param encPassword the encrypted password
 	 * @return <code>true</code> if authentication is successful;
 	 <code>false</code> otherwise
+	 * @deprecated As of Cavanaugh (7.4.x), with no replacement
 	 */
+	@Deprecated
 	public static boolean authenticateForJAAS(long userId, String encPassword) {
 		return getService().authenticateForJAAS(userId, encPassword);
 	}
@@ -1198,7 +1170,13 @@ public class UserLocalServiceUtil {
 		return getService().fetchUserByEmailAddress(companyId, emailAddress);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the user with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user's external reference code
+	 * @return the matching user, or <code>null</code> if a matching user could not be found
+	 */
 	public static User fetchUserByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
 
@@ -1270,6 +1248,9 @@ public class UserLocalServiceUtil {
 		return getService().fetchUserByPortraitId(portraitId);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchUserByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static User fetchUserByReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -1870,7 +1851,14 @@ public class UserLocalServiceUtil {
 		return getService().getUserByEmailAddress(companyId, emailAddress);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the user with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user's external reference code
+	 * @return the matching user
+	 * @throws PortalException if a matching user could not be found
+	 */
 	public static User getUserByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
 		throws PortalException {
@@ -2384,6 +2372,39 @@ public class UserLocalServiceUtil {
 			emailAddress, status, params, andSearch, start, end, sorts);
 	}
 
+	public static List<User> searchBySocial(
+			long userId, int[] socialRelationTypes, String keywords, int start,
+			int end)
+		throws PortalException {
+
+		return getService().searchBySocial(
+			userId, socialRelationTypes, keywords, start, end);
+	}
+
+	public static List<User> searchBySocial(
+		long companyId, long[] groupIds, String keywords, int start, int end) {
+
+		return getService().searchBySocial(
+			companyId, groupIds, keywords, start, end);
+	}
+
+	public static List<User> searchBySocial(
+		long companyId, long[] groupIds, String keywords, int start, int end,
+		OrderByComparator<User> orderByComparator) {
+
+		return getService().searchBySocial(
+			companyId, groupIds, keywords, start, end, orderByComparator);
+	}
+
+	public static List<User> searchBySocial(
+			long[] groupIds, long userId, int[] socialRelationTypes,
+			String keywords, int start, int end)
+		throws PortalException {
+
+		return getService().searchBySocial(
+			groupIds, userId, socialRelationTypes, keywords, start, end);
+	}
+
 	/**
 	 * Returns the number of users who match the keywords and status.
 	 *
@@ -2441,6 +2462,11 @@ public class UserLocalServiceUtil {
 		return getService().searchCounts(companyId, status, groupIds);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #searchBySocial(long, int[], String, int, int)}
+	 */
+	@Deprecated
 	public static List<User> searchSocial(
 			long userId, int[] socialRelationTypes, String keywords, int start,
 			int end)
@@ -2450,6 +2476,11 @@ public class UserLocalServiceUtil {
 			userId, socialRelationTypes, keywords, start, end);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #searchBySocial(long, long[], String, int, int)}
+	 */
+	@Deprecated
 	public static List<User> searchSocial(
 		long companyId, long[] groupIds, String keywords, int start, int end) {
 
@@ -2457,6 +2488,12 @@ public class UserLocalServiceUtil {
 			companyId, groupIds, keywords, start, end);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #searchBySocial(long, long[], String, int, int,
+	 OrderByComparator)}
+	 */
+	@Deprecated
 	public static List<User> searchSocial(
 		long companyId, long[] groupIds, String keywords, int start, int end,
 		OrderByComparator<User> orderByComparator) {
@@ -2465,6 +2502,11 @@ public class UserLocalServiceUtil {
 			companyId, groupIds, keywords, start, end, orderByComparator);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #searchBySocial(long[], long, int[], String, int, int)}
+	 */
+	@Deprecated
 	public static List<User> searchSocial(
 			long[] groupIds, long userId, int[] socialRelationTypes,
 			String keywords, int start, int end)

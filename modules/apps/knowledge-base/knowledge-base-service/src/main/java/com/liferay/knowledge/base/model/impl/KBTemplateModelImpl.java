@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -296,72 +297,94 @@ public class KBTemplateModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<KBTemplate, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, KBTemplate>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<KBTemplate, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<KBTemplate, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			KBTemplate.class.getClassLoader(), KBTemplate.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", KBTemplate::getMvccVersion);
-		attributeGetterFunctions.put("uuid", KBTemplate::getUuid);
-		attributeGetterFunctions.put(
-			"kbTemplateId", KBTemplate::getKbTemplateId);
-		attributeGetterFunctions.put("groupId", KBTemplate::getGroupId);
-		attributeGetterFunctions.put("companyId", KBTemplate::getCompanyId);
-		attributeGetterFunctions.put("userId", KBTemplate::getUserId);
-		attributeGetterFunctions.put("userName", KBTemplate::getUserName);
-		attributeGetterFunctions.put("createDate", KBTemplate::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", KBTemplate::getModifiedDate);
-		attributeGetterFunctions.put("title", KBTemplate::getTitle);
-		attributeGetterFunctions.put("content", KBTemplate::getContent);
-		attributeGetterFunctions.put(
-			"lastPublishDate", KBTemplate::getLastPublishDate);
+		try {
+			Constructor<KBTemplate> constructor =
+				(Constructor<KBTemplate>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<KBTemplate, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<KBTemplate, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<KBTemplate, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<KBTemplate, Object>>();
 		Map<String, BiConsumer<KBTemplate, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<KBTemplate, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", KBTemplate::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<KBTemplate, Long>)KBTemplate::setMvccVersion);
+		attributeGetterFunctions.put("uuid", KBTemplate::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<KBTemplate, String>)KBTemplate::setUuid);
+		attributeGetterFunctions.put(
+			"kbTemplateId", KBTemplate::getKbTemplateId);
 		attributeSetterBiConsumers.put(
 			"kbTemplateId",
 			(BiConsumer<KBTemplate, Long>)KBTemplate::setKbTemplateId);
+		attributeGetterFunctions.put("groupId", KBTemplate::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<KBTemplate, Long>)KBTemplate::setGroupId);
+		attributeGetterFunctions.put("companyId", KBTemplate::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<KBTemplate, Long>)KBTemplate::setCompanyId);
+		attributeGetterFunctions.put("userId", KBTemplate::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<KBTemplate, Long>)KBTemplate::setUserId);
+		attributeGetterFunctions.put("userName", KBTemplate::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<KBTemplate, String>)KBTemplate::setUserName);
+		attributeGetterFunctions.put("createDate", KBTemplate::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<KBTemplate, Date>)KBTemplate::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", KBTemplate::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<KBTemplate, Date>)KBTemplate::setModifiedDate);
+		attributeGetterFunctions.put("title", KBTemplate::getTitle);
 		attributeSetterBiConsumers.put(
 			"title", (BiConsumer<KBTemplate, String>)KBTemplate::setTitle);
+		attributeGetterFunctions.put("content", KBTemplate::getContent);
 		attributeSetterBiConsumers.put(
 			"content", (BiConsumer<KBTemplate, String>)KBTemplate::setContent);
+		attributeGetterFunctions.put(
+			"lastPublishDate", KBTemplate::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<KBTemplate, Date>)KBTemplate::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -697,6 +720,34 @@ public class KBTemplateModelImpl
 	}
 
 	@Override
+	public KBTemplate cloneWithOriginalValues() {
+		KBTemplateImpl kbTemplateImpl = new KBTemplateImpl();
+
+		kbTemplateImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		kbTemplateImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		kbTemplateImpl.setKbTemplateId(
+			this.<Long>getColumnOriginalValue("kbTemplateId"));
+		kbTemplateImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		kbTemplateImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		kbTemplateImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		kbTemplateImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		kbTemplateImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		kbTemplateImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		kbTemplateImpl.setTitle(this.<String>getColumnOriginalValue("title"));
+		kbTemplateImpl.setContent(
+			this.<String>getColumnOriginalValue("content"));
+		kbTemplateImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+
+		return kbTemplateImpl;
+	}
+
+	@Override
 	public int compareTo(KBTemplate kbTemplate) {
 		int value = 0;
 
@@ -925,9 +976,7 @@ public class KBTemplateModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, KBTemplate>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					KBTemplate.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

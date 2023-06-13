@@ -27,6 +27,10 @@ public class CommerceShippingMethodServiceWrapper
 	implements CommerceShippingMethodService,
 			   ServiceWrapper<CommerceShippingMethodService> {
 
+	public CommerceShippingMethodServiceWrapper() {
+		this(null);
+	}
+
 	public CommerceShippingMethodServiceWrapper(
 		CommerceShippingMethodService commerceShippingMethodService) {
 
@@ -36,12 +40,11 @@ public class CommerceShippingMethodServiceWrapper
 	@Override
 	public com.liferay.commerce.model.CommerceAddressRestriction
 			addCommerceAddressRestriction(
-				long userId, long groupId, long commerceShippingMethodId,
-				long commerceCountryId)
+				long groupId, long commerceShippingMethodId, long countryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceShippingMethodService.addCommerceAddressRestriction(
-			userId, groupId, commerceShippingMethodId, commerceCountryId);
+			groupId, commerceShippingMethodId, countryId);
 	}
 
 	/**
@@ -51,27 +54,26 @@ public class CommerceShippingMethodServiceWrapper
 	@Override
 	public com.liferay.commerce.model.CommerceAddressRestriction
 			addCommerceAddressRestriction(
-				long commerceShippingMethodId, long commerceCountryId,
+				long commerceShippingMethodId, long countryId,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceShippingMethodService.addCommerceAddressRestriction(
-			commerceShippingMethodId, commerceCountryId, serviceContext);
+			commerceShippingMethodId, countryId, serviceContext);
 	}
 
 	@Override
 	public com.liferay.commerce.model.CommerceShippingMethod
 			addCommerceShippingMethod(
-				long userId, long groupId,
-				java.util.Map<java.util.Locale, String> nameMap,
+				long groupId, java.util.Map<java.util.Locale, String> nameMap,
 				java.util.Map<java.util.Locale, String> descriptionMap,
 				java.io.File imageFile, String engineKey, double priority,
 				boolean active)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceShippingMethodService.addCommerceShippingMethod(
-			userId, groupId, nameMap, descriptionMap, imageFile, engineKey,
-			priority, active);
+			groupId, nameMap, descriptionMap, imageFile, engineKey, priority,
+			active);
 	}
 
 	@Override
@@ -169,11 +171,11 @@ public class CommerceShippingMethodServiceWrapper
 	@Override
 	public java.util.List<com.liferay.commerce.model.CommerceShippingMethod>
 			getCommerceShippingMethods(
-				long groupId, long commerceCountryId, boolean active)
+				long groupId, long countryId, boolean active)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceShippingMethodService.getCommerceShippingMethods(
-			groupId, commerceCountryId, active);
+			groupId, countryId, active);
 	}
 
 	@Override

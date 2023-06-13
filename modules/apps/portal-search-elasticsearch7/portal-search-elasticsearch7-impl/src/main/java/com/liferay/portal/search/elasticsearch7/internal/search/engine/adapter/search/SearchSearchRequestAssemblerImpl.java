@@ -245,7 +245,7 @@ public class SearchSearchRequestAssemblerImpl
 
 		Map<String, Stats> statsMap = searchSearchRequest.getStats();
 
-		if (MapUtil.isNotEmpty(statsMap)) {
+		if (!MapUtil.isEmpty(statsMap)) {
 			statsMap.forEach(
 				(key, stats) -> _statsTranslator.populateRequest(
 					searchSourceBuilder, translate(stats)));

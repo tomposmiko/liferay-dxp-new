@@ -27,6 +27,10 @@ public class AccountGroupLocalServiceWrapper
 	implements AccountGroupLocalService,
 			   ServiceWrapper<AccountGroupLocalService> {
 
+	public AccountGroupLocalServiceWrapper() {
+		this(null);
+	}
+
 	public AccountGroupLocalServiceWrapper(
 		AccountGroupLocalService accountGroupLocalService) {
 
@@ -52,11 +56,19 @@ public class AccountGroupLocalServiceWrapper
 
 	@Override
 	public com.liferay.account.model.AccountGroup addAccountGroup(
-			long userId, String name, String description)
+			long userId, String description, String name)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _accountGroupLocalService.addAccountGroup(
-			userId, name, description);
+			userId, description, name);
+	}
+
+	@Override
+	public com.liferay.account.model.AccountGroup checkGuestAccountGroup(
+			long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _accountGroupLocalService.checkGuestAccountGroup(companyId);
 	}
 
 	/**
@@ -92,10 +104,12 @@ public class AccountGroupLocalServiceWrapper
 	 *
 	 * @param accountGroup the account group
 	 * @return the account group that was removed
+	 * @throws PortalException
 	 */
 	@Override
 	public com.liferay.account.model.AccountGroup deleteAccountGroup(
-		com.liferay.account.model.AccountGroup accountGroup) {
+			com.liferay.account.model.AccountGroup accountGroup)
+		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _accountGroupLocalService.deleteAccountGroup(accountGroup);
 	}
@@ -239,7 +253,13 @@ public class AccountGroupLocalServiceWrapper
 		return _accountGroupLocalService.fetchAccountGroup(accountGroupId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the account group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account group's external reference code
+	 * @return the matching account group, or <code>null</code> if a matching account group could not be found
+	 */
 	@Override
 	public com.liferay.account.model.AccountGroup
 		fetchAccountGroupByExternalReferenceCode(
@@ -250,6 +270,9 @@ public class AccountGroupLocalServiceWrapper
 				companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAccountGroupByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.account.model.AccountGroup
@@ -275,7 +298,14 @@ public class AccountGroupLocalServiceWrapper
 		return _accountGroupLocalService.getAccountGroup(accountGroupId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the account group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the account group's external reference code
+	 * @return the matching account group
+	 * @throws PortalException if a matching account group could not be found
+	 */
 	@Override
 	public com.liferay.account.model.AccountGroup
 			getAccountGroupByExternalReferenceCode(
@@ -315,6 +345,14 @@ public class AccountGroupLocalServiceWrapper
 			companyId, start, end, orderByComparator);
 	}
 
+	@Override
+	public java.util.List<com.liferay.account.model.AccountGroup>
+		getAccountGroupsByAccountGroupId(long[] accountGroupIds) {
+
+		return _accountGroupLocalService.getAccountGroupsByAccountGroupId(
+			accountGroupIds);
+	}
+
 	/**
 	 * Returns the number of account groups.
 	 *
@@ -326,10 +364,22 @@ public class AccountGroupLocalServiceWrapper
 	}
 
 	@Override
+	public int getAccountGroupsCount(long companyId) {
+		return _accountGroupLocalService.getAccountGroupsCount(companyId);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 
 		return _accountGroupLocalService.getActionableDynamicQuery();
+	}
+
+	@Override
+	public com.liferay.account.model.AccountGroup getDefaultAccountGroup(
+		long companyId) {
+
+		return _accountGroupLocalService.getDefaultAccountGroup(companyId);
 	}
 
 	@Override
@@ -358,6 +408,11 @@ public class AccountGroupLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _accountGroupLocalService.getPersistedModel(primaryKeyObj);
+	}
+
+	@Override
+	public boolean hasDefaultAccountGroup(long companyId) {
+		return _accountGroupLocalService.hasDefaultAccountGroup(companyId);
 	}
 
 	@Override
@@ -390,11 +445,11 @@ public class AccountGroupLocalServiceWrapper
 
 	@Override
 	public com.liferay.account.model.AccountGroup updateAccountGroup(
-			long accountGroupId, String name, String description)
+			long accountGroupId, String description, String name)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _accountGroupLocalService.updateAccountGroup(
-			accountGroupId, name, description);
+			accountGroupId, description, name);
 	}
 
 	@Override

@@ -63,7 +63,7 @@ if (Validator.isNotNull(viewUsersRedirect)) {
 	</liferay-frontend:management-bar-filters>
 </liferay-frontend:management-bar>
 
-<div class="container-fluid-1280">
+<div class="container-fluid container-fluid-max-xl">
 	<liferay-ui:search-container
 		searchContainer="<%= new UserSearch(renderRequest, portletURL) %>"
 		var="userSearchContainer"
@@ -141,9 +141,25 @@ if (Validator.isNotNull(viewUsersRedirect)) {
 		}
 		%>
 
-		<liferay-ui:user-search-container-results
-			userParams="<%= userParams %>"
-		/>
+		<liferay-ui:search-container-results>
+
+			<%
+			if (searchTerms.isAdvancedSearch()) {
+				total = UserLocalServiceUtil.searchCount(company.getCompanyId(), searchTerms.getFirstName(), searchTerms.getMiddleName(), searchTerms.getLastName(), searchTerms.getScreenName(), searchTerms.getEmailAddress(), searchTerms.getStatus(), userParams, searchTerms.isAndOperator());
+
+				results = UserLocalServiceUtil.search(company.getCompanyId(), searchTerms.getFirstName(), searchTerms.getMiddleName(), searchTerms.getLastName(), searchTerms.getScreenName(), searchTerms.getEmailAddress(), searchTerms.getStatus(), userParams, searchTerms.isAndOperator(), userSearchContainer.getStart(), userSearchContainer.getEnd(), userSearchContainer.getOrderByComparator());
+			}
+			else {
+				total = UserLocalServiceUtil.searchCount(company.getCompanyId(), searchTerms.getKeywords(), searchTerms.getStatus(), userParams);
+
+				results = UserLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), searchTerms.getStatus(), userParams, userSearchContainer.getStart(), userSearchContainer.getEnd(), userSearchContainer.getOrderByComparator());
+			}
+
+			userSearchContainer.setTotal(total);
+			userSearchContainer.setResults(results);
+			%>
+
+		</liferay-ui:search-container-results>
 
 		<liferay-ui:search-container-row
 			className="com.liferay.portal.kernel.model.User"

@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -300,75 +301,97 @@ public class AnnouncementsDeliveryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, AnnouncementsDelivery>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AnnouncementsDelivery.class.getClassLoader(),
+			AnnouncementsDelivery.class, ModelWrapper.class);
+
+		try {
+			Constructor<AnnouncementsDelivery> constructor =
+				(Constructor<AnnouncementsDelivery>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<AnnouncementsDelivery, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AnnouncementsDelivery, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<AnnouncementsDelivery, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<AnnouncementsDelivery, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", AnnouncementsDelivery::getMvccVersion);
-		attributeGetterFunctions.put(
-			"deliveryId", AnnouncementsDelivery::getDeliveryId);
-		attributeGetterFunctions.put(
-			"companyId", AnnouncementsDelivery::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", AnnouncementsDelivery::getUserId);
-		attributeGetterFunctions.put("type", AnnouncementsDelivery::getType);
-		attributeGetterFunctions.put("email", AnnouncementsDelivery::getEmail);
-		attributeGetterFunctions.put("sms", AnnouncementsDelivery::getSms);
-		attributeGetterFunctions.put(
-			"website", AnnouncementsDelivery::getWebsite);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<AnnouncementsDelivery, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<AnnouncementsDelivery, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<AnnouncementsDelivery, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", AnnouncementsDelivery::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AnnouncementsDelivery, Long>)
 				AnnouncementsDelivery::setMvccVersion);
+		attributeGetterFunctions.put(
+			"deliveryId", AnnouncementsDelivery::getDeliveryId);
 		attributeSetterBiConsumers.put(
 			"deliveryId",
 			(BiConsumer<AnnouncementsDelivery, Long>)
 				AnnouncementsDelivery::setDeliveryId);
+		attributeGetterFunctions.put(
+			"companyId", AnnouncementsDelivery::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AnnouncementsDelivery, Long>)
 				AnnouncementsDelivery::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", AnnouncementsDelivery::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<AnnouncementsDelivery, Long>)
 				AnnouncementsDelivery::setUserId);
+		attributeGetterFunctions.put("type", AnnouncementsDelivery::getType);
 		attributeSetterBiConsumers.put(
 			"type",
 			(BiConsumer<AnnouncementsDelivery, String>)
 				AnnouncementsDelivery::setType);
+		attributeGetterFunctions.put("email", AnnouncementsDelivery::getEmail);
 		attributeSetterBiConsumers.put(
 			"email",
 			(BiConsumer<AnnouncementsDelivery, Boolean>)
 				AnnouncementsDelivery::setEmail);
+		attributeGetterFunctions.put("sms", AnnouncementsDelivery::getSms);
 		attributeSetterBiConsumers.put(
 			"sms",
 			(BiConsumer<AnnouncementsDelivery, Boolean>)
 				AnnouncementsDelivery::setSms);
+		attributeGetterFunctions.put(
+			"website", AnnouncementsDelivery::getWebsite);
 		attributeSetterBiConsumers.put(
 			"website",
 			(BiConsumer<AnnouncementsDelivery, Boolean>)
 				AnnouncementsDelivery::setWebsite);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -633,6 +656,31 @@ public class AnnouncementsDeliveryModelImpl
 	}
 
 	@Override
+	public AnnouncementsDelivery cloneWithOriginalValues() {
+		AnnouncementsDeliveryImpl announcementsDeliveryImpl =
+			new AnnouncementsDeliveryImpl();
+
+		announcementsDeliveryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		announcementsDeliveryImpl.setDeliveryId(
+			this.<Long>getColumnOriginalValue("deliveryId"));
+		announcementsDeliveryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		announcementsDeliveryImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		announcementsDeliveryImpl.setType(
+			this.<String>getColumnOriginalValue("type_"));
+		announcementsDeliveryImpl.setEmail(
+			this.<Boolean>getColumnOriginalValue("email"));
+		announcementsDeliveryImpl.setSms(
+			this.<Boolean>getColumnOriginalValue("sms"));
+		announcementsDeliveryImpl.setWebsite(
+			this.<Boolean>getColumnOriginalValue("website"));
+
+		return announcementsDeliveryImpl;
+	}
+
+	@Override
 	public int compareTo(AnnouncementsDelivery announcementsDelivery) {
 		long primaryKey = announcementsDelivery.getPrimaryKey();
 
@@ -815,9 +863,7 @@ public class AnnouncementsDeliveryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AnnouncementsDelivery>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AnnouncementsDelivery.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

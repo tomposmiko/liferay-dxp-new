@@ -23,7 +23,11 @@ import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.StringUtil;
 
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Matija Petanjek
@@ -74,7 +78,7 @@ public abstract class BaseCommerceProductServiceUpgradeProcess
 						indexMetadata.getIndexName(), tableName));
 			}
 
-			if (!hasIndex(tableName, indexMetadata.getIndexName())) {
+			if (!tableHasIndex(tableName, indexMetadata.getIndexName())) {
 				runSQL(indexMetadata.getCreateSQL(null));
 			}
 			else if (_log.isInfoEnabled()) {
@@ -137,6 +141,31 @@ public abstract class BaseCommerceProductServiceUpgradeProcess
 						tableName));
 			}
 		}
+	}
+
+	protected boolean tableHasIndex(String tableName, String indexName)
+		throws Exception {
+
+		DatabaseMetaData metadata = connection.getMetaData();
+
+		try (ResultSet resultSet = metadata.getIndexInfo(
+				null, null, tableName, false, false)) {
+
+			while (resultSet.next()) {
+				String curIndexName = resultSet.getString("index_name");
+
+				if (Objects.equals(indexName, curIndexName)) {
+					return true;
+				}
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+		}
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

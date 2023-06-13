@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.data.engine.internal.upgrade.v2_1_1.util;;
+package com.liferay.data.engine.internal.upgrade.v2_1_1.util;
 
 import java.sql.Types;
 

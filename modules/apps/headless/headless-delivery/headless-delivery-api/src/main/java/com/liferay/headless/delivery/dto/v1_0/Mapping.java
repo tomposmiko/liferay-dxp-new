@@ -46,7 +46,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("Mapping")
+@GraphQLName(
+	description = "The mapping of the fragment mapped value.", value = "Mapping"
+)
 @JsonFilter("Liferay.Vulcan")
 @XmlRootElement(name = "Mapping")
 public class Mapping implements Serializable {
@@ -59,7 +61,7 @@ public class Mapping implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(Mapping.class, json);
 	}
 
-	@Schema
+	@Schema(description = "The mapping's field key.")
 	public String getFieldKey() {
 		return fieldKey;
 	}
@@ -83,11 +85,11 @@ public class Mapping implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The mapping's field key.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String fieldKey;
 
-	@Schema
+	@Schema(description = "The mapping's item reference.")
 	@Valid
 	public Object getItemReference() {
 		return itemReference;
@@ -112,7 +114,7 @@ public class Mapping implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The mapping's item reference.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Object itemReference;
 

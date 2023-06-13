@@ -25,9 +25,7 @@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
 page import="com.liferay.commerce.shipping.engine.fedex.internal.constants.FedExCommerceShippingEngineConstants" %><%@
 page import="com.liferay.portal.kernel.util.ArrayUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
-page import="com.liferay.portal.kernel.util.Portal" %><%@
-page import="com.liferay.portal.kernel.util.StringUtil" %><%@
-page import="com.liferay.portal.kernel.util.Validator" %>
+page import="com.liferay.portal.kernel.util.StringUtil" %>
 
 <liferay-frontend:defineObjects />
 

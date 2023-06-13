@@ -28,6 +28,10 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class UserGroupLocalServiceWrapper
 	implements ServiceWrapper<UserGroupLocalService>, UserGroupLocalService {
 
+	public UserGroupLocalServiceWrapper() {
+		this(null);
+	}
+
 	public UserGroupLocalServiceWrapper(
 		UserGroupLocalService userGroupLocalService) {
 
@@ -413,7 +417,13 @@ public class UserGroupLocalServiceWrapper
 		return _userGroupLocalService.fetchUserGroup(companyId, name);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the user group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user group's external reference code
+	 * @return the matching user group, or <code>null</code> if a matching user group could not be found
+	 */
 	@Override
 	public UserGroup fetchUserGroupByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -422,6 +432,9 @@ public class UserGroupLocalServiceWrapper
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchUserGroupByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public UserGroup fetchUserGroupByReferenceCode(
@@ -603,7 +616,14 @@ public class UserGroupLocalServiceWrapper
 		return _userGroupLocalService.getUserGroup(companyId, name);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the user group with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the user group's external reference code
+	 * @return the matching user group
+	 * @throws PortalException if a matching user group could not be found
+	 */
 	@Override
 	public UserGroup getUserGroupByExternalReferenceCode(
 			long companyId, String externalReferenceCode)

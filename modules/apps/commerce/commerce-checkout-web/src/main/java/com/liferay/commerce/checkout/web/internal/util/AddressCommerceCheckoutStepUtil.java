@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.checkout.web.internal.util;
 
+import com.liferay.account.model.AccountEntry;
 import com.liferay.commerce.account.constants.CommerceAccountConstants;
 import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.account.service.CommerceAccountLocalService;
@@ -22,8 +23,6 @@ import com.liferay.commerce.constants.CommerceCheckoutWebKeys;
 import com.liferay.commerce.constants.CommerceOrderActionKeys;
 import com.liferay.commerce.constants.CommerceWebKeys;
 import com.liferay.commerce.context.CommerceContext;
-import com.liferay.commerce.exception.CommerceOrderBillingAddressException;
-import com.liferay.commerce.exception.CommerceOrderShippingAddressException;
 import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.service.CommerceAddressService;
@@ -71,10 +70,8 @@ public class AddressCommerceCheckoutStepUtil {
 		String street3 = ParamUtil.getString(actionRequest, "street3");
 		String city = ParamUtil.getString(actionRequest, "city");
 		String zip = ParamUtil.getString(actionRequest, "zip");
-		long commerceRegionId = ParamUtil.getLong(
-			actionRequest, "commerceRegionId");
-		long commerceCountryId = ParamUtil.getLong(
-			actionRequest, "commerceCountryId");
+		long regionId = ParamUtil.getLong(actionRequest, "regionId");
+		long countryId = ParamUtil.getLong(actionRequest, "countryId");
 		String phoneNumber = ParamUtil.getString(actionRequest, "phoneNumber");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
@@ -107,10 +104,9 @@ public class AddressCommerceCheckoutStepUtil {
 		}
 
 		return _commerceAddressService.addCommerceAddress(
-			CommerceAccount.class.getName(),
-			commerceOrder.getCommerceAccountId(), name, description, street1,
-			street2, street3, city, zip, commerceRegionId, commerceCountryId,
-			phoneNumber, _commerceAddressType, serviceContext);
+			AccountEntry.class.getName(), commerceOrder.getCommerceAccountId(),
+			name, description, street1, street2, street3, city, zip, regionId,
+			countryId, phoneNumber, _commerceAddressType, serviceContext);
 	}
 
 	protected CommerceOrder updateCommerceOrderAddress(
@@ -159,10 +155,6 @@ public class AddressCommerceCheckoutStepUtil {
 				paramName) &&
 			useAsBilling) {
 
-			if (commerceAddressId < 1) {
-				throw new CommerceOrderShippingAddressException();
-			}
-
 			CommerceAddress commerceAddress =
 				_commerceAddressService.getCommerceAddress(commerceAddressId);
 
@@ -171,8 +163,7 @@ public class AddressCommerceCheckoutStepUtil {
 				commerceAddress.getDescription(), commerceAddress.getStreet1(),
 				commerceAddress.getStreet2(), commerceAddress.getStreet3(),
 				commerceAddress.getCity(), commerceAddress.getZip(),
-				commerceAddress.getCommerceRegionId(),
-				commerceAddress.getCommerceCountryId(),
+				commerceAddress.getRegionId(), commerceAddress.getCountryId(),
 				commerceAddress.getPhoneNumber(), _commerceAddressType, null);
 
 			commerceOrder.setBillingAddressId(commerceAddressId);
@@ -193,10 +184,6 @@ public class AddressCommerceCheckoutStepUtil {
 				commerceOrder.getBillingAddressId()) &&
 			!useAsBilling) {
 
-			if (commerceAddressId < 1) {
-				throw new CommerceOrderShippingAddressException();
-			}
-
 			return updateCommerceOrderAddress(
 				commerceOrder, 0, commerceAddressId, commerceContext);
 		}
@@ -209,10 +196,6 @@ public class AddressCommerceCheckoutStepUtil {
 				commerceOrder.getBillingAddressId()) &&
 			!useAsBilling) {
 
-			if (commerceAddressId < 1) {
-				throw new CommerceOrderShippingAddressException();
-			}
-
 			return updateCommerceOrderAddress(
 				commerceOrder, commerceOrder.getBillingAddressId(),
 				commerceAddressId, commerceContext);
@@ -221,10 +204,6 @@ public class AddressCommerceCheckoutStepUtil {
 		if (Objects.equals(
 				CommerceCheckoutWebKeys.BILLING_ADDRESS_PARAM_NAME,
 				paramName)) {
-
-			if (commerceAddressId < 1) {
-				throw new CommerceOrderBillingAddressException();
-			}
 
 			return updateCommerceOrderAddress(
 				commerceOrder, commerceAddressId,

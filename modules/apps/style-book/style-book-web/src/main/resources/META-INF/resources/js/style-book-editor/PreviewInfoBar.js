@@ -14,7 +14,7 @@
 
 import ClayIcon from '@clayui/icon';
 import ClayPopover from '@clayui/popover';
-import {Align} from 'metal-position';
+import {ALIGN_POSITIONS, align} from 'frontend-js-web';
 import React, {useLayoutEffect, useRef, useState} from 'react';
 
 import LayoutSelector from './LayoutSelector';
@@ -26,10 +26,10 @@ export default function PreviewInfoBar() {
 
 	useLayoutEffect(() => {
 		if (isShowPopover) {
-			Align.align(
+			align(
 				popoverRef.current,
 				helpIconRef.current,
-				Align.BottomRight,
+				ALIGN_POSITIONS.BottomRight,
 				false
 			);
 		}
@@ -41,8 +41,10 @@ export default function PreviewInfoBar() {
 				<span className="style-book-editor__page-preview-text">
 					{Liferay.Language.get('page-preview')}
 				</span>
+
 				<LayoutSelector />
 			</div>
+
 			<span className="d-none d-xl-block">
 				{Liferay.Language.get(
 					'edit-the-style-book-using-the-sidebar-form.-you-can-preview-the-changes-instantly'
@@ -54,13 +56,11 @@ export default function PreviewInfoBar() {
 					onMouseEnter={() => setIsShowPopover(true)}
 					onMouseLeave={() => setIsShowPopover(false)}
 					ref={helpIconRef}
-					symbol={'question-circle'}
+					symbol="question-circle"
 				/>
+
 				{isShowPopover && (
-					<ClayPopover
-						alignPosition={'bottom-right'}
-						ref={popoverRef}
-					>
+					<ClayPopover alignPosition="bottom-right" ref={popoverRef}>
 						{Liferay.Language.get(
 							'edit-the-style-book-using-the-sidebar-form.-you-can-preview-the-changes-instantly'
 						)}

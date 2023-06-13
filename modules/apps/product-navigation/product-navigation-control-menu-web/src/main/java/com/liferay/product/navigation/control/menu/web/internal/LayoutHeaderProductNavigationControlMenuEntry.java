@@ -82,12 +82,11 @@ public class LayoutHeaderProductNavigationControlMenuEntry
 
 		Writer writer = httpServletResponse.getWriter();
 
-		StringBundler sb = new StringBundler(19);
+		StringBundler sb = new StringBundler(17);
 
 		sb.append("<li class=\"");
 		sb.append(_getCssClass(httpServletRequest));
-		sb.append("\">");
-		sb.append("<span class=\"align-items-center ");
+		sb.append("\"><span class=\"align-items-center ");
 		sb.append("control-menu-level-1-heading d-flex mr-1\" ");
 		sb.append("data-qa-id=\"headerTitle\"><span class=\"");
 		sb.append("lfr-portal-tooltip text-truncate\" title=\"");
@@ -110,25 +109,12 @@ public class LayoutHeaderProductNavigationControlMenuEntry
 			sb.append("label-inverse-secondary ml-2 mr-0\">");
 			sb.append("<span class=\"label-item label-item-expand\">");
 			sb.append(LanguageUtil.get(httpServletRequest, "draft"));
-			sb.append("</span>");
-			sb.append("</span>");
+			sb.append("</span></span>");
 		}
 
 		writer.write(sb.toString());
 
 		return true;
-	}
-
-	@Override
-	public boolean isRelevant(HttpServletRequest httpServletRequest) {
-		String layoutMode = ParamUtil.getString(
-			httpServletRequest, "p_l_mode", Constants.VIEW);
-
-		if (layoutMode.equals(Constants.EDIT)) {
-			return true;
-		}
-
-		return false;
 	}
 
 	@Override
@@ -142,13 +128,6 @@ public class LayoutHeaderProductNavigationControlMenuEntry
 		Layout layout = themeDisplay.getLayout();
 
 		if (layout.isTypeControlPanel()) {
-			return false;
-		}
-
-		if (!(themeDisplay.isShowLayoutTemplatesIcon() ||
-			  themeDisplay.isShowPageSettingsIcon() ||
-			  layout.isTypeAssetDisplay() || layout.isTypeContent())) {
-
 			return false;
 		}
 

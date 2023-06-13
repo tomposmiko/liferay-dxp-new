@@ -27,6 +27,7 @@ import com.liferay.layout.content.page.editor.web.internal.segments.SegmentsExpe
 import com.liferay.layout.content.page.editor.web.internal.util.FragmentEntryLinkUtil;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -69,7 +70,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
-		"mvc.command.name=/content_layout/add_segments_experience"
+		"mvc.command.name=/layout_content_page_editor/add_segments_experience"
 	},
 	service = MVCActionCommand.class
 )
@@ -219,10 +220,6 @@ public class AddSegmentsExperienceMVCActionCommand
 					groupId, segmentExperienceId, plid);
 
 		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
-			JSONObject editableValuesJSONObject =
-				JSONFactoryUtil.createJSONObject(
-					fragmentEntryLink.getEditableValues());
-
 			fragmentEntryLinksJSONObject.put(
 				String.valueOf(fragmentEntryLink.getFragmentEntryLinkId()),
 				FragmentEntryLinkUtil.getFragmentEntryLinkJSONObject(
@@ -230,8 +227,7 @@ public class AddSegmentsExperienceMVCActionCommand
 					_fragmentEntryConfigurationParser, fragmentEntryLink,
 					_fragmentCollectionContributorTracker,
 					_fragmentRendererController, _fragmentRendererTracker,
-					_itemSelector,
-					editableValuesJSONObject.getString("portletId")));
+					_itemSelector, StringPool.BLANK));
 		}
 
 		return fragmentEntryLinksJSONObject;

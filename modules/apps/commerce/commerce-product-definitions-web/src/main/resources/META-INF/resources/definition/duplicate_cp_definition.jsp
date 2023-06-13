@@ -25,7 +25,7 @@ CPDefinition cpDefinition = cpDefinitionsDisplayContext.getCPDefinition();
 <commerce-ui:modal-content
 	title='<%= LanguageUtil.get(request, "duplicate-product") %>'
 >
-	<aui:form cssClass="container-fluid-1280 p-0" method="post" name="duplicatefm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "apiSubmit(this.form);" %>'>
+	<aui:form cssClass="container-fluid container-fluid-max-xl p-0" method="post" name="duplicatefm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "apiSubmit(this.form);" %>'>
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 
 		<aui:input name="name" required="<%= true %>" type="text" value='<%= LanguageUtil.format(locale, "copy-of-x", cpDefinition.getName(languageId)) %>' />
@@ -43,22 +43,21 @@ CPDefinition cpDefinition = cpDefinitionsDisplayContext.getCPDefinition();
 		var <portlet:namespace />defaultLanguageId = null;
 		var <portlet:namespace />product = {
 			active: true,
-			productStatus: <%= WorkflowConstants.STATUS_DRAFT %>,
 			productType: '<%= cpDefinition.getProductTypeName() %>',
 		};
 
 		Liferay.provide(
 			window,
 			'<portlet:namespace />apiSubmit',
-			function (form) {
+			(form) => {
 				var API_URL =
 					'/o/headless-commerce-admin-catalog/v1.0/products/<%= cpDefinition.getCProductId() %>/clone?catalogId=' +
 					<portlet:namespace />product.catalogId;
 
 				FormUtils.apiSubmit(form, API_URL)
-					.then(function (payload) {
+					.then((payload) => {
 						var headers = new Headers({
-							Accept: 'application/json',
+							'Accept': 'application/json',
 							'Content-Type': 'application/json',
 						});
 
@@ -73,26 +72,36 @@ CPDefinition cpDefinition = cpDefinitionsDisplayContext.getCPDefinition();
 							<portlet:namespace />defaultLanguageId
 						] = document.getElementById('<portlet:namespace />name').value;
 
-						var redirectURL = new Liferay.PortletURL.createURL(
-							'<%= editProductDefinitionURL %>'
-						);
+						Liferay.Util.fetch(
+							'/o/headless-commerce-admin-catalog/v1.0/products/' +
+								payload.productId,
+							{
+								body: JSON.stringify(formattedData),
+								headers: headers,
+								method: 'patch',
+							}
+						).then(() => {
+							var redirectURL = new Liferay.PortletURL.createURL(
+								'<%= editProductDefinitionURL %>'
+							);
 
-						redirectURL.setParameter('cpDefinitionId', payload.id);
-						redirectURL.setParameter(
-							'p_p_state',
-							'<%= LiferayWindowState.MAXIMIZED.toString() %>'
-						);
+							redirectURL.setParameter('cpDefinitionId', payload.id);
+							redirectURL.setParameter(
+								'p_p_state',
+								'<%= LiferayWindowState.MAXIMIZED.toString() %>'
+							);
 
-						window.parent.Liferay.fire(events.CLOSE_MODAL, {
-							redirectURL: redirectURL.toString(),
-							successNotification: {
-								showSuccessNotification: true,
-								message:
-									'<liferay-ui:message key="your-request-completed-successfully" />',
-							},
+							window.parent.Liferay.fire(events.CLOSE_MODAL, {
+								redirectURL: redirectURL.toString(),
+								successNotification: {
+									showSuccessNotification: true,
+									message:
+										'<liferay-ui:message key="your-request-completed-successfully" />',
+								},
+							});
 						});
 					})
-					.catch(function () {
+					.catch(() => {
 						window.parent.Liferay.fire(events.IS_LOADING_MODAL, {
 							isLoading: false,
 						});

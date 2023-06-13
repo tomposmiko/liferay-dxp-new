@@ -42,14 +42,13 @@ public class CommerceShippingMethodServiceImpl
 
 	@Override
 	public CommerceAddressRestriction addCommerceAddressRestriction(
-			long userId, long groupId, long commerceShippingMethodId,
-			long commerceCountryId)
+			long groupId, long commerceShippingMethodId, long countryId)
 		throws PortalException {
 
 		_checkCommerceChannel(groupId);
 
 		return commerceShippingMethodLocalService.addCommerceAddressRestriction(
-			userId, groupId, commerceShippingMethodId, commerceCountryId);
+			getUserId(), groupId, commerceShippingMethodId, countryId);
 	}
 
 	/**
@@ -58,18 +57,18 @@ public class CommerceShippingMethodServiceImpl
 	@Deprecated
 	@Override
 	public CommerceAddressRestriction addCommerceAddressRestriction(
-			long commerceShippingMethodId, long commerceCountryId,
+			long commerceShippingMethodId, long countryId,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		return commerceShippingMethodService.addCommerceAddressRestriction(
-			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
-			commerceShippingMethodId, commerceCountryId);
+			serviceContext.getScopeGroupId(), commerceShippingMethodId,
+			countryId);
 	}
 
 	@Override
 	public CommerceShippingMethod addCommerceShippingMethod(
-			long userId, long groupId, Map<Locale, String> nameMap,
+			long groupId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, File imageFile,
 			String engineKey, double priority, boolean active)
 		throws PortalException {
@@ -77,7 +76,7 @@ public class CommerceShippingMethodServiceImpl
 		_checkCommerceChannel(groupId);
 
 		return commerceShippingMethodLocalService.addCommerceShippingMethod(
-			userId, groupId, nameMap, descriptionMap, imageFile, engineKey,
+			getUserId(), groupId, nameMap, descriptionMap, imageFile, engineKey,
 			priority, active);
 	}
 
@@ -228,13 +227,13 @@ public class CommerceShippingMethodServiceImpl
 
 	@Override
 	public List<CommerceShippingMethod> getCommerceShippingMethods(
-			long groupId, long commerceCountryId, boolean active)
+			long groupId, long countryId, boolean active)
 		throws PortalException {
 
 		_checkCommerceChannel(groupId);
 
 		return commerceShippingMethodLocalService.getCommerceShippingMethods(
-			groupId, commerceCountryId, active);
+			groupId, countryId, active);
 	}
 
 	@Override

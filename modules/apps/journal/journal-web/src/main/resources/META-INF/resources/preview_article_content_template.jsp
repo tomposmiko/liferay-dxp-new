@@ -28,10 +28,10 @@ JournalPreviewArticleContentTemplateDisplayContext journalPreviewArticleContentT
 					<aui:option label="no-template" selected="<%= Objects.equals(journalPreviewArticleContentTemplateDisplayContext.getDDMTemplateId(), -1) %>" value="<%= -1 %>" />
 
 					<%
-					for (DDMTemplate ddmTemplate : journalPreviewArticleContentTemplateDisplayContext.getDDMTemplates()) {
+					for (DDMTemplate ddTemplate : journalPreviewArticleContentTemplateDisplayContext.getDDMTemplates()) {
 					%>
 
-						<aui:option label="<%= HtmlUtil.escape(ddmTemplate.getName(locale)) %>" selected="<%= Objects.equals(journalPreviewArticleContentTemplateDisplayContext.getDDMTemplateId(), ddmTemplate.getTemplateId()) %>" value="<%= ddmTemplate.getTemplateId() %>" />
+						<aui:option label="<%= HtmlUtil.escape(ddTemplate.getName(locale)) %>" selected="<%= Objects.equals(journalPreviewArticleContentTemplateDisplayContext.getDDMTemplateId(), ddTemplate.getTemplateId()) %>" value="<%= ddTemplate.getTemplateId() %>" />
 
 					<%
 					}
@@ -88,9 +88,4 @@ JournalArticleDisplay articleDisplay = journalPreviewArticleContentTemplateDispl
 			'<%= journalPreviewArticleContentTemplateDisplayContext.getPortletURL() %>'
 		);
 	}
-
-	Liferay.Util.selectEntityHandler(
-		'#<portlet:namespace />previewFm',
-		'<%= HtmlUtil.escapeJS(journalPreviewArticleContentTemplateDisplayContext.getEventName()) %>'
-	);
 </script>

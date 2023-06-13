@@ -12,11 +12,12 @@
  * details.
  */
 
+import {ReactPortal} from '@liferay/frontend-js-react-web';
 import PropTypes from 'prop-types';
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 import RawDOM from '../../common/components/RawDOM';
+import isNullOrUndefined from '../utils/isNullOrUndefined';
 
 /**
  * DOM node which will be manually updated and injects
@@ -50,28 +51,16 @@ export default class UnsafeHTML extends React.PureComponent {
 
 		const scriptElements = Array.from(
 			this.state.ref.querySelectorAll('script')
-		).filter(
-			(script) =>
-				!script.type ||
-				script.type === 'module' ||
-				script.type === 'text/javascript'
-		);
+		).filter((script) => !script.type || script.type === 'text/javascript');
 
 		const runNextScript = () => {
 			if (scriptElements.length) {
 				const nextScriptElement = doc.createElement('script');
 				const prevScriptElement = scriptElements.shift();
 
-				nextScriptElement.type = prevScriptElement.type;
-
-				if (prevScriptElement.src) {
-					nextScriptElement.src = prevScriptElement.src;
-				}
-				else {
-					nextScriptElement.appendChild(
-						doc.createTextNode(prevScriptElement.innerHTML)
-					);
-				}
+				nextScriptElement.appendChild(
+					doc.createTextNode(prevScriptElement.innerHTML)
+				);
 
 				prevScriptElement.parentNode.replaceChild(
 					nextScriptElement,
@@ -142,8 +131,10 @@ export default class UnsafeHTML extends React.PureComponent {
 
 		ref.removeAttribute('style');
 
-		Object.keys(this.props.style).forEach((key) => {
-			ref.style[key] = this.props.style[key];
+		Object.entries(this.props.style).forEach(([key, value]) => {
+			if (!isNullOrUndefined(value)) {
+				ref.style[key] = value;
+			}
 		});
 	}
 
@@ -182,9 +173,11 @@ export default class UnsafeHTML extends React.PureComponent {
 					elementRef={this._updateRef}
 				/>
 
-				{this.state.portals.map(({Component, element}) =>
-					ReactDOM.createPortal(<Component />, element)
-				)}
+				{this.state.portals.map(({Component, element}, i) => (
+					<ReactPortal container={element} key={i}>
+						<Component />
+					</ReactPortal>
+				))}
 			</>
 		);
 	}
@@ -199,6 +192,7 @@ UnsafeHTML.defaultProps = {
 		document,
 		window,
 	},
+	id: '',
 	markup: '',
 	onRender: () => {},
 	style: {},
@@ -216,6 +210,7 @@ UnsafeHTML.propTypes = {
 		document: PropTypes.object,
 		window: PropTypes.object,
 	}),
+	id: PropTypes.string,
 	markup: PropTypes.string,
 	onRender: PropTypes.func,
 	style: PropTypes.object,

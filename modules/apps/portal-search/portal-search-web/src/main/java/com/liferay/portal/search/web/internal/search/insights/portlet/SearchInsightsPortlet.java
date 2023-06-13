@@ -80,7 +80,7 @@ public class SearchInsightsPortlet extends MVCPortlet {
 		throws IOException, PortletException {
 
 		PortletSharedSearchResponse portletSharedSearchResponse =
-			_portletSharedSearchRequest.search(renderRequest);
+			portletSharedSearchRequest.search(renderRequest);
 
 		SearchInsightsPortletPreferences searchInsightsPortletPreferences =
 			new SearchInsightsPortletPreferencesImpl(
@@ -94,7 +94,7 @@ public class SearchInsightsPortlet extends MVCPortlet {
 				renderRequest));
 
 		if (!SearchPortletPermissionUtil.containsConfiguration(
-				_portletPermission, renderRequest, _portal)) {
+				portletPermission, renderRequest, portal)) {
 
 			renderRequest.setAttribute(
 				WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.TRUE);
@@ -142,17 +142,17 @@ public class SearchInsightsPortlet extends MVCPortlet {
 	}
 
 	protected String buildResponseString(SearchResponse searchResponse) {
-		Optional<String> responseString = SearchStringUtil.maybe(
+		Optional<String> responseStringOptional = SearchStringUtil.maybe(
 			searchResponse.getResponseString());
 
-		return responseString.orElse(StringPool.BLANK);
+		return responseStringOptional.orElse(StringPool.BLANK);
 	}
 
 	protected String getHelpMessage(RenderRequest renderRequest) {
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", renderRequest.getLocale(), getClass());
 
-		return _language.get(resourceBundle, "search-insights-help");
+		return language.get(resourceBundle, "search-insights-help");
 	}
 
 	protected boolean isCompanyAdmin() {
@@ -163,29 +163,29 @@ public class SearchInsightsPortlet extends MVCPortlet {
 	}
 
 	protected boolean isRequestStringPresent(SearchResponse searchResponse) {
-		Optional<String> requestString = SearchStringUtil.maybe(
+		Optional<String> requestStringOptional = SearchStringUtil.maybe(
 			searchResponse.getRequestString());
 
-		return requestString.isPresent();
+		return requestStringOptional.isPresent();
 	}
 
 	protected boolean isResponseStringPresent(SearchResponse searchResponse) {
-		Optional<String> responseString = SearchStringUtil.maybe(
+		Optional<String> responseStringOptional = SearchStringUtil.maybe(
 			searchResponse.getResponseString());
 
-		return responseString.isPresent();
+		return responseStringOptional.isPresent();
 	}
 
 	@Reference
-	private Language _language;
+	protected Language language;
 
 	@Reference
-	private Portal _portal;
+	protected Portal portal;
 
 	@Reference
-	private PortletPermission _portletPermission;
+	protected PortletPermission portletPermission;
 
 	@Reference
-	private PortletSharedSearchRequest _portletSharedSearchRequest;
+	protected PortletSharedSearchRequest portletSharedSearchRequest;
 
 }

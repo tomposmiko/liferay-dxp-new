@@ -19,6 +19,8 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.sso.openid.connect.OpenIdConnectProvider;
@@ -214,11 +216,14 @@ public class OpenIdConnectProviderRegistryImpl
 				openIdConnectProviderConfiguration.providerName(),
 				new URL(openIdConnectProviderConfiguration.discoveryEndPoint()),
 				openIdConnectProviderConfiguration.
-					discoveryEndPointCacheInMillis());
+					discoveryEndPointCacheInMillis(),
+				openIdConnectProviderConfiguration.
+					registeredIdTokenSigningAlg());
 		}
 
 		return new OpenIdConnectMetadataFactoryImpl(
 			openIdConnectProviderConfiguration.providerName(),
+			openIdConnectProviderConfiguration.registeredIdTokenSigningAlg(),
 			openIdConnectProviderConfiguration.idTokenSigningAlgValues(),
 			openIdConnectProviderConfiguration.issuerURL(),
 			openIdConnectProviderConfiguration.subjectTypes(),
@@ -237,13 +242,14 @@ public class OpenIdConnectProviderRegistryImpl
 	private void _rebuild() {
 		_rebuild(CompanyConstants.SYSTEM);
 
-		for (long companyId :
-				_companyIdProviderNameOpenIdConnectProviders.keySet()) {
-
-			if (companyId != CompanyConstants.SYSTEM) {
-				_rebuild(companyId);
-			}
-		}
+		_companyLocalService.forEachCompanyId(
+			companyId -> {
+				if (companyId != CompanyConstants.SYSTEM) {
+					_rebuild(companyId);
+				}
+			},
+			ArrayUtil.toLongArray(
+				_companyIdProviderNameOpenIdConnectProviders.keySet()));
 	}
 
 	private void _rebuild(long companyId) {
@@ -308,6 +314,10 @@ public class OpenIdConnectProviderRegistryImpl
 			  OpenIdConnectProvider<OIDCClientMetadata, OIDCProviderMetadata>>>
 				_companyIdProviderNameOpenIdConnectProviders =
 					new ConcurrentHashMap<>();
+
+	@Reference
+	private CompanyLocalService _companyLocalService;
+
 	private final Map<String, Dictionary<String, ?>>
 		_configurationPidsProperties = new ConcurrentHashMap<>();
 

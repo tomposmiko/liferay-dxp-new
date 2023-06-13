@@ -11,8 +11,38 @@
 
 <tbody>
 <tr>
-	<td>CONTEXT_CHANGE_DESCRIPTION</td>
-	<td>//div[contains(@class,'publication-description') and contains(.,'${key_changeDescription}')]</td>
+	<td>CHANGE_HEADER</td>
+	<td>//span[contains(@class,'control-menu-level-1-heading') and contains(.,'Changes')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMMENT_ACTIONS</td>
+	<td>//div[contains(@class,'autofit-row') and contains(.,'${key_commentValue}')]/preceding-sibling::div//button[*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMMENT_BODY</td>
+	<td>//textarea[contains(@aria-label,'Comment')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMMENT_BODY_SPECIFIC</td>
+	<td>//div[contains(@class,'autofit-col-expand')]//textarea[contains(@aria-label,'Comment')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMMENT_BUTTON</td>
+	<td>//li[contains(@title,'Comments')]/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMMENT_DELETING_MESSAGE</td>
+	<td>//div[(@class='comment-deleting-title')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>COMMENT_VALUE</td>
+	<td>//div[(@class='autofit-row') and contains(.,'${key_commentValue}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -21,13 +51,18 @@
 	<td></td>
 </tr>
 <tr>
-	<td>CONTEXT_CHANGE_CATEGORY_RADIO</td>
-	<td>//input[contains(@type,'radio') and contains(@value,'${key_changeCategory}')]</td>
+	<td>DDL_RECORD_DIFF_ADDED_VALUE</td>
+	<td>//span[contains(@class,'diff-html-added') and contains(.,'${key_diffAddedValue}')]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>CURRENT_DISPLAY_STYLE</td>
-	<td>//ul[@class='navbar-nav']//li[contains(@class,'nav-item lfr-portal-tooltip')]//button[contains(@class,'dropdown-toggle')]</td>
+	<td>FIELD_VALUE_IN_PRODUCTION</td>
+	<td>//label[contains(.,'${key_fieldName}')]//following-sibling::input[contains(@value,'${key_fieldValueInProduction}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FIELD_VALUE_IN_PUBLICATION</td>
+	<td>//label[contains(.,'${key_fieldName}')]//following-sibling::input[contains(@value,'${key_fieldValueInPublication}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -51,8 +86,28 @@
 	<td></td>
 </tr>
 <tr>
-	<td>PUBLICATIONS_ELLIPSIS</td>
-	<td>//h2[contains(@class,'autofit-row')]//button[*[contains(@class,'lexicon-icon-ellipsis-v')]]</td>
+	<td>PUBLICATIONS_CHANGE_ELLIPSIS</td>
+	<td>//div[contains(@class,'autofit-col')]//button[*[contains(@class,'lexicon-icon-ellipsis-v')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SHOW_ALL_ITEMS_TOGGLE_SWITCH</td>
+	<td>//input[contains(@class,'toggle-switch-check')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SORT_BUTTON</td>
+	<td>//button[contains(.,'${key_name}')]/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SORTED_ASCENDING_ICON</td>
+	<td>//span//*[name()='svg'][contains(@class,'lexicon-icon-order-list-up')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SORTED_DESCENDING_ICON</td>
+	<td>//span//*[name()='svg'][contains(@class,'lexicon-icon-order-list-down')]</td>
 	<td></td>
 </tr>
 </tbody>

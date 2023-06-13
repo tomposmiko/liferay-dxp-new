@@ -28,6 +28,7 @@ import com.liferay.headless.admin.workflow.client.pagination.Page;
 import com.liferay.headless.admin.workflow.client.pagination.Pagination;
 import com.liferay.headless.admin.workflow.client.resource.v1_0.WorkflowDefinitionResource;
 import com.liferay.headless.admin.workflow.client.serdes.v1_0.WorkflowDefinitionSerDes;
+import com.liferay.petra.function.UnsafeTriConsumer;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -49,9 +50,8 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -60,16 +60,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -207,7 +209,7 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 	public void testGetWorkflowDefinitionsPage() throws Exception {
 		Page<WorkflowDefinition> page =
 			workflowDefinitionResource.getWorkflowDefinitionsPage(
-				Pagination.of(1, 10));
+				null, Pagination.of(1, 10), null);
 
 		long totalCount = page.getTotalCount();
 
@@ -220,7 +222,7 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 				randomWorkflowDefinition());
 
 		page = workflowDefinitionResource.getWorkflowDefinitionsPage(
-			Pagination.of(1, 10));
+			null, Pagination.of(1, 10), null);
 
 		Assert.assertEquals(totalCount + 2, page.getTotalCount());
 
@@ -228,16 +230,7 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 			workflowDefinition1, (List<WorkflowDefinition>)page.getItems());
 		assertContains(
 			workflowDefinition2, (List<WorkflowDefinition>)page.getItems());
-		assertValid(page, testGetWorkflowDefinitionsPage_getExpectedActions());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetWorkflowDefinitionsPage_getExpectedActions()
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
+		assertValid(page);
 	}
 
 	@Test
@@ -245,7 +238,8 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 		throws Exception {
 
 		Page<WorkflowDefinition> totalPage =
-			workflowDefinitionResource.getWorkflowDefinitionsPage(null);
+			workflowDefinitionResource.getWorkflowDefinitionsPage(
+				null, null, null);
 
 		int totalCount = GetterUtil.getInteger(totalPage.getTotalCount());
 
@@ -263,7 +257,7 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 
 		Page<WorkflowDefinition> page1 =
 			workflowDefinitionResource.getWorkflowDefinitionsPage(
-				Pagination.of(1, totalCount + 2));
+				null, Pagination.of(1, totalCount + 2), null);
 
 		List<WorkflowDefinition> workflowDefinitions1 =
 			(List<WorkflowDefinition>)page1.getItems();
@@ -274,7 +268,7 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 
 		Page<WorkflowDefinition> page2 =
 			workflowDefinitionResource.getWorkflowDefinitionsPage(
-				Pagination.of(2, totalCount + 2));
+				null, Pagination.of(2, totalCount + 2), null);
 
 		Assert.assertEquals(totalCount + 3, page2.getTotalCount());
 
@@ -286,7 +280,7 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 
 		Page<WorkflowDefinition> page3 =
 			workflowDefinitionResource.getWorkflowDefinitionsPage(
-				Pagination.of(1, totalCount + 3));
+				null, Pagination.of(1, totalCount + 3), null);
 
 		assertContains(
 			workflowDefinition1, (List<WorkflowDefinition>)page3.getItems());
@@ -294,6 +288,134 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 			workflowDefinition2, (List<WorkflowDefinition>)page3.getItems());
 		assertContains(
 			workflowDefinition3, (List<WorkflowDefinition>)page3.getItems());
+	}
+
+	@Test
+	public void testGetWorkflowDefinitionsPageWithSortDateTime()
+		throws Exception {
+
+		testGetWorkflowDefinitionsPageWithSort(
+			EntityField.Type.DATE_TIME,
+			(entityField, workflowDefinition1, workflowDefinition2) -> {
+				BeanUtils.setProperty(
+					workflowDefinition1, entityField.getName(),
+					DateUtils.addMinutes(new Date(), -2));
+			});
+	}
+
+	@Test
+	public void testGetWorkflowDefinitionsPageWithSortInteger()
+		throws Exception {
+
+		testGetWorkflowDefinitionsPageWithSort(
+			EntityField.Type.INTEGER,
+			(entityField, workflowDefinition1, workflowDefinition2) -> {
+				BeanUtils.setProperty(
+					workflowDefinition1, entityField.getName(), 0);
+				BeanUtils.setProperty(
+					workflowDefinition2, entityField.getName(), 1);
+			});
+	}
+
+	@Test
+	public void testGetWorkflowDefinitionsPageWithSortString()
+		throws Exception {
+
+		testGetWorkflowDefinitionsPageWithSort(
+			EntityField.Type.STRING,
+			(entityField, workflowDefinition1, workflowDefinition2) -> {
+				Class<?> clazz = workflowDefinition1.getClass();
+
+				String entityFieldName = entityField.getName();
+
+				java.lang.reflect.Method method = clazz.getMethod(
+					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
+
+				Class<?> returnType = method.getReturnType();
+
+				if (returnType.isAssignableFrom(Map.class)) {
+					BeanUtils.setProperty(
+						workflowDefinition1, entityFieldName,
+						Collections.singletonMap("Aaa", "Aaa"));
+					BeanUtils.setProperty(
+						workflowDefinition2, entityFieldName,
+						Collections.singletonMap("Bbb", "Bbb"));
+				}
+				else if (entityFieldName.contains("email")) {
+					BeanUtils.setProperty(
+						workflowDefinition1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()) +
+									"@liferay.com");
+					BeanUtils.setProperty(
+						workflowDefinition2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()) +
+									"@liferay.com");
+				}
+				else {
+					BeanUtils.setProperty(
+						workflowDefinition1, entityFieldName,
+						"aaa" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+					BeanUtils.setProperty(
+						workflowDefinition2, entityFieldName,
+						"bbb" +
+							StringUtil.toLowerCase(
+								RandomTestUtil.randomString()));
+				}
+			});
+	}
+
+	protected void testGetWorkflowDefinitionsPageWithSort(
+			EntityField.Type type,
+			UnsafeTriConsumer
+				<EntityField, WorkflowDefinition, WorkflowDefinition, Exception>
+					unsafeTriConsumer)
+		throws Exception {
+
+		List<EntityField> entityFields = getEntityFields(type);
+
+		if (entityFields.isEmpty()) {
+			return;
+		}
+
+		WorkflowDefinition workflowDefinition1 = randomWorkflowDefinition();
+		WorkflowDefinition workflowDefinition2 = randomWorkflowDefinition();
+
+		for (EntityField entityField : entityFields) {
+			unsafeTriConsumer.accept(
+				entityField, workflowDefinition1, workflowDefinition2);
+		}
+
+		workflowDefinition1 =
+			testGetWorkflowDefinitionsPage_addWorkflowDefinition(
+				workflowDefinition1);
+
+		workflowDefinition2 =
+			testGetWorkflowDefinitionsPage_addWorkflowDefinition(
+				workflowDefinition2);
+
+		for (EntityField entityField : entityFields) {
+			Page<WorkflowDefinition> ascPage =
+				workflowDefinitionResource.getWorkflowDefinitionsPage(
+					null, Pagination.of(1, 2), entityField.getName() + ":asc");
+
+			assertEquals(
+				Arrays.asList(workflowDefinition1, workflowDefinition2),
+				(List<WorkflowDefinition>)ascPage.getItems());
+
+			Page<WorkflowDefinition> descPage =
+				workflowDefinitionResource.getWorkflowDefinitionsPage(
+					null, Pagination.of(1, 2), entityField.getName() + ":desc");
+
+			assertEquals(
+				Arrays.asList(workflowDefinition2, workflowDefinition1),
+				(List<WorkflowDefinition>)descPage.getItems());
+		}
 	}
 
 	protected WorkflowDefinition
@@ -483,6 +605,10 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 
 		boolean valid = true;
 
+		if (workflowDefinition.getDateCreated() == null) {
+			valid = false;
+		}
+
 		if (workflowDefinition.getDateModified() == null) {
 			valid = false;
 		}
@@ -522,8 +648,32 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("nodes", additionalAssertFieldName)) {
+				if (workflowDefinition.getNodes() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("title", additionalAssertFieldName)) {
 				if (workflowDefinition.getTitle() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("title_i18n", additionalAssertFieldName)) {
+				if (workflowDefinition.getTitle_i18n() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("transitions", additionalAssertFieldName)) {
+				if (workflowDefinition.getTransitions() == null) {
 					valid = false;
 				}
 
@@ -547,13 +697,6 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 	}
 
 	protected void assertValid(Page<WorkflowDefinition> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<WorkflowDefinition> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<WorkflowDefinition> workflowDefinitions =
@@ -569,20 +712,6 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -676,6 +805,17 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("dateCreated", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						workflowDefinition1.getDateCreated(),
+						workflowDefinition2.getDateCreated())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("dateModified", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						workflowDefinition1.getDateModified(),
@@ -709,10 +849,43 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("nodes", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						workflowDefinition1.getNodes(),
+						workflowDefinition2.getNodes())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("title", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						workflowDefinition1.getTitle(),
 						workflowDefinition2.getTitle())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("title_i18n", additionalAssertFieldName)) {
+				if (!equals(
+						(Map)workflowDefinition1.getTitle_i18n(),
+						(Map)workflowDefinition2.getTitle_i18n())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("transitions", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						workflowDefinition1.getTransitions(),
+						workflowDefinition2.getTransitions())) {
 
 					return false;
 				}
@@ -768,16 +941,14 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -794,10 +965,6 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -807,18 +974,18 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -844,6 +1011,40 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 			sb.append("'");
 			sb.append(String.valueOf(workflowDefinition.getContent()));
 			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("dateCreated")) {
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							workflowDefinition.getDateCreated(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							workflowDefinition.getDateCreated(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(
+					_dateFormat.format(workflowDefinition.getDateCreated()));
+			}
 
 			return sb.toString();
 		}
@@ -898,12 +1099,27 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("nodes")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("title")) {
 			sb.append("'");
 			sb.append(String.valueOf(workflowDefinition.getTitle()));
 			sb.append("'");
 
 			return sb.toString();
+		}
+
+		if (entityFieldName.equals("title_i18n")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("transitions")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("version")) {
@@ -960,6 +1176,7 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 			{
 				active = RandomTestUtil.randomBoolean();
 				content = StringUtil.toLowerCase(RandomTestUtil.randomString());
+				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();
 				description = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
@@ -989,115 +1206,6 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 	protected Group irrelevantGroup;
 	protected Company testCompany;
 	protected Group testGroup;
-
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
 
 	protected class GraphQLField {
 
@@ -1173,6 +1281,18 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseWorkflowDefinitionResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

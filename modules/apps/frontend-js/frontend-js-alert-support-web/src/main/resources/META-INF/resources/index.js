@@ -12,20 +12,20 @@
  * details.
  */
 
-import dom from 'metal-dom';
+import {delegate} from 'frontend-js-web';
 
 let handle;
 
-export default () => {
+export default function main() {
 	if (!handle) {
-		handle = dom.delegate(
+		handle = delegate(
 			document.body,
 			'click',
 			'[data-dismiss="liferay-alert"]',
 			(event) => {
 				event.preventDefault();
 
-				const container = dom.closest(event.delegateTarget, '.alert');
+				const container = event.delegateTarget.closest('.alert');
 
 				if (container) {
 					container.parentNode.removeChild(container);
@@ -33,4 +33,4 @@ export default () => {
 			}
 		);
 	}
-};
+}

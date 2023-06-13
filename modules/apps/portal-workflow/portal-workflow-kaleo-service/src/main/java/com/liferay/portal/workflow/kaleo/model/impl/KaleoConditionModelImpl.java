@@ -33,6 +33,7 @@ import com.liferay.portal.workflow.kaleo.model.KaleoConditionModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -241,98 +242,120 @@ public class KaleoConditionModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<KaleoCondition, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, KaleoCondition>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<KaleoCondition, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<KaleoCondition, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			KaleoCondition.class.getClassLoader(), KaleoCondition.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", KaleoCondition::getMvccVersion);
-		attributeGetterFunctions.put(
-			"kaleoConditionId", KaleoCondition::getKaleoConditionId);
-		attributeGetterFunctions.put("groupId", KaleoCondition::getGroupId);
-		attributeGetterFunctions.put("companyId", KaleoCondition::getCompanyId);
-		attributeGetterFunctions.put("userId", KaleoCondition::getUserId);
-		attributeGetterFunctions.put("userName", KaleoCondition::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", KaleoCondition::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", KaleoCondition::getModifiedDate);
-		attributeGetterFunctions.put(
-			"kaleoDefinitionId", KaleoCondition::getKaleoDefinitionId);
-		attributeGetterFunctions.put(
-			"kaleoDefinitionVersionId",
-			KaleoCondition::getKaleoDefinitionVersionId);
-		attributeGetterFunctions.put(
-			"kaleoNodeId", KaleoCondition::getKaleoNodeId);
-		attributeGetterFunctions.put("script", KaleoCondition::getScript);
-		attributeGetterFunctions.put(
-			"scriptLanguage", KaleoCondition::getScriptLanguage);
-		attributeGetterFunctions.put(
-			"scriptRequiredContexts",
-			KaleoCondition::getScriptRequiredContexts);
+		try {
+			Constructor<KaleoCondition> constructor =
+				(Constructor<KaleoCondition>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<KaleoCondition, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<KaleoCondition, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<KaleoCondition, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<KaleoCondition, Object>>();
 		Map<String, BiConsumer<KaleoCondition, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<KaleoCondition, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", KaleoCondition::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<KaleoCondition, Long>)KaleoCondition::setMvccVersion);
+		attributeGetterFunctions.put(
+			"kaleoConditionId", KaleoCondition::getKaleoConditionId);
 		attributeSetterBiConsumers.put(
 			"kaleoConditionId",
 			(BiConsumer<KaleoCondition, Long>)
 				KaleoCondition::setKaleoConditionId);
+		attributeGetterFunctions.put("groupId", KaleoCondition::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<KaleoCondition, Long>)KaleoCondition::setGroupId);
+		attributeGetterFunctions.put("companyId", KaleoCondition::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<KaleoCondition, Long>)KaleoCondition::setCompanyId);
+		attributeGetterFunctions.put("userId", KaleoCondition::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<KaleoCondition, Long>)KaleoCondition::setUserId);
+		attributeGetterFunctions.put("userName", KaleoCondition::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<KaleoCondition, String>)KaleoCondition::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", KaleoCondition::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<KaleoCondition, Date>)KaleoCondition::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", KaleoCondition::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<KaleoCondition, Date>)KaleoCondition::setModifiedDate);
+		attributeGetterFunctions.put(
+			"kaleoDefinitionId", KaleoCondition::getKaleoDefinitionId);
 		attributeSetterBiConsumers.put(
 			"kaleoDefinitionId",
 			(BiConsumer<KaleoCondition, Long>)
 				KaleoCondition::setKaleoDefinitionId);
+		attributeGetterFunctions.put(
+			"kaleoDefinitionVersionId",
+			KaleoCondition::getKaleoDefinitionVersionId);
 		attributeSetterBiConsumers.put(
 			"kaleoDefinitionVersionId",
 			(BiConsumer<KaleoCondition, Long>)
 				KaleoCondition::setKaleoDefinitionVersionId);
+		attributeGetterFunctions.put(
+			"kaleoNodeId", KaleoCondition::getKaleoNodeId);
 		attributeSetterBiConsumers.put(
 			"kaleoNodeId",
 			(BiConsumer<KaleoCondition, Long>)KaleoCondition::setKaleoNodeId);
+		attributeGetterFunctions.put("script", KaleoCondition::getScript);
 		attributeSetterBiConsumers.put(
 			"script",
 			(BiConsumer<KaleoCondition, String>)KaleoCondition::setScript);
+		attributeGetterFunctions.put(
+			"scriptLanguage", KaleoCondition::getScriptLanguage);
 		attributeSetterBiConsumers.put(
 			"scriptLanguage",
 			(BiConsumer<KaleoCondition, String>)
 				KaleoCondition::setScriptLanguage);
+		attributeGetterFunctions.put(
+			"scriptRequiredContexts",
+			KaleoCondition::getScriptRequiredContexts);
 		attributeSetterBiConsumers.put(
 			"scriptRequiredContexts",
 			(BiConsumer<KaleoCondition, String>)
 				KaleoCondition::setScriptRequiredContexts);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -684,6 +707,42 @@ public class KaleoConditionModelImpl
 	}
 
 	@Override
+	public KaleoCondition cloneWithOriginalValues() {
+		KaleoConditionImpl kaleoConditionImpl = new KaleoConditionImpl();
+
+		kaleoConditionImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		kaleoConditionImpl.setKaleoConditionId(
+			this.<Long>getColumnOriginalValue("kaleoConditionId"));
+		kaleoConditionImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		kaleoConditionImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		kaleoConditionImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		kaleoConditionImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		kaleoConditionImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		kaleoConditionImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		kaleoConditionImpl.setKaleoDefinitionId(
+			this.<Long>getColumnOriginalValue("kaleoDefinitionId"));
+		kaleoConditionImpl.setKaleoDefinitionVersionId(
+			this.<Long>getColumnOriginalValue("kaleoDefinitionVersionId"));
+		kaleoConditionImpl.setKaleoNodeId(
+			this.<Long>getColumnOriginalValue("kaleoNodeId"));
+		kaleoConditionImpl.setScript(
+			this.<String>getColumnOriginalValue("script"));
+		kaleoConditionImpl.setScriptLanguage(
+			this.<String>getColumnOriginalValue("scriptLanguage"));
+		kaleoConditionImpl.setScriptRequiredContexts(
+			this.<String>getColumnOriginalValue("scriptRequiredContexts"));
+
+		return kaleoConditionImpl;
+	}
+
+	@Override
 	public int compareTo(KaleoCondition kaleoCondition) {
 		int value = 0;
 
@@ -920,9 +979,7 @@ public class KaleoConditionModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, KaleoCondition>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					KaleoCondition.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

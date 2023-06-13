@@ -44,6 +44,7 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
+import java.util.Collections;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -82,11 +83,11 @@ public class CatalogResourceImpl
 
 		CommerceCatalog commerceCatalog =
 			_commerceCatalogService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (commerceCatalog == null) {
 			throw new NoSuchCatalogException(
-				"Unable to find Catalog with externalReferenceCode: " +
+				"Unable to find catalog with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -115,11 +116,11 @@ public class CatalogResourceImpl
 
 		CommerceCatalog commerceCatalog =
 			_commerceCatalogService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (commerceCatalog == null) {
 			throw new NoSuchCatalogException(
-				"Unable to find Catalog with externalReferenceCode: " +
+				"Unable to find catalog with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -132,8 +133,9 @@ public class CatalogResourceImpl
 		throws Exception {
 
 		return SearchUtil.search(
+			Collections.emptyMap(),
 			booleanQuery -> booleanQuery.getPreBooleanFilter(), filter,
-			CommerceCatalog.class, search, pagination,
+			CommerceCatalog.class.getName(), search, pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
 			new UnsafeConsumer() {
@@ -145,10 +147,10 @@ public class CatalogResourceImpl
 				}
 
 			},
+			sorts,
 			document -> _toCatalog(
 				_commerceCatalogService.getCommerceCatalog(
-					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))),
-			sorts);
+					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
 	}
 
 	@Override
@@ -166,11 +168,11 @@ public class CatalogResourceImpl
 		CPDefinition cpDefinition =
 			_cpDefinitionService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
-					contextCompany.getCompanyId(), externalReferenceCode);
+					externalReferenceCode, contextCompany.getCompanyId());
 
 		if (cpDefinition == null) {
 			throw new NoSuchCPDefinitionException(
-				"Unable to find Product with externalReferenceCode: " +
+				"Unable to find product with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -220,11 +222,11 @@ public class CatalogResourceImpl
 
 		CommerceCatalog commerceCatalog =
 			_commerceCatalogService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(), externalReferenceCode);
+				externalReferenceCode, contextCompany.getCompanyId());
 
 		if (commerceCatalog == null) {
 			throw new NoSuchCatalogException(
-				"Unable to find Catalog with externalReferenceCode: " +
+				"Unable to find catalog with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -237,14 +239,13 @@ public class CatalogResourceImpl
 	public Catalog postCatalog(Catalog catalog) throws Exception {
 		CommerceCatalog commerceCatalog =
 			_commerceCatalogService.fetchByExternalReferenceCode(
-				contextCompany.getCompanyId(),
-				catalog.getExternalReferenceCode());
+				catalog.getExternalReferenceCode(),
+				contextCompany.getCompanyId());
 
 		if (commerceCatalog == null) {
 			commerceCatalog = _commerceCatalogService.addCommerceCatalog(
-				catalog.getName(), catalog.getCurrencyCode(),
-				catalog.getDefaultLanguageId(),
-				catalog.getExternalReferenceCode(),
+				catalog.getExternalReferenceCode(), catalog.getName(),
+				catalog.getCurrencyCode(), catalog.getDefaultLanguageId(),
 				_serviceContextHelper.getServiceContext());
 		}
 		else {

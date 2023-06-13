@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -27,7 +27,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-67094."
-	@priority = 4
+	@priority = "4"
 	test ViewCacheableCheckbox {
 		ProductMenu.gotoPortlet(
 			category = "Content & Data",
@@ -39,8 +39,7 @@ definition {
 			structureDescription = "WC Structure Description",
 			structureName = "WC Structure Name");
 
-		DynamicDataMapping.addField(
-			field = "Text",
+		DataEngine.addField(
 			fieldFieldLabel = "Text",
 			fieldName = "Text");
 
@@ -100,7 +99,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Test Page");
+		PagesAdmin.addPublicPage(pageName = "Test Page");
 
 		Navigator.gotoPage(pageName = "Test Page");
 

@@ -28,6 +28,10 @@ import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersisten
 public class LayoutSetLocalServiceWrapper
 	implements LayoutSetLocalService, ServiceWrapper<LayoutSetLocalService> {
 
+	public LayoutSetLocalServiceWrapper() {
+		this(null);
+	}
+
 	public LayoutSetLocalServiceWrapper(
 		LayoutSetLocalService layoutSetLocalService) {
 
@@ -460,20 +464,6 @@ public class LayoutSetLocalServiceWrapper
 
 		return _layoutSetLocalService.updateSettings(
 			groupId, privateLayout, settings);
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #updateVirtualHosts(long, boolean, TreeMap)}
-	 */
-	@Deprecated
-	@Override
-	public LayoutSet updateVirtualHost(
-			long groupId, boolean privateLayout, String virtualHostname)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _layoutSetLocalService.updateVirtualHost(
-			groupId, privateLayout, virtualHostname);
 	}
 
 	@Override

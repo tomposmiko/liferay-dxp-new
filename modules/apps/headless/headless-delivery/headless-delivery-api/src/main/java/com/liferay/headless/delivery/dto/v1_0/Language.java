@@ -46,7 +46,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Generated("")
 @GraphQLName(
-	description = "Describes a specific language in the platform",
+	description = "Describes a specific language in the platform.",
 	value = "Language"
 )
 @JsonFilter("Liferay.Vulcan")
@@ -61,7 +61,7 @@ public class Language implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(Language.class, json);
 	}
 
-	@Schema
+	@Schema(description = "The language's contry name.")
 	public String getCountryName() {
 		return countryName;
 	}
@@ -85,11 +85,11 @@ public class Language implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The language's contry name.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String countryName;
 
-	@Schema
+	@Schema(description = "The localized language's country name values.")
 	@Valid
 	public Map<String, String> getCountryName_i18n() {
 		return countryName_i18n;
@@ -115,11 +115,11 @@ public class Language implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The localized language's country name values.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> countryName_i18n;
 
-	@Schema
+	@Schema(description = "The language's ID.")
 	public String getId() {
 		return id;
 	}
@@ -141,11 +141,13 @@ public class Language implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The language's ID.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String id;
 
-	@Schema
+	@Schema(
+		description = "A flag that indicates whether the language has benn marked as default language."
+	)
 	public Boolean getMarkedAsDefault() {
 		return markedAsDefault;
 	}
@@ -169,11 +171,13 @@ public class Language implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether the language has benn marked as default language."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean markedAsDefault;
 
-	@Schema
+	@Schema(description = "The language's name.")
 	public String getName() {
 		return name;
 	}
@@ -195,11 +199,11 @@ public class Language implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The language's name.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
-	@Schema
+	@Schema(description = "The localized language's name values.")
 	@Valid
 	public Map<String, String> getName_i18n() {
 		return name_i18n;
@@ -225,7 +229,7 @@ public class Language implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The localized language's name values.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> name_i18n;
 

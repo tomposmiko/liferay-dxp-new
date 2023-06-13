@@ -48,6 +48,7 @@ public class GroupDescriptiveNameComparator extends OrderByComparator<Group> {
 
 	public GroupDescriptiveNameComparator(boolean ascending, Locale locale) {
 		_ascending = ascending;
+
 		_locale = locale;
 
 		_collator = CollatorUtil.getInstance(locale);

@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,7 +51,9 @@ public class JournalArticleInfoItemProviderTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new LiferayIntegrationTestRule();
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			PermissionCheckerMethodTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws Exception {
@@ -78,7 +81,8 @@ public class JournalArticleInfoItemProviderTest {
 			(InfoItemObjectProvider<JournalArticle>)
 				_infoItemServiceTracker.getFirstInfoItemService(
 					InfoItemObjectProvider.class,
-					JournalArticle.class.getName());
+					JournalArticle.class.getName(),
+					infoItemIdentifier.getInfoItemServiceFilter());
 
 		JournalArticle publishedArticle =
 			journalArticleInfoItemProvider.getInfoItem(infoItemIdentifier);
@@ -97,14 +101,15 @@ public class JournalArticleInfoItemProviderTest {
 	public void testGetInvalidInfoItemFromJournalInfoItemProvider()
 		throws Exception {
 
+		InfoItemIdentifier infoItemIdentifier = new ClassPKInfoItemIdentifier(
+			RandomTestUtil.randomLong());
+
 		InfoItemObjectProvider<JournalArticle> journalArticleInfoItemProvider =
 			(InfoItemObjectProvider<JournalArticle>)
 				_infoItemServiceTracker.getFirstInfoItemService(
 					InfoItemObjectProvider.class,
-					JournalArticle.class.getName());
-
-		InfoItemIdentifier infoItemIdentifier = new ClassPKInfoItemIdentifier(
-			RandomTestUtil.randomLong());
+					JournalArticle.class.getName(),
+					infoItemIdentifier.getInfoItemServiceFilter());
 
 		journalArticleInfoItemProvider.getInfoItem(infoItemIdentifier);
 	}

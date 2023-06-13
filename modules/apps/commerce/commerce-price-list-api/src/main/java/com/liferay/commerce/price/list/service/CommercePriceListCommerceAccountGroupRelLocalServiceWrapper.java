@@ -28,6 +28,10 @@ public class CommercePriceListCommerceAccountGroupRelLocalServiceWrapper
 			   ServiceWrapper
 				   <CommercePriceListCommerceAccountGroupRelLocalService> {
 
+	public CommercePriceListCommerceAccountGroupRelLocalServiceWrapper() {
+		this(null);
+	}
+
 	public CommercePriceListCommerceAccountGroupRelLocalServiceWrapper(
 		CommercePriceListCommerceAccountGroupRelLocalService
 			commercePriceListCommerceAccountGroupRelLocalService) {
@@ -63,15 +67,15 @@ public class CommercePriceListCommerceAccountGroupRelLocalServiceWrapper
 	public com.liferay.commerce.price.list.model.
 		CommercePriceListCommerceAccountGroupRel
 				addCommercePriceListCommerceAccountGroupRel(
-					long commercePriceListId, long commerceAccountGroupId,
-					int order,
+					long userId, long commercePriceListId,
+					long commerceAccountGroupId, int order,
 					com.liferay.portal.kernel.service.ServiceContext
 						serviceContext)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commercePriceListCommerceAccountGroupRelLocalService.
 			addCommercePriceListCommerceAccountGroupRel(
-				commercePriceListId, commerceAccountGroupId, order,
+				userId, commercePriceListId, commerceAccountGroupId, order,
 				serviceContext);
 	}
 

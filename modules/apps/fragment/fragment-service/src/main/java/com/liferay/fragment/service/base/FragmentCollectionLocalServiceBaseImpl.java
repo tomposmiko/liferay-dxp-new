@@ -23,9 +23,6 @@ import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.service.FragmentCollectionLocalService;
 import com.liferay.fragment.service.FragmentCollectionLocalServiceUtil;
 import com.liferay.fragment.service.persistence.FragmentCollectionPersistence;
-import com.liferay.fragment.service.persistence.FragmentCompositionPersistence;
-import com.liferay.fragment.service.persistence.FragmentEntryFinder;
-import com.liferay.fragment.service.persistence.FragmentEntryPersistence;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
@@ -42,8 +39,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -420,6 +415,7 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -438,6 +434,7 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 			(FragmentCollection)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<FragmentCollection> getBasePersistence() {
 		return fragmentCollectionPersistence;
 	}
@@ -649,25 +646,5 @@ public abstract class FragmentCollectionLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@Reference
-	protected FragmentCompositionPersistence fragmentCompositionPersistence;
-
-	@Reference
-	protected FragmentEntryPersistence fragmentEntryPersistence;
-
-	@Reference
-	protected FragmentEntryFinder fragmentEntryFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		FragmentCollectionLocalServiceBaseImpl.class);
 
 }

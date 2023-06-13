@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -311,88 +312,110 @@ public class CommerceAccountGroupModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CommerceAccountGroup>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceAccountGroup.class.getClassLoader(),
+			CommerceAccountGroup.class, ModelWrapper.class);
+
+		try {
+			Constructor<CommerceAccountGroup> constructor =
+				(Constructor<CommerceAccountGroup>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<CommerceAccountGroup, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CommerceAccountGroup, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceAccountGroup, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceAccountGroup, Object>>();
-
-		attributeGetterFunctions.put(
-			"externalReferenceCode",
-			CommerceAccountGroup::getExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"commerceAccountGroupId",
-			CommerceAccountGroup::getCommerceAccountGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceAccountGroup::getCompanyId);
-		attributeGetterFunctions.put("userId", CommerceAccountGroup::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceAccountGroup::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceAccountGroup::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceAccountGroup::getModifiedDate);
-		attributeGetterFunctions.put("name", CommerceAccountGroup::getName);
-		attributeGetterFunctions.put("type", CommerceAccountGroup::getType);
-		attributeGetterFunctions.put("system", CommerceAccountGroup::getSystem);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CommerceAccountGroup, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceAccountGroup, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceAccountGroup, ?>>();
 
+		attributeGetterFunctions.put(
+			"externalReferenceCode",
+			CommerceAccountGroup::getExternalReferenceCode);
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<CommerceAccountGroup, String>)
 				CommerceAccountGroup::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"commerceAccountGroupId",
+			CommerceAccountGroup::getCommerceAccountGroupId);
 		attributeSetterBiConsumers.put(
 			"commerceAccountGroupId",
 			(BiConsumer<CommerceAccountGroup, Long>)
 				CommerceAccountGroup::setCommerceAccountGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceAccountGroup::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceAccountGroup, Long>)
 				CommerceAccountGroup::setCompanyId);
+		attributeGetterFunctions.put("userId", CommerceAccountGroup::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceAccountGroup, Long>)
 				CommerceAccountGroup::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceAccountGroup::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceAccountGroup, String>)
 				CommerceAccountGroup::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceAccountGroup::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceAccountGroup, Date>)
 				CommerceAccountGroup::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceAccountGroup::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceAccountGroup, Date>)
 				CommerceAccountGroup::setModifiedDate);
+		attributeGetterFunctions.put("name", CommerceAccountGroup::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommerceAccountGroup, String>)
 				CommerceAccountGroup::setName);
+		attributeGetterFunctions.put("type", CommerceAccountGroup::getType);
 		attributeSetterBiConsumers.put(
 			"type",
 			(BiConsumer<CommerceAccountGroup, Integer>)
 				CommerceAccountGroup::setType);
+		attributeGetterFunctions.put("system", CommerceAccountGroup::getSystem);
 		attributeSetterBiConsumers.put(
 			"system",
 			(BiConsumer<CommerceAccountGroup, Boolean>)
 				CommerceAccountGroup::setSystem);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -706,6 +729,35 @@ public class CommerceAccountGroupModelImpl
 	}
 
 	@Override
+	public CommerceAccountGroup cloneWithOriginalValues() {
+		CommerceAccountGroupImpl commerceAccountGroupImpl =
+			new CommerceAccountGroupImpl();
+
+		commerceAccountGroupImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
+		commerceAccountGroupImpl.setCommerceAccountGroupId(
+			this.<Long>getColumnOriginalValue("commerceAccountGroupId"));
+		commerceAccountGroupImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commerceAccountGroupImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commerceAccountGroupImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commerceAccountGroupImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commerceAccountGroupImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commerceAccountGroupImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		commerceAccountGroupImpl.setType(
+			this.<Integer>getColumnOriginalValue("type_"));
+		commerceAccountGroupImpl.setSystem(
+			this.<Boolean>getColumnOriginalValue("system_"));
+
+		return commerceAccountGroupImpl;
+	}
+
+	@Override
 	public int compareTo(CommerceAccountGroup commerceAccountGroup) {
 		int value = 0;
 
@@ -924,9 +976,7 @@ public class CommerceAccountGroupModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CommerceAccountGroup>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CommerceAccountGroup.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

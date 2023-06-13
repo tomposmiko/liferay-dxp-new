@@ -19,9 +19,11 @@
 <%
 String navigation = "banned-users";
 
-PortletURL portletURL = renderResponse.createRenderURL();
-
-portletURL.setParameter("mvcRenderCommandName", "/message_boards_admin/view_banned_users");
+PortletURL portletURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCRenderCommandName(
+	"/message_boards_admin/view_banned_users"
+).buildPortletURL();
 %>
 
 <%@ include file="/message_boards/nav.jspf" %>
@@ -34,9 +36,10 @@ int totalBannedUsers = MBBanLocalServiceUtil.getBansCount(scopeGroupId);
 
 <clay:management-toolbar
 	actionDropdownItems="<%= mbBannedUsersManagementToolbarDisplayContext.getActionDropdownItems() %>"
-	componentId="mbBannedUsersManagementToolbar"
+	additionalProps="<%= mbBannedUsersManagementToolbarDisplayContext.getAdditionalProps() %>"
 	disabled="<%= totalBannedUsers == 0 %>"
 	itemsTotal="<%= totalBannedUsers %>"
+	propsTransformer="message_boards_admin/js/BanUsersManagementToolbarPropsTransformer"
 	searchContainerId="mbBanUsers"
 	showCreationMenu="<%= false %>"
 	showInfoButton="<%= false %>"
@@ -136,30 +139,3 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, TextForm
 
 PortalUtil.setPageSubtitle(LanguageUtil.get(request, "banned-users"), request);
 %>
-
-<aui:script>
-	var unbanUser = function () {
-		Liferay.Util.postForm(document.<portlet:namespace />fm, {
-			data: {
-				<%= Constants.CMD %>: 'unban',
-			},
-			url: '<portlet:actionURL name="/message_boards/ban_user" />',
-		});
-	};
-
-	var ACTIONS = {
-		unbanUser: unbanUser,
-	};
-
-	Liferay.componentReady('mbBannedUsersManagementToolbar').then(function (
-		managementToolbar
-	) {
-		managementToolbar.on('actionItemClicked', function (event) {
-			var itemData = event.data.item.data;
-
-			if (itemData && itemData.action && ACTIONS[itemData.action]) {
-				ACTIONS[itemData.action]();
-			}
-		});
-	});
-</aui:script>

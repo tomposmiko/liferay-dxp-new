@@ -29,6 +29,7 @@ import com.liferay.view.count.service.persistence.ViewCountEntryPK;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -218,43 +219,65 @@ public class ViewCountEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<ViewCountEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, ViewCountEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<ViewCountEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<ViewCountEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ViewCountEntry.class.getClassLoader(), ViewCountEntry.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("companyId", ViewCountEntry::getCompanyId);
-		attributeGetterFunctions.put(
-			"classNameId", ViewCountEntry::getClassNameId);
-		attributeGetterFunctions.put("classPK", ViewCountEntry::getClassPK);
-		attributeGetterFunctions.put("viewCount", ViewCountEntry::getViewCount);
+		try {
+			Constructor<ViewCountEntry> constructor =
+				(Constructor<ViewCountEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<ViewCountEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<ViewCountEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<ViewCountEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<ViewCountEntry, Object>>();
 		Map<String, BiConsumer<ViewCountEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<ViewCountEntry, ?>>();
 
+		attributeGetterFunctions.put("companyId", ViewCountEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<ViewCountEntry, Long>)ViewCountEntry::setCompanyId);
+		attributeGetterFunctions.put(
+			"classNameId", ViewCountEntry::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<ViewCountEntry, Long>)ViewCountEntry::setClassNameId);
+		attributeGetterFunctions.put("classPK", ViewCountEntry::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<ViewCountEntry, Long>)ViewCountEntry::setClassPK);
+		attributeGetterFunctions.put("viewCount", ViewCountEntry::getViewCount);
 		attributeSetterBiConsumers.put(
 			"viewCount",
 			(BiConsumer<ViewCountEntry, Long>)ViewCountEntry::setViewCount);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -384,6 +407,22 @@ public class ViewCountEntryModelImpl
 		viewCountEntryImpl.setViewCount(getViewCount());
 
 		viewCountEntryImpl.resetOriginalValues();
+
+		return viewCountEntryImpl;
+	}
+
+	@Override
+	public ViewCountEntry cloneWithOriginalValues() {
+		ViewCountEntryImpl viewCountEntryImpl = new ViewCountEntryImpl();
+
+		viewCountEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		viewCountEntryImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		viewCountEntryImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		viewCountEntryImpl.setViewCount(
+			this.<Long>getColumnOriginalValue("viewCount"));
 
 		return viewCountEntryImpl;
 	}
@@ -548,9 +587,7 @@ public class ViewCountEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, ViewCountEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					ViewCountEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

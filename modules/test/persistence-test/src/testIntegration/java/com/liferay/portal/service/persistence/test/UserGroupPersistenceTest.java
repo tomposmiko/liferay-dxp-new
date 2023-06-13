@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
-import com.liferay.portal.kernel.exception.DuplicateUserGroupExternalReferenceCodeException;
 import com.liferay.portal.kernel.exception.NoSuchUserGroupException;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.service.UserGroupLocalServiceUtil;
@@ -191,26 +190,6 @@ public class UserGroupPersistenceTest {
 			newUserGroup.isAddedByLDAPImport());
 	}
 
-	@Test(expected = DuplicateUserGroupExternalReferenceCodeException.class)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		UserGroup userGroup = addUserGroup();
-
-		UserGroup newUserGroup = addUserGroup();
-
-		newUserGroup.setCompanyId(userGroup.getCompanyId());
-
-		newUserGroup = _persistence.update(newUserGroup);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newUserGroup);
-
-		newUserGroup.setExternalReferenceCode(
-			userGroup.getExternalReferenceCode());
-
-		_persistence.update(newUserGroup);
-	}
-
 	@Test
 	public void testCountByUuid() throws Exception {
 		_persistence.countByUuid("");
@@ -263,12 +242,12 @@ public class UserGroupPersistenceTest {
 	}
 
 	@Test
-	public void testCountByU_C_P() throws Exception {
-		_persistence.countByU_C_P(
+	public void testCountByGtU_C_P() throws Exception {
+		_persistence.countByGtU_C_P(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
 			RandomTestUtil.nextLong());
 
-		_persistence.countByU_C_P(0L, 0L, 0L);
+		_persistence.countByGtU_C_P(0L, 0L, 0L);
 	}
 
 	@Test

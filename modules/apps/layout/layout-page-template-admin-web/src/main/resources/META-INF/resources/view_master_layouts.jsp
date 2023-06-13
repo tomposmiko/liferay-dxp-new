@@ -30,16 +30,17 @@ MasterLayoutManagementToolbarDisplayContext masterLayoutManagementToolbarDisplay
 %>
 
 <clay:management-toolbar
-	displayContext="<%= masterLayoutManagementToolbarDisplayContext %>"
+	managementToolbarDisplayContext="<%= masterLayoutManagementToolbarDisplayContext %>"
+	propsTransformer="js/propsTransformers/MasterLayoutManagementToolbarPropsTransformer"
 />
 
-<liferay-ui:success key="masterPagePublished" message="the-master-page-was-published-succesfully" />
+<liferay-ui:success key="masterPagePublished" message="the-master-page-was-published-successfully" />
 
-<portlet:actionURL name="/layout_page_template/delete_master_layout" var="deleteMasterLayoutURL">
+<portlet:actionURL name="/layout_page_template_admin/delete_master_layout" var="deleteMasterLayoutURL">
 	<portlet:param name="redirect" value="<%= currentURL %>" />
 </portlet:actionURL>
 
-<aui:form action="<%= deleteMasterLayoutURL %>" cssClass="container-fluid-1280" name="fm">
+<aui:form action="<%= deleteMasterLayoutURL %>" cssClass="container-fluid container-fluid-max-xl" name="fm">
 	<liferay-ui:error key="<%= PortalException.class.getName() %>" message="one-or-more-entries-could-not-be-deleted" />
 	<liferay-ui:error key="<%= RequiredLayoutPageTemplateEntryException.class.getName() %>" message="you-cannot-delete-master-pages-that-are-used-by-a-page,-a-page-template,-or-a-display-page-template" />
 
@@ -49,15 +50,12 @@ MasterLayoutManagementToolbarDisplayContext masterLayoutManagementToolbarDisplay
 	>
 		<liferay-ui:search-container-row
 			className="com.liferay.layout.page.template.model.LayoutPageTemplateEntry"
-			cssClass="selectable"
 			escapedModel="<%= true %>"
 			keyProperty="layoutPrototypeId"
 			modelVar="layoutPageTemplateEntry"
 		>
 
 			<%
-			row.setCssClass("entry-card lfr-asset-item");
-
 			row.setData(
 				HashMapBuilder.<String, Object>put(
 					"actions", masterLayoutManagementToolbarDisplayContext.getAvailableActions(layoutPageTemplateEntry)
@@ -66,6 +64,7 @@ MasterLayoutManagementToolbarDisplayContext masterLayoutManagementToolbarDisplay
 
 			<liferay-ui:search-container-column-text>
 				<clay:vertical-card
+					propsTransformer="js/propsTransformers/MasterLayoutDropdownPropsTransformer"
 					verticalCard="<%= new MasterLayoutVerticalCard(layoutPageTemplateEntry, renderRequest, renderResponse, searchContainer.getRowChecker()) %>"
 				/>
 			</liferay-ui:search-container-column-text>
@@ -78,7 +77,7 @@ MasterLayoutManagementToolbarDisplayContext masterLayoutManagementToolbarDisplay
 	</liferay-ui:search-container>
 </aui:form>
 
-<portlet:actionURL name="/layout_page_template/update_layout_page_template_entry_preview" var="masterLayoutPreviewURL">
+<portlet:actionURL name="/layout_page_template_admin/update_layout_page_template_entry_preview" var="masterLayoutPreviewURL">
 	<portlet:param name="redirect" value="<%= currentURL %>" />
 </portlet:actionURL>
 
@@ -86,13 +85,3 @@ MasterLayoutManagementToolbarDisplayContext masterLayoutManagementToolbarDisplay
 	<aui:input name="layoutPageTemplateEntryId" type="hidden" />
 	<aui:input name="fileEntryId" type="hidden" />
 </aui:form>
-
-<liferay-frontend:component
-	componentId="<%= LayoutPageTemplateAdminWebKeys.MASTER_LAYOUT_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
-	module="js/MasterLayoutDropdownDefaultEventHandler.es"
-/>
-
-<liferay-frontend:component
-	componentId="<%= masterLayoutManagementToolbarDisplayContext.getDefaultEventHandler() %>"
-	module="js/MasterLayoutManagementToolbarDefaultEventHandler.es"
-/>

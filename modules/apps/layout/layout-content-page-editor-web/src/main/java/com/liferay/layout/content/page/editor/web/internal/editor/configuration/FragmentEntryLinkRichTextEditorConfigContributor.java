@@ -27,29 +27,20 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.editor.configuration.BaseEditorConfigContributor;
 import com.liferay.portal.kernel.editor.configuration.EditorConfigContributor;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
-import com.liferay.portal.kernel.resource.bundle.AggregateResourceBundleLoader;
-import com.liferay.portal.kernel.resource.bundle.ClassResourceBundleLoader;
-import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 import javax.portlet.PortletURL;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Pavel Savinov
@@ -70,14 +61,6 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 		ThemeDisplay themeDisplay,
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory) {
 
-		StringBundler sb = new StringBundler(5);
-
-		sb.append(getAllowedContentText());
-		sb.append(" a[*](*); div[*](*){text-align}; img[*](*){*}; p[*](*); ");
-		sb.append(getAllowedContentLists());
-		sb.append(getAllowedContentTable());
-		sb.append(" span[*](*){*}; ");
-
 		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
 			requestBackedPortletURLFactory, "_EDITOR_NAME_selectItem",
 			getFileItemSelectorCriterion(), getLayoutItemSelectorURL());
@@ -86,7 +69,12 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 			getImageItemSelectorCriterion(), getURLItemSelectorCriterion());
 
 		jsonObject.put(
-			"allowedContent", sb.toString()
+			"allowedContent",
+			StringBundler.concat(
+				getAllowedContentText(),
+				" a[*](*); div[*](*){text-align}; img[*](*){*}; p[*](*); ",
+				getAllowedContentLists(), getAllowedContentTable(),
+				" span[*](*){*}; ")
 		).put(
 			"documentBrowseLinkUrl", itemSelectorURL.toString()
 		).put(
@@ -122,7 +110,7 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 	}
 
 	protected String getExtraPluginsLists() {
-		return "autolink,ae_dragresize,ae_addimages,ae_imagealignment," +
+		return "ae_autolink,ae_dragresize,ae_addimages,ae_imagealignment," +
 			"ae_placeholder,ae_selectionregion,ae_tableresize," +
 				"ae_tabletools,ae_uicore,itemselector,media,adaptivemedia";
 	}
@@ -174,42 +162,25 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 	}
 
 	protected JSONArray getStyleFormatsJSONArray(Locale locale) {
-		Class<?> clazz = getClass();
-
-		ResourceBundle resourceBundle = null;
-
-		ResourceBundleLoader resourceBundleLoader =
-			new AggregateResourceBundleLoader(
-				new ClassResourceBundleLoader(
-					"content.Language", clazz.getClassLoader()),
-				_resourceBundleLoader, LanguageUtil.getResourceBundleLoader());
-
-		try {
-			resourceBundle = resourceBundleLoader.loadResourceBundle(locale);
-		}
-		catch (MissingResourceException missingResourceException) {
-			resourceBundle = ResourceBundleUtil.EMPTY_RESOURCE_BUNDLE;
-		}
-
 		return JSONUtil.putAll(
 			getStyleFormatJSONObject(
-				LanguageUtil.get(resourceBundle, "small"), "span", "small",
+				LanguageUtil.get(locale, "small"), "span", "small",
 				_CKEDITOR_STYLE_INLINE),
 			getStyleFormatJSONObject(
-				LanguageUtil.get(resourceBundle, "lead"), "span", "lead",
+				LanguageUtil.get(locale, "lead"), "span", "lead",
 				_CKEDITOR_STYLE_INLINE),
 			getStyleFormatJSONObject(
-				LanguageUtil.format(resourceBundle, "heading-x", "1"), "h1",
-				null, _CKEDITOR_STYLE_BLOCK),
+				LanguageUtil.format(locale, "heading-x", "1"), "h1", null,
+				_CKEDITOR_STYLE_BLOCK),
 			getStyleFormatJSONObject(
-				LanguageUtil.format(resourceBundle, "heading-x", "2"), "h2",
-				null, _CKEDITOR_STYLE_BLOCK),
+				LanguageUtil.format(locale, "heading-x", "2"), "h2", null,
+				_CKEDITOR_STYLE_BLOCK),
 			getStyleFormatJSONObject(
-				LanguageUtil.format(resourceBundle, "heading-x", "3"), "h3",
-				null, _CKEDITOR_STYLE_BLOCK),
+				LanguageUtil.format(locale, "heading-x", "3"), "h3", null,
+				_CKEDITOR_STYLE_BLOCK),
 			getStyleFormatJSONObject(
-				LanguageUtil.format(resourceBundle, "heading-x", "4"), "h4",
-				null, _CKEDITOR_STYLE_BLOCK));
+				LanguageUtil.format(locale, "heading-x", "4"), "h4", null,
+				_CKEDITOR_STYLE_BLOCK));
 	}
 
 	protected JSONObject getStyleFormatsJSONObject(Locale locale) {
@@ -223,19 +194,20 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 	protected JSONObject getStyleJSONObject(
 		String element, String cssClass, int type) {
 
-		JSONObject styleJSONObject = JSONFactoryUtil.createJSONObject();
+		return JSONUtil.put(
+			"attributes",
+			() -> {
+				if (Validator.isNotNull(cssClass)) {
+					return JSONUtil.put("class", cssClass);
+				}
 
-		if (Validator.isNotNull(cssClass)) {
-			styleJSONObject.put("attributes", JSONUtil.put("class", cssClass));
-		}
-
-		styleJSONObject.put(
+				return null;
+			}
+		).put(
 			"element", element
 		).put(
 			"type", type
 		);
-
-		return styleJSONObject;
 	}
 
 	protected JSONObject getToolbarsJSONObject(Locale locale) {
@@ -334,12 +306,5 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 
 	@Reference
 	private ItemSelector _itemSelector;
-
-	@Reference(
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY,
-		target = "(bundle.symbolic.name=com.liferay.frontend.editor.lang)"
-	)
-	private volatile ResourceBundleLoader _resourceBundleLoader;
 
 }

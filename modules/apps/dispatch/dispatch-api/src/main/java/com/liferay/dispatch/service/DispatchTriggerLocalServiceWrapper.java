@@ -27,6 +27,10 @@ public class DispatchTriggerLocalServiceWrapper
 	implements DispatchTriggerLocalService,
 			   ServiceWrapper<DispatchTriggerLocalService> {
 
+	public DispatchTriggerLocalServiceWrapper() {
+		this(null);
+	}
+
 	public DispatchTriggerLocalServiceWrapper(
 		DispatchTriggerLocalService dispatchTriggerLocalService) {
 
@@ -257,6 +261,12 @@ public class DispatchTriggerLocalServiceWrapper
 
 		return _dispatchTriggerLocalService.fetchDispatchTrigger(
 			companyId, name);
+	}
+
+	@Override
+	public java.util.Date fetchNextFireDate(long dispatchTriggerId) {
+		return _dispatchTriggerLocalService.fetchNextFireDate(
+			dispatchTriggerId);
 	}
 
 	@Override

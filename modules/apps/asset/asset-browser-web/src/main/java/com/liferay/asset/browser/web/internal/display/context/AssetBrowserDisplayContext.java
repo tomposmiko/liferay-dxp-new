@@ -27,6 +27,7 @@ import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryServiceUtil;
 import com.liferay.item.selector.constants.ItemSelectorPortletKeys;
 import com.liferay.item.selector.criteria.constants.ItemSelectorCriteriaConstants;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -38,6 +39,7 @@ import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Sort;
@@ -250,52 +252,75 @@ public class AssetBrowserDisplayContext {
 	}
 
 	public PortletURL getPortletURL() throws PortletException {
-		PortletURL portletURL = PortletURLUtil.clone(
-			_portletURL, PortalUtil.getLiferayPortletResponse(_renderResponse));
+		return PortletURLBuilder.create(
+			PortletURLUtil.clone(
+				_portletURL,
+				PortalUtil.getLiferayPortletResponse(_renderResponse))
+		).setParameter(
+			"eventName", getEventName()
+		).setParameter(
+			"groupId", getGroupId()
+		).setParameter(
+			"listable",
+			() -> {
+				if (_getListable() != null) {
+					return _getListable();
+				}
 
-		portletURL.setParameter("groupId", String.valueOf(getGroupId()));
+				return null;
+			}
+		).setParameter(
+			"multipleSelection",
+			() -> {
+				if (isMultipleSelection()) {
+					return Boolean.TRUE.toString();
+				}
 
-		long selectedGroupId = ParamUtil.getLong(
-			_httpServletRequest, "selectedGroupId");
+				return null;
+			}
+		).setParameter(
+			"refererAssetEntryId", getRefererAssetEntryId()
+		).setParameter(
+			"selectedGroupId",
+			() -> {
+				long selectedGroupId = ParamUtil.getLong(
+					_httpServletRequest, "selectedGroupId");
 
-		if (selectedGroupId > 0) {
-			portletURL.setParameter(
-				"selectedGroupId", String.valueOf(selectedGroupId));
-		}
+				if (selectedGroupId > 0) {
+					return selectedGroupId;
+				}
 
-		long[] selectedGroupIds = getSelectedGroupIds();
+				return null;
+			}
+		).setParameter(
+			"selectedGroupIds",
+			() -> {
+				long[] selectedGroupIds = getSelectedGroupIds();
 
-		if (selectedGroupIds.length > 0) {
-			portletURL.setParameter(
-				"selectedGroupIds", StringUtil.merge(selectedGroupIds));
-		}
+				if (selectedGroupIds.length > 0) {
+					return StringUtil.merge(selectedGroupIds);
+				}
 
-		portletURL.setParameter(
-			"refererAssetEntryId", String.valueOf(getRefererAssetEntryId()));
-		portletURL.setParameter("typeSelection", getTypeSelection());
-		portletURL.setParameter(
-			"subtypeSelectionId", String.valueOf(getSubtypeSelectionId()));
+				return null;
+			}
+		).setParameter(
+			"showAddButton",
+			() -> {
+				if (isShowAddButton()) {
+					return Boolean.TRUE.toString();
+				}
 
-		if (_getListable() != null) {
-			portletURL.setParameter("listable", String.valueOf(_getListable()));
-		}
-
-		if (isMultipleSelection()) {
-			portletURL.setParameter(
-				"multipleSelection", Boolean.TRUE.toString());
-		}
-
-		if (isShowAddButton()) {
-			portletURL.setParameter("showAddButton", Boolean.TRUE.toString());
-		}
-
-		portletURL.setParameter(
-			"showNonindexable", String.valueOf(_isShowNonindexable()));
-		portletURL.setParameter(
-			"showScheduled", String.valueOf(_isShowScheduled()));
-		portletURL.setParameter("eventName", getEventName());
-
-		return portletURL;
+				return null;
+			}
+		).setParameter(
+			"showNonindexable", _isShowNonindexable()
+		).setParameter(
+			"showScheduled", _isShowScheduled()
+		).setParameter(
+			"subtypeSelectionId", getSubtypeSelectionId()
+		).setParameter(
+			"typeSelection", getTypeSelection()
+		).buildPortletURL();
 	}
 
 	public long getRefererAssetEntryId() {
@@ -358,24 +383,6 @@ public class AssetBrowserDisplayContext {
 			_httpServletRequest, "typeSelection");
 
 		return _typeSelection;
-	}
-
-	public boolean isLegacySingleSelection() {
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
-
-		if (Objects.equals(
-				AssetBrowserPortletKeys.ASSET_BROWSER,
-				portletDisplay.getPortletName()) &&
-			!isMultipleSelection()) {
-
-			return true;
-		}
-
-		return false;
 	}
 
 	public boolean isMultipleSelection() {
@@ -451,7 +458,7 @@ public class AssetBrowserDisplayContext {
 	}
 
 	protected String getOrderByCol() {
-		if (_orderByCol != null) {
+		if (Validator.isNotNull(_orderByCol)) {
 			return _orderByCol;
 		}
 
@@ -462,27 +469,15 @@ public class AssetBrowserDisplayContext {
 			return _orderByCol;
 		}
 
-		String orderByCol = ParamUtil.getString(
-			_httpServletRequest, "orderByCol");
-
-		if (Validator.isNotNull(orderByCol)) {
-			_portalPreferences.setValue(
-				AssetBrowserPortletKeys.ASSET_BROWSER, "order-by-col",
-				orderByCol);
-		}
-		else {
-			orderByCol = _portalPreferences.getValue(
-				AssetBrowserPortletKeys.ASSET_BROWSER, "order-by-col",
-				"modified-date");
-		}
-
-		_orderByCol = orderByCol;
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			_httpServletRequest, AssetBrowserPortletKeys.ASSET_BROWSER,
+			"modified-date");
 
 		return _orderByCol;
 	}
 
 	protected String getOrderByType() {
-		if (_orderByType != null) {
+		if (Validator.isNotNull(_orderByType)) {
 			return _orderByType;
 		}
 
@@ -490,20 +485,8 @@ public class AssetBrowserDisplayContext {
 			return "desc";
 		}
 
-		String orderByType = ParamUtil.getString(
-			_httpServletRequest, "orderByType");
-
-		if (Validator.isNotNull(orderByType)) {
-			_portalPreferences.setValue(
-				AssetBrowserPortletKeys.ASSET_BROWSER, "order-by-type",
-				orderByType);
-		}
-		else {
-			orderByType = _portalPreferences.getValue(
-				AssetBrowserPortletKeys.ASSET_BROWSER, "order-by-type", "asc");
-		}
-
-		_orderByType = orderByType;
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			_httpServletRequest, AssetBrowserPortletKeys.ASSET_BROWSER, "asc");
 
 		return _orderByType;
 	}
@@ -600,16 +583,19 @@ public class AssetBrowserDisplayContext {
 		breadcrumbEntry.setTitle(
 			LanguageUtil.get(_httpServletRequest, "sites-and-libraries"));
 
-		PortletURL portletURL = PortletURLUtil.clone(
-			_portletURL, PortalUtil.getLiferayPortletResponse(_renderResponse));
-
-		portletURL.setParameter("groupType", "site");
-		portletURL.setParameter("showGroupSelector", Boolean.TRUE.toString());
-		portletURL.setParameter(
-			"scopeGroupType",
-			ParamUtil.getString(_httpServletRequest, "scopeGroupType"));
-
-		breadcrumbEntry.setURL(portletURL.toString());
+		breadcrumbEntry.setURL(
+			PortletURLBuilder.create(
+				PortletURLUtil.clone(
+					_portletURL,
+					PortalUtil.getLiferayPortletResponse(_renderResponse))
+			).setParameter(
+				"groupType", "site"
+			).setParameter(
+				"scopeGroupType",
+				ParamUtil.getString(_httpServletRequest, "scopeGroupType")
+			).setParameter(
+				"showGroupSelector", true
+			).buildString());
 
 		return breadcrumbEntry;
 	}

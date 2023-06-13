@@ -139,15 +139,19 @@ else {
 
 						<%
 						Group group = organization.getGroup();
-
-						Map<String, Object> data = HashMapBuilder.<String, Object>put(
-							"groupid", group.getGroupId()
-						).put(
-							"organizationid", organization.getOrganizationId()
-						).build();
 						%>
 
-						<aui:button cssClass="organization-selector-button" data="<%= data %>" value="choose" />
+						<aui:button
+							cssClass="organization-selector-button"
+							data='<%=
+								HashMapBuilder.<String, Object>put(
+									"groupid", group.getGroupId()
+								).put(
+									"organizationid", organization.getOrganizationId()
+								).build()
+							%>'
+							value="choose"
+						/>
 					</liferay-ui:search-container-column-text>
 				</liferay-ui:search-container-row>
 
@@ -156,10 +160,12 @@ else {
 				/>
 			</liferay-ui:search-container>
 
-			<aui:script require="metal-dom/src/dom as dom">
+			<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
 				var form = document.<portlet:namespace />selectOrganizationRoleFm;
 
-				dom.delegate(form, 'click', '.organization-selector-button', function (event) {
+				var delegate = delegateModule.default;
+
+				delegate(form, 'click', '.organization-selector-button', (event) => {
 					Liferay.Util.postForm(form, {
 						data: {
 							organizationId: event.delegateTarget.dataset.organizationid,

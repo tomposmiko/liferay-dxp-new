@@ -229,6 +229,9 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 			join(10000);
 		}
 		catch (InterruptedException interruptedException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(interruptedException, interruptedException);
+			}
 		}
 
 		_fileInstallers.close();
@@ -245,6 +248,10 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 				Thread.sleep(_poll);
 			}
 			catch (InterruptedException interruptedException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(interruptedException, interruptedException);
+				}
+
 				return;
 			}
 
@@ -271,6 +278,10 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 				}
 			}
 			catch (InterruptedException interruptedException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(interruptedException, interruptedException);
+				}
+
 				interrupt();
 
 				return;
@@ -280,6 +291,11 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 					_bundleContext.getBundle();
 				}
 				catch (IllegalStateException illegalStateException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							illegalStateException, illegalStateException);
+					}
+
 					return;
 				}
 
@@ -587,6 +603,10 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 				uri = uri.normalize();
 			}
 			catch (URISyntaxException uriSyntaxException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(uriSyntaxException, uriSyntaxException);
+				}
+
 				File file = new File(location);
 
 				uri = file.toURI();
@@ -712,7 +732,6 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 			}
 
 			_installationFailures.remove(file);
-
 			_setArtifact(file, artifact);
 		}
 		catch (Exception exception) {
@@ -1248,15 +1267,11 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 
 				if (bundle == null) {
 					if (_log.isWarnEnabled()) {
-						StringBundler sb = new StringBundler(5);
-
-						sb.append("Unable to uninstall bundle: ");
-						sb.append(file);
-						sb.append(" with id: ");
-						sb.append(bundleId);
-						sb.append(". The bundle has already been uninstalled");
-
-						_log.warn(sb.toString());
+						_log.warn(
+							StringBundler.concat(
+								"Unable to uninstall bundle: ", file,
+								" with id: ", bundleId,
+								". The bundle has already been uninstalled"));
 					}
 
 					return null;
@@ -1329,15 +1344,10 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 
 			if (bundle == null) {
 				if (_log.isWarnEnabled()) {
-					StringBundler sb = new StringBundler(5);
-
-					sb.append("Unable to update bundle: ");
-					sb.append(file);
-					sb.append(" with ID ");
-					sb.append(bundleId);
-					sb.append(". The bundle has been uninstalled");
-
-					_log.warn(sb.toString());
+					_log.warn(
+						StringBundler.concat(
+							"Unable to update bundle: ", file, " with ID ",
+							bundleId, ". The bundle has been uninstalled"));
 				}
 
 				return null;
@@ -1392,8 +1402,7 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 	private final Map<File, Artifact> _currentManagedArtifacts =
 		new HashMap<>();
 	private final Set<Bundle> _delayedStart = new HashSet<>();
-	private final ServiceTrackerList<FileInstaller, FileInstaller>
-		_fileInstallers;
+	private final ServiceTrackerList<FileInstaller> _fileInstallers;
 	private final String _filter;
 	private int _frameworkStartLevel;
 	private final Map<File, Artifact> _installationFailures = new HashMap<>();

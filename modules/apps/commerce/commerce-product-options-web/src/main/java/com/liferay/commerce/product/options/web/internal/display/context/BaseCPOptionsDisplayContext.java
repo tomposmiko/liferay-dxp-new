@@ -14,8 +14,8 @@
 
 package com.liferay.commerce.product.options.web.internal.display.context;
 
-import com.liferay.commerce.product.display.context.util.CPRequestHelper;
-import com.liferay.commerce.product.options.web.internal.portlet.action.ActionHelper;
+import com.liferay.commerce.product.display.context.helper.CPRequestHelper;
+import com.liferay.commerce.product.options.web.internal.portlet.action.helper.ActionHelper;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -24,6 +24,8 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portal.kernel.portlet.SearchOrderByUtil;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -40,11 +42,13 @@ public abstract class BaseCPOptionsDisplayContext<T> {
 
 	public BaseCPOptionsDisplayContext(
 		ActionHelper actionHelper, HttpServletRequest httpServletRequest,
-		String portalPreferenceNamespace) {
+		String portalPreferenceNamespace,
+		PortletResourcePermission portletResourcePermission) {
 
 		this.actionHelper = actionHelper;
 		this.httpServletRequest = httpServletRequest;
 		_portalPreferenceNamespace = portalPreferenceNamespace;
+		_portletResourcePermission = portletResourcePermission;
 
 		portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
 			this.httpServletRequest);
@@ -68,50 +72,24 @@ public abstract class BaseCPOptionsDisplayContext<T> {
 	}
 
 	public String getOrderByCol() {
-		if (_orderByCol != null) {
+		if (Validator.isNotNull(_orderByCol)) {
 			return _orderByCol;
 		}
 
-		_orderByCol = ParamUtil.getString(httpServletRequest, "orderByCol");
-
-		if (Validator.isNull(_orderByCol)) {
-			_orderByCol = portalPreferences.getValue(
-				_portalPreferenceNamespace, "order-by-col", _defaultOrderByCol);
-		}
-		else {
-			boolean saveOrderBy = ParamUtil.getBoolean(
-				httpServletRequest, "saveOrderBy");
-
-			if (saveOrderBy) {
-				portalPreferences.setValue(
-					_portalPreferenceNamespace, "order-by-col", _orderByCol);
-			}
-		}
+		_orderByCol = SearchOrderByUtil.getOrderByCol(
+			httpServletRequest, _portalPreferenceNamespace, _defaultOrderByCol);
 
 		return _orderByCol;
 	}
 
 	public String getOrderByType() {
-		if (_orderByType != null) {
+		if (Validator.isNotNull(_orderByType)) {
 			return _orderByType;
 		}
 
-		_orderByType = ParamUtil.getString(httpServletRequest, "orderByType");
-
-		if (Validator.isNull(_orderByType)) {
-			_orderByType = portalPreferences.getValue(
-				_portalPreferenceNamespace, "order-by-type",
-				_defaultOrderByType);
-		}
-		else {
-			boolean saveOrderBy = ParamUtil.getBoolean(
-				httpServletRequest, "saveOrderBy");
-
-			if (saveOrderBy) {
-				portalPreferences.setValue(
-					_portalPreferenceNamespace, "order-by-type", _orderByType);
-			}
-		}
+		_orderByType = SearchOrderByUtil.getOrderByType(
+			httpServletRequest, _portalPreferenceNamespace,
+			_defaultOrderByType);
 
 		return _orderByType;
 	}
@@ -168,6 +146,15 @@ public abstract class BaseCPOptionsDisplayContext<T> {
 
 	public abstract SearchContainer<T> getSearchContainer()
 		throws PortalException;
+
+	public boolean hasPermission(String actionId) throws PortalException {
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		return _portletResourcePermission.contains(
+			themeDisplay.getPermissionChecker(), null, actionId);
+	}
 
 	public boolean isShowInfoPanel() {
 		return true;
@@ -244,6 +231,7 @@ public abstract class BaseCPOptionsDisplayContext<T> {
 	private String _orderByCol;
 	private String _orderByType;
 	private final String _portalPreferenceNamespace;
+	private final PortletResourcePermission _portletResourcePermission;
 	private RowChecker _rowChecker;
 
 }

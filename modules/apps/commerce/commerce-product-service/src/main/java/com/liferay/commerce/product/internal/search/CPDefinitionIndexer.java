@@ -209,50 +209,53 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 			long commerceChannelId = GetterUtil.getLong(
 				attributes.get("commerceChannelGroupId"));
 
-			BooleanFilter channelBooleanFilter = new BooleanFilter();
+			BooleanFilter commerceChannelBooleanFilter = new BooleanFilter();
 
-			BooleanFilter channelFilterEnableBooleanFilter =
+			BooleanFilter commerceChannelFilterEnableBooleanFilter =
 				new BooleanFilter();
 
-			channelFilterEnableBooleanFilter.addTerm(
+			commerceChannelFilterEnableBooleanFilter.addTerm(
 				CPField.CHANNEL_FILTER_ENABLED, Boolean.TRUE.toString(),
 				BooleanClauseOccur.MUST);
 
 			if (commerceChannelId > 0) {
-				channelFilterEnableBooleanFilter.addTerm(
-					CPField.CHANNEL_GROUP_IDS,
+				commerceChannelFilterEnableBooleanFilter.addTerm(
+					CPField.COMMERCE_CHANNEL_GROUP_IDS,
 					String.valueOf(commerceChannelId), BooleanClauseOccur.MUST);
 			}
 			else {
-				channelFilterEnableBooleanFilter.addTerm(
-					CPField.CHANNEL_GROUP_IDS, "-1", BooleanClauseOccur.MUST);
+				commerceChannelFilterEnableBooleanFilter.addTerm(
+					CPField.COMMERCE_CHANNEL_GROUP_IDS, "-1",
+					BooleanClauseOccur.MUST);
 			}
 
-			channelBooleanFilter.add(
-				channelFilterEnableBooleanFilter, BooleanClauseOccur.SHOULD);
-			channelBooleanFilter.addTerm(
+			commerceChannelBooleanFilter.add(
+				commerceChannelFilterEnableBooleanFilter,
+				BooleanClauseOccur.SHOULD);
+			commerceChannelBooleanFilter.addTerm(
 				CPField.CHANNEL_FILTER_ENABLED, Boolean.FALSE.toString(),
 				BooleanClauseOccur.SHOULD);
 
 			contextBooleanFilter.add(
-				channelBooleanFilter, BooleanClauseOccur.MUST);
+				commerceChannelBooleanFilter, BooleanClauseOccur.MUST);
 
 			long[] commerceAccountGroupIds = GetterUtil.getLongValues(
 				searchContext.getAttribute("commerceAccountGroupIds"), null);
 
-			BooleanFilter accountGroupsBooleanFilter = new BooleanFilter();
-
-			BooleanFilter accountGroupsFilteEnableBooleanFilter =
+			BooleanFilter commerceAccountGroupsBooleanFilter =
 				new BooleanFilter();
 
-			accountGroupsFilteEnableBooleanFilter.addTerm(
+			BooleanFilter commerceAccountGroupsFilterEnableBooleanFilter =
+				new BooleanFilter();
+
+			commerceAccountGroupsFilterEnableBooleanFilter.addTerm(
 				CPField.ACCOUNT_GROUP_FILTER_ENABLED, Boolean.TRUE.toString(),
 				BooleanClauseOccur.MUST);
 
 			if ((commerceAccountGroupIds != null) &&
 				(commerceAccountGroupIds.length > 0)) {
 
-				BooleanFilter accountGroupIdsBooleanFilter =
+				BooleanFilter commerceAccountGroupIdsBooleanFilter =
 					new BooleanFilter();
 
 				for (long commerceAccountGroupId : commerceAccountGroupIds) {
@@ -260,27 +263,28 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 						"commerceAccountGroupIds",
 						String.valueOf(commerceAccountGroupId));
 
-					accountGroupIdsBooleanFilter.add(
+					commerceAccountGroupIdsBooleanFilter.add(
 						termFilter, BooleanClauseOccur.SHOULD);
 				}
 
-				accountGroupsFilteEnableBooleanFilter.add(
-					accountGroupIdsBooleanFilter, BooleanClauseOccur.MUST);
+				commerceAccountGroupsFilterEnableBooleanFilter.add(
+					commerceAccountGroupIdsBooleanFilter,
+					BooleanClauseOccur.MUST);
 			}
 			else {
-				accountGroupsFilteEnableBooleanFilter.addTerm(
+				commerceAccountGroupsFilterEnableBooleanFilter.addTerm(
 					"commerceAccountGroupIds", "-1", BooleanClauseOccur.MUST);
 			}
 
-			accountGroupsBooleanFilter.add(
-				accountGroupsFilteEnableBooleanFilter,
+			commerceAccountGroupsBooleanFilter.add(
+				commerceAccountGroupsFilterEnableBooleanFilter,
 				BooleanClauseOccur.SHOULD);
-			accountGroupsBooleanFilter.addTerm(
+			commerceAccountGroupsBooleanFilter.addTerm(
 				CPField.ACCOUNT_GROUP_FILTER_ENABLED, Boolean.FALSE.toString(),
 				BooleanClauseOccur.SHOULD);
 
 			contextBooleanFilter.add(
-				accountGroupsBooleanFilter, BooleanClauseOccur.MUST);
+				commerceAccountGroupsBooleanFilter, BooleanClauseOccur.MUST);
 		}
 		else {
 			long[] commerceCatalogIds = _getUserCommerceCatalogIds(
@@ -442,7 +446,7 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 			CPField.SHORT_DESCRIPTION,
 			cpDefinition.getShortDescription(cpDefinitionDefaultLanguageId));
 
-		List<Long> channelGroupIds = new ArrayList<>();
+		List<Long> commerceChannelGroupIds = new ArrayList<>();
 
 		for (CommerceChannelRel commerceChannelRel :
 				_commerceChannelRelLocalService.getCommerceChannelRels(
@@ -453,11 +457,12 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 			CommerceChannel commerceChannel =
 				commerceChannelRel.getCommerceChannel();
 
-			channelGroupIds.add(commerceChannel.getGroupId());
+			commerceChannelGroupIds.add(commerceChannel.getGroupId());
 		}
 
 		document.addNumber(
-			CPField.CHANNEL_GROUP_IDS, ArrayUtil.toLongArray(channelGroupIds));
+			CPField.COMMERCE_CHANNEL_GROUP_IDS,
+			ArrayUtil.toLongArray(commerceChannelGroupIds));
 
 		List<CommerceAccountGroupRel> commerceAccountGroupRels =
 			_commerceAccountGroupRelService.getCommerceAccountGroupRels(
@@ -720,7 +725,7 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 		long cpAttachmentFileEntryId = 0;
 
 		CPAttachmentFileEntry cpAttachmentFileEntry =
-			_cpDefinitionLocalService.getDefaultImage(
+			_cpDefinitionLocalService.getDefaultImageCPAttachmentFileEntry(
 				cpDefinition.getCPDefinitionId());
 
 		if (cpAttachmentFileEntry != null) {
@@ -735,7 +740,7 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 		if (cpAttachmentFileEntryId == 0) {
 			document.addKeyword(
 				CPField.DEFAULT_IMAGE_FILE_URL,
-				_commerceMediaResolver.getDefaultUrl(
+				_commerceMediaResolver.getDefaultURL(
 					cpDefinition.getGroupId()));
 		}
 		else {
@@ -797,10 +802,6 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 						getInstanceBaseCommercePriceEntry(
 							cpInstance.getCPInstanceUuid(),
 							CommercePriceListConstants.TYPE_PRICE_LIST);
-
-				if (commercePriceEntry == null) {
-					continue;
-				}
 
 				BigDecimal price = commercePriceEntry.getPrice();
 
@@ -878,7 +879,7 @@ public class CPDefinitionIndexer extends BaseIndexer<CPDefinition> {
 	}
 
 	protected void reindexCPDefinitions(long companyId) throws PortalException {
-		final IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_cpDefinitionLocalService.getIndexableActionableDynamicQuery();
 
 		indexableActionableDynamicQuery.setCompanyId(companyId);

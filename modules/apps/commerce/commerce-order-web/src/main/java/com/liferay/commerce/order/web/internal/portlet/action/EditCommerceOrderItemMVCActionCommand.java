@@ -80,7 +80,7 @@ public class EditCommerceOrderItemMVCActionCommand
 
 		for (long cpInstanceId : cpInstanceIds) {
 			_commerceOrderItemService.addCommerceOrderItem(
-				commerceOrderId, cpInstanceId, 1, 0, null, commerceContext,
+				commerceOrderId, cpInstanceId, null, 1, 0, commerceContext,
 				serviceContext);
 		}
 	}
@@ -173,33 +173,32 @@ public class EditCommerceOrderItemMVCActionCommand
 
 		long commerceOrderItemId = ParamUtil.getLong(
 			actionRequest, "commerceOrderItemId");
-		int quantity = ParamUtil.getInteger(actionRequest, "quantity");
 
 		CommerceOrderItem commerceOrderItem =
 			_commerceOrderItemService.getCommerceOrderItem(commerceOrderItemId);
 
 		CommerceOrder commerceOrder = commerceOrderItem.getCommerceOrder();
 
-		if (commerceOrder.isOpen()) {
-			CommerceContext commerceContext =
-				(CommerceContext)actionRequest.getAttribute(
-					CommerceWebKeys.COMMERCE_CONTEXT);
+		long cpMeasurementUnitId = ParamUtil.getLong(
+			actionRequest, "cpMeasurementUnitId");
+		BigDecimal decimalQuantity = (BigDecimal)ParamUtil.getNumber(
+			actionRequest, "decimalQuantity");
 
-			ServiceContext serviceContext = ServiceContextFactory.getInstance(
-				CommerceOrderItem.class.getName(), actionRequest);
+		commerceOrderItem = _commerceOrderItemService.updateCommerceOrderItem(
+			commerceOrderItemId, cpMeasurementUnitId,
+			decimalQuantity.intValue(),
+			(CommerceContext)actionRequest.getAttribute(
+				CommerceWebKeys.COMMERCE_CONTEXT),
+			ServiceContextFactory.getInstance(
+				CommerceOrderItem.class.getName(), actionRequest));
 
-			commerceOrderItem =
-				_commerceOrderItemService.updateCommerceOrderItem(
-					commerceOrderItemId, quantity, commerceContext,
-					serviceContext);
-		}
-		else {
+		if (!commerceOrder.isOpen()) {
 			BigDecimal price = (BigDecimal)ParamUtil.getNumber(
 				actionRequest, "price");
 
 			commerceOrderItem =
 				_commerceOrderItemService.updateCommerceOrderItemUnitPrice(
-					commerceOrderItemId, price, quantity);
+					commerceOrderItemId, decimalQuantity, price);
 
 			BigDecimal discountAmount = (BigDecimal)ParamUtil.getNumber(
 				actionRequest, "discountAmount");
@@ -209,14 +208,17 @@ public class EditCommerceOrderItemMVCActionCommand
 
 			commerceOrderItem =
 				_commerceOrderItemService.updateCommerceOrderItemPrices(
-					commerceOrderItemId, commerceOrderItem.getUnitPrice(),
-					commerceOrderItem.getPromoPrice(), discountAmount,
-					finalPrice, commerceOrderItem.getDiscountPercentageLevel1(),
+					commerceOrderItemId, discountAmount,
+					commerceOrderItem.getDiscountPercentageLevel1(),
 					commerceOrderItem.getDiscountPercentageLevel2(),
 					commerceOrderItem.getDiscountPercentageLevel3(),
-					commerceOrderItem.getDiscountPercentageLevel4());
+					commerceOrderItem.getDiscountPercentageLevel4(), finalPrice,
+					commerceOrderItem.getPromoPrice(),
+					commerceOrderItem.getUnitPrice());
 		}
 
+		String deliveryGroup = ParamUtil.getString(
+			actionRequest, "deliveryGroup");
 		int requestedDeliveryDateMonth = ParamUtil.getInteger(
 			actionRequest, "requestedDeliveryDateMonth");
 		int requestedDeliveryDateDay = ParamUtil.getInteger(
@@ -224,12 +226,9 @@ public class EditCommerceOrderItemMVCActionCommand
 		int requestedDeliveryDateYear = ParamUtil.getInteger(
 			actionRequest, "requestedDeliveryDateYear");
 
-		String deliveryGroup = ParamUtil.getString(
-			actionRequest, "deliveryGroup");
-
 		_commerceOrderItemService.updateCommerceOrderItemInfo(
-			commerceOrderItem.getCommerceOrderItemId(), deliveryGroup,
-			commerceOrderItem.getShippingAddressId(),
+			commerceOrderItem.getCommerceOrderItemId(),
+			commerceOrderItem.getShippingAddressId(), deliveryGroup,
 			commerceOrderItem.getPrintedNote(), requestedDeliveryDateMonth,
 			requestedDeliveryDateDay, requestedDeliveryDateYear);
 	}

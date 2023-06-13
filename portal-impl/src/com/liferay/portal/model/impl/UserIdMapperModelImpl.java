@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -237,56 +238,78 @@ public class UserIdMapperModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<UserIdMapper, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, UserIdMapper>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<UserIdMapper, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<UserIdMapper, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			UserIdMapper.class.getClassLoader(), UserIdMapper.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", UserIdMapper::getMvccVersion);
-		attributeGetterFunctions.put(
-			"userIdMapperId", UserIdMapper::getUserIdMapperId);
-		attributeGetterFunctions.put("companyId", UserIdMapper::getCompanyId);
-		attributeGetterFunctions.put("userId", UserIdMapper::getUserId);
-		attributeGetterFunctions.put("type", UserIdMapper::getType);
-		attributeGetterFunctions.put(
-			"description", UserIdMapper::getDescription);
-		attributeGetterFunctions.put(
-			"externalUserId", UserIdMapper::getExternalUserId);
+		try {
+			Constructor<UserIdMapper> constructor =
+				(Constructor<UserIdMapper>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<UserIdMapper, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<UserIdMapper, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<UserIdMapper, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<UserIdMapper, Object>>();
 		Map<String, BiConsumer<UserIdMapper, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<UserIdMapper, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", UserIdMapper::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<UserIdMapper, Long>)UserIdMapper::setMvccVersion);
+		attributeGetterFunctions.put(
+			"userIdMapperId", UserIdMapper::getUserIdMapperId);
 		attributeSetterBiConsumers.put(
 			"userIdMapperId",
 			(BiConsumer<UserIdMapper, Long>)UserIdMapper::setUserIdMapperId);
+		attributeGetterFunctions.put("companyId", UserIdMapper::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<UserIdMapper, Long>)UserIdMapper::setCompanyId);
+		attributeGetterFunctions.put("userId", UserIdMapper::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<UserIdMapper, Long>)UserIdMapper::setUserId);
+		attributeGetterFunctions.put("type", UserIdMapper::getType);
 		attributeSetterBiConsumers.put(
 			"type", (BiConsumer<UserIdMapper, String>)UserIdMapper::setType);
+		attributeGetterFunctions.put(
+			"description", UserIdMapper::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<UserIdMapper, String>)UserIdMapper::setDescription);
+		attributeGetterFunctions.put(
+			"externalUserId", UserIdMapper::getExternalUserId);
 		attributeSetterBiConsumers.put(
 			"externalUserId",
 			(BiConsumer<UserIdMapper, String>)UserIdMapper::setExternalUserId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -517,6 +540,26 @@ public class UserIdMapperModelImpl
 	}
 
 	@Override
+	public UserIdMapper cloneWithOriginalValues() {
+		UserIdMapperImpl userIdMapperImpl = new UserIdMapperImpl();
+
+		userIdMapperImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		userIdMapperImpl.setUserIdMapperId(
+			this.<Long>getColumnOriginalValue("userIdMapperId"));
+		userIdMapperImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		userIdMapperImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		userIdMapperImpl.setType(this.<String>getColumnOriginalValue("type_"));
+		userIdMapperImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		userIdMapperImpl.setExternalUserId(
+			this.<String>getColumnOriginalValue("externalUserId"));
+
+		return userIdMapperImpl;
+	}
+
+	@Override
 	public int compareTo(UserIdMapper userIdMapper) {
 		long primaryKey = userIdMapper.getPrimaryKey();
 
@@ -706,9 +749,7 @@ public class UserIdMapperModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, UserIdMapper>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					UserIdMapper.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

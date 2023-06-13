@@ -24,7 +24,6 @@ import com.liferay.document.library.sync.service.persistence.DLSyncEventUtil;
 import com.liferay.document.library.sync.service.persistence.impl.constants.DLSyncPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -35,11 +34,10 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -52,16 +50,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -77,7 +71,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  * @generated
  */
-@Component(service = DLSyncEventPersistence.class)
+@Component(service = {DLSyncEventPersistence.class, BasePersistence.class})
 public class DLSyncEventPersistenceImpl
 	extends BasePersistenceImpl<DLSyncEvent> implements DLSyncEventPersistence {
 
@@ -98,8 +92,8 @@ public class DLSyncEventPersistenceImpl
 	private FinderPath _finderPathWithPaginationFindAll;
 	private FinderPath _finderPathWithoutPaginationFindAll;
 	private FinderPath _finderPathCountAll;
-	private FinderPath _finderPathWithPaginationFindByModifiedTime;
-	private FinderPath _finderPathWithPaginationCountByModifiedTime;
+	private FinderPath _finderPathWithPaginationFindByGtModifiedTime;
+	private FinderPath _finderPathWithPaginationCountByGtModifiedTime;
 
 	/**
 	 * Returns all the dl sync events where modifiedTime &gt; &#63;.
@@ -108,8 +102,8 @@ public class DLSyncEventPersistenceImpl
 	 * @return the matching dl sync events
 	 */
 	@Override
-	public List<DLSyncEvent> findByModifiedTime(long modifiedTime) {
-		return findByModifiedTime(
+	public List<DLSyncEvent> findByGtModifiedTime(long modifiedTime) {
+		return findByGtModifiedTime(
 			modifiedTime, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
@@ -126,10 +120,10 @@ public class DLSyncEventPersistenceImpl
 	 * @return the range of matching dl sync events
 	 */
 	@Override
-	public List<DLSyncEvent> findByModifiedTime(
+	public List<DLSyncEvent> findByGtModifiedTime(
 		long modifiedTime, int start, int end) {
 
-		return findByModifiedTime(modifiedTime, start, end, null);
+		return findByGtModifiedTime(modifiedTime, start, end, null);
 	}
 
 	/**
@@ -146,11 +140,11 @@ public class DLSyncEventPersistenceImpl
 	 * @return the ordered range of matching dl sync events
 	 */
 	@Override
-	public List<DLSyncEvent> findByModifiedTime(
+	public List<DLSyncEvent> findByGtModifiedTime(
 		long modifiedTime, int start, int end,
 		OrderByComparator<DLSyncEvent> orderByComparator) {
 
-		return findByModifiedTime(
+		return findByGtModifiedTime(
 			modifiedTime, start, end, orderByComparator, true);
 	}
 
@@ -169,7 +163,7 @@ public class DLSyncEventPersistenceImpl
 	 * @return the ordered range of matching dl sync events
 	 */
 	@Override
-	public List<DLSyncEvent> findByModifiedTime(
+	public List<DLSyncEvent> findByGtModifiedTime(
 		long modifiedTime, int start, int end,
 		OrderByComparator<DLSyncEvent> orderByComparator,
 		boolean useFinderCache) {
@@ -177,14 +171,14 @@ public class DLSyncEventPersistenceImpl
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
-		finderPath = _finderPathWithPaginationFindByModifiedTime;
+		finderPath = _finderPathWithPaginationFindByGtModifiedTime;
 		finderArgs = new Object[] {modifiedTime, start, end, orderByComparator};
 
 		List<DLSyncEvent> list = null;
 
 		if (useFinderCache) {
 			list = (List<DLSyncEvent>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DLSyncEvent dlSyncEvent : list) {
@@ -210,7 +204,7 @@ public class DLSyncEventPersistenceImpl
 
 			sb.append(_SQL_SELECT_DLSYNCEVENT_WHERE);
 
-			sb.append(_FINDER_COLUMN_MODIFIEDTIME_MODIFIEDTIME_2);
+			sb.append(_FINDER_COLUMN_GTMODIFIEDTIME_MODIFIEDTIME_2);
 
 			if (orderByComparator != null) {
 				appendOrderByComparator(
@@ -262,11 +256,11 @@ public class DLSyncEventPersistenceImpl
 	 * @throws NoSuchEventException if a matching dl sync event could not be found
 	 */
 	@Override
-	public DLSyncEvent findByModifiedTime_First(
+	public DLSyncEvent findByGtModifiedTime_First(
 			long modifiedTime, OrderByComparator<DLSyncEvent> orderByComparator)
 		throws NoSuchEventException {
 
-		DLSyncEvent dlSyncEvent = fetchByModifiedTime_First(
+		DLSyncEvent dlSyncEvent = fetchByGtModifiedTime_First(
 			modifiedTime, orderByComparator);
 
 		if (dlSyncEvent != null) {
@@ -293,10 +287,10 @@ public class DLSyncEventPersistenceImpl
 	 * @return the first matching dl sync event, or <code>null</code> if a matching dl sync event could not be found
 	 */
 	@Override
-	public DLSyncEvent fetchByModifiedTime_First(
+	public DLSyncEvent fetchByGtModifiedTime_First(
 		long modifiedTime, OrderByComparator<DLSyncEvent> orderByComparator) {
 
-		List<DLSyncEvent> list = findByModifiedTime(
+		List<DLSyncEvent> list = findByGtModifiedTime(
 			modifiedTime, 0, 1, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -315,11 +309,11 @@ public class DLSyncEventPersistenceImpl
 	 * @throws NoSuchEventException if a matching dl sync event could not be found
 	 */
 	@Override
-	public DLSyncEvent findByModifiedTime_Last(
+	public DLSyncEvent findByGtModifiedTime_Last(
 			long modifiedTime, OrderByComparator<DLSyncEvent> orderByComparator)
 		throws NoSuchEventException {
 
-		DLSyncEvent dlSyncEvent = fetchByModifiedTime_Last(
+		DLSyncEvent dlSyncEvent = fetchByGtModifiedTime_Last(
 			modifiedTime, orderByComparator);
 
 		if (dlSyncEvent != null) {
@@ -346,16 +340,16 @@ public class DLSyncEventPersistenceImpl
 	 * @return the last matching dl sync event, or <code>null</code> if a matching dl sync event could not be found
 	 */
 	@Override
-	public DLSyncEvent fetchByModifiedTime_Last(
+	public DLSyncEvent fetchByGtModifiedTime_Last(
 		long modifiedTime, OrderByComparator<DLSyncEvent> orderByComparator) {
 
-		int count = countByModifiedTime(modifiedTime);
+		int count = countByGtModifiedTime(modifiedTime);
 
 		if (count == 0) {
 			return null;
 		}
 
-		List<DLSyncEvent> list = findByModifiedTime(
+		List<DLSyncEvent> list = findByGtModifiedTime(
 			modifiedTime, count - 1, count, orderByComparator);
 
 		if (!list.isEmpty()) {
@@ -375,7 +369,7 @@ public class DLSyncEventPersistenceImpl
 	 * @throws NoSuchEventException if a dl sync event with the primary key could not be found
 	 */
 	@Override
-	public DLSyncEvent[] findByModifiedTime_PrevAndNext(
+	public DLSyncEvent[] findByGtModifiedTime_PrevAndNext(
 			long syncEventId, long modifiedTime,
 			OrderByComparator<DLSyncEvent> orderByComparator)
 		throws NoSuchEventException {
@@ -389,12 +383,12 @@ public class DLSyncEventPersistenceImpl
 
 			DLSyncEvent[] array = new DLSyncEventImpl[3];
 
-			array[0] = getByModifiedTime_PrevAndNext(
+			array[0] = getByGtModifiedTime_PrevAndNext(
 				session, dlSyncEvent, modifiedTime, orderByComparator, true);
 
 			array[1] = dlSyncEvent;
 
-			array[2] = getByModifiedTime_PrevAndNext(
+			array[2] = getByGtModifiedTime_PrevAndNext(
 				session, dlSyncEvent, modifiedTime, orderByComparator, false);
 
 			return array;
@@ -407,7 +401,7 @@ public class DLSyncEventPersistenceImpl
 		}
 	}
 
-	protected DLSyncEvent getByModifiedTime_PrevAndNext(
+	protected DLSyncEvent getByGtModifiedTime_PrevAndNext(
 		Session session, DLSyncEvent dlSyncEvent, long modifiedTime,
 		OrderByComparator<DLSyncEvent> orderByComparator, boolean previous) {
 
@@ -424,7 +418,7 @@ public class DLSyncEventPersistenceImpl
 
 		sb.append(_SQL_SELECT_DLSYNCEVENT_WHERE);
 
-		sb.append(_FINDER_COLUMN_MODIFIEDTIME_MODIFIEDTIME_2);
+		sb.append(_FINDER_COLUMN_GTMODIFIEDTIME_MODIFIEDTIME_2);
 
 		if (orderByComparator != null) {
 			String[] orderByConditionFields =
@@ -521,9 +515,9 @@ public class DLSyncEventPersistenceImpl
 	 * @param modifiedTime the modified time
 	 */
 	@Override
-	public void removeByModifiedTime(long modifiedTime) {
+	public void removeByGtModifiedTime(long modifiedTime) {
 		for (DLSyncEvent dlSyncEvent :
-				findByModifiedTime(
+				findByGtModifiedTime(
 					modifiedTime, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
 
 			remove(dlSyncEvent);
@@ -537,19 +531,19 @@ public class DLSyncEventPersistenceImpl
 	 * @return the number of matching dl sync events
 	 */
 	@Override
-	public int countByModifiedTime(long modifiedTime) {
-		FinderPath finderPath = _finderPathWithPaginationCountByModifiedTime;
+	public int countByGtModifiedTime(long modifiedTime) {
+		FinderPath finderPath = _finderPathWithPaginationCountByGtModifiedTime;
 
 		Object[] finderArgs = new Object[] {modifiedTime};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
 
 			sb.append(_SQL_COUNT_DLSYNCEVENT_WHERE);
 
-			sb.append(_FINDER_COLUMN_MODIFIEDTIME_MODIFIEDTIME_2);
+			sb.append(_FINDER_COLUMN_GTMODIFIEDTIME_MODIFIEDTIME_2);
 
 			String sql = sb.toString();
 
@@ -579,7 +573,7 @@ public class DLSyncEventPersistenceImpl
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_MODIFIEDTIME_MODIFIEDTIME_2 =
+	private static final String _FINDER_COLUMN_GTMODIFIEDTIME_MODIFIEDTIME_2 =
 		"dlSyncEvent.modifiedTime > ?";
 
 	private FinderPath _finderPathFetchByTypePK;
@@ -646,7 +640,7 @@ public class DLSyncEventPersistenceImpl
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
-				_finderPathFetchByTypePK, finderArgs, this);
+				_finderPathFetchByTypePK, finderArgs);
 		}
 
 		if (result instanceof DLSyncEvent) {
@@ -734,7 +728,7 @@ public class DLSyncEventPersistenceImpl
 
 		Object[] finderArgs = new Object[] {typePK};
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -841,9 +835,7 @@ public class DLSyncEventPersistenceImpl
 	public void clearCache() {
 		entityCache.clearCache(DLSyncEventImpl.class);
 
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(DLSyncEventImpl.class);
 	}
 
 	/**
@@ -867,9 +859,7 @@ public class DLSyncEventPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		finderCache.clearCache(DLSyncEventImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(DLSyncEventImpl.class, primaryKey);
@@ -881,10 +871,9 @@ public class DLSyncEventPersistenceImpl
 
 		Object[] args = new Object[] {dlSyncEventModelImpl.getTypePK()};
 
+		finderCache.putResult(_finderPathCountByTypePK, args, Long.valueOf(1));
 		finderCache.putResult(
-			_finderPathCountByTypePK, args, Long.valueOf(1), false);
-		finderCache.putResult(
-			_finderPathFetchByTypePK, args, dlSyncEventModelImpl, false);
+			_finderPathFetchByTypePK, args, dlSyncEventModelImpl);
 	}
 
 	/**
@@ -1177,7 +1166,7 @@ public class DLSyncEventPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<DLSyncEvent>)finderCache.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -1247,7 +1236,7 @@ public class DLSyncEventPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -1302,47 +1291,40 @@ public class DLSyncEventPersistenceImpl
 	 * Initializes the dl sync event persistence.
 	 */
 	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-
-		_argumentsResolverServiceRegistration = _bundleContext.registerService(
-			ArgumentsResolver.class, new DLSyncEventModelArgumentsResolver(),
-			MapUtil.singletonDictionary(
-				"model.class.name", DLSyncEvent.class.getName()));
-
+	public void activate() {
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByModifiedTime = _createFinderPath(
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByModifiedTime",
+		_finderPathWithPaginationFindByGtModifiedTime = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGtModifiedTime",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
 				Integer.class.getName(), OrderByComparator.class.getName()
 			},
 			new String[] {"modifiedTime"}, true);
 
-		_finderPathWithPaginationCountByModifiedTime = _createFinderPath(
-			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByModifiedTime",
+		_finderPathWithPaginationCountByGtModifiedTime = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByGtModifiedTime",
 			new String[] {Long.class.getName()}, new String[] {"modifiedTime"},
 			false);
 
-		_finderPathFetchByTypePK = _createFinderPath(
+		_finderPathFetchByTypePK = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByTypePK",
 			new String[] {Long.class.getName()}, new String[] {"typePK"}, true);
 
-		_finderPathCountByTypePK = _createFinderPath(
+		_finderPathCountByTypePK = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByTypePK",
 			new String[] {Long.class.getName()}, new String[] {"typePK"},
 			false);
@@ -1355,14 +1337,6 @@ public class DLSyncEventPersistenceImpl
 		_setDLSyncEventUtilPersistence(null);
 
 		entityCache.removeCache(DLSyncEventImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setDLSyncEventUtilPersistence(
@@ -1407,8 +1381,6 @@ public class DLSyncEventPersistenceImpl
 		super.setSessionFactory(sessionFactory);
 	}
 
-	private BundleContext _bundleContext;
-
 	@Reference
 	protected EntityCache entityCache;
 
@@ -1441,121 +1413,13 @@ public class DLSyncEventPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"type"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			_serviceRegistrations.add(
-				_bundleContext.registerService(
-					FinderPath.class, finderPath,
-					MapUtil.singletonDictionary("cache.name", cacheName)));
-		}
-
-		return finderPath;
+	@Override
+	protected FinderCache getFinderCache() {
+		return finderCache;
 	}
 
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class DLSyncEventModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			DLSyncEventModelImpl dlSyncEventModelImpl =
-				(DLSyncEventModelImpl)baseModel;
-
-			long columnBitmask = dlSyncEventModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(dlSyncEventModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						dlSyncEventModelImpl.getColumnBitmask(columnName);
-				}
-
-				if (finderPath.isBaseModelResult() &&
-					(DLSyncEventPersistenceImpl.
-						FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION ==
-							finderPath.getCacheName())) {
-
-					finderPathColumnBitmask |= _ORDER_BY_COLUMNS_BITMASK;
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(dlSyncEventModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			DLSyncEventModelImpl dlSyncEventModelImpl, String[] columnNames,
-			boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] = dlSyncEventModelImpl.getColumnOriginalValue(
-						columnName);
-				}
-				else {
-					arguments[i] = dlSyncEventModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-		private static final long _ORDER_BY_COLUMNS_BITMASK;
-
-		static {
-			long orderByColumnsBitmask = 0;
-
-			orderByColumnsBitmask |= DLSyncEventModelImpl.getColumnBitmask(
-				"modifiedTime");
-
-			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
-		}
-
-	}
+	@Reference
+	private DLSyncEventModelArgumentsResolver
+		_dlSyncEventModelArgumentsResolver;
 
 }

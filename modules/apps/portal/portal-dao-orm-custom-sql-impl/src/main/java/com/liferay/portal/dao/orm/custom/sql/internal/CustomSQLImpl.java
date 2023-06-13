@@ -181,18 +181,13 @@ public class CustomSQLImpl implements CustomSQL {
 
 		if (queryDefinition.getOwnerUserId() > 0) {
 			if (queryDefinition.isIncludeOwner()) {
-				StringBundler sb = new StringBundler(7);
-
-				sb.append(StringPool.OPEN_PARENTHESIS);
-				sb.append(tableName);
-				sb.append(_OWNER_USER_ID_CONDITION_DEFAULT);
-				sb.append(" AND ");
-				sb.append(tableName);
-				sb.append(_STATUS_CONDITION_INVERSE);
-				sb.append(StringPool.CLOSE_PARENTHESIS);
-
 				sql = StringUtil.replace(
-					sql, _OWNER_USER_ID_KEYWORD, sb.toString());
+					sql, _OWNER_USER_ID_KEYWORD,
+					StringBundler.concat(
+						StringPool.OPEN_PARENTHESIS, tableName,
+						_OWNER_USER_ID_CONDITION_DEFAULT, " AND ", tableName,
+						_STATUS_CONDITION_INVERSE,
+						StringPool.CLOSE_PARENTHESIS));
 
 				sql = StringUtil.replace(
 					sql, _OWNER_USER_ID_AND_OR_CONNECTOR, " OR ");
@@ -521,14 +516,9 @@ public class CustomSQLImpl implements CustomSQL {
 				sql = StringBundler.concat(sql, _GROUP_BY_CLAUSE, groupBy);
 			}
 			else {
-				StringBundler sb = new StringBundler(4);
-
-				sb.append(sql.substring(0, y));
-				sb.append(_GROUP_BY_CLAUSE);
-				sb.append(groupBy);
-				sb.append(sql.substring(y));
-
-				sql = sb.toString();
+				sql = StringBundler.concat(
+					sql.substring(0, y), _GROUP_BY_CLAUSE, groupBy,
+					sql.substring(y));
 			}
 		}
 
@@ -718,7 +708,7 @@ public class CustomSQLImpl implements CustomSQL {
 		String functionIsNull = _portal.getCustomSQLFunctionIsNull();
 		String functionIsNotNull = _portal.getCustomSQLFunctionIsNotNull();
 
-		try (Connection con = DataAccess.getConnection()) {
+		try (Connection connection = DataAccess.getConnection()) {
 			if (Validator.isNotNull(functionIsNull) &&
 				Validator.isNotNull(functionIsNotNull)) {
 
@@ -733,8 +723,8 @@ public class CustomSQLImpl implements CustomSQL {
 							functionIsNotNull);
 				}
 			}
-			else if (con != null) {
-				DatabaseMetaData metaData = con.getMetaData();
+			else if (connection != null) {
+				DatabaseMetaData metaData = connection.getMetaData();
 
 				String dbName = GetterUtil.getString(
 					metaData.getDatabaseProductName());
@@ -835,9 +825,10 @@ public class CustomSQLImpl implements CustomSQL {
 		else if (wildcardMode == WildcardMode.TRAILING) {
 			return keyword.concat(StringPool.PERCENT);
 		}
-
-		throw new IllegalArgumentException(
-			"Invalid wildcard mode " + wildcardMode);
+		else {
+			throw new IllegalArgumentException(
+				"Invalid wildcard mode " + wildcardMode);
+		}
 	}
 
 	protected String transform(String sql) {
@@ -865,6 +856,10 @@ public class CustomSQLImpl implements CustomSQL {
 			}
 		}
 		catch (IOException ioException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(ioException, ioException);
+			}
+
 			return sql;
 		}
 

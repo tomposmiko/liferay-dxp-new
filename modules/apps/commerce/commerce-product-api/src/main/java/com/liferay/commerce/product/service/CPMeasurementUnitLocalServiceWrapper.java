@@ -27,6 +27,10 @@ public class CPMeasurementUnitLocalServiceWrapper
 	implements CPMeasurementUnitLocalService,
 			   ServiceWrapper<CPMeasurementUnitLocalService> {
 
+	public CPMeasurementUnitLocalServiceWrapper() {
+		this(null);
+	}
+
 	public CPMeasurementUnitLocalServiceWrapper(
 		CPMeasurementUnitLocalService cpMeasurementUnitLocalService) {
 
@@ -259,6 +263,15 @@ public class CPMeasurementUnitLocalServiceWrapper
 			CPMeasurementUnitId);
 	}
 
+	@Override
+	public com.liferay.commerce.product.model.CPMeasurementUnit
+			fetchCPMeasurementUnit(long companyId, String key)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _cpMeasurementUnitLocalService.fetchCPMeasurementUnit(
+			companyId, key);
+	}
+
 	/**
 	 * Returns the cp measurement unit matching the UUID and group.
 	 *
@@ -303,6 +316,15 @@ public class CPMeasurementUnitLocalServiceWrapper
 
 		return _cpMeasurementUnitLocalService.getCPMeasurementUnit(
 			CPMeasurementUnitId);
+	}
+
+	@Override
+	public com.liferay.commerce.product.model.CPMeasurementUnit
+			getCPMeasurementUnit(long companyId, String key)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _cpMeasurementUnitLocalService.getCPMeasurementUnit(
+			companyId, key);
 	}
 
 	/**
@@ -373,10 +395,10 @@ public class CPMeasurementUnitLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.commerce.product.model.CPMeasurementUnit>
-		getCPMeasurementUnits(long companyId, String[] keys, int type) {
+		getCPMeasurementUnits(long companyId, String[] keys) {
 
 		return _cpMeasurementUnitLocalService.getCPMeasurementUnits(
-			companyId, keys, type);
+			companyId, keys);
 	}
 
 	/**

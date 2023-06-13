@@ -39,12 +39,15 @@ import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,9 +62,9 @@ public class CommerceCatalogLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public CommerceCatalog addCommerceCatalog(
-			String name, String commerceCurrencyCode,
-			String catalogDefaultLanguageId, boolean system,
-			String externalReferenceCode, ServiceContext serviceContext)
+			String externalReferenceCode, String name,
+			String commerceCurrencyCode, String catalogDefaultLanguageId,
+			boolean system, ServiceContext serviceContext)
 		throws PortalException {
 
 		User user = userLocalService.getUser(serviceContext.getUserId());
@@ -79,6 +82,7 @@ public class CommerceCatalogLocalServiceImpl
 		commerceCatalog.setCompanyId(user.getCompanyId());
 		commerceCatalog.setUserId(user.getUserId());
 		commerceCatalog.setUserName(user.getFullName());
+
 		commerceCatalog.setName(name);
 		commerceCatalog.setCommerceCurrencyCode(commerceCurrencyCode);
 		commerceCatalog.setCatalogDefaultLanguageId(catalogDefaultLanguageId);
@@ -86,7 +90,7 @@ public class CommerceCatalogLocalServiceImpl
 
 		// Group
 
-		groupLocalService.addGroup(
+		_groupLocalService.addGroup(
 			user.getUserId(), GroupConstants.DEFAULT_PARENT_GROUP_ID,
 			CommerceCatalog.class.getName(), commerceCatalogId,
 			GroupConstants.DEFAULT_LIVE_GROUP_ID, getLocalizationMap(name),
@@ -105,21 +109,21 @@ public class CommerceCatalogLocalServiceImpl
 
 	@Override
 	public CommerceCatalog addCommerceCatalog(
-			String name, String commerceCurrencyCode,
-			String catalogDefaultLanguageId, String externalReferenceCode,
+			String externalReferenceCode, String name,
+			String commerceCurrencyCode, String catalogDefaultLanguageId,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		return commerceCatalogLocalService.addCommerceCatalog(
-			name, commerceCurrencyCode, catalogDefaultLanguageId, false,
-			externalReferenceCode, serviceContext);
+			externalReferenceCode, name, commerceCurrencyCode,
+			catalogDefaultLanguageId, false, serviceContext);
 	}
 
 	@Override
 	public CommerceCatalog addDefaultCommerceCatalog(long companyId)
 		throws PortalException {
 
-		Company company = companyLocalService.getCompany(companyId);
+		Company company = _companyLocalService.getCompany(companyId);
 
 		User defaultUser = company.getDefaultUser();
 
@@ -130,9 +134,9 @@ public class CommerceCatalogLocalServiceImpl
 		serviceContext.setUuid(PortalUUIDUtil.generate());
 
 		return commerceCatalogLocalService.addCommerceCatalog(
-			CommerceCatalogConstants.MASTER_COMMERCE_CATALOG,
+			null, CommerceCatalogConstants.MASTER_COMMERCE_CATALOG,
 			CommerceCatalogConstants.MASTER_COMMERCE_DEFAULT_CURRENCY,
-			defaultUser.getLanguageId(), true, null, serviceContext);
+			defaultUser.getLanguageId(), true, serviceContext);
 	}
 
 	@Indexable(type = IndexableType.DELETE)
@@ -152,7 +156,7 @@ public class CommerceCatalogLocalServiceImpl
 
 		// Group
 
-		groupLocalService.deleteGroup(groupId);
+		_groupLocalService.deleteGroup(groupId);
 
 		// Resources
 
@@ -186,7 +190,7 @@ public class CommerceCatalogLocalServiceImpl
 
 	@Override
 	public CommerceCatalog fetchByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
+		String externalReferenceCode, long companyId) {
 
 		if (Validator.isBlank(externalReferenceCode)) {
 			return null;
@@ -198,7 +202,7 @@ public class CommerceCatalogLocalServiceImpl
 
 	@Override
 	public CommerceCatalog fetchCommerceCatalogByGroupId(long groupId) {
-		Group group = groupLocalService.fetchGroup(groupId);
+		Group group = _groupLocalService.fetchGroup(groupId);
 
 		if ((group != null) &&
 			(group.getClassNameId() == classNameLocalService.getClassNameId(
@@ -228,14 +232,14 @@ public class CommerceCatalogLocalServiceImpl
 
 		// Group
 
-		Group group = groupLocalService.fetchGroup(
+		Group group = _groupLocalService.fetchGroup(
 			commerceCatalog.getCompanyId(),
 			classNameLocalService.getClassNameId(
 				CommerceCatalog.class.getName()),
 			commerceCatalog.getCommerceCatalogId());
 
 		if (group != null) {
-			groupLocalService.deleteGroup(group);
+			_groupLocalService.deleteGroup(group);
 		}
 
 		return commerceCatalog;
@@ -251,7 +255,7 @@ public class CommerceCatalogLocalServiceImpl
 		long classNameId = classNameLocalService.getClassNameId(
 			CommerceCatalog.class.getName());
 
-		Group group = groupLocalService.fetchGroup(
+		Group group = _groupLocalService.fetchGroup(
 			commerceCatalog.getCompanyId(), classNameId, commerceCatalogId);
 
 		if (group != null) {
@@ -269,16 +273,14 @@ public class CommerceCatalogLocalServiceImpl
 	}
 
 	@Override
-	public List<CommerceCatalog> searchCommerceCatalogs(long companyId)
-		throws PortalException {
-
-		return searchCommerceCatalogs(
+	public List<CommerceCatalog> search(long companyId) throws PortalException {
+		return search(
 			companyId, StringPool.BLANK, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
 			null);
 	}
 
 	@Override
-	public List<CommerceCatalog> searchCommerceCatalogs(
+	public List<CommerceCatalog> search(
 			long companyId, String keywords, int start, int end, Sort sort)
 		throws PortalException {
 
@@ -287,7 +289,7 @@ public class CommerceCatalogLocalServiceImpl
 
 		searchContext.setKeywords(keywords);
 
-		return searchCommerceCatalogs(searchContext);
+		return search(searchContext);
 	}
 
 	@Override
@@ -322,7 +324,7 @@ public class CommerceCatalogLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public CommerceCatalog updateCommerceCatalogExternalReferenceCode(
-			long commerceCatalogId, String externalReferenceCode)
+			String externalReferenceCode, long commerceCatalogId)
 		throws PortalException {
 
 		CommerceCatalog commerceCatalog =
@@ -389,8 +391,7 @@ public class CommerceCatalogLocalServiceImpl
 		return commerceCatalogs;
 	}
 
-	protected List<CommerceCatalog> searchCommerceCatalogs(
-			SearchContext searchContext)
+	protected List<CommerceCatalog> search(SearchContext searchContext)
 		throws PortalException {
 
 		Indexer<CommerceCatalog> indexer =
@@ -437,5 +438,11 @@ public class CommerceCatalogLocalServiceImpl
 	private static final String[] _SELECTED_FIELD_NAMES = {
 		Field.ENTRY_CLASS_PK, Field.COMPANY_ID
 	};
+
+	@ServiceReference(type = CompanyLocalService.class)
+	private CompanyLocalService _companyLocalService;
+
+	@ServiceReference(type = GroupLocalService.class)
+	private GroupLocalService _groupLocalService;
 
 }

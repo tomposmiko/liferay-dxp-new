@@ -39,10 +39,12 @@ import com.liferay.saml.opensaml.integration.internal.util.OpenSamlUtil;
 import com.liferay.saml.opensaml.integration.internal.util.SamlUtil;
 import com.liferay.saml.persistence.model.SamlIdpSpSession;
 import com.liferay.saml.persistence.model.SamlIdpSsoSession;
+import com.liferay.saml.persistence.model.SamlPeerBinding;
 import com.liferay.saml.persistence.model.SamlSpSession;
 import com.liferay.saml.persistence.service.SamlIdpSpConnectionLocalService;
 import com.liferay.saml.persistence.service.SamlIdpSpSessionLocalService;
 import com.liferay.saml.persistence.service.SamlIdpSsoSessionLocalService;
+import com.liferay.saml.persistence.service.SamlPeerBindingLocalService;
 import com.liferay.saml.persistence.service.SamlSpSessionLocalService;
 import com.liferay.saml.runtime.SamlException;
 import com.liferay.saml.runtime.configuration.SamlProviderConfigurationHelper;
@@ -140,10 +142,14 @@ public class SingleLogoutProfileImpl
 			MetadataResolver metadataResolver =
 				metadataManager.getMetadataResolver();
 
-			String entityId = samlSpSession.getSamlIdpEntityId();
+			SamlPeerBinding samlPeerBinding =
+				_samlPeerBindingLocalService.getSamlPeerBinding(
+					samlSpSession.getSamlPeerBindingId());
 
 			EntityDescriptor entityDescriptor = metadataResolver.resolveSingle(
-				new CriteriaSet(new EntityIdCriterion(entityId)));
+				new CriteriaSet(
+					new EntityIdCriterion(
+						samlPeerBinding.getSamlPeerEntityId())));
 
 			SingleLogoutService singleLogoutService =
 				SamlUtil.resolveSingleLogoutService(
@@ -441,10 +447,11 @@ public class SingleLogoutProfileImpl
 		HttpServletRequest httpServletRequest,
 		MessageContext<?> messageContext) {
 
-		HttpSession session = httpServletRequest.getSession();
+		HttpSession httpSession = httpServletRequest.getSession();
 
-		SamlSloContext samlSloContext = (SamlSloContext)session.getAttribute(
-			SamlWebKeys.SAML_SLO_CONTEXT);
+		SamlSloContext samlSloContext =
+			(SamlSloContext)httpSession.getAttribute(
+				SamlWebKeys.SAML_SLO_CONTEXT);
 
 		String samlSsoSessionId = getSamlSsoSessionId(httpServletRequest);
 
@@ -476,12 +483,13 @@ public class SingleLogoutProfileImpl
 				samlSloContext = new SamlSloContext(
 					samlIdpSsoSession, messageContext,
 					_samlIdpSpConnectionLocalService,
-					_samlIdpSpSessionLocalService, _userLocalService);
+					_samlIdpSpSessionLocalService, _samlPeerBindingLocalService,
+					_userLocalService);
 
 				samlSloContext.setSamlSsoSessionId(samlSsoSessionId);
 				samlSloContext.setUserId(portal.getUserId(httpServletRequest));
 
-				session.setAttribute(
+				httpSession.setAttribute(
 					SamlWebKeys.SAML_SLO_CONTEXT, samlSloContext);
 			}
 		}
@@ -622,17 +630,13 @@ public class SingleLogoutProfileImpl
 			}
 			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					StringBundler sb = new StringBundler(7);
-
-					sb.append("Unable to perform a single logout for service ");
-					sb.append("provider ");
-					sb.append(entityId);
-					sb.append(" with binding ");
-					sb.append(singleLogoutService.getBinding());
-					sb.append(" to ");
-					sb.append(singleLogoutService.getLocation());
-
-					_log.debug(sb.toString(), exception);
+					_log.debug(
+						StringBundler.concat(
+							"Unable to perform a single logout for service ",
+							"provider ", entityId, " with binding ",
+							singleLogoutService.getBinding(), " to ",
+							singleLogoutService.getLocation()),
+						exception);
 				}
 
 				samlSloRequestInfo.setStatus(
@@ -699,7 +703,8 @@ public class SingleLogoutProfileImpl
 				StatusCode.UNKNOWN_PRINCIPAL,
 				new SamlSloContext(
 					null, messageContext, _samlIdpSpConnectionLocalService,
-					_samlIdpSpSessionLocalService, _userLocalService));
+					_samlIdpSpSessionLocalService, _samlPeerBindingLocalService,
+					_userLocalService));
 
 			return;
 		}
@@ -829,13 +834,17 @@ public class SingleLogoutProfileImpl
 
 		NameID nameID = logoutRequest.getNameID();
 
+		SAMLPeerEntityContext samlPeerEntityContext =
+			messageContext.getSubcontext(SAMLPeerEntityContext.class);
 		List<SessionIndex> sessionIndexes = logoutRequest.getSessionIndexes();
-
 		String statusCodeURI = StatusCode.SUCCESS;
 
 		if (sessionIndexes.isEmpty()) {
 			List<SamlSpSession> samlSpSessions =
-				samlSpSessionLocalService.getSamlSpSessions(nameID.getValue());
+				samlSpSessionLocalService.getSamlSpSessions(
+					CompanyThreadLocal.getCompanyId(), nameID.getFormat(),
+					nameID.getNameQualifier(), nameID.getSPNameQualifier(),
+					nameID.getValue(), samlPeerEntityContext.getEntityId());
 
 			if (samlSpSessions.isEmpty()) {
 				statusCodeURI = StatusCode.UNKNOWN_PRINCIPAL;
@@ -860,10 +869,15 @@ public class SingleLogoutProfileImpl
 				continue;
 			}
 
+			SamlPeerBinding samlPeerBinding =
+				_samlPeerBindingLocalService.getSamlPeerBinding(
+					samlSpSession.getSamlPeerBindingId());
+
 			if (Objects.equals(
-					samlSpSession.getNameIdValue(), nameID.getValue()) &&
+					samlPeerBinding.getSamlNameIdValue(), nameID.getValue()) &&
 				Objects.equals(
-					samlSpSession.getNameIdFormat(), nameID.getFormat())) {
+					samlPeerBinding.getSamlNameIdFormat(),
+					nameID.getFormat())) {
 
 				samlSpSession.setTerminated(true);
 
@@ -888,9 +902,6 @@ public class SingleLogoutProfileImpl
 		SecurityParametersContext securityParametersContext =
 			outboundMessageContext.getSubcontext(
 				SecurityParametersContext.class, true);
-
-		SAMLPeerEntityContext samlPeerEntityContext =
-			messageContext.getSubcontext(SAMLPeerEntityContext.class);
 
 		SAMLMetadataContext samlPeerMetadataContext =
 			samlPeerEntityContext.getSubcontext(SAMLMetadataContext.class);
@@ -1086,9 +1097,13 @@ public class SingleLogoutProfileImpl
 		SamlIdpSpSession samlIdpSpSession =
 			samlSloRequestInfo.getSamlIdpSpSession();
 
+		SamlPeerBinding samlPeerBinding =
+			_samlPeerBindingLocalService.getSamlPeerBinding(
+				samlIdpSpSession.getSamlPeerBindingId());
+
 		NameID nameID = OpenSamlUtil.buildNameId(
-			samlIdpSpSession.getNameIdFormat(),
-			samlIdpSpSession.getNameIdValue());
+			samlPeerBinding.getSamlNameIdFormat(),
+			samlPeerBinding.getSamlNameIdValue());
 
 		SAMLSubjectNameIdentifierContext samlSubjectNameIdentifierContext =
 			messageContext.getSubcontext(
@@ -1231,10 +1246,13 @@ public class SingleLogoutProfileImpl
 
 		LogoutRequest logoutRequest = OpenSamlUtil.buildLogoutRequest();
 
-		String entityId = samlSpSession.getSamlIdpEntityId();
+		SamlPeerBinding samlPeerBinding =
+			_samlPeerBindingLocalService.getSamlPeerBinding(
+				samlSpSession.getSamlPeerBindingId());
 
 		MessageContext<?> messageContext = getMessageContext(
-			httpServletRequest, httpServletResponse, entityId);
+			httpServletRequest, httpServletResponse,
+			samlPeerBinding.getSamlPeerEntityId());
 
 		InOutOperationContext<?, LogoutRequest> inOutOperationContext =
 			new InOutOperationContext(
@@ -1290,10 +1308,10 @@ public class SingleLogoutProfileImpl
 		logoutRequest.setIssuer(issuer);
 
 		NameID nameID = OpenSamlUtil.buildNameId(
-			samlSpSession.getNameIdFormat(),
-			samlSpSession.getNameIdNameQualifier(),
-			samlSpSession.getNameIdSPNameQualifier(),
-			samlSpSession.getNameIdValue());
+			samlPeerBinding.getSamlNameIdFormat(),
+			samlPeerBinding.getSamlNameIdNameQualifier(),
+			samlPeerBinding.getSamlNameIdSpNameQualifier(),
+			samlPeerBinding.getSamlNameIdValue());
 
 		logoutRequest.setNameID(nameID);
 
@@ -1472,6 +1490,13 @@ public class SingleLogoutProfileImpl
 	}
 
 	@Reference(unbind = "-")
+	protected void setSamlPeerBindingLocalService(
+		SamlPeerBindingLocalService samlPeerBindingLocalService) {
+
+		_samlPeerBindingLocalService = samlPeerBindingLocalService;
+	}
+
+	@Reference(unbind = "-")
 	protected void setSamlSpSessionLocalService(
 		SamlSpSessionLocalService samlSpSessionLocalService) {
 
@@ -1493,6 +1518,7 @@ public class SingleLogoutProfileImpl
 	private SamlIdpSpConnectionLocalService _samlIdpSpConnectionLocalService;
 	private SamlIdpSpSessionLocalService _samlIdpSpSessionLocalService;
 	private SamlIdpSsoSessionLocalService _samlIdpSsoSessionLocalService;
+	private SamlPeerBindingLocalService _samlPeerBindingLocalService;
 	private UserLocalService _userLocalService;
 
 }

@@ -23,6 +23,7 @@ import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.fragment.service.FragmentCollectionLocalService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.headless.delivery.dto.v1_0.PageElement;
+import com.liferay.layout.page.template.admin.web.internal.exception.DropzoneLayoutStructureItemException;
 import com.liferay.layout.util.structure.DropZoneLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
@@ -49,15 +50,24 @@ public class DropZoneLayoutStructureItemImporter
 
 	@Override
 	public LayoutStructureItem addLayoutStructureItem(
-			Layout layout, LayoutStructure layoutStructure,
-			PageElement pageElement, String parentItemId, int position,
-			Set<String> warningMessages)
+			LayoutStructure layoutStructure,
+			LayoutStructureItemImporterContext
+				layoutStructureItemImporterContext,
+			PageElement pageElement, Set<String> warningMessages)
 		throws Exception {
+
+		LayoutStructureItem existingLayoutStructureItem =
+			layoutStructure.getDropZoneLayoutStructureItem();
+
+		if (existingLayoutStructureItem != null) {
+			throw new DropzoneLayoutStructureItemException();
+		}
 
 		DropZoneLayoutStructureItem dropZoneLayoutStructureItem =
 			(DropZoneLayoutStructureItem)
 				layoutStructure.addDropZoneLayoutStructureItem(
-					parentItemId, position);
+					layoutStructureItemImporterContext.getParentItemId(),
+					layoutStructureItemImporterContext.getPosition());
 
 		Map<String, Object> definitionMap = getDefinitionMap(
 			pageElement.getDefinition());
@@ -104,6 +114,8 @@ public class DropZoneLayoutStructureItemImporter
 				(List<Map<String, String>>)fragmentSettingsMap.get(
 					_KEY_UNALLOWED_FRAGMENTS));
 		}
+
+		Layout layout = layoutStructureItemImporterContext.getLayout();
 
 		for (Map<String, String> allowedFragmentMap : allowedFragments) {
 			fragmentEntryKeys.add(allowedFragmentMap.get(_KEY_KEY));

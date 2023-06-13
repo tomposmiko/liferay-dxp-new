@@ -1,12 +1,12 @@
 @component-name = "portal-document-management-ee"
 definition {
 
-	property osgi.modules.includes = "sharepoint-rest";
-	property portal.release = "true";
+	property osgi.app.includes = "sharepoint-rest";
+	property portal.release = "false";
 	property portal.ssl.enabled = "true";
 	property portal.upstream = "true";
 	property test.run.environment = "EE";
-	property testray.main.component.name = "Document Management";
+	property testray.main.component.name = "Sharepoint";
 
 	setUp {
 		TestCase.setUpPortalInstance();
@@ -37,47 +37,47 @@ definition {
 		Type(
 			key_text = "name",
 			locator1 = "TextArea#ANY",
-			value1 = ${configurationName});
+			value1 = "${configurationName}");
 
 		Type(
 			key_text = "authorizationGrantEndpoint",
 			locator1 = "TextArea#ANY",
-			value1 = ${authorizationGrantEndpoint});
+			value1 = "${authorizationGrantEndpoint}");
 
 		Type(
 			key_text = "authorizationTokenEndpoint",
 			locator1 = "TextArea#ANY",
-			value1 = ${authorizationTokenEndpoint});
+			value1 = "${authorizationTokenEndpoint}");
 
 		Type(
 			key_text = "clientId",
 			locator1 = "TextArea#ANY",
-			value1 = ${clientId});
+			value1 = "${clientId}");
 
 		Type(
 			key_text = "clientSecret",
 			locator1 = "TextArea#ANY",
-			value1 = ${clientSecret});
+			value1 = "${clientSecret}");
 
 		Type(
 			key_text = "scope",
 			locator1 = "TextArea#ANY",
-			value1 = ${configurationScope});
+			value1 = "${configurationScope}");
 
 		Type(
 			key_text = "tenantId",
 			locator1 = "TextArea#ANY",
-			value1 = ${tenantId});
+			value1 = "${tenantId}");
 
 		Type(
 			key_text = "siteDomain",
 			locator1 = "TextArea#ANY",
-			value1 = ${siteDomain});
+			value1 = "${siteDomain}");
 
 		Type(
 			key_text = "resource",
 			locator1 = "TextArea#ANY",
-			value1 = ${configurationResource});
+			value1 = "${configurationResource}");
 
 		PortletEntry.save();
 
@@ -115,8 +115,8 @@ definition {
 			value1 = "Collaboration Test Application");
 
 		MicrosoftLogin.accountSignIn(
-			userEmail = ${userName},
-			userPassword = ${userPassword});
+			userEmail = "${userName}",
+			userPassword = "${userPassword}");
 
 		MicrosoftLogin.confirmSharepointApp(dmRepositoryName = "Collaboration Test Application");
 	}
@@ -124,12 +124,43 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	@priority = 4
+	@description = "This is a test for LPS-136821. It checks that a repository can be published."
+	@priority = "3"
+	test CanPublishRepository {
+		property test.name.skip.portal.instance = "SharepointREST#CanPublishRepository";
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Documents and Media Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Documents and Media Page",
+			widgetName = "Documents and Media");
+
+		JSONStaging.enableLocalStaging(groupName = "Guest");
+
+		Navigator.gotoStagedSitePage(
+			defaultSite = "true",
+			pageName = "Documents and Media Page");
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoRepository(dmRepositoryName = "Collaboration Test Application");
+	}
+
+	@priority = "4"
+	@refactorneeded
 	test CheckinDocument {
 		property test.name.skip.portal.instance = "SharepointREST#CheckinDocument";
 
@@ -139,7 +170,7 @@ definition {
 			dmDocumentFile = "Document_3.txt",
 			dmDocumentTitle = "Document_3.txt");
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		DMDocument.checkoutCP(
 			dmDocumentTitle = "Document_3.txt",
@@ -153,7 +184,7 @@ definition {
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_3.txt");
 
-		Pause(locator1 = 5000);
+		Pause(locator1 = "5000");
 
 		DMDocument.viewCheckedoutCP(dmRepositoryName = "true");
 
@@ -174,7 +205,8 @@ definition {
 			dmRepositoryName = "true");
 	}
 
-	@priority = 4
+	@priority = "4"
+	@refactorneeded
 	test DeleteDocumentInSubfolder {
 		property test.name.skip.portal.instance = "SharepointREST#DeleteDocumentInSubfolder";
 
@@ -218,12 +250,13 @@ definition {
 
 		DMDocument.cannotViewCP(dmDocumentTitle = "Document_2.doc");
 
-		DMDocument.viewDefaultCP();
+		DMDocument.viewDefault();
 
 		DMRepository.cleanRepository(dmFolderName = "DM Folder3 Name");
 	}
 
-	@priority = 4
+	@priority = "4"
+	@refactorneeded
 	test DeleteSubfolder {
 		property test.name.skip.portal.instance = "SharepointREST#DeleteSubfolder";
 
@@ -246,7 +279,8 @@ definition {
 		DMRepository.cleanRepository(dmFolderName = "DM Folder Name");
 	}
 
-	@priority = 4
+	@priority = "4"
+	@refactorneeded
 	test EditDocumentFile {
 		property test.name.skip.portal.instance = "SharepointREST#EditDocumentFile";
 
@@ -259,7 +293,7 @@ definition {
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_3.doc");
 
 		DMDocument.viewCP(
-			dmDocumentSize = "38 KB",
+			dmDocumentSize = "37 KB",
 			dmDocumentTitle = "Document_3.doc");
 
 		ProductMenu.gotoPortlet(
@@ -286,7 +320,7 @@ definition {
 			dmDocumentSize = "30 KB",
 			dmDocumentTitle = "Document_3.doc");
 
-		DMDocument.viewDocumentMetadataCP(
+		DMDocument.cannotViewDocumentMetadataCP(
 			metadataData = "image/jpeg",
 			metadataLabel = "Content Type");
 
@@ -297,7 +331,8 @@ definition {
 		DMRepository.cleanRepository(dmDocumentTitle = "Document_3.doc");
 	}
 
-	@priority = 4
+	@priority = "4"
+	@refactorneeded
 	test MoveCheckedoutDocumentToFolder {
 		property test.name.skip.portal.instance = "SharepointREST#MoveCheckedoutDocumentToFolder";
 
@@ -357,7 +392,8 @@ definition {
 		DMRepository.cleanRepository(dmFolderName = "Sharepoint Subfolder");
 	}
 
-	@priority = 4
+	@priority = "4"
+	@refactorneeded
 	test MoveDocumentToHome {
 		property test.name.skip.portal.instance = "SharepointREST#MoveDocumentToHome";
 
@@ -384,7 +420,8 @@ definition {
 		DMDocument.cannotViewCP(dmDocumentTitle = "Document_1.odt");
 	}
 
-	@priority = 4
+	@priority = "4"
+	@refactorneeded
 	test SearchDocumentViaHome {
 		property test.name.skip.portal.instance = "SharepointREST#SearchDocumentViaHome";
 
@@ -405,7 +442,8 @@ definition {
 		DMRepository.cleanRepository(dmDocumentTitle = "Document_3.odt");
 	}
 
-	@priority = 4
+	@priority = "4"
+	@refactorneeded
 	test ViewDocumentAsGuest {
 		property test.name.skip.portal.instance = "SharepointREST#ViewDocumentAsGuest";
 
@@ -413,11 +451,11 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(
+		PagesAdmin.addPublicPage(
 			pageName = "Documents and Media Page",
 			sitePageType = "Widget Page");
 
-		SitePages.configurePage(
+		PagesAdmin.configurePage(
 			columnName = "1 Column",
 			pageName = "Documents and Media Page",
 			privacy = "Public Pages",
@@ -427,9 +465,9 @@ definition {
 
 		Portlet.addPG(portletName = "Documents and Media");
 
-		Navigator.gotoPage(pageName = "Documents and Media Page");
-
 		DMDocument.enableActionsMenuOnPortlet();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
 
 		DMRepository.cleanRepository(dmDocumentTitle = "Document_1.doc");
 
@@ -457,7 +495,7 @@ definition {
 			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_FOLDER_TITLE",
 			value1 = "Collaboration Test Application");
 
-		Pause(locator1 = 3000);
+		Pause(locator1 = "3000");
 
 		AssertElementNotPresent(
 			key_dmDocumentTitle = "Document_1.doc",
@@ -470,7 +508,8 @@ definition {
 		DMRepository.cleanRepository(dmDocumentTitle = "Document_1.doc");
 	}
 
-	@priority = 4
+	@priority = "4"
+	@refactorneeded
 	test ViewEditedCheckedoutDocument {
 		property test.name.skip.portal.instance = "SharepointREST#ViewEditedCheckedoutDocument";
 
@@ -513,7 +552,8 @@ definition {
 		DMRepository.cleanRepository(dmDocumentTitle = "Document_1_Edit.xls");
 	}
 
-	@priority = 4
+	@priority = "4"
+	@refactorneeded
 	test ViewOriginalFileExtensionAfterUnsuccessfulExtensionChange {
 		property test.name.skip.portal.instance = "SharepointREST#ViewOriginalFileExtensionAfterUnsuccessfulExtensionChange";
 
@@ -548,7 +588,8 @@ definition {
 		DMRepository.cleanRepository(dmDocumentTitle = "Document_1.docx");
 	}
 
-	@priority = 4
+	@priority = "4"
+	@refactorneeded
 	test ViewOriginalFileExtensionAfterUnsuccessfulExtensionRemoval {
 		property test.name.skip.portal.instance = "SharepointREST#ViewOriginalFileExtensionAfterUnsuccessfulExtensionRemoval";
 
@@ -584,7 +625,8 @@ definition {
 	}
 
 	@description = "This test ensures that repositories can be added both on site admin and on a content page."
-	@priority = 4
+	@priority = "4"
+	@refactorneeded
 	test ViewRepository {
 		property test.name.skip.portal.instance = "SharepointREST#ViewRepository";
 
@@ -608,6 +650,10 @@ definition {
 		DMDocument.enableActionsMenuOnPortlet();
 
 		PageEditor.clickPublish();
+
+		ContentPagesNavigator.openViewContentPage(
+			pageName = "Test Content Page Name",
+			siteName = "Guest");
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 

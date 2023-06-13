@@ -16,9 +16,11 @@ package com.liferay.asset.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.kernel.exception.DuplicateVocabularyException;
+import com.liferay.asset.kernel.exception.DuplicateVocabularyExternalReferenceCodeException;
 import com.liferay.asset.kernel.exception.VocabularyNameException;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
+import com.liferay.asset.kernel.model.AssetVocabularyConstants;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil;
@@ -109,6 +111,66 @@ public class AssetVocabularyServiceTest {
 	}
 
 	@Test
+	public void testAddVocabularyWithExternalReferenceCode() throws Exception {
+		String externalReferenceCode = StringUtil.randomString();
+
+		String title = RandomTestUtil.randomString();
+
+		String description = RandomTestUtil.randomString();
+
+		AssetVocabulary vocabulary =
+			AssetVocabularyLocalServiceUtil.addVocabulary(
+				externalReferenceCode, TestPropsValues.getUserId(),
+				_group.getGroupId(), StringPool.BLANK, StringPool.BLANK,
+				HashMapBuilder.put(
+					LocaleUtil.SPAIN, title + "_ES"
+				).put(
+					LocaleUtil.US, title + "_US"
+				).build(),
+				HashMapBuilder.put(
+					LocaleUtil.SPAIN, description + "_ES"
+				).put(
+					LocaleUtil.US, description + "_US"
+				).build(),
+				null, AssetVocabularyConstants.VISIBILITY_TYPE_PUBLIC,
+				ServiceContextTestUtil.getServiceContext(
+					_group.getGroupId(), TestPropsValues.getUserId()));
+
+		Assert.assertEquals(
+			externalReferenceCode, vocabulary.getExternalReferenceCode());
+
+		vocabulary =
+			AssetVocabularyLocalServiceUtil.
+				getAssetVocabularyByExternalReferenceCode(
+					_group.getGroupId(), externalReferenceCode);
+
+		Assert.assertEquals(
+			externalReferenceCode, vocabulary.getExternalReferenceCode());
+	}
+
+	@Test
+	public void testAddVocabularyWithoutExternalReferenceCode()
+		throws Exception {
+
+		AssetVocabulary vocabulary = AssetTestUtil.addVocabulary(
+			_group.getGroupId());
+
+		String externalReferenceCode = String.valueOf(
+			vocabulary.getVocabularyId());
+
+		Assert.assertEquals(
+			externalReferenceCode, vocabulary.getExternalReferenceCode());
+
+		vocabulary =
+			AssetVocabularyLocalServiceUtil.
+				getAssetVocabularyByExternalReferenceCode(
+					_group.getGroupId(), externalReferenceCode);
+
+		Assert.assertEquals(
+			externalReferenceCode, vocabulary.getExternalReferenceCode());
+	}
+
+	@Test
 	public void testDeleteVocabulary() throws Exception {
 		int initialAssetCategoriesCount = searchCount();
 		int initialResourceActionsCount =
@@ -141,6 +203,49 @@ public class AssetVocabularyServiceTest {
 		Assert.assertNull(
 			AssetVocabularyLocalServiceUtil.fetchAssetVocabulary(
 				vocabulary.getVocabularyId()));
+	}
+
+	@Test(expected = DuplicateVocabularyExternalReferenceCodeException.class)
+	public void testDuplicateVocabularyExternalReferenceCode()
+		throws Exception {
+
+		String externalReferenceCode = StringUtil.randomString();
+		String title = RandomTestUtil.randomString();
+		String description = RandomTestUtil.randomString();
+
+		AssetVocabularyLocalServiceUtil.addVocabulary(
+			externalReferenceCode, TestPropsValues.getUserId(),
+			_group.getGroupId(), StringPool.BLANK, StringPool.BLANK,
+			HashMapBuilder.put(
+				LocaleUtil.SPAIN, title + "_ES"
+			).put(
+				LocaleUtil.US, title + "_US"
+			).build(),
+			HashMapBuilder.put(
+				LocaleUtil.SPAIN, description + "_ES"
+			).put(
+				LocaleUtil.US, description + "_US"
+			).build(),
+			null, AssetVocabularyConstants.VISIBILITY_TYPE_PUBLIC,
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId()));
+
+		AssetVocabularyLocalServiceUtil.addVocabulary(
+			externalReferenceCode, TestPropsValues.getUserId(),
+			_group.getGroupId(), StringPool.BLANK, StringPool.BLANK,
+			HashMapBuilder.put(
+				LocaleUtil.SPAIN, title + "_ES"
+			).put(
+				LocaleUtil.US, title + "_US"
+			).build(),
+			HashMapBuilder.put(
+				LocaleUtil.SPAIN, description + "_ES"
+			).put(
+				LocaleUtil.US, description + "_US"
+			).build(),
+			null, AssetVocabularyConstants.VISIBILITY_TYPE_PUBLIC,
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId()));
 	}
 
 	@Test
@@ -440,42 +545,30 @@ public class AssetVocabularyServiceTest {
 			StringUtil.toLowerCase(title), vocabulary.getName());
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x)
-	 */
-	@Deprecated
-	@Test
+	@Test(expected = DuplicateVocabularyException.class)
 	public void testUpdateDuplicateVocabulary() throws Exception {
 		AssetVocabulary vocabulary = AssetTestUtil.addVocabulary(
 			_group.getGroupId(), "test1");
 
 		AssetTestUtil.addVocabulary(_group.getGroupId(), "test2");
 
-		vocabulary = _assetVocabularyLocalService.updateVocabulary(
+		_assetVocabularyLocalService.updateVocabulary(
 			vocabulary.getVocabularyId(), "test2", vocabulary.getTitle(),
 			vocabulary.getTitleMap(), vocabulary.getDescriptionMap(),
 			vocabulary.getSettings(),
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
-
-		Assert.assertEquals("test1", vocabulary.getName());
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x)
-	 */
-	@Deprecated
-	@Test
+	@Test(expected = VocabularyNameException.class)
 	public void testUpdateEmptyNameVocabulary() throws Exception {
 		AssetVocabulary vocabulary = AssetTestUtil.addVocabulary(
 			_group.getGroupId(), "test");
 
-		vocabulary = _assetVocabularyLocalService.updateVocabulary(
+		_assetVocabularyLocalService.updateVocabulary(
 			vocabulary.getVocabularyId(), StringPool.BLANK,
 			vocabulary.getTitle(), vocabulary.getTitleMap(),
 			vocabulary.getDescriptionMap(), vocabulary.getSettings(),
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
-
-		Assert.assertEquals("test", vocabulary.getName());
 	}
 
 	@Rule

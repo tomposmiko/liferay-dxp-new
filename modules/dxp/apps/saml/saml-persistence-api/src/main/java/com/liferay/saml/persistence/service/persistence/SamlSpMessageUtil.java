@@ -126,10 +126,10 @@ public class SamlSpMessageUtil {
 	 * @param expirationDate the expiration date
 	 * @return the matching saml sp messages
 	 */
-	public static List<SamlSpMessage> findByExpirationDate(
+	public static List<SamlSpMessage> findByLtExpirationDate(
 		Date expirationDate) {
 
-		return getPersistence().findByExpirationDate(expirationDate);
+		return getPersistence().findByLtExpirationDate(expirationDate);
 	}
 
 	/**
@@ -144,10 +144,10 @@ public class SamlSpMessageUtil {
 	 * @param end the upper bound of the range of saml sp messages (not inclusive)
 	 * @return the range of matching saml sp messages
 	 */
-	public static List<SamlSpMessage> findByExpirationDate(
+	public static List<SamlSpMessage> findByLtExpirationDate(
 		Date expirationDate, int start, int end) {
 
-		return getPersistence().findByExpirationDate(
+		return getPersistence().findByLtExpirationDate(
 			expirationDate, start, end);
 	}
 
@@ -164,11 +164,11 @@ public class SamlSpMessageUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching saml sp messages
 	 */
-	public static List<SamlSpMessage> findByExpirationDate(
+	public static List<SamlSpMessage> findByLtExpirationDate(
 		Date expirationDate, int start, int end,
 		OrderByComparator<SamlSpMessage> orderByComparator) {
 
-		return getPersistence().findByExpirationDate(
+		return getPersistence().findByLtExpirationDate(
 			expirationDate, start, end, orderByComparator);
 	}
 
@@ -186,12 +186,12 @@ public class SamlSpMessageUtil {
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching saml sp messages
 	 */
-	public static List<SamlSpMessage> findByExpirationDate(
+	public static List<SamlSpMessage> findByLtExpirationDate(
 		Date expirationDate, int start, int end,
 		OrderByComparator<SamlSpMessage> orderByComparator,
 		boolean useFinderCache) {
 
-		return getPersistence().findByExpirationDate(
+		return getPersistence().findByLtExpirationDate(
 			expirationDate, start, end, orderByComparator, useFinderCache);
 	}
 
@@ -203,12 +203,12 @@ public class SamlSpMessageUtil {
 	 * @return the first matching saml sp message
 	 * @throws NoSuchSpMessageException if a matching saml sp message could not be found
 	 */
-	public static SamlSpMessage findByExpirationDate_First(
+	public static SamlSpMessage findByLtExpirationDate_First(
 			Date expirationDate,
 			OrderByComparator<SamlSpMessage> orderByComparator)
 		throws com.liferay.saml.persistence.exception.NoSuchSpMessageException {
 
-		return getPersistence().findByExpirationDate_First(
+		return getPersistence().findByLtExpirationDate_First(
 			expirationDate, orderByComparator);
 	}
 
@@ -219,11 +219,11 @@ public class SamlSpMessageUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching saml sp message, or <code>null</code> if a matching saml sp message could not be found
 	 */
-	public static SamlSpMessage fetchByExpirationDate_First(
+	public static SamlSpMessage fetchByLtExpirationDate_First(
 		Date expirationDate,
 		OrderByComparator<SamlSpMessage> orderByComparator) {
 
-		return getPersistence().fetchByExpirationDate_First(
+		return getPersistence().fetchByLtExpirationDate_First(
 			expirationDate, orderByComparator);
 	}
 
@@ -235,12 +235,12 @@ public class SamlSpMessageUtil {
 	 * @return the last matching saml sp message
 	 * @throws NoSuchSpMessageException if a matching saml sp message could not be found
 	 */
-	public static SamlSpMessage findByExpirationDate_Last(
+	public static SamlSpMessage findByLtExpirationDate_Last(
 			Date expirationDate,
 			OrderByComparator<SamlSpMessage> orderByComparator)
 		throws com.liferay.saml.persistence.exception.NoSuchSpMessageException {
 
-		return getPersistence().findByExpirationDate_Last(
+		return getPersistence().findByLtExpirationDate_Last(
 			expirationDate, orderByComparator);
 	}
 
@@ -251,11 +251,11 @@ public class SamlSpMessageUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching saml sp message, or <code>null</code> if a matching saml sp message could not be found
 	 */
-	public static SamlSpMessage fetchByExpirationDate_Last(
+	public static SamlSpMessage fetchByLtExpirationDate_Last(
 		Date expirationDate,
 		OrderByComparator<SamlSpMessage> orderByComparator) {
 
-		return getPersistence().fetchByExpirationDate_Last(
+		return getPersistence().fetchByLtExpirationDate_Last(
 			expirationDate, orderByComparator);
 	}
 
@@ -268,12 +268,12 @@ public class SamlSpMessageUtil {
 	 * @return the previous, current, and next saml sp message
 	 * @throws NoSuchSpMessageException if a saml sp message with the primary key could not be found
 	 */
-	public static SamlSpMessage[] findByExpirationDate_PrevAndNext(
+	public static SamlSpMessage[] findByLtExpirationDate_PrevAndNext(
 			long samlSpMessageId, Date expirationDate,
 			OrderByComparator<SamlSpMessage> orderByComparator)
 		throws com.liferay.saml.persistence.exception.NoSuchSpMessageException {
 
-		return getPersistence().findByExpirationDate_PrevAndNext(
+		return getPersistence().findByLtExpirationDate_PrevAndNext(
 			samlSpMessageId, expirationDate, orderByComparator);
 	}
 
@@ -282,8 +282,8 @@ public class SamlSpMessageUtil {
 	 *
 	 * @param expirationDate the expiration date
 	 */
-	public static void removeByExpirationDate(Date expirationDate) {
-		getPersistence().removeByExpirationDate(expirationDate);
+	public static void removeByLtExpirationDate(Date expirationDate) {
+		getPersistence().removeByLtExpirationDate(expirationDate);
 	}
 
 	/**
@@ -292,8 +292,8 @@ public class SamlSpMessageUtil {
 	 * @param expirationDate the expiration date
 	 * @return the number of matching saml sp messages
 	 */
-	public static int countByExpirationDate(Date expirationDate) {
-		return getPersistence().countByExpirationDate(expirationDate);
+	public static int countByLtExpirationDate(Date expirationDate) {
+		return getPersistence().countByLtExpirationDate(expirationDate);
 	}
 
 	/**

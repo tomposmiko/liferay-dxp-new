@@ -15,7 +15,6 @@
 package com.liferay.commerce.pricing.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.commerce.pricing.exception.DuplicateCommercePriceModifierExternalReferenceCodeException;
 import com.liferay.commerce.pricing.exception.NoSuchPriceModifierException;
 import com.liferay.commerce.pricing.model.CommercePriceModifier;
 import com.liferay.commerce.pricing.service.CommercePriceModifierLocalServiceUtil;
@@ -132,6 +131,8 @@ public class CommercePriceModifierPersistenceTest {
 		CommercePriceModifier newCommercePriceModifier = _persistence.create(
 			pk);
 
+		newCommercePriceModifier.setMvccVersion(RandomTestUtil.nextLong());
+
 		newCommercePriceModifier.setUuid(RandomTestUtil.randomString());
 
 		newCommercePriceModifier.setExternalReferenceCode(
@@ -187,6 +188,9 @@ public class CommercePriceModifierPersistenceTest {
 			_persistence.findByPrimaryKey(
 				newCommercePriceModifier.getPrimaryKey());
 
+		Assert.assertEquals(
+			existingCommercePriceModifier.getMvccVersion(),
+			newCommercePriceModifier.getMvccVersion());
 		Assert.assertEquals(
 			existingCommercePriceModifier.getUuid(),
 			newCommercePriceModifier.getUuid());
@@ -264,32 +268,6 @@ public class CommercePriceModifierPersistenceTest {
 			Time.getShortTimestamp(
 				existingCommercePriceModifier.getStatusDate()),
 			Time.getShortTimestamp(newCommercePriceModifier.getStatusDate()));
-	}
-
-	@Test(
-		expected = DuplicateCommercePriceModifierExternalReferenceCodeException.class
-	)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		CommercePriceModifier commercePriceModifier =
-			addCommercePriceModifier();
-
-		CommercePriceModifier newCommercePriceModifier =
-			addCommercePriceModifier();
-
-		newCommercePriceModifier.setCompanyId(
-			commercePriceModifier.getCompanyId());
-
-		newCommercePriceModifier = _persistence.update(
-			newCommercePriceModifier);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newCommercePriceModifier);
-
-		newCommercePriceModifier.setExternalReferenceCode(
-			commercePriceModifier.getExternalReferenceCode());
-
-		_persistence.update(newCommercePriceModifier);
 	}
 
 	@Test
@@ -427,15 +405,15 @@ public class CommercePriceModifierPersistenceTest {
 
 	protected OrderByComparator<CommercePriceModifier> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
-			"CommercePriceModifier", "uuid", true, "externalReferenceCode",
-			true, "commercePriceModifierId", true, "groupId", true, "companyId",
-			true, "userId", true, "userName", true, "createDate", true,
-			"modifiedDate", true, "commercePriceListId", true, "title", true,
-			"target", true, "modifierAmount", true, "modifierType", true,
-			"priority", true, "active", true, "displayDate", true,
-			"expirationDate", true, "lastPublishDate", true, "status", true,
-			"statusByUserId", true, "statusByUserName", true, "statusDate",
-			true);
+			"CommercePriceModifier", "mvccVersion", true, "uuid", true,
+			"externalReferenceCode", true, "commercePriceModifierId", true,
+			"groupId", true, "companyId", true, "userId", true, "userName",
+			true, "createDate", true, "modifiedDate", true,
+			"commercePriceListId", true, "title", true, "target", true,
+			"modifierAmount", true, "modifierType", true, "priority", true,
+			"active", true, "displayDate", true, "expirationDate", true,
+			"lastPublishDate", true, "status", true, "statusByUserId", true,
+			"statusByUserName", true, "statusDate", true);
 	}
 
 	@Test
@@ -760,6 +738,8 @@ public class CommercePriceModifierPersistenceTest {
 		long pk = RandomTestUtil.nextLong();
 
 		CommercePriceModifier commercePriceModifier = _persistence.create(pk);
+
+		commercePriceModifier.setMvccVersion(RandomTestUtil.nextLong());
 
 		commercePriceModifier.setUuid(RandomTestUtil.randomString());
 

@@ -14,9 +14,11 @@
 
 package com.liferay.headless.delivery.dto.v1_0;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
@@ -45,7 +47,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("PageCollectionDefinition")
+@GraphQLName(
+	description = "Represents a definition of a Page Collection.",
+	value = "PageCollectionDefinition"
+)
 @JsonFilter("Liferay.Vulcan")
 @XmlRootElement(name = "PageCollectionDefinition")
 public class PageCollectionDefinition implements Serializable {
@@ -89,7 +94,7 @@ public class PageCollectionDefinition implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected CollectionConfig collectionConfig;
 
-	@Schema
+	@Schema(description = "The fragment style of the page collection.")
 	@Valid
 	public FragmentStyle getFragmentStyle() {
 		return fragmentStyle;
@@ -114,11 +119,11 @@ public class PageCollectionDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The fragment style of the page collection.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected FragmentStyle fragmentStyle;
 
-	@Schema
+	@Schema(description = "The fragment viewports of the page collection.")
 	@Valid
 	public FragmentViewport[] getFragmentViewports() {
 		return fragmentViewports;
@@ -144,11 +149,15 @@ public class PageCollectionDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The fragment viewports of the page collection."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected FragmentViewport[] fragmentViewports;
 
-	@Schema
+	@Schema(
+		description = "The style of a list of items in the page collection."
+	)
 	public String getListItemStyle() {
 		return listItemStyle;
 	}
@@ -172,11 +181,13 @@ public class PageCollectionDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The style of a list of items in the page collection."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String listItemStyle;
 
-	@Schema
+	@Schema(description = "The style of a list in the page collection.")
 	public String getListStyle() {
 		return listStyle;
 	}
@@ -200,11 +211,11 @@ public class PageCollectionDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The style of a list in the page collection.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String listStyle;
 
-	@Schema
+	@Schema(description = "The number of columns in the page collection.")
 	public Integer getNumberOfColumns() {
 		return numberOfColumns;
 	}
@@ -228,11 +239,11 @@ public class PageCollectionDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The number of columns in the page collection.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer numberOfColumns;
 
-	@Schema
+	@Schema(description = "The number of items in the page collection.")
 	public Integer getNumberOfItems() {
 		return numberOfItems;
 	}
@@ -256,11 +267,82 @@ public class PageCollectionDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The number of items in the page collection.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer numberOfItems;
 
-	@Schema
+	@Schema(
+		description = "The number of items per page in the page collection."
+	)
+	public Integer getNumberOfItemsPerPage() {
+		return numberOfItemsPerPage;
+	}
+
+	public void setNumberOfItemsPerPage(Integer numberOfItemsPerPage) {
+		this.numberOfItemsPerPage = numberOfItemsPerPage;
+	}
+
+	@JsonIgnore
+	public void setNumberOfItemsPerPage(
+		UnsafeSupplier<Integer, Exception> numberOfItemsPerPageUnsafeSupplier) {
+
+		try {
+			numberOfItemsPerPage = numberOfItemsPerPageUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(
+		description = "The number of items per page in the page collection."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Integer numberOfItemsPerPage;
+
+	@Schema(description = "The type of pagination.")
+	@Valid
+	public PaginationType getPaginationType() {
+		return paginationType;
+	}
+
+	@JsonIgnore
+	public String getPaginationTypeAsString() {
+		if (paginationType == null) {
+			return null;
+		}
+
+		return paginationType.toString();
+	}
+
+	public void setPaginationType(PaginationType paginationType) {
+		this.paginationType = paginationType;
+	}
+
+	@JsonIgnore
+	public void setPaginationType(
+		UnsafeSupplier<PaginationType, Exception>
+			paginationTypeUnsafeSupplier) {
+
+		try {
+			paginationType = paginationTypeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(description = "The type of pagination.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected PaginationType paginationType;
+
+	@Schema(description = "The page collection's template key.")
 	public String getTemplateKey() {
 		return templateKey;
 	}
@@ -284,7 +366,7 @@ public class PageCollectionDefinition implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The page collection's template key.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String templateKey;
 
@@ -404,6 +486,30 @@ public class PageCollectionDefinition implements Serializable {
 			sb.append(numberOfItems);
 		}
 
+		if (numberOfItemsPerPage != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"numberOfItemsPerPage\": ");
+
+			sb.append(numberOfItemsPerPage);
+		}
+
+		if (paginationType != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"paginationType\": ");
+
+			sb.append("\"");
+
+			sb.append(paginationType);
+
+			sb.append("\"");
+		}
+
 		if (templateKey != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -429,6 +535,44 @@ public class PageCollectionDefinition implements Serializable {
 		name = "x-class-name"
 	)
 	public String xClassName;
+
+	@GraphQLName("PaginationType")
+	public static enum PaginationType {
+
+		NONE("None"), REGULAR("Regular"), SIMPLE("Simple");
+
+		@JsonCreator
+		public static PaginationType create(String value) {
+			if ((value == null) || value.equals("")) {
+				return null;
+			}
+
+			for (PaginationType paginationType : values()) {
+				if (Objects.equals(paginationType.getValue(), value)) {
+					return paginationType;
+				}
+			}
+
+			throw new IllegalArgumentException("Invalid enum value: " + value);
+		}
+
+		@JsonValue
+		public String getValue() {
+			return _value;
+		}
+
+		@Override
+		public String toString() {
+			return _value;
+		}
+
+		private PaginationType(String value) {
+			_value = value;
+		}
+
+		private final String _value;
+
+	}
 
 	private static String _escape(Object object) {
 		return StringUtil.replace(

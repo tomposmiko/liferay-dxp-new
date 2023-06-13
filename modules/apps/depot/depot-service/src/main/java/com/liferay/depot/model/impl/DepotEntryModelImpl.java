@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -288,61 +289,83 @@ public class DepotEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<DepotEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, DepotEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<DepotEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<DepotEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DepotEntry.class.getClassLoader(), DepotEntry.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", DepotEntry::getMvccVersion);
-		attributeGetterFunctions.put("uuid", DepotEntry::getUuid);
-		attributeGetterFunctions.put(
-			"depotEntryId", DepotEntry::getDepotEntryId);
-		attributeGetterFunctions.put("groupId", DepotEntry::getGroupId);
-		attributeGetterFunctions.put("companyId", DepotEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", DepotEntry::getUserId);
-		attributeGetterFunctions.put("userName", DepotEntry::getUserName);
-		attributeGetterFunctions.put("createDate", DepotEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", DepotEntry::getModifiedDate);
+		try {
+			Constructor<DepotEntry> constructor =
+				(Constructor<DepotEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<DepotEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<DepotEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<DepotEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DepotEntry, Object>>();
 		Map<String, BiConsumer<DepotEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<DepotEntry, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", DepotEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DepotEntry, Long>)DepotEntry::setMvccVersion);
+		attributeGetterFunctions.put("uuid", DepotEntry::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<DepotEntry, String>)DepotEntry::setUuid);
+		attributeGetterFunctions.put(
+			"depotEntryId", DepotEntry::getDepotEntryId);
 		attributeSetterBiConsumers.put(
 			"depotEntryId",
 			(BiConsumer<DepotEntry, Long>)DepotEntry::setDepotEntryId);
+		attributeGetterFunctions.put("groupId", DepotEntry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<DepotEntry, Long>)DepotEntry::setGroupId);
+		attributeGetterFunctions.put("companyId", DepotEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DepotEntry, Long>)DepotEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", DepotEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<DepotEntry, Long>)DepotEntry::setUserId);
+		attributeGetterFunctions.put("userName", DepotEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<DepotEntry, String>)DepotEntry::setUserName);
+		attributeGetterFunctions.put("createDate", DepotEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<DepotEntry, Date>)DepotEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", DepotEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<DepotEntry, Date>)DepotEntry::setModifiedDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -620,6 +643,29 @@ public class DepotEntryModelImpl
 	}
 
 	@Override
+	public DepotEntry cloneWithOriginalValues() {
+		DepotEntryImpl depotEntryImpl = new DepotEntryImpl();
+
+		depotEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		depotEntryImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		depotEntryImpl.setDepotEntryId(
+			this.<Long>getColumnOriginalValue("depotEntryId"));
+		depotEntryImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		depotEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		depotEntryImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		depotEntryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		depotEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		depotEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+
+		return depotEntryImpl;
+	}
+
+	@Override
 	public int compareTo(DepotEntry depotEntry) {
 		long primaryKey = depotEntry.getPrimaryKey();
 
@@ -822,9 +868,7 @@ public class DepotEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DepotEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DepotEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

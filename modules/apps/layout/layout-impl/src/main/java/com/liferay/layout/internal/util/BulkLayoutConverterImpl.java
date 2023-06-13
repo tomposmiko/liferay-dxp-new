@@ -36,14 +36,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
-import com.liferay.portal.kernel.model.PortletConstants;
 import com.liferay.portal.kernel.model.PortletDecorator;
 import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.PortletPreferenceValueLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -346,14 +345,11 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 			Layout layout, ServiceContext serviceContext)
 		throws PortalException {
 
-		if ((layout.getClassNameId() != 0) || (layout.getClassPK() != 0)) {
-			StringBundler sb = new StringBundler(3);
-
-			sb.append("Layout with PLID ");
-			sb.append(layout.getPlid());
-			sb.append(" is a draft. You cannot get the draft of a draft.");
-
-			throw new PortalException(sb.toString());
+		if (layout.isDraftLayout()) {
+			throw new PortalException(
+				StringBundler.concat(
+					"Layout with PLID ", layout.getPlid(),
+					" is a draft. You cannot get the draft of a draft."));
 		}
 
 		Layout draftLayout = layout.fetchDraftLayout();
@@ -396,14 +392,9 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, layout.getPlid());
 
 		for (PortletPreferences portletPreferences : portletPreferencesList) {
-			String preferencesXML = portletPreferences.getPreferences();
-
-			if (Validator.isNull(preferencesXML)) {
-				preferencesXML = PortletConstants.DEFAULT_PREFERENCES;
-			}
-
 			javax.portlet.PortletPreferences jxPortletPreferences =
-				PortletPreferencesFactoryUtil.fromDefaultXML(preferencesXML);
+				_portletPreferenceValueLocalService.getPreferences(
+					portletPreferences);
 
 			String portletSetupPortletDecoratorId =
 				jxPortletPreferences.getValue(
@@ -422,11 +413,10 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 				throw new PortalException(readOnlyException);
 			}
 
-			portletPreferences.setPreferences(
-				PortletPreferencesFactoryUtil.toXML(jxPortletPreferences));
-
-			_portletPreferencesLocalService.updatePortletPreferences(
-				portletPreferences);
+			_portletPreferencesLocalService.updatePreferences(
+				portletPreferences.getOwnerId(),
+				portletPreferences.getOwnerType(), portletPreferences.getPlid(),
+				portletPreferences.getPortletId(), jxPortletPreferences);
 		}
 	}
 
@@ -458,6 +448,10 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 
 	@Reference
 	private PortletPreferencesLocalService _portletPreferencesLocalService;
+
+	@Reference
+	private PortletPreferenceValueLocalService
+		_portletPreferenceValueLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;

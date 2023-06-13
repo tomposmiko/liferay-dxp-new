@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -261,26 +262,6 @@ public class AssetCategoryModelImpl
 		return models;
 	}
 
-	public static final String MAPPING_TABLE_ASSETENTRIES_ASSETCATEGORIES_NAME =
-		"AssetEntries_AssetCategories";
-
-	public static final Object[][]
-		MAPPING_TABLE_ASSETENTRIES_ASSETCATEGORIES_COLUMNS = {
-			{"companyId", Types.BIGINT}, {"categoryId", Types.BIGINT},
-			{"entryId", Types.BIGINT}
-		};
-
-	public static final String
-		MAPPING_TABLE_ASSETENTRIES_ASSETCATEGORIES_SQL_CREATE =
-			"create table AssetEntries_AssetCategories (companyId LONG not null,categoryId LONG not null,entryId LONG not null,ctCollectionId LONG default 0 not null,ctChangeType BOOLEAN,primary key (categoryId, entryId, ctCollectionId))";
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final boolean
-		FINDER_CACHE_ENABLED_ASSETENTRIES_ASSETCATEGORIES = true;
-
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
 		com.liferay.portal.util.PropsUtil.get(
 			"lock.expiration.time.com.liferay.asset.kernel.model.AssetCategory"));
@@ -370,108 +351,130 @@ public class AssetCategoryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<AssetCategory, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, AssetCategory>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<AssetCategory, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<AssetCategory, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AssetCategory.class.getClassLoader(), AssetCategory.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", AssetCategory::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", AssetCategory::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", AssetCategory::getUuid);
-		attributeGetterFunctions.put(
-			"externalReferenceCode", AssetCategory::getExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"categoryId", AssetCategory::getCategoryId);
-		attributeGetterFunctions.put("groupId", AssetCategory::getGroupId);
-		attributeGetterFunctions.put("companyId", AssetCategory::getCompanyId);
-		attributeGetterFunctions.put("userId", AssetCategory::getUserId);
-		attributeGetterFunctions.put("userName", AssetCategory::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", AssetCategory::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", AssetCategory::getModifiedDate);
-		attributeGetterFunctions.put(
-			"parentCategoryId", AssetCategory::getParentCategoryId);
-		attributeGetterFunctions.put("treePath", AssetCategory::getTreePath);
-		attributeGetterFunctions.put("name", AssetCategory::getName);
-		attributeGetterFunctions.put("title", AssetCategory::getTitle);
-		attributeGetterFunctions.put(
-			"description", AssetCategory::getDescription);
-		attributeGetterFunctions.put(
-			"vocabularyId", AssetCategory::getVocabularyId);
-		attributeGetterFunctions.put(
-			"lastPublishDate", AssetCategory::getLastPublishDate);
+		try {
+			Constructor<AssetCategory> constructor =
+				(Constructor<AssetCategory>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<AssetCategory, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<AssetCategory, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<AssetCategory, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AssetCategory, Object>>();
 		Map<String, BiConsumer<AssetCategory, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<AssetCategory, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", AssetCategory::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AssetCategory, Long>)AssetCategory::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", AssetCategory::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<AssetCategory, Long>)AssetCategory::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", AssetCategory::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<AssetCategory, String>)AssetCategory::setUuid);
+		attributeGetterFunctions.put(
+			"externalReferenceCode", AssetCategory::getExternalReferenceCode);
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<AssetCategory, String>)
 				AssetCategory::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"categoryId", AssetCategory::getCategoryId);
 		attributeSetterBiConsumers.put(
 			"categoryId",
 			(BiConsumer<AssetCategory, Long>)AssetCategory::setCategoryId);
+		attributeGetterFunctions.put("groupId", AssetCategory::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<AssetCategory, Long>)AssetCategory::setGroupId);
+		attributeGetterFunctions.put("companyId", AssetCategory::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AssetCategory, Long>)AssetCategory::setCompanyId);
+		attributeGetterFunctions.put("userId", AssetCategory::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<AssetCategory, Long>)AssetCategory::setUserId);
+		attributeGetterFunctions.put("userName", AssetCategory::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<AssetCategory, String>)AssetCategory::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", AssetCategory::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<AssetCategory, Date>)AssetCategory::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", AssetCategory::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<AssetCategory, Date>)AssetCategory::setModifiedDate);
+		attributeGetterFunctions.put(
+			"parentCategoryId", AssetCategory::getParentCategoryId);
 		attributeSetterBiConsumers.put(
 			"parentCategoryId",
 			(BiConsumer<AssetCategory, Long>)
 				AssetCategory::setParentCategoryId);
+		attributeGetterFunctions.put("treePath", AssetCategory::getTreePath);
 		attributeSetterBiConsumers.put(
 			"treePath",
 			(BiConsumer<AssetCategory, String>)AssetCategory::setTreePath);
+		attributeGetterFunctions.put("name", AssetCategory::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<AssetCategory, String>)AssetCategory::setName);
+		attributeGetterFunctions.put("title", AssetCategory::getTitle);
 		attributeSetterBiConsumers.put(
 			"title",
 			(BiConsumer<AssetCategory, String>)AssetCategory::setTitle);
+		attributeGetterFunctions.put(
+			"description", AssetCategory::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<AssetCategory, String>)AssetCategory::setDescription);
+		attributeGetterFunctions.put(
+			"vocabularyId", AssetCategory::getVocabularyId);
 		attributeSetterBiConsumers.put(
 			"vocabularyId",
 			(BiConsumer<AssetCategory, Long>)AssetCategory::setVocabularyId);
+		attributeGetterFunctions.put(
+			"lastPublishDate", AssetCategory::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<AssetCategory, Date>)AssetCategory::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -1234,6 +1237,48 @@ public class AssetCategoryModelImpl
 	}
 
 	@Override
+	public AssetCategory cloneWithOriginalValues() {
+		AssetCategoryImpl assetCategoryImpl = new AssetCategoryImpl();
+
+		assetCategoryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		assetCategoryImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		assetCategoryImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		assetCategoryImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
+		assetCategoryImpl.setCategoryId(
+			this.<Long>getColumnOriginalValue("categoryId"));
+		assetCategoryImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		assetCategoryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		assetCategoryImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		assetCategoryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		assetCategoryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		assetCategoryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		assetCategoryImpl.setParentCategoryId(
+			this.<Long>getColumnOriginalValue("parentCategoryId"));
+		assetCategoryImpl.setTreePath(
+			this.<String>getColumnOriginalValue("treePath"));
+		assetCategoryImpl.setName(this.<String>getColumnOriginalValue("name"));
+		assetCategoryImpl.setTitle(
+			this.<String>getColumnOriginalValue("title"));
+		assetCategoryImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		assetCategoryImpl.setVocabularyId(
+			this.<Long>getColumnOriginalValue("vocabularyId"));
+		assetCategoryImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+
+		return assetCategoryImpl;
+	}
+
+	@Override
 	public int compareTo(AssetCategory assetCategory) {
 		int value = 0;
 
@@ -1494,9 +1539,7 @@ public class AssetCategoryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AssetCategory>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AssetCategory.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

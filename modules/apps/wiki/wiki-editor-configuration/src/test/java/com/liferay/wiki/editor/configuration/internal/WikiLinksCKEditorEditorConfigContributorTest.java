@@ -107,7 +107,7 @@ public class WikiLinksCKEditorEditorConfigContributorTest extends PowerMockito {
 			getJSONObjectWithDefaultItemSelectorURL();
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		_wikiLinksCKEditorEditorConfigContributor.populateConfigJSONObject(
 			jsonObject, _inputEditorTaglibAttributes, null, null);
@@ -119,7 +119,7 @@ public class WikiLinksCKEditorEditorConfigContributorTest extends PowerMockito {
 		);
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	@Test
@@ -130,7 +130,7 @@ public class WikiLinksCKEditorEditorConfigContributorTest extends PowerMockito {
 			getJSONObjectWithDefaultItemSelectorURL();
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		_wikiLinksCKEditorEditorConfigContributor.populateConfigJSONObject(
 			jsonObject, _inputEditorTaglibAttributes, null, null);
@@ -142,7 +142,7 @@ public class WikiLinksCKEditorEditorConfigContributorTest extends PowerMockito {
 		);
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	@Test
@@ -155,7 +155,7 @@ public class WikiLinksCKEditorEditorConfigContributorTest extends PowerMockito {
 			getJSONObjectWithDefaultItemSelectorURL();
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			originalJSONObject.toString());
+			originalJSONObject.toJSONString());
 
 		_wikiLinksCKEditorEditorConfigContributor.populateConfigJSONObject(
 			jsonObject, _inputEditorTaglibAttributes, null, null);
@@ -167,7 +167,7 @@ public class WikiLinksCKEditorEditorConfigContributorTest extends PowerMockito {
 		);
 
 		JSONAssert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString(), true);
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString(), true);
 	}
 
 	protected JSONObject getJSONObjectWithDefaultItemSelectorURL()

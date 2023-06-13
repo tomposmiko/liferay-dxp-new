@@ -22,7 +22,6 @@ import com.liferay.commerce.price.list.service.CommercePriceEntryLocalServiceUti
 import com.liferay.commerce.price.list.service.CommerceTierPriceEntryLocalServiceUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -51,12 +50,12 @@ public class CommerceTierPriceEntryTestUtil {
 				commercePriceList.getGroupId());
 
 		return CommerceTierPriceEntryLocalServiceUtil.addCommerceTierPriceEntry(
-			commercePriceEntryId, externalReferenceCode,
+			externalReferenceCode, commercePriceEntryId,
 			BigDecimal.valueOf(price), BigDecimal.valueOf(promoPrice),
 			minQuantity, serviceContext);
 	}
 
-	public static CommerceTierPriceEntry upsertCommerceTierPriceEntry(
+	public static CommerceTierPriceEntry addOrUpdateCommerceTierPriceEntry(
 			long companyId, long commerceTierPriceEntryId,
 			long commercePriceEntryId, int minQuantity, double price,
 			double promoPrice, String externalReferenceCode,
@@ -67,9 +66,9 @@ public class CommerceTierPriceEntryTestUtil {
 			companyId, commercePriceEntryId, priceEntryExternalReferenceCode);
 
 		return CommerceTierPriceEntryLocalServiceUtil.
-			upsertCommerceTierPriceEntry(
-				commerceTierPriceEntryId, commercePriceEntryId,
-				externalReferenceCode, BigDecimal.valueOf(price),
+			addOrUpdateCommerceTierPriceEntry(
+				externalReferenceCode, commerceTierPriceEntryId,
+				commercePriceEntryId, BigDecimal.valueOf(price),
 				BigDecimal.valueOf(promoPrice), minQuantity,
 				priceEntryExternalReferenceCode,
 				ServiceContextTestUtil.getServiceContext(groupId));
@@ -106,16 +105,11 @@ public class CommerceTierPriceEntryTestUtil {
 			}
 		}
 
-		StringBundler sb = new StringBundler(6);
-
-		sb.append("{commercePriceEntryId=");
-		sb.append(commercePriceEntryId);
-		sb.append(StringPool.COMMA_AND_SPACE);
-		sb.append("priceEntryExternalReferenceCode=");
-		sb.append(priceEntryExternalReferenceCode);
-		sb.append(CharPool.CLOSE_CURLY_BRACE);
-
-		throw new NoSuchPriceEntryException(sb.toString());
+		throw new NoSuchPriceEntryException(
+			StringBundler.concat(
+				"{commercePriceEntryId=", commercePriceEntryId,
+				", priceEntryExternalReferenceCode=",
+				priceEntryExternalReferenceCode, CharPool.CLOSE_CURLY_BRACE));
 	}
 
 }

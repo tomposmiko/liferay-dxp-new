@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mobile.device.Device;
-import com.liferay.portal.kernel.model.Account;
 import com.liferay.portal.kernel.model.ColorScheme;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Contact;
@@ -55,7 +54,6 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.Mergeable;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.TimeZoneThreadLocal;
@@ -138,19 +136,6 @@ public class ThemeDisplay
 		portletDisplay.setThemeDisplay(themeDisplay);
 
 		return themeDisplay;
-	}
-
-	public Account getAccount() {
-		if ((_account == null) && (_company != null)) {
-			try {
-				_account = _company.getAccount();
-			}
-			catch (PortalException portalException) {
-				ReflectionUtil.throwException(portalException);
-			}
-		}
-
-		return _account;
 	}
 
 	/**
@@ -544,14 +529,6 @@ public class ThemeDisplay
 		return _mdrRuleGroupInstance;
 	}
 
-	public List<NavItem> getNavItems() throws PortalException {
-		if (_navItems == null) {
-			_navItems = NavItem.fromLayouts(_httpServletRequest, this);
-		}
-
-		return _navItems;
-	}
-
 	public String getPathApplet() {
 		return _pathApplet;
 	}
@@ -574,6 +551,10 @@ public class ThemeDisplay
 		return _pathContext;
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public String getPathFlash() {
 		return _pathFlash;
 	}
@@ -954,11 +935,9 @@ public class ThemeDisplay
 	public String getThemeSetting(String key) {
 		Theme theme = getTheme();
 
-		String device = theme.getDevice();
-
 		Layout layout = getLayout();
 
-		return layout.getThemeSetting(key, device);
+		return layout.getThemeSetting(key, theme.getDevice());
 	}
 
 	/**
@@ -1053,17 +1032,6 @@ public class ThemeDisplay
 
 	public String getURLSignOut() {
 		return _urlSignOut;
-	}
-
-	@JSON(include = false)
-	public PortletURL getURLUpdateManager() {
-		if (_urlUpdateManager == null) {
-			_urlUpdateManager = PortalUtil.getControlPanelPortletURL(
-				getRequest(), PortletKeys.MARKETPLACE_STORE,
-				PortletRequest.RENDER_PHASE);
-		}
-
-		return _urlUpdateManager;
 	}
 
 	/**
@@ -1277,10 +1245,6 @@ public class ThemeDisplay
 		_includePortletCssJs = themeDisplay._includePortletCssJs;
 
 		return this;
-	}
-
-	public void setAccount(Account account) {
-		_account = account;
 	}
 
 	public void setAddSessionIdToURL(boolean addSessionIdToURL) {
@@ -1499,10 +1463,6 @@ public class ThemeDisplay
 		_mdrRuleGroupInstance = mdrRuleGroupInstance;
 	}
 
-	public void setNavItems(List<NavItem> navItems) {
-		_navItems = navItems;
-	}
-
 	public void setPathApplet(String pathApplet) {
 		_pathApplet = pathApplet;
 	}
@@ -1519,6 +1479,10 @@ public class ThemeDisplay
 		_pathContext = pathContext;
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public void setPathFlash(String pathFlash) {
 		_pathFlash = pathFlash;
 	}
@@ -1864,10 +1828,6 @@ public class ThemeDisplay
 			}
 		}
 
-		if (layout.getCtCollectionId() != 0) {
-			return layout.getFriendlyURL(_locale);
-		}
-
 		String layoutFriendlyURL = _layoutFriendlyURLs.get(layout.getPlid());
 
 		if (layoutFriendlyURL == null) {
@@ -1904,7 +1864,6 @@ public class ThemeDisplay
 
 	private static int _layoutManagePagesInitialChildren = Integer.MIN_VALUE;
 
-	private Account _account;
 	private boolean _addSessionIdToURL;
 	private boolean _ajax;
 	private boolean _async;
@@ -1950,7 +1909,6 @@ public class ThemeDisplay
 	private boolean _lifecycleResource;
 	private Locale _locale;
 	private MDRRuleGroupInstance _mdrRuleGroupInstance;
-	private List<NavItem> _navItems;
 	private String _pathApplet = StringPool.BLANK;
 	private String _pathCms = StringPool.BLANK;
 	private String _pathColorSchemeImages = StringPool.BLANK;
@@ -2026,7 +1984,6 @@ public class ThemeDisplay
 	private transient PortletURL _urlPublishToLive;
 	private String _urlSignIn = StringPool.BLANK;
 	private String _urlSignOut = StringPool.BLANK;
-	private transient PortletURL _urlUpdateManager;
 	private User _user;
 	private boolean _widget;
 

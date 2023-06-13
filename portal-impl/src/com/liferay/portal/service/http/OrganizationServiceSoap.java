@@ -200,6 +200,27 @@ public class OrganizationServiceSoap {
 		}
 	}
 
+	public static com.liferay.portal.kernel.model.UserSoap
+			addOrganizationUserByEmailAddress(
+				String emailAddress, long organizationId,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			com.liferay.portal.kernel.model.User returnValue =
+				OrganizationServiceUtil.addOrganizationUserByEmailAddress(
+					emailAddress, organizationId, serviceContext);
+
+			return com.liferay.portal.kernel.model.UserSoap.toSoapModel(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
 	/**
 	 * Assigns the password policy to the organizations, removing any other
 	 * currently assigned password policies.
@@ -214,6 +235,21 @@ public class OrganizationServiceSoap {
 		try {
 			OrganizationServiceUtil.addPasswordPolicyOrganizations(
 				passwordPolicyId, organizationIds);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static void addUserOrganizationByEmailAddress(
+			String emailAddress, long organizationId)
+		throws RemoteException {
+
+		try {
+			OrganizationServiceUtil.addUserOrganizationByEmailAddress(
+				emailAddress, organizationId);
 		}
 		catch (Exception exception) {
 			_log.error(exception, exception);
@@ -249,6 +285,21 @@ public class OrganizationServiceSoap {
 
 		try {
 			OrganizationServiceUtil.deleteOrganization(organizationId);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static void deleteUserOrganizationByEmailAddress(
+			String emailAddress, long organizationId)
+		throws RemoteException {
+
+		try {
+			OrganizationServiceUtil.deleteUserOrganizationByEmailAddress(
+				emailAddress, organizationId);
 		}
 		catch (Exception exception) {
 			_log.error(exception, exception);

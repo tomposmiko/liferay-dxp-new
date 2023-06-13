@@ -43,6 +43,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -82,7 +83,8 @@ public class BlogsEntryModelImpl
 	public static final String TABLE_NAME = "BlogsEntry";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
+		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
+		{"uuid_", Types.VARCHAR}, {"externalReferenceCode", Types.VARCHAR},
 		{"entryId", Types.BIGINT}, {"groupId", Types.BIGINT},
 		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
 		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
@@ -105,7 +107,9 @@ public class BlogsEntryModelImpl
 
 	static {
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("externalReferenceCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("entryId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -137,7 +141,7 @@ public class BlogsEntryModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table BlogsEntry (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,entryId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title VARCHAR(255) null,subtitle STRING null,urlTitle VARCHAR(255) null,description STRING null,content TEXT null,displayDate DATE null,allowPingbacks BOOLEAN,allowTrackbacks BOOLEAN,trackbacks TEXT null,coverImageCaption STRING null,coverImageFileEntryId LONG,coverImageURL STRING null,smallImage BOOLEAN,smallImageFileEntryId LONG,smallImageId LONG,smallImageURL STRING null,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
+		"create table BlogsEntry (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,entryId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title VARCHAR(255) null,subtitle STRING null,urlTitle VARCHAR(255) null,description STRING null,content TEXT null,displayDate DATE null,allowPingbacks BOOLEAN,allowTrackbacks BOOLEAN,trackbacks TEXT null,coverImageCaption STRING null,coverImageFileEntryId LONG,coverImageURL STRING null,smallImage BOOLEAN,smallImageFileEntryId LONG,smallImageId LONG,smallImageURL STRING null,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,primary key (entryId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP = "drop table BlogsEntry";
 
@@ -169,38 +173,44 @@ public class BlogsEntryModelImpl
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long GROUPID_COLUMN_BITMASK = 4L;
+	public static final long EXTERNALREFERENCECODE_COLUMN_BITMASK = 4L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long STATUS_COLUMN_BITMASK = 8L;
+	public static final long GROUPID_COLUMN_BITMASK = 8L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long URLTITLE_COLUMN_BITMASK = 16L;
+	public static final long STATUS_COLUMN_BITMASK = 16L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long USERID_COLUMN_BITMASK = 32L;
+	public static final long URLTITLE_COLUMN_BITMASK = 32L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long UUID_COLUMN_BITMASK = 64L;
+	public static final long USERID_COLUMN_BITMASK = 64L;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long UUID_COLUMN_BITMASK = 128L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *		#getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long CREATEDATE_COLUMN_BITMASK = 128L;
+	public static final long CREATEDATE_COLUMN_BITMASK = 256L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -232,7 +242,9 @@ public class BlogsEntryModelImpl
 		BlogsEntry model = new BlogsEntryImpl();
 
 		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
 		model.setUuid(soapModel.getUuid());
+		model.setExternalReferenceCode(soapModel.getExternalReferenceCode());
 		model.setEntryId(soapModel.getEntryId());
 		model.setGroupId(soapModel.getGroupId());
 		model.setCompanyId(soapModel.getCompanyId());
@@ -371,151 +383,184 @@ public class BlogsEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<BlogsEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, BlogsEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<BlogsEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<BlogsEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			BlogsEntry.class.getClassLoader(), BlogsEntry.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", BlogsEntry::getMvccVersion);
-		attributeGetterFunctions.put("uuid", BlogsEntry::getUuid);
-		attributeGetterFunctions.put("entryId", BlogsEntry::getEntryId);
-		attributeGetterFunctions.put("groupId", BlogsEntry::getGroupId);
-		attributeGetterFunctions.put("companyId", BlogsEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", BlogsEntry::getUserId);
-		attributeGetterFunctions.put("userName", BlogsEntry::getUserName);
-		attributeGetterFunctions.put("createDate", BlogsEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", BlogsEntry::getModifiedDate);
-		attributeGetterFunctions.put("title", BlogsEntry::getTitle);
-		attributeGetterFunctions.put("subtitle", BlogsEntry::getSubtitle);
-		attributeGetterFunctions.put("urlTitle", BlogsEntry::getUrlTitle);
-		attributeGetterFunctions.put("description", BlogsEntry::getDescription);
-		attributeGetterFunctions.put("content", BlogsEntry::getContent);
-		attributeGetterFunctions.put("displayDate", BlogsEntry::getDisplayDate);
-		attributeGetterFunctions.put(
-			"allowPingbacks", BlogsEntry::getAllowPingbacks);
-		attributeGetterFunctions.put(
-			"allowTrackbacks", BlogsEntry::getAllowTrackbacks);
-		attributeGetterFunctions.put("trackbacks", BlogsEntry::getTrackbacks);
-		attributeGetterFunctions.put(
-			"coverImageCaption", BlogsEntry::getCoverImageCaption);
-		attributeGetterFunctions.put(
-			"coverImageFileEntryId", BlogsEntry::getCoverImageFileEntryId);
-		attributeGetterFunctions.put(
-			"coverImageURL", BlogsEntry::getCoverImageURL);
-		attributeGetterFunctions.put("smallImage", BlogsEntry::getSmallImage);
-		attributeGetterFunctions.put(
-			"smallImageFileEntryId", BlogsEntry::getSmallImageFileEntryId);
-		attributeGetterFunctions.put(
-			"smallImageId", BlogsEntry::getSmallImageId);
-		attributeGetterFunctions.put(
-			"smallImageURL", BlogsEntry::getSmallImageURL);
-		attributeGetterFunctions.put(
-			"lastPublishDate", BlogsEntry::getLastPublishDate);
-		attributeGetterFunctions.put("status", BlogsEntry::getStatus);
-		attributeGetterFunctions.put(
-			"statusByUserId", BlogsEntry::getStatusByUserId);
-		attributeGetterFunctions.put(
-			"statusByUserName", BlogsEntry::getStatusByUserName);
-		attributeGetterFunctions.put("statusDate", BlogsEntry::getStatusDate);
+		try {
+			Constructor<BlogsEntry> constructor =
+				(Constructor<BlogsEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<BlogsEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<BlogsEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<BlogsEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<BlogsEntry, Object>>();
 		Map<String, BiConsumer<BlogsEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<BlogsEntry, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", BlogsEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<BlogsEntry, Long>)BlogsEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", BlogsEntry::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<BlogsEntry, Long>)BlogsEntry::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", BlogsEntry::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<BlogsEntry, String>)BlogsEntry::setUuid);
+		attributeGetterFunctions.put(
+			"externalReferenceCode", BlogsEntry::getExternalReferenceCode);
+		attributeSetterBiConsumers.put(
+			"externalReferenceCode",
+			(BiConsumer<BlogsEntry, String>)
+				BlogsEntry::setExternalReferenceCode);
+		attributeGetterFunctions.put("entryId", BlogsEntry::getEntryId);
 		attributeSetterBiConsumers.put(
 			"entryId", (BiConsumer<BlogsEntry, Long>)BlogsEntry::setEntryId);
+		attributeGetterFunctions.put("groupId", BlogsEntry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<BlogsEntry, Long>)BlogsEntry::setGroupId);
+		attributeGetterFunctions.put("companyId", BlogsEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<BlogsEntry, Long>)BlogsEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", BlogsEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<BlogsEntry, Long>)BlogsEntry::setUserId);
+		attributeGetterFunctions.put("userName", BlogsEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<BlogsEntry, String>)BlogsEntry::setUserName);
+		attributeGetterFunctions.put("createDate", BlogsEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<BlogsEntry, Date>)BlogsEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", BlogsEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<BlogsEntry, Date>)BlogsEntry::setModifiedDate);
+		attributeGetterFunctions.put("title", BlogsEntry::getTitle);
 		attributeSetterBiConsumers.put(
 			"title", (BiConsumer<BlogsEntry, String>)BlogsEntry::setTitle);
+		attributeGetterFunctions.put("subtitle", BlogsEntry::getSubtitle);
 		attributeSetterBiConsumers.put(
 			"subtitle",
 			(BiConsumer<BlogsEntry, String>)BlogsEntry::setSubtitle);
+		attributeGetterFunctions.put("urlTitle", BlogsEntry::getUrlTitle);
 		attributeSetterBiConsumers.put(
 			"urlTitle",
 			(BiConsumer<BlogsEntry, String>)BlogsEntry::setUrlTitle);
+		attributeGetterFunctions.put("description", BlogsEntry::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<BlogsEntry, String>)BlogsEntry::setDescription);
+		attributeGetterFunctions.put("content", BlogsEntry::getContent);
 		attributeSetterBiConsumers.put(
 			"content", (BiConsumer<BlogsEntry, String>)BlogsEntry::setContent);
+		attributeGetterFunctions.put("displayDate", BlogsEntry::getDisplayDate);
 		attributeSetterBiConsumers.put(
 			"displayDate",
 			(BiConsumer<BlogsEntry, Date>)BlogsEntry::setDisplayDate);
+		attributeGetterFunctions.put(
+			"allowPingbacks", BlogsEntry::getAllowPingbacks);
 		attributeSetterBiConsumers.put(
 			"allowPingbacks",
 			(BiConsumer<BlogsEntry, Boolean>)BlogsEntry::setAllowPingbacks);
+		attributeGetterFunctions.put(
+			"allowTrackbacks", BlogsEntry::getAllowTrackbacks);
 		attributeSetterBiConsumers.put(
 			"allowTrackbacks",
 			(BiConsumer<BlogsEntry, Boolean>)BlogsEntry::setAllowTrackbacks);
+		attributeGetterFunctions.put("trackbacks", BlogsEntry::getTrackbacks);
 		attributeSetterBiConsumers.put(
 			"trackbacks",
 			(BiConsumer<BlogsEntry, String>)BlogsEntry::setTrackbacks);
+		attributeGetterFunctions.put(
+			"coverImageCaption", BlogsEntry::getCoverImageCaption);
 		attributeSetterBiConsumers.put(
 			"coverImageCaption",
 			(BiConsumer<BlogsEntry, String>)BlogsEntry::setCoverImageCaption);
+		attributeGetterFunctions.put(
+			"coverImageFileEntryId", BlogsEntry::getCoverImageFileEntryId);
 		attributeSetterBiConsumers.put(
 			"coverImageFileEntryId",
 			(BiConsumer<BlogsEntry, Long>)BlogsEntry::setCoverImageFileEntryId);
+		attributeGetterFunctions.put(
+			"coverImageURL", BlogsEntry::getCoverImageURL);
 		attributeSetterBiConsumers.put(
 			"coverImageURL",
 			(BiConsumer<BlogsEntry, String>)BlogsEntry::setCoverImageURL);
+		attributeGetterFunctions.put("smallImage", BlogsEntry::getSmallImage);
 		attributeSetterBiConsumers.put(
 			"smallImage",
 			(BiConsumer<BlogsEntry, Boolean>)BlogsEntry::setSmallImage);
+		attributeGetterFunctions.put(
+			"smallImageFileEntryId", BlogsEntry::getSmallImageFileEntryId);
 		attributeSetterBiConsumers.put(
 			"smallImageFileEntryId",
 			(BiConsumer<BlogsEntry, Long>)BlogsEntry::setSmallImageFileEntryId);
+		attributeGetterFunctions.put(
+			"smallImageId", BlogsEntry::getSmallImageId);
 		attributeSetterBiConsumers.put(
 			"smallImageId",
 			(BiConsumer<BlogsEntry, Long>)BlogsEntry::setSmallImageId);
+		attributeGetterFunctions.put(
+			"smallImageURL", BlogsEntry::getSmallImageURL);
 		attributeSetterBiConsumers.put(
 			"smallImageURL",
 			(BiConsumer<BlogsEntry, String>)BlogsEntry::setSmallImageURL);
+		attributeGetterFunctions.put(
+			"lastPublishDate", BlogsEntry::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<BlogsEntry, Date>)BlogsEntry::setLastPublishDate);
+		attributeGetterFunctions.put("status", BlogsEntry::getStatus);
 		attributeSetterBiConsumers.put(
 			"status", (BiConsumer<BlogsEntry, Integer>)BlogsEntry::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", BlogsEntry::getStatusByUserId);
 		attributeSetterBiConsumers.put(
 			"statusByUserId",
 			(BiConsumer<BlogsEntry, Long>)BlogsEntry::setStatusByUserId);
+		attributeGetterFunctions.put(
+			"statusByUserName", BlogsEntry::getStatusByUserName);
 		attributeSetterBiConsumers.put(
 			"statusByUserName",
 			(BiConsumer<BlogsEntry, String>)BlogsEntry::setStatusByUserName);
+		attributeGetterFunctions.put("statusDate", BlogsEntry::getStatusDate);
 		attributeSetterBiConsumers.put(
 			"statusDate",
 			(BiConsumer<BlogsEntry, Date>)BlogsEntry::setStatusDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -533,6 +578,21 @@ public class BlogsEntryModelImpl
 		}
 
 		_mvccVersion = mvccVersion;
+	}
+
+	@JSON
+	@Override
+	public long getCtCollectionId() {
+		return _ctCollectionId;
+	}
+
+	@Override
+	public void setCtCollectionId(long ctCollectionId) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_ctCollectionId = ctCollectionId;
 	}
 
 	@JSON
@@ -562,6 +622,35 @@ public class BlogsEntryModelImpl
 	@Deprecated
 	public String getOriginalUuid() {
 		return getColumnOriginalValue("uuid_");
+	}
+
+	@JSON
+	@Override
+	public String getExternalReferenceCode() {
+		if (_externalReferenceCode == null) {
+			return "";
+		}
+		else {
+			return _externalReferenceCode;
+		}
+	}
+
+	@Override
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_externalReferenceCode = externalReferenceCode;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
+	public String getOriginalExternalReferenceCode() {
+		return getColumnOriginalValue("externalReferenceCode");
 	}
 
 	@JSON
@@ -1439,7 +1528,9 @@ public class BlogsEntryModelImpl
 		BlogsEntryImpl blogsEntryImpl = new BlogsEntryImpl();
 
 		blogsEntryImpl.setMvccVersion(getMvccVersion());
+		blogsEntryImpl.setCtCollectionId(getCtCollectionId());
 		blogsEntryImpl.setUuid(getUuid());
+		blogsEntryImpl.setExternalReferenceCode(getExternalReferenceCode());
 		blogsEntryImpl.setEntryId(getEntryId());
 		blogsEntryImpl.setGroupId(getGroupId());
 		blogsEntryImpl.setCompanyId(getCompanyId());
@@ -1470,6 +1561,73 @@ public class BlogsEntryModelImpl
 		blogsEntryImpl.setStatusDate(getStatusDate());
 
 		blogsEntryImpl.resetOriginalValues();
+
+		return blogsEntryImpl;
+	}
+
+	@Override
+	public BlogsEntry cloneWithOriginalValues() {
+		BlogsEntryImpl blogsEntryImpl = new BlogsEntryImpl();
+
+		blogsEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		blogsEntryImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		blogsEntryImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		blogsEntryImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
+		blogsEntryImpl.setEntryId(this.<Long>getColumnOriginalValue("entryId"));
+		blogsEntryImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
+		blogsEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		blogsEntryImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		blogsEntryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		blogsEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		blogsEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		blogsEntryImpl.setTitle(this.<String>getColumnOriginalValue("title"));
+		blogsEntryImpl.setSubtitle(
+			this.<String>getColumnOriginalValue("subtitle"));
+		blogsEntryImpl.setUrlTitle(
+			this.<String>getColumnOriginalValue("urlTitle"));
+		blogsEntryImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		blogsEntryImpl.setContent(
+			this.<String>getColumnOriginalValue("content"));
+		blogsEntryImpl.setDisplayDate(
+			this.<Date>getColumnOriginalValue("displayDate"));
+		blogsEntryImpl.setAllowPingbacks(
+			this.<Boolean>getColumnOriginalValue("allowPingbacks"));
+		blogsEntryImpl.setAllowTrackbacks(
+			this.<Boolean>getColumnOriginalValue("allowTrackbacks"));
+		blogsEntryImpl.setTrackbacks(
+			this.<String>getColumnOriginalValue("trackbacks"));
+		blogsEntryImpl.setCoverImageCaption(
+			this.<String>getColumnOriginalValue("coverImageCaption"));
+		blogsEntryImpl.setCoverImageFileEntryId(
+			this.<Long>getColumnOriginalValue("coverImageFileEntryId"));
+		blogsEntryImpl.setCoverImageURL(
+			this.<String>getColumnOriginalValue("coverImageURL"));
+		blogsEntryImpl.setSmallImage(
+			this.<Boolean>getColumnOriginalValue("smallImage"));
+		blogsEntryImpl.setSmallImageFileEntryId(
+			this.<Long>getColumnOriginalValue("smallImageFileEntryId"));
+		blogsEntryImpl.setSmallImageId(
+			this.<Long>getColumnOriginalValue("smallImageId"));
+		blogsEntryImpl.setSmallImageURL(
+			this.<String>getColumnOriginalValue("smallImageURL"));
+		blogsEntryImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+		blogsEntryImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
+		blogsEntryImpl.setStatusByUserId(
+			this.<Long>getColumnOriginalValue("statusByUserId"));
+		blogsEntryImpl.setStatusByUserName(
+			this.<String>getColumnOriginalValue("statusByUserName"));
+		blogsEntryImpl.setStatusDate(
+			this.<Date>getColumnOriginalValue("statusDate"));
 
 		return blogsEntryImpl;
 	}
@@ -1558,12 +1716,25 @@ public class BlogsEntryModelImpl
 
 		blogsEntryCacheModel.mvccVersion = getMvccVersion();
 
+		blogsEntryCacheModel.ctCollectionId = getCtCollectionId();
+
 		blogsEntryCacheModel.uuid = getUuid();
 
 		String uuid = blogsEntryCacheModel.uuid;
 
 		if ((uuid != null) && (uuid.length() == 0)) {
 			blogsEntryCacheModel.uuid = null;
+		}
+
+		blogsEntryCacheModel.externalReferenceCode = getExternalReferenceCode();
+
+		String externalReferenceCode =
+			blogsEntryCacheModel.externalReferenceCode;
+
+		if ((externalReferenceCode != null) &&
+			(externalReferenceCode.length() == 0)) {
+
+			blogsEntryCacheModel.externalReferenceCode = null;
 		}
 
 		blogsEntryCacheModel.entryId = getEntryId();
@@ -1809,14 +1980,14 @@ public class BlogsEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, BlogsEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					BlogsEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
 	private long _mvccVersion;
+	private long _ctCollectionId;
 	private String _uuid;
+	private String _externalReferenceCode;
 	private long _entryId;
 	private long _groupId;
 	private long _companyId;
@@ -1877,7 +2048,10 @@ public class BlogsEntryModelImpl
 		_columnOriginalValues = new HashMap<String, Object>();
 
 		_columnOriginalValues.put("mvccVersion", _mvccVersion);
+		_columnOriginalValues.put("ctCollectionId", _ctCollectionId);
 		_columnOriginalValues.put("uuid_", _uuid);
+		_columnOriginalValues.put(
+			"externalReferenceCode", _externalReferenceCode);
 		_columnOriginalValues.put("entryId", _entryId);
 		_columnOriginalValues.put("groupId", _groupId);
 		_columnOriginalValues.put("companyId", _companyId);
@@ -1933,63 +2107,67 @@ public class BlogsEntryModelImpl
 
 		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("uuid_", 2L);
+		columnBitmasks.put("ctCollectionId", 2L);
 
-		columnBitmasks.put("entryId", 4L);
+		columnBitmasks.put("uuid_", 4L);
 
-		columnBitmasks.put("groupId", 8L);
+		columnBitmasks.put("externalReferenceCode", 8L);
 
-		columnBitmasks.put("companyId", 16L);
+		columnBitmasks.put("entryId", 16L);
 
-		columnBitmasks.put("userId", 32L);
+		columnBitmasks.put("groupId", 32L);
 
-		columnBitmasks.put("userName", 64L);
+		columnBitmasks.put("companyId", 64L);
 
-		columnBitmasks.put("createDate", 128L);
+		columnBitmasks.put("userId", 128L);
 
-		columnBitmasks.put("modifiedDate", 256L);
+		columnBitmasks.put("userName", 256L);
 
-		columnBitmasks.put("title", 512L);
+		columnBitmasks.put("createDate", 512L);
 
-		columnBitmasks.put("subtitle", 1024L);
+		columnBitmasks.put("modifiedDate", 1024L);
 
-		columnBitmasks.put("urlTitle", 2048L);
+		columnBitmasks.put("title", 2048L);
 
-		columnBitmasks.put("description", 4096L);
+		columnBitmasks.put("subtitle", 4096L);
 
-		columnBitmasks.put("content", 8192L);
+		columnBitmasks.put("urlTitle", 8192L);
 
-		columnBitmasks.put("displayDate", 16384L);
+		columnBitmasks.put("description", 16384L);
 
-		columnBitmasks.put("allowPingbacks", 32768L);
+		columnBitmasks.put("content", 32768L);
 
-		columnBitmasks.put("allowTrackbacks", 65536L);
+		columnBitmasks.put("displayDate", 65536L);
 
-		columnBitmasks.put("trackbacks", 131072L);
+		columnBitmasks.put("allowPingbacks", 131072L);
 
-		columnBitmasks.put("coverImageCaption", 262144L);
+		columnBitmasks.put("allowTrackbacks", 262144L);
 
-		columnBitmasks.put("coverImageFileEntryId", 524288L);
+		columnBitmasks.put("trackbacks", 524288L);
 
-		columnBitmasks.put("coverImageURL", 1048576L);
+		columnBitmasks.put("coverImageCaption", 1048576L);
 
-		columnBitmasks.put("smallImage", 2097152L);
+		columnBitmasks.put("coverImageFileEntryId", 2097152L);
 
-		columnBitmasks.put("smallImageFileEntryId", 4194304L);
+		columnBitmasks.put("coverImageURL", 4194304L);
 
-		columnBitmasks.put("smallImageId", 8388608L);
+		columnBitmasks.put("smallImage", 8388608L);
 
-		columnBitmasks.put("smallImageURL", 16777216L);
+		columnBitmasks.put("smallImageFileEntryId", 16777216L);
 
-		columnBitmasks.put("lastPublishDate", 33554432L);
+		columnBitmasks.put("smallImageId", 33554432L);
 
-		columnBitmasks.put("status", 67108864L);
+		columnBitmasks.put("smallImageURL", 67108864L);
 
-		columnBitmasks.put("statusByUserId", 134217728L);
+		columnBitmasks.put("lastPublishDate", 134217728L);
 
-		columnBitmasks.put("statusByUserName", 268435456L);
+		columnBitmasks.put("status", 268435456L);
 
-		columnBitmasks.put("statusDate", 536870912L);
+		columnBitmasks.put("statusByUserId", 536870912L);
+
+		columnBitmasks.put("statusByUserName", 1073741824L);
+
+		columnBitmasks.put("statusDate", 2147483648L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

@@ -32,20 +32,15 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.workflow.metrics.rest.internal.security.permission.LiberalPermissionChecker;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.IndexResource;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 
 import javax.annotation.Generated;
 
@@ -53,7 +48,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.ComponentServiceObjects;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
@@ -61,10 +58,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
  * @author Rafael Praxedes
  * @generated
  */
-@Component(
-	property = "resource.locator.key=/portal-workflow-metrics/v1.0/Index",
-	service = IndexResource.Factory.class
-)
+@Component(immediate = true, service = IndexResource.Factory.class)
 @Generated("")
 public class IndexResourceFactoryImpl implements IndexResource.Factory {
 
@@ -78,7 +72,9 @@ public class IndexResourceFactoryImpl implements IndexResource.Factory {
 					throw new IllegalArgumentException("User is not set");
 				}
 
-				return _indexResourceProxyProviderFunction.apply(
+				return (IndexResource)ProxyUtil.newProxyInstance(
+					IndexResource.class.getClassLoader(),
+					new Class<?>[] {IndexResource.class},
 					(proxy, method, arguments) -> _invoke(
 						method, arguments, _checkPermissions,
 						_httpServletRequest, _httpServletResponse,
@@ -137,31 +133,14 @@ public class IndexResourceFactoryImpl implements IndexResource.Factory {
 		};
 	}
 
-	private static Function<InvocationHandler, IndexResource>
-		_getProxyProviderFunction() {
+	@Activate
+	protected void activate() {
+		IndexResource.FactoryHolder.factory = this;
+	}
 
-		Class<?> proxyClass = ProxyUtil.getProxyClass(
-			IndexResource.class.getClassLoader(), IndexResource.class);
-
-		try {
-			Constructor<IndexResource> constructor =
-				(Constructor<IndexResource>)proxyClass.getConstructor(
-					InvocationHandler.class);
-
-			return invocationHandler -> {
-				try {
-					return constructor.newInstance(invocationHandler);
-				}
-				catch (ReflectiveOperationException
-							reflectiveOperationException) {
-
-					throw new InternalError(reflectiveOperationException);
-				}
-			};
-		}
-		catch (NoSuchMethodException noSuchMethodException) {
-			throw new InternalError(noSuchMethodException);
-		}
+	@Deactivate
+	protected void deactivate() {
+		IndexResource.FactoryHolder.factory = null;
 	}
 
 	private Object _invoke(
@@ -184,7 +163,7 @@ public class IndexResourceFactoryImpl implements IndexResource.Factory {
 		}
 		else {
 			PermissionThreadLocal.setPermissionChecker(
-				new LiberalPermissionChecker(user));
+				_liberalPermissionCheckerFactory.create(user));
 		}
 
 		IndexResource indexResource = _componentServiceObjects.getService();
@@ -207,7 +186,6 @@ public class IndexResourceFactoryImpl implements IndexResource.Factory {
 		indexResource.setResourcePermissionLocalService(
 			_resourcePermissionLocalService);
 		indexResource.setRoleLocalService(_roleLocalService);
-		indexResource.setSortParserProvider(_sortParserProvider);
 
 		try {
 			return method.invoke(indexResource, arguments);
@@ -223,9 +201,6 @@ public class IndexResourceFactoryImpl implements IndexResource.Factory {
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
-
-	private static final Function<InvocationHandler, IndexResource>
-		_indexResourceProxyProviderFunction = _getProxyProviderFunction();
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
@@ -247,6 +222,9 @@ public class IndexResourceFactoryImpl implements IndexResource.Factory {
 	@Reference
 	private GroupLocalService _groupLocalService;
 
+	@Reference(target = "(permission.checker.type=liberal)")
+	private PermissionCheckerFactory _liberalPermissionCheckerFactory;
+
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;
 
@@ -255,9 +233,6 @@ public class IndexResourceFactoryImpl implements IndexResource.Factory {
 
 	@Reference
 	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private SortParserProvider _sortParserProvider;
 
 	@Reference
 	private UserLocalService _userLocalService;

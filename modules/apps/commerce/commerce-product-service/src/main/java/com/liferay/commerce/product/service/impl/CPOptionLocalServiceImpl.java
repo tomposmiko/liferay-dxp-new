@@ -21,6 +21,7 @@ import com.liferay.commerce.product.exception.CPOptionKeyException;
 import com.liferay.commerce.product.exception.CPOptionSKUContributorException;
 import com.liferay.commerce.product.model.CPOption;
 import com.liferay.commerce.product.service.base.CPOptionLocalServiceBaseImpl;
+import com.liferay.expando.kernel.service.ExpandoRowLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
@@ -67,11 +68,10 @@ public class CPOptionLocalServiceImpl extends CPOptionLocalServiceBaseImpl {
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public CPOption addCPOption(
-			long userId, Map<Locale, String> nameMap,
-			Map<Locale, String> descriptionMap, String ddmFormFieldTypeName,
-			boolean facetable, boolean required, boolean skuContributor,
-			String key, String externalReferenceCode,
-			ServiceContext serviceContext)
+			String externalReferenceCode, long userId,
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			String ddmFormFieldTypeName, boolean facetable, boolean required,
+			boolean skuContributor, String key, ServiceContext serviceContext)
 		throws PortalException {
 
 		validateDDMFormFieldTypeName(ddmFormFieldTypeName, skuContributor);
@@ -90,6 +90,7 @@ public class CPOptionLocalServiceImpl extends CPOptionLocalServiceBaseImpl {
 
 		CPOption cpOption = cpOptionPersistence.create(cpOptionId);
 
+		cpOption.setExternalReferenceCode(externalReferenceCode);
 		cpOption.setCompanyId(user.getCompanyId());
 		cpOption.setUserId(user.getUserId());
 		cpOption.setUserName(user.getFullName());
@@ -101,7 +102,6 @@ public class CPOptionLocalServiceImpl extends CPOptionLocalServiceBaseImpl {
 		cpOption.setSkuContributor(skuContributor);
 		cpOption.setKey(key);
 		cpOption.setExpandoBridgeAttributes(serviceContext);
-		cpOption.setExternalReferenceCode(externalReferenceCode);
 
 		cpOption = cpOptionPersistence.update(cpOption);
 
@@ -110,6 +110,35 @@ public class CPOptionLocalServiceImpl extends CPOptionLocalServiceBaseImpl {
 		resourceLocalService.addModelResources(cpOption, serviceContext);
 
 		return cpOption;
+	}
+
+	@Override
+	public CPOption addOrUpdateCPOption(
+			String externalReferenceCode, long userId,
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			String ddmFormFieldTypeName, boolean facetable, boolean required,
+			boolean skuContributor, String key, ServiceContext serviceContext)
+		throws PortalException {
+
+		if (Validator.isBlank(externalReferenceCode)) {
+			externalReferenceCode = null;
+		}
+		else {
+			CPOption cpOption = cpOptionPersistence.fetchByC_ERC(
+				serviceContext.getCompanyId(), externalReferenceCode);
+
+			if (cpOption != null) {
+				return updateCPOption(
+					cpOption.getCPOptionId(), nameMap, descriptionMap,
+					ddmFormFieldTypeName, facetable, required, skuContributor,
+					key, serviceContext);
+			}
+		}
+
+		return addCPOption(
+			externalReferenceCode, userId, nameMap, descriptionMap,
+			ddmFormFieldTypeName, facetable, required, skuContributor, key,
+			serviceContext);
 	}
 
 	@Indexable(type = IndexableType.DELETE)
@@ -133,7 +162,7 @@ public class CPOptionLocalServiceImpl extends CPOptionLocalServiceBaseImpl {
 
 		// Expando
 
-		expandoRowLocalService.deleteRows(cpOption.getCPOptionId());
+		_expandoRowLocalService.deleteRows(cpOption.getCPOptionId());
 
 		return cpOption;
 	}
@@ -157,7 +186,7 @@ public class CPOptionLocalServiceImpl extends CPOptionLocalServiceBaseImpl {
 
 	@Override
 	public CPOption fetchByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
+		String externalReferenceCode, long companyId) {
 
 		if (Validator.isBlank(externalReferenceCode)) {
 			return null;
@@ -168,7 +197,9 @@ public class CPOptionLocalServiceImpl extends CPOptionLocalServiceBaseImpl {
 	}
 
 	@Override
-	public CPOption fetchCPOption(long companyId, String key) {
+	public CPOption fetchCPOption(long companyId, String key)
+		throws PortalException {
+
 		return cpOptionPersistence.fetchByC_K(companyId, key);
 	}
 
@@ -234,34 +265,17 @@ public class CPOptionLocalServiceImpl extends CPOptionLocalServiceBaseImpl {
 		return cpOptionPersistence.update(cpOption);
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public CPOption upsertCPOption(
-			long userId, Map<Locale, String> nameMap,
-			Map<Locale, String> descriptionMap, String ddmFormFieldTypeName,
-			boolean facetable, boolean required, boolean skuContributor,
-			String key, String externalReferenceCode,
-			ServiceContext serviceContext)
+	public CPOption updateCPOptionExternalReferenceCode(
+			String externalReferenceCode, long cpOptionId)
 		throws PortalException {
 
-		if (Validator.isBlank(externalReferenceCode)) {
-			externalReferenceCode = null;
-		}
-		else {
-			CPOption cpOption = cpOptionPersistence.fetchByC_ERC(
-				serviceContext.getCompanyId(), externalReferenceCode);
+		CPOption cpOption = cpOptionLocalService.getCPOption(cpOptionId);
 
-			if (cpOption != null) {
-				return updateCPOption(
-					cpOption.getCPOptionId(), nameMap, descriptionMap,
-					ddmFormFieldTypeName, facetable, required, skuContributor,
-					key, serviceContext);
-			}
-		}
+		cpOption.setExternalReferenceCode(externalReferenceCode);
 
-		return addCPOption(
-			userId, nameMap, descriptionMap, ddmFormFieldTypeName, facetable,
-			required, skuContributor, key, externalReferenceCode,
-			serviceContext);
+		return cpOptionPersistence.update(cpOption);
 	}
 
 	protected SearchContext buildSearchContext(
@@ -403,7 +417,7 @@ public class CPOptionLocalServiceImpl extends CPOptionLocalServiceBaseImpl {
 
 		return _configurationProvider.getConfiguration(
 			CPOptionConfiguration.class,
-			new SystemSettingsLocator(CPConstants.CP_OPTION_SERVICE_NAME));
+			new SystemSettingsLocator(CPConstants.SERVICE_NAME_CP_OPTION));
 	}
 
 	private static final String[] _SELECTED_FIELD_NAMES = {
@@ -412,5 +426,8 @@ public class CPOptionLocalServiceImpl extends CPOptionLocalServiceBaseImpl {
 
 	@ServiceReference(type = ConfigurationProvider.class)
 	private ConfigurationProvider _configurationProvider;
+
+	@ServiceReference(type = ExpandoRowLocalService.class)
+	private ExpandoRowLocalService _expandoRowLocalService;
 
 }

@@ -16,7 +16,7 @@
 
 <%@ include file="/init.jsp" %>
 
-<div class="nav-menu sites-directory-taglib">
+<div class="nav-menu overflow-hidden sites-directory-taglib">
 	<c:choose>
 		<c:when test="<%= sitesDirectoryDisplayContext.isHidden() %>">
 			<div class="alert alert-info">
@@ -43,11 +43,6 @@
 								>
 									<c:choose>
 										<c:when test='<%= Objects.equals(sitesDirectoryDisplayContext.getDisplayStyle(), "icon") %>'>
-
-											<%
-											row.setCssClass("entry-card lfr-asset-item");
-											%>
-
 											<liferay-ui:search-container-column-text>
 												<clay:vertical-card
 													verticalCard="<%= new GroupVerticalCard(childGroup, renderRequest) %>"
@@ -87,14 +82,14 @@
 												</h6>
 
 												<h6 class="text-default">
-													<liferay-ui:asset-tags-summary
+													<liferay-asset:asset-tags-summary
 														className="<%= Group.class.getName() %>"
 														classPK="<%= childGroup.getGroupId() %>"
 													/>
 												</h6>
 
 												<h6 class="text-default">
-													<liferay-ui:asset-categories-summary
+													<liferay-asset:asset-categories-summary
 														className="<%= Group.class.getName() %>"
 														classPK="<%= childGroup.getGroupId() %>"
 													/>

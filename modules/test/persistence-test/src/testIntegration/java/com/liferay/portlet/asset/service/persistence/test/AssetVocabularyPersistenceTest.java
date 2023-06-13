@@ -15,7 +15,6 @@
 package com.liferay.portlet.asset.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.asset.kernel.exception.DuplicateAssetVocabularyExternalReferenceCodeException;
 import com.liferay.asset.kernel.exception.NoSuchVocabularyException;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil;
@@ -213,28 +212,6 @@ public class AssetVocabularyPersistenceTest {
 			Time.getShortTimestamp(newAssetVocabulary.getLastPublishDate()));
 	}
 
-	@Test(
-		expected = DuplicateAssetVocabularyExternalReferenceCodeException.class
-	)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		AssetVocabulary assetVocabulary = addAssetVocabulary();
-
-		AssetVocabulary newAssetVocabulary = addAssetVocabulary();
-
-		newAssetVocabulary.setCompanyId(assetVocabulary.getCompanyId());
-
-		newAssetVocabulary = _persistence.update(newAssetVocabulary);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newAssetVocabulary);
-
-		newAssetVocabulary.setExternalReferenceCode(
-			assetVocabulary.getExternalReferenceCode());
-
-		_persistence.update(newAssetVocabulary);
-	}
-
 	@Test
 	public void testCountByUuid() throws Exception {
 		_persistence.countByUuid("");
@@ -315,12 +292,12 @@ public class AssetVocabularyPersistenceTest {
 	}
 
 	@Test
-	public void testCountByC_ERC() throws Exception {
-		_persistence.countByC_ERC(RandomTestUtil.nextLong(), "");
+	public void testCountByG_ERC() throws Exception {
+		_persistence.countByG_ERC(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByC_ERC(0L, "null");
+		_persistence.countByG_ERC(0L, "null");
 
-		_persistence.countByC_ERC(0L, (String)null);
+		_persistence.countByG_ERC(0L, (String)null);
 	}
 
 	@Test
@@ -650,10 +627,10 @@ public class AssetVocabularyPersistenceTest {
 				new Class<?>[] {String.class}, "name"));
 
 		Assert.assertEquals(
-			Long.valueOf(assetVocabulary.getCompanyId()),
+			Long.valueOf(assetVocabulary.getGroupId()),
 			ReflectionTestUtil.<Long>invoke(
 				assetVocabulary, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "companyId"));
+				new Class<?>[] {String.class}, "groupId"));
 		Assert.assertEquals(
 			assetVocabulary.getExternalReferenceCode(),
 			ReflectionTestUtil.invoke(

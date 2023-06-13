@@ -30,6 +30,7 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -188,7 +189,7 @@ public class DDMFormValuesJSONDeserializer
 		while (iterator.hasNext()) {
 			String languageId = iterator.next();
 
-			if (!isInvalidLocale(languageId)) {
+			if (LanguageUtil.isAvailableLocale(languageId)) {
 				localizedValue.addString(
 					LocaleUtil.fromLanguageId(languageId),
 					jsonObject.getString(languageId));

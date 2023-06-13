@@ -15,7 +15,6 @@
 package com.liferay.portlet.asset.service.persistence.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.asset.kernel.exception.DuplicateAssetCategoryExternalReferenceCodeException;
 import com.liferay.asset.kernel.exception.NoSuchCategoryException;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
@@ -215,26 +214,6 @@ public class AssetCategoryPersistenceTest {
 			Time.getShortTimestamp(newAssetCategory.getLastPublishDate()));
 	}
 
-	@Test(expected = DuplicateAssetCategoryExternalReferenceCodeException.class)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		AssetCategory assetCategory = addAssetCategory();
-
-		AssetCategory newAssetCategory = addAssetCategory();
-
-		newAssetCategory.setCompanyId(assetCategory.getCompanyId());
-
-		newAssetCategory = _persistence.update(newAssetCategory);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newAssetCategory);
-
-		newAssetCategory.setExternalReferenceCode(
-			assetCategory.getExternalReferenceCode());
-
-		_persistence.update(newAssetCategory);
-	}
-
 	@Test
 	public void testCountByUuid() throws Exception {
 		_persistence.countByUuid("");
@@ -302,7 +281,7 @@ public class AssetCategoryPersistenceTest {
 	@Test
 	public void testCountByG_VArrayable() throws Exception {
 		_persistence.countByG_V(
-			RandomTestUtil.nextLong(),
+			new long[] {RandomTestUtil.nextLong(), 0L},
 			new long[] {RandomTestUtil.nextLong(), 0L});
 	}
 
@@ -364,7 +343,8 @@ public class AssetCategoryPersistenceTest {
 	@Test
 	public void testCountByG_LikeN_VArrayable() throws Exception {
 		_persistence.countByG_LikeN_V(
-			RandomTestUtil.nextLong(), RandomTestUtil.randomString(),
+			new long[] {RandomTestUtil.nextLong(), 0L},
+			RandomTestUtil.randomString(),
 			new long[] {RandomTestUtil.nextLong(), 0L});
 	}
 
@@ -379,12 +359,12 @@ public class AssetCategoryPersistenceTest {
 	}
 
 	@Test
-	public void testCountByC_ERC() throws Exception {
-		_persistence.countByC_ERC(RandomTestUtil.nextLong(), "");
+	public void testCountByG_ERC() throws Exception {
+		_persistence.countByG_ERC(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByC_ERC(0L, "null");
+		_persistence.countByG_ERC(0L, "null");
 
-		_persistence.countByC_ERC(0L, (String)null);
+		_persistence.countByG_ERC(0L, (String)null);
 	}
 
 	@Test
@@ -718,10 +698,10 @@ public class AssetCategoryPersistenceTest {
 				new Class<?>[] {String.class}, "vocabularyId"));
 
 		Assert.assertEquals(
-			Long.valueOf(assetCategory.getCompanyId()),
+			Long.valueOf(assetCategory.getGroupId()),
 			ReflectionTestUtil.<Long>invoke(
 				assetCategory, "getColumnOriginalValue",
-				new Class<?>[] {String.class}, "companyId"));
+				new Class<?>[] {String.class}, "groupId"));
 		Assert.assertEquals(
 			assetCategory.getExternalReferenceCode(),
 			ReflectionTestUtil.invoke(

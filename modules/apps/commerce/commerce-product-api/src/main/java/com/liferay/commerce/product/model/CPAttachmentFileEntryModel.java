@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.LocaleException;
 import com.liferay.portal.kernel.model.AttachedModel;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.LocalizedModel;
+import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.StagedGroupedModel;
 import com.liferay.portal.kernel.model.WorkflowedModel;
@@ -43,7 +44,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface CPAttachmentFileEntryModel
 	extends AttachedModel, BaseModel<CPAttachmentFileEntry>, LocalizedModel,
-			ShardedModel, StagedGroupedModel, WorkflowedModel {
+			MVCCModel, ShardedModel, StagedGroupedModel, WorkflowedModel {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -64,6 +65,22 @@ public interface CPAttachmentFileEntryModel
 	 * @param primaryKey the primary key of this cp attachment file entry
 	 */
 	public void setPrimaryKey(long primaryKey);
+
+	/**
+	 * Returns the mvcc version of this cp attachment file entry.
+	 *
+	 * @return the mvcc version of this cp attachment file entry
+	 */
+	@Override
+	public long getMvccVersion();
+
+	/**
+	 * Sets the mvcc version of this cp attachment file entry.
+	 *
+	 * @param mvccVersion the mvcc version of this cp attachment file entry
+	 */
+	@Override
+	public void setMvccVersion(long mvccVersion);
 
 	/**
 	 * Returns the uuid of this cp attachment file entry.
@@ -279,6 +296,42 @@ public interface CPAttachmentFileEntryModel
 	 * @param fileEntryId the file entry ID of this cp attachment file entry
 	 */
 	public void setFileEntryId(long fileEntryId);
+
+	/**
+	 * Returns the cdn enabled of this cp attachment file entry.
+	 *
+	 * @return the cdn enabled of this cp attachment file entry
+	 */
+	public boolean getCDNEnabled();
+
+	/**
+	 * Returns <code>true</code> if this cp attachment file entry is cdn enabled.
+	 *
+	 * @return <code>true</code> if this cp attachment file entry is cdn enabled; <code>false</code> otherwise
+	 */
+	public boolean isCDNEnabled();
+
+	/**
+	 * Sets whether this cp attachment file entry is cdn enabled.
+	 *
+	 * @param cdnEnabled the cdn enabled of this cp attachment file entry
+	 */
+	public void setCDNEnabled(boolean cdnEnabled);
+
+	/**
+	 * Returns the cdn url of this cp attachment file entry.
+	 *
+	 * @return the cdn url of this cp attachment file entry
+	 */
+	@AutoEscape
+	public String getCDNURL();
+
+	/**
+	 * Sets the cdn url of this cp attachment file entry.
+	 *
+	 * @param cdnURL the cdn url of this cp attachment file entry
+	 */
+	public void setCDNURL(String cdnURL);
 
 	/**
 	 * Returns the display date of this cp attachment file entry.
@@ -623,5 +676,8 @@ public interface CPAttachmentFileEntryModel
 	@Override
 	public void prepareLocalizedFieldsForImport(Locale defaultImportLocale)
 		throws LocaleException;
+
+	@Override
+	public CPAttachmentFileEntry cloneWithOriginalValues();
 
 }

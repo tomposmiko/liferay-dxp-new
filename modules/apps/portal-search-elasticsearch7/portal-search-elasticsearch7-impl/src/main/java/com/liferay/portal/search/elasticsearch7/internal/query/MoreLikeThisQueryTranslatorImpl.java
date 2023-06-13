@@ -41,7 +41,7 @@ public class MoreLikeThisQueryTranslatorImpl
 	public QueryBuilder translate(MoreLikeThisQuery moreLikeThisQuery) {
 		List<MoreLikeThisQueryBuilder.Item> likeItems = new ArrayList<>();
 
-		if (SetUtil.isNotEmpty(moreLikeThisQuery.getDocumentIdentifiers())) {
+		if (!SetUtil.isEmpty(moreLikeThisQuery.getDocumentIdentifiers())) {
 			Set<MoreLikeThisQuery.DocumentIdentifier> documentIdentifiers =
 				moreLikeThisQuery.getDocumentIdentifiers();
 

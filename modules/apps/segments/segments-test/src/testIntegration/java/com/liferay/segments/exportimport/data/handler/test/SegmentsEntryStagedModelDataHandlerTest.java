@@ -19,7 +19,6 @@ import com.liferay.expando.kernel.model.ExpandoColumn;
 import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.model.ExpandoTable;
 import com.liferay.expando.kernel.model.adapter.StagedExpandoColumn;
-import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalServiceUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
@@ -119,8 +118,6 @@ public class SegmentsEntryStagedModelDataHandlerTest
 
 		StagedModelDataHandlerUtil.exportStagedModel(
 			portletDataContext, segmentsEntry);
-
-		_expandoColumnLocalService.deleteColumn(expandoColumn.getColumnId());
 
 		initImport();
 
@@ -304,9 +301,6 @@ public class SegmentsEntryStagedModelDataHandlerTest
 
 		return criterion.getFilterString();
 	}
-
-	@Inject
-	private ExpandoColumnLocalService _expandoColumnLocalService;
 
 	@DeleteAfterTestRun
 	private ExpandoTable _expandoTable;

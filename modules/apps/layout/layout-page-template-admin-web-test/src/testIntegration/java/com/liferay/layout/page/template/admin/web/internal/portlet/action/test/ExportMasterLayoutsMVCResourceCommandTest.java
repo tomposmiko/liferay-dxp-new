@@ -277,7 +277,7 @@ public class ExportMasterLayoutsMVCResourceCommandTest {
 			_read(expectedFileName));
 
 		Assert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString());
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString());
 	}
 
 	private void _validateZipEntry(ZipEntry zipEntry, ZipFile zipFile)
@@ -314,7 +314,7 @@ public class ExportMasterLayoutsMVCResourceCommandTest {
 		_layoutPageTemplateStructureLocalService;
 
 	@Inject(
-		filter = "mvc.command.name=/layout_page_template/export_master_layout"
+		filter = "mvc.command.name=/layout_page_template_admin/export_master_layouts"
 	)
 	private MVCResourceCommand _mvcResourceCommand;
 

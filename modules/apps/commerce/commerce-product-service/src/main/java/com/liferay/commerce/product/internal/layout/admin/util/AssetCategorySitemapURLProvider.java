@@ -18,8 +18,8 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryService;
 import com.liferay.asset.kernel.service.AssetVocabularyService;
-import com.liferay.commerce.product.constants.CPConstants;
 import com.liferay.commerce.product.constants.CPPortletKeys;
+import com.liferay.commerce.product.url.CPFriendlyURL;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.layout.admin.kernel.model.LayoutTypePortletConstants;
@@ -67,7 +67,11 @@ public class AssetCategorySitemapURLProvider implements SitemapURLProvider {
 			layoutSet.getGroupId(), layoutSet.isPrivateLayout(),
 			CPPortletKeys.CP_CATEGORY_CONTENT_WEB);
 
-		Layout layout = _layoutLocalService.getLayout(plid);
+		Layout layout = _layoutLocalService.fetchLayout(plid);
+
+		if (layout == null) {
+			return;
+		}
 
 		if (layoutUuid.equals(layout.getUuid())) {
 			Group group = layoutSet.getGroup();
@@ -126,14 +130,17 @@ public class AssetCategorySitemapURLProvider implements SitemapURLProvider {
 		}
 
 		String currentSiteURL = _portal.getGroupFriendlyURL(
-			layout.getLayoutSet(), themeDisplay);
+			layout.getLayoutSet(), themeDisplay, false, false);
+
+		String urlSeparator = _cpFriendlyURL.getAssetCategoryURLSeparator(
+			themeDisplay.getCompanyId());
 
 		FriendlyURLEntry friendlyURLEntry =
 			_friendlyURLEntryLocalService.getMainFriendlyURLEntry(
 				_portal.getClassNameId(AssetCategory.class), assetCategoryId);
 
 		String categoryFriendlyURL =
-			currentSiteURL + CPConstants.SEPARATOR_ASSET_CATEGORY_URL +
+			currentSiteURL + urlSeparator +
 				friendlyURLEntry.getUrlTitle(themeDisplay.getLanguageId());
 
 		_sitemap.addURLElement(
@@ -149,6 +156,9 @@ public class AssetCategorySitemapURLProvider implements SitemapURLProvider {
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private CPFriendlyURL _cpFriendlyURL;
 
 	@Reference
 	private FriendlyURLEntryLocalService _friendlyURLEntryLocalService;

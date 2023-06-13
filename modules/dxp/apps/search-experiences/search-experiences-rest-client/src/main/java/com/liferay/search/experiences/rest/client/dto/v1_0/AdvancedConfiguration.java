@@ -34,26 +34,68 @@ public class AdvancedConfiguration implements Cloneable, Serializable {
 		return AdvancedConfigurationSerDes.toDTO(json);
 	}
 
-	public Source getSource() {
-		return source;
+	public String[] getExcludes() {
+		return excludes;
 	}
 
-	public void setSource(Source source) {
-		this.source = source;
+	public void setExcludes(String[] excludes) {
+		this.excludes = excludes;
 	}
 
-	public void setSource(
-		UnsafeSupplier<Source, Exception> sourceUnsafeSupplier) {
+	public void setExcludes(
+		UnsafeSupplier<String[], Exception> excludesUnsafeSupplier) {
 
 		try {
-			source = sourceUnsafeSupplier.get();
+			excludes = excludesUnsafeSupplier.get();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected Source source;
+	protected String[] excludes;
+
+	public Boolean getFetchSource() {
+		return fetchSource;
+	}
+
+	public void setFetchSource(Boolean fetchSource) {
+		this.fetchSource = fetchSource;
+	}
+
+	public void setFetchSource(
+		UnsafeSupplier<Boolean, Exception> fetchSourceUnsafeSupplier) {
+
+		try {
+			fetchSource = fetchSourceUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Boolean fetchSource;
+
+	public String[] getIncludes() {
+		return includes;
+	}
+
+	public void setIncludes(String[] includes) {
+		this.includes = includes;
+	}
+
+	public void setIncludes(
+		UnsafeSupplier<String[], Exception> includesUnsafeSupplier) {
+
+		try {
+			includes = includesUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String[] includes;
 
 	@Override
 	public AdvancedConfiguration clone() throws CloneNotSupportedException {

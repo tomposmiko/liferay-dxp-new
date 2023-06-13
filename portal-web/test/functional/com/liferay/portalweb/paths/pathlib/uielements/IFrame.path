@@ -11,11 +11,6 @@
 
 <tbody>
 <tr>
-	<td>ADD_ASSIGNEE_TO_ACCOUNT</td>
-	<td>//iframe[@title='Assign ${key_assigneeType} to ${key_accountName}']</td>
-	<td></td>
-</tr>
-<tr>
 	<td>ADD_DOMAIN</td>
 	<td>//iframe[@title='Add Domain']</td>
 	<td></td>
@@ -28,6 +23,11 @@
 <tr>
 	<td>ADD_USERS_TO_SITE</td>
 	<td>//iframe[@title='Assign Users to This Site']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ASSET_DETAILS_IFRAME</td>
+	<td>//div[contains(@class,'preview-file-container')]//iframe</td>
 	<td></td>
 </tr>
 <tr>
@@ -87,7 +87,12 @@
 </tr>
 <tr>
 	<td>EMBEDDED_VIDEO_IFRAME</td>
-	<td>//iframe[contains(@src,'embed')]</td>
+	<td>//iframe[contains(@src,'embed') or contains(@src,'Embed')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EXTERNAL_VIDEO_IFRAME</td>
+	<td>//div[contains(@class,'video-preview-aspect-ratio')]//iframe</td>
 	<td></td>
 </tr>
 <tr>
@@ -202,17 +207,12 @@
 </tr>
 <tr>
 	<td>SELECT_MEDIA_GALLERY_VIDEO</td>
-	<td>//div[contains(@class,'image-viewer-base-current-image')]//iframe[@class='image-viewer-base-image']</td>
+	<td>//iframe[@class='image-viewer-base-image']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SELECT_ORGANIZATION_ROLE</td>
 	<td>//iframe[contains(@id,'selectOrganizationRole_iframe_')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>SELECT_PUBLICATION</td>
-	<td>//iframe[contains(@id,'selectPublication_iframe')]</td>
 	<td></td>
 </tr>
 <tr>

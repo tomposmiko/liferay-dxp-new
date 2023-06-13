@@ -59,7 +59,7 @@ public class Warehouse implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(Warehouse.class, json);
 	}
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getActive() {
 		return active;
 	}
@@ -87,7 +87,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean active;
 
-	@Schema(example = "Diamond Bar")
+	@Schema
 	public String getCity() {
 		return city;
 	}
@@ -113,7 +113,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String city;
 
-	@Schema(example = "US")
+	@Schema
 	public String getCountryISOCode() {
 		return countryISOCode;
 	}
@@ -141,7 +141,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String countryISOCode;
 
-	@Schema(example = "right stairs, first room on the left")
+	@Schema
 	public String getDescription() {
 		return description;
 	}
@@ -169,7 +169,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -198,7 +198,7 @@ public class Warehouse implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -224,7 +224,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@Schema(example = "33.9976884")
+	@Schema
 	public Double getLatitude() {
 		return latitude;
 	}
@@ -252,7 +252,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Double latitude;
 
-	@Schema(example = "-117.8144595")
+	@Schema
 	public Double getLongitude() {
 		return longitude;
 	}
@@ -280,7 +280,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Double longitude;
 
-	@Schema(example = "0")
+	@Schema
 	@Valid
 	public Number getMvccVersion() {
 		return mvccVersion;
@@ -309,7 +309,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Number mvccVersion;
 
-	@Schema(example = "Alessio Antonio Rendina")
+	@Schema
 	public String getName() {
 		return name;
 	}
@@ -335,7 +335,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
-	@Schema(example = "CA")
+	@Schema
 	public String getRegionISOCode() {
 		return regionISOCode;
 	}
@@ -363,7 +363,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String regionISOCode;
 
-	@Schema(example = "1400 Montefino Ave")
+	@Schema
 	public String getStreet1() {
 		return street1;
 	}
@@ -391,7 +391,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String street1;
 
-	@Schema(example = "1st floor")
+	@Schema
 	public String getStreet2() {
 		return street2;
 	}
@@ -419,7 +419,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String street2;
 
-	@Schema(example = "suite 200")
+	@Schema
 	public String getStreet3() {
 		return street3;
 	}
@@ -503,7 +503,7 @@ public class Warehouse implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected WarehouseItem[] warehouseItems;
 
-	@Schema(example = "91765")
+	@Schema
 	public String getZip() {
 		return zip;
 	}

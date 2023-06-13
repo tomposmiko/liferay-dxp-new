@@ -30,6 +30,8 @@ boolean neverExpire = ParamUtil.getBoolean(request, "neverExpire", true);
 if ((cpInstance != null) && (cpInstance.getExpirationDate() != null)) {
 	neverExpire = false;
 }
+
+boolean discontinued = BeanParamUtil.getBoolean(cpInstance, request, "discontinued");
 %>
 
 <portlet:actionURL name="/cp_definitions/edit_cp_instance" var="editProductInstanceActionURL" />
@@ -165,6 +167,52 @@ if ((cpInstance != null) && (cpInstance.getExpirationDate() != null)) {
 		<aui:input bean="<%= cpInstance %>" dateTogglerCheckboxLabel="never-expire" disabled="<%= neverExpire %>" formName="fm" model="<%= CPInstance.class %>" name="expirationDate" />
 	</commerce-ui:panel>
 
+	<commerce-ui:panel
+		elementClasses="pb-5"
+		title='<%= LanguageUtil.get(request, "end-of-life") %>'
+	>
+		<div class="row">
+			<div class="align-items-start col-auto d-flex">
+				<aui:input checked="<%= discontinued %>" name="discontinued" type="toggle-switch" />
+			</div>
+
+			<div class="col">
+				<div class="form-group input-date-wrapper">
+					<label for="discontinuedDate"><liferay-ui:message key="end-of-production-date" /></label>
+
+					<liferay-ui:input-date
+						dayParam="discontinuedDateDay"
+						dayValue="<%= cpInstanceDisplayContext.getDiscontinuedDateField(Calendar.DAY_OF_MONTH) %>"
+						disabled="<%= !discontinued %>"
+						monthParam="discontinuedDateMonth"
+						monthValue="<%= cpInstanceDisplayContext.getDiscontinuedDateField(Calendar.MONTH) %>"
+						name="discontinuedDate"
+						nullable="<%= true %>"
+						showDisableCheckbox="<%= false %>"
+						yearParam="discontinuedDateYear"
+						yearValue="<%= cpInstanceDisplayContext.getDiscontinuedDateField(Calendar.YEAR) %>"
+					/>
+				</div>
+			</div>
+		</div>
+
+		<%
+		String replacementAutocompleteWrapperCssClasses = "row";
+
+		if (!discontinued) {
+			replacementAutocompleteWrapperCssClasses += " d-none";
+		}
+		%>
+
+		<div class="<%= replacementAutocompleteWrapperCssClasses %>" id="<portlet:namespace />replacementAutocompleteWrapper">
+			<div class="col">
+				<label class="control-label" for="replacementCPInstanceId"><%= LanguageUtil.get(request, "replacement") %></label>
+
+				<div id="autocomplete-root"></div>
+			</div>
+		</div>
+	</commerce-ui:panel>
+
 	<c:if test="<%= cpInstanceDisplayContext.hasCustomAttributesAvailable() %>">
 		<commerce-ui:panel
 			title='<%= LanguageUtil.get(request, "custom-attribute") %>'
@@ -219,34 +267,34 @@ if ((cpInstance != null) && (cpInstance.getExpirationDate() != null)) {
 
 	Liferay.componentReady(
 		'ProductOptions<%= cpDefinition.getCPDefinitionId() %>'
-	).then(function (ddmForm) {
-		if (!ddmForm.on) {
-			return;
-		}
-		ddmForm.on('fieldEdited', function (e) {
-			var key = e.fieldInstance.fieldName;
-			var updatedItem = {
-				key: e.fieldInstance.fieldName,
-				value: e.value,
-			};
+	).then((ddmForm) => {
+		ddmForm.unstable_onEvent((e) => {
+			var eventName = e.type;
+			if (eventName === 'field_change') {
+				var key = e.payload.fieldInstance.fieldName;
+				var updatedItem = {
+					key: e.payload.fieldInstance.fieldName,
+					value: e.payload.value,
+				};
 
-			var itemFound = fieldValues.find(function (item) {
-				return item.key === key;
-			});
+				var itemFound = fieldValues.find((item) => {
+					return item.key === key;
+				});
 
-			if (itemFound) {
-				fieldValues = fieldValues.reduce(function (acc, item) {
-					return acc.concat(item.key === key ? updatedItem : item);
-				}, []);
+				if (itemFound) {
+					fieldValues = fieldValues.reduce((acc, item) => {
+						return acc.concat(item.key === key ? updatedItem : item);
+					}, []);
+				}
+				else {
+					fieldValues.push(updatedItem);
+				}
+
+				var form = window.document['<portlet:namespace />fm'];
+				form['<portlet:namespace />ddmFormValues'].value = JSON.stringify(
+					fieldValues
+				);
 			}
-			else {
-				fieldValues.push(updatedItem);
-			}
-
-			var form = window.document['<portlet:namespace />fm'];
-			form['<portlet:namespace />ddmFormValues'].value = JSON.stringify(
-				fieldValues
-			);
 		});
 	});
 
@@ -262,7 +310,7 @@ if ((cpInstance != null) && (cpInstance.getExpirationDate() != null)) {
 
 			var fieldValues = [];
 
-			fields.forEach(function (field) {
+			fields.forEach((field) => {
 				var fieldValue = {};
 
 				fieldValue.key = field.get('fieldName');
@@ -297,11 +345,49 @@ if ((cpInstance != null) && (cpInstance.getExpirationDate() != null)) {
 
 	var publishButton = form.one('#<portlet:namespace />publishButton');
 
-	publishButton.on('click', function () {
+	publishButton.on('click', () => {
 		var workflowActionInput = form.one('#<portlet:namespace />workflowAction');
 
 		if (workflowActionInput) {
 			workflowActionInput.val('<%= WorkflowConstants.ACTION_PUBLISH %>');
+		}
+	});
+</aui:script>
+
+<aui:script require="commerce-frontend-js/components/autocomplete/entry as autocomplete, commerce-frontend-js/utilities/eventsDefinitions as events">
+	autocomplete.default('autocomplete', 'autocomplete-root', {
+		apiUrl: '/o/headless-commerce-admin-catalog/v1.0/skus',
+		initialLabel:
+			'<%= cpInstanceDisplayContext.getReplacementCPInstanceLabel() %>',
+		initialValue:
+			'<%= cpInstanceDisplayContext.getReplacementCPInstanceId() %>',
+		inputId: 'replacementId',
+		inputName:
+			'<%= liferayPortletResponse.getNamespace() %>replacementCPInstanceId',
+		itemsKey: 'id',
+		itemsLabel: 'sku',
+	});
+
+	const discontinuedInput = document.getElementById(
+		'<%= liferayPortletResponse.getNamespace() %>discontinued'
+	);
+	const discontinuedDateInput = document.getElementById(
+		'<%= liferayPortletResponse.getNamespace() %>discontinuedDate'
+	);
+	const replacementAutocompleteWrapper = document.getElementById(
+		'<%= liferayPortletResponse.getNamespace() %>replacementAutocompleteWrapper'
+	);
+
+	discontinuedInput.addEventListener('change', (event) => {
+		if (event.target.checked) {
+			discontinuedDateInput.disabled = false;
+			discontinuedDateInput.classList.remove('disabled');
+			replacementAutocompleteWrapper.classList.remove('d-none');
+		}
+		else {
+			discontinuedDateInput.disabled = true;
+			discontinuedDateInput.classList.add('disabled');
+			replacementAutocompleteWrapper.classList.add('d-none');
 		}
 	});
 </aui:script>

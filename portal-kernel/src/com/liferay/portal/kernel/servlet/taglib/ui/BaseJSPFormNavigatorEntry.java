@@ -32,8 +32,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * @author Julio Camarero
+ * @author     Julio Camarero
+ * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+ *             com.liferay.frontend.taglib.form.navigator.BaseJSPFormNavigatorEntry}
  */
+@Deprecated
 public abstract class BaseJSPFormNavigatorEntry<T>
 	extends BaseFormNavigatorEntry<T> implements FormNavigatorEntry<T> {
 

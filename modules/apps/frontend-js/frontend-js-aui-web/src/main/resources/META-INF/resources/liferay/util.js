@@ -1,3 +1,4 @@
+/* eslint-disable @liferay/aui/no-one */
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -12,7 +13,7 @@
  * details.
  */
 
-(function (A, Liferay) {
+(function (A) {
 	A.use('aui-base-lang');
 
 	var Lang = A.Lang;
@@ -253,7 +254,7 @@
 		},
 
 		checkTab(box) {
-			if (document.all && window.event.keyCode == 9) {
+			if (document.all && Number(window.event.keyCode) === 9) {
 				box.selection = document.selection.createRange();
 
 				setTimeout(() => {
@@ -262,8 +263,8 @@
 			}
 		},
 
-		disableElements(el) {
-			const currentElement = Util.getElement(el);
+		disableElements(element) {
+			const currentElement = Util.getElement(element);
 
 			if (currentElement) {
 				var children = currentElement.getElementsByTagName('*');
@@ -335,10 +336,10 @@
 			return str.replace(/<!\[CDATA\[|\]\]>/gi, (match) => {
 				var str = '';
 
-				if (match == ']]>') {
+				if (match === ']]>') {
 					str = ']]&gt;';
 				}
-				else if (match == '<![CDATA[') {
+				else if (match === '<![CDATA[') {
 					str = '&lt;![CDATA[';
 				}
 
@@ -359,7 +360,7 @@
 				}
 
 				const newWindow =
-					currentElement.getAttribute('target') == '_blank';
+					currentElement.getAttribute('target') === '_blank';
 
 				const hrefFm = document.hrefFm;
 
@@ -373,14 +374,14 @@
 			}
 		},
 
-		getAttributes(el, attributeGetter) {
+		getAttributes(element, attributeGetter) {
 			var result = null;
 
-			if (el) {
-				el = Util.getDOM(el);
+			if (element) {
+				element = Util.getDOM(element);
 
-				if (el.jquery) {
-					el = el[0];
+				if (element.jquery) {
+					element = element[0];
 				}
 
 				result = {};
@@ -388,7 +389,7 @@
 				var getterFn = typeof attributeGetter === 'function';
 				var getterString = typeof attributeGetter === 'string';
 
-				var attrs = el.attributes;
+				var attrs = element.attributes;
 				var length = attrs.length;
 
 				while (length--) {
@@ -486,15 +487,15 @@
 
 				var parentThemeDisplay;
 
-				while (parentWindow != window) {
+				while (parentWindow !== window) {
 					try {
-						if (typeof parentWindow.location.href == 'undefined') {
+						if (typeof parentWindow.location.href === 'undefined') {
 							break;
 						}
 
 						parentThemeDisplay = parentWindow.themeDisplay;
 					}
-					catch (e) {
+					catch (error) {
 						break;
 					}
 
@@ -506,7 +507,7 @@
 					}
 					else if (
 						!parentThemeDisplay.isStatePopUp() ||
-						parentWindow == parentWindow.parent
+						parentWindow === parentWindow.parent
 					) {
 						topWindow = parentWindow;
 
@@ -555,7 +556,7 @@
 			if (x > -1) {
 				var y = url.lastIndexOf('/');
 
-				if (x + 1 == y) {
+				if (x + 1 === y) {
 					return url + '/' + sessionId;
 				}
 			}
@@ -651,7 +652,13 @@
 
 			var currentTarget = Util.getElement(event.currentTarget);
 
-			config = A.mix(A.merge({}, currentTarget.dataset), config);
+			// eslint-disable-next-line prefer-object-spread
+			config = Object.assign(
+				{},
+				// eslint-disable-next-line prefer-object-spread
+				Object.assign({}, currentTarget.dataset),
+				config
+			);
 
 			if (!config.uri) {
 				config.uri =
@@ -719,7 +726,7 @@
 			box = Util.getElement(box);
 
 			if (box) {
-				if (box.getAttribute('selectedIndex') == -1) {
+				if (box.getAttribute('selectedIndex') === -1) {
 					box.setAttribute('selectedIndex', 0);
 				}
 				else {
@@ -830,26 +837,26 @@
 			}
 		},
 
-		setCursorPosition(el, position) {
+		setCursorPosition(element, position) {
 			var instance = this;
 
-			instance.setSelectionRange(el, position, position);
+			instance.setSelectionRange(element, position, position);
 		},
 
-		setSelectionRange(el, selectionStart, selectionEnd) {
-			el = Util.getDOM(el);
+		setSelectionRange(element, selectionStart, selectionEnd) {
+			element = Util.getDOM(element);
 
-			if (el.jquery) {
-				el = el[0];
+			if (element.jquery) {
+				element = element[0];
 			}
 
-			if (el.setSelectionRange) {
-				el.focus();
+			if (element.setSelectionRange) {
+				element.focus();
 
-				el.setSelectionRange(selectionStart, selectionEnd);
+				element.setSelectionRange(selectionStart, selectionEnd);
 			}
-			else if (el.createTextRange) {
-				var textRange = el.createTextRange();
+			else if (element.createTextRange) {
+				var textRange = element.createTextRange();
 
 				textRange.collapse(true);
 
@@ -1046,7 +1053,7 @@
 				var toggle = function () {
 					var currentValue = selectBox.value;
 
-					var visible = value == currentValue;
+					var visible = value === currentValue;
 
 					if (dynamicValue) {
 						visible = value(currentValue, value);
@@ -1071,6 +1078,7 @@
 		Util,
 		'afterIframeLoaded',
 		(event) => {
+			// eslint-disable-next-line @liferay/aui/no-node
 			var nodeInstances = A.Node._instances;
 
 			var docEl = event.doc;
@@ -1156,6 +1164,9 @@
 		['aui-base']
 	);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by `openSelectionModal`
+	 */
 	Liferay.provide(
 		Util,
 		'openDDMPortlet',
@@ -1163,7 +1174,7 @@
 			var defaultValues = {
 				eventName: 'selectStructure',
 			};
-
+			// eslint-disable-next-line @liferay/aui/no-merge
 			config = A.merge(defaultValues, config);
 
 			var params = {
@@ -1287,9 +1298,9 @@
 						onSuccess();
 					}
 				}
-				catch (e) {
+				catch (error) {
 					if (Lang.isFunction(onError)) {
-						onError(e);
+						onError(error);
 					}
 				}
 			}
@@ -1297,6 +1308,9 @@
 		['aui-base']
 	);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
 	Liferay.provide(
 		Util,
 		'selectEntityHandler',
@@ -1372,12 +1386,12 @@
 		Util,
 		'portletTitleEdit',
 		(options) => {
-			var obj = options.obj;
+			var object = options.obj;
 
 			A.Event.defineOutside('mouseup');
 
-			if (obj) {
-				var title = obj.one('.portlet-title-text');
+			if (object) {
+				var title = object.one('.portlet-title-text');
 
 				if (title && !title.hasClass('not-editable')) {
 					title.addClass('portlet-title-editable');
@@ -1465,6 +1479,7 @@
 
 				var editURL = new Liferay.Util.PortletURL.createPortletURL(
 					config.uri,
+					// eslint-disable-next-line @liferay/aui/no-merge
 					A.merge(
 						{
 							eventName,
@@ -1475,6 +1490,7 @@
 
 				config.uri = editURL.toString();
 
+				// eslint-disable-next-line @liferay/aui/no-merge
 				config.dialogIframe = A.merge(
 					{
 						bodyCssClass: 'dialog-with-footer',
@@ -1497,6 +1513,9 @@
 		['aui-base', 'liferay-util-window']
 	);
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by `openSelectionModal`
+	 */
 	Liferay.provide(
 		Util,
 		'selectEntity',
@@ -1529,6 +1548,7 @@
 				);
 
 				if (selectedData) {
+					// eslint-disable-next-line @liferay/aui/no-each
 					A.each(selectorButtons, (item) => {
 						var assetEntryId =
 							item.attr('data-entityid') ||
@@ -1596,80 +1616,67 @@
 		['aui-base', 'liferay-util-window']
 	);
 
-	Liferay.provide(
-		Util,
-		'toggleControls',
-		(node) => {
-			var docBody = A.getBody();
+	Liferay.provide(Util, 'toggleControls', (node) => {
+		const docBody = document.body;
 
-			node = node || docBody;
+		node = node._node || docBody;
 
-			var trigger = node.one('.toggle-controls');
+		const trigger = node.querySelector('.toggle-controls');
 
-			if (trigger) {
-				var controlsVisible = Liferay._editControlsState === 'visible';
+		if (!trigger) {
+			return;
+		}
 
-				var currentState = MAP_TOGGLE_STATE[controlsVisible];
+		let controlsVisible = Liferay._editControlsState === 'visible';
 
-				var icon = trigger.one('.lexicon-icon');
+		let currentState = MAP_TOGGLE_STATE[controlsVisible];
 
-				if (icon) {
-					currentState.icon = icon;
-				}
+		let icon = trigger.querySelector('.lexicon-icon');
 
-				docBody.addClass(currentState.cssClass);
+		if (icon) {
+			currentState.icon = icon;
+		}
 
-				Liferay.fire('toggleControls', {
-					enabled: controlsVisible,
-				});
+		docBody.classList.add(currentState.cssClass);
 
-				trigger.on('tap', () => {
-					controlsVisible = !controlsVisible;
+		Liferay.fire('toggleControls', {
+			enabled: controlsVisible,
+		});
 
-					var prevState = currentState;
+		trigger.addEventListener('click', () => {
+			controlsVisible = !controlsVisible;
 
-					currentState = MAP_TOGGLE_STATE[controlsVisible];
+			const previousState = currentState;
 
-					docBody.toggleClass(prevState.cssClass);
-					docBody.toggleClass(currentState.cssClass);
+			currentState = MAP_TOGGLE_STATE[controlsVisible];
 
-					var editControlsIconClass = currentState.iconCssClass;
-					var editControlsState = currentState.state;
+			docBody.classList.toggle(previousState.cssClass);
+			docBody.classList.toggle(currentState.cssClass);
 
-					if (icon) {
-						var newIcon = currentState.icon;
+			const editControlsIconClass = currentState.iconCssClass;
+			const editControlsState = currentState.state;
 
-						if (!newIcon) {
-							newIcon = Util.getLexiconIcon(
-								editControlsIconClass
-							);
+			const newIcon = Util.getLexiconIcon(editControlsIconClass);
 
-							newIcon = A.one(newIcon);
+			currentState.icon = newIcon;
 
-							currentState.icon = newIcon;
-						}
+			icon.replaceWith(newIcon);
 
-						icon.replace(newIcon);
+			icon = newIcon;
 
-						icon = newIcon;
-					}
+			Liferay._editControlsState = editControlsState;
 
-					Liferay._editControlsState = editControlsState;
+			Liferay.Util.Session.set(
+				'com.liferay.frontend.js.web_toggleControls',
+				editControlsState
+			);
 
-					Liferay.Util.Session.set(
-						'com.liferay.frontend.js.web_toggleControls',
-						editControlsState
-					);
-
-					Liferay.fire('toggleControls', {
-						enabled: controlsVisible,
-						src: 'ui',
-					});
-				});
-			}
-		},
-		['event-tap']
-	);
+			Liferay.fire('toggleControls', {
+				enabled: controlsVisible,
+				src: 'ui',
+			});
+		});
+	});
 
 	Liferay.provide(
 		Util,
@@ -1718,4 +1725,4 @@
 		TOOLTIP: 10000,
 		WINDOW: 1200,
 	};
-})(AUI(), Liferay);
+})(AUI());

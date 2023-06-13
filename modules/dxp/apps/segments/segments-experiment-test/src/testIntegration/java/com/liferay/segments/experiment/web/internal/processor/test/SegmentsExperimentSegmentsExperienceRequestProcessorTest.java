@@ -600,7 +600,7 @@ public class SegmentsExperimentSegmentsExperienceRequestProcessorTest {
 
 		@Override
 		public boolean getBoolean(long companyId, String name) {
-			if (Objects.equals(name, "liferayAnalyticsEnableAllGroupIds")) {
+			if (Objects.equals("liferayAnalyticsEnableAllGroupIds", name)) {
 				return true;
 			}
 
@@ -609,10 +609,10 @@ public class SegmentsExperimentSegmentsExperienceRequestProcessorTest {
 
 		@Override
 		public String getString(long companyId, String name) {
-			if (Objects.equals(name, "liferayAnalyticsDataSourceId") ||
+			if (Objects.equals("liferayAnalyticsDataSourceId", name) ||
 				Objects.equals(
 					name, "liferayAnalyticsFaroBackendSecuritySignature") ||
-				Objects.equals(name, "liferayAnalyticsFaroBackendURL")) {
+				Objects.equals("liferayAnalyticsFaroBackendURL", name)) {
 
 				return "test";
 			}
@@ -633,7 +633,7 @@ public class SegmentsExperimentSegmentsExperienceRequestProcessorTest {
 
 		@Override
 		public boolean getBoolean(long companyId, String name) {
-			if (Objects.equals(name, "liferayAnalyticsEnableAllGroupIds")) {
+			if (Objects.equals("liferayAnalyticsEnableAllGroupIds", name)) {
 				return false;
 			}
 
@@ -642,10 +642,10 @@ public class SegmentsExperimentSegmentsExperienceRequestProcessorTest {
 
 		@Override
 		public String getString(long companyId, String name) {
-			if (Objects.equals(name, "liferayAnalyticsDataSourceId") ||
+			if (Objects.equals("liferayAnalyticsDataSourceId", name) ||
 				Objects.equals(
 					name, "liferayAnalyticsFaroBackendSecuritySignature") ||
-				Objects.equals(name, "liferayAnalyticsFaroBackendURL")) {
+				Objects.equals("liferayAnalyticsFaroBackendURL", name)) {
 
 				return "test";
 			}

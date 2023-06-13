@@ -18,11 +18,11 @@ import com.liferay.exportimport.constants.ExportImportPortletKeys;
 import com.liferay.exportimport.kernel.exception.RemoteExportException;
 import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.staging.Staging;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.LayoutPrototypeException;
 import com.liferay.portal.kernel.exception.RemoteOptionsException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lock.DuplicateLockException;
-import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.AuthException;
@@ -33,13 +33,12 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.SessionTreeJSClicks;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.taglib.ui.util.SessionTreeJSClicks;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
-import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -53,7 +52,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ExportImportPortletKeys.EXPORT_IMPORT,
-		"mvc.command.name=publishLayouts"
+		"mvc.command.name=/export_import/publish_layouts"
 	},
 	service = MVCActionCommand.class
 )
@@ -182,16 +181,15 @@ public class PublishLayoutsMVCActionCommand extends BaseMVCActionCommand {
 		ActionRequest actionRequest, ActionResponse actionResponse,
 		long backgroundTaskId) {
 
-		LiferayPortletResponse liferayPortletResponse =
-			_portal.getLiferayPortletResponse(actionResponse);
-
-		PortletURL renderURL = liferayPortletResponse.createRenderURL();
-
-		renderURL.setParameter("mvcPath", "/view_export_import.jsp");
-		renderURL.setParameter(
-			"backgroundTaskId", String.valueOf(backgroundTaskId));
-
-		actionRequest.setAttribute(WebKeys.REDIRECT, renderURL.toString());
+		actionRequest.setAttribute(
+			WebKeys.REDIRECT,
+			PortletURLBuilder.createRenderURL(
+				_portal.getLiferayPortletResponse(actionResponse)
+			).setMVCPath(
+				"/view_export_import.jsp"
+			).setParameter(
+				"backgroundTaskId", backgroundTaskId
+			).buildString());
 	}
 
 	@Reference

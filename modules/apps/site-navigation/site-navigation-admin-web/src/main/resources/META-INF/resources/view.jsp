@@ -21,14 +21,15 @@ SiteNavigationAdminManagementToolbarDisplayContext siteNavigationAdminManagement
 %>
 
 <clay:management-toolbar
-	displayContext="<%= siteNavigationAdminManagementToolbarDisplayContext %>"
+	managementToolbarDisplayContext="<%= siteNavigationAdminManagementToolbarDisplayContext %>"
+	propsTransformer="js/SiteNavigationManagementToolbarPropsTransformer"
 />
 
-<portlet:actionURL name="/navigation_menu/delete_site_navigation_menu" var="deleteSitaNavigationMenuURL">
+<portlet:actionURL name="/site_navigation_admin/delete_site_navigation_menu" var="deleteSitaNavigationMenuURL">
 	<portlet:param name="redirect" value="<%= currentURL %>" />
 </portlet:actionURL>
 
-<aui:form action="<%= deleteSitaNavigationMenuURL %>" cssClass="container-fluid-1280" name="fm">
+<aui:form action="<%= deleteSitaNavigationMenuURL %>" cssClass="container-fluid container-fluid-max-xl" name="fm">
 	<liferay-ui:search-container
 		id="siteNavigationMenus"
 		searchContainer="<%= siteNavigationAdminDisplayContext.getSearchContainer() %>"
@@ -147,12 +148,14 @@ SiteNavigationAdminManagementToolbarDisplayContext siteNavigationAdminManagement
 	</liferay-ui:search-container>
 </aui:form>
 
-<aui:script require="metal-dom/src/all/dom as dom,frontend-js-web/liferay/modal/commands/OpenSimpleInputModal.es as openSimpleInputModal" sandbox="<%= true %>">
-	var renameSiteNavigationMenuClickHandler = dom.delegate(
+<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule,frontend-js-web/liferay/modal/commands/OpenSimpleInputModal.es as openSimpleInputModal">
+	var delegate = delegateModule.default;
+
+	var renameSiteNavigationMenuClickHandler = delegate(
 		document.body,
 		'click',
 		'.<portlet:namespace />update-site-navigation-menu-action-option > a',
-		function (event) {
+		(event) => {
 			var data = event.delegateTarget.dataset;
 
 			event.preventDefault();
@@ -175,15 +178,10 @@ SiteNavigationAdminManagementToolbarDisplayContext siteNavigationAdminManagement
 	);
 
 	function handleDestroyPortlet() {
-		renameSiteNavigationMenuClickHandler.removeListener();
+		renameSiteNavigationMenuClickHandler.dispose();
 
 		Liferay.detach('destroyPortlet', handleDestroyPortlet);
 	}
 
 	Liferay.on('destroyPortlet', handleDestroyPortlet);
 </aui:script>
-
-<liferay-frontend:component
-	componentId="<%= siteNavigationAdminManagementToolbarDisplayContext.getDefaultEventHandler() %>"
-	module="js/ManagementToolbarDefaultEventHandler"
-/>

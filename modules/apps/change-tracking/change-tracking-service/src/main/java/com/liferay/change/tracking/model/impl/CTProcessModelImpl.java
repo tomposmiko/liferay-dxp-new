@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -276,54 +277,76 @@ public class CTProcessModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<CTProcess, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, CTProcess>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<CTProcess, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<CTProcess, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CTProcess.class.getClassLoader(), CTProcess.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", CTProcess::getMvccVersion);
-		attributeGetterFunctions.put("ctProcessId", CTProcess::getCtProcessId);
-		attributeGetterFunctions.put("companyId", CTProcess::getCompanyId);
-		attributeGetterFunctions.put("userId", CTProcess::getUserId);
-		attributeGetterFunctions.put("createDate", CTProcess::getCreateDate);
-		attributeGetterFunctions.put(
-			"ctCollectionId", CTProcess::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"backgroundTaskId", CTProcess::getBackgroundTaskId);
+		try {
+			Constructor<CTProcess> constructor =
+				(Constructor<CTProcess>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<CTProcess, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<CTProcess, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<CTProcess, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<CTProcess, Object>>();
 		Map<String, BiConsumer<CTProcess, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<CTProcess, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", CTProcess::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<CTProcess, Long>)CTProcess::setMvccVersion);
+		attributeGetterFunctions.put("ctProcessId", CTProcess::getCtProcessId);
 		attributeSetterBiConsumers.put(
 			"ctProcessId",
 			(BiConsumer<CTProcess, Long>)CTProcess::setCtProcessId);
+		attributeGetterFunctions.put("companyId", CTProcess::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<CTProcess, Long>)CTProcess::setCompanyId);
+		attributeGetterFunctions.put("userId", CTProcess::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<CTProcess, Long>)CTProcess::setUserId);
+		attributeGetterFunctions.put("createDate", CTProcess::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CTProcess, Date>)CTProcess::setCreateDate);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CTProcess::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<CTProcess, Long>)CTProcess::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"backgroundTaskId", CTProcess::getBackgroundTaskId);
 		attributeSetterBiConsumers.put(
 			"backgroundTaskId",
 			(BiConsumer<CTProcess, Long>)CTProcess::setBackgroundTaskId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -539,6 +562,27 @@ public class CTProcessModelImpl
 	}
 
 	@Override
+	public CTProcess cloneWithOriginalValues() {
+		CTProcessImpl ctProcessImpl = new CTProcessImpl();
+
+		ctProcessImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		ctProcessImpl.setCtProcessId(
+			this.<Long>getColumnOriginalValue("ctProcessId"));
+		ctProcessImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		ctProcessImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		ctProcessImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		ctProcessImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		ctProcessImpl.setBackgroundTaskId(
+			this.<Long>getColumnOriginalValue("backgroundTaskId"));
+
+		return ctProcessImpl;
+	}
+
+	@Override
 	public int compareTo(CTProcess ctProcess) {
 		int value = 0;
 
@@ -716,9 +760,7 @@ public class CTProcessModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CTProcess>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CTProcess.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

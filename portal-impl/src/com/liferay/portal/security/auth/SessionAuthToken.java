@@ -57,11 +57,8 @@ public class SessionAuthToken implements AuthToken {
 
 		String lifecycle = liferayPortletURL.getLifecycle();
 
-		if (!lifecycle.equals(PortletRequest.ACTION_PHASE)) {
-			return;
-		}
-
-		if (AuthTokenWhitelistUtil.isPortletURLCSRFWhitelisted(
+		if (!lifecycle.equals(PortletRequest.ACTION_PHASE) ||
+			AuthTokenWhitelistUtil.isPortletURLCSRFWhitelisted(
 				liferayPortletURL)) {
 
 			return;
@@ -79,22 +76,13 @@ public class SessionAuthToken implements AuthToken {
 			return;
 		}
 
-		long companyId = PortalUtil.getCompanyId(httpServletRequest);
-
 		String portletId = liferayPortletURL.getPortletId();
 
 		Portlet portlet = PortletLocalServiceUtil.getPortletById(
-			companyId, portletId);
+			PortalUtil.getCompanyId(httpServletRequest), portletId);
 
-		if (portlet == null) {
-			return;
-		}
-
-		if (!portlet.isAddDefaultResource()) {
-			return;
-		}
-
-		if (AuthTokenWhitelistUtil.isPortletURLPortletInvocationWhitelisted(
+		if ((portlet == null) || !portlet.isAddDefaultResource() ||
+			AuthTokenWhitelistUtil.isPortletURLPortletInvocationWhitelisted(
 				liferayPortletURL)) {
 
 			return;
@@ -237,13 +225,14 @@ public class SessionAuthToken implements AuthToken {
 		String sessionAuthenticationToken = null;
 
 		HttpServletRequest currentHttpServletRequest = httpServletRequest;
-		HttpSession session = null;
+		HttpSession httpSession = null;
 		String tokenKey = WebKeys.AUTHENTICATION_TOKEN.concat(key);
 
 		while (currentHttpServletRequest instanceof HttpServletRequestWrapper) {
-			session = currentHttpServletRequest.getSession();
+			httpSession = currentHttpServletRequest.getSession();
 
-			sessionAuthenticationToken = (String)session.getAttribute(tokenKey);
+			sessionAuthenticationToken = (String)httpSession.getAttribute(
+				tokenKey);
 
 			if (Validator.isNotNull(sessionAuthenticationToken)) {
 				break;
@@ -257,16 +246,17 @@ public class SessionAuthToken implements AuthToken {
 		}
 
 		if (Validator.isNull(sessionAuthenticationToken)) {
-			session = currentHttpServletRequest.getSession();
+			httpSession = currentHttpServletRequest.getSession();
 
-			sessionAuthenticationToken = (String)session.getAttribute(tokenKey);
+			sessionAuthenticationToken = (String)httpSession.getAttribute(
+				tokenKey);
 		}
 
 		if (createToken && Validator.isNull(sessionAuthenticationToken)) {
 			sessionAuthenticationToken = PwdGenerator.getPassword(
 				PropsValues.AUTH_TOKEN_LENGTH);
 
-			session.setAttribute(tokenKey, sessionAuthenticationToken);
+			httpSession.setAttribute(tokenKey, sessionAuthenticationToken);
 		}
 
 		return sessionAuthenticationToken;

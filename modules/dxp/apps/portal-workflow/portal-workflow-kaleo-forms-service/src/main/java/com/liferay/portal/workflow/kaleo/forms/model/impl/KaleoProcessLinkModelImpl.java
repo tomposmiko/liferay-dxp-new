@@ -30,6 +30,7 @@ import com.liferay.portal.workflow.kaleo.forms.model.KaleoProcessLinkModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -217,57 +218,79 @@ public class KaleoProcessLinkModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, KaleoProcessLink>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			KaleoProcessLink.class.getClassLoader(), KaleoProcessLink.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<KaleoProcessLink> constructor =
+				(Constructor<KaleoProcessLink>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<KaleoProcessLink, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<KaleoProcessLink, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<KaleoProcessLink, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<KaleoProcessLink, Object>>();
-
-		attributeGetterFunctions.put(
-			"kaleoProcessLinkId", KaleoProcessLink::getKaleoProcessLinkId);
-		attributeGetterFunctions.put(
-			"companyId", KaleoProcessLink::getCompanyId);
-		attributeGetterFunctions.put(
-			"kaleoProcessId", KaleoProcessLink::getKaleoProcessId);
-		attributeGetterFunctions.put(
-			"workflowTaskName", KaleoProcessLink::getWorkflowTaskName);
-		attributeGetterFunctions.put(
-			"DDMTemplateId", KaleoProcessLink::getDDMTemplateId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<KaleoProcessLink, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<KaleoProcessLink, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<KaleoProcessLink, ?>>();
 
+		attributeGetterFunctions.put(
+			"kaleoProcessLinkId", KaleoProcessLink::getKaleoProcessLinkId);
 		attributeSetterBiConsumers.put(
 			"kaleoProcessLinkId",
 			(BiConsumer<KaleoProcessLink, Long>)
 				KaleoProcessLink::setKaleoProcessLinkId);
+		attributeGetterFunctions.put(
+			"companyId", KaleoProcessLink::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<KaleoProcessLink, Long>)KaleoProcessLink::setCompanyId);
+		attributeGetterFunctions.put(
+			"kaleoProcessId", KaleoProcessLink::getKaleoProcessId);
 		attributeSetterBiConsumers.put(
 			"kaleoProcessId",
 			(BiConsumer<KaleoProcessLink, Long>)
 				KaleoProcessLink::setKaleoProcessId);
+		attributeGetterFunctions.put(
+			"workflowTaskName", KaleoProcessLink::getWorkflowTaskName);
 		attributeSetterBiConsumers.put(
 			"workflowTaskName",
 			(BiConsumer<KaleoProcessLink, String>)
 				KaleoProcessLink::setWorkflowTaskName);
+		attributeGetterFunctions.put(
+			"DDMTemplateId", KaleoProcessLink::getDDMTemplateId);
 		attributeSetterBiConsumers.put(
 			"DDMTemplateId",
 			(BiConsumer<KaleoProcessLink, Long>)
 				KaleoProcessLink::setDDMTemplateId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -429,6 +452,24 @@ public class KaleoProcessLinkModelImpl
 		kaleoProcessLinkImpl.setDDMTemplateId(getDDMTemplateId());
 
 		kaleoProcessLinkImpl.resetOriginalValues();
+
+		return kaleoProcessLinkImpl;
+	}
+
+	@Override
+	public KaleoProcessLink cloneWithOriginalValues() {
+		KaleoProcessLinkImpl kaleoProcessLinkImpl = new KaleoProcessLinkImpl();
+
+		kaleoProcessLinkImpl.setKaleoProcessLinkId(
+			this.<Long>getColumnOriginalValue("kaleoProcessLinkId"));
+		kaleoProcessLinkImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		kaleoProcessLinkImpl.setKaleoProcessId(
+			this.<Long>getColumnOriginalValue("kaleoProcessId"));
+		kaleoProcessLinkImpl.setWorkflowTaskName(
+			this.<String>getColumnOriginalValue("workflowTaskName"));
+		kaleoProcessLinkImpl.setDDMTemplateId(
+			this.<Long>getColumnOriginalValue("DDMTemplateId"));
 
 		return kaleoProcessLinkImpl;
 	}
@@ -608,9 +649,7 @@ public class KaleoProcessLinkModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, KaleoProcessLink>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					KaleoProcessLink.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

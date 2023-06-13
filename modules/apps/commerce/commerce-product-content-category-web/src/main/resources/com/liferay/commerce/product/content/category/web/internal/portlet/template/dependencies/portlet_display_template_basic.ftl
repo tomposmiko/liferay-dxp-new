@@ -25,7 +25,7 @@
 		<img src="${htmlUtil.escapeAttribute(image)}">
 	</div>
 
-	<div class="container-fluid-1280">
+	<div class="container-fluid container-fluid-max-xl">
 		<h1>${htmlUtil.escape(title)}</h1>
 
 		<p>${htmlUtil.escape(description)}</p>

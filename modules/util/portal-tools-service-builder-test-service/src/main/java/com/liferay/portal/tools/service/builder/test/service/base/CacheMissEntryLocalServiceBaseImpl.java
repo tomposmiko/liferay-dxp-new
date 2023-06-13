@@ -29,15 +29,12 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
-import com.liferay.portal.kernel.service.change.tracking.CTService;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -70,8 +67,7 @@ import javax.sql.DataSource;
  */
 public abstract class CacheMissEntryLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
-	implements CacheMissEntryLocalService, CTService<CacheMissEntry>,
-			   IdentifiableOSGiService {
+	implements CacheMissEntryLocalService, IdentifiableOSGiService {
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -307,6 +303,7 @@ public abstract class CacheMissEntryLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -325,6 +322,7 @@ public abstract class CacheMissEntryLocalServiceBaseImpl
 			(CacheMissEntry)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<CacheMissEntry> getBasePersistence() {
 		return cacheMissEntryPersistence;
 	}
@@ -543,9 +541,6 @@ public abstract class CacheMissEntryLocalServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CacheMissEntryLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

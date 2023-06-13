@@ -29,6 +29,7 @@ import com.liferay.saml.persistence.model.SamlSpMessageModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -224,57 +225,79 @@ public class SamlSpMessageModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<SamlSpMessage, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, SamlSpMessage>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<SamlSpMessage, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<SamlSpMessage, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			SamlSpMessage.class.getClassLoader(), SamlSpMessage.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"samlSpMessageId", SamlSpMessage::getSamlSpMessageId);
-		attributeGetterFunctions.put("companyId", SamlSpMessage::getCompanyId);
-		attributeGetterFunctions.put(
-			"createDate", SamlSpMessage::getCreateDate);
-		attributeGetterFunctions.put(
-			"samlIdpEntityId", SamlSpMessage::getSamlIdpEntityId);
-		attributeGetterFunctions.put(
-			"samlIdpResponseKey", SamlSpMessage::getSamlIdpResponseKey);
-		attributeGetterFunctions.put(
-			"expirationDate", SamlSpMessage::getExpirationDate);
+		try {
+			Constructor<SamlSpMessage> constructor =
+				(Constructor<SamlSpMessage>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<SamlSpMessage, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<SamlSpMessage, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<SamlSpMessage, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<SamlSpMessage, Object>>();
 		Map<String, BiConsumer<SamlSpMessage, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<SamlSpMessage, ?>>();
 
+		attributeGetterFunctions.put(
+			"samlSpMessageId", SamlSpMessage::getSamlSpMessageId);
 		attributeSetterBiConsumers.put(
 			"samlSpMessageId",
 			(BiConsumer<SamlSpMessage, Long>)SamlSpMessage::setSamlSpMessageId);
+		attributeGetterFunctions.put("companyId", SamlSpMessage::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<SamlSpMessage, Long>)SamlSpMessage::setCompanyId);
+		attributeGetterFunctions.put(
+			"createDate", SamlSpMessage::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<SamlSpMessage, Date>)SamlSpMessage::setCreateDate);
+		attributeGetterFunctions.put(
+			"samlIdpEntityId", SamlSpMessage::getSamlIdpEntityId);
 		attributeSetterBiConsumers.put(
 			"samlIdpEntityId",
 			(BiConsumer<SamlSpMessage, String>)
 				SamlSpMessage::setSamlIdpEntityId);
+		attributeGetterFunctions.put(
+			"samlIdpResponseKey", SamlSpMessage::getSamlIdpResponseKey);
 		attributeSetterBiConsumers.put(
 			"samlIdpResponseKey",
 			(BiConsumer<SamlSpMessage, String>)
 				SamlSpMessage::setSamlIdpResponseKey);
+		attributeGetterFunctions.put(
+			"expirationDate", SamlSpMessage::getExpirationDate);
 		attributeSetterBiConsumers.put(
 			"expirationDate",
 			(BiConsumer<SamlSpMessage, Date>)SamlSpMessage::setExpirationDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -464,6 +487,26 @@ public class SamlSpMessageModelImpl
 		samlSpMessageImpl.setExpirationDate(getExpirationDate());
 
 		samlSpMessageImpl.resetOriginalValues();
+
+		return samlSpMessageImpl;
+	}
+
+	@Override
+	public SamlSpMessage cloneWithOriginalValues() {
+		SamlSpMessageImpl samlSpMessageImpl = new SamlSpMessageImpl();
+
+		samlSpMessageImpl.setSamlSpMessageId(
+			this.<Long>getColumnOriginalValue("samlSpMessageId"));
+		samlSpMessageImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		samlSpMessageImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		samlSpMessageImpl.setSamlIdpEntityId(
+			this.<String>getColumnOriginalValue("samlIdpEntityId"));
+		samlSpMessageImpl.setSamlIdpResponseKey(
+			this.<String>getColumnOriginalValue("samlIdpResponseKey"));
+		samlSpMessageImpl.setExpirationDate(
+			this.<Date>getColumnOriginalValue("expirationDate"));
 
 		return samlSpMessageImpl;
 	}
@@ -666,9 +709,7 @@ public class SamlSpMessageModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, SamlSpMessage>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					SamlSpMessage.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

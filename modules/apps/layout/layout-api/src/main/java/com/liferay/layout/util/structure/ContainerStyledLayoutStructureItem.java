@@ -50,7 +50,7 @@ public class ContainerStyledLayoutStructureItem
 			(ContainerStyledLayoutStructureItem)object;
 
 		if (!Objects.equals(
-				_linkJSONObject.toString(),
+				_linkJSONObject.toJSONString(),
 				containerStyledLayoutStructureItem._linkJSONObject.
 					toJSONString()) ||
 			!Objects.equals(
@@ -71,11 +71,20 @@ public class ContainerStyledLayoutStructureItem
 	}
 
 	@Override
+	public String getContentDisplay() {
+		return _contentDisplay;
+	}
+
+	@Override
 	public JSONObject getItemConfigJSONObject() {
 		JSONObject jsonObject = super.getItemConfigJSONObject();
 
 		return jsonObject.put(
-			"indexed", _indexed
+			"align", _align
+		).put(
+			"contentDisplay", _contentDisplay
+		).put(
+			"justify", _justify
 		).put(
 			"link", _linkJSONObject
 		).put(
@@ -110,15 +119,8 @@ public class ContainerStyledLayoutStructureItem
 		return HashUtil.hash(0, getItemId());
 	}
 
-	public boolean isIndexed() {
-		return _indexed;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
 	public void setAlign(String align) {
+		_align = align;
 	}
 
 	/**
@@ -166,22 +168,12 @@ public class ContainerStyledLayoutStructureItem
 		_widthType = containerType;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
 	public void setContentDisplay(String contentDisplay) {
+		_contentDisplay = contentDisplay;
 	}
 
-	public void setIndexed(boolean indexed) {
-		_indexed = indexed;
-	}
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
 	public void setJustify(String justify) {
+		_justify = justify;
 	}
 
 	public void setLinkJSONObject(JSONObject linkJSONObject) {
@@ -276,8 +268,16 @@ public class ContainerStyledLayoutStructureItem
 
 		super.updateItemConfig(itemConfigJSONObject);
 
-		if (itemConfigJSONObject.has("indexed")) {
-			setIndexed(itemConfigJSONObject.getBoolean("indexed"));
+		if (itemConfigJSONObject.has("align")) {
+			setAlign(itemConfigJSONObject.getString("align"));
+		}
+
+		if (itemConfigJSONObject.has("contentDisplay")) {
+			setContentDisplay(itemConfigJSONObject.getString("contentDisplay"));
+		}
+
+		if (itemConfigJSONObject.has("justify")) {
+			setJustify(itemConfigJSONObject.getString("justify"));
 		}
 
 		if (itemConfigJSONObject.has("link")) {
@@ -378,7 +378,9 @@ public class ContainerStyledLayoutStructureItem
 		"shadow-sm", "0 .125rem .25rem rgba(0, 0, 0, 0.075)"
 	).build();
 
-	private boolean _indexed = true;
+	private String _align = "";
+	private String _contentDisplay = "";
+	private String _justify = "";
 	private JSONObject _linkJSONObject;
 	private String _widthType = "fluid";
 

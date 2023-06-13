@@ -65,13 +65,31 @@ public class CTPreferencesServiceSoap {
 
 	public static com.liferay.change.tracking.model.CTPreferencesSoap
 			checkoutCTCollection(
-				long companyId, long ctCollectionId, long userId)
+				long companyId, long userId, long ctCollectionId)
 		throws RemoteException {
 
 		try {
 			com.liferay.change.tracking.model.CTPreferences returnValue =
 				CTPreferencesServiceUtil.checkoutCTCollection(
-					companyId, ctCollectionId, userId);
+					companyId, userId, ctCollectionId);
+
+			return com.liferay.change.tracking.model.CTPreferencesSoap.
+				toSoapModel(returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.change.tracking.model.CTPreferencesSoap
+			enablePublications(long companyId, boolean enable)
+		throws RemoteException {
+
+		try {
+			com.liferay.change.tracking.model.CTPreferences returnValue =
+				CTPreferencesServiceUtil.enablePublications(companyId, enable);
 
 			return com.liferay.change.tracking.model.CTPreferencesSoap.
 				toSoapModel(returnValue);

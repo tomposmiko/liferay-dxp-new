@@ -1,9 +1,44 @@
 definition {
 
+	macro addCategoriesFilter {
+		Panel.expandPanel(panel = "Filter");
+
+		if (isSet(queryAndOperator)) {
+			Select(
+				locator1 = "APConfiguration#FILTER_QUERY_AND_OPERATOR",
+				value1 = "${queryAndOperator}");
+		}
+
+		if (isSet(queryContains)) {
+			Select(
+				locator1 = "APConfiguration#FILTER_QUERY_CONTAINS",
+				value1 = "${queryContains}");
+		}
+
+		Select(
+			locator1 = "APConfiguration#FILTER_CATEGORIZATION_SELECT",
+			value1 = "Categories");
+
+		Click(locator1 = "Button#SELECT_CATEGORIES");
+
+		AssetCategorization.gotoSelectCategory();
+
+		for (var categoryName : list "${categoryNameList}") {
+			Portlet.selectTreeNode(nodeName = "${categoryName}");
+		}
+
+		SelectFrameTop();
+
+		Click(locator1 = "Button#DONE");
+
+		PortletEntry.save();
+	}
+
 	macro addDynamicSelection {
 		if (isSet(depotName)) {
-			Click(locator1 = "Message#EMPTY_INFO_TAGLIB");
-
+			LexiconEntry.gotoAddMenuItem(menuItem = "Dynamic Collection");
+		}
+		else if (IsVisible(locator1 = "Message#EMPTY_INFO_TAGLIB")) {
 			Click.waitForMenuToggleJSClick(locator1 = "Dropdown#EMPTY_MESSAGE_DROPDOWN");
 
 			Click(
@@ -16,11 +51,9 @@ definition {
 
 		PortletEntry.inputText(
 			fieldLabel = "Title",
-			text = ${assetListTitle});
+			text = "${assetListTitle}");
 
-		Button.clickSave();
-
-		Alert.viewSuccessMessage();
+		PortletEntry.save();
 	}
 
 	macro addKeywordsFilter {
@@ -40,27 +73,28 @@ definition {
 
 		Select(
 			locator1 = "APConfiguration#FILTER_QUERY_CONTAINS",
-			value1 = ${queryContains});
+			value1 = "${queryContains}");
 
 		Select(
 			locator1 = "APConfiguration#FILTER_QUERY_AND_OPERATOR",
-			value1 = ${queryAndOperator});
+			value1 = "${queryAndOperator}");
 
 		Type(
 			locator1 = "AssetLists#ASSET_LIST_KEYWORDS_FIELD",
-			value1 = ${keyWords});
+			value1 = "${keyWords}");
 
 		PortletEntry.save();
 
 		AssertTextEquals(
 			locator1 = "AssetLists#ASSET_LIST_KEYWORDS_FIELD",
-			value1 = ${keyWords});
+			value1 = "${keyWords}");
 	}
 
 	macro addManualSelection {
 		if (isSet(depotName)) {
-			Click(locator1 = "Message#EMPTY_INFO_TAGLIB");
-
+			LexiconEntry.gotoAddMenuItem(menuItem = "Manual Collection");
+		}
+		else if (IsVisible(locator1 = "Message#EMPTY_INFO_TAGLIB")) {
 			Click.waitForMenuToggleJSClick(locator1 = "Dropdown#EMPTY_MESSAGE_DROPDOWN");
 
 			Click(
@@ -73,9 +107,24 @@ definition {
 
 		PortletEntry.inputText(
 			fieldLabel = "Title",
-			text = ${assetListTitle});
+			text = "${assetListTitle}");
 
-		Button.clickSave();
+		PortletEntry.save();
+	}
+
+	macro addPersonalizedVariation {
+		if (IsElementPresent(locator1 = "AssetLists#ADD_VARIATION_ICON")) {
+			Click(locator1 = "AssetLists#ADD_VARIATION_ICON");
+		}
+		else {
+			Button.click(button = "New Personalized Variation");
+		}
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+
+		LexiconTable.clickTableEntryTitle(tableEntry = "${segmentName}");
+
+		SelectFrameTop();
 
 		Alert.viewSuccessMessage();
 	}
@@ -83,23 +132,23 @@ definition {
 	macro addSelection {
 		Click(locator1 = "Button#NEW");
 
-		MenuItem.click(menuItem = ${menuItem});
+		MenuItem.click(menuItem = "${menuItem}");
 
 		PortletEntry.inputText(
 			fieldLabel = "Title",
-			text = ${collectionName});
+			text = "${collectionName}");
 
 		Button.clickSave();
 
 		Select(
 			locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_SELECT",
-			value1 = ${selectedAsset});
+			value1 = "${selectedAsset}");
 
-		Pause(locator1 = 3000);
+		WaitForElementNotPresent(
+			key_text = "Save",
+			locator1 = "Button#ANY_DISABLED");
 
 		PortletEntry.save();
-
-		Alert.viewSuccessMessage();
 	}
 
 	macro addTagsFilter {
@@ -108,13 +157,13 @@ definition {
 		if (isSet(queryAndOperator)) {
 			Select(
 				locator1 = "APConfiguration#FILTER_QUERY_AND_OPERATOR",
-				value1 = ${queryAndOperator});
+				value1 = "${queryAndOperator}");
 		}
 
 		if (isSet(queryContains)) {
 			Select(
 				locator1 = "APConfiguration#FILTER_QUERY_CONTAINS",
-				value1 = ${queryContains});
+				value1 = "${queryContains}");
 		}
 
 		Select(
@@ -125,9 +174,9 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		for (var tagName : list ${tagNameList}) {
+		for (var tagName : list "${tagNameList}") {
 			Check(
-				key_rowEntry = ${tagName},
+				key_rowEntry = "${tagName}",
 				locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_CHECKBOX");
 		}
 
@@ -140,69 +189,69 @@ definition {
 		PortletEntry.save();
 	}
 
-	macro configureAssetEntrySubtype {
-		Panel.expandPanel(panel = "Source");
-
-		Select(
-			locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_SUBTYPE_SELECT",
-			value1 = ${selectedSubtype});
-
-		Pause(locator1 = 3000);
-
-		PortletEntry.save();
-	}
-
-	macro configureAssetEntryType {
-		Panel.expandPanel(panel = "Source");
-
-		Select(
-			locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_SELECT",
-			value1 = ${selectedAsset});
-
-		Pause(locator1 = 3000);
-
-		PortletEntry.save();
-	}
-
 	macro configureFilterByField {
 		Check.checkToggleSwitch(locator1 = "APConfiguration#SOURCE_SCOPE_FILTER_BY_FIELD_CHECKBOX");
 
-		Pause(locator1 = 3000);
+		WaitForElementPresent(locator1 = "APConfiguration#SOURCE_SCOPE_FILTER_BY_FIELD_SELECT_BUTTON_ENABLED");
 
 		Click(locator1 = "APConfiguration#SOURCE_SCOPE_FILTER_BY_FIELD_SELECT_BUTTON");
-
-		Pause(locator1 = 3000);
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		Check(
-			key_fieldName = ${fieldName},
+			key_fieldName = "${fieldName}",
 			locator1 = "APConfigurationFilterbyfield#FIELD_FILTER_RADIO_BUTTON");
 	}
 
-	macro configureItemTypeInManualCollection {
+	macro configureItemTypeInDynamicCollection {
+		Panel.expandPanel(panel = "Source");
+
 		if (isSet(itemType)) {
 			Select(
 				locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_SELECT",
-				value1 = ${itemType});
-
-			Pause(locator1 = 3000);
+				value1 = "${itemType}");
 		}
 
 		if (isSet(itemSubtype)) {
 			Select(
 				locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_SUBTYPE_SELECT",
-				value1 = ${itemSubtype});
-
-			Pause(locator1 = 3000);
+				value1 = "${itemSubtype}");
 		}
+
+		WaitForElementNotPresent(
+			key_text = "Save",
+			locator1 = "Button#ANY_DISABLED");
+
+		PortletEntry.save();
+	}
+
+	macro configureItemTypeInManualCollection {
+		if (isSet(variationName)) {
+			Navigator.gotoNavTab(navTab = "${variationName}");
+		}
+
+		if (isSet(itemType)) {
+			Select(
+				locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_SELECT",
+				value1 = "${itemType}");
+		}
+
+		if (isSet(itemSubtype)) {
+			Select(
+				locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_SUBTYPE_SELECT",
+				value1 = "${itemSubtype}");
+		}
+
+		WaitForElementNotPresent(
+			key_text = "Save",
+			locator1 = "Button#ANY_DISABLED");
 
 		PortletEntry.save();
 	}
 
 	macro configureScope {
 		Click(
-			key_title = ${assetListTitle},
+			key_title = "${assetListTitle}",
 			locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE");
 
 		if (isSet(selectedAsset)) {
@@ -210,7 +259,7 @@ definition {
 
 			Select(
 				locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_SELECT",
-				value1 = ${selectedAsset});
+				value1 = "${selectedAsset}");
 		}
 
 		Panel.expandPanel(panel = "Scope");
@@ -230,7 +279,7 @@ definition {
 
 			LexiconEntry.changeDisplayStyle(displayStyle = "table");
 
-			LexiconEntry.gotoEntry(rowEntry = ${otherSite});
+			LexiconEntry.gotoEntry(rowEntry = "${otherSite}");
 		}
 
 		if (isSet(defaultSite)) {
@@ -239,9 +288,9 @@ definition {
 				value1 = "Select");
 
 			AssertClick(
-				key_menuItem = ${defaultSite},
+				key_menuItem = "${defaultSite}",
 				locator1 = "AssetLists#ASSET_LIST_SCOPE_ITEM",
-				value1 = ${defaultSite});
+				value1 = "${defaultSite}");
 		}
 
 		SelectFrameTop();
@@ -250,94 +299,142 @@ definition {
 	}
 
 	macro deleteEntry {
-		LexiconList.delete(listEntry = ${assetListTitle});
+		LexiconList.delete(listEntry = "${assetListTitle}");
 
 		Alert.viewSuccessMessage();
 	}
 
 	macro deleteManualSelectionAssets {
-		for (var assetName : list ${assetsList}) {
+		for (var assetName : list "${assetsList}") {
 			Click(
-				key_entryName = ${assetName},
+				key_entryName = "${assetName}",
 				locator1 = "LexiconTable#TABLE_ENTRY_DELETE");
 		}
 	}
 
 	macro editAssetList {
 		AssetListsAdmin.gotoEntryMenuItem(
-			assetListTitle = ${assetListTitle},
+			assetListTitle = "${assetListTitle}",
 			item = "Edit");
+
+		WaitForPageLoad();
+	}
+
+	macro enableCollectionsToCombineAssetsFromSegments {
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "System Settings");
+
+		SystemSettings.gotoConfiguration(
+			configurationCategory = "Assets",
+			configurationName = "Collections",
+			configurationScope = "System Scope");
+
+		Click.javaScriptClick(
+			checkboxName = "${collectionType}",
+			locator1 = "Checkbox#ANY_CHECKBOX");
+
+		if (IsElementPresent(locator1 = "Button#SAVE")) {
+			Click(locator1 = "Button#SAVE");
+		}
+		else if (IsElementPresent(locator1 = "Button#UPDATE")) {
+			Click(locator1 = "Button#UPDATE");
+		}
+
+		Alert.viewSuccessMessage();
 	}
 
 	macro gotoEntry {
 		Click(
-			key_title = ${assetListName},
+			key_title = "${assetListName}",
 			locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE");
 	}
 
 	macro gotoEntryMenuItem {
 		LexiconList.clickEllipsisItem(
-			item = ${item},
-			listEntry = ${assetListTitle});
-	}
-
-	macro gotoPersonalizationMenuItem {
-		Click(locator1 = "AssetLists#PERSONALIZATION_DROPDOWN");
-
-		Click(
-			key_menuItem = "View Content",
-			locator1 = "AssetLists#PERSONALIZATION_DROPDOWN_ITEM");
+			item = "${item}",
+			listEntry = "${assetListTitle}");
 	}
 
 	macro openAssetListsAdmin {
 		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_asset_list_web_portlet_AssetListPortlet");
 	}
 
+	macro openPersonalizedVariation {
+		Button.click(button = "New Personalized Variation");
+
+		SelectFrame(locator1 = "IFrame#MODAL_BODY");
+	}
+
 	macro removeScope {
 		Click(
-			key_title = ${assetListTitle},
+			key_title = "${assetListTitle}",
 			locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE");
 
 		Panel.expandPanel(panel = "Scope");
 
 		Click(
-			key_scopeName = ${scopeName},
+			key_scopeName = "${scopeName}",
 			locator1 = "AssetLists#ASSET_LIST_REMOVE_SCOPE");
 
 		PortletEntry.save();
 
 		AssertTextNotPresent(
-			key_scopeName = ${scopeName},
+			key_scopeName = "${scopeName}",
 			locator1 = "AssetLists#ASSET_LIST_SCOPE_NAME",
-			value1 = ${scopeName});
+			value1 = "${scopeName}");
 
 		SelectFrameTop();
 	}
 
 	macro renameAssetList {
 		AssetListsAdmin.gotoEntryMenuItem(
-			assetListTitle = ${oldAssetListTitle},
+			assetListTitle = "${oldAssetListTitle}",
 			item = "Rename");
 
 		PortletEntry.inputText(
 			fieldLabel = "Title",
-			text = ${newAssetListTitle});
+			text = "${newAssetListTitle}");
 
 		Button.clickSave();
 	}
 
+	macro resetCollectionsToCombineAssetsFromSegments {
+		ApplicationsMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "System Settings");
+
+		SystemSettings.gotoConfiguration(
+			configurationCategory = "Assets",
+			configurationName = "Collections",
+			configurationScope = "System Scope");
+
+		if (IsElementPresent(locator1 = "Button#UPDATE")) {
+			Click(locator1 = "Icon#HISTORY_VERTICAL_ELLIPSIS");
+
+			MenuItem.clickNoError(menuItem = "Reset Default Values");
+
+			Alert.viewSuccessMessage();
+		}
+	}
+
 	macro selectAsset {
-		var key_title = ${assetListName};
-		var key_assetType = ${assetType};
+		var key_assetType = "${assetType}";
 
-		Click(locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE");
+		if (isSet(assetListName)) {
+			Click(
+				key_title = "${assetListName}",
+				locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE");
 
-		Pause(locator1 = 3000);
+			WaitForPageLoad();
+		}
 
 		if (IsElementPresent(locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_SELECT")) {
 			AssetListsAdmin.configureItemTypeInManualCollection(
-				itemSubtype = ${itemSubtype},
-				itemType = ${itemType});
+				itemSubtype = "${itemSubtype}",
+				itemType = "${itemType}");
 		}
 
 		Click(locator1 = "AssetLists#ASSET_LIST_SELECT_BUTTON");
@@ -345,8 +442,6 @@ definition {
 		Click(locator1 = "AssetLists#ASSET_TYPE_DROPDOWN_ITEM");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
-
-		Pause(locator1 = 3000);
 
 		if (isSet(depotName)) {
 			AssertClick(
@@ -359,18 +454,16 @@ definition {
 				locator1 = "ItemSelector#NAVIGATION_GROUP_TAB",
 				value1 = "Asset Library");
 
-			LexiconCard.clickCard(card = ${depotName});
+			LexiconCard.clickCard(card = "${depotName}");
 		}
 
 		if (isSet(entryList)) {
-			for (var assetName : list ${entryList}) {
-				LexiconEntry.selectEntry(rowEntry = ${assetName});
-
-				Pause(locator1 = 3000);
+			for (var assetName : list "${entryList}") {
+				LexiconEntry.selectEntry(rowEntry = "${assetName}");
 			}
 		}
 		else {
-			LexiconEntry.selectEntry(rowEntry = ${assetName});
+			LexiconEntry.selectEntry(rowEntry = "${assetName}");
 		}
 
 		SelectFrameTop();
@@ -381,53 +474,48 @@ definition {
 	}
 
 	macro viewAssetList {
-		var key_title = ${assetListTitle};
-		var key_type = ${type};
+		var key_title = "${assetListTitle}";
+		var key_type = "${type}";
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE",
-			value1 = ${assetListTitle});
+			value1 = "${assetListTitle}");
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "AssetLists#ASSET_LIST_ENTRY_TYPE",
-			value1 = ${type});
+			value1 = "${type}");
 	}
 
 	macro viewAssetTypeList {
-		var key_title = ${assetListName};
+		var key_title = "${assetListName}";
 
 		Click(locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE");
 
 		if (isSet(manualSelection)) {
-			if (IsElementPresent(locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_SELECT")) {
-				if (isSet(itemType)) {
-					Select(
-						locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_SELECT",
-						value1 = ${itemType});
-				}
+			if (isSet(itemType)) {
+				Select(
+					locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_SELECT",
+					value1 = "${itemType}");
 
 				if (isSet(itemSubtype)) {
 					Select(
 						locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_SUBTYPE_SELECT",
-						value1 = ${itemSubtype});
+						value1 = "${itemSubtype}");
 				}
 
-				Pause(locator1 = 3000);
+				WaitForElementNotPresent(
+					key_text = "Save",
+					locator1 = "Button#ANY_DISABLED");
 
 				PortletEntry.save();
 			}
 
-			if (isSet(allAssetsDisabled)) {
-				AssertElementNotPresent(locator1 = "AssetLists#ASSET_LIST_SELECT_BUTTON");
-			}
-			else {
-				Click(locator1 = "AssetLists#ASSET_LIST_SELECT_BUTTON");
+			Click(locator1 = "AssetLists#ASSET_LIST_SELECT_BUTTON");
 
-				for (var assetType : list ${assetType}) {
-					var key_assetType = ${assetType};
+			for (var assetType : list "${assetType}") {
+				var key_assetType = "${assetType}";
 
-					AssertElementPresent(locator1 = "AssetLists#ASSET_TYPE_DROPDOWN_ITEM");
-				}
+				AssertElementPresent(locator1 = "AssetLists#ASSET_TYPE_DROPDOWN_ITEM");
 			}
 		}
 
@@ -436,25 +524,22 @@ definition {
 
 			Click(locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_SELECT");
 
-			if (isSet(allAssetsDisabled)) {
-				for (var assetType : list "Document,Documents Folder,Web Content Article,Web Content Folder") {
-					AssertElementNotPresent(
-						key_assetType = ${assetType},
-						locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_OPTION");
-				}
-			}
-			else {
-				for (var assetType : list ${assetType}) {
-					AssertElementPresent(
-						key_assetType = ${assetType},
-						locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_OPTION");
-				}
+			for (var assetType : list "${assetType}") {
+				AssertElementPresent(
+					key_assetType = "${assetType}",
+					locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_OPTION");
 			}
 		}
 	}
 
 	macro viewCollectionItems {
-		AssetListsAdmin.gotoEntry(assetListName = ${assetListTitle});
+		if (isSet(assetListTitle)) {
+			AssetListsAdmin.gotoEntry(assetListName = "${assetListTitle}");
+		}
+
+		if (isSet(personalizedVariation)) {
+			Navigator.gotoNavTab(navTab = "${personalizedVariation}");
+		}
 
 		WaitForLiferayEvent.initializeLiferayEventLog();
 
@@ -466,22 +551,26 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		for (var assetTitle : list ${assetTitleList}) {
+		for (var assetTitle : list "${assetTitleList}") {
 			AssertTextEquals(
-				key_assetTitle = ${assetTitle},
+				key_assetTitle = "${assetTitle}",
 				locator1 = "AssetLists#ASSET_TITLE_ROW",
-				value1 = ${assetTitle});
+				value1 = "${assetTitle}");
 		}
 
-		SelectFrameTop();
-
-		Click(locator1 = "Icon#CLOSE");
+		IFrame.closeFrame();
 	}
 
 	macro viewContent {
 		Click(
-			key_title = ${assetListTitle},
+			key_title = "${assetListTitle}",
 			locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE");
+
+		if (isSet(personalizedVariation)) {
+			Navigator.gotoNavTab(navTab = "${personalizedVariation}");
+		}
+
+		WaitForLiferayEvent.initializeLiferayEventLog();
 
 		Click(locator1 = "AssetLists#ASSET_LIST_ELLIPSIS");
 
@@ -492,24 +581,61 @@ definition {
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		AssertTextEquals(
-			key_assetTitle = ${assetTitle},
+			key_assetTitle = "${assetTitle}",
 			locator1 = "AssetLists#ASSET_TITLE_ROW",
-			value1 = ${assetTitle});
+			value1 = "${assetTitle}");
 
 		AssertTextEquals(
-			key_assetTitle = ${assetTitle},
+			key_assetTitle = "${assetTitle}",
 			locator1 = "AssetLists#ASSET_TYPE_ROW",
-			value1 = ${assetType});
+			value1 = "${assetType}");
 
-		SelectFrameTop();
+		IFrame.closeFrame();
+	}
 
-		Click(locator1 = "Icon#CLOSE");
+	macro viewNoAssetType {
+		var key_title = "${assetListName}";
+
+		Click(locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE");
+
+		if (isSet(manualSelection)) {
+			if (isSet(allAssetsDisabled)) {
+				AssertElementNotPresent(locator1 = "AssetLists#ASSET_LIST_SELECT_BUTTON");
+			}
+			else {
+				Click(locator1 = "AssetLists#ASSET_LIST_SELECT_BUTTON");
+
+				for (var assetType : list "${assetType}") {
+					AssertElementNotPresent(
+						key_assetType = "${assetType}",
+						locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_OPTION");
+				}
+			}
+		}
+
+		if (isSet(dynamicSelection)) {
+			Panel.expandPanel(panel = "Source");
+
+			Click(locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_SELECT");
+
+			for (var assetType : list "${assetType}") {
+				AssertElementNotPresent(
+					key_assetType = "${assetType}",
+					locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_TYPE_OPTION");
+			}
+		}
 	}
 
 	macro viewNoContent {
 		Click(
-			key_title = ${assetListTitle},
+			key_title = "${assetListTitle}",
 			locator1 = "AssetLists#ASSET_LIST_ENTRY_TITLE");
+
+		if (isSet(personalizedVariation)) {
+			Navigator.gotoNavTab(navTab = "${personalizedVariation}");
+		}
+
+		WaitForLiferayEvent.initializeLiferayEventLog();
 
 		Click(locator1 = "AssetLists#ASSET_LIST_ELLIPSIS");
 
@@ -519,24 +645,22 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		var key_assetTitle = ${assetTitle};
+		var key_assetTitle = "${assetTitle}";
 
 		AssertElementNotPresent(locator1 = "AssetLists#ASSET_TITLE_ROW");
 
 		AssertElementNotPresent(locator1 = "AssetLists#ASSET_TYPE_ROW");
 
-		SelectFrameTop();
-
-		Click(locator1 = "Icon#CLOSE");
+		IFrame.closeFrame();
 	}
 
 	macro viewUsages {
 		AssetListsAdmin.gotoEntryMenuItem(
-			assetListTitle = ${assetListTitle},
+			assetListTitle = "${assetListTitle}",
 			item = "View Usages");
 
-		var usageAmount = ${usageAmount};
-		var usageType = ${usageType};
+		var usageAmount = "${usageAmount}";
+		var usageType = "${usageType}";
 
 		AssertElementPresent(locator1 = "AssetLists#ASSET_LIST_USAGES");
 	}

@@ -15,7 +15,6 @@
 package com.liferay.data.engine.rest.resource.v2_0;
 
 import com.liferay.data.engine.rest.dto.v2_0.DataDefinitionFieldLink;
-import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -23,9 +22,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.pagination.Page;
 
 import java.util.Collections;
@@ -53,6 +50,10 @@ import org.osgi.annotation.versioning.ProviderType;
 @Generated("")
 @ProviderType
 public interface DataDefinitionFieldLinkResource {
+
+	public static Builder builder() {
+		return FactoryHolder.factory.create();
+	}
 
 	public Page<DataDefinitionFieldLink>
 			getDataDefinitionDataDefinitionFieldLinksPage(
@@ -96,12 +97,6 @@ public interface DataDefinitionFieldLinkResource {
 
 	public void setRoleLocalService(RoleLocalService roleLocalService);
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider);
-
-	public void setVulcanBatchEngineImportTaskResource(
-		VulcanBatchEngineImportTaskResource
-			vulcanBatchEngineImportTaskResource);
-
 	public default Filter toFilter(String filterString) {
 		return toFilter(
 			filterString, Collections.<String, List<String>>emptyMap());
@@ -113,8 +108,10 @@ public interface DataDefinitionFieldLinkResource {
 		return null;
 	}
 
-	public default Sort[] toSorts(String sortsString) {
-		return new Sort[0];
+	public static class FactoryHolder {
+
+		public static volatile Factory factory;
+
 	}
 
 	@ProviderType

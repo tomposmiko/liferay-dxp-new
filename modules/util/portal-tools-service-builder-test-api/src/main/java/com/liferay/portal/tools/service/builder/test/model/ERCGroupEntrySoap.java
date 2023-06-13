@@ -32,7 +32,6 @@ public class ERCGroupEntrySoap implements Serializable {
 	public static ERCGroupEntrySoap toSoapModel(ERCGroupEntry model) {
 		ERCGroupEntrySoap soapModel = new ERCGroupEntrySoap();
 
-		soapModel.setUuid(model.getUuid());
 		soapModel.setExternalReferenceCode(model.getExternalReferenceCode());
 		soapModel.setErcGroupEntryId(model.getErcGroupEntryId());
 		soapModel.setGroupId(model.getGroupId());
@@ -90,14 +89,6 @@ public class ERCGroupEntrySoap implements Serializable {
 		setErcGroupEntryId(pk);
 	}
 
-	public String getUuid() {
-		return _uuid;
-	}
-
-	public void setUuid(String uuid) {
-		_uuid = uuid;
-	}
-
 	public String getExternalReferenceCode() {
 		return _externalReferenceCode;
 	}
@@ -130,7 +121,6 @@ public class ERCGroupEntrySoap implements Serializable {
 		_companyId = companyId;
 	}
 
-	private String _uuid;
 	private String _externalReferenceCode;
 	private long _ercGroupEntryId;
 	private long _groupId;

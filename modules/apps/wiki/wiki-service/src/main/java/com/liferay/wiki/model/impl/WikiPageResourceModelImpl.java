@@ -30,6 +30,7 @@ import com.liferay.wiki.model.WikiPageResourceModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -238,61 +239,83 @@ public class WikiPageResourceModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, WikiPageResource>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			WikiPageResource.class.getClassLoader(), WikiPageResource.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<WikiPageResource> constructor =
+				(Constructor<WikiPageResource>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<WikiPageResource, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<WikiPageResource, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<WikiPageResource, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<WikiPageResource, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", WikiPageResource::getMvccVersion);
-		attributeGetterFunctions.put("uuid", WikiPageResource::getUuid);
-		attributeGetterFunctions.put(
-			"resourcePrimKey", WikiPageResource::getResourcePrimKey);
-		attributeGetterFunctions.put("groupId", WikiPageResource::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", WikiPageResource::getCompanyId);
-		attributeGetterFunctions.put("nodeId", WikiPageResource::getNodeId);
-		attributeGetterFunctions.put("title", WikiPageResource::getTitle);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<WikiPageResource, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<WikiPageResource, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<WikiPageResource, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", WikiPageResource::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<WikiPageResource, Long>)
 				WikiPageResource::setMvccVersion);
+		attributeGetterFunctions.put("uuid", WikiPageResource::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<WikiPageResource, String>)WikiPageResource::setUuid);
+		attributeGetterFunctions.put(
+			"resourcePrimKey", WikiPageResource::getResourcePrimKey);
 		attributeSetterBiConsumers.put(
 			"resourcePrimKey",
 			(BiConsumer<WikiPageResource, Long>)
 				WikiPageResource::setResourcePrimKey);
+		attributeGetterFunctions.put("groupId", WikiPageResource::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<WikiPageResource, Long>)WikiPageResource::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", WikiPageResource::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<WikiPageResource, Long>)WikiPageResource::setCompanyId);
+		attributeGetterFunctions.put("nodeId", WikiPageResource::getNodeId);
 		attributeSetterBiConsumers.put(
 			"nodeId",
 			(BiConsumer<WikiPageResource, Long>)WikiPageResource::setNodeId);
+		attributeGetterFunctions.put("title", WikiPageResource::getTitle);
 		attributeSetterBiConsumers.put(
 			"title",
 			(BiConsumer<WikiPageResource, String>)WikiPageResource::setTitle);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -521,6 +544,28 @@ public class WikiPageResourceModelImpl
 	}
 
 	@Override
+	public WikiPageResource cloneWithOriginalValues() {
+		WikiPageResourceImpl wikiPageResourceImpl = new WikiPageResourceImpl();
+
+		wikiPageResourceImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		wikiPageResourceImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		wikiPageResourceImpl.setResourcePrimKey(
+			this.<Long>getColumnOriginalValue("resourcePrimKey"));
+		wikiPageResourceImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		wikiPageResourceImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		wikiPageResourceImpl.setNodeId(
+			this.<Long>getColumnOriginalValue("nodeId"));
+		wikiPageResourceImpl.setTitle(
+			this.<String>getColumnOriginalValue("title"));
+
+		return wikiPageResourceImpl;
+	}
+
+	@Override
 	public int compareTo(WikiPageResource wikiPageResource) {
 		long primaryKey = wikiPageResource.getPrimaryKey();
 
@@ -705,9 +750,7 @@ public class WikiPageResourceModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, WikiPageResource>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					WikiPageResource.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

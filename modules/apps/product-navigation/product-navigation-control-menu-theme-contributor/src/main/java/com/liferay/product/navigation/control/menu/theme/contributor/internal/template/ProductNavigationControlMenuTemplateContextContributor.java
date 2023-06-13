@@ -100,15 +100,8 @@ public class ProductNavigationControlMenuTemplateContextContributor
 							productNavigationControlMenuCategory,
 							httpServletRequest);
 
-			for (ProductNavigationControlMenuEntry
-					productNavigationControlMenuEntry :
-						productNavigationControlMenuEntries) {
-
-				if (productNavigationControlMenuEntry.isRelevant(
-						httpServletRequest)) {
-
-					return true;
-				}
+			if (!productNavigationControlMenuEntries.isEmpty()) {
+				return true;
 			}
 		}
 

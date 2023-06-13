@@ -43,7 +43,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("MasterPage")
+@GraphQLName(
+	description = "Represents a page with common elements (header, footer, ...) used for all or several pages of a site.",
+	value = "MasterPage"
+)
 @JsonFilter("Liferay.Vulcan")
 @XmlRootElement(name = "MasterPage")
 public class MasterPage implements Serializable {
@@ -56,7 +59,7 @@ public class MasterPage implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(MasterPage.class, json);
 	}
 
-	@Schema
+	@Schema(description = "The master page's key.")
 	public String getKey() {
 		return key;
 	}
@@ -78,11 +81,11 @@ public class MasterPage implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The master page's key.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String key;
 
-	@Schema
+	@Schema(description = "The master page's name.")
 	public String getName() {
 		return name;
 	}
@@ -104,7 +107,7 @@ public class MasterPage implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The master page's name.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 

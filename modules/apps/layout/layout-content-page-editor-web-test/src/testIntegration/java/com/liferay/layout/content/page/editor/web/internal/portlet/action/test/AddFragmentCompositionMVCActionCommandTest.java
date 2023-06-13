@@ -243,8 +243,8 @@ public class AddFragmentCompositionMVCActionCommandTest {
 				TestPropsValues.getUserId(), _group.getGroupId(),
 				fragmentCollection.getFragmentCollectionId(),
 				"example-fragment-entry-key", RandomTestUtil.randomString(),
-				StringPool.BLANK, html, StringPool.BLANK, StringPool.BLANK, 0,
-				FragmentConstants.TYPE_COMPONENT,
+				StringPool.BLANK, html, StringPool.BLANK, false,
+				StringPool.BLANK, null, 0, FragmentConstants.TYPE_COMPONENT,
 				WorkflowConstants.STATUS_APPROVED, _serviceContext);
 
 		JournalArticle journalArticle1 = _addJournalArticle(
@@ -391,9 +391,9 @@ public class AddFragmentCompositionMVCActionCommandTest {
 
 		Assert.assertEquals(
 			_objectMapper.readTree(
-				expectedFragmentCompositionDataJSONObject.toString()),
+				expectedFragmentCompositionDataJSONObject.toJSONString()),
 			_objectMapper.readTree(
-				fragmentCompositionDataJSONObject.toString()));
+				fragmentCompositionDataJSONObject.toJSONString()));
 	}
 
 	@Test
@@ -542,7 +542,7 @@ public class AddFragmentCompositionMVCActionCommandTest {
 		_layoutPageTemplateStructureLocalService;
 
 	@Inject(
-		filter = "mvc.command.name=/content_layout/add_fragment_composition"
+		filter = "mvc.command.name=/layout_content_page_editor/add_fragment_composition"
 	)
 	private MVCActionCommand _mvcActionCommand;
 

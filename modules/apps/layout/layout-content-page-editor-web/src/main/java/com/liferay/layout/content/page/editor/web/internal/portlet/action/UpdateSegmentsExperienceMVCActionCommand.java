@@ -37,7 +37,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
-		"mvc.command.name=/content_layout/update_segments_experience"
+		"mvc.command.name=/layout_content_page_editor/update_segments_experience"
 	},
 	service = MVCActionCommand.class
 )
@@ -49,18 +49,15 @@ public class UpdateSegmentsExperienceMVCActionCommand
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		long segmentsExperienceId = ParamUtil.getLong(
-			actionRequest, "segmentsExperienceId");
-
-		long segmentsEntryId = ParamUtil.getLong(
-			actionRequest, "segmentsEntryId");
-		String name = ParamUtil.getString(actionRequest, "name");
-
 		return JSONUtil.put(
 			"segmentsExperience",
 			_segmentsExperienceService.updateSegmentsExperience(
-				segmentsExperienceId, segmentsEntryId,
-				Collections.singletonMap(LocaleUtil.getDefault(), name), true));
+				ParamUtil.getLong(actionRequest, "segmentsExperienceId"),
+				ParamUtil.getLong(actionRequest, "segmentsEntryId"),
+				Collections.singletonMap(
+					LocaleUtil.getSiteDefault(),
+					ParamUtil.getString(actionRequest, "name")),
+				true));
 	}
 
 	@Reference

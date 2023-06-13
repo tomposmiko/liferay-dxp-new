@@ -64,36 +64,6 @@ public class SXPBlueprint implements Serializable {
 
 	@Schema
 	@Valid
-	public Map<String, Map<String, String>> getActions() {
-		return actions;
-	}
-
-	public void setActions(Map<String, Map<String, String>> actions) {
-		this.actions = actions;
-	}
-
-	@JsonIgnore
-	public void setActions(
-		UnsafeSupplier<Map<String, Map<String, String>>, Exception>
-			actionsUnsafeSupplier) {
-
-		try {
-			actions = actionsUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Map<String, Map<String, String>> actions;
-
-	@Schema
-	@Valid
 	public Configuration getConfiguration() {
 		return configuration;
 	}
@@ -237,34 +207,6 @@ public class SXPBlueprint implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ElementInstance[] elementInstances;
 
-	@Schema(example = "AB-34098-789-N")
-	public String getExternalReferenceCode() {
-		return externalReferenceCode;
-	}
-
-	public void setExternalReferenceCode(String externalReferenceCode) {
-		this.externalReferenceCode = externalReferenceCode;
-	}
-
-	@JsonIgnore
-	public void setExternalReferenceCode(
-		UnsafeSupplier<String, Exception> externalReferenceCodeUnsafeSupplier) {
-
-		try {
-			externalReferenceCode = externalReferenceCodeUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String externalReferenceCode;
-
 	@Schema
 	public Long getId() {
 		return id;
@@ -318,34 +260,6 @@ public class SXPBlueprint implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date modifiedDate;
-
-	@Schema
-	public String getSchemaVersion() {
-		return schemaVersion;
-	}
-
-	public void setSchemaVersion(String schemaVersion) {
-		this.schemaVersion = schemaVersion;
-	}
-
-	@JsonIgnore
-	public void setSchemaVersion(
-		UnsafeSupplier<String, Exception> schemaVersionUnsafeSupplier) {
-
-		try {
-			schemaVersion = schemaVersionUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String schemaVersion;
 
 	@Schema
 	public String getTitle() {
@@ -433,34 +347,6 @@ public class SXPBlueprint implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String userName;
 
-	@Schema
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
-	@JsonIgnore
-	public void setVersion(
-		UnsafeSupplier<String, Exception> versionUnsafeSupplier) {
-
-		try {
-			version = versionUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String version;
-
 	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
@@ -490,16 +376,6 @@ public class SXPBlueprint implements Serializable {
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-		if (actions != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"actions\": ");
-
-			sb.append(_toJSON(actions));
-		}
 
 		if (configuration != null) {
 			if (sb.length() > 1) {
@@ -569,20 +445,6 @@ public class SXPBlueprint implements Serializable {
 			sb.append("]");
 		}
 
-		if (externalReferenceCode != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"externalReferenceCode\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(externalReferenceCode));
-
-			sb.append("\"");
-		}
-
 		if (id != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -603,20 +465,6 @@ public class SXPBlueprint implements Serializable {
 			sb.append("\"");
 
 			sb.append(liferayToJSONDateFormat.format(modifiedDate));
-
-			sb.append("\"");
-		}
-
-		if (schemaVersion != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"schemaVersion\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(schemaVersion));
 
 			sb.append("\"");
 		}
@@ -655,20 +503,6 @@ public class SXPBlueprint implements Serializable {
 			sb.append("\"");
 
 			sb.append(_escape(userName));
-
-			sb.append("\"");
-		}
-
-		if (version != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"version\": ");
-
-			sb.append("\"");
-
-			sb.append(_escape(version));
 
 			sb.append("\"");
 		}

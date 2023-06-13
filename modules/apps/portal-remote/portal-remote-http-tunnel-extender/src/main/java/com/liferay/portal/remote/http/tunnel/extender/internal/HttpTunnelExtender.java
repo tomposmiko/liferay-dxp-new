@@ -48,7 +48,7 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
  * @author Miguel Pastor
  */
 @Component(
-	configurationPid = "com.liferay.portal.remote.http.tunnel.extender.configuration.HttpTunnelExtenderConfiguration",
+	configurationPid = "com.liferay.portal.remote.http.tunnel.configuration.HttpTunnelExtenderConfiguration",
 	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true,
 	service = {}
 )
@@ -223,7 +223,8 @@ public class HttpTunnelExtender
 	}
 
 	private BundleTracker<?> _bundleTracker;
-	private HttpTunnelExtenderConfiguration _httpTunnelExtenderConfiguration;
+	private volatile HttpTunnelExtenderConfiguration
+		_httpTunnelExtenderConfiguration;
 
 	private final class ServiceRegistrations {
 

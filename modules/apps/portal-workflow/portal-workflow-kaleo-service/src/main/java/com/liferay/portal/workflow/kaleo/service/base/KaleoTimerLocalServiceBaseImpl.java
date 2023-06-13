@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -322,6 +320,7 @@ public abstract class KaleoTimerLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -339,6 +338,7 @@ public abstract class KaleoTimerLocalServiceBaseImpl
 			(KaleoTimer)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<KaleoTimer> getBasePersistence() {
 		return kaleoTimerPersistence;
 	}
@@ -555,8 +555,5 @@ public abstract class KaleoTimerLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		KaleoTimerLocalServiceBaseImpl.class);
 
 }

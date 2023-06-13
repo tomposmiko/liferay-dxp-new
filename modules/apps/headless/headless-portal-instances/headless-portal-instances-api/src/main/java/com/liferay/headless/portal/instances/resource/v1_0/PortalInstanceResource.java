@@ -15,7 +15,6 @@
 package com.liferay.headless.portal.instances.resource.v1_0;
 
 import com.liferay.headless.portal.instances.dto.v1_0.PortalInstance;
-import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -23,7 +22,6 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.pagination.Page;
 
@@ -53,11 +51,14 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface PortalInstanceResource {
 
+	public static Builder builder() {
+		return FactoryHolder.factory.create();
+	}
+
 	public Page<PortalInstance> getPortalInstancesPage(Boolean skipDefault)
 		throws Exception;
 
-	public PortalInstance postPortalInstance(
-			String initializerKey, PortalInstance portalInstance)
+	public PortalInstance postPortalInstance(PortalInstance portalInstance)
 		throws Exception;
 
 	public void deletePortalInstance(String portalInstanceId) throws Exception;
@@ -112,8 +113,6 @@ public interface PortalInstanceResource {
 
 	public void setRoleLocalService(RoleLocalService roleLocalService);
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider);
-
 	public default Filter toFilter(String filterString) {
 		return toFilter(
 			filterString, Collections.<String, List<String>>emptyMap());
@@ -125,8 +124,10 @@ public interface PortalInstanceResource {
 		return null;
 	}
 
-	public default Sort[] toSorts(String sortsString) {
-		return new Sort[0];
+	public static class FactoryHolder {
+
+		public static volatile Factory factory;
+
 	}
 
 	@ProviderType

@@ -26,11 +26,9 @@ import com.liferay.portal.kernel.test.portlet.MockLiferayPortletRenderRequest;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletRenderResponse;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.PropsImpl;
 import com.liferay.portlet.internal.PortalContextImpl;
 import com.liferay.portletmvc4spring.test.mock.web.portlet.MockPortletURL;
 
@@ -49,7 +47,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -62,8 +59,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 public class DLEditFileShortcutDisplayContextTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@Before
@@ -81,8 +77,6 @@ public class DLEditFileShortcutDisplayContextTest {
 		LanguageResources languageResources = new LanguageResources();
 
 		languageResources.setConfig(StringPool.BLANK);
-
-		PropsUtil.setProps(new PropsImpl());
 	}
 
 	@Test
@@ -93,8 +87,7 @@ public class DLEditFileShortcutDisplayContextTest {
 
 		DLEditFileShortcutDisplayContext dlEditFileShortcutDisplayContext =
 			_getDLEditFileShortcutDisplayContext(
-				new MockHttpServletRequestBuilder(
-				).withAttribute(
+				new MockHttpServletRequestBuilder().withAttribute(
 					WebKeys.DOCUMENT_LIBRARY_FILE_SHORTCUT, fileShortcut
 				).build());
 
@@ -123,8 +116,7 @@ public class DLEditFileShortcutDisplayContextTest {
 
 		DLEditFileShortcutDisplayContext dlEditFileShortcutDisplayContext =
 			_getDLEditFileShortcutDisplayContext(
-				new MockHttpServletRequestBuilder(
-				).withAttribute(
+				new MockHttpServletRequestBuilder().withAttribute(
 					WebKeys.DOCUMENT_LIBRARY_FILE_SHORTCUT, fileShortcut
 				).build());
 
@@ -162,8 +154,7 @@ public class DLEditFileShortcutDisplayContextTest {
 
 		DLEditFileShortcutDisplayContext dlEditFileShortcutDisplayContext =
 			_getDLEditFileShortcutDisplayContext(
-				new MockHttpServletRequestBuilder(
-				).withAttribute(
+				new MockHttpServletRequestBuilder().withAttribute(
 					WebKeys.DOCUMENT_LIBRARY_FILE_SHORTCUT, fileShortcut
 				).withParameter(
 					"fileShortcutId", "12356"
@@ -189,8 +180,7 @@ public class DLEditFileShortcutDisplayContextTest {
 	public void testGetFieldsWithParametersAndWithoutAttributes() {
 		DLEditFileShortcutDisplayContext dlEditFileShortcutDisplayContext =
 			_getDLEditFileShortcutDisplayContext(
-				new MockHttpServletRequestBuilder(
-				).withParameter(
+				new MockHttpServletRequestBuilder().withParameter(
 					"fileShortcutId", "12356"
 				).withParameter(
 					"folderId", "23567"
@@ -216,15 +206,15 @@ public class DLEditFileShortcutDisplayContextTest {
 
 		DLEditFileShortcutDisplayContext dlEditFileShortcutDisplayContext =
 			_getDLEditFileShortcutDisplayContext(
-				new MockHttpServletRequestBuilder(
-				).withAttribute(
+				new MockHttpServletRequestBuilder().withAttribute(
 					WebKeys.DOCUMENT_LIBRARY_FILE_SHORTCUT, fileShortcut
 				).build());
 
 		Mockito.when(
-			_language.get(
+			_language.format(
 				Mockito.any(HttpServletRequest.class),
-				Mockito.eq("shortcut-to-x"), Mockito.anyString())
+				Mockito.eq("shortcut-to-x"), Mockito.anyString(),
+				Mockito.anyBoolean())
 		).thenReturn(
 			"Short Cut To X"
 		);

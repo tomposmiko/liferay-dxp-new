@@ -121,6 +121,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiPredicate;
@@ -376,14 +377,12 @@ public class PortletImportControllerImpl implements PortletImportController {
 			portletDataHandler.isDataPortletInstanceLevel()) {
 
 			if (_log.isDebugEnabled()) {
-				StringBundler sb = new StringBundler(4);
-
-				sb.append("Do not import portlet data for portlet ");
-				sb.append(portletDataContext.getPortletId());
-				sb.append(" because the portlet does not have a portlet data ");
-				sb.append("handler");
-
-				_log.debug(sb.toString());
+				_log.debug(
+					StringBundler.concat(
+						"Do not import portlet data for portlet ",
+						portletDataContext.getPortletId(),
+						" because the portlet does not have a portlet data ",
+						"handler"));
 			}
 
 			return null;
@@ -666,12 +665,10 @@ public class PortletImportControllerImpl implements PortletImportController {
 			serviceElement.remove(attribute);
 		}
 
-		String xml = serviceElement.asXML();
-
-		portletPreferences.setPreferences(xml);
-
-		_portletPreferencesLocalService.updatePortletPreferences(
-			portletPreferences);
+		_portletPreferencesLocalService.updatePreferences(
+			portletPreferences.getOwnerId(), portletPreferences.getOwnerType(),
+			portletPreferences.getPlid(), portletPreferences.getPortletId(),
+			serviceElement.asXML());
 	}
 
 	@Override
@@ -891,14 +888,12 @@ public class PortletImportControllerImpl implements PortletImportController {
 
 		if (portletDataHandler == null) {
 			if (_log.isDebugEnabled()) {
-				StringBundler sb = new StringBundler(4);
-
-				sb.append("Do not delete portlet data for portlet ");
-				sb.append(portletDataContext.getPortletId());
-				sb.append(" because the portlet does not have a ");
-				sb.append("PortletDataHandler");
-
-				_log.debug(sb.toString());
+				_log.debug(
+					StringBundler.concat(
+						"Do not delete portlet data for portlet ",
+						portletDataContext.getPortletId(),
+						" because the portlet does not have a ",
+						"PortletDataHandler"));
 			}
 
 			return null;
@@ -932,9 +927,6 @@ public class PortletImportControllerImpl implements PortletImportController {
 
 		Map<String, String[]> parameterMap =
 			portletDataContext.getParameterMap();
-
-		boolean importPermissions = MapUtil.getBoolean(
-			parameterMap, PortletDataHandlerKeys.PERMISSIONS);
 
 		StopWatch stopWatch = new StopWatch();
 
@@ -1010,6 +1002,9 @@ public class PortletImportControllerImpl implements PortletImportController {
 			throw exportImportDocumentException;
 		}
 
+		boolean importPermissions = MapUtil.getBoolean(
+			parameterMap, PortletDataHandlerKeys.PERMISSIONS);
+
 		_permissionImporter.clearCache();
 
 		if (importPermissions) {
@@ -1081,6 +1076,18 @@ public class PortletImportControllerImpl implements PortletImportController {
 		if (importPermissions) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("Importing portlet permissions");
+			}
+
+			PortletDataHandler portletDataHandler =
+				_portletDataHandlerProvider.provide(
+					portletDataContext.getCompanyId(),
+					portletDataContext.getPortletId());
+
+			if ((portletDataHandler != null) &&
+				Validator.isNotNull(portletDataHandler.getResourceName())) {
+
+				portletDataContext.importPortletPermissions(
+					portletDataHandler.getResourceName());
 			}
 
 			_permissionImporter.importPortletPermissions(
@@ -1452,7 +1459,6 @@ public class PortletImportControllerImpl implements PortletImportController {
 		// Build compatibility
 
 		Element headerElement = rootElement.element("header");
-		Element portletElement = rootElement.element("portlet");
 
 		int importBuildNumber = GetterUtil.getInteger(
 			headerElement.attributeValue("build-number"));
@@ -1527,6 +1533,8 @@ public class PortletImportControllerImpl implements PortletImportController {
 			throw new PortletIdException(expectedRootPortletId);
 		}
 
+		Element portletElement = rootElement.element("portlet");
+
 		String schemaVersion = GetterUtil.getString(
 			portletElement.attributeValue("schema-version"), "1.0.0");
 
@@ -1545,21 +1553,21 @@ public class PortletImportControllerImpl implements PortletImportController {
 		// Available locales
 
 		if (portletDataHandler.isDataLocalized()) {
-			String[] sourceAvailableLanguageIds = StringUtil.split(
-				headerElement.attributeValue("available-locales"));
+			List<Locale> sourceAvailableLocales = Arrays.asList(
+				LocaleUtil.fromLanguageIds(
+					StringUtil.split(
+						headerElement.attributeValue("available-locales"))));
 
-			for (String sourceAvailableLanguageId :
-					sourceAvailableLanguageIds) {
-
+			for (Locale sourceAvailableLocale : sourceAvailableLocales) {
 				if (!LanguageUtil.isAvailableLocale(
 						_portal.getSiteGroupId(groupId),
-						sourceAvailableLanguageId)) {
+						sourceAvailableLocale)) {
 
 					LocaleException localeException = new LocaleException(
 						LocaleException.TYPE_EXPORT_IMPORT);
 
-					localeException.setSourceAvailableLanguageIds(
-						Arrays.asList(sourceAvailableLanguageIds));
+					localeException.setSourceAvailableLocales(
+						sourceAvailableLocales);
 					localeException.setTargetAvailableLocales(
 						LanguageUtil.getAvailableLocales(
 							_portal.getSiteGroupId(groupId)));

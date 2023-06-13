@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -60,7 +61,7 @@ public class AccountSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (account.getAccountAddresses() != null) {
 			if (sb.length() > 1) {
@@ -330,7 +331,7 @@ public class AccountSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (account.getAccountAddresses() == null) {
 			map.put("accountAddresses", null);
@@ -496,53 +497,41 @@ public class AccountSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "accountAddresses")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					AccountAddress[] accountAddressesArray =
-						new AccountAddress[jsonParserFieldValues.length];
-
-					for (int i = 0; i < accountAddressesArray.length; i++) {
-						accountAddressesArray[i] = AccountAddressSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					account.setAccountAddresses(accountAddressesArray);
+					account.setAccountAddresses(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AccountAddressSerDes.toDTO((String)object)
+						).toArray(
+							size -> new AccountAddress[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "accountMembers")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					AccountMember[] accountMembersArray =
-						new AccountMember[jsonParserFieldValues.length];
-
-					for (int i = 0; i < accountMembersArray.length; i++) {
-						accountMembersArray[i] = AccountMemberSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					account.setAccountMembers(accountMembersArray);
+					account.setAccountMembers(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AccountMemberSerDes.toDTO((String)object)
+						).toArray(
+							size -> new AccountMember[size]
+						));
 				}
 			}
 			else if (Objects.equals(
 						jsonParserFieldName, "accountOrganizations")) {
 
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					AccountOrganization[] accountOrganizationsArray =
-						new AccountOrganization[jsonParserFieldValues.length];
-
-					for (int i = 0; i < accountOrganizationsArray.length; i++) {
-						accountOrganizationsArray[i] =
-							AccountOrganizationSerDes.toDTO(
-								(String)jsonParserFieldValues[i]);
-					}
-
-					account.setAccountOrganizations(accountOrganizationsArray);
+					account.setAccountOrganizations(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> AccountOrganizationSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new AccountOrganization[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "active")) {

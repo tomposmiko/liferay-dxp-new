@@ -12,8 +12,10 @@
 import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useContext} from 'react';
 
+import {ChartDispatchContext} from '../context/ChartStateContext';
+import {StoreDispatchContext} from '../context/StoreContext';
 import KeywordsDetail from './detail/KeywordsDetail';
 import ReferralDetail from './detail/ReferralDetail';
 import SocialDetail from './detail/SocialDetail';
@@ -28,13 +30,18 @@ const TRAFFIC_CHANNELS = {
 
 export default function Detail({
 	currentPage,
-	languageTag,
+	handleDetailPeriodChange,
 	onCurrentPageChange,
 	onTrafficSourceNameChange,
 	timeSpanOptions,
 	trafficShareDataProvider,
+	trafficSourcesDataProvider,
 	trafficVolumeDataProvider,
 }) {
+	const chartDispatch = useContext(ChartDispatchContext);
+
+	const storeDispatch = useContext(StoreDispatchContext);
+
 	return (
 		<>
 			<div className="c-pt-3 c-px-3 d-flex">
@@ -43,6 +50,11 @@ export default function Detail({
 					onClick={() => {
 						onCurrentPageChange({view: 'main'});
 						onTrafficSourceNameChange('');
+						chartDispatch({type: 'SET_LOADING'});
+						storeDispatch({
+							selectedTrafficSourceName: '',
+							type: 'SET_SELECTED_TRAFFIC_SOURCE_NAME',
+						});
 					}}
 					small={true}
 				>
@@ -59,7 +71,6 @@ export default function Detail({
 				currentPage.data.countryKeywords.length > 0 && (
 					<KeywordsDetail
 						currentPage={currentPage}
-						languageTag={languageTag}
 						trafficShareDataProvider={trafficShareDataProvider}
 						trafficVolumeDataProvider={trafficVolumeDataProvider}
 					/>
@@ -68,9 +79,10 @@ export default function Detail({
 			{currentPage.view === TRAFFIC_CHANNELS.REFERRAL && (
 				<ReferralDetail
 					currentPage={currentPage}
-					languageTag={languageTag}
+					handleDetailPeriodChange={handleDetailPeriodChange}
 					timeSpanOptions={timeSpanOptions}
 					trafficShareDataProvider={trafficShareDataProvider}
+					trafficSourcesDataProvider={trafficSourcesDataProvider}
 					trafficVolumeDataProvider={trafficVolumeDataProvider}
 				/>
 			)}
@@ -78,9 +90,10 @@ export default function Detail({
 			{currentPage.view === TRAFFIC_CHANNELS.SOCIAL && (
 				<SocialDetail
 					currentPage={currentPage}
-					languageTag={languageTag}
+					handleDetailPeriodChange={handleDetailPeriodChange}
 					timeSpanOptions={timeSpanOptions}
 					trafficShareDataProvider={trafficShareDataProvider}
+					trafficSourcesDataProvider={trafficSourcesDataProvider}
 					trafficVolumeDataProvider={trafficVolumeDataProvider}
 				/>
 			)}
@@ -88,9 +101,8 @@ export default function Detail({
 	);
 }
 
-Detail.proptypes = {
+Detail.propTypes = {
 	currentPage: PropTypes.object.isRequired,
-	languageTag: PropTypes.string.isRequired,
 	onCurrentPageChange: PropTypes.func.isRequired,
 	onTrafficSourceNameChange: PropTypes.func.isRequired,
 	timeSpanOptions: PropTypes.arrayOf(
@@ -100,5 +112,6 @@ Detail.proptypes = {
 		})
 	).isRequired,
 	trafficShareDataProvider: PropTypes.func.isRequired,
+	trafficSourcesDataProvider: PropTypes.func.isRequired,
 	trafficVolumeDataProvider: PropTypes.func.isRequired,
 };

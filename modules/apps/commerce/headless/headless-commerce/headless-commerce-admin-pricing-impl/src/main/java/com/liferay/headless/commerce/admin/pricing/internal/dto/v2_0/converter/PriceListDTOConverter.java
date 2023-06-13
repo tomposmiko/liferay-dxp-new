@@ -39,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	enabled = false,
-	property = "model.class.name=com.liferay.commerce.price.list.model.CommercePriceList",
+	property = "dto.class.name=com.liferay.commerce.price.list.model.CommercePriceList",
 	service = {DTOConverter.class, PriceListDTOConverter.class}
 )
 public class PriceListDTOConverter
@@ -96,7 +96,7 @@ public class PriceListDTOConverter
 					commercePriceList.getParentCommercePriceListId();
 				priority = commercePriceList.getPriority();
 				type = Type.create(commercePriceList.getType());
-				workflowStatusInfo = _getWorkflowStatusInfo(
+				workflowStatusInfo = _toStatus(
 					commercePriceList.getStatus(), priceListStatusLabel,
 					priceListStatusLabelI18n);
 			}
@@ -131,7 +131,7 @@ public class PriceListDTOConverter
 		return commerceCatalog.getName();
 	}
 
-	private Status _getWorkflowStatusInfo(
+	private Status _toStatus(
 		int statusCode, String priceListStatusLabel,
 		String priceListStatusLabelI18n) {
 

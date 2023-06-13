@@ -51,7 +51,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + KaleoDesignerPortletKeys.KALEO_DESIGNER,
-		"mvc.command.name=publishKaleoDefinitionVersion"
+		"mvc.command.name=/kaleo_designer/publish_kaleo_definition_version"
 	},
 	service = MVCActionCommand.class
 )
@@ -62,9 +62,6 @@ public class PublishKaleoDefinitionVersionMVCActionCommand
 	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
 
 		Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
 			actionRequest, "title");
@@ -77,6 +74,9 @@ public class PublishKaleoDefinitionVersionMVCActionCommand
 			throw new WorkflowDefinitionFileException(
 				"please-enter-a-valid-definition-before-publishing");
 		}
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
 		validateWorkflowDefinition(actionRequest, content.getBytes());
 

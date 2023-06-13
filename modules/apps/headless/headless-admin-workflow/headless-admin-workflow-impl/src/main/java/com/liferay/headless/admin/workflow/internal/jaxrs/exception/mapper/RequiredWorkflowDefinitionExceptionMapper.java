@@ -77,8 +77,7 @@ public class RequiredWorkflowDefinitionExceptionMapper
 				workflowDefinitionLinks.get(0);
 
 			return new Object[] {
-				_getModelResource(workflowDefinitionLink.getClassName()),
-				StringPool.BLANK
+				_getModelResource(workflowDefinitionLink.getClassName())
 			};
 		}
 		else if (workflowDefinitionLinks.size() == 2) {
@@ -89,23 +88,21 @@ public class RequiredWorkflowDefinitionExceptionMapper
 
 			return new Object[] {
 				_getModelResource(workflowDefinitionLink1.getClassName()),
-				_getModelResource(workflowDefinitionLink2.getClassName()),
-				StringPool.BLANK
+				_getModelResource(workflowDefinitionLink2.getClassName())
 			};
 		}
+		else {
+			WorkflowDefinitionLink workflowDefinitionLink1 =
+				workflowDefinitionLinks.get(0);
+			WorkflowDefinitionLink workflowDefinitionLink2 =
+				workflowDefinitionLinks.get(1);
 
-		int moreAssets = workflowDefinitionLinks.size() - 2;
-
-		WorkflowDefinitionLink workflowDefinitionLink1 =
-			workflowDefinitionLinks.get(0);
-		WorkflowDefinitionLink workflowDefinitionLink2 =
-			workflowDefinitionLinks.get(1);
-
-		return new Object[] {
-			_getModelResource(workflowDefinitionLink1.getClassName()),
-			_getModelResource(workflowDefinitionLink2.getClassName()),
-			moreAssets, StringPool.BLANK
-		};
+			return new Object[] {
+				_getModelResource(workflowDefinitionLink1.getClassName()),
+				_getModelResource(workflowDefinitionLink2.getClassName()),
+				workflowDefinitionLinks.size() - 2
+			};
+		}
 	}
 
 	private String _getMessageKey(
@@ -119,13 +116,13 @@ public class RequiredWorkflowDefinitionExceptionMapper
 			return StringPool.BLANK;
 		}
 		else if (workflowDefinitionLinks.size() == 1) {
-			return "workflow-in-use-remove-assignement-to-x-x";
+			return "workflow-is-in-use.-remove-its-assignment-to-x";
 		}
 		else if (workflowDefinitionLinks.size() == 2) {
-			return "workflow-in-use-remove-assignements-to-x-and-x-x";
+			return "workflow-is-in-use.-remove-its-assignment-to-x-and-x";
 		}
 
-		return "workflow-in-use-remove-assignements-to-x-x-and-x-more-x";
+		return "workflow-is-in-use.-remove-its-assignment-to-x-x-and-x-more";
 	}
 
 	private String _getModelResource(String className) {

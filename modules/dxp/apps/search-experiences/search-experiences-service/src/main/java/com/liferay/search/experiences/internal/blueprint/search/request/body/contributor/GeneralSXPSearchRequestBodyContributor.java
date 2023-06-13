@@ -14,9 +14,6 @@
 
 package com.liferay.search.experiences.internal.blueprint.search.request.body.contributor;
 
-import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.search.experiences.internal.blueprint.parameter.SXPParameterData;
 import com.liferay.search.experiences.rest.dto.v1_0.Configuration;
@@ -40,22 +37,6 @@ public class GeneralSXPSearchRequestBodyContributor
 			return;
 		}
 
-		if (generalConfiguration.getClauseContributorsExcludes() != null) {
-			searchRequestBuilder.withSearchContext(
-				searchContext -> searchContext.setAttribute(
-					"search.full.query.clause.contributors.excludes",
-					StringUtil.merge(
-						generalConfiguration.getClauseContributorsExcludes())));
-		}
-
-		if (generalConfiguration.getClauseContributorsIncludes() != null) {
-			searchRequestBuilder.withSearchContext(
-				searchContext -> searchContext.setAttribute(
-					"search.full.query.clause.contributors.includes",
-					StringUtil.merge(
-						generalConfiguration.getClauseContributorsIncludes())));
-		}
-
 		if (generalConfiguration.getEmptySearchEnabled() != null) {
 			searchRequestBuilder.emptySearchEnabled(
 				generalConfiguration.getEmptySearchEnabled());
@@ -70,27 +51,9 @@ public class GeneralSXPSearchRequestBodyContributor
 				generalConfiguration.getIncludeResponseString());
 		}
 
-		if (generalConfiguration.getQueryString() != null) {
-			searchRequestBuilder.queryString(
-				generalConfiguration.getQueryString());
-		}
-
 		if (generalConfiguration.getSearchableAssetTypes() != null) {
 			searchRequestBuilder.modelIndexerClassNames(
 				generalConfiguration.getSearchableAssetTypes());
-		}
-
-		if (generalConfiguration.getLanguageId() != null) {
-			searchRequestBuilder.locale(
-				LocaleUtil.fromLanguageId(
-					generalConfiguration.getLanguageId()));
-		}
-
-		if (generalConfiguration.getTimeZoneId() != null) {
-			searchRequestBuilder.withSearchContext(
-				searchContext -> searchContext.setTimeZone(
-					TimeZoneUtil.getTimeZone(
-						generalConfiguration.getTimeZoneId())));
 		}
 	}
 

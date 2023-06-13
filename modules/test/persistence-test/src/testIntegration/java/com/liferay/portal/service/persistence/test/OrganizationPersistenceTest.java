@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
-import com.liferay.portal.kernel.exception.DuplicateOrganizationExternalReferenceCodeException;
 import com.liferay.portal.kernel.exception.NoSuchOrganizationException;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
@@ -219,26 +218,6 @@ public class OrganizationPersistenceTest {
 			existingOrganization.getLogoId(), newOrganization.getLogoId());
 	}
 
-	@Test(expected = DuplicateOrganizationExternalReferenceCodeException.class)
-	public void testUpdateWithExistingExternalReferenceCode() throws Exception {
-		Organization organization = addOrganization();
-
-		Organization newOrganization = addOrganization();
-
-		newOrganization.setCompanyId(organization.getCompanyId());
-
-		newOrganization = _persistence.update(newOrganization);
-
-		Session session = _persistence.getCurrentSession();
-
-		session.evict(newOrganization);
-
-		newOrganization.setExternalReferenceCode(
-			organization.getExternalReferenceCode());
-
-		_persistence.update(newOrganization);
-	}
-
 	@Test
 	public void testCountByUuid() throws Exception {
 		_persistence.countByUuid("");
@@ -265,10 +244,10 @@ public class OrganizationPersistenceTest {
 	}
 
 	@Test
-	public void testCountByLocations() throws Exception {
-		_persistence.countByLocations(RandomTestUtil.nextLong());
+	public void testCountByCompanyIdLocations() throws Exception {
+		_persistence.countByCompanyIdLocations(RandomTestUtil.nextLong());
 
-		_persistence.countByLocations(0L);
+		_persistence.countByCompanyIdLocations(0L);
 	}
 
 	@Test
@@ -280,12 +259,12 @@ public class OrganizationPersistenceTest {
 	}
 
 	@Test
-	public void testCountByC_T() throws Exception {
-		_persistence.countByC_T(RandomTestUtil.nextLong(), "");
+	public void testCountByC_LikeT() throws Exception {
+		_persistence.countByC_LikeT(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByC_T(0L, "null");
+		_persistence.countByC_LikeT(0L, "null");
 
-		_persistence.countByC_T(0L, (String)null);
+		_persistence.countByC_LikeT(0L, (String)null);
 	}
 
 	@Test
@@ -307,12 +286,12 @@ public class OrganizationPersistenceTest {
 	}
 
 	@Test
-	public void testCountByO_C_P() throws Exception {
-		_persistence.countByO_C_P(
+	public void testCountByGtO_C_P() throws Exception {
+		_persistence.countByGtO_C_P(
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
 			RandomTestUtil.nextLong());
 
-		_persistence.countByO_C_P(0L, 0L, 0L);
+		_persistence.countByGtO_C_P(0L, 0L, 0L);
 	}
 
 	@Test

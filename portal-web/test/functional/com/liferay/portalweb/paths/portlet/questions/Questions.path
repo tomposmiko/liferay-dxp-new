@@ -56,6 +56,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>EDIT_ANSWER</td>
+	<td>//button[contains(@class,'text-reset')]//a[contains(.,'Edit')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>EMPTY_STATE_MESSAGE</td>
 	<td>//div[contains(@class,'questions-container')]//div[contains(@class,'empty')]//span[contains(text(),'${key_emptyInfo}')]</td>
 	<td></td>
@@ -66,13 +71,28 @@
 	<td></td>
 </tr>
 <tr>
+	<td>MODAL_ITEM_BUTTON</td>
+	<td>//div[contains(@class,'modal-item')]//button[contains(@type,'button') and contains(.,'${key_text}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>NEW_TOPIC</td>
 	<td>//button[contains(@class,'breadcrumb-button') and contains(.,'New Topic')]</td>
 	<td></td>
 </tr>
 <tr>
+	<td>PAGINATION_NEXT_LINK</td>
+	<td>//button[*[name()='svg'][contains(@class,'lexicon-icon-angle-right')]]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PAGINATION_RESULTS</td>
 	<td>//div[@class='pagination-results']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>QUESTIONS_ARTICLE_BODY</td>
+	<td>//div[contains(@class,'questions-article-body') and contains(.,'${key_articleBodyContent}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -151,6 +171,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>QUESTIONS_RESPONSE_DATE_LABEL</td>
+	<td>//span[contains(@class,'text-secondary') and contains(.,'${key_label}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>QUESTIONS_SUBSCRIBE</td>
+	<td>//button[@type='button' and @title='Subscribe']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>QUESTIONS_SUBSCRIBED_BUTTON</td>
 	<td>//button[@type='button' and @title='Subscribed']</td>
 	<td></td>
@@ -181,13 +211,13 @@
 	<td></td>
 </tr>
 <tr>
-	<td>QUESTIONS_LIST_LOCKED_ICON</td>
-	<td>//h2[contains(.,'${key_questionTitle}')]//*[name()='svg'][contains(@class,'lexicon-icon-lock')]</td>
+	<td>QUESTIONS_LIST_VOTED_COUNT</td>
+	<td>//*[*[name()='svg'][contains(@class,'lexicon-icon-caret-${key_text}')]]//span[contains(.,'${key_count}')]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>QUESTIONS_NAME_FIELD</td>
-	<td>//p[@title='${key_questionNameField}']</td>
+	<td>QUESTIONS_LIST_LOCKED_ICON</td>
+	<td>//h2[contains(.,'${key_questionTitle}')]//*[name()='svg'][contains(@class,'lexicon-icon-lock')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -231,6 +261,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>QUESTIONS_UNSUBSCRIBE</td>
+	<td>//button[contains(@class,'btn-primary')][*[name()='svg'][contains(@class,'lexicon-icon-bell-on')]]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>QUESTIONS_STATISTICS_HEADER</td>
 	<td>//h4[contains(@class,'text-secondary') and contains(.,'${key_headerName}')]</td>
 	<td></td>
@@ -251,6 +286,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>REPLY_BODY</td>
+	<td>//div[contains(@class,'questions-reply')]//div[contains(@class,'questions-article-body')]//p[contains(.,'${key_replyBodyContent}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ROOT_TOPIC_ID_VALUE</td>
 	<td>//input[contains(@value,'${key_categoryName}')]</td>
 	<td></td>
@@ -261,6 +301,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>VOTE_BUTTON_2</td>
+	<td>xpath=(//button[contains(@class,'text-reset')]//*[name()='svg'][contains(@class,'${key_caretName}')])[2]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>VOTE_BUTTON_DISABLED</td>
 	<td>//button[contains(@class,'text-reset') and @disabled]//*[name()='svg'][contains(@class,'${key_caretName}')]</td>
 	<td></td>
@@ -268,6 +313,11 @@
 <tr>
 	<td>VOTED_RESULT</td>
 	<td>//div[contains(@class,'questions-container')]//span[contains(@class,'c-px-2') and normalize-space()='${key_votedResult}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>VOTED_RESULT_ANSWER</td>
+	<td>//div[contains(@class,'questions-answer')]//span[contains(@class,'c-px-2') and normalize-space()='${key_votedResult}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -308,6 +358,23 @@
 <tr>
 	<td>TAGS_LIST_TAB_USED_TIMES</td>
 	<td>//a[contains(@href, '${key_tagName}')]//*[contains(.,'Used ${key_amountOfUsedTimes} Times')]</td>
+	<td></td>
+</tr>
+<!--RELATED_QUESTIONS-->
+<tr>
+	<td>RELATED_QUESTIONS_EMPTY_TEXT</td>
+	<td>//h2[contains(@class,'text-secondary') and contains(.,'No related questions were found.')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>RELATED_QUESTIONS_QUESTIONS_TITLE</td>
+	<td>//a[contains(@class,'questions-title')]/h3[contains(.,'${key_questionTitle}')]</td>
+	<td></td>
+</tr>
+<!--WORKFLOW-->
+<tr>
+	<td>WORKFLOW_STATUS</td>
+	<td>//span[contains(@class,'label-item') and contains(.,'${key_status}')]</td>
 	<td></td>
 </tr>
 </tbody>

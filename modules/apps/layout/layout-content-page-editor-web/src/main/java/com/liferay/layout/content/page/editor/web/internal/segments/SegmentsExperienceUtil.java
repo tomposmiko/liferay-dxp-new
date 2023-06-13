@@ -34,18 +34,18 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
+import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
+import com.liferay.portal.kernel.service.PortletPreferenceValueLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.CopyLayoutThreadLocal;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -62,7 +62,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -84,22 +83,10 @@ public class SegmentsExperienceUtil {
 			long userId)
 		throws PortalException {
 
-		boolean copyLayout = CopyLayoutThreadLocal.isCopyLayout();
-
-		try {
-			CopyLayoutThreadLocal.setCopyLayout(true);
-
-			_copyLayoutData(
-				plid, commentManager, groupId, portletRegistry,
-				sourceSegmentsExperienceId, targetSegmentsExperienceId,
-				serviceContextFunction, userId);
-		}
-		catch (Throwable throwable) {
-			throw new PortalException(throwable);
-		}
-		finally {
-			CopyLayoutThreadLocal.setCopyLayout(copyLayout);
-		}
+		_copyLayoutData(
+			plid, commentManager, groupId, portletRegistry,
+			sourceSegmentsExperienceId, targetSegmentsExperienceId,
+			serviceContextFunction, userId);
 	}
 
 	public static Map<String, Object> getAvailableSegmentsExperiences(
@@ -213,10 +200,7 @@ public class SegmentsExperienceUtil {
 
 		return HashMapBuilder.<String, Object>put(
 			"label",
-			LanguageUtil.get(
-				ResourceBundleUtil.getBundle(
-					themeDisplay.getLocale(), SegmentsExperienceUtil.class),
-				status.getLabel())
+			LanguageUtil.get(themeDisplay.getLocale(), status.getLabel())
 		).put(
 			"value", status.getValue()
 		).build();
@@ -383,21 +367,27 @@ public class SegmentsExperienceUtil {
 				portletPreferences.getOwnerId(),
 				portletPreferences.getOwnerType(), plid, newPortletId);
 
+		javax.portlet.PortletPreferences jxPortletPreferences =
+			PortletPreferenceValueLocalServiceUtil.getPreferences(
+				portletPreferences);
+
 		if (existingPortletPreferences == null) {
 			return Optional.of(
 				PortletPreferencesLocalServiceUtil.addPortletPreferences(
 					portletPreferences.getCompanyId(),
 					portletPreferences.getOwnerId(),
 					portletPreferences.getOwnerType(), plid, newPortletId,
-					portlet, portletPreferences.getPreferences()));
+					portlet,
+					PortletPreferencesFactoryUtil.toXML(jxPortletPreferences)));
 		}
 
-		existingPortletPreferences.setPreferences(
-			portletPreferences.getPreferences());
-
 		return Optional.of(
-			PortletPreferencesLocalServiceUtil.updatePortletPreferences(
-				existingPortletPreferences));
+			PortletPreferencesLocalServiceUtil.updatePreferences(
+				existingPortletPreferences.getOwnerId(),
+				existingPortletPreferences.getOwnerType(),
+				existingPortletPreferences.getPlid(),
+				existingPortletPreferences.getPortletId(),
+				jxPortletPreferences));
 	}
 
 	private static Optional<SegmentsExperiment> _getSegmentsExperimentOptional(
@@ -451,12 +441,7 @@ public class SegmentsExperienceUtil {
 				layoutStructure.getLayoutStructureItems()) {
 
 			if (!(layoutStructureItem instanceof
-					FragmentStyledLayoutStructureItem) ||
-				ListUtil.exists(
-					layoutStructure.getDeletedLayoutStructureItems(),
-					deletedLayoutStructureItem -> Objects.equals(
-						deletedLayoutStructureItem.getItemId(),
-						layoutStructureItem.getItemId()))) {
+					FragmentStyledLayoutStructureItem)) {
 
 				continue;
 			}

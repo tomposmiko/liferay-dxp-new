@@ -14,12 +14,10 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.cluster;
 
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.engine.adapter.cluster.ClusterHealthStatus;
 import com.liferay.portal.search.engine.adapter.cluster.HealthClusterRequest;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.PropsImpl;
 
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.core.TimeValue;
@@ -28,7 +26,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -37,14 +34,11 @@ import org.junit.Test;
 public class HealthClusterRequestExecutorTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws Exception {
-		PropsUtil.setProps(new PropsImpl());
-
 		_elasticsearchFixture = new ElasticsearchFixture(
 			HealthClusterRequestExecutorTest.class.getSimpleName());
 

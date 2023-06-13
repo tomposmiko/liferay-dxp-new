@@ -32,8 +32,8 @@ import com.liferay.dynamic.data.mapping.model.DDMTemplateConstants;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.dynamic.data.mapping.util.DDM;
+import com.liferay.journal.constants.JournalArticleConstants;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.string.CharPool;
@@ -59,6 +59,7 @@ import com.liferay.portal.kernel.model.ThemeSetting;
 import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryConstants;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.resource.bundle.AggregateResourceBundleLoader;
 import com.liferay.portal.kernel.resource.bundle.ClassResourceBundleLoader;
@@ -206,7 +207,7 @@ public class CPFileImporterImpl implements CPFileImporter {
 
 		return fetchOrAddDDMTemplate(
 			classNameId, classPK, resourceClassNameId, name, type, mode,
-			language, script, serviceContext);
+			language, script, true, serviceContext);
 	}
 
 	@Override
@@ -323,7 +324,8 @@ public class CPFileImporterImpl implements CPFileImporter {
 				ddmStructure.getStructureId(),
 				_portal.getClassNameId(JournalArticle.class), ddmTemplateKey,
 				DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY, null, "ftl",
-				StringUtil.read(inputStream), serviceContext);
+				StringUtil.read(inputStream),
+				jsonObject.getBoolean("cacheable", true), serviceContext);
 		}
 
 		Locale locale = serviceContext.getLocale();
@@ -357,13 +359,13 @@ public class CPFileImporterImpl implements CPFileImporter {
 		}
 
 		journalArticle = _journalArticleLocalService.addArticle(
-			serviceContext.getUserId(), serviceContext.getScopeGroupId(), 0L,
-			JournalArticleConstants.CLASSNAME_ID_DEFAULT, 0L, articleId, false,
-			1, titleMap, descriptionMap, content, ddmStructureKey,
-			ddmTemplateKey, StringPool.BLANK, displayDateMonth, displayDateDay,
-			displayDateYear, displayDateHour, displayDateMinute, 0, 0, 0, 0, 0,
-			true, 0, 0, 0, 0, 0, true, true, false, StringPool.BLANK, null,
-			null, StringPool.BLANK, serviceContext);
+			null, serviceContext.getUserId(), serviceContext.getScopeGroupId(),
+			0L, JournalArticleConstants.CLASS_NAME_ID_DEFAULT, 0L, articleId,
+			false, 1, titleMap, descriptionMap, titleMap, content,
+			ddmStructureKey, ddmTemplateKey, StringPool.BLANK, displayDateMonth,
+			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
+			0, 0, 0, 0, 0, true, 0, 0, 0, 0, 0, true, true, false,
+			StringPool.BLANK, null, null, StringPool.BLANK, serviceContext);
 
 		JSONArray permissionsJSONArray = jsonObject.getJSONArray("permissions");
 
@@ -556,7 +558,7 @@ public class CPFileImporterImpl implements CPFileImporter {
 	protected DDMTemplate fetchOrAddDDMTemplate(
 			long classNameId, long classPK, long resourceClassNameId,
 			String name, String type, String mode, String language,
-			String script, ServiceContext serviceContext)
+			String script, boolean cacheable, ServiceContext serviceContext)
 		throws PortalException {
 
 		Map<Locale, String> nameMap = HashMapBuilder.put(
@@ -570,13 +572,13 @@ public class CPFileImporterImpl implements CPFileImporter {
 			ddmTemplate = _ddmTemplateLocalService.addTemplate(
 				serviceContext.getUserId(), serviceContext.getScopeGroupId(),
 				classNameId, classPK, resourceClassNameId, getKey(name),
-				nameMap, null, type, mode, language, script, true, false,
+				nameMap, null, type, mode, language, script, cacheable, false,
 				StringPool.BLANK, null, serviceContext);
 		}
 		else {
 			ddmTemplate = _ddmTemplateLocalService.updateTemplate(
 				serviceContext.getUserId(), ddmTemplate.getTemplateId(),
-				classPK, nameMap, null, type, mode, language, script, true,
+				classPK, nameMap, null, type, mode, language, script, cacheable,
 				serviceContext);
 		}
 
@@ -614,9 +616,9 @@ public class CPFileImporterImpl implements CPFileImporter {
 		byte[] byteArray = FileUtil.getBytes(inputStream);
 
 		return _dlAppLocalService.addFileEntry(
-			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
+			null, serviceContext.getUserId(), serviceContext.getScopeGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, fileName, mimeType,
-			fileName, StringPool.BLANK, StringPool.BLANK, byteArray,
+			fileName, StringPool.BLANK, StringPool.BLANK, byteArray, null, null,
 			serviceContext);
 	}
 
@@ -697,10 +699,15 @@ public class CPFileImporterImpl implements CPFileImporter {
 				).put(
 					"type", "document"
 				).put(
+					"url",
+					_portletFileRepository.getDownloadPortletFileEntryURL(
+						serviceContext.getThemeDisplay(), fileEntry,
+						StringPool.BLANK)
+				).put(
 					"uuid", fileEntry.getUuid()
 				);
 
-				return jsonObject.toString();
+				return jsonObject.toJSONString();
 			},
 			classLoader, dependenciesFilePath, serviceContext);
 
@@ -1040,6 +1047,9 @@ public class CPFileImporterImpl implements CPFileImporter {
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private PortletFileRepository _portletFileRepository;
 
 	@Reference
 	private PortletPreferencesLocalService _portletPreferencesLocalService;

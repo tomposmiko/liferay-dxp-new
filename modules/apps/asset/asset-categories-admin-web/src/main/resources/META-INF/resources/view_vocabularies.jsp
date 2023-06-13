@@ -17,10 +17,10 @@
 <%@ include file="/init.jsp" %>
 
 <clay:management-toolbar
-	displayContext="<%= new AssetVocabulariesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, assetCategoriesDisplayContext) %>"
+	managementToolbarDisplayContext="<%= new AssetVocabulariesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, assetCategoriesDisplayContext) %>"
 />
 
-<aui:form cssClass="container-fluid-1280" name="fm">
+<aui:form cssClass="container-fluid container-fluid-max-xl" name="fm">
 	<liferay-ui:search-container
 		id="assetVocabularies"
 		searchContainer="<%= assetCategoriesDisplayContext.getVocabulariesSearchContainer() %>"
@@ -101,18 +101,3 @@
 		/>
 	</liferay-ui:search-container>
 </aui:form>
-
-<aui:script use="liferay-search-container">
-	var searchContainer = Liferay.SearchContainer.get(
-		'<portlet:namespace />assetVocabularies'
-	);
-
-	searchContainer.on('rowToggled', function (event) {
-		Liferay.Util.getOpener().Liferay.fire(
-			'<%= HtmlUtil.escapeJS(assetCategoriesDisplayContext.getEventName()) %>',
-			{
-				data: event.elements.allSelectedElements.getDOMNodes(),
-			}
-		);
-	});
-</aui:script>

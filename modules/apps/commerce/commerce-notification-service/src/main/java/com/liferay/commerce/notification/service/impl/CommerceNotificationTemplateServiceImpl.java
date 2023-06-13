@@ -15,9 +15,9 @@
 package com.liferay.commerce.notification.service.impl;
 
 import com.liferay.commerce.notification.constants.CommerceNotificationActionKeys;
-import com.liferay.commerce.notification.constants.CommerceNotificationConstants;
 import com.liferay.commerce.notification.model.CommerceNotificationTemplate;
 import com.liferay.commerce.notification.service.base.CommerceNotificationTemplateServiceBaseImpl;
+import com.liferay.commerce.product.constants.CPConstants;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
@@ -39,21 +39,20 @@ public class CommerceNotificationTemplateServiceImpl
 
 	@Override
 	public CommerceNotificationTemplate addCommerceNotificationTemplate(
-			long userId, long groupId, String name, String description,
-			String from, Map<Locale, String> fromNameMap, String to, String cc,
-			String bcc, String type, boolean enabled,
-			Map<Locale, String> subjectMap, Map<Locale, String> bodyMap,
-			ServiceContext serviceContext)
+			long groupId, String name, String description, String from,
+			Map<Locale, String> fromNameMap, String to, String cc, String bcc,
+			String type, boolean enabled, Map<Locale, String> subjectMap,
+			Map<Locale, String> bodyMap, ServiceContext serviceContext)
 		throws PortalException {
 
 		_portletResourcePermission.check(
-			getPermissionChecker(), serviceContext.getScopeGroupId(),
+			getPermissionChecker(), groupId,
 			CommerceNotificationActionKeys.ADD_COMMERCE_NOTIFICATION_TEMPLATE);
 
 		return commerceNotificationTemplateLocalService.
 			addCommerceNotificationTemplate(
-				userId, groupId, name, description, from, fromNameMap, to, cc,
-				bcc, type, enabled, subjectMap, bodyMap, serviceContext);
+				getUserId(), groupId, name, description, from, fromNameMap, to,
+				cc, bcc, type, enabled, subjectMap, bodyMap, serviceContext);
 	}
 
 	/**
@@ -70,9 +69,9 @@ public class CommerceNotificationTemplateServiceImpl
 
 		return commerceNotificationTemplateService.
 			addCommerceNotificationTemplate(
-				serviceContext.getUserId(), serviceContext.getScopeGroupId(),
-				name, description, from, fromNameMap, to, cc, bcc, type,
-				enabled, subjectMap, bodyMap, serviceContext);
+				serviceContext.getScopeGroupId(), name, description, from,
+				fromNameMap, to, cc, bcc, type, enabled, subjectMap, bodyMap,
+				serviceContext);
 	}
 
 	@Override
@@ -170,6 +169,6 @@ public class CommerceNotificationTemplateServiceImpl
 			PortletResourcePermissionFactory.getInstance(
 				CommerceNotificationTemplateServiceImpl.class,
 				"_portletResourcePermission",
-				CommerceNotificationConstants.RESOURCE_NAME);
+				CPConstants.RESOURCE_NAME_CHANNEL);
 
 }

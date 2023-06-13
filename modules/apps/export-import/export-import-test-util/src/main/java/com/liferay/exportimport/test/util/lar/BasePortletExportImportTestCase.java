@@ -36,6 +36,8 @@ import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.LocaleException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.StagedModel;
@@ -562,6 +564,10 @@ public abstract class BasePortletExportImportTestCase
 			Assert.assertFalse(expectFailure);
 		}
 		catch (LocaleException localeException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(localeException, localeException);
+			}
+
 			Assert.assertTrue(expectFailure);
 		}
 	}
@@ -605,22 +611,24 @@ public abstract class BasePortletExportImportTestCase
 			PortletDisplayTemplateManager.DISPLAY_STYLE_PREFIX +
 				ddmTemplate.getTemplateKey();
 
-		Map<String, String[]> preferenceMap = HashMapBuilder.put(
-			"displayStyle", new String[] {displayStyle}
-		).put(
-			"displayStyleGroupId",
-			new String[] {String.valueOf(ddmTemplate.getGroupId())}
-		).build();
-
-		if (scopeType.equals("layout")) {
-			preferenceMap.put(
-				"lfrScopeLayoutUuid", new String[] {layout.getUuid()});
-		}
-
-		preferenceMap.put("lfrScopeType", new String[] {scopeType});
-
 		PortletPreferences portletPreferences = getImportedPortletPreferences(
-			preferenceMap);
+			HashMapBuilder.put(
+				"displayStyle", new String[] {displayStyle}
+			).put(
+				"displayStyleGroupId",
+				new String[] {String.valueOf(ddmTemplate.getGroupId())}
+			).put(
+				"lfrScopeLayoutUuid",
+				() -> {
+					if (scopeType.equals("layout")) {
+						return new String[] {layout.getUuid()};
+					}
+
+					return null;
+				}
+			).put(
+				"lfrScopeType", new String[] {scopeType}
+			).build());
 
 		String importedDisplayStyle = portletPreferences.getValue(
 			"displayStyle", StringPool.BLANK);
@@ -715,5 +723,8 @@ public abstract class BasePortletExportImportTestCase
 
 	protected void validateVersions() throws Exception {
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		BasePortletExportImportTestCase.class);
 
 }

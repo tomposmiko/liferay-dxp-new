@@ -32,6 +32,7 @@ import com.liferay.portal.tools.service.builder.test.model.EagerBlobEntrySoap;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -251,43 +252,65 @@ public class EagerBlobEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<EagerBlobEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, EagerBlobEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<EagerBlobEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<EagerBlobEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			EagerBlobEntry.class.getClassLoader(), EagerBlobEntry.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("uuid", EagerBlobEntry::getUuid);
-		attributeGetterFunctions.put(
-			"eagerBlobEntryId", EagerBlobEntry::getEagerBlobEntryId);
-		attributeGetterFunctions.put("groupId", EagerBlobEntry::getGroupId);
-		attributeGetterFunctions.put("blob", EagerBlobEntry::getBlob);
+		try {
+			Constructor<EagerBlobEntry> constructor =
+				(Constructor<EagerBlobEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<EagerBlobEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<EagerBlobEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<EagerBlobEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<EagerBlobEntry, Object>>();
 		Map<String, BiConsumer<EagerBlobEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<EagerBlobEntry, ?>>();
 
+		attributeGetterFunctions.put("uuid", EagerBlobEntry::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<EagerBlobEntry, String>)EagerBlobEntry::setUuid);
+		attributeGetterFunctions.put(
+			"eagerBlobEntryId", EagerBlobEntry::getEagerBlobEntryId);
 		attributeSetterBiConsumers.put(
 			"eagerBlobEntryId",
 			(BiConsumer<EagerBlobEntry, Long>)
 				EagerBlobEntry::setEagerBlobEntryId);
+		attributeGetterFunctions.put("groupId", EagerBlobEntry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<EagerBlobEntry, Long>)EagerBlobEntry::setGroupId);
+		attributeGetterFunctions.put("blob", EagerBlobEntry::getBlob);
 		attributeSetterBiConsumers.put(
 			"blob", (BiConsumer<EagerBlobEntry, Blob>)EagerBlobEntry::setBlob);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -412,6 +435,20 @@ public class EagerBlobEntryModelImpl
 		eagerBlobEntryImpl.setGroupId(getGroupId());
 
 		eagerBlobEntryImpl.resetOriginalValues();
+
+		return eagerBlobEntryImpl;
+	}
+
+	@Override
+	public EagerBlobEntry cloneWithOriginalValues() {
+		EagerBlobEntryImpl eagerBlobEntryImpl = new EagerBlobEntryImpl();
+
+		eagerBlobEntryImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		eagerBlobEntryImpl.setEagerBlobEntryId(
+			this.<Long>getColumnOriginalValue("eagerBlobEntryId"));
+		eagerBlobEntryImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
 
 		return eagerBlobEntryImpl;
 	}
@@ -584,9 +621,7 @@ public class EagerBlobEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, EagerBlobEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					EagerBlobEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

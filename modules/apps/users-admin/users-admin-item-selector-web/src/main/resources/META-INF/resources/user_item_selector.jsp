@@ -23,7 +23,7 @@ String displayStyle = userItemSelectorViewDisplayContext.getDisplayStyle();
 %>
 
 <clay:management-toolbar
-	displayContext="<%= new UserItemSelectorViewManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, userItemSelectorViewDisplayContext) %>"
+	managementToolbarDisplayContext="<%= new UserItemSelectorViewManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, userItemSelectorViewDisplayContext) %>"
 />
 
 <clay:container-fluid
@@ -70,7 +70,7 @@ String displayStyle = userItemSelectorViewDisplayContext.getDisplayStyle();
 				<c:when test='<%= displayStyle.equals("icon") %>'>
 
 					<%
-					row.setCssClass("entry-card lfr-asset-item selectable");
+					row.setCssClass("card-page-item card-page-item-asset selectable");
 					%>
 
 					<liferay-ui:search-container-column-text>
@@ -81,13 +81,13 @@ String displayStyle = userItemSelectorViewDisplayContext.getDisplayStyle();
 				</c:when>
 				<c:otherwise>
 					<liferay-ui:search-container-column-text
-						cssClass="table-cell-content table-title"
+						cssClass="table-cell-expand table-title"
 						name="name"
 						value="<%= HtmlUtil.escape(user.getFullName()) %>"
 					/>
 
 					<liferay-ui:search-container-column-text
-						cssClass="table-cell-content"
+						cssClass="table-cell-expand"
 						name="screen-name"
 						property="screenName"
 					/>
@@ -102,39 +102,3 @@ String displayStyle = userItemSelectorViewDisplayContext.getDisplayStyle();
 		/>
 	</liferay-ui:search-container>
 </clay:container-fluid>
-
-<aui:script use="liferay-search-container">
-	var searchContainer = Liferay.SearchContainer.get(
-		'<portlet:namespace /><%= HtmlUtil.escape(userItemSelectorViewDisplayContext.getSearchContainerId()) %>'
-	);
-
-	searchContainer.on('rowToggled', function (event) {
-		var allSelectedElements = event.elements.allSelectedElements;
-		var selectedData = [];
-
-		allSelectedElements.each(function () {
-			<c:choose>
-				<c:when test='<%= displayStyle.equals("list") %>'>
-					var row = this.ancestor('tr');
-				</c:when>
-				<c:otherwise>
-					var row = this.ancestor('dd');
-				</c:otherwise>
-			</c:choose>
-
-			var data = row.getDOM().dataset;
-
-			selectedData.push({
-				id: data.id,
-				name: data.name,
-			});
-		});
-
-		Liferay.Util.getOpener().Liferay.fire(
-			'<%= HtmlUtil.escapeJS(userItemSelectorViewDisplayContext.getItemSelectedEventName()) %>',
-			{
-				data: selectedData,
-			}
-		);
-	});
-</aui:script>

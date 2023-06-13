@@ -15,6 +15,9 @@
 package com.liferay.frontend.taglib.servlet.taglib;
 
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolvedPackageNameUtil;
+import com.liferay.frontend.js.module.launcher.JSModuleLauncher;
+import com.liferay.frontend.taglib.internal.util.ServicesProvider;
+import com.liferay.petra.lang.ClassLoaderPool;
 import com.liferay.portal.kernel.portlet.LiferayPortletConfig;
 import com.liferay.portal.kernel.servlet.taglib.aui.ScriptData;
 import com.liferay.portal.kernel.theme.PortletDisplay;
@@ -40,7 +43,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -54,12 +56,14 @@ import org.springframework.mock.web.MockPageContext;
 public class ComponentTagTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@BeforeClass
 	public static void setUpClass() {
+		ClassLoaderPool.register(
+			"ShieldedContainerClassLoader", PortalImpl.class.getClassLoader());
+
 		PortalUtil portalUtil = new PortalUtil();
 
 		portalUtil.setPortal(new PortalImpl());
@@ -67,6 +71,11 @@ public class ComponentTagTest {
 
 	@Test
 	public void testDoEndTag() throws Exception {
+		ServicesProvider servicesProvider = new ServicesProvider();
+
+		servicesProvider.setJsModuleLauncher(
+			Mockito.mock(JSModuleLauncher.class));
+
 		ComponentTag componentTag = new ComponentTag();
 
 		HttpServletRequest httpServletRequest = _getHttpServletRequest();

@@ -64,17 +64,16 @@ else {
 />
 
 <liferay-frontend:screen-navigation
-	containerCssClass="col-md-10"
+	containerWrapperCssClass="container"
 	key="<%= CPDefinitionScreenNavigationConstants.SCREEN_NAVIGATION_KEY_CP_DEFINITION_GENERAL %>"
 	modelBean="<%= cpDefinition %>"
-	navCssClass="col-md-2"
 	portletURL="<%= currentURLObj %>"
 />
 
 <aui:script>
 	document
 		.getElementById('<portlet:namespace />publishButton')
-		.addEventListener('click', function (e) {
+		.addEventListener('click', (e) => {
 			e.preventDefault();
 
 			var form = document.getElementById('<portlet:namespace />fm');

@@ -31,7 +31,9 @@ import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.indexer.IndexerQueryBuilder;
-import com.liferay.portal.search.internal.expando.ExpandoQueryContributorHelper;
+import com.liferay.portal.search.internal.expando.helper.ExpandoQueryContributorHelper;
+import com.liferay.portal.search.internal.indexer.helper.AddSearchKeywordsQueryContributorHelper;
+import com.liferay.portal.search.internal.indexer.helper.PreFilterContributorHelper;
 import com.liferay.portal.search.internal.util.SearchStringUtil;
 import com.liferay.portal.search.spi.model.query.contributor.KeywordQueryContributor;
 import com.liferay.portal.search.spi.model.query.contributor.SearchContextContributor;
@@ -136,10 +138,10 @@ public class IndexerQueryBuilderImpl<T extends BaseModel<?>>
 		contribute(
 			_modelKeywordQueryContributorsHolder.stream(
 				getStrings(
-					"search.full.query.clause.contributors.excludes",
+					"search.full.query.clause.contributors.includes",
 					searchContext),
 				getStrings(
-					"search.full.query.clause.contributors.includes",
+					"search.full.query.clause.contributors.excludes",
 					searchContext)),
 			booleanQuery, searchContext);
 	}
@@ -174,7 +176,7 @@ public class IndexerQueryBuilderImpl<T extends BaseModel<?>>
 
 	protected void contributeSearchContext(SearchContext searchContext) {
 		SearchContextContributorHelper searchContextContributorHelper =
-			_modelSearchSettings::getSearchClassNames;
+			() -> _modelSearchSettings.getSearchClassNames();
 
 		_searchContextContributors.forEach(
 			searchContextContributor -> searchContextContributor.contribute(
@@ -331,11 +333,9 @@ public class IndexerQueryBuilderImpl<T extends BaseModel<?>>
 		for (String entryClassName : entryClassNames) {
 			Indexer<?> indexer = _indexerRegistry.getIndexer(entryClassName);
 
-			if (indexer == null) {
-				continue;
-			}
+			if ((indexer == null) ||
+				!searchEngineId.equals(indexer.getSearchEngineId())) {
 
-			if (!searchEngineId.equals(indexer.getSearchEngineId())) {
 				continue;
 			}
 

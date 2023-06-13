@@ -56,7 +56,7 @@ public class Availability implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(Availability.class, json);
 	}
 
-	@Schema(example = "Available")
+	@Schema
 	public String getLabel() {
 		return label;
 	}
@@ -83,6 +83,34 @@ public class Availability implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String label;
+
+	@Schema
+	public String getLabel_i18n() {
+		return label_i18n;
+	}
+
+	public void setLabel_i18n(String label_i18n) {
+		this.label_i18n = label_i18n;
+	}
+
+	@JsonIgnore
+	public void setLabel_i18n(
+		UnsafeSupplier<String, Exception> label_i18nUnsafeSupplier) {
+
+		try {
+			label_i18n = label_i18nUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String label_i18n;
 
 	@Schema
 	public Integer getStockQuantity() {
@@ -149,6 +177,20 @@ public class Availability implements Serializable {
 			sb.append("\"");
 
 			sb.append(_escape(label));
+
+			sb.append("\"");
+		}
+
+		if (label_i18n != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"label_i18n\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(label_i18n));
 
 			sb.append("\"");
 		}

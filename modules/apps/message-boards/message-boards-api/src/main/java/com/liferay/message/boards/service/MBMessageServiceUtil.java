@@ -51,6 +51,12 @@ public class MBMessageServiceUtil {
 			body, serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addMessage(String, long, String, String, String, List,
+	 boolean, double, boolean, ServiceContext)}
+	 */
+	@Deprecated
 	public static MBMessage addMessage(
 			long groupId, long categoryId, String subject, String body,
 			String format,
@@ -66,6 +72,12 @@ public class MBMessageServiceUtil {
 			anonymous, priority, allowPingbacks, serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addMessage(String, long, String, String, String, List,
+	 boolean, double, boolean, ServiceContext)}
+	 */
+	@Deprecated
 	public static MBMessage addMessage(
 			long groupId, long categoryId, String subject, String body,
 			String format, String fileName, java.io.File file,
@@ -78,6 +90,12 @@ public class MBMessageServiceUtil {
 			anonymous, priority, allowPingbacks, serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addMessage(String, long, String, String, String, List,
+	 boolean, double, boolean, ServiceContext)}
+	 */
+	@Deprecated
 	public static MBMessage addMessage(
 			long categoryId, String subject, String body,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
@@ -87,6 +105,12 @@ public class MBMessageServiceUtil {
 			categoryId, subject, body, serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addMessage(String, long, String, String, String, List,
+	 boolean, double, boolean, ServiceContext)}
+	 */
+	@Deprecated
 	public static MBMessage addMessage(
 			long parentMessageId, String subject, String body, String format,
 			List
@@ -99,6 +123,22 @@ public class MBMessageServiceUtil {
 		return getService().addMessage(
 			parentMessageId, subject, body, format, inputStreamOVPs, anonymous,
 			priority, allowPingbacks, serviceContext);
+	}
+
+	public static MBMessage addMessage(
+			String externalReferenceCode, long parentMessageId, String subject,
+			String body, String format,
+			List
+				<com.liferay.portal.kernel.util.ObjectValuePair
+					<String, InputStream>> inputStreamOVPs,
+			boolean anonymous, double priority, boolean allowPingbacks,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addMessage(
+			externalReferenceCode, parentMessageId, subject, body, format,
+			inputStreamOVPs, anonymous, priority, allowPingbacks,
+			serviceContext);
 	}
 
 	public static void addMessageAttachment(
@@ -186,6 +226,26 @@ public class MBMessageServiceUtil {
 		return getService().getCategoryMessagesRSS(
 			groupId, categoryId, status, max, type, version, displayStyle,
 			feedURL, entryURL, themeDisplay);
+	}
+
+	public static List<MBMessage> getChildMessages(
+			long parentMessageId, boolean flatten,
+			com.liferay.portal.kernel.dao.orm.QueryDefinition<MBMessage>
+				queryDefinition)
+		throws PortalException {
+
+		return getService().getChildMessages(
+			parentMessageId, flatten, queryDefinition);
+	}
+
+	public static int getChildMessagesCount(
+			long parentMessageId, boolean flatten,
+			com.liferay.portal.kernel.dao.orm.QueryDefinition<MBMessage>
+				queryDefinition)
+		throws PortalException {
+
+		return getService().getChildMessagesCount(
+			parentMessageId, flatten, queryDefinition);
 	}
 
 	public static String getCompanyMessagesRSS(

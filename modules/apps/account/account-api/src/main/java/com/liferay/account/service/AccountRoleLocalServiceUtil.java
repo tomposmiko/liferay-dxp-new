@@ -77,6 +77,19 @@ public class AccountRoleLocalServiceUtil {
 		getService().associateUser(accountEntryId, accountRoleId, userId);
 	}
 
+	public static void associateUser(
+			long accountEntryId, long[] accountRoleIds, long userId)
+		throws PortalException {
+
+		getService().associateUser(accountEntryId, accountRoleIds, userId);
+	}
+
+	public static void checkCompanyAccountRoles(long companyId)
+		throws PortalException {
+
+		getService().checkCompanyAccountRoles(companyId);
+	}
+
 	/**
 	 * Creates a new account role with the primary key. Does not add the account role to the database.
 	 *
@@ -131,7 +144,9 @@ public class AccountRoleLocalServiceUtil {
 		return getService().deleteAccountRole(accountRoleId);
 	}
 
-	public static void deleteAccountRolesByCompanyId(long companyId) {
+	public static void deleteAccountRolesByCompanyId(long companyId)
+		throws PortalException {
+
 		getService().deleteAccountRolesByCompanyId(companyId);
 	}
 
@@ -325,22 +340,31 @@ public class AccountRoleLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
-	public static com.liferay.portal.kernel.search.BaseModelSearchResult
-		<AccountRole> searchAccountRoles(
-			long accountEntryId, String keywords, int start, int end,
-			OrderByComparator<?> orderByComparator) {
+	public static boolean hasUserAccountRole(
+			long accountEntryId, long accountRoleId, long userId)
+		throws PortalException {
 
-		return getService().searchAccountRoles(
-			accountEntryId, keywords, start, end, orderByComparator);
+		return getService().hasUserAccountRole(
+			accountEntryId, accountRoleId, userId);
 	}
 
 	public static com.liferay.portal.kernel.search.BaseModelSearchResult
 		<AccountRole> searchAccountRoles(
-			long[] accountEntryIds, String keywords, int start, int end,
+			long companyId, long[] accountEntryIds, String keywords,
+			java.util.LinkedHashMap<String, Object> params, int start, int end,
 			OrderByComparator<?> orderByComparator) {
 
 		return getService().searchAccountRoles(
-			accountEntryIds, keywords, start, end, orderByComparator);
+			companyId, accountEntryIds, keywords, params, start, end,
+			orderByComparator);
+	}
+
+	public static void setUserAccountRoles(
+			long accountEntryId, long[] accountRoleIds, long userId)
+		throws PortalException {
+
+		getService().setUserAccountRoles(
+			accountEntryId, accountRoleIds, userId);
 	}
 
 	public static void unassociateUser(

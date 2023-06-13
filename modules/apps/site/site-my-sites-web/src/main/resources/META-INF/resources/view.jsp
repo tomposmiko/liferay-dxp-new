@@ -25,10 +25,10 @@
 />
 
 <clay:management-toolbar
-	displayContext="<%= new SiteMySitesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, siteMySitesDisplayContext) %>"
+	managementToolbarDisplayContext="<%= new SiteMySitesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, siteMySitesDisplayContext) %>"
 />
 
-<aui:form action="<%= siteMySitesDisplayContext.getPortletURL() %>" cssClass="container-fluid-1280" method="get" name="fm">
+<aui:form action="<%= siteMySitesDisplayContext.getPortletURL() %>" cssClass="container-fluid container-fluid-max-xl" method="get" name="fm">
 	<liferay-ui:search-container
 		searchContainer="<%= siteMySitesDisplayContext.getGroupSearchContainer() %>"
 	>
@@ -72,7 +72,7 @@
 					<liferay-ui:search-container-column-text
 						colspan="<%= 2 %>"
 					>
-						<div>
+						<h5>
 							<c:choose>
 								<c:when test="<%= Validator.isNotNull(rowURL) %>">
 									<a href="<%= rowURL %>" target="_blank">
@@ -83,37 +83,29 @@
 									<strong><%= HtmlUtil.escape(group.getDescriptiveName(locale)) %></strong>
 								</c:otherwise>
 							</c:choose>
-						</div>
+						</h5>
 
 						<c:if test='<%= !Objects.equals(siteMySitesDisplayContext.getTabs1(), "my-sites") && Validator.isNotNull(group.getDescription(locale)) %>'>
-							<div class="text-default">
+							<h6 class="text-default">
 								<%= HtmlUtil.escape(group.getDescription(locale)) %>
-							</div>
+							</h6>
 						</c:if>
 
-						<liferay-util:buffer
-							var="assetTagsSummary"
-						>
+						<h6 class="text-default">
 							<liferay-asset:asset-tags-summary
 								className="<%= Group.class.getName() %>"
 								classPK="<%= group.getGroupId() %>"
 							/>
-						</liferay-util:buffer>
-
-						<c:if test="<%= Validator.isNotNull(assetTagsSummary) %>">
-							<div class="text-default">
-								<%= assetTagsSummary %>
-							</div>
-						</c:if>
+						</h6>
 
 						<%
 						int usersCount = siteMySitesDisplayContext.getGroupUsersCounts(group.getGroupId());
 						%>
 
 						<c:if test="<%= usersCount > 0 %>">
-							<div class="text-default">
+							<h6 class="text-default">
 								<strong><liferay-ui:message arguments="<%= usersCount %>" key='<%= (usersCount > 1) ? "x-users" : "x-user" %>' /></strong>
-							</div>
+							</h6>
 						</c:if>
 
 						<%
@@ -121,9 +113,9 @@
 						%>
 
 						<c:if test="<%= organizationsCount > 0 %>">
-							<div class="text-default">
+							<h6 class="text-default">
 								<strong><liferay-ui:message arguments="<%= organizationsCount %>" key='<%= (organizationsCount > 1) ? "x-organizations" : "x-organization" %>' /></strong>
-							</div>
+							</h6>
 						</c:if>
 
 						<%
@@ -131,33 +123,28 @@
 						%>
 
 						<c:if test="<%= userGroupsCount > 0 %>">
-							<div class="text-default">
+							<h6 class="text-default">
 								<strong><liferay-ui:message arguments="<%= userGroupsCount %>" key='<%= (userGroupsCount > 1) ? "x-user-groups" : "x-user-group" %>' /></strong>
-							</div>
+							</h6>
 						</c:if>
 
 						<c:if test='<%= Objects.equals(siteMySitesDisplayContext.getTabs1(), "my-sites") && PropsValues.LIVE_USERS_ENABLED %>'>
-							<div class="text-default">
+							<h6 class="text-default">
 								<strong><liferay-ui:message key="online-now" /></strong>: <%= String.valueOf(LiveUsers.getGroupUsersCount(company.getCompanyId(), group.getGroupId())) %>
-							</div>
+							</h6>
 						</c:if>
 					</liferay-ui:search-container-column-text>
 
 					<c:if test="<%= ListUtil.isNotEmpty(dropdownItems) %>">
 						<liferay-ui:search-container-column-text>
 							<clay:dropdown-actions
-								defaultEventHandler="<%= MySitesWebKeys.SITES_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
 								dropdownItems="<%= dropdownItems %>"
+								propsTransformer="js/SiteDropdownDefaultPropsTransformer"
 							/>
 						</liferay-ui:search-container-column-text>
 					</c:if>
 				</c:when>
 				<c:when test='<%= Objects.equals(siteMySitesDisplayContext.getDisplayStyle(), "icon") %>'>
-
-					<%
-					row.setCssClass("entry-card lfr-asset-item");
-					%>
-
 					<liferay-ui:search-container-column-text>
 						<clay:vertical-card
 							verticalCard="<%= new SiteVerticalCard(group, siteMySitesDisplayContext.getGroupOrganizationsCount(group.getGroupId()), siteMySitesDisplayContext.getGroupUserGroupsCount(group.getGroupId()), siteMySitesDisplayContext.getGroupUsersCounts(group.getGroupId()), renderRequest, renderResponse, siteMySitesDisplayContext.getTabs1()) %>"
@@ -251,8 +238,8 @@
 					<c:if test="<%= ListUtil.isNotEmpty(dropdownItems) %>">
 						<liferay-ui:search-container-column-text>
 							<clay:dropdown-actions
-								defaultEventHandler="<%= MySitesWebKeys.SITES_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
 								dropdownItems="<%= dropdownItems %>"
+								propsTransformer="js/SiteDropdownDefaultPropsTransformer"
 							/>
 						</liferay-ui:search-container-column-text>
 					</c:if>
@@ -266,8 +253,3 @@
 		/>
 	</liferay-ui:search-container>
 </aui:form>
-
-<liferay-frontend:component
-	componentId="<%= MySitesWebKeys.SITES_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
-	module="js/SiteDropdownDefaultEventHandler.es"
-/>

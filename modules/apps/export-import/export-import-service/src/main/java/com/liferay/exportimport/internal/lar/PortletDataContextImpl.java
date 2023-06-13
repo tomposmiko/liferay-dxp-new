@@ -419,11 +419,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 		String referenceKey = getReferenceKey(classedModel);
 
 		if (missing) {
-			referenceElement.addAttribute("missing", Boolean.TRUE.toString());
-
 			if (_references.contains(referenceKey)) {
 				return referenceElement;
 			}
+
+			referenceElement.addAttribute("missing", Boolean.TRUE.toString());
 
 			if (!_missingReferences.contains(referenceKey)) {
 				_missingReferences.add(referenceKey);
@@ -1483,10 +1483,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 	public void importPortletPermissions(String resourceName)
 		throws PortalException {
 
-		if (getGroupId() != getScopeGroupId()) {
-			return;
-		}
-
 		importPermissions(resourceName, getSourceGroupId(), getScopeGroupId());
 	}
 
@@ -1534,6 +1530,9 @@ public class PortletDataContextImpl implements PortletDataContext {
 			group = GroupLocalServiceUtil.getGroup(getGroupId());
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 
 		if (ExportImportThreadLocal.isStagingInProcess() && (group != null) &&
@@ -2103,7 +2102,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 			}
 			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
-					_log.warn("Unable to find group " + groupId);
+					_log.warn("Unable to find group " + groupId, exception);
 				}
 			}
 		}
@@ -2323,15 +2322,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 				referencesElement.elements("reference")) {
 
 			if (!Objects.equals(
-					referenceElement.attributeValue("class-name"), className)) {
-
-				continue;
-			}
-
-			if ((groupId > 0) &&
-				!Objects.equals(
-					referenceElement.attributeValue("group-id"),
-					String.valueOf(groupId))) {
+					referenceElement.attributeValue("class-name"), className) ||
+				((groupId > 0) &&
+				 !Objects.equals(
+					 referenceElement.attributeValue("group-id"),
+					 String.valueOf(groupId)))) {
 
 				continue;
 			}
@@ -2432,7 +2427,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					"Unable to load class com.sybase.jdbc4.tds.SybTimestamp " +
-						"because the Sybase driver is not available");
+						"because the Sybase driver is not available",
+					classNotFoundException);
 			}
 		}
 

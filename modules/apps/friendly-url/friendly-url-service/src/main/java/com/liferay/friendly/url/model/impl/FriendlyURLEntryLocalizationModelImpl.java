@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -256,95 +257,117 @@ public class FriendlyURLEntryLocalizationModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, FriendlyURLEntryLocalization>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			FriendlyURLEntryLocalization.class.getClassLoader(),
+			FriendlyURLEntryLocalization.class, ModelWrapper.class);
+
+		try {
+			Constructor<FriendlyURLEntryLocalization> constructor =
+				(Constructor<FriendlyURLEntryLocalization>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map
 		<String, Function<FriendlyURLEntryLocalization, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<FriendlyURLEntryLocalization, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<FriendlyURLEntryLocalization, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<FriendlyURLEntryLocalization, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", FriendlyURLEntryLocalization::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", FriendlyURLEntryLocalization::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"friendlyURLEntryLocalizationId",
-			FriendlyURLEntryLocalization::getFriendlyURLEntryLocalizationId);
-		attributeGetterFunctions.put(
-			"companyId", FriendlyURLEntryLocalization::getCompanyId);
-		attributeGetterFunctions.put(
-			"friendlyURLEntryId",
-			FriendlyURLEntryLocalization::getFriendlyURLEntryId);
-		attributeGetterFunctions.put(
-			"languageId", FriendlyURLEntryLocalization::getLanguageId);
-		attributeGetterFunctions.put(
-			"urlTitle", FriendlyURLEntryLocalization::getUrlTitle);
-		attributeGetterFunctions.put(
-			"groupId", FriendlyURLEntryLocalization::getGroupId);
-		attributeGetterFunctions.put(
-			"classNameId", FriendlyURLEntryLocalization::getClassNameId);
-		attributeGetterFunctions.put(
-			"classPK", FriendlyURLEntryLocalization::getClassPK);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<FriendlyURLEntryLocalization, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<FriendlyURLEntryLocalization, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<FriendlyURLEntryLocalization, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", FriendlyURLEntryLocalization::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<FriendlyURLEntryLocalization, Long>)
 				FriendlyURLEntryLocalization::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", FriendlyURLEntryLocalization::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<FriendlyURLEntryLocalization, Long>)
 				FriendlyURLEntryLocalization::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"friendlyURLEntryLocalizationId",
+			FriendlyURLEntryLocalization::getFriendlyURLEntryLocalizationId);
 		attributeSetterBiConsumers.put(
 			"friendlyURLEntryLocalizationId",
 			(BiConsumer<FriendlyURLEntryLocalization, Long>)
 				FriendlyURLEntryLocalization::
 					setFriendlyURLEntryLocalizationId);
+		attributeGetterFunctions.put(
+			"companyId", FriendlyURLEntryLocalization::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<FriendlyURLEntryLocalization, Long>)
 				FriendlyURLEntryLocalization::setCompanyId);
+		attributeGetterFunctions.put(
+			"friendlyURLEntryId",
+			FriendlyURLEntryLocalization::getFriendlyURLEntryId);
 		attributeSetterBiConsumers.put(
 			"friendlyURLEntryId",
 			(BiConsumer<FriendlyURLEntryLocalization, Long>)
 				FriendlyURLEntryLocalization::setFriendlyURLEntryId);
+		attributeGetterFunctions.put(
+			"languageId", FriendlyURLEntryLocalization::getLanguageId);
 		attributeSetterBiConsumers.put(
 			"languageId",
 			(BiConsumer<FriendlyURLEntryLocalization, String>)
 				FriendlyURLEntryLocalization::setLanguageId);
+		attributeGetterFunctions.put(
+			"urlTitle", FriendlyURLEntryLocalization::getUrlTitle);
 		attributeSetterBiConsumers.put(
 			"urlTitle",
 			(BiConsumer<FriendlyURLEntryLocalization, String>)
 				FriendlyURLEntryLocalization::setUrlTitle);
+		attributeGetterFunctions.put(
+			"groupId", FriendlyURLEntryLocalization::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<FriendlyURLEntryLocalization, Long>)
 				FriendlyURLEntryLocalization::setGroupId);
+		attributeGetterFunctions.put(
+			"classNameId", FriendlyURLEntryLocalization::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<FriendlyURLEntryLocalization, Long>)
 				FriendlyURLEntryLocalization::setClassNameId);
+		attributeGetterFunctions.put(
+			"classPK", FriendlyURLEntryLocalization::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<FriendlyURLEntryLocalization, Long>)
 				FriendlyURLEntryLocalization::setClassPK);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -654,6 +677,36 @@ public class FriendlyURLEntryLocalizationModelImpl
 	}
 
 	@Override
+	public FriendlyURLEntryLocalization cloneWithOriginalValues() {
+		FriendlyURLEntryLocalizationImpl friendlyURLEntryLocalizationImpl =
+			new FriendlyURLEntryLocalizationImpl();
+
+		friendlyURLEntryLocalizationImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		friendlyURLEntryLocalizationImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		friendlyURLEntryLocalizationImpl.setFriendlyURLEntryLocalizationId(
+			this.<Long>getColumnOriginalValue(
+				"friendlyURLEntryLocalizationId"));
+		friendlyURLEntryLocalizationImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		friendlyURLEntryLocalizationImpl.setFriendlyURLEntryId(
+			this.<Long>getColumnOriginalValue("friendlyURLEntryId"));
+		friendlyURLEntryLocalizationImpl.setLanguageId(
+			this.<String>getColumnOriginalValue("languageId"));
+		friendlyURLEntryLocalizationImpl.setUrlTitle(
+			this.<String>getColumnOriginalValue("urlTitle"));
+		friendlyURLEntryLocalizationImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		friendlyURLEntryLocalizationImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		friendlyURLEntryLocalizationImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+
+		return friendlyURLEntryLocalizationImpl;
+	}
+
+	@Override
 	public int compareTo(
 		FriendlyURLEntryLocalization friendlyURLEntryLocalization) {
 
@@ -855,8 +908,7 @@ public class FriendlyURLEntryLocalizationModelImpl
 		private static final Function
 			<InvocationHandler, FriendlyURLEntryLocalization>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						FriendlyURLEntryLocalization.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 

@@ -32,8 +32,10 @@ components:
                     properties:
                         parameterName:
                             type: string
-                        value:
-                            type: object
+                        values:
+                            items:
+                                type: object
+                            type: array
                     type: object
                 allConditions:
                     items:
@@ -49,6 +51,10 @@ components:
                             type: string
                         value:
                             type: object
+                        values:
+                            items:
+                                type: object
+                            type: array
                     type: object
                 equals:
                     properties:
@@ -80,25 +86,28 @@ components:
                             type: object
                         parameterName:
                             type: string
+                        value:
+                            type: object
+                        values:
+                            items:
+                                type: object
+                            type: array
                     type: object
             type: object
         Configuration:
             properties:
                 advancedConfiguration:
                     properties:
-                        source:
-                            properties:
-                                excludes:
-                                    items:
-                                        type: string
-                                    type: array
-                                fetchSource:
-                                    type: boolean
-                                includes:
-                                    items:
-                                        type: string
-                                    type: array
-                            type: object
+                        excludes:
+                            items:
+                                type: string
+                            type: array
+                        fetchSource:
+                            type: boolean
+                        includes:
+                            items:
+                                type: string
+                            type: array
                     type: object
                 aggregationConfiguration:
                     properties:
@@ -121,16 +130,10 @@ components:
                             type: boolean
                         includeResponseString:
                             type: boolean
-                        languageId:
-                            type: string
-                        queryString:
-                            type: string
                         searchableAssetTypes:
                             items:
                                 type: string
                             type: array
-                        timeZoneId:
-                            type: string
                     type: object
                 highlightConfiguration:
                     properties:
@@ -211,12 +214,6 @@ components:
                             type: object
                     type: object
             type: object
-        DocumentField:
-            properties:
-                values:
-                    items:
-                        type: object
-                    type: array
         ElementDefinition:
             properties:
                 category:
@@ -351,13 +348,6 @@ components:
                     type: string
         SXPBlueprint:
             properties:
-                actions:
-                    additionalProperties:
-                        additionalProperties:
-                            type: string
-                        type: object
-                    readOnly: true
-                    type: object
                 configuration:
                     $ref: "#/components/schemas/Configuration"
                 createDate:
@@ -373,16 +363,11 @@ components:
                     items:
                         $ref: "#/components/schemas/ElementInstance"
                     type: array
-                externalReferenceCode:
-                    example: AB-34098-789-N
-                    type: string
                 id:
                     format: int64
                     type: integer
                 modifiedDate:
                     format: date
-                    type: string
-                schemaVersion:
                     type: string
                 title:
                     type: string
@@ -392,18 +377,9 @@ components:
                     type: object
                 userName:
                     type: string
-                version:
-                    type: string
             type: object
         SXPElement:
             properties:
-                actions:
-                    additionalProperties:
-                        additionalProperties:
-                            type: string
-                        type: object
-                    readOnly: true
-                    type: object
                 createDate:
                     format: date
                     type: string
@@ -415,9 +391,6 @@ components:
                     type: object
                 elementDefinition:
                     $ref: "#/components/schemas/ElementDefinition"
-                externalReferenceCode:
-                    example: AB-34098-789-N
-                    type: string
                 hidden:
                     type: boolean
                 id:
@@ -428,8 +401,6 @@ components:
                     type: string
                 readOnly:
                     type: boolean
-                schemaVersion:
-                    type: string
                 title:
                     type: string
                 title_i18n:
@@ -439,8 +410,6 @@ components:
                 type:
                     type: integer
                 userName:
-                    type: string
-                version:
                     type: string
             type: object
         SXPParameterContributorDefinition:
@@ -452,61 +421,18 @@ components:
                 templateVariable:
                     type: string
             type: object
-        SearchRequest:
-            properties:
-                queryString:
-                    type: string
-            type: object
         SearchResponse:
             properties:
-                errors:
-                    items:
-                        additionalProperties:
-                            type: string
-                        type: object
-                    type: array
                 page:
                     type: integer
                 pageSize:
                     type: integer
-                request:
-                    type: object
                 requestString:
                     type: string
-                response:
-                    type: object
                 responseString:
                     type: string
-                searchHits:
-                    properties:
-                        hits:
-                            items:
-                                properties:
-                                    documentFields:
-                                        additionalProperties:
-                                            $ref: "#/components/schemas/DocumentField"
-                                        type: object
-                                    explanation:
-                                        type: string
-                                    id:
-                                        type: string
-                                    score:
-                                        format: float
-                                        type: number
-                                    version:
-                                        format: int64
-                                        type: integer
-                                type: object
-                            type: array
-                        maxScore:
-                            format: float
-                            type: number
-                        totalHits:
-                            format: int64
-                            type: integer
-                    type: object
-                searchRequest:
-                    $ref: "#/components/schemas/SearchRequest"
+                totalHits:
+                    type: integer
             type: object
         SearchableAssetName:
             properties:
@@ -523,7 +449,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.search.experiences.rest.client', and version '2.0.10'."
+        'com.liferay.search.experiences.rest.client', and version '1.0.0'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"

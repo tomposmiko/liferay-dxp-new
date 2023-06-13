@@ -32,10 +32,9 @@ import com.liferay.portal.kernel.security.membershippolicy.MembershipPolicyExcep
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.RoleService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
-import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.service.permission.OrganizationPermissionUtil;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
@@ -244,10 +243,10 @@ public class UpdateUserRolesMVCActionCommand extends BaseMVCActionCommand {
 		// this check in UserServiceImpl is useless because UsersAdmin readds
 		// the role.
 
-		Role administratorRole = _roleLocalService.getRole(
+		Role administratorRole = _roleService.getRole(
 			user.getCompanyId(), RoleConstants.ADMINISTRATOR);
 
-		long[] administratorUserIds = _userLocalService.getRoleUserIds(
+		long[] administratorUserIds = _userService.getRoleUserIds(
 			administratorRole.getRoleId());
 
 		if ((administratorUserIds.length == 1) &&
@@ -265,10 +264,7 @@ public class UpdateUserRolesMVCActionCommand extends BaseMVCActionCommand {
 	private Portal _portal;
 
 	@Reference
-	private RoleLocalService _roleLocalService;
-
-	@Reference
-	private UserLocalService _userLocalService;
+	private RoleService _roleService;
 
 	@Reference
 	private UsersAdmin _usersAdmin;

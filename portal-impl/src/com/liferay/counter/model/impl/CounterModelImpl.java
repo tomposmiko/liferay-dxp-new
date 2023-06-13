@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -202,32 +203,53 @@ public class CounterModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Counter, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Counter>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Counter, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Counter, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Counter.class.getClassLoader(), Counter.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("name", Counter::getName);
-		attributeGetterFunctions.put("currentId", Counter::getCurrentId);
+		try {
+			Constructor<Counter> constructor =
+				(Constructor<Counter>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Counter, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Counter, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Counter, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Counter, Object>>();
 		Map<String, BiConsumer<Counter, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Counter, ?>>();
 
+		attributeGetterFunctions.put("name", Counter::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<Counter, String>)Counter::setName);
+		attributeGetterFunctions.put("currentId", Counter::getCurrentId);
 		attributeSetterBiConsumers.put(
 			"currentId", (BiConsumer<Counter, Long>)Counter::setCurrentId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -312,6 +334,17 @@ public class CounterModelImpl
 		counterImpl.setCurrentId(getCurrentId());
 
 		counterImpl.resetOriginalValues();
+
+		return counterImpl;
+	}
+
+	@Override
+	public Counter cloneWithOriginalValues() {
+		CounterImpl counterImpl = new CounterImpl();
+
+		counterImpl.setName(this.<String>getColumnOriginalValue("name"));
+		counterImpl.setCurrentId(
+			this.<Long>getColumnOriginalValue("currentId"));
 
 		return counterImpl;
 	}
@@ -475,9 +508,7 @@ public class CounterModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Counter>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Counter.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

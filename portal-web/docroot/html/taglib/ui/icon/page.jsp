@@ -18,24 +18,14 @@
 
 <%
 boolean urlIsNotNull = Validator.isNotNull(url);
-
-String listItemAnchorAriaHasPopup = "false";
-String listItemAnchorAriaRole = "menuitem";
-String listItemAriaRole = "presentation";
-
-if (useDialog || (urlIsNotNull && url.startsWith("javascript:"))) {
-	listItemAnchorAriaHasPopup = "dialog";
-	listItemAnchorAriaRole = null;
-	listItemAriaRole = "";
-}
 %>
 
 <c:choose>
 	<c:when test="<%= (iconListIconCount != null) && ((iconListSingleIcon == null) || iconListShowWhenSingleIcon) %>">
-		<li class="<%= cssClass %>" role="<%= listItemAriaRole %>">
+		<li class="<%= cssClass %>" role="presentation">
 			<c:choose>
 				<c:when test="<%= urlIsNotNull %>">
-					<aui:a aria-haspopup="<%= listItemAnchorAriaHasPopup %>" ariaRole="<%= listItemAnchorAriaRole %>" cssClass="<%= linkCssClass %>" data="<%= data %>" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" onClick="<%= onClick %>" target="<%= target %>">
+					<aui:a ariaRole="menuitem" cssClass="<%= linkCssClass %>" data="<%= data %>" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" onClick="<%= onClick %>" target="<%= target %>">
 						<%@ include file="/html/taglib/ui/icon/link_content.jspf" %>
 					</aui:a>
 				</c:when>
@@ -46,10 +36,10 @@ if (useDialog || (urlIsNotNull && url.startsWith("javascript:"))) {
 		</li>
 	</c:when>
 	<c:when test="<%= (iconMenuIconCount != null) && ((iconMenuSingleIcon == null) || iconMenuShowWhenSingleIcon) %>">
-		<li class="<%= cssClass %>" role="<%= listItemAriaRole %>">
+		<li class="<%= cssClass %>" role="presentation">
 			<c:choose>
 				<c:when test="<%= urlIsNotNull %>">
-					<aui:a aria-haspopup="<%= listItemAnchorAriaHasPopup %>" ariaRole="<%= listItemAnchorAriaRole %>" cssClass="<%= linkCssClass %>" data="<%= data %>" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" onClick="<%= onClick %>" target="<%= target %>">
+					<aui:a ariaRole="menuitem" cssClass="<%= linkCssClass %>" data="<%= data %>" href="<%= url %>" id="<%= id %>" lang="<%= lang %>" onClick="<%= onClick %>" target="<%= target %>">
 						<%@ include file="/html/taglib/ui/icon/link_content.jspf" %>
 					</aui:a>
 				</c:when>

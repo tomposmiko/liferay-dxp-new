@@ -282,7 +282,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {dataLayout(dataLayoutId: ___){contentType, dataDefinitionId, dataLayoutKey, dataLayoutPages, dataRules, dateCreated, dateModified, description, id, name, paginationMode, siteId, userId}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {dataLayout(dataLayoutId: ___){contentType, dataDefinitionId, dataLayoutFields, dataLayoutKey, dataLayoutPages, dataRules, dateCreated, dateModified, description, id, name, paginationMode, siteId, userId}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public DataLayout dataLayout(@GraphQLName("dataLayoutId") Long dataLayoutId)
@@ -298,7 +298,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {dataLayoutByContentTypeByDataLayoutKey(contentType: ___, dataLayoutKey: ___, siteKey: ___){contentType, dataDefinitionId, dataLayoutKey, dataLayoutPages, dataRules, dateCreated, dateModified, description, id, name, paginationMode, siteId, userId}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {dataLayoutByContentTypeByDataLayoutKey(contentType: ___, dataLayoutKey: ___, siteKey: ___){contentType, dataDefinitionId, dataLayoutFields, dataLayoutKey, dataLayoutPages, dataRules, dateCreated, dateModified, description, id, name, paginationMode, siteId, userId}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public DataLayout dataLayoutByContentTypeByDataLayoutKey(
@@ -430,7 +430,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {dataRecord(dataRecordId: ___){dataRecordCollectionId, dataRecordValues, id}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {dataRecord(dataRecordId: ___){dataRecordCollectionId, dataRecordValues, id, status}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public DataRecord dataRecord(@GraphQLName("dataRecordId") Long dataRecordId)
@@ -937,7 +937,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<DataDefinition> items;
@@ -970,7 +970,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<DataDefinitionFieldLink> items;
@@ -1003,7 +1003,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<DataLayout> items;
@@ -1036,7 +1036,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<DataListView> items;
@@ -1069,7 +1069,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<DataRecord> items;
@@ -1102,7 +1102,7 @@ public class Query {
 		}
 
 		@GraphQLField
-		protected Map<String, Map<String, String>> actions;
+		protected Map<String, Map> actions;
 
 		@GraphQLField
 		protected java.util.Collection<DataRecordCollection> items;

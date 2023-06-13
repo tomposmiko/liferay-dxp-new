@@ -34,8 +34,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -397,6 +395,7 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -415,6 +414,7 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 			(SiteFriendlyURL)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<SiteFriendlyURL> getBasePersistence() {
 		return siteFriendlyURLPersistence;
 	}
@@ -609,12 +609,5 @@ public abstract class SiteFriendlyURLLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SiteFriendlyURLLocalServiceBaseImpl.class);
 
 }

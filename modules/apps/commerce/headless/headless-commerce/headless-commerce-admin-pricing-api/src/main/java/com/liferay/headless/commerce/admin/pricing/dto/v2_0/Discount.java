@@ -102,7 +102,7 @@ public class Discount implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, Map<String, String>> actions;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getActive() {
 		return active;
 	}
@@ -158,7 +158,7 @@ public class Discount implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String amountFormatted;
 
-	@Schema(example = "SAVE20")
+	@Schema
 	public String getCouponCode() {
 		return couponCode;
 	}
@@ -339,6 +339,36 @@ public class Discount implements Serializable {
 
 	@Schema
 	@Valid
+	public DiscountOrderType[] getDiscountOrderTypes() {
+		return discountOrderTypes;
+	}
+
+	public void setDiscountOrderTypes(DiscountOrderType[] discountOrderTypes) {
+		this.discountOrderTypes = discountOrderTypes;
+	}
+
+	@JsonIgnore
+	public void setDiscountOrderTypes(
+		UnsafeSupplier<DiscountOrderType[], Exception>
+			discountOrderTypesUnsafeSupplier) {
+
+		try {
+			discountOrderTypes = discountOrderTypesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected DiscountOrderType[] discountOrderTypes;
+
+	@Schema
+	@Valid
 	public DiscountProductGroup[] getDiscountProductGroups() {
 		return discountProductGroups;
 	}
@@ -428,7 +458,7 @@ public class Discount implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected DiscountRule[] discountRules;
 
-	@Schema(example = "2017-07-21")
+	@Schema
 	public Date getDisplayDate() {
 		return displayDate;
 	}
@@ -456,7 +486,7 @@ public class Discount implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date displayDate;
 
-	@Schema(example = "2017-08-21")
+	@Schema
 	public Date getExpirationDate() {
 		return expirationDate;
 	}
@@ -484,7 +514,7 @@ public class Discount implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date expirationDate;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -513,7 +543,7 @@ public class Discount implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -539,7 +569,7 @@ public class Discount implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@Schema(example = "L1")
+	@Schema
 	public String getLevel() {
 		return level;
 	}
@@ -569,7 +599,7 @@ public class Discount implements Serializable {
 	protected String level;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Integer getLimitationTimes() {
 		return limitationTimes;
 	}
@@ -598,7 +628,7 @@ public class Discount implements Serializable {
 	protected Integer limitationTimes;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	public Integer getLimitationTimesPerAccount() {
 		return limitationTimesPerAccount;
 	}
@@ -630,7 +660,7 @@ public class Discount implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer limitationTimesPerAccount;
 
-	@Schema(example = "unlimited")
+	@Schema
 	public String getLimitationType() {
 		return limitationType;
 	}
@@ -660,7 +690,7 @@ public class Discount implements Serializable {
 	protected String limitationType;
 
 	@DecimalMin("0")
-	@Schema(example = "25")
+	@Schema
 	@Valid
 	public BigDecimal getMaximumDiscountAmount() {
 		return maximumDiscountAmount;
@@ -690,7 +720,7 @@ public class Discount implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected BigDecimal maximumDiscountAmount;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getNeverExpire() {
 		return neverExpire;
 	}
@@ -719,7 +749,7 @@ public class Discount implements Serializable {
 	protected Boolean neverExpire;
 
 	@DecimalMin("0")
-	@Schema(example = "5")
+	@Schema
 	public Integer getNumberOfUse() {
 		return numberOfUse;
 	}
@@ -748,7 +778,7 @@ public class Discount implements Serializable {
 	protected Integer numberOfUse;
 
 	@DecimalMin("0")
-	@Schema(example = "20")
+	@Schema
 	@Valid
 	public BigDecimal getPercentageLevel1() {
 		return percentageLevel1;
@@ -778,7 +808,7 @@ public class Discount implements Serializable {
 	protected BigDecimal percentageLevel1;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	@Valid
 	public BigDecimal getPercentageLevel2() {
 		return percentageLevel2;
@@ -808,7 +838,7 @@ public class Discount implements Serializable {
 	protected BigDecimal percentageLevel2;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	@Valid
 	public BigDecimal getPercentageLevel3() {
 		return percentageLevel3;
@@ -838,7 +868,7 @@ public class Discount implements Serializable {
 	protected BigDecimal percentageLevel3;
 
 	@DecimalMin("0")
-	@Schema(example = "0")
+	@Schema
 	@Valid
 	public BigDecimal getPercentageLevel4() {
 		return percentageLevel4;
@@ -867,7 +897,7 @@ public class Discount implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected BigDecimal percentageLevel4;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getRulesConjunction() {
 		return rulesConjunction;
 	}
@@ -895,7 +925,7 @@ public class Discount implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean rulesConjunction;
 
-	@Schema(example = "subtotal")
+	@Schema
 	public String getTarget() {
 		return target;
 	}
@@ -924,7 +954,7 @@ public class Discount implements Serializable {
 	@NotEmpty
 	protected String target;
 
-	@Schema(example = "20% Off")
+	@Schema
 	public String getTitle() {
 		return title;
 	}
@@ -953,7 +983,7 @@ public class Discount implements Serializable {
 	@NotEmpty
 	protected String title;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getUseCouponCode() {
 		return useCouponCode;
 	}
@@ -981,7 +1011,7 @@ public class Discount implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean useCouponCode;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getUsePercentage() {
 		return usePercentage;
 	}
@@ -1171,6 +1201,26 @@ public class Discount implements Serializable {
 				sb.append(String.valueOf(discountChannels[i]));
 
 				if ((i + 1) < discountChannels.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
+		if (discountOrderTypes != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"discountOrderTypes\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < discountOrderTypes.length; i++) {
+				sb.append(String.valueOf(discountOrderTypes[i]));
+
+				if ((i + 1) < discountOrderTypes.length) {
 					sb.append(", ");
 				}
 			}

@@ -79,7 +79,7 @@ if ((entriesCount == 0) && portletName.equals(AnnouncementsPortletKeys.ALERTS) &
 				entryId: entryId,
 				value: <%= AnnouncementsFlagConstants.HIDDEN %>,
 			},
-			function (response) {
+			(response) => {
 				Liferay.Service(
 					'/announcementsflag/delete-flag',
 					{

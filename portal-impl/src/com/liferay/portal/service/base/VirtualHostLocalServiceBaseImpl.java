@@ -29,8 +29,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.model.VirtualHost;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
@@ -41,10 +39,6 @@ import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.VirtualHostLocalService;
 import com.liferay.portal.kernel.service.VirtualHostLocalServiceUtil;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.CompanyPersistence;
-import com.liferay.portal.kernel.service.persistence.GroupFinder;
-import com.liferay.portal.kernel.service.persistence.GroupPersistence;
-import com.liferay.portal.kernel.service.persistence.LayoutSetPersistence;
 import com.liferay.portal.kernel.service.persistence.VirtualHostPersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -308,6 +302,7 @@ public abstract class VirtualHostLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -325,6 +320,7 @@ public abstract class VirtualHostLocalServiceBaseImpl
 			(VirtualHost)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<VirtualHost> getBasePersistence() {
 		return virtualHostPersistence;
 	}
@@ -444,148 +440,6 @@ public abstract class VirtualHostLocalServiceBaseImpl
 		this.counterLocalService = counterLocalService;
 	}
 
-	/**
-	 * Returns the company local service.
-	 *
-	 * @return the company local service
-	 */
-	public com.liferay.portal.kernel.service.CompanyLocalService
-		getCompanyLocalService() {
-
-		return companyLocalService;
-	}
-
-	/**
-	 * Sets the company local service.
-	 *
-	 * @param companyLocalService the company local service
-	 */
-	public void setCompanyLocalService(
-		com.liferay.portal.kernel.service.CompanyLocalService
-			companyLocalService) {
-
-		this.companyLocalService = companyLocalService;
-	}
-
-	/**
-	 * Returns the company persistence.
-	 *
-	 * @return the company persistence
-	 */
-	public CompanyPersistence getCompanyPersistence() {
-		return companyPersistence;
-	}
-
-	/**
-	 * Sets the company persistence.
-	 *
-	 * @param companyPersistence the company persistence
-	 */
-	public void setCompanyPersistence(CompanyPersistence companyPersistence) {
-		this.companyPersistence = companyPersistence;
-	}
-
-	/**
-	 * Returns the group local service.
-	 *
-	 * @return the group local service
-	 */
-	public com.liferay.portal.kernel.service.GroupLocalService
-		getGroupLocalService() {
-
-		return groupLocalService;
-	}
-
-	/**
-	 * Sets the group local service.
-	 *
-	 * @param groupLocalService the group local service
-	 */
-	public void setGroupLocalService(
-		com.liferay.portal.kernel.service.GroupLocalService groupLocalService) {
-
-		this.groupLocalService = groupLocalService;
-	}
-
-	/**
-	 * Returns the group persistence.
-	 *
-	 * @return the group persistence
-	 */
-	public GroupPersistence getGroupPersistence() {
-		return groupPersistence;
-	}
-
-	/**
-	 * Sets the group persistence.
-	 *
-	 * @param groupPersistence the group persistence
-	 */
-	public void setGroupPersistence(GroupPersistence groupPersistence) {
-		this.groupPersistence = groupPersistence;
-	}
-
-	/**
-	 * Returns the group finder.
-	 *
-	 * @return the group finder
-	 */
-	public GroupFinder getGroupFinder() {
-		return groupFinder;
-	}
-
-	/**
-	 * Sets the group finder.
-	 *
-	 * @param groupFinder the group finder
-	 */
-	public void setGroupFinder(GroupFinder groupFinder) {
-		this.groupFinder = groupFinder;
-	}
-
-	/**
-	 * Returns the layout set local service.
-	 *
-	 * @return the layout set local service
-	 */
-	public com.liferay.portal.kernel.service.LayoutSetLocalService
-		getLayoutSetLocalService() {
-
-		return layoutSetLocalService;
-	}
-
-	/**
-	 * Sets the layout set local service.
-	 *
-	 * @param layoutSetLocalService the layout set local service
-	 */
-	public void setLayoutSetLocalService(
-		com.liferay.portal.kernel.service.LayoutSetLocalService
-			layoutSetLocalService) {
-
-		this.layoutSetLocalService = layoutSetLocalService;
-	}
-
-	/**
-	 * Returns the layout set persistence.
-	 *
-	 * @return the layout set persistence
-	 */
-	public LayoutSetPersistence getLayoutSetPersistence() {
-		return layoutSetPersistence;
-	}
-
-	/**
-	 * Sets the layout set persistence.
-	 *
-	 * @param layoutSetPersistence the layout set persistence
-	 */
-	public void setLayoutSetPersistence(
-		LayoutSetPersistence layoutSetPersistence) {
-
-		this.layoutSetPersistence = layoutSetPersistence;
-	}
-
 	public void afterPropertiesSet() {
 		persistedModelLocalServiceRegistry.register(
 			"com.liferay.portal.kernel.model.VirtualHost",
@@ -685,39 +539,6 @@ public abstract class VirtualHostLocalServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.CompanyLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.CompanyLocalService
-		companyLocalService;
-
-	@BeanReference(type = CompanyPersistence.class)
-	protected CompanyPersistence companyPersistence;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.GroupLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.GroupLocalService
-		groupLocalService;
-
-	@BeanReference(type = GroupPersistence.class)
-	protected GroupPersistence groupPersistence;
-
-	@BeanReference(type = GroupFinder.class)
-	protected GroupFinder groupFinder;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.LayoutSetLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.LayoutSetLocalService
-		layoutSetLocalService;
-
-	@BeanReference(type = LayoutSetPersistence.class)
-	protected LayoutSetPersistence layoutSetPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		VirtualHostLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

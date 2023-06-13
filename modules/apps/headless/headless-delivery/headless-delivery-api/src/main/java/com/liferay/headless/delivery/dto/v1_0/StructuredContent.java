@@ -73,7 +73,9 @@ public class StructuredContent implements Serializable {
 		return ObjectMapperUtil.unsafeReadValue(StructuredContent.class, json);
 	}
 
-	@Schema
+	@Schema(
+		description = "Block of actions allowed by the user making the request."
+	)
 	@Valid
 	public Map<String, Map<String, String>> getActions() {
 		return actions;
@@ -99,7 +101,9 @@ public class StructuredContent implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "Block of actions allowed by the user making the request."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, Map<String, String>> actions;
 
@@ -133,7 +137,9 @@ public class StructuredContent implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected AggregateRating aggregateRating;
 
-	@Schema
+	@Schema(
+		description = "The key of the asset library to which the structure content is scoped."
+	)
 	public String getAssetLibraryKey() {
 		return assetLibraryKey;
 	}
@@ -157,7 +163,9 @@ public class StructuredContent implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The key of the asset library to which the structure content is scoped."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String assetLibraryKey;
 
@@ -284,7 +292,9 @@ public class StructuredContent implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
-	@Schema
+	@Schema(
+		description = "A list of the custom fields associated with the structured content."
+	)
 	@Valid
 	public CustomField[] getCustomFields() {
 		return customFields;
@@ -309,7 +319,9 @@ public class StructuredContent implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A list of the custom fields associated with the structured content."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected CustomField[] customFields;
 
@@ -433,7 +445,7 @@ public class StructuredContent implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
-	@Schema
+	@Schema(description = "The localized structured content's descriptions.")
 	@Valid
 	public Map<String, String> getDescription_i18n() {
 		return description_i18n;
@@ -459,9 +471,41 @@ public class StructuredContent implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The localized structured content's descriptions."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> description_i18n;
+
+	@Schema(description = "The structured content's external reference code.")
+	public String getExternalReferenceCode() {
+		return externalReferenceCode;
+	}
+
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		this.externalReferenceCode = externalReferenceCode;
+	}
+
+	@JsonIgnore
+	public void setExternalReferenceCode(
+		UnsafeSupplier<String, Exception> externalReferenceCodeUnsafeSupplier) {
+
+		try {
+			externalReferenceCode = externalReferenceCodeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(
+		description = "The structured content's external reference code."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String externalReferenceCode;
 
 	@Schema(
 		description = "A relative URL to the structured content's rendered content."
@@ -495,7 +539,9 @@ public class StructuredContent implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String friendlyUrlPath;
 
-	@Schema
+	@Schema(
+		description = "The localized relative URLs to the structured content's rendered content."
+	)
 	@Valid
 	public Map<String, String> getFriendlyUrlPath_i18n() {
 		return friendlyUrlPath_i18n;
@@ -523,7 +569,9 @@ public class StructuredContent implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The localized relative URLs to the structured content's rendered content."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> friendlyUrlPath_i18n;
 
@@ -647,7 +695,9 @@ public class StructuredContent implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfComments;
 
-	@Schema
+	@Schema(
+		description = "A list of related contents to this structured content."
+	)
 	@Valid
 	public RelatedContent[] getRelatedContents() {
 		return relatedContents;
@@ -673,12 +723,14 @@ public class StructuredContent implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A list of related contents to this structured content."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected RelatedContent[] relatedContents;
 
 	@Schema(
-		description = "A list of rendered structured content, which results from using a template to process the content and return HTML."
+		description = "A list of rendered content, which results from using a template to process the content and return HTML."
 	)
 	@Valid
 	public RenderedContent[] getRenderedContents() {
@@ -706,7 +758,7 @@ public class StructuredContent implements Serializable {
 	}
 
 	@GraphQLField(
-		description = "A list of rendered structured content, which results from using a template to process the content and return HTML."
+		description = "A list of rendered content, which results from using a template to process the content and return HTML."
 	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected RenderedContent[] renderedContents;
@@ -743,7 +795,9 @@ public class StructuredContent implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
-	@Schema
+	@Schema(
+		description = "A flag that indicates whether the user making the requests is subscribed to this structured content."
+	)
 	public Boolean getSubscribed() {
 		return subscribed;
 	}
@@ -767,7 +821,9 @@ public class StructuredContent implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether the user making the requests is subscribed to this structured content."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean subscribed;
 
@@ -808,7 +864,7 @@ public class StructuredContent implements Serializable {
 	protected TaxonomyCategoryBrief[] taxonomyCategoryBriefs;
 
 	@Schema(
-		description = "A write-only field to add a category to this structured content."
+		description = "A write-only field that adds `TaxonomyCategory` instances to the structured content."
 	)
 	public Long[] getTaxonomyCategoryIds() {
 		return taxonomyCategoryIds;
@@ -834,7 +890,7 @@ public class StructuredContent implements Serializable {
 	}
 
 	@GraphQLField(
-		description = "A write-only field to add a category to this structured content."
+		description = "A write-only field that adds `TaxonomyCategory` instances to the structured content."
 	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Long[] taxonomyCategoryIds;
@@ -868,7 +924,7 @@ public class StructuredContent implements Serializable {
 	@NotEmpty
 	protected String title;
 
-	@Schema
+	@Schema(description = "The localized structured content's main titles.")
 	@Valid
 	public Map<String, String> getTitle_i18n() {
 		return title_i18n;
@@ -894,7 +950,9 @@ public class StructuredContent implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The localized structured content's main titles."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> title_i18n;
 
@@ -1182,6 +1240,20 @@ public class StructuredContent implements Serializable {
 			sb.append("\"description_i18n\": ");
 
 			sb.append(_toJSON(description_i18n));
+		}
+
+		if (externalReferenceCode != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"externalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(externalReferenceCode));
+
+			sb.append("\"");
 		}
 
 		if (friendlyUrlPath != null) {

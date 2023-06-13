@@ -224,11 +224,11 @@ public class LayoutTypePortletImpl
 		// specified
 
 		if (startPortlets == null) {
-			startPortlets = Collections.emptyList();
+			startPortlets = new ArrayList<>();
 		}
 
 		if (endPortlets == null) {
-			endPortlets = Collections.emptyList();
+			endPortlets = new ArrayList<>();
 		}
 
 		if (startPortlets.isEmpty() && endPortlets.isEmpty()) {
@@ -269,13 +269,12 @@ public class LayoutTypePortletImpl
 
 	@Override
 	public List<Portlet> getAllPortlets() {
-		List<Portlet> explicitlyAddedPortlets = getExplicitlyAddedPortlets();
-
 		List<Portlet> staticPortlets = getStaticPortlets(
 			PropsKeys.LAYOUT_STATIC_PORTLETS_ALL);
 
 		return addStaticPortlets(
-			explicitlyAddedPortlets, staticPortlets, getEmbeddedPortlets());
+			getExplicitlyAddedPortlets(), staticPortlets,
+			getEmbeddedPortlets());
 	}
 
 	@Override
@@ -604,11 +603,9 @@ public class LayoutTypePortletImpl
 		List<String> columns = getColumns();
 
 		for (String columnId : columns) {
-			if (hasNonstaticPortletId(columnId, portletId)) {
-				return true;
-			}
+			if (hasNonstaticPortletId(columnId, portletId) ||
+				hasStaticPortletId(columnId, portletId)) {
 
-			if (hasStaticPortletId(columnId, portletId)) {
 				return true;
 			}
 		}
@@ -1068,7 +1065,6 @@ public class LayoutTypePortletImpl
 
 				try {
 					portletPreferences.setValue(columnId, columnValue);
-
 					portletPreferences.store();
 				}
 				catch (Exception exception) {
@@ -1479,7 +1475,6 @@ public class LayoutTypePortletImpl
 
 			try {
 				portletPreferences.setValue(columnId, columnValue);
-
 				portletPreferences.store();
 			}
 			catch (Exception exception) {
@@ -1561,6 +1556,9 @@ public class LayoutTypePortletImpl
 				portletPreferencesIds.getPortletId(), sourcePortletPreferences);
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 	}
 

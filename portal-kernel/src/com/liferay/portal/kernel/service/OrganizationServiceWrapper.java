@@ -26,6 +26,10 @@ import com.liferay.portal.kernel.model.Organization;
 public class OrganizationServiceWrapper
 	implements OrganizationService, ServiceWrapper<OrganizationService> {
 
+	public OrganizationServiceWrapper() {
+		this(null);
+	}
+
 	public OrganizationServiceWrapper(OrganizationService organizationService) {
 		_organizationService = organizationService;
 	}
@@ -125,6 +129,17 @@ public class OrganizationServiceWrapper
 			comments, site, serviceContext);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.model.User
+			addOrganizationUserByEmailAddress(
+				String emailAddress, long organizationId,
+				ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _organizationService.addOrganizationUserByEmailAddress(
+			emailAddress, organizationId, serviceContext);
+	}
+
 	/**
 	 * Assigns the password policy to the organizations, removing any other
 	 * currently assigned password policies.
@@ -139,6 +154,15 @@ public class OrganizationServiceWrapper
 
 		_organizationService.addPasswordPolicyOrganizations(
 			passwordPolicyId, organizationIds);
+	}
+
+	@Override
+	public void addUserOrganizationByEmailAddress(
+			String emailAddress, long organizationId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_organizationService.addUserOrganizationByEmailAddress(
+			emailAddress, organizationId);
 	}
 
 	/**
@@ -164,6 +188,15 @@ public class OrganizationServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_organizationService.deleteOrganization(organizationId);
+	}
+
+	@Override
+	public void deleteUserOrganizationByEmailAddress(
+			String emailAddress, long organizationId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_organizationService.deleteUserOrganizationByEmailAddress(
+			emailAddress, organizationId);
 	}
 
 	/**

@@ -11,19 +11,22 @@
 
 import ClayButton from '@clayui/button';
 import ClayList from '@clayui/list';
-import {ClayTooltipProvider} from '@clayui/tooltip';
-import {Align} from 'metal-position';
+import ClayLoadingIndicator from '@clayui/loading-indicator';
+import className from 'classnames';
 import PropTypes from 'prop-types';
-import React, {useMemo, useState} from 'react';
+import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
 
 import {
-	useChangeTimeSpanKey,
-	useChartState,
+	ChartDispatchContext,
+	ChartStateContext,
 	useDateTitle,
 	useIsPreviousPeriodButtonDisabled,
-	useNextTimeSpan,
-	usePreviousTimeSpan,
 } from '../../context/ChartStateContext';
+import ConnectionContext from '../../context/ConnectionContext';
+import {
+	StoreDispatchContext,
+	StoreStateContext,
+} from '../../context/StoreContext';
 import {generateDateFormatters as dateFormat} from '../../utils/dateFormat';
 import {numberFormat} from '../../utils/numberFormat';
 import Hint from '../Hint';
@@ -34,12 +37,14 @@ const ITEMS_TO_SHOW = 5;
 
 export default function ReferralDetail({
 	currentPage,
-	languageTag,
-	showTimeSpanSelector = false,
+	handleDetailPeriodChange,
 	timeSpanOptions,
 	trafficShareDataProvider,
+	trafficSourcesDataProvider,
 	trafficVolumeDataProvider,
 }) {
+	const {languageTag} = useContext(StoreStateContext);
+
 	const [isReferringPagesExpanded, setIsReferringPagesExpanded] = useState(
 		false
 	);
@@ -61,52 +66,94 @@ export default function ReferralDetail({
 		return dateFormatters.formatChartTitle([firstDate, lastDate]);
 	}, [dateFormatters, firstDate, lastDate]);
 
-	const chartState = useChartState();
+	const dispatch = useContext(StoreDispatchContext);
+
+	const chartDispatch = useContext(ChartDispatchContext);
+
+	const {pieChartLoading, timeSpanKey, timeSpanOffset} = useContext(
+		ChartStateContext
+	);
+
+	const {validAnalyticsConnection} = useContext(ConnectionContext);
 
 	const isPreviousPeriodButtonDisabled = useIsPreviousPeriodButtonDisabled();
 
-	const changeTimeSpanKey = useChangeTimeSpanKey();
+	const firstUpdateRef = useRef(true);
 
-	const nextTimeSpan = useNextTimeSpan();
+	const trafficSourceDetailClasses = className(
+		'c-p-3 traffic-source-detail',
+		{
+			'traffic-source-detail--loading': pieChartLoading,
+		}
+	);
 
-	const previousTimeSpan = usePreviousTimeSpan();
+	useEffect(() => {
+		if (firstUpdateRef.current) {
+			firstUpdateRef.current = false;
 
-	const handleTimeSpanChange = (event) => {
-		const {value} = event.target;
+			return;
+		}
 
-		changeTimeSpanKey({key: value});
-	};
+		if (validAnalyticsConnection) {
+			chartDispatch({
+				payload: {
+					loading: true,
+				},
+				type: 'SET_PIE_CHART_LOADING',
+			});
+
+			trafficSourcesDataProvider()
+				.then((trafficSources) =>
+					handleDetailPeriodChange(trafficSources, 'referral')
+				)
+				.catch(() => {
+					dispatch({type: 'ADD_WARNING'});
+				})
+				.finally(() => {
+					chartDispatch({
+						payload: {
+							loading: false,
+						},
+						type: 'SET_PIE_CHART_LOADING',
+					});
+				});
+		}
+	}, [
+		chartDispatch,
+		dispatch,
+		handleDetailPeriodChange,
+		timeSpanKey,
+		timeSpanOffset,
+		trafficSourcesDataProvider,
+		validAnalyticsConnection,
+	]);
 
 	return (
-		<div className="c-p-3 traffic-source-detail">
-			{showTimeSpanSelector && (
-				<>
-					<div className="c-mb-3 c-mt-2">
-						<TimeSpanSelector
-							disabledNextTimeSpan={
-								chartState.timeSpanOffset === 0
-							}
-							disabledPreviousPeriodButton={
-								isPreviousPeriodButtonDisabled
-							}
-							onNextTimeSpanClick={nextTimeSpan}
-							onPreviousTimeSpanClick={previousTimeSpan}
-							onTimeSpanChange={handleTimeSpanChange}
-							timeSpanKey={chartState.timeSpanKey}
-							timeSpanOptions={timeSpanOptions}
-						/>
-					</div>
-
-					{title && <h5 className="c-mb-4">{title}</h5>}
-				</>
+		<div className={trafficSourceDetailClasses}>
+			{pieChartLoading && (
+				<ClayLoadingIndicator
+					className="chart-loading-indicator"
+					small
+				/>
 			)}
+
+			<div className="c-mb-3 c-mt-2">
+				<TimeSpanSelector
+					disabledNextTimeSpan={timeSpanOffset === 0}
+					disabledPreviousPeriodButton={
+						isPreviousPeriodButtonDisabled
+					}
+					timeSpanKey={timeSpanKey}
+					timeSpanOptions={timeSpanOptions}
+				/>
+			</div>
+
+			{title && <h5 className="c-mb-4">{title}</h5>}
 
 			<TotalCount
 				className="c-mb-2"
 				dataProvider={trafficVolumeDataProvider}
 				label={Liferay.Util.sub(Liferay.Language.get('traffic-volume'))}
-				languageTag={languageTag}
-				popoverAlign={Align.Bottom}
 				popoverHeader={Liferay.Language.get('traffic-volume')}
 				popoverMessage={Liferay.Language.get(
 					'traffic-volume-is-the-number-of-page-views-coming-from-one-channel'
@@ -131,6 +178,7 @@ export default function ReferralDetail({
 						<ClayList.ItemTitle className="text-truncate-inline">
 							<span className="text-truncate">
 								{Liferay.Language.get('top-referring-pages')}
+
 								<span className="text-secondary">
 									<Hint
 										message={Liferay.Language.get(
@@ -144,12 +192,14 @@ export default function ReferralDetail({
 							</span>
 						</ClayList.ItemTitle>
 					</ClayList.ItemField>
+
 					<ClayList.ItemField>
 						<ClayList.ItemTitle>
 							<span>{Liferay.Language.get('traffic')}</span>
 						</ClayList.ItemTitle>
 					</ClayList.ItemField>
 				</ClayList.Item>
+
 				{referringPages
 					.slice(0, isReferringPagesExpanded ? 10 : ITEMS_TO_SHOW)
 					.map(({trafficAmount, url}) => {
@@ -157,23 +207,22 @@ export default function ReferralDetail({
 							<ClayList.Item flex key={url}>
 								<ClayList.ItemField expand>
 									<ClayList.ItemText>
-										<ClayTooltipProvider>
-											<span
-												className="text-truncate-inline"
-												data-tooltip-align="top"
-												title={url}
+										<span
+											className="text-truncate-inline"
+											data-tooltip-align="top"
+											title={url}
+										>
+											<a
+												className="c-mr-2 text-primary text-truncate text-truncate-reverse"
+												href={url}
+												target="_blank"
 											>
-												<a
-													className="c-mr-2 text-primary text-truncate text-truncate-reverse"
-													href={url}
-													target="_blank"
-												>
-													{url}
-												</a>
-											</span>
-										</ClayTooltipProvider>
+												{url}
+											</a>
+										</span>
 									</ClayList.ItemText>
 								</ClayList.ItemField>
+
 								<ClayList.ItemField expand>
 									<span className="align-self-end font-weight-semi-bold text-dark">
 										{numberFormat(
@@ -211,6 +260,7 @@ export default function ReferralDetail({
 						<ClayList.ItemTitle className="text-truncate-inline">
 							<span className="text-truncate">
 								{Liferay.Language.get('top-referring-domains')}
+
 								<span className="text-secondary">
 									<Hint
 										message={Liferay.Language.get(
@@ -224,12 +274,14 @@ export default function ReferralDetail({
 							</span>
 						</ClayList.ItemTitle>
 					</ClayList.ItemField>
+
 					<ClayList.ItemField>
 						<ClayList.ItemTitle>
 							<span>{Liferay.Language.get('traffic')}</span>
 						</ClayList.ItemTitle>
 					</ClayList.ItemField>
 				</ClayList.Item>
+
 				{referringDomains
 					.slice(0, isReferringDomainsExpanded ? 10 : ITEMS_TO_SHOW)
 					.map(({trafficAmount, url}) => {
@@ -237,23 +289,22 @@ export default function ReferralDetail({
 							<ClayList.Item flex key={url}>
 								<ClayList.ItemField expand>
 									<ClayList.ItemText>
-										<ClayTooltipProvider>
-											<span
-												className="text-truncate-inline"
-												data-tooltip-align="top"
-												title={url}
+										<span
+											className="text-truncate-inline"
+											data-tooltip-align="top"
+											title={url}
+										>
+											<a
+												className="c-mr-2 text-primary text-truncate"
+												href={url}
+												target="_blank"
 											>
-												<a
-													className="c-mr-2 text-primary text-truncate"
-													href={url}
-													target="_blank"
-												>
-													{url}
-												</a>
-											</span>
-										</ClayTooltipProvider>
+												{url}
+											</a>
+										</span>
 									</ClayList.ItemText>
 								</ClayList.ItemField>
+
 								<ClayList.ItemField expand>
 									<span className="align-self-end font-weight-semi-bold text-dark">
 										{numberFormat(
@@ -292,8 +343,7 @@ export default function ReferralDetail({
 
 ReferralDetail.propTypes = {
 	currentPage: PropTypes.object.isRequired,
-	languageTag: PropTypes.string.isRequired,
-	showTimeSpanSelector: PropTypes.bool,
+	handleDetailPeriodChange: PropTypes.func.isRequired,
 	timeSpanOptions: PropTypes.arrayOf(
 		PropTypes.shape({
 			key: PropTypes.string,
@@ -301,5 +351,6 @@ ReferralDetail.propTypes = {
 		})
 	).isRequired,
 	trafficShareDataProvider: PropTypes.func.isRequired,
+	trafficSourcesDataProvider: PropTypes.func.isRequired,
 	trafficVolumeDataProvider: PropTypes.func.isRequired,
 };

@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -76,6 +77,7 @@ public class CommercePricingClassCPDefinitionRelModelImpl
 	public static final String TABLE_NAME = "CPricingClassCPDefinitionRel";
 
 	public static final Object[][] TABLE_COLUMNS = {
+		{"mvccVersion", Types.BIGINT},
 		{"CPricingClassCPDefinitionRelId", Types.BIGINT},
 		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
 		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
@@ -88,6 +90,7 @@ public class CommercePricingClassCPDefinitionRelModelImpl
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("CPricingClassCPDefinitionRelId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
@@ -99,7 +102,7 @@ public class CommercePricingClassCPDefinitionRelModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CPricingClassCPDefinitionRel (CPricingClassCPDefinitionRelId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commercePricingClassId LONG,CPDefinitionId LONG)";
+		"create table CPricingClassCPDefinitionRel (mvccVersion LONG default 0 not null,CPricingClassCPDefinitionRelId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commercePricingClassId LONG,CPDefinitionId LONG)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table CPricingClassCPDefinitionRel";
@@ -171,6 +174,7 @@ public class CommercePricingClassCPDefinitionRelModelImpl
 		CommercePricingClassCPDefinitionRel model =
 			new CommercePricingClassCPDefinitionRelImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setCommercePricingClassCPDefinitionRelId(
 			soapModel.getCommercePricingClassCPDefinitionRelId());
 		model.setCompanyId(soapModel.getCompanyId());
@@ -303,9 +307,41 @@ public class CommercePricingClassCPDefinitionRelModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function
+		<InvocationHandler, CommercePricingClassCPDefinitionRel>
+			_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommercePricingClassCPDefinitionRel.class.getClassLoader(),
+			CommercePricingClassCPDefinitionRel.class, ModelWrapper.class);
+
+		try {
+			Constructor<CommercePricingClassCPDefinitionRel> constructor =
+				(Constructor<CommercePricingClassCPDefinitionRel>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map
 		<String, Function<CommercePricingClassCPDefinitionRel, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CommercePricingClassCPDefinitionRel, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommercePricingClassCPDefinitionRel, Object>>
@@ -313,80 +349,92 @@ public class CommercePricingClassCPDefinitionRelModelImpl
 				new LinkedHashMap
 					<String,
 					 Function<CommercePricingClassCPDefinitionRel, Object>>();
-
-		attributeGetterFunctions.put(
-			"CommercePricingClassCPDefinitionRelId",
-			CommercePricingClassCPDefinitionRel::
-				getCommercePricingClassCPDefinitionRelId);
-		attributeGetterFunctions.put(
-			"companyId", CommercePricingClassCPDefinitionRel::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommercePricingClassCPDefinitionRel::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommercePricingClassCPDefinitionRel::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommercePricingClassCPDefinitionRel::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate",
-			CommercePricingClassCPDefinitionRel::getModifiedDate);
-		attributeGetterFunctions.put(
-			"commercePricingClassId",
-			CommercePricingClassCPDefinitionRel::getCommercePricingClassId);
-		attributeGetterFunctions.put(
-			"CPDefinitionId",
-			CommercePricingClassCPDefinitionRel::getCPDefinitionId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CommercePricingClassCPDefinitionRel, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommercePricingClassCPDefinitionRel, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String,
 					 BiConsumer<CommercePricingClassCPDefinitionRel, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CommercePricingClassCPDefinitionRel::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CommercePricingClassCPDefinitionRel, Long>)
+				CommercePricingClassCPDefinitionRel::setMvccVersion);
+		attributeGetterFunctions.put(
+			"CommercePricingClassCPDefinitionRelId",
+			CommercePricingClassCPDefinitionRel::
+				getCommercePricingClassCPDefinitionRelId);
 		attributeSetterBiConsumers.put(
 			"CommercePricingClassCPDefinitionRelId",
 			(BiConsumer<CommercePricingClassCPDefinitionRel, Long>)
 				CommercePricingClassCPDefinitionRel::
 					setCommercePricingClassCPDefinitionRelId);
+		attributeGetterFunctions.put(
+			"companyId", CommercePricingClassCPDefinitionRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommercePricingClassCPDefinitionRel, Long>)
 				CommercePricingClassCPDefinitionRel::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommercePricingClassCPDefinitionRel::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommercePricingClassCPDefinitionRel, Long>)
 				CommercePricingClassCPDefinitionRel::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommercePricingClassCPDefinitionRel::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommercePricingClassCPDefinitionRel, String>)
 				CommercePricingClassCPDefinitionRel::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommercePricingClassCPDefinitionRel::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommercePricingClassCPDefinitionRel, Date>)
 				CommercePricingClassCPDefinitionRel::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate",
+			CommercePricingClassCPDefinitionRel::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommercePricingClassCPDefinitionRel, Date>)
 				CommercePricingClassCPDefinitionRel::setModifiedDate);
+		attributeGetterFunctions.put(
+			"commercePricingClassId",
+			CommercePricingClassCPDefinitionRel::getCommercePricingClassId);
 		attributeSetterBiConsumers.put(
 			"commercePricingClassId",
 			(BiConsumer<CommercePricingClassCPDefinitionRel, Long>)
 				CommercePricingClassCPDefinitionRel::setCommercePricingClassId);
+		attributeGetterFunctions.put(
+			"CPDefinitionId",
+			CommercePricingClassCPDefinitionRel::getCPDefinitionId);
 		attributeSetterBiConsumers.put(
 			"CPDefinitionId",
 			(BiConsumer<CommercePricingClassCPDefinitionRel, Long>)
 				CommercePricingClassCPDefinitionRel::setCPDefinitionId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@JSON
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@JSON
@@ -618,6 +666,8 @@ public class CommercePricingClassCPDefinitionRelModelImpl
 			commercePricingClassCPDefinitionRelImpl =
 				new CommercePricingClassCPDefinitionRelImpl();
 
+		commercePricingClassCPDefinitionRelImpl.setMvccVersion(
+			getMvccVersion());
 		commercePricingClassCPDefinitionRelImpl.
 			setCommercePricingClassCPDefinitionRelId(
 				getCommercePricingClassCPDefinitionRelId());
@@ -633,6 +683,36 @@ public class CommercePricingClassCPDefinitionRelModelImpl
 			getCPDefinitionId());
 
 		commercePricingClassCPDefinitionRelImpl.resetOriginalValues();
+
+		return commercePricingClassCPDefinitionRelImpl;
+	}
+
+	@Override
+	public CommercePricingClassCPDefinitionRel cloneWithOriginalValues() {
+		CommercePricingClassCPDefinitionRelImpl
+			commercePricingClassCPDefinitionRelImpl =
+				new CommercePricingClassCPDefinitionRelImpl();
+
+		commercePricingClassCPDefinitionRelImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		commercePricingClassCPDefinitionRelImpl.
+			setCommercePricingClassCPDefinitionRelId(
+				this.<Long>getColumnOriginalValue(
+					"CPricingClassCPDefinitionRelId"));
+		commercePricingClassCPDefinitionRelImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commercePricingClassCPDefinitionRelImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commercePricingClassCPDefinitionRelImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commercePricingClassCPDefinitionRelImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commercePricingClassCPDefinitionRelImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commercePricingClassCPDefinitionRelImpl.setCommercePricingClassId(
+			this.<Long>getColumnOriginalValue("commercePricingClassId"));
+		commercePricingClassCPDefinitionRelImpl.setCPDefinitionId(
+			this.<Long>getColumnOriginalValue("CPDefinitionId"));
 
 		return commercePricingClassCPDefinitionRelImpl;
 	}
@@ -718,6 +798,9 @@ public class CommercePricingClassCPDefinitionRelModelImpl
 		CommercePricingClassCPDefinitionRelCacheModel
 			commercePricingClassCPDefinitionRelCacheModel =
 				new CommercePricingClassCPDefinitionRelCacheModel();
+
+		commercePricingClassCPDefinitionRelCacheModel.mvccVersion =
+			getMvccVersion();
 
 		commercePricingClassCPDefinitionRelCacheModel.
 			CommercePricingClassCPDefinitionRelId =
@@ -858,12 +941,11 @@ public class CommercePricingClassCPDefinitionRelModelImpl
 		private static final Function
 			<InvocationHandler, CommercePricingClassCPDefinitionRel>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						CommercePricingClassCPDefinitionRel.class,
-						ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private long _CommercePricingClassCPDefinitionRelId;
 	private long _companyId;
 	private long _userId;
@@ -903,6 +985,7 @@ public class CommercePricingClassCPDefinitionRelModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put(
 			"CPricingClassCPDefinitionRelId",
 			_CommercePricingClassCPDefinitionRelId);
@@ -939,21 +1022,23 @@ public class CommercePricingClassCPDefinitionRelModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("CPricingClassCPDefinitionRelId", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("companyId", 2L);
+		columnBitmasks.put("CPricingClassCPDefinitionRelId", 2L);
 
-		columnBitmasks.put("userId", 4L);
+		columnBitmasks.put("companyId", 4L);
 
-		columnBitmasks.put("userName", 8L);
+		columnBitmasks.put("userId", 8L);
 
-		columnBitmasks.put("createDate", 16L);
+		columnBitmasks.put("userName", 16L);
 
-		columnBitmasks.put("modifiedDate", 32L);
+		columnBitmasks.put("createDate", 32L);
 
-		columnBitmasks.put("commercePricingClassId", 64L);
+		columnBitmasks.put("modifiedDate", 64L);
 
-		columnBitmasks.put("CPDefinitionId", 128L);
+		columnBitmasks.put("commercePricingClassId", 128L);
+
+		columnBitmasks.put("CPDefinitionId", 256L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

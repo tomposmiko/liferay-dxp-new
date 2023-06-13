@@ -15,9 +15,9 @@
 package com.liferay.portal.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
+import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.dao.orm.Query;
@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.NoSuchSubscriptionException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Subscription;
 import com.liferay.portal.kernel.model.SubscriptionTable;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -38,7 +37,6 @@ import com.liferay.portal.kernel.service.persistence.SubscriptionUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -46,9 +44,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.SubscriptionImpl;
 import com.liferay.portal.model.impl.SubscriptionModelImpl;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
@@ -58,11 +53,9 @@ import java.lang.reflect.InvocationHandler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The persistence implementation for the subscription service.
@@ -190,7 +183,7 @@ public class SubscriptionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Subscription>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Subscription subscription : list) {
@@ -547,8 +540,7 @@ public class SubscriptionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {userId};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -690,7 +682,7 @@ public class SubscriptionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Subscription>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Subscription subscription : list) {
@@ -1078,8 +1070,7 @@ public class SubscriptionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {groupId, userId};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1229,7 +1220,7 @@ public class SubscriptionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Subscription>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Subscription subscription : list) {
@@ -1618,8 +1609,7 @@ public class SubscriptionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {userId, classNameId};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1777,7 +1767,7 @@ public class SubscriptionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Subscription>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Subscription subscription : list) {
@@ -2189,8 +2179,7 @@ public class SubscriptionPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, classNameId, classPK};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -2332,7 +2321,7 @@ public class SubscriptionPersistenceImpl
 	 * @param companyId the company ID
 	 * @param userId the user ID
 	 * @param classNameId the class name ID
-	 * @param classPKs the class pks
+	 * @param classPK the class pk
 	 * @param start the lower bound of the range of subscriptions
 	 * @param end the upper bound of the range of subscriptions (not inclusive)
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
@@ -2390,7 +2379,7 @@ public class SubscriptionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Subscription>)FinderCacheUtil.getResult(
-				_finderPathWithPaginationFindByC_U_C_C, finderArgs, this);
+				_finderPathWithPaginationFindByC_U_C_C, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Subscription subscription : list) {
@@ -2569,7 +2558,7 @@ public class SubscriptionPersistenceImpl
 
 		if (useFinderCache) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByC_U_C_C, finderArgs, this);
+				_finderPathFetchByC_U_C_C, finderArgs);
 		}
 
 		if (result instanceof Subscription) {
@@ -2687,8 +2676,7 @@ public class SubscriptionPersistenceImpl
 			companyId, userId, classNameId, classPK
 		};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(5);
@@ -2762,7 +2750,7 @@ public class SubscriptionPersistenceImpl
 		};
 
 		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathWithPaginationCountByC_U_C_C, finderArgs, this);
+			_finderPathWithPaginationCountByC_U_C_C, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler();
@@ -2896,23 +2884,21 @@ public class SubscriptionPersistenceImpl
 	 * Clears the cache for all subscriptions.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache() {
 		EntityCacheUtil.clearCache(SubscriptionImpl.class);
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		FinderCacheUtil.clearCache(SubscriptionImpl.class);
 	}
 
 	/**
 	 * Clears the cache for the subscription.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -2929,9 +2915,7 @@ public class SubscriptionPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		FinderCacheUtil.clearCache(SubscriptionImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			EntityCacheUtil.removeResult(SubscriptionImpl.class, primaryKey);
@@ -2949,9 +2933,9 @@ public class SubscriptionPersistenceImpl
 		};
 
 		FinderCacheUtil.putResult(
-			_finderPathCountByC_U_C_C, args, Long.valueOf(1), false);
+			_finderPathCountByC_U_C_C, args, Long.valueOf(1));
 		FinderCacheUtil.putResult(
-			_finderPathFetchByC_U_C_C, args, subscriptionModelImpl, false);
+			_finderPathFetchByC_U_C_C, args, subscriptionModelImpl);
 	}
 
 	/**
@@ -3271,7 +3255,7 @@ public class SubscriptionPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Subscription>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -3341,7 +3325,7 @@ public class SubscriptionPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -3391,30 +3375,22 @@ public class SubscriptionPersistenceImpl
 	 * Initializes the subscription persistence.
 	 */
 	public void afterPropertiesSet() {
-		Registry registry = RegistryUtil.getRegistry();
-
-		_argumentsResolverServiceRegistration = registry.registerService(
-			ArgumentsResolver.class, new SubscriptionModelArgumentsResolver(),
-			HashMapBuilder.<String, Object>put(
-				"model.class.name", Subscription.class.getName()
-			).build());
-
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByUserId = _createFinderPath(
+		_finderPathWithPaginationFindByUserId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -3422,16 +3398,16 @@ public class SubscriptionPersistenceImpl
 			},
 			new String[] {"userId"}, true);
 
-		_finderPathWithoutPaginationFindByUserId = _createFinderPath(
+		_finderPathWithoutPaginationFindByUserId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
 			new String[] {Long.class.getName()}, new String[] {"userId"}, true);
 
-		_finderPathCountByUserId = _createFinderPath(
+		_finderPathCountByUserId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
 			new String[] {Long.class.getName()}, new String[] {"userId"},
 			false);
 
-		_finderPathWithPaginationFindByG_U = _createFinderPath(
+		_finderPathWithPaginationFindByG_U = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -3440,17 +3416,17 @@ public class SubscriptionPersistenceImpl
 			},
 			new String[] {"groupId", "userId"}, true);
 
-		_finderPathWithoutPaginationFindByG_U = _createFinderPath(
+		_finderPathWithoutPaginationFindByG_U = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"groupId", "userId"}, true);
 
-		_finderPathCountByG_U = _createFinderPath(
+		_finderPathCountByG_U = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"groupId", "userId"}, false);
 
-		_finderPathWithPaginationFindByU_C = _createFinderPath(
+		_finderPathWithPaginationFindByU_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -3459,17 +3435,17 @@ public class SubscriptionPersistenceImpl
 			},
 			new String[] {"userId", "classNameId"}, true);
 
-		_finderPathWithoutPaginationFindByU_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByU_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"userId", "classNameId"}, true);
 
-		_finderPathCountByU_C = _createFinderPath(
+		_finderPathCountByU_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"userId", "classNameId"}, false);
 
-		_finderPathWithPaginationFindByC_C_C = _createFinderPath(
+		_finderPathWithPaginationFindByC_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -3478,21 +3454,21 @@ public class SubscriptionPersistenceImpl
 			},
 			new String[] {"companyId", "classNameId", "classPK"}, true);
 
-		_finderPathWithoutPaginationFindByC_C_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			},
 			new String[] {"companyId", "classNameId", "classPK"}, true);
 
-		_finderPathCountByC_C_C = _createFinderPath(
+		_finderPathCountByC_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			},
 			new String[] {"companyId", "classNameId", "classPK"}, false);
 
-		_finderPathWithPaginationFindByC_U_C_C = _createFinderPath(
+		_finderPathWithPaginationFindByC_U_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_U_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -3503,7 +3479,7 @@ public class SubscriptionPersistenceImpl
 			new String[] {"companyId", "userId", "classNameId", "classPK"},
 			true);
 
-		_finderPathWithoutPaginationFindByC_U_C_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_U_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_U_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -3512,7 +3488,7 @@ public class SubscriptionPersistenceImpl
 			new String[] {"companyId", "userId", "classNameId", "classPK"},
 			true);
 
-		_finderPathFetchByC_U_C_C = _createFinderPath(
+		_finderPathFetchByC_U_C_C = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_U_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -3521,7 +3497,7 @@ public class SubscriptionPersistenceImpl
 			new String[] {"companyId", "userId", "classNameId", "classPK"},
 			true);
 
-		_finderPathCountByC_U_C_C = _createFinderPath(
+		_finderPathCountByC_U_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_U_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -3530,7 +3506,7 @@ public class SubscriptionPersistenceImpl
 			new String[] {"companyId", "userId", "classNameId", "classPK"},
 			false);
 
-		_finderPathWithPaginationCountByC_U_C_C = _createFinderPath(
+		_finderPathWithPaginationCountByC_U_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_U_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -3546,14 +3522,6 @@ public class SubscriptionPersistenceImpl
 		_setSubscriptionUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(SubscriptionImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setSubscriptionUtilPersistence(
@@ -3595,106 +3563,9 @@ public class SubscriptionPersistenceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		SubscriptionPersistenceImpl.class);
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			Registry registry = RegistryUtil.getRegistry();
-
-			_serviceRegistrations.add(
-				registry.registerService(
-					FinderPath.class, finderPath,
-					HashMapBuilder.<String, Object>put(
-						"cache.name", cacheName
-					).build()));
-		}
-
-		return finderPath;
-	}
-
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class SubscriptionModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			SubscriptionModelImpl subscriptionModelImpl =
-				(SubscriptionModelImpl)baseModel;
-
-			long columnBitmask = subscriptionModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(subscriptionModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						subscriptionModelImpl.getColumnBitmask(columnName);
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(subscriptionModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			SubscriptionModelImpl subscriptionModelImpl, String[] columnNames,
-			boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] = subscriptionModelImpl.getColumnOriginalValue(
-						columnName);
-				}
-				else {
-					arguments[i] = subscriptionModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
+	@Override
+	protected FinderCache getFinderCache() {
+		return FinderCacheUtil.getFinderCache();
 	}
 
 }

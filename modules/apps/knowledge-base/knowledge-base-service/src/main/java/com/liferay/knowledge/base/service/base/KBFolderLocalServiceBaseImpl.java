@@ -43,8 +43,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -268,6 +266,48 @@ public abstract class KBFolderLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the kb folder with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the kb folder's external reference code
+	 * @return the matching kb folder, or <code>null</code> if a matching kb folder could not be found
+	 */
+	@Override
+	public KBFolder fetchKBFolderByExternalReferenceCode(
+		long groupId, String externalReferenceCode) {
+
+		return kbFolderPersistence.fetchByG_ERC(groupId, externalReferenceCode);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchKBFolderByExternalReferenceCode(long, String)}
+	 */
+	@Deprecated
+	@Override
+	public KBFolder fetchKBFolderByReferenceCode(
+		long groupId, String externalReferenceCode) {
+
+		return fetchKBFolderByExternalReferenceCode(
+			groupId, externalReferenceCode);
+	}
+
+	/**
+	 * Returns the kb folder with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the kb folder's external reference code
+	 * @return the matching kb folder
+	 * @throws PortalException if a matching kb folder could not be found
+	 */
+	@Override
+	public KBFolder getKBFolderByExternalReferenceCode(
+			long groupId, String externalReferenceCode)
+		throws PortalException {
+
+		return kbFolderPersistence.findByG_ERC(groupId, externalReferenceCode);
+	}
+
+	/**
 	 * Returns the kb folder with the primary key.
 	 *
 	 * @param kbFolderId the primary key of the kb folder
@@ -392,6 +432,7 @@ public abstract class KBFolderLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -408,6 +449,7 @@ public abstract class KBFolderLocalServiceBaseImpl
 		return kbFolderLocalService.deleteKBFolder((KBFolder)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<KBFolder> getBasePersistence() {
 		return kbFolderPersistence;
 	}
@@ -625,12 +667,5 @@ public abstract class KBFolderLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	@Reference
-	protected com.liferay.expando.kernel.service.ExpandoRowLocalService
-		expandoRowLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		KBFolderLocalServiceBaseImpl.class);
 
 }

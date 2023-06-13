@@ -53,8 +53,8 @@ public class CommerceShippingMethodServiceHttp {
 
 	public static com.liferay.commerce.model.CommerceAddressRestriction
 			addCommerceAddressRestriction(
-				HttpPrincipal httpPrincipal, long userId, long groupId,
-				long commerceShippingMethodId, long commerceCountryId)
+				HttpPrincipal httpPrincipal, long groupId,
+				long commerceShippingMethodId, long countryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -64,8 +64,7 @@ public class CommerceShippingMethodServiceHttp {
 				_addCommerceAddressRestrictionParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, userId, groupId, commerceShippingMethodId,
-				commerceCountryId);
+				methodKey, groupId, commerceShippingMethodId, countryId);
 
 			Object returnObj = null;
 
@@ -99,7 +98,7 @@ public class CommerceShippingMethodServiceHttp {
 	public static com.liferay.commerce.model.CommerceAddressRestriction
 			addCommerceAddressRestriction(
 				HttpPrincipal httpPrincipal, long commerceShippingMethodId,
-				long commerceCountryId,
+				long countryId,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -110,8 +109,7 @@ public class CommerceShippingMethodServiceHttp {
 				_addCommerceAddressRestrictionParameterTypes1);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, commerceShippingMethodId, commerceCountryId,
-				serviceContext);
+				methodKey, commerceShippingMethodId, countryId, serviceContext);
 
 			Object returnObj = null;
 
@@ -144,7 +142,7 @@ public class CommerceShippingMethodServiceHttp {
 
 	public static com.liferay.commerce.model.CommerceShippingMethod
 			addCommerceShippingMethod(
-				HttpPrincipal httpPrincipal, long userId, long groupId,
+				HttpPrincipal httpPrincipal, long groupId,
 				java.util.Map<java.util.Locale, String> nameMap,
 				java.util.Map<java.util.Locale, String> descriptionMap,
 				java.io.File imageFile, String engineKey, double priority,
@@ -158,7 +156,7 @@ public class CommerceShippingMethodServiceHttp {
 				_addCommerceShippingMethodParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, userId, groupId, nameMap, descriptionMap, imageFile,
+				methodKey, groupId, nameMap, descriptionMap, imageFile,
 				engineKey, priority, active);
 
 			Object returnObj = null;
@@ -607,8 +605,8 @@ public class CommerceShippingMethodServiceHttp {
 	public static java.util.List
 		<com.liferay.commerce.model.CommerceShippingMethod>
 				getCommerceShippingMethods(
-					HttpPrincipal httpPrincipal, long groupId,
-					long commerceCountryId, boolean active)
+					HttpPrincipal httpPrincipal, long groupId, long countryId,
+					boolean active)
 			throws com.liferay.portal.kernel.exception.PortalException {
 
 		try {
@@ -618,7 +616,7 @@ public class CommerceShippingMethodServiceHttp {
 				_getCommerceShippingMethodsParameterTypes13);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, groupId, commerceCountryId, active);
+				methodKey, groupId, countryId, active);
 
 			Object returnObj = null;
 
@@ -782,7 +780,7 @@ public class CommerceShippingMethodServiceHttp {
 
 	private static final Class<?>[]
 		_addCommerceAddressRestrictionParameterTypes0 = new Class[] {
-			long.class, long.class, long.class, long.class
+			long.class, long.class, long.class
 		};
 	private static final Class<?>[]
 		_addCommerceAddressRestrictionParameterTypes1 = new Class[] {
@@ -791,7 +789,7 @@ public class CommerceShippingMethodServiceHttp {
 		};
 	private static final Class<?>[] _addCommerceShippingMethodParameterTypes2 =
 		new Class[] {
-			long.class, long.class, java.util.Map.class, java.util.Map.class,
+			long.class, java.util.Map.class, java.util.Map.class,
 			java.io.File.class, String.class, double.class, boolean.class
 		};
 	private static final Class<?>[]

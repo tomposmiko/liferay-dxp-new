@@ -30,8 +30,8 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.test.log.CaptureAppender;
-import com.liferay.portal.test.log.Log4JLoggerTestUtil;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.view.count.model.ViewCountEntry;
@@ -44,8 +44,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.FutureTask;
-
-import org.apache.log4j.Level;
 
 import org.hibernate.util.JDBCExceptionReporter;
 
@@ -101,9 +99,8 @@ public class ViewCountEntryLocalServiceTest {
 			_viewCountEntryFinder, "_sessionFactory",
 			_createSessionFactoryProxy(sessionFactory, cyclicBarrier));
 
-		try (CaptureAppender captureAppender =
-				Log4JLoggerTestUtil.configureLog4JLogger(
-					JDBCExceptionReporter.class.getName(), Level.OFF)) {
+		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
+				JDBCExceptionReporter.class.getName(), LoggerTestUtil.OFF)) {
 
 			FutureTask<Void> futureTask = new FutureTask<>(
 				() -> {
@@ -150,7 +147,7 @@ public class ViewCountEntryLocalServiceTest {
 			SessionFactory.class.getClassLoader(),
 			new Class<?>[] {SessionFactory.class},
 			(proxy, method, args) -> {
-				if (Objects.equals(method.getName(), "openSession")) {
+				if (Objects.equals("openSession", method.getName())) {
 					return _createSessionProxy(
 						sessionFactory.openSession(), cyclicBarrier);
 				}
@@ -165,7 +162,7 @@ public class ViewCountEntryLocalServiceTest {
 		return ProxyUtil.newProxyInstance(
 			Session.class.getClassLoader(), new Class<?>[] {Session.class},
 			(proxy, method, args) -> {
-				if (Objects.equals(method.getName(), "flush")) {
+				if (Objects.equals("flush", method.getName())) {
 					cyclicBarrier.await();
 				}
 

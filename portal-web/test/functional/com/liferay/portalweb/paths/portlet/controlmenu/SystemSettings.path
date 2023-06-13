@@ -16,6 +16,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CHECK_INTERVAL_SEGMENTS_INPUT</td>
+	<td>//*[contains(text(),'Check Interval')]/following-sibling::input[contains(@class,'form-control')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CHECK_INTERVAL_SEGMENTS_VALUE</td>
+	<td>//*[contains(text(),'Check Interval')]/following-sibling::input[contains(@value,'${key_value}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DROPDOWN_MENU</td>
 	<td>//*[contains(.,'${key_fieldLabel}')]/parent::div//div[contains(@class,'option-selected')] | //p[contains(.,'${key_fieldLabel}')]/following-sibling::div//button[contains(@class,'dropdown-toggle')]</td>
 	<td></td>
@@ -23,6 +33,16 @@
 <tr>
 	<td>DROPDOWN_MENU_OPTION</td>
 	<td>//button[contains(@class,'dropdown-item') and @label='${key_selectOption}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LABEL</td>
+	<td>//span[contains(@class,'custom-control-label-text') and contains(.,'${key_fieldLabel}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SAVE_BUTTON_SEGMENTS_AC</td>
+	<td>//div[contains(@class,'button-holder')]//*[@class = 'lfr-btn-label' and text()='Save']</td>
 	<td></td>
 </tr>
 <tr>
@@ -45,27 +65,18 @@
 	<td>//span[contains(@class,'custom-control-label-text') and contains(.,'${key_settingFieldName}')]/../..//input[@type='checkbox']</td>
 	<td></td>
 </tr>
-
+<tr>
+	<td>SETTINGS_TEXT</td>
+	<td>//span[contains(@class,'form-text')][contains(.,'${key_settingsText}')]</td>
+	<td></td>
+</tr>
 <!--ASSETS-->
-
 <tr>
 	<td>ASSETS_DYNAMIC_EXPORT_LIMIT</td>
 	<td>//div[contains(@data-field-name,'dynamicExportLimit')]//input[@type='text']</td>
 	<td></td>
 </tr>
-
 <!--CORS-->
-
-<tr>
-	<td>CORS_ADD_RESPONSE_HEADERS</td>
-	<td>//div[@id='senna_surface1-screen_10']//div[4]//div[1]//div[1]//div[1]//button</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CORS_ADDED_RESPONSE_HEADERS</td>
-	<td>//div[@id='senna_surface1-screen_10']//div[4]//div[1]//div[2]//div//textarea</td>
-	<td></td>
-</tr>
 <tr>
 	<td>CORS_CONFIGURATION</td>
 	<td>//textarea[contains(@name,'${key_configurationValue}')]</td>
@@ -77,8 +88,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>CORS_DELETE_URL_PATTERN</td>
-	<td>//div[@class='active ddm-form-page lfr-ddm-form-page']/div[3]/div[1]/div[2]//button[contains(@aria-label,'trash')]</td>
+	<td></td>
+	<td></td>
 	<td></td>
 </tr>
 </tbody>

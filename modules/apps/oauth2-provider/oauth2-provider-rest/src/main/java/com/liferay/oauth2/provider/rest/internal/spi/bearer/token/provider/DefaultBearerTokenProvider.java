@@ -25,13 +25,15 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 /**
  * @author Tomas Polesovsky
  */
 @Component(
 	configurationPid = "com.liferay.oauth2.provider.rest.internal.spi.bearer.token.provider.configuration.DefaultBearerTokenProviderConfiguration",
-	immediate = true, property = {"name=default", "token.format=opaque"},
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	property = {"name=default", "token.format=opaque"},
 	service = BearerTokenProvider.class
 )
 public class DefaultBearerTokenProvider implements BearerTokenProvider {
@@ -106,11 +108,9 @@ public class DefaultBearerTokenProvider implements BearerTokenProvider {
 
 		long issuedAtMillis = issuedAt * 1000;
 
-		if (issuedAtMillis > System.currentTimeMillis()) {
-			return false;
-		}
+		if ((issuedAtMillis > System.currentTimeMillis()) ||
+			((issuedAtMillis + expiresInMillis) < System.currentTimeMillis())) {
 
-		if ((issuedAtMillis + expiresInMillis) < System.currentTimeMillis()) {
 			return false;
 		}
 

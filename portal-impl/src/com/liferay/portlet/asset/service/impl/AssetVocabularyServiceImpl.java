@@ -17,19 +17,21 @@ package com.liferay.portlet.asset.service.impl;
 import com.liferay.asset.kernel.model.AssetCategoryConstants;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.model.AssetVocabularyDisplay;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.asset.service.base.AssetVocabularyServiceBaseImpl;
 import com.liferay.portlet.asset.service.permission.AssetCategoriesPermission;
 import com.liferay.portlet.asset.service.permission.AssetVocabularyPermission;
-import com.liferay.portlet.asset.util.AssetUtil;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.util.ArrayList;
@@ -103,6 +105,22 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 		return assetVocabularyLocalService.addVocabulary(
 			getUserId(), groupId, name, title, titleMap, descriptionMap,
 			settings, serviceContext);
+	}
+
+	@Override
+	public AssetVocabulary addVocabulary(
+			String externalReferenceCode, long groupId, String name,
+			String title, Map<Locale, String> titleMap,
+			Map<Locale, String> descriptionMap, String settings,
+			int visibilityType, ServiceContext serviceContext)
+		throws PortalException {
+
+		AssetCategoriesPermission.check(
+			getPermissionChecker(), groupId, ActionKeys.ADD_VOCABULARY);
+
+		return assetVocabularyLocalService.addVocabulary(
+			externalReferenceCode, getUserId(), groupId, name, title, titleMap,
+			descriptionMap, settings, visibilityType, serviceContext);
 	}
 
 	@Override
@@ -190,8 +208,13 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 			return vocabularies;
 		}
 
-		return AssetUtil.filterVocabularies(
-			vocabularies, className, classTypePK);
+		long classNameId = _classNameLocalService.getClassNameId(className);
+
+		return ListUtil.filter(
+			vocabularies,
+			assetVocabulary ->
+				assetVocabulary.isAssociatedToClassNameIdAndClassTypePK(
+					classNameId, classTypePK));
 	}
 
 	@Override
@@ -245,7 +268,7 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 	public List<AssetVocabulary> getGroupVocabularies(
 		long groupId, int visibilityType) {
 
-		return assetVocabularyPersistence.filterFindByG_V(
+		return assetVocabularyLocalService.getGroupVocabularies(
 			groupId, visibilityType);
 	}
 
@@ -276,7 +299,7 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 	public List<AssetVocabulary> getGroupVocabularies(
 		long[] groupIds, int[] visibilityTypes) {
 
-		return assetVocabularyPersistence.filterFindByG_V(
+		return assetVocabularyLocalService.getGroupVocabularies(
 			groupIds, visibilityTypes);
 	}
 
@@ -438,12 +461,6 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 			serviceContext);
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #updateVocabulary(long, String, Map, Map, String,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
 	@Override
 	public AssetVocabulary updateVocabulary(
 			long vocabularyId, String name, String title,
@@ -458,5 +475,8 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 			vocabularyId, name, title, titleMap, descriptionMap, settings,
 			serviceContext);
 	}
+
+	@BeanReference(type = ClassNameLocalService.class)
+	private ClassNameLocalService _classNameLocalService;
 
 }

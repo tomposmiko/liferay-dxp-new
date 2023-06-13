@@ -95,6 +95,24 @@ public class DLFileEntryTypeLocalServiceUtil {
 	public static DLFileEntryType addFileEntryType(
 			long userId, long groupId, long dataDefinitionId,
 			String fileEntryTypeKey, Map<java.util.Locale, String> nameMap,
+			Map<java.util.Locale, String> descriptionMap, int scope,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addFileEntryType(
+			userId, groupId, dataDefinitionId, fileEntryTypeKey, nameMap,
+			descriptionMap, scope, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addFileEntryType(long, long, long, String, Map, Map, long,
+	 ServiceContext)}
+	 */
+	@Deprecated
+	public static DLFileEntryType addFileEntryType(
+			long userId, long groupId, long dataDefinitionId,
+			String fileEntryTypeKey, Map<java.util.Locale, String> nameMap,
 			Map<java.util.Locale, String> descriptionMap,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
@@ -540,6 +558,10 @@ public class DLFileEntryTypeLocalServiceUtil {
 		return getService().getFileEntryType(groupId, fileEntryTypeKey);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x)
+	 */
+	@Deprecated
 	public static List<DLFileEntryType> getFileEntryTypes(long ddmStructureId)
 		throws PortalException {
 

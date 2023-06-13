@@ -2,6 +2,7 @@
 **/.gradle
 **/.settings
 **/.sonar
+**/TEST-frontend-js.xml
 **/liferay/logs/*.log
 **/liferay/logs/*.xml
 **/pmd-reports
@@ -29,6 +30,7 @@
 /.sonar
 /.xmlcatalog
 /ActiveMQ
+/WEB-INF
 /ant.install.log
 /api
 /app.server.*.properties
@@ -44,8 +46,6 @@
 /dist
 /intellij
 /jacoco
-/modules/.releng/dxp/apps/lcs
-/modules/dxp/apps/lcs
 /modules/node_modules_cache
 /modules/private/node_modules_cache
 /nbproject/private
@@ -58,12 +58,12 @@
 /portal-client/src
 /portal-impl/*.ipr
 /portal-impl/*.iws
+/portal-impl/ServiceBuilder.temp
 /portal-impl/build
 /portal-impl/classes
 /portal-impl/portal-impl*.asc
 /portal-impl/portal-impl*.jar
 /portal-impl/service.xml
-/portal-impl/ServiceBuilder.temp
 /portal-impl/src/META-INF/portal-log4j-ext.xml
 /portal-impl/src/portal-ext.properties
 /portal-impl/src/system-ext.properties
@@ -91,11 +91,9 @@
 /portal-test/portal-test*.jar
 /portal-web/*.ipr
 /portal-web/*.iws
+/portal-web/ROOT.war
 /portal-web/build
 /portal-web/classes
-/portal-web/docroot/aui
-/portal-web/docroot/dtd
-/portal-web/docroot/html/icons/_sprite.*
 /portal-web/docroot/WEB-INF/classes
 /portal-web/docroot/WEB-INF/lib
 /portal-web/docroot/WEB-INF/liferay-portlet-ext.xml
@@ -106,11 +104,12 @@
 /portal-web/docroot/WEB-INF/tld/ddm.tld
 /portal-web/docroot/WEB-INF/tld/liferay-*.tld
 /portal-web/docroot/WEB-INF/tmp
+/portal-web/docroot/aui
+/portal-web/docroot/dtd
+/portal-web/docroot/html/icons/_sprite.*
 /portal-web/liferay-portal.war
 /portal-web/portal-web.war
 /portal-web/portal-web.war.asc
-/portal-web/poshi-ext.properties
-/portal-web/ROOT.war
 /portal-web/test-ant-scripts
 /portal-web/test-classes
 /portal-web/test-output
@@ -145,10 +144,6 @@
 /support-tomcat/*.iws
 /support-tomcat/classes
 /support-tomcat/support-tomcat*.jar
-/support-websphere/*.ipr
-/support-websphere/*.iws
-/support-websphere/classes
-/support-websphere/support-websphere*.jar
 /svn-revision
 /test-coverage
 /test-results
@@ -157,7 +152,9 @@
 /tools/gradle-*-bin.zip
 /tools/maven/*.asc
 /tools/node*
-/tools/sdk
+/tools/sdk/dependencies/*/ivy.xml.MD5
+/tools/sdk/dependencies/*/lib
+/tools/sdk/dist
 /tools/selenium/*.exe
 /tools/selenium/extensions/ide.*.js
 /tools/zip_tmpl
@@ -198,5 +195,4 @@
 /util-taglib/util-taglib*.asc
 /util-taglib/util-taglib*.jar
 /working.dir.properties
-/WEB-INF
 _sass_cache_*.css

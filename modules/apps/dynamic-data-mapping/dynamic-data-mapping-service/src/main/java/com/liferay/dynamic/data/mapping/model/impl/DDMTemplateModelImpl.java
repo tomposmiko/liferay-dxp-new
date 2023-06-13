@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -386,142 +387,164 @@ public class DDMTemplateModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<DDMTemplate, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, DDMTemplate>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<DDMTemplate, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<DDMTemplate, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DDMTemplate.class.getClassLoader(), DDMTemplate.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", DDMTemplate::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", DDMTemplate::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", DDMTemplate::getUuid);
-		attributeGetterFunctions.put("templateId", DDMTemplate::getTemplateId);
-		attributeGetterFunctions.put("groupId", DDMTemplate::getGroupId);
-		attributeGetterFunctions.put("companyId", DDMTemplate::getCompanyId);
-		attributeGetterFunctions.put("userId", DDMTemplate::getUserId);
-		attributeGetterFunctions.put("userName", DDMTemplate::getUserName);
-		attributeGetterFunctions.put(
-			"versionUserId", DDMTemplate::getVersionUserId);
-		attributeGetterFunctions.put(
-			"versionUserName", DDMTemplate::getVersionUserName);
-		attributeGetterFunctions.put("createDate", DDMTemplate::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", DDMTemplate::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", DDMTemplate::getClassNameId);
-		attributeGetterFunctions.put("classPK", DDMTemplate::getClassPK);
-		attributeGetterFunctions.put(
-			"resourceClassNameId", DDMTemplate::getResourceClassNameId);
-		attributeGetterFunctions.put(
-			"templateKey", DDMTemplate::getTemplateKey);
-		attributeGetterFunctions.put("version", DDMTemplate::getVersion);
-		attributeGetterFunctions.put("name", DDMTemplate::getName);
-		attributeGetterFunctions.put(
-			"description", DDMTemplate::getDescription);
-		attributeGetterFunctions.put("type", DDMTemplate::getType);
-		attributeGetterFunctions.put("mode", DDMTemplate::getMode);
-		attributeGetterFunctions.put("language", DDMTemplate::getLanguage);
-		attributeGetterFunctions.put("script", DDMTemplate::getScript);
-		attributeGetterFunctions.put("cacheable", DDMTemplate::getCacheable);
-		attributeGetterFunctions.put("smallImage", DDMTemplate::getSmallImage);
-		attributeGetterFunctions.put(
-			"smallImageId", DDMTemplate::getSmallImageId);
-		attributeGetterFunctions.put(
-			"smallImageURL", DDMTemplate::getSmallImageURL);
-		attributeGetterFunctions.put(
-			"lastPublishDate", DDMTemplate::getLastPublishDate);
+		try {
+			Constructor<DDMTemplate> constructor =
+				(Constructor<DDMTemplate>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<DDMTemplate, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<DDMTemplate, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<DDMTemplate, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DDMTemplate, Object>>();
 		Map<String, BiConsumer<DDMTemplate, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<DDMTemplate, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", DDMTemplate::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DDMTemplate, Long>)DDMTemplate::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", DDMTemplate::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<DDMTemplate, Long>)DDMTemplate::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", DDMTemplate::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<DDMTemplate, String>)DDMTemplate::setUuid);
+		attributeGetterFunctions.put("templateId", DDMTemplate::getTemplateId);
 		attributeSetterBiConsumers.put(
 			"templateId",
 			(BiConsumer<DDMTemplate, Long>)DDMTemplate::setTemplateId);
+		attributeGetterFunctions.put("groupId", DDMTemplate::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<DDMTemplate, Long>)DDMTemplate::setGroupId);
+		attributeGetterFunctions.put("companyId", DDMTemplate::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DDMTemplate, Long>)DDMTemplate::setCompanyId);
+		attributeGetterFunctions.put("userId", DDMTemplate::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<DDMTemplate, Long>)DDMTemplate::setUserId);
+		attributeGetterFunctions.put("userName", DDMTemplate::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<DDMTemplate, String>)DDMTemplate::setUserName);
+		attributeGetterFunctions.put(
+			"versionUserId", DDMTemplate::getVersionUserId);
 		attributeSetterBiConsumers.put(
 			"versionUserId",
 			(BiConsumer<DDMTemplate, Long>)DDMTemplate::setVersionUserId);
+		attributeGetterFunctions.put(
+			"versionUserName", DDMTemplate::getVersionUserName);
 		attributeSetterBiConsumers.put(
 			"versionUserName",
 			(BiConsumer<DDMTemplate, String>)DDMTemplate::setVersionUserName);
+		attributeGetterFunctions.put("createDate", DDMTemplate::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<DDMTemplate, Date>)DDMTemplate::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", DDMTemplate::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<DDMTemplate, Date>)DDMTemplate::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", DDMTemplate::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<DDMTemplate, Long>)DDMTemplate::setClassNameId);
+		attributeGetterFunctions.put("classPK", DDMTemplate::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK", (BiConsumer<DDMTemplate, Long>)DDMTemplate::setClassPK);
+		attributeGetterFunctions.put(
+			"resourceClassNameId", DDMTemplate::getResourceClassNameId);
 		attributeSetterBiConsumers.put(
 			"resourceClassNameId",
 			(BiConsumer<DDMTemplate, Long>)DDMTemplate::setResourceClassNameId);
+		attributeGetterFunctions.put(
+			"templateKey", DDMTemplate::getTemplateKey);
 		attributeSetterBiConsumers.put(
 			"templateKey",
 			(BiConsumer<DDMTemplate, String>)DDMTemplate::setTemplateKey);
+		attributeGetterFunctions.put("version", DDMTemplate::getVersion);
 		attributeSetterBiConsumers.put(
 			"version",
 			(BiConsumer<DDMTemplate, String>)DDMTemplate::setVersion);
+		attributeGetterFunctions.put("name", DDMTemplate::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<DDMTemplate, String>)DDMTemplate::setName);
+		attributeGetterFunctions.put(
+			"description", DDMTemplate::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<DDMTemplate, String>)DDMTemplate::setDescription);
+		attributeGetterFunctions.put("type", DDMTemplate::getType);
 		attributeSetterBiConsumers.put(
 			"type", (BiConsumer<DDMTemplate, String>)DDMTemplate::setType);
+		attributeGetterFunctions.put("mode", DDMTemplate::getMode);
 		attributeSetterBiConsumers.put(
 			"mode", (BiConsumer<DDMTemplate, String>)DDMTemplate::setMode);
+		attributeGetterFunctions.put("language", DDMTemplate::getLanguage);
 		attributeSetterBiConsumers.put(
 			"language",
 			(BiConsumer<DDMTemplate, String>)DDMTemplate::setLanguage);
+		attributeGetterFunctions.put("script", DDMTemplate::getScript);
 		attributeSetterBiConsumers.put(
 			"script", (BiConsumer<DDMTemplate, String>)DDMTemplate::setScript);
+		attributeGetterFunctions.put("cacheable", DDMTemplate::getCacheable);
 		attributeSetterBiConsumers.put(
 			"cacheable",
 			(BiConsumer<DDMTemplate, Boolean>)DDMTemplate::setCacheable);
+		attributeGetterFunctions.put("smallImage", DDMTemplate::getSmallImage);
 		attributeSetterBiConsumers.put(
 			"smallImage",
 			(BiConsumer<DDMTemplate, Boolean>)DDMTemplate::setSmallImage);
+		attributeGetterFunctions.put(
+			"smallImageId", DDMTemplate::getSmallImageId);
 		attributeSetterBiConsumers.put(
 			"smallImageId",
 			(BiConsumer<DDMTemplate, Long>)DDMTemplate::setSmallImageId);
+		attributeGetterFunctions.put(
+			"smallImageURL", DDMTemplate::getSmallImageURL);
 		attributeSetterBiConsumers.put(
 			"smallImageURL",
 			(BiConsumer<DDMTemplate, String>)DDMTemplate::setSmallImageURL);
+		attributeGetterFunctions.put(
+			"lastPublishDate", DDMTemplate::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<DDMTemplate, Date>)DDMTemplate::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -1541,6 +1564,65 @@ public class DDMTemplateModelImpl
 	}
 
 	@Override
+	public DDMTemplate cloneWithOriginalValues() {
+		DDMTemplateImpl ddmTemplateImpl = new DDMTemplateImpl();
+
+		ddmTemplateImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		ddmTemplateImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		ddmTemplateImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		ddmTemplateImpl.setTemplateId(
+			this.<Long>getColumnOriginalValue("templateId"));
+		ddmTemplateImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		ddmTemplateImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		ddmTemplateImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		ddmTemplateImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		ddmTemplateImpl.setVersionUserId(
+			this.<Long>getColumnOriginalValue("versionUserId"));
+		ddmTemplateImpl.setVersionUserName(
+			this.<String>getColumnOriginalValue("versionUserName"));
+		ddmTemplateImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		ddmTemplateImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		ddmTemplateImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		ddmTemplateImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		ddmTemplateImpl.setResourceClassNameId(
+			this.<Long>getColumnOriginalValue("resourceClassNameId"));
+		ddmTemplateImpl.setTemplateKey(
+			this.<String>getColumnOriginalValue("templateKey"));
+		ddmTemplateImpl.setVersion(
+			this.<String>getColumnOriginalValue("version"));
+		ddmTemplateImpl.setName(this.<String>getColumnOriginalValue("name"));
+		ddmTemplateImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		ddmTemplateImpl.setType(this.<String>getColumnOriginalValue("type_"));
+		ddmTemplateImpl.setMode(this.<String>getColumnOriginalValue("mode_"));
+		ddmTemplateImpl.setLanguage(
+			this.<String>getColumnOriginalValue("language"));
+		ddmTemplateImpl.setScript(
+			this.<String>getColumnOriginalValue("script"));
+		ddmTemplateImpl.setCacheable(
+			this.<Boolean>getColumnOriginalValue("cacheable"));
+		ddmTemplateImpl.setSmallImage(
+			this.<Boolean>getColumnOriginalValue("smallImage"));
+		ddmTemplateImpl.setSmallImageId(
+			this.<Long>getColumnOriginalValue("smallImageId"));
+		ddmTemplateImpl.setSmallImageURL(
+			this.<String>getColumnOriginalValue("smallImageURL"));
+		ddmTemplateImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+
+		return ddmTemplateImpl;
+	}
+
+	@Override
 	public int compareTo(DDMTemplate ddmTemplate) {
 		long primaryKey = ddmTemplate.getPrimaryKey();
 
@@ -1855,9 +1937,7 @@ public class DDMTemplateModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DDMTemplate>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DDMTemplate.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

@@ -12,22 +12,17 @@
 <tbody>
 <tr>
 	<td>CARD</td>
-	<td>//div[contains(@class,'card')][contains(.,'${key_card}')]</td>
+	<td>//*[contains(@class,'card-body')][contains(.,'${key_card}')]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>CARD_ITEM</td>
-	<td>xpath=(//dd[contains(@class,'asset-item')])[${key_index}]//*[contains(@class,'card-title')][contains(.,'${key_card}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>CARD_LINK</td>
-	<td>//a[contains(@class,'card-link') and contains(@href,'${key_card}')]</td>
+	<td>CARD_PAGE_ITEM</td>
+	<td>xpath=(//li[contains(@class,'card-page-item')])[${key_index}]//*[contains(@class,'card-title')][contains(.,'${key_card}')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>CARD_TITLE</td>
-	<td>//*[contains(@class,'card-title')][contains(.,'${key_card}')]</td>
+	<td>//*[contains(@class,'card-title')][.//*[normalize-space(text())='${key_card}']] | //*[contains(@class,'card-title')][normalize-space(text())='${key_card}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -37,7 +32,7 @@
 </tr>
 <tr>
 	<td>CARD_SUBTITLE</td>
-	<td>//div[contains(@class,'card')][contains(.,'${key_card}')]//div[contains(@class,'card-subtitle')]</td>
+	<td>//div[contains(@class,'card')][contains(.,'${key_card}')]//*[contains(@class,'card-subtitle')] | //div[contains(@class,'card')][contains(.,'${key_card}')]//*[contains(@class,'card-detail')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -52,7 +47,7 @@
 </tr>
 <tr>
 	<td>CARD_ELLIPSIS</td>
-	<td>//div[contains(@class,'card')][contains(.,'${key_card}')]//button[contains(@class,'dropdown-toggle')]</td>
+	<td>//div[contains(@class,'card')][contains(.,'${key_card}')]//*[contains(@class,'dropdown-toggle')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -61,13 +56,13 @@
 	<td></td>
 </tr>
 <tr>
-	<td>CARD_STICKER</td>
-	<td>//div[contains(@class,'card')][contains(.,'${key_card}')]//span[contains(@class,'sticker')]</td>
+	<td>CARD_SHORTCUT</td>
+	<td>//*[@data-qa-id='row'][div[contains(@class,'card')]//*[normalize-space()='${key_card}']]//*[contains(@class,'shortcut')]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>CARD_STYLE</td>
-	<td>//a[contains(@class,'card-link') and contains(@href,'${key_card}')]</td>
+	<td>CARD_STICKER</td>
+	<td>//div[contains(@class,'card')][contains(.,'${key_card}')]//span[contains(@class,'sticker-overlay')]//*[name()='svg'][contains(@class,'lexicon-icon-${key_icon}')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -173,7 +173,7 @@ public class ContentSetElement implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String title;
 
-	@Schema
+	@Schema(description = "The localized content's titles.")
 	@Valid
 	public Map<String, String> getTitle_i18n() {
 		return title_i18n;
@@ -199,7 +199,7 @@ public class ContentSetElement implements Serializable {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The localized content's titles.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, String> title_i18n;
 

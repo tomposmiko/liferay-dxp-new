@@ -22,7 +22,7 @@
 	}
 }
 
-.has-error .alloy-editor-container .alloy-editor {
+.has-error .alloy-editor-container .alloy-editor.alloy-editor-placeholder {
 	&.ae-placeholder:not(:focus) {
 		border-left-color: #CC6677;
 	}

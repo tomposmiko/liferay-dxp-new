@@ -1,6 +1,7 @@
 @component-name = "portal-collaboration"
 definition {
 
+	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Friendly URL Service";
@@ -20,7 +21,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -28,14 +29,32 @@ definition {
 		}
 	}
 
+	@description = "This test covers LPS-125475. The default page will be displayed when accessing a page through a language without a specific layout."
+	@priority = "3"
+	test AccessWithSpecificDisabledLanguage {
+		property custom.properties = "locales.enabled=zh_CN,en_US,en_AU,fr_FR,de_DE,it_IT,ja_JP,pt_BR,es_ES${line.separator}locales=zh_CN,en_US,en_AU,fr_FR,de_DE,it_IT,ja_JP,pt_BR,es_ES,ru_RU,pl_PL,sv_SE,hu_HU,ar_SA,nb_NO,hr_HR,fi_FI,nl_NL,cs_CZ";
+
+		var portalURL = PropsUtil.get("portal.url");
+
+		Site.openSiteSettingsAdmin(siteURLKey = "test-site-name");
+
+		Site.configureCurrentLanguagesCP(
+			currentSiteLanguages = "English (United States),Japanese (Japan)",
+			defaultSiteLanguage = "English (United States)");
+
+		Navigator.openSpecificURL(url = "${portalURL}/en_AU/web/test-site-name/test-source-page");
+
+		AssertTextNotPresent(value1 = "The requested resource could not be found.");
+	}
+
 	@description = "This ensures that a user is redirected to the updated friendlyURL when he accesses the former friendlyURL."
-	@priority = 5
+	@priority = "5"
 	test RedirectToUpdatedFriendlyURL {
 		var portalURL = PropsUtil.get("portal.url");
 
-		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Source Page");
 
@@ -51,29 +70,20 @@ definition {
 	}
 
 	@description = "This ensures that a user is redirected to the updated localized friendlyURL when he accesses the former localized friendlyURL."
-	@priority = 5
+	@priority = "5"
 	test RedirectToUpdatedLocalizedFriendlyURL {
 		var portalURL = PropsUtil.get("portal.url");
 
-		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Source Page");
 
-		Page.addFriendlyURLLocalizedPG(
-			friendlyUrlLocalized = "es_ES",
-			localizedFriendlyURL = "/pagina-de-prueba");
-
-		PortletEntry.inputName(name = "Pagina de prueba");
-
-		Button.clickSave();
-
-		Page.addFriendlyURLLocalizedPG(
-			friendlyUrlLocalized = "es_ES",
-			localizedFriendlyURL = "/nueva-pagina-de-prueba");
-
-		Button.clickSave();
+		PagesAdmin.addLocalizedFriendlyURL(
+			friendlyUrlLocalizedList = "es-ES,es-ES",
+			localizedFriendlyURLList = "/pagina-de-prueba,/nueva-pagina-de-prueba",
+			localizedNameList = "Pagina de prueba,-");
 
 		Navigator.openSpecificURL(url = "${portalURL}/es/web/test-site-name/pagina-de-prueba");
 
@@ -85,7 +95,7 @@ definition {
 	}
 
 	@description = "This ensures that the old friendlyURL can be removed from the history."
-	@priority = 5
+	@priority = "5"
 	test RemoveOldFriendlyURL {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -93,9 +103,9 @@ definition {
 			groupName = "Test Site Name",
 			layoutName = "Test Page");
 
-		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Page");
 
@@ -111,7 +121,7 @@ definition {
 	}
 
 	@description = "This ensures that the old friendlyURL can be restored from the history."
-	@priority = 5
+	@priority = "5"
 	test RestoreOldFriendlyURL {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -119,9 +129,9 @@ definition {
 			groupName = "Test Site Name",
 			layoutName = "Test Page");
 
-		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Page");
 
@@ -141,7 +151,7 @@ definition {
 	}
 
 	@description = "This ensures that accessing an old friendlyURL in the default language after publishing the new friendly URL will redirect the user to the new URL."
-	@priority = 5
+	@priority = "5"
 	test StagingFriendlyURLRedirect {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -149,9 +159,9 @@ definition {
 
 		Staging.activateStagingCP(siteName = "Test Site Name");
 
-		SitePages.openPagesAdmin(siteURLKey = "test-site-name-staging");
+		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name-staging");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Source Page");
 
@@ -175,7 +185,7 @@ definition {
 	}
 
 	@description = "This ensures that accessing an old localized friendlyURL after publishing the new friendly URL will redirect the user to the new URL."
-	@priority = 5
+	@priority = "5"
 	test StagingLocalizedFriendlyURLRedirect {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -183,19 +193,16 @@ definition {
 
 		Staging.activateStagingCP(siteName = "Test Site Name");
 
-		SitePages.openPagesAdmin(siteURLKey = "test-site-name-staging");
+		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name-staging");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Source Page");
 
-		Page.addFriendlyURLLocalizedPG(
-			friendlyUrlLocalized = "es_ES",
-			localizedFriendlyURL = "/pagina-de-prueba");
-
-		PortletEntry.inputName(name = "Pagina de prueba");
-
-		Button.clickSave();
+		PagesAdmin.addLocalizedFriendlyURL(
+			friendlyUrlLocalizedList = "es-ES",
+			localizedFriendlyURLList = "/pagina-de-prueba",
+			localizedNameList = "Pagina de prueba");
 
 		Navigator.gotoStagedSitePage(
 			pageName = "Test Source Page",
@@ -205,17 +212,16 @@ definition {
 
 		Staging.publishToLive();
 
-		SitePages.openPagesAdmin(siteURLKey = "test-site-name-staging");
+		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name-staging");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Source Page");
 
-		Page.addFriendlyURLLocalizedPG(
-			friendlyUrlLocalized = "es_ES",
-			localizedFriendlyURL = "/nueva-pagina-de-prueba");
-
-		Button.clickSave();
+		PagesAdmin.addLocalizedFriendlyURL(
+			friendlyUrlLocalizedList = "es-ES",
+			localizedFriendlyURLList = "/nueva-pagina-de-prueba",
+			localizedNameList = "-");
 
 		Navigator.gotoStagedSitePage(
 			pageName = "Test Source Page",
@@ -235,15 +241,15 @@ definition {
 	}
 
 	@description = "This ensures that both the active URL and old friendlyURL can be viewed from the history."
-	@priority = 5
+	@priority = "5"
 	test ViewFriendlyURLs {
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",
 			layoutName = "Test Page");
 
-		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Page");
 
@@ -265,11 +271,11 @@ definition {
 	}
 
 	@description = "This test covers LPS-116068. It ensures that both the active URL and old friendlyURL can be viewed from the history of a default page."
-	@priority = 5
+	@priority = "5"
 	test ViewFriendlyURLsViaDefaultPage {
-		SitePages.openPagesAdmin(siteURLKey = "guest");
+		PagesAdmin.openPagesAdmin(siteURLKey = "guest");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Search");
 
@@ -290,22 +296,21 @@ definition {
 			locator1 = "SitePages#FRIENDLY_URL_HISTORY_ITEM");
 	}
 
-	@description = "This test covers LPS-119836. It ensures the localized URL with special characters can be escaped correctly."
-	@priority = 4
+	@description = "This test covers LPS-119836. It ensures the localized URL with special characters can be escaped correctly and viewed in friendly URL history."
+	@priority = "4"
 	test ViewFriendlyURLWithSpecialCharacters {
-		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+		property portal.acceptance = "false";
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Source Page");
 
-		Page.addFriendlyURLLocalizedPG(
-			friendlyUrlLocalized = "es_ES",
-			localizedFriendlyURL = "/^_^");
-
-		PortletEntry.inputName(name = "Pagina de prueba");
-
-		Button.clickSave();
+		PagesAdmin.addLocalizedFriendlyURL(
+			friendlyUrlLocalizedList = "es-ES",
+			localizedFriendlyURLList = "/^_^",
+			localizedNameList = "Pagina de prueba");
 
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -314,42 +319,62 @@ definition {
 		AssertLocation(value1 = "${portalURL}/es/web/test-site-name/%5E_%5E");
 
 		AssertTextNotPresent(value1 = "The requested resource could not be found");
-	}
 
-	@description = "This ensures that both the localized active URL and old friendlyURL can be viewed from the history."
-	@priority = 5
-	test ViewLocalizedFriendlyURLs {
-		JSONLayout.addPublicLayout(
-			groupName = "Test Site Name",
-			layoutName = "Test Page");
+		Navigator.openWithAppendToBaseURL(urlAppend = "en/web/test-site-name/test-source-page");
 
-		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
-			pageName = "Test Page");
+			pageName = "Test Source Page");
 
-		Page.editFriendlyURL(friendlyURLEdit = "/new-test-page");
-
-		Page.addFriendlyURLLocalizedPG(
-			friendlyUrlLocalized = "es_ES",
-			localizedFriendlyURL = "/pagina-de-prueba");
-
-		PortletEntry.inputName(name = "Pagina de prueba");
-
-		Button.clickSave();
-
-		Page.addFriendlyURLLocalizedPG(
-			friendlyUrlLocalized = "es_ES",
-			localizedFriendlyURL = "/nueva-pagina-de-prueba");
-
-		Button.clickSave();
+		PagesAdmin.addLocalizedFriendlyURL(
+			friendlyUrlLocalizedList = "es-ES",
+			localizedFriendlyURLList = "/página-de-prueba",
+			localizedNameList = "-");
 
 		Page.gotoFriendlyURLHistory();
 
 		PortletEntry.changeLocale(
 			friendlyURLHistory = "true",
-			localizedFriendlyURL = "es_ES");
+			localizedFriendlyURL = "es-ES");
+
+		Page.viewActiveURL(activeURL = "/página-de-prueba");
+
+		Page.viewOldFriendlyURL(oldFriendlyURL = "/^_^");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "es/web/test-site-name/test-source-page");
+
+		AssertLocation(value1 = "${portalURL}/es/web/test-site-name/p%C3%A1gina-de-prueba");
+
+		AssertTextNotPresent(value1 = "The requested resource could not be found");
+	}
+
+	@description = "This ensures that both the localized active URL and old friendlyURL can be viewed from the history."
+	@priority = "5"
+	test ViewLocalizedFriendlyURLs {
+		JSONLayout.addPublicLayout(
+			groupName = "Test Site Name",
+			layoutName = "Test Page");
+
+		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
+
+		PagesAdmin.gotoPageEllipsisMenuItem(
+			menuItem = "Configure",
+			pageName = "Test Page");
+
+		Page.editFriendlyURL(friendlyURLEdit = "/new-test-page");
+
+		PagesAdmin.addLocalizedFriendlyURL(
+			friendlyUrlLocalizedList = "es-ES,es-ES",
+			localizedFriendlyURLList = "/pagina-de-prueba,/nueva-pagina-de-prueba",
+			localizedNameList = "Pagina de prueba,-");
+
+		Page.gotoFriendlyURLHistory();
+
+		PortletEntry.changeLocale(
+			friendlyURLHistory = "true",
+			localizedFriendlyURL = "es-ES");
 
 		Page.viewActiveURL(activeURL = "/nueva-pagina-de-prueba");
 
@@ -365,15 +390,15 @@ definition {
 	}
 
 	@description = "This ensures that the multiple old friendlyURLs can be viewed from the history. This test also covers the first old friendlyURL is the last one."
-	@priority = 5
+	@priority = "5"
 	test ViewMultipleOldFriendlyURLs {
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",
 			layoutName = "Test Page");
 
-		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Page");
 
@@ -391,15 +416,15 @@ definition {
 	}
 
 	@description = "This ensures that only the active URL can be viewed by default language from the history after localization without friendlyURL."
-	@priority = 5
+	@priority = "5"
 	test ViewURLsAfterLocalizationWithoutFriendlyURL {
 		JSONLayout.addPublicLayout(
 			groupName = "Test Site Name",
 			layoutName = "Test Page");
 
-		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+		PagesAdmin.openPagesAdmin(siteURLKey = "test-site-name");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Test Page");
 

@@ -32,7 +32,6 @@ import com.liferay.portal.configuration.test.util.ConfigurationTestUtil;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
 import com.liferay.portal.kernel.cache.PortalCacheManagerNames;
-import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
@@ -40,7 +39,6 @@ import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
-import com.liferay.portal.kernel.service.CountryService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -48,7 +46,7 @@ import com.liferay.portal.kernel.test.util.ResourcePermissionTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -86,22 +84,18 @@ public class DDMRESTDataProviderTest {
 	public static void setUpClass() throws Exception {
 		ConfigurationTestUtil.saveConfiguration(
 			DDMDataProviderConfiguration.class.getName(),
-			new HashMapDictionary() {
-				{
-					put("accessLocalNetwork", true);
-				}
-			});
+			HashMapDictionaryBuilder.<String, Object>put(
+				"accessLocalNetwork", true
+			).build());
 	}
 
 	@AfterClass
 	public static void tearDownClass() throws Exception {
 		ConfigurationTestUtil.saveConfiguration(
 			DDMDataProviderConfiguration.class.getName(),
-			new HashMapDictionary() {
-				{
-					put("accessLocalNetwork", false);
-				}
-			});
+			HashMapDictionaryBuilder.<String, Object>put(
+				"accessLocalNetwork", false
+			).build());
 	}
 
 	@Before
@@ -296,9 +290,7 @@ public class DDMRESTDataProviderTest {
 			ddmDataProviderResponse.getOutputOptional(
 				outputParameterId, Number.class);
 
-		List<Country> countries = _countryService.getCountries();
-
-		Assert.assertEquals(countries.size(), outputOptional.get());
+		Assert.assertEquals(246, outputOptional.get());
 	}
 
 	@Test
@@ -660,9 +652,6 @@ public class DDMRESTDataProviderTest {
 
 	private static final String _GET_COUNTRY_BY_NAME_URL =
 		"http://localhost:8080/api/jsonws/country/get-country-by-name";
-
-	@Inject
-	private CountryService _countryService;
 
 	@Inject(
 		filter = "ddm.data.provider.type=rest", type = DDMDataProvider.class

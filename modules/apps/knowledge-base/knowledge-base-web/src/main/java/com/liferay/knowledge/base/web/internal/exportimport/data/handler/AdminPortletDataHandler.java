@@ -66,7 +66,7 @@ public class AdminPortletDataHandler extends BasePortletDataHandler {
 
 	public static final String NAMESPACE = "knowledge_base";
 
-	public static final String SCHEMA_VERSION = "2.0.0";
+	public static final String SCHEMA_VERSION = "4.0.0";
 
 	public AdminPortletDataHandler() {
 		setDataLevel(DataLevel.SITE);
@@ -287,7 +287,7 @@ public class AdminPortletDataHandler extends BasePortletDataHandler {
 	}
 
 	protected ActionableDynamicQuery getKBArticleActionableDynamicQuery(
-			final PortletDataContext portletDataContext)
+			PortletDataContext portletDataContext)
 		throws Exception {
 
 		ExportActionableDynamicQuery exportActionableDynamicQuery =

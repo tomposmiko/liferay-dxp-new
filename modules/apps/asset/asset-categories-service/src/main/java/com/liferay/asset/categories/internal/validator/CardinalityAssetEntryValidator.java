@@ -118,7 +118,7 @@ public class CardinalityAssetEntryValidator implements AssetEntryValidator {
 	}
 
 	protected void validate(
-			long classNameId, long classTypePK, final long[] categoryIds,
+			long classNameId, long classTypePK, long[] categoryIds,
 			AssetVocabulary assetVocabulary)
 		throws PortalException {
 

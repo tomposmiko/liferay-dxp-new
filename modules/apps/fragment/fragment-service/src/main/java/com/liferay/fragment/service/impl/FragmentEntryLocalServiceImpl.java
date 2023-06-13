@@ -28,6 +28,8 @@ import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.service.base.FragmentEntryLocalServiceBaseImpl;
+import com.liferay.fragment.service.persistence.FragmentCollectionPersistence;
+import com.liferay.fragment.service.persistence.FragmentEntryLinkPersistence;
 import com.liferay.fragment.validator.FragmentEntryValidator;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
@@ -50,8 +52,10 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -84,28 +88,15 @@ public class FragmentEntryLocalServiceImpl
 	@Override
 	public FragmentEntry addFragmentEntry(
 			long userId, long groupId, long fragmentCollectionId,
-			String fragmentEntryKey, String name, long previewFileEntryId,
-			int type, int status, ServiceContext serviceContext)
-		throws PortalException {
-
-		return addFragmentEntry(
-			userId, groupId, fragmentCollectionId, fragmentEntryKey, name,
-			StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
-			StringPool.BLANK, previewFileEntryId, type, status, serviceContext);
-	}
-
-	@Override
-	public FragmentEntry addFragmentEntry(
-			long userId, long groupId, long fragmentCollectionId,
 			String fragmentEntryKey, String name, String css, String html,
-			String js, boolean cacheable, String configuration,
+			String js, boolean cacheable, String configuration, String icon,
 			long previewFileEntryId, int type, int status,
 			ServiceContext serviceContext)
 		throws PortalException {
 
 		// Fragment entry
 
-		User user = userLocalService.getUser(userId);
+		User user = _userLocalService.getUser(userId);
 
 		long companyId = user.getCompanyId();
 
@@ -127,7 +118,6 @@ public class FragmentEntryLocalServiceImpl
 
 		if (WorkflowConstants.STATUS_APPROVED == status) {
 			_fragmentEntryValidator.validateConfiguration(configuration);
-
 			validateContent(html, configuration);
 		}
 
@@ -150,6 +140,7 @@ public class FragmentEntryLocalServiceImpl
 		draftFragmentEntry.setJs(js);
 		draftFragmentEntry.setCacheable(cacheable);
 		draftFragmentEntry.setConfiguration(configuration);
+		draftFragmentEntry.setIcon(icon);
 		draftFragmentEntry.setPreviewFileEntryId(previewFileEntryId);
 		draftFragmentEntry.setType(type);
 		draftFragmentEntry.setStatus(WorkflowConstants.STATUS_DRAFT);
@@ -165,20 +156,6 @@ public class FragmentEntryLocalServiceImpl
 		}
 
 		return updatedDraftFragmentEntry;
-	}
-
-	@Override
-	public FragmentEntry addFragmentEntry(
-			long userId, long groupId, long fragmentCollectionId,
-			String fragmentEntryKey, String name, String css, String html,
-			String js, String configuration, long previewFileEntryId, int type,
-			int status, ServiceContext serviceContext)
-		throws PortalException {
-
-		return addFragmentEntry(
-			userId, groupId, fragmentCollectionId, fragmentEntryKey, name, css,
-			html, js, false, configuration, previewFileEntryId, type, status,
-			serviceContext);
 	}
 
 	@Override
@@ -209,15 +186,11 @@ public class FragmentEntryLocalServiceImpl
 				publishedFragmentEntry.fetchDraftFragmentEntry();
 		}
 
-		StringBundler sb = new StringBundler(5);
-
-		sb.append(fragmentEntry.getName());
-		sb.append(StringPool.SPACE);
-		sb.append(StringPool.OPEN_PARENTHESIS);
-		sb.append(LanguageUtil.get(LocaleUtil.getMostRelevantLocale(), "copy"));
-		sb.append(StringPool.CLOSE_PARENTHESIS);
-
-		String name = sb.toString();
+		String name = StringBundler.concat(
+			fragmentEntry.getName(), StringPool.SPACE,
+			StringPool.OPEN_PARENTHESIS,
+			LanguageUtil.get(LocaleUtil.getMostRelevantLocale(), "copy"),
+			StringPool.CLOSE_PARENTHESIS);
 
 		FragmentEntry copyPublishedFragmentEntry = null;
 
@@ -231,7 +204,8 @@ public class FragmentEntryLocalServiceImpl
 				publishedFragmentEntry.getHtml(),
 				publishedFragmentEntry.getJs(),
 				publishedFragmentEntry.isCacheable(),
-				publishedFragmentEntry.getConfiguration(), 0,
+				publishedFragmentEntry.getConfiguration(),
+				publishedFragmentEntry.getIcon(), 0,
 				publishedFragmentEntry.getType(),
 				WorkflowConstants.STATUS_APPROVED, serviceContext);
 
@@ -253,9 +227,9 @@ public class FragmentEntryLocalServiceImpl
 				userId, groupId, fragmentCollectionId, null, name,
 				draftFragmentEntry.getCss(), draftFragmentEntry.getHtml(),
 				draftFragmentEntry.getJs(), draftFragmentEntry.isCacheable(),
-				draftFragmentEntry.getConfiguration(), 0,
-				draftFragmentEntry.getType(), WorkflowConstants.STATUS_DRAFT,
-				serviceContext);
+				draftFragmentEntry.getConfiguration(),
+				draftFragmentEntry.getIcon(), 0, draftFragmentEntry.getType(),
+				WorkflowConstants.STATUS_DRAFT, serviceContext);
 
 			_copyFragmentEntryPreviewFileEntry(
 				userId, groupId, draftFragmentEntry, copyDraftFragmentEntry);
@@ -277,6 +251,7 @@ public class FragmentEntryLocalServiceImpl
 				draftFragmentEntry.isCacheable());
 			copyDraftFragmentEntry.setConfiguration(
 				draftFragmentEntry.getConfiguration());
+			copyDraftFragmentEntry.setIcon(draftFragmentEntry.getIcon());
 
 			updateDraft(copyDraftFragmentEntry);
 		}
@@ -306,7 +281,7 @@ public class FragmentEntryLocalServiceImpl
 		// Fragment entry
 
 		long fragmentEntryLinkCount =
-			fragmentEntryLinkPersistence.countByFragmentEntryId(
+			_fragmentEntryLinkPersistence.countByFragmentEntryId(
 				fragmentEntry.getFragmentEntryId());
 
 		if (fragmentEntryLinkCount > 0) {
@@ -315,7 +290,7 @@ public class FragmentEntryLocalServiceImpl
 
 		// Resources
 
-		resourceLocalService.deleteResource(
+		_resourceLocalService.deleteResource(
 			fragmentEntry.getCompanyId(), FragmentEntry.class.getName(),
 			ResourceConstants.SCOPE_INDIVIDUAL,
 			fragmentEntry.getFragmentEntryId());
@@ -545,7 +520,6 @@ public class FragmentEntryLocalServiceImpl
 
 		_fragmentEntryValidator.validateConfiguration(
 			draftFragmentEntry.getConfiguration());
-
 		validateContent(
 			draftFragmentEntry.getHtml(),
 			draftFragmentEntry.getConfiguration());
@@ -619,6 +593,20 @@ public class FragmentEntryLocalServiceImpl
 			String configuration, long previewFileEntryId, int status)
 		throws PortalException {
 
+		return updateFragmentEntry(
+			userId, fragmentEntryId, fragmentCollectionId, name, css, html, js,
+			cacheable, configuration, StringPool.BLANK, previewFileEntryId,
+			status);
+	}
+
+	@Override
+	public FragmentEntry updateFragmentEntry(
+			long userId, long fragmentEntryId, long fragmentCollectionId,
+			String name, String css, String html, String js, boolean cacheable,
+			String configuration, String icon, long previewFileEntryId,
+			int status)
+		throws PortalException {
+
 		FragmentEntry fragmentEntry = fragmentEntryPersistence.findByPrimaryKey(
 			fragmentEntryId);
 
@@ -626,11 +614,10 @@ public class FragmentEntryLocalServiceImpl
 
 		if (WorkflowConstants.STATUS_APPROVED == status) {
 			_fragmentEntryValidator.validateConfiguration(configuration);
-
 			validateContent(html, configuration);
 		}
 
-		User user = userLocalService.getUser(userId);
+		User user = _userLocalService.getUser(userId);
 
 		fragmentEntry.setModifiedDate(new Date());
 		fragmentEntry.setFragmentCollectionId(fragmentCollectionId);
@@ -640,6 +627,7 @@ public class FragmentEntryLocalServiceImpl
 		fragmentEntry.setJs(js);
 		fragmentEntry.setCacheable(cacheable);
 		fragmentEntry.setConfiguration(configuration);
+		fragmentEntry.setIcon(icon);
 		fragmentEntry.setPreviewFileEntryId(previewFileEntryId);
 		fragmentEntry.setStatus(status);
 		fragmentEntry.setStatusByUserId(userId);
@@ -668,27 +656,6 @@ public class FragmentEntryLocalServiceImpl
 		return fragmentEntry;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 * #updateFragmentEntry(long, long, long, String, String, String, String, boolean, String, long, int)}
-	 */
-	@Deprecated
-	@Override
-	public FragmentEntry updateFragmentEntry(
-			long userId, long fragmentEntryId, String name, String css,
-			String html, String js, boolean cacheable, String configuration,
-			long previewFileEntryId, int status)
-		throws PortalException {
-
-		FragmentEntry fragmentEntry = fragmentEntryPersistence.findByPrimaryKey(
-			fragmentEntryId);
-
-		return updateFragmentEntry(
-			userId, fragmentEntryId, fragmentEntry.getFragmentCollectionId(),
-			name, css, html, js, cacheable, configuration, previewFileEntryId,
-			status);
-	}
-
 	@Override
 	public FragmentEntry updateFragmentEntry(
 			long userId, long fragmentEntryId, String name, String css,
@@ -710,9 +677,13 @@ public class FragmentEntryLocalServiceImpl
 			long previewFileEntryId, int status)
 		throws PortalException {
 
+		FragmentEntry fragmentEntry = fragmentEntryPersistence.findByPrimaryKey(
+			fragmentEntryId);
+
 		return updateFragmentEntry(
-			userId, fragmentEntryId, name, css, html, js, false, configuration,
-			previewFileEntryId, status);
+			userId, fragmentEntryId, fragmentEntry.getFragmentCollectionId(),
+			name, css, html, js, false, configuration, previewFileEntryId,
+			status);
 	}
 
 	@Override
@@ -837,7 +808,7 @@ public class FragmentEntryLocalServiceImpl
 		}
 
 		FragmentCollection targetFragmentCollection =
-			fragmentCollectionPersistence.fetchByPrimaryKey(
+			_fragmentCollectionPersistence.fetchByPrimaryKey(
 				targetFragmentCollectionId);
 
 		try {
@@ -875,7 +846,7 @@ public class FragmentEntryLocalServiceImpl
 		Set<FileEntry> fileEntries = new HashSet<>();
 
 		FragmentCollection fragmentCollection =
-			fragmentCollectionPersistence.fetchByPrimaryKey(
+			_fragmentCollectionPersistence.fetchByPrimaryKey(
 				fragmentCollectionId);
 
 		Matcher matcher = _pattern.matcher(fragmentEntry.getHtml());
@@ -942,12 +913,24 @@ public class FragmentEntryLocalServiceImpl
 	private DLAppLocalService _dlAppLocalService;
 
 	@Reference
+	private FragmentCollectionPersistence _fragmentCollectionPersistence;
+
+	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
+
+	@Reference
+	private FragmentEntryLinkPersistence _fragmentEntryLinkPersistence;
 
 	@Reference
 	private FragmentEntryProcessorRegistry _fragmentEntryProcessorRegistry;
 
 	@Reference
 	private FragmentEntryValidator _fragmentEntryValidator;
+
+	@Reference
+	private ResourceLocalService _resourceLocalService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

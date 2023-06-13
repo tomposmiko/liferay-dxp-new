@@ -20,11 +20,11 @@
 String redirect = ParamUtil.getString(request, "redirect");
 
 if (Validator.isNull(redirect)) {
-	PortletURL portletURL = renderResponse.createRenderURL();
-
-	portletURL.setParameter("mvcPath", "/view_membership_requests.jsp");
-
-	redirect = portletURL.toString();
+	redirect = PortletURLBuilder.createRenderURL(
+		renderResponse
+	).setMVCPath(
+		"/view_membership_requests.jsp"
+	).buildString();
 }
 
 long membershipRequestId = ParamUtil.getLong(request, "membershipRequestId");
@@ -46,7 +46,7 @@ renderResponse.setTitle(LanguageUtil.format(request, "reply-membership-request-f
 	<portlet:param name="membershipRequestId" value="<%= String.valueOf(membershipRequest.getMembershipRequestId()) %>" />
 </portlet:actionURL>
 
-<aui:form action="<%= replyMembershipRequestURL %>" cssClass="container-fluid-1280" method="post" name="fm">
+<aui:form action="<%= replyMembershipRequestURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="membershipRequestId" type="hidden" value="<%= membershipRequest.getMembershipRequestId() %>" />
 

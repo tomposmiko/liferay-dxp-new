@@ -15,9 +15,9 @@
 package com.liferay.portal.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
+import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.dao.orm.Query;
@@ -29,41 +29,37 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Address;
 import com.liferay.portal.kernel.model.AddressTable;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.AddressPersistence;
 import com.liferay.portal.kernel.service.persistence.AddressUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.impl.AddressImpl;
 import com.liferay.portal.model.impl.AddressModelImpl;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The persistence implementation for the address service.
@@ -189,7 +185,7 @@ public class AddressPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Address>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Address address : list) {
@@ -569,8 +565,7 @@ public class AddressPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -727,7 +722,7 @@ public class AddressPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Address>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Address address : list) {
@@ -1139,8 +1134,7 @@ public class AddressPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, companyId};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1296,7 +1290,7 @@ public class AddressPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Address>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Address address : list) {
@@ -1652,8 +1646,7 @@ public class AddressPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -1785,7 +1778,7 @@ public class AddressPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Address>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Address address : list) {
@@ -2140,8 +2133,7 @@ public class AddressPersistenceImpl
 
 		Object[] finderArgs = new Object[] {userId};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -2180,6 +2172,985 @@ public class AddressPersistenceImpl
 
 	private static final String _FINDER_COLUMN_USERID_USERID_2 =
 		"address.userId = ?";
+
+	private FinderPath _finderPathWithPaginationFindByCountryId;
+	private FinderPath _finderPathWithoutPaginationFindByCountryId;
+	private FinderPath _finderPathCountByCountryId;
+
+	/**
+	 * Returns all the addresses where countryId = &#63;.
+	 *
+	 * @param countryId the country ID
+	 * @return the matching addresses
+	 */
+	@Override
+	public List<Address> findByCountryId(long countryId) {
+		return findByCountryId(
+			countryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the addresses where countryId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AddressModelImpl</code>.
+	 * </p>
+	 *
+	 * @param countryId the country ID
+	 * @param start the lower bound of the range of addresses
+	 * @param end the upper bound of the range of addresses (not inclusive)
+	 * @return the range of matching addresses
+	 */
+	@Override
+	public List<Address> findByCountryId(long countryId, int start, int end) {
+		return findByCountryId(countryId, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the addresses where countryId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AddressModelImpl</code>.
+	 * </p>
+	 *
+	 * @param countryId the country ID
+	 * @param start the lower bound of the range of addresses
+	 * @param end the upper bound of the range of addresses (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching addresses
+	 */
+	@Override
+	public List<Address> findByCountryId(
+		long countryId, int start, int end,
+		OrderByComparator<Address> orderByComparator) {
+
+		return findByCountryId(countryId, start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the addresses where countryId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AddressModelImpl</code>.
+	 * </p>
+	 *
+	 * @param countryId the country ID
+	 * @param start the lower bound of the range of addresses
+	 * @param end the upper bound of the range of addresses (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching addresses
+	 */
+	@Override
+	public List<Address> findByCountryId(
+		long countryId, int start, int end,
+		OrderByComparator<Address> orderByComparator, boolean useFinderCache) {
+
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+			(orderByComparator == null)) {
+
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByCountryId;
+				finderArgs = new Object[] {countryId};
+			}
+		}
+		else if (useFinderCache) {
+			finderPath = _finderPathWithPaginationFindByCountryId;
+			finderArgs = new Object[] {
+				countryId, start, end, orderByComparator
+			};
+		}
+
+		List<Address> list = null;
+
+		if (useFinderCache) {
+			list = (List<Address>)FinderCacheUtil.getResult(
+				finderPath, finderArgs);
+
+			if ((list != null) && !list.isEmpty()) {
+				for (Address address : list) {
+					if (countryId != address.getCountryId()) {
+						list = null;
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler sb = null;
+
+			if (orderByComparator != null) {
+				sb = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
+			}
+			else {
+				sb = new StringBundler(3);
+			}
+
+			sb.append(_SQL_SELECT_ADDRESS_WHERE);
+
+			sb.append(_FINDER_COLUMN_COUNTRYID_COUNTRYID_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+			}
+			else {
+				sb.append(AddressModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(countryId);
+
+				list = (List<Address>)QueryUtil.list(
+					query, getDialect(), start, end);
+
+				cacheResult(list);
+
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first address in the ordered set where countryId = &#63;.
+	 *
+	 * @param countryId the country ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching address
+	 * @throws NoSuchAddressException if a matching address could not be found
+	 */
+	@Override
+	public Address findByCountryId_First(
+			long countryId, OrderByComparator<Address> orderByComparator)
+		throws NoSuchAddressException {
+
+		Address address = fetchByCountryId_First(countryId, orderByComparator);
+
+		if (address != null) {
+			return address;
+		}
+
+		StringBundler sb = new StringBundler(4);
+
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		sb.append("countryId=");
+		sb.append(countryId);
+
+		sb.append("}");
+
+		throw new NoSuchAddressException(sb.toString());
+	}
+
+	/**
+	 * Returns the first address in the ordered set where countryId = &#63;.
+	 *
+	 * @param countryId the country ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching address, or <code>null</code> if a matching address could not be found
+	 */
+	@Override
+	public Address fetchByCountryId_First(
+		long countryId, OrderByComparator<Address> orderByComparator) {
+
+		List<Address> list = findByCountryId(
+			countryId, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last address in the ordered set where countryId = &#63;.
+	 *
+	 * @param countryId the country ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching address
+	 * @throws NoSuchAddressException if a matching address could not be found
+	 */
+	@Override
+	public Address findByCountryId_Last(
+			long countryId, OrderByComparator<Address> orderByComparator)
+		throws NoSuchAddressException {
+
+		Address address = fetchByCountryId_Last(countryId, orderByComparator);
+
+		if (address != null) {
+			return address;
+		}
+
+		StringBundler sb = new StringBundler(4);
+
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		sb.append("countryId=");
+		sb.append(countryId);
+
+		sb.append("}");
+
+		throw new NoSuchAddressException(sb.toString());
+	}
+
+	/**
+	 * Returns the last address in the ordered set where countryId = &#63;.
+	 *
+	 * @param countryId the country ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching address, or <code>null</code> if a matching address could not be found
+	 */
+	@Override
+	public Address fetchByCountryId_Last(
+		long countryId, OrderByComparator<Address> orderByComparator) {
+
+		int count = countByCountryId(countryId);
+
+		if (count == 0) {
+			return null;
+		}
+
+		List<Address> list = findByCountryId(
+			countryId, count - 1, count, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the addresses before and after the current address in the ordered set where countryId = &#63;.
+	 *
+	 * @param addressId the primary key of the current address
+	 * @param countryId the country ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next address
+	 * @throws NoSuchAddressException if a address with the primary key could not be found
+	 */
+	@Override
+	public Address[] findByCountryId_PrevAndNext(
+			long addressId, long countryId,
+			OrderByComparator<Address> orderByComparator)
+		throws NoSuchAddressException {
+
+		Address address = findByPrimaryKey(addressId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			Address[] array = new AddressImpl[3];
+
+			array[0] = getByCountryId_PrevAndNext(
+				session, address, countryId, orderByComparator, true);
+
+			array[1] = address;
+
+			array[2] = getByCountryId_PrevAndNext(
+				session, address, countryId, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected Address getByCountryId_PrevAndNext(
+		Session session, Address address, long countryId,
+		OrderByComparator<Address> orderByComparator, boolean previous) {
+
+		StringBundler sb = null;
+
+		if (orderByComparator != null) {
+			sb = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			sb = new StringBundler(3);
+		}
+
+		sb.append(_SQL_SELECT_ADDRESS_WHERE);
+
+		sb.append(_FINDER_COLUMN_COUNTRYID_COUNTRYID_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				sb.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			sb.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						sb.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC);
+					}
+					else {
+						sb.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			sb.append(AddressModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = sb.toString();
+
+		Query query = session.createQuery(sql);
+
+		query.setFirstResult(0);
+		query.setMaxResults(2);
+
+		QueryPos queryPos = QueryPos.getInstance(query);
+
+		queryPos.add(countryId);
+
+		if (orderByComparator != null) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(address)) {
+
+				queryPos.add(orderByConditionValue);
+			}
+		}
+
+		List<Address> list = query.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Removes all the addresses where countryId = &#63; from the database.
+	 *
+	 * @param countryId the country ID
+	 */
+	@Override
+	public void removeByCountryId(long countryId) {
+		for (Address address :
+				findByCountryId(
+					countryId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
+			remove(address);
+		}
+	}
+
+	/**
+	 * Returns the number of addresses where countryId = &#63;.
+	 *
+	 * @param countryId the country ID
+	 * @return the number of matching addresses
+	 */
+	@Override
+	public int countByCountryId(long countryId) {
+		FinderPath finderPath = _finderPathCountByCountryId;
+
+		Object[] finderArgs = new Object[] {countryId};
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
+
+		if (count == null) {
+			StringBundler sb = new StringBundler(2);
+
+			sb.append(_SQL_COUNT_ADDRESS_WHERE);
+
+			sb.append(_FINDER_COLUMN_COUNTRYID_COUNTRYID_2);
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(countryId);
+
+				count = (Long)query.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_COUNTRYID_COUNTRYID_2 =
+		"address.countryId = ?";
+
+	private FinderPath _finderPathWithPaginationFindByRegionId;
+	private FinderPath _finderPathWithoutPaginationFindByRegionId;
+	private FinderPath _finderPathCountByRegionId;
+
+	/**
+	 * Returns all the addresses where regionId = &#63;.
+	 *
+	 * @param regionId the region ID
+	 * @return the matching addresses
+	 */
+	@Override
+	public List<Address> findByRegionId(long regionId) {
+		return findByRegionId(
+			regionId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the addresses where regionId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AddressModelImpl</code>.
+	 * </p>
+	 *
+	 * @param regionId the region ID
+	 * @param start the lower bound of the range of addresses
+	 * @param end the upper bound of the range of addresses (not inclusive)
+	 * @return the range of matching addresses
+	 */
+	@Override
+	public List<Address> findByRegionId(long regionId, int start, int end) {
+		return findByRegionId(regionId, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the addresses where regionId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AddressModelImpl</code>.
+	 * </p>
+	 *
+	 * @param regionId the region ID
+	 * @param start the lower bound of the range of addresses
+	 * @param end the upper bound of the range of addresses (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching addresses
+	 */
+	@Override
+	public List<Address> findByRegionId(
+		long regionId, int start, int end,
+		OrderByComparator<Address> orderByComparator) {
+
+		return findByRegionId(regionId, start, end, orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the addresses where regionId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AddressModelImpl</code>.
+	 * </p>
+	 *
+	 * @param regionId the region ID
+	 * @param start the lower bound of the range of addresses
+	 * @param end the upper bound of the range of addresses (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching addresses
+	 */
+	@Override
+	public List<Address> findByRegionId(
+		long regionId, int start, int end,
+		OrderByComparator<Address> orderByComparator, boolean useFinderCache) {
+
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+			(orderByComparator == null)) {
+
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByRegionId;
+				finderArgs = new Object[] {regionId};
+			}
+		}
+		else if (useFinderCache) {
+			finderPath = _finderPathWithPaginationFindByRegionId;
+			finderArgs = new Object[] {regionId, start, end, orderByComparator};
+		}
+
+		List<Address> list = null;
+
+		if (useFinderCache) {
+			list = (List<Address>)FinderCacheUtil.getResult(
+				finderPath, finderArgs);
+
+			if ((list != null) && !list.isEmpty()) {
+				for (Address address : list) {
+					if (regionId != address.getRegionId()) {
+						list = null;
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler sb = null;
+
+			if (orderByComparator != null) {
+				sb = new StringBundler(
+					3 + (orderByComparator.getOrderByFields().length * 2));
+			}
+			else {
+				sb = new StringBundler(3);
+			}
+
+			sb.append(_SQL_SELECT_ADDRESS_WHERE);
+
+			sb.append(_FINDER_COLUMN_REGIONID_REGIONID_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+			}
+			else {
+				sb.append(AddressModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(regionId);
+
+				list = (List<Address>)QueryUtil.list(
+					query, getDialect(), start, end);
+
+				cacheResult(list);
+
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first address in the ordered set where regionId = &#63;.
+	 *
+	 * @param regionId the region ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching address
+	 * @throws NoSuchAddressException if a matching address could not be found
+	 */
+	@Override
+	public Address findByRegionId_First(
+			long regionId, OrderByComparator<Address> orderByComparator)
+		throws NoSuchAddressException {
+
+		Address address = fetchByRegionId_First(regionId, orderByComparator);
+
+		if (address != null) {
+			return address;
+		}
+
+		StringBundler sb = new StringBundler(4);
+
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		sb.append("regionId=");
+		sb.append(regionId);
+
+		sb.append("}");
+
+		throw new NoSuchAddressException(sb.toString());
+	}
+
+	/**
+	 * Returns the first address in the ordered set where regionId = &#63;.
+	 *
+	 * @param regionId the region ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching address, or <code>null</code> if a matching address could not be found
+	 */
+	@Override
+	public Address fetchByRegionId_First(
+		long regionId, OrderByComparator<Address> orderByComparator) {
+
+		List<Address> list = findByRegionId(regionId, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last address in the ordered set where regionId = &#63;.
+	 *
+	 * @param regionId the region ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching address
+	 * @throws NoSuchAddressException if a matching address could not be found
+	 */
+	@Override
+	public Address findByRegionId_Last(
+			long regionId, OrderByComparator<Address> orderByComparator)
+		throws NoSuchAddressException {
+
+		Address address = fetchByRegionId_Last(regionId, orderByComparator);
+
+		if (address != null) {
+			return address;
+		}
+
+		StringBundler sb = new StringBundler(4);
+
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		sb.append("regionId=");
+		sb.append(regionId);
+
+		sb.append("}");
+
+		throw new NoSuchAddressException(sb.toString());
+	}
+
+	/**
+	 * Returns the last address in the ordered set where regionId = &#63;.
+	 *
+	 * @param regionId the region ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching address, or <code>null</code> if a matching address could not be found
+	 */
+	@Override
+	public Address fetchByRegionId_Last(
+		long regionId, OrderByComparator<Address> orderByComparator) {
+
+		int count = countByRegionId(regionId);
+
+		if (count == 0) {
+			return null;
+		}
+
+		List<Address> list = findByRegionId(
+			regionId, count - 1, count, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the addresses before and after the current address in the ordered set where regionId = &#63;.
+	 *
+	 * @param addressId the primary key of the current address
+	 * @param regionId the region ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next address
+	 * @throws NoSuchAddressException if a address with the primary key could not be found
+	 */
+	@Override
+	public Address[] findByRegionId_PrevAndNext(
+			long addressId, long regionId,
+			OrderByComparator<Address> orderByComparator)
+		throws NoSuchAddressException {
+
+		Address address = findByPrimaryKey(addressId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			Address[] array = new AddressImpl[3];
+
+			array[0] = getByRegionId_PrevAndNext(
+				session, address, regionId, orderByComparator, true);
+
+			array[1] = address;
+
+			array[2] = getByRegionId_PrevAndNext(
+				session, address, regionId, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected Address getByRegionId_PrevAndNext(
+		Session session, Address address, long regionId,
+		OrderByComparator<Address> orderByComparator, boolean previous) {
+
+		StringBundler sb = null;
+
+		if (orderByComparator != null) {
+			sb = new StringBundler(
+				4 + (orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			sb = new StringBundler(3);
+		}
+
+		sb.append(_SQL_SELECT_ADDRESS_WHERE);
+
+		sb.append(_FINDER_COLUMN_REGIONID_REGIONID_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				sb.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			sb.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						sb.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC);
+					}
+					else {
+						sb.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			sb.append(AddressModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = sb.toString();
+
+		Query query = session.createQuery(sql);
+
+		query.setFirstResult(0);
+		query.setMaxResults(2);
+
+		QueryPos queryPos = QueryPos.getInstance(query);
+
+		queryPos.add(regionId);
+
+		if (orderByComparator != null) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(address)) {
+
+				queryPos.add(orderByConditionValue);
+			}
+		}
+
+		List<Address> list = query.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Removes all the addresses where regionId = &#63; from the database.
+	 *
+	 * @param regionId the region ID
+	 */
+	@Override
+	public void removeByRegionId(long regionId) {
+		for (Address address :
+				findByRegionId(
+					regionId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
+			remove(address);
+		}
+	}
+
+	/**
+	 * Returns the number of addresses where regionId = &#63;.
+	 *
+	 * @param regionId the region ID
+	 * @return the number of matching addresses
+	 */
+	@Override
+	public int countByRegionId(long regionId) {
+		FinderPath finderPath = _finderPathCountByRegionId;
+
+		Object[] finderArgs = new Object[] {regionId};
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
+
+		if (count == null) {
+			StringBundler sb = new StringBundler(2);
+
+			sb.append(_SQL_COUNT_ADDRESS_WHERE);
+
+			sb.append(_FINDER_COLUMN_REGIONID_REGIONID_2);
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(regionId);
+
+				count = (Long)query.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_REGIONID_REGIONID_2 =
+		"address.regionId = ?";
 
 	private FinderPath _finderPathWithPaginationFindByC_C;
 	private FinderPath _finderPathWithoutPaginationFindByC_C;
@@ -2283,7 +3254,7 @@ public class AddressPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Address>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Address address : list) {
@@ -2671,8 +3642,7 @@ public class AddressPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, classNameId};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2829,7 +3799,7 @@ public class AddressPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Address>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Address address : list) {
@@ -3241,8 +4211,7 @@ public class AddressPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, classNameId, classPK};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -3295,6 +4264,937 @@ public class AddressPersistenceImpl
 
 	private static final String _FINDER_COLUMN_C_C_C_CLASSPK_2 =
 		"address.classPK = ?";
+
+	private FinderPath _finderPathWithPaginationFindByC_C_C_T;
+	private FinderPath _finderPathWithoutPaginationFindByC_C_C_T;
+	private FinderPath _finderPathCountByC_C_C_T;
+	private FinderPath _finderPathWithPaginationCountByC_C_C_T;
+
+	/**
+	 * Returns all the addresses where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeId the type ID
+	 * @return the matching addresses
+	 */
+	@Override
+	public List<Address> findByC_C_C_T(
+		long companyId, long classNameId, long classPK, long typeId) {
+
+		return findByC_C_C_T(
+			companyId, classNameId, classPK, typeId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the addresses where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AddressModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeId the type ID
+	 * @param start the lower bound of the range of addresses
+	 * @param end the upper bound of the range of addresses (not inclusive)
+	 * @return the range of matching addresses
+	 */
+	@Override
+	public List<Address> findByC_C_C_T(
+		long companyId, long classNameId, long classPK, long typeId, int start,
+		int end) {
+
+		return findByC_C_C_T(
+			companyId, classNameId, classPK, typeId, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the addresses where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AddressModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeId the type ID
+	 * @param start the lower bound of the range of addresses
+	 * @param end the upper bound of the range of addresses (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching addresses
+	 */
+	@Override
+	public List<Address> findByC_C_C_T(
+		long companyId, long classNameId, long classPK, long typeId, int start,
+		int end, OrderByComparator<Address> orderByComparator) {
+
+		return findByC_C_C_T(
+			companyId, classNameId, classPK, typeId, start, end,
+			orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the addresses where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AddressModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeId the type ID
+	 * @param start the lower bound of the range of addresses
+	 * @param end the upper bound of the range of addresses (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching addresses
+	 */
+	@Override
+	public List<Address> findByC_C_C_T(
+		long companyId, long classNameId, long classPK, long typeId, int start,
+		int end, OrderByComparator<Address> orderByComparator,
+		boolean useFinderCache) {
+
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+			(orderByComparator == null)) {
+
+			if (useFinderCache) {
+				finderPath = _finderPathWithoutPaginationFindByC_C_C_T;
+				finderArgs = new Object[] {
+					companyId, classNameId, classPK, typeId
+				};
+			}
+		}
+		else if (useFinderCache) {
+			finderPath = _finderPathWithPaginationFindByC_C_C_T;
+			finderArgs = new Object[] {
+				companyId, classNameId, classPK, typeId, start, end,
+				orderByComparator
+			};
+		}
+
+		List<Address> list = null;
+
+		if (useFinderCache) {
+			list = (List<Address>)FinderCacheUtil.getResult(
+				finderPath, finderArgs);
+
+			if ((list != null) && !list.isEmpty()) {
+				for (Address address : list) {
+					if ((companyId != address.getCompanyId()) ||
+						(classNameId != address.getClassNameId()) ||
+						(classPK != address.getClassPK()) ||
+						(typeId != address.getTypeId())) {
+
+						list = null;
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler sb = null;
+
+			if (orderByComparator != null) {
+				sb = new StringBundler(
+					6 + (orderByComparator.getOrderByFields().length * 2));
+			}
+			else {
+				sb = new StringBundler(6);
+			}
+
+			sb.append(_SQL_SELECT_ADDRESS_WHERE);
+
+			sb.append(_FINDER_COLUMN_C_C_C_T_COMPANYID_2);
+
+			sb.append(_FINDER_COLUMN_C_C_C_T_CLASSNAMEID_2);
+
+			sb.append(_FINDER_COLUMN_C_C_C_T_CLASSPK_2);
+
+			sb.append(_FINDER_COLUMN_C_C_C_T_TYPEID_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+			}
+			else {
+				sb.append(AddressModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(companyId);
+
+				queryPos.add(classNameId);
+
+				queryPos.add(classPK);
+
+				queryPos.add(typeId);
+
+				list = (List<Address>)QueryUtil.list(
+					query, getDialect(), start, end);
+
+				cacheResult(list);
+
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first address in the ordered set where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeId the type ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching address
+	 * @throws NoSuchAddressException if a matching address could not be found
+	 */
+	@Override
+	public Address findByC_C_C_T_First(
+			long companyId, long classNameId, long classPK, long typeId,
+			OrderByComparator<Address> orderByComparator)
+		throws NoSuchAddressException {
+
+		Address address = fetchByC_C_C_T_First(
+			companyId, classNameId, classPK, typeId, orderByComparator);
+
+		if (address != null) {
+			return address;
+		}
+
+		StringBundler sb = new StringBundler(10);
+
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		sb.append("companyId=");
+		sb.append(companyId);
+
+		sb.append(", classNameId=");
+		sb.append(classNameId);
+
+		sb.append(", classPK=");
+		sb.append(classPK);
+
+		sb.append(", typeId=");
+		sb.append(typeId);
+
+		sb.append("}");
+
+		throw new NoSuchAddressException(sb.toString());
+	}
+
+	/**
+	 * Returns the first address in the ordered set where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeId the type ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching address, or <code>null</code> if a matching address could not be found
+	 */
+	@Override
+	public Address fetchByC_C_C_T_First(
+		long companyId, long classNameId, long classPK, long typeId,
+		OrderByComparator<Address> orderByComparator) {
+
+		List<Address> list = findByC_C_C_T(
+			companyId, classNameId, classPK, typeId, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last address in the ordered set where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeId the type ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching address
+	 * @throws NoSuchAddressException if a matching address could not be found
+	 */
+	@Override
+	public Address findByC_C_C_T_Last(
+			long companyId, long classNameId, long classPK, long typeId,
+			OrderByComparator<Address> orderByComparator)
+		throws NoSuchAddressException {
+
+		Address address = fetchByC_C_C_T_Last(
+			companyId, classNameId, classPK, typeId, orderByComparator);
+
+		if (address != null) {
+			return address;
+		}
+
+		StringBundler sb = new StringBundler(10);
+
+		sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		sb.append("companyId=");
+		sb.append(companyId);
+
+		sb.append(", classNameId=");
+		sb.append(classNameId);
+
+		sb.append(", classPK=");
+		sb.append(classPK);
+
+		sb.append(", typeId=");
+		sb.append(typeId);
+
+		sb.append("}");
+
+		throw new NoSuchAddressException(sb.toString());
+	}
+
+	/**
+	 * Returns the last address in the ordered set where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeId the type ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching address, or <code>null</code> if a matching address could not be found
+	 */
+	@Override
+	public Address fetchByC_C_C_T_Last(
+		long companyId, long classNameId, long classPK, long typeId,
+		OrderByComparator<Address> orderByComparator) {
+
+		int count = countByC_C_C_T(companyId, classNameId, classPK, typeId);
+
+		if (count == 0) {
+			return null;
+		}
+
+		List<Address> list = findByC_C_C_T(
+			companyId, classNameId, classPK, typeId, count - 1, count,
+			orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the addresses before and after the current address in the ordered set where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = &#63;.
+	 *
+	 * @param addressId the primary key of the current address
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeId the type ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next address
+	 * @throws NoSuchAddressException if a address with the primary key could not be found
+	 */
+	@Override
+	public Address[] findByC_C_C_T_PrevAndNext(
+			long addressId, long companyId, long classNameId, long classPK,
+			long typeId, OrderByComparator<Address> orderByComparator)
+		throws NoSuchAddressException {
+
+		Address address = findByPrimaryKey(addressId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			Address[] array = new AddressImpl[3];
+
+			array[0] = getByC_C_C_T_PrevAndNext(
+				session, address, companyId, classNameId, classPK, typeId,
+				orderByComparator, true);
+
+			array[1] = address;
+
+			array[2] = getByC_C_C_T_PrevAndNext(
+				session, address, companyId, classNameId, classPK, typeId,
+				orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected Address getByC_C_C_T_PrevAndNext(
+		Session session, Address address, long companyId, long classNameId,
+		long classPK, long typeId, OrderByComparator<Address> orderByComparator,
+		boolean previous) {
+
+		StringBundler sb = null;
+
+		if (orderByComparator != null) {
+			sb = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			sb = new StringBundler(6);
+		}
+
+		sb.append(_SQL_SELECT_ADDRESS_WHERE);
+
+		sb.append(_FINDER_COLUMN_C_C_C_T_COMPANYID_2);
+
+		sb.append(_FINDER_COLUMN_C_C_C_T_CLASSNAMEID_2);
+
+		sb.append(_FINDER_COLUMN_C_C_C_T_CLASSPK_2);
+
+		sb.append(_FINDER_COLUMN_C_C_C_T_TYPEID_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				sb.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(WHERE_GREATER_THAN);
+					}
+					else {
+						sb.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			sb.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				sb.append(_ORDER_BY_ENTITY_ALIAS);
+				sb.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						sb.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						sb.append(ORDER_BY_ASC);
+					}
+					else {
+						sb.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			sb.append(AddressModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = sb.toString();
+
+		Query query = session.createQuery(sql);
+
+		query.setFirstResult(0);
+		query.setMaxResults(2);
+
+		QueryPos queryPos = QueryPos.getInstance(query);
+
+		queryPos.add(companyId);
+
+		queryPos.add(classNameId);
+
+		queryPos.add(classPK);
+
+		queryPos.add(typeId);
+
+		if (orderByComparator != null) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(address)) {
+
+				queryPos.add(orderByConditionValue);
+			}
+		}
+
+		List<Address> list = query.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Returns all the addresses where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = any &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AddressModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeIds the type IDs
+	 * @return the matching addresses
+	 */
+	@Override
+	public List<Address> findByC_C_C_T(
+		long companyId, long classNameId, long classPK, long[] typeIds) {
+
+		return findByC_C_C_T(
+			companyId, classNameId, classPK, typeIds, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the addresses where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = any &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AddressModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeIds the type IDs
+	 * @param start the lower bound of the range of addresses
+	 * @param end the upper bound of the range of addresses (not inclusive)
+	 * @return the range of matching addresses
+	 */
+	@Override
+	public List<Address> findByC_C_C_T(
+		long companyId, long classNameId, long classPK, long[] typeIds,
+		int start, int end) {
+
+		return findByC_C_C_T(
+			companyId, classNameId, classPK, typeIds, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the addresses where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = any &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AddressModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeIds the type IDs
+	 * @param start the lower bound of the range of addresses
+	 * @param end the upper bound of the range of addresses (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching addresses
+	 */
+	@Override
+	public List<Address> findByC_C_C_T(
+		long companyId, long classNameId, long classPK, long[] typeIds,
+		int start, int end, OrderByComparator<Address> orderByComparator) {
+
+		return findByC_C_C_T(
+			companyId, classNameId, classPK, typeIds, start, end,
+			orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the addresses where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = &#63;, optionally using the finder cache.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AddressModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeId the type ID
+	 * @param start the lower bound of the range of addresses
+	 * @param end the upper bound of the range of addresses (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching addresses
+	 */
+	@Override
+	public List<Address> findByC_C_C_T(
+		long companyId, long classNameId, long classPK, long[] typeIds,
+		int start, int end, OrderByComparator<Address> orderByComparator,
+		boolean useFinderCache) {
+
+		if (typeIds == null) {
+			typeIds = new long[0];
+		}
+		else if (typeIds.length > 1) {
+			typeIds = ArrayUtil.sortedUnique(typeIds);
+		}
+
+		if (typeIds.length == 1) {
+			return findByC_C_C_T(
+				companyId, classNameId, classPK, typeIds[0], start, end,
+				orderByComparator);
+		}
+
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+			(orderByComparator == null)) {
+
+			if (useFinderCache) {
+				finderArgs = new Object[] {
+					companyId, classNameId, classPK, StringUtil.merge(typeIds)
+				};
+			}
+		}
+		else if (useFinderCache) {
+			finderArgs = new Object[] {
+				companyId, classNameId, classPK, StringUtil.merge(typeIds),
+				start, end, orderByComparator
+			};
+		}
+
+		List<Address> list = null;
+
+		if (useFinderCache) {
+			list = (List<Address>)FinderCacheUtil.getResult(
+				_finderPathWithPaginationFindByC_C_C_T, finderArgs);
+
+			if ((list != null) && !list.isEmpty()) {
+				for (Address address : list) {
+					if ((companyId != address.getCompanyId()) ||
+						(classNameId != address.getClassNameId()) ||
+						(classPK != address.getClassPK()) ||
+						!ArrayUtil.contains(typeIds, address.getTypeId())) {
+
+						list = null;
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler sb = new StringBundler();
+
+			sb.append(_SQL_SELECT_ADDRESS_WHERE);
+
+			sb.append(_FINDER_COLUMN_C_C_C_T_COMPANYID_2);
+
+			sb.append(_FINDER_COLUMN_C_C_C_T_CLASSNAMEID_2);
+
+			sb.append(_FINDER_COLUMN_C_C_C_T_CLASSPK_2);
+
+			if (typeIds.length > 0) {
+				sb.append("(");
+
+				sb.append(_FINDER_COLUMN_C_C_C_T_TYPEID_7);
+
+				sb.append(StringUtil.merge(typeIds));
+
+				sb.append(")");
+
+				sb.append(")");
+			}
+
+			sb.setStringAt(
+				removeConjunction(sb.stringAt(sb.index() - 1)), sb.index() - 1);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(
+					sb, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+			}
+			else {
+				sb.append(AddressModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(companyId);
+
+				queryPos.add(classNameId);
+
+				queryPos.add(classPK);
+
+				list = (List<Address>)QueryUtil.list(
+					query, getDialect(), start, end);
+
+				cacheResult(list);
+
+				if (useFinderCache) {
+					FinderCacheUtil.putResult(
+						_finderPathWithPaginationFindByC_C_C_T, finderArgs,
+						list);
+				}
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Removes all the addresses where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeId the type ID
+	 */
+	@Override
+	public void removeByC_C_C_T(
+		long companyId, long classNameId, long classPK, long typeId) {
+
+		for (Address address :
+				findByC_C_C_T(
+					companyId, classNameId, classPK, typeId, QueryUtil.ALL_POS,
+					QueryUtil.ALL_POS, null)) {
+
+			remove(address);
+		}
+	}
+
+	/**
+	 * Returns the number of addresses where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeId the type ID
+	 * @return the number of matching addresses
+	 */
+	@Override
+	public int countByC_C_C_T(
+		long companyId, long classNameId, long classPK, long typeId) {
+
+		FinderPath finderPath = _finderPathCountByC_C_C_T;
+
+		Object[] finderArgs = new Object[] {
+			companyId, classNameId, classPK, typeId
+		};
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
+
+		if (count == null) {
+			StringBundler sb = new StringBundler(5);
+
+			sb.append(_SQL_COUNT_ADDRESS_WHERE);
+
+			sb.append(_FINDER_COLUMN_C_C_C_T_COMPANYID_2);
+
+			sb.append(_FINDER_COLUMN_C_C_C_T_CLASSNAMEID_2);
+
+			sb.append(_FINDER_COLUMN_C_C_C_T_CLASSPK_2);
+
+			sb.append(_FINDER_COLUMN_C_C_C_T_TYPEID_2);
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(companyId);
+
+				queryPos.add(classNameId);
+
+				queryPos.add(classPK);
+
+				queryPos.add(typeId);
+
+				count = (Long)query.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
+	 * Returns the number of addresses where companyId = &#63; and classNameId = &#63; and classPK = &#63; and typeId = any &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param typeIds the type IDs
+	 * @return the number of matching addresses
+	 */
+	@Override
+	public int countByC_C_C_T(
+		long companyId, long classNameId, long classPK, long[] typeIds) {
+
+		if (typeIds == null) {
+			typeIds = new long[0];
+		}
+		else if (typeIds.length > 1) {
+			typeIds = ArrayUtil.sortedUnique(typeIds);
+		}
+
+		Object[] finderArgs = new Object[] {
+			companyId, classNameId, classPK, StringUtil.merge(typeIds)
+		};
+
+		Long count = (Long)FinderCacheUtil.getResult(
+			_finderPathWithPaginationCountByC_C_C_T, finderArgs);
+
+		if (count == null) {
+			StringBundler sb = new StringBundler();
+
+			sb.append(_SQL_COUNT_ADDRESS_WHERE);
+
+			sb.append(_FINDER_COLUMN_C_C_C_T_COMPANYID_2);
+
+			sb.append(_FINDER_COLUMN_C_C_C_T_CLASSNAMEID_2);
+
+			sb.append(_FINDER_COLUMN_C_C_C_T_CLASSPK_2);
+
+			if (typeIds.length > 0) {
+				sb.append("(");
+
+				sb.append(_FINDER_COLUMN_C_C_C_T_TYPEID_7);
+
+				sb.append(StringUtil.merge(typeIds));
+
+				sb.append(")");
+
+				sb.append(")");
+			}
+
+			sb.setStringAt(
+				removeConjunction(sb.stringAt(sb.index() - 1)), sb.index() - 1);
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(companyId);
+
+				queryPos.add(classNameId);
+
+				queryPos.add(classPK);
+
+				count = (Long)query.uniqueResult();
+
+				FinderCacheUtil.putResult(
+					_finderPathWithPaginationCountByC_C_C_T, finderArgs, count);
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_C_C_C_T_COMPANYID_2 =
+		"address.companyId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_C_C_T_CLASSNAMEID_2 =
+		"address.classNameId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_C_C_T_CLASSPK_2 =
+		"address.classPK = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_C_C_T_TYPEID_2 =
+		"address.typeId = ?";
+
+	private static final String _FINDER_COLUMN_C_C_C_T_TYPEID_7 =
+		"address.typeId IN (";
 
 	private FinderPath _finderPathWithPaginationFindByC_C_C_M;
 	private FinderPath _finderPathWithoutPaginationFindByC_C_C_M;
@@ -3416,7 +5316,7 @@ public class AddressPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Address>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Address address : list) {
@@ -3856,8 +5756,7 @@ public class AddressPersistenceImpl
 			companyId, classNameId, classPK, mailing
 		};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(5);
@@ -4038,7 +5937,7 @@ public class AddressPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Address>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Address address : list) {
@@ -4478,8 +6377,7 @@ public class AddressPersistenceImpl
 			companyId, classNameId, classPK, primary
 		};
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(5);
@@ -4540,6 +6438,273 @@ public class AddressPersistenceImpl
 	private static final String _FINDER_COLUMN_C_C_C_P_PRIMARY_2 =
 		"address.primary = ?";
 
+	private FinderPath _finderPathFetchByC_ERC;
+	private FinderPath _finderPathCountByC_ERC;
+
+	/**
+	 * Returns the address where companyId = &#63; and externalReferenceCode = &#63; or throws a <code>NoSuchAddressException</code> if it could not be found.
+	 *
+	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
+	 * @return the matching address
+	 * @throws NoSuchAddressException if a matching address could not be found
+	 */
+	@Override
+	public Address findByC_ERC(long companyId, String externalReferenceCode)
+		throws NoSuchAddressException {
+
+		Address address = fetchByC_ERC(companyId, externalReferenceCode);
+
+		if (address == null) {
+			StringBundler sb = new StringBundler(6);
+
+			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			sb.append("companyId=");
+			sb.append(companyId);
+
+			sb.append(", externalReferenceCode=");
+			sb.append(externalReferenceCode);
+
+			sb.append("}");
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(sb.toString());
+			}
+
+			throw new NoSuchAddressException(sb.toString());
+		}
+
+		return address;
+	}
+
+	/**
+	 * Returns the address where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
+	 * @return the matching address, or <code>null</code> if a matching address could not be found
+	 */
+	@Override
+	public Address fetchByC_ERC(long companyId, String externalReferenceCode) {
+		return fetchByC_ERC(companyId, externalReferenceCode, true);
+	}
+
+	/**
+	 * Returns the address where companyId = &#63; and externalReferenceCode = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching address, or <code>null</code> if a matching address could not be found
+	 */
+	@Override
+	public Address fetchByC_ERC(
+		long companyId, String externalReferenceCode, boolean useFinderCache) {
+
+		externalReferenceCode = Objects.toString(externalReferenceCode, "");
+
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {companyId, externalReferenceCode};
+		}
+
+		Object result = null;
+
+		if (useFinderCache) {
+			result = FinderCacheUtil.getResult(
+				_finderPathFetchByC_ERC, finderArgs);
+		}
+
+		if (result instanceof Address) {
+			Address address = (Address)result;
+
+			if ((companyId != address.getCompanyId()) ||
+				!Objects.equals(
+					externalReferenceCode,
+					address.getExternalReferenceCode())) {
+
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler sb = new StringBundler(4);
+
+			sb.append(_SQL_SELECT_ADDRESS_WHERE);
+
+			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
+
+			boolean bindExternalReferenceCode = false;
+
+			if (externalReferenceCode.isEmpty()) {
+				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
+			}
+			else {
+				bindExternalReferenceCode = true;
+
+				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(companyId);
+
+				if (bindExternalReferenceCode) {
+					queryPos.add(externalReferenceCode);
+				}
+
+				List<Address> list = query.list();
+
+				if (list.isEmpty()) {
+					if (useFinderCache) {
+						FinderCacheUtil.putResult(
+							_finderPathFetchByC_ERC, finderArgs, list);
+					}
+				}
+				else {
+					if (list.size() > 1) {
+						Collections.sort(list, Collections.reverseOrder());
+
+						if (_log.isWarnEnabled()) {
+							if (!useFinderCache) {
+								finderArgs = new Object[] {
+									companyId, externalReferenceCode
+								};
+							}
+
+							_log.warn(
+								"AddressPersistenceImpl.fetchByC_ERC(long, String, boolean) with parameters (" +
+									StringUtil.merge(finderArgs) +
+										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+						}
+					}
+
+					Address address = list.get(0);
+
+					result = address;
+
+					cacheResult(address);
+				}
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (Address)result;
+		}
+	}
+
+	/**
+	 * Removes the address where companyId = &#63; and externalReferenceCode = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
+	 * @return the address that was removed
+	 */
+	@Override
+	public Address removeByC_ERC(long companyId, String externalReferenceCode)
+		throws NoSuchAddressException {
+
+		Address address = findByC_ERC(companyId, externalReferenceCode);
+
+		return remove(address);
+	}
+
+	/**
+	 * Returns the number of addresses where companyId = &#63; and externalReferenceCode = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param externalReferenceCode the external reference code
+	 * @return the number of matching addresses
+	 */
+	@Override
+	public int countByC_ERC(long companyId, String externalReferenceCode) {
+		externalReferenceCode = Objects.toString(externalReferenceCode, "");
+
+		FinderPath finderPath = _finderPathCountByC_ERC;
+
+		Object[] finderArgs = new Object[] {companyId, externalReferenceCode};
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
+
+		if (count == null) {
+			StringBundler sb = new StringBundler(3);
+
+			sb.append(_SQL_COUNT_ADDRESS_WHERE);
+
+			sb.append(_FINDER_COLUMN_C_ERC_COMPANYID_2);
+
+			boolean bindExternalReferenceCode = false;
+
+			if (externalReferenceCode.isEmpty()) {
+				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3);
+			}
+			else {
+				bindExternalReferenceCode = true;
+
+				sb.append(_FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(companyId);
+
+				if (bindExternalReferenceCode) {
+					queryPos.add(externalReferenceCode);
+				}
+
+				count = (Long)query.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_C_ERC_COMPANYID_2 =
+		"address.companyId = ? AND ";
+
+	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_2 =
+		"address.externalReferenceCode = ?";
+
+	private static final String _FINDER_COLUMN_C_ERC_EXTERNALREFERENCECODE_3 =
+		"(address.externalReferenceCode IS NULL OR address.externalReferenceCode = '')";
+
 	public AddressPersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
@@ -4565,6 +6730,13 @@ public class AddressPersistenceImpl
 	public void cacheResult(Address address) {
 		EntityCacheUtil.putResult(
 			AddressImpl.class, address.getPrimaryKey(), address);
+
+		FinderCacheUtil.putResult(
+			_finderPathFetchByC_ERC,
+			new Object[] {
+				address.getCompanyId(), address.getExternalReferenceCode()
+			},
+			address);
 	}
 
 	private int _valueObjectFinderCacheListThreshold;
@@ -4596,23 +6768,21 @@ public class AddressPersistenceImpl
 	 * Clears the cache for all addresses.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache() {
 		EntityCacheUtil.clearCache(AddressImpl.class);
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		FinderCacheUtil.clearCache(AddressImpl.class);
 	}
 
 	/**
 	 * Clears the cache for the address.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -4629,13 +6799,23 @@ public class AddressPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		FinderCacheUtil.clearCache(AddressImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			EntityCacheUtil.removeResult(AddressImpl.class, primaryKey);
 		}
+	}
+
+	protected void cacheUniqueFindersCache(AddressModelImpl addressModelImpl) {
+		Object[] args = new Object[] {
+			addressModelImpl.getCompanyId(),
+			addressModelImpl.getExternalReferenceCode()
+		};
+
+		FinderCacheUtil.putResult(
+			_finderPathCountByC_ERC, args, Long.valueOf(1));
+		FinderCacheUtil.putResult(
+			_finderPathFetchByC_ERC, args, addressModelImpl);
 	}
 
 	/**
@@ -4816,6 +6996,8 @@ public class AddressPersistenceImpl
 		EntityCacheUtil.putResult(
 			AddressImpl.class, addressModelImpl, false, true);
 
+		cacheUniqueFindersCache(addressModelImpl);
+
 		if (isNew) {
 			address.setNew(false);
 		}
@@ -4958,7 +7140,7 @@ public class AddressPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<Address>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -5028,7 +7210,7 @@ public class AddressPersistenceImpl
 	@Override
 	public int countAll() {
 		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+			_finderPathCountAll, FINDER_ARGS_EMPTY);
 
 		if (count == null) {
 			Session session = null;
@@ -5083,30 +7265,22 @@ public class AddressPersistenceImpl
 	 * Initializes the address persistence.
 	 */
 	public void afterPropertiesSet() {
-		Registry registry = RegistryUtil.getRegistry();
-
-		_argumentsResolverServiceRegistration = registry.registerService(
-			ArgumentsResolver.class, new AddressModelArgumentsResolver(),
-			HashMapBuilder.<String, Object>put(
-				"model.class.name", Address.class.getName()
-			).build());
-
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByUuid = _createFinderPath(
+		_finderPathWithPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
@@ -5114,17 +7288,17 @@ public class AddressPersistenceImpl
 			},
 			new String[] {"uuid_"}, true);
 
-		_finderPathWithoutPaginationFindByUuid = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			true);
 
-		_finderPathCountByUuid = _createFinderPath(
+		_finderPathCountByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			false);
 
-		_finderPathWithPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -5133,17 +7307,17 @@ public class AddressPersistenceImpl
 			},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathWithoutPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathCountByUuid_C = _createFinderPath(
+		_finderPathCountByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
 
-		_finderPathWithPaginationFindByCompanyId = _createFinderPath(
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -5151,17 +7325,17 @@ public class AddressPersistenceImpl
 			},
 			new String[] {"companyId"}, true);
 
-		_finderPathWithoutPaginationFindByCompanyId = _createFinderPath(
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			true);
 
-		_finderPathCountByCompanyId = _createFinderPath(
+		_finderPathCountByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
 
-		_finderPathWithPaginationFindByUserId = _createFinderPath(
+		_finderPathWithPaginationFindByUserId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -5169,16 +7343,52 @@ public class AddressPersistenceImpl
 			},
 			new String[] {"userId"}, true);
 
-		_finderPathWithoutPaginationFindByUserId = _createFinderPath(
+		_finderPathWithoutPaginationFindByUserId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId",
 			new String[] {Long.class.getName()}, new String[] {"userId"}, true);
 
-		_finderPathCountByUserId = _createFinderPath(
+		_finderPathCountByUserId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId",
 			new String[] {Long.class.getName()}, new String[] {"userId"},
 			false);
 
-		_finderPathWithPaginationFindByC_C = _createFinderPath(
+		_finderPathWithPaginationFindByCountryId = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCountryId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			},
+			new String[] {"countryId"}, true);
+
+		_finderPathWithoutPaginationFindByCountryId = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCountryId",
+			new String[] {Long.class.getName()}, new String[] {"countryId"},
+			true);
+
+		_finderPathCountByCountryId = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCountryId",
+			new String[] {Long.class.getName()}, new String[] {"countryId"},
+			false);
+
+		_finderPathWithPaginationFindByRegionId = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByRegionId",
+			new String[] {
+				Long.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			},
+			new String[] {"regionId"}, true);
+
+		_finderPathWithoutPaginationFindByRegionId = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByRegionId",
+			new String[] {Long.class.getName()}, new String[] {"regionId"},
+			true);
+
+		_finderPathCountByRegionId = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByRegionId",
+			new String[] {Long.class.getName()}, new String[] {"regionId"},
+			false);
+
+		_finderPathWithPaginationFindByC_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5187,17 +7397,17 @@ public class AddressPersistenceImpl
 			},
 			new String[] {"companyId", "classNameId"}, true);
 
-		_finderPathWithoutPaginationFindByC_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"companyId", "classNameId"}, true);
 
-		_finderPathCountByC_C = _createFinderPath(
+		_finderPathCountByC_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"companyId", "classNameId"}, false);
 
-		_finderPathWithPaginationFindByC_C_C = _createFinderPath(
+		_finderPathWithPaginationFindByC_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5206,21 +7416,59 @@ public class AddressPersistenceImpl
 			},
 			new String[] {"companyId", "classNameId", "classPK"}, true);
 
-		_finderPathWithoutPaginationFindByC_C_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			},
 			new String[] {"companyId", "classNameId", "classPK"}, true);
 
-		_finderPathCountByC_C_C = _createFinderPath(
+		_finderPathCountByC_C_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C",
 			new String[] {
 				Long.class.getName(), Long.class.getName(), Long.class.getName()
 			},
 			new String[] {"companyId", "classNameId", "classPK"}, false);
 
-		_finderPathWithPaginationFindByC_C_C_M = _createFinderPath(
+		_finderPathWithPaginationFindByC_C_C_T = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_C_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Long.class.getName(),
+				Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			},
+			new String[] {"companyId", "classNameId", "classPK", "typeId"},
+			true);
+
+		_finderPathWithoutPaginationFindByC_C_C_T = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_C_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Long.class.getName()
+			},
+			new String[] {"companyId", "classNameId", "classPK", "typeId"},
+			true);
+
+		_finderPathCountByC_C_C_T = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Long.class.getName()
+			},
+			new String[] {"companyId", "classNameId", "classPK", "typeId"},
+			false);
+
+		_finderPathWithPaginationCountByC_C_C_T = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_C_C_T",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Long.class.getName()
+			},
+			new String[] {"companyId", "classNameId", "classPK", "typeId"},
+			false);
+
+		_finderPathWithPaginationFindByC_C_C_M = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_C_M",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5231,7 +7479,7 @@ public class AddressPersistenceImpl
 			new String[] {"companyId", "classNameId", "classPK", "mailing"},
 			true);
 
-		_finderPathWithoutPaginationFindByC_C_C_M = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_C_C_M = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_C_M",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5240,7 +7488,7 @@ public class AddressPersistenceImpl
 			new String[] {"companyId", "classNameId", "classPK", "mailing"},
 			true);
 
-		_finderPathCountByC_C_C_M = _createFinderPath(
+		_finderPathCountByC_C_C_M = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C_M",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5249,7 +7497,7 @@ public class AddressPersistenceImpl
 			new String[] {"companyId", "classNameId", "classPK", "mailing"},
 			false);
 
-		_finderPathWithPaginationFindByC_C_C_P = _createFinderPath(
+		_finderPathWithPaginationFindByC_C_C_P = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_C_P",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5260,7 +7508,7 @@ public class AddressPersistenceImpl
 			new String[] {"companyId", "classNameId", "classPK", "primary_"},
 			true);
 
-		_finderPathWithoutPaginationFindByC_C_C_P = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_C_C_P = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_C_C_P",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5269,7 +7517,7 @@ public class AddressPersistenceImpl
 			new String[] {"companyId", "classNameId", "classPK", "primary_"},
 			true);
 
-		_finderPathCountByC_C_C_P = _createFinderPath(
+		_finderPathCountByC_C_C_P = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_C_C_P",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5278,6 +7526,16 @@ public class AddressPersistenceImpl
 			new String[] {"companyId", "classNameId", "classPK", "primary_"},
 			false);
 
+		_finderPathFetchByC_ERC = new FinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByC_ERC",
+			new String[] {Long.class.getName(), String.class.getName()},
+			new String[] {"companyId", "externalReferenceCode"}, true);
+
+		_finderPathCountByC_ERC = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_ERC",
+			new String[] {Long.class.getName(), String.class.getName()},
+			new String[] {"companyId", "externalReferenceCode"}, false);
+
 		_setAddressUtilPersistence(this);
 	}
 
@@ -5285,14 +7543,6 @@ public class AddressPersistenceImpl
 		_setAddressUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(AddressImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setAddressUtilPersistence(
@@ -5336,123 +7586,9 @@ public class AddressPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"uuid", "primary"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			Registry registry = RegistryUtil.getRegistry();
-
-			_serviceRegistrations.add(
-				registry.registerService(
-					FinderPath.class, finderPath,
-					HashMapBuilder.<String, Object>put(
-						"cache.name", cacheName
-					).build()));
-		}
-
-		return finderPath;
-	}
-
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class AddressModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			AddressModelImpl addressModelImpl = (AddressModelImpl)baseModel;
-
-			long columnBitmask = addressModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(addressModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						addressModelImpl.getColumnBitmask(columnName);
-				}
-
-				if (finderPath.isBaseModelResult() &&
-					(AddressPersistenceImpl.
-						FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION ==
-							finderPath.getCacheName())) {
-
-					finderPathColumnBitmask |= _ORDER_BY_COLUMNS_BITMASK;
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(addressModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			AddressModelImpl addressModelImpl, String[] columnNames,
-			boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] = addressModelImpl.getColumnOriginalValue(
-						columnName);
-				}
-				else {
-					arguments[i] = addressModelImpl.getColumnValue(columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-		private static final long _ORDER_BY_COLUMNS_BITMASK;
-
-		static {
-			long orderByColumnsBitmask = 0;
-
-			orderByColumnsBitmask |= AddressModelImpl.getColumnBitmask(
-				"createDate");
-
-			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
-		}
-
+	@Override
+	protected FinderCache getFinderCache() {
+		return FinderCacheUtil.getFinderCache();
 	}
 
 }

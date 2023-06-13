@@ -15,6 +15,8 @@
 package com.liferay.bookmarks.search.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.service.BookmarksEntryLocalService;
@@ -24,7 +26,6 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -101,8 +102,7 @@ public class BookmarksEntryIndexerIndexedFieldsTest {
 		_group = group;
 		_groups = groupSearchFixture.getGroups();
 		_indexedFieldsFixture = new IndexedFieldsFixture(
-			resourcePermissionLocalService, searchEngineHelper, uidFactory,
-			documentBuilderFactory);
+			resourcePermissionLocalService, uidFactory, documentBuilderFactory);
 		_users = userSearchFixture.getUsers();
 	}
 
@@ -134,8 +134,6 @@ public class BookmarksEntryIndexerIndexedFieldsTest {
 					MODEL_INDEXER_CLASS
 				).queryString(
 					searchTerm
-				).fetchSourceIncludes(
-					new String[] {"*_sortable"}
 				).build()));
 	}
 
@@ -159,9 +157,6 @@ public class BookmarksEntryIndexerIndexedFieldsTest {
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
 
 	@Inject
-	protected SearchEngineHelper searchEngineHelper;
-
-	@Inject
 	protected Searcher searcher;
 
 	@Inject
@@ -178,6 +173,9 @@ public class BookmarksEntryIndexerIndexedFieldsTest {
 		throws Exception {
 
 		Map<String, String> map = HashMapBuilder.put(
+			Field.ASSET_ENTRY_ID,
+			String.valueOf(_getAssetEntryId(bookmarksEntry))
+		).put(
 			Field.COMPANY_ID, String.valueOf(bookmarksEntry.getCompanyId())
 		).put(
 			Field.DESCRIPTION, bookmarksEntry.getDescription()
@@ -204,6 +202,9 @@ public class BookmarksEntryIndexerIndexedFieldsTest {
 		).put(
 			Field.USER_NAME, StringUtil.lowerCase(bookmarksEntry.getUserName())
 		).put(
+			"assetEntryId_sortable",
+			String.valueOf(_getAssetEntryId(bookmarksEntry))
+		).put(
 			"title_sortable", StringUtil.lowerCase(bookmarksEntry.getName())
 		).put(
 			"visible", "true"
@@ -222,6 +223,17 @@ public class BookmarksEntryIndexerIndexedFieldsTest {
 		_populateRoles(bookmarksEntry, map);
 
 		return map;
+	}
+
+	private long _getAssetEntryId(BookmarksEntry bookmarksEntry) {
+		AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
+			BookmarksEntry.class.getName(), bookmarksEntry.getEntryId());
+
+		if (assetEntry == null) {
+			return 0;
+		}
+
+		return assetEntry.getEntryId();
 	}
 
 	private void _populateDates(
@@ -245,6 +257,9 @@ public class BookmarksEntryIndexerIndexedFieldsTest {
 			bookmarksEntry.getEntryId(), bookmarksEntry.getGroupId(), null,
 			map);
 	}
+
+	@Inject
+	private AssetEntryLocalService _assetEntryLocalService;
 
 	@DeleteAfterTestRun
 	private List<BookmarksEntry> _bookmarksEntries;

@@ -110,7 +110,8 @@ public class ReleaseManagerImpl implements ReleaseManager {
 		catch (SQLException sqlException) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
-					"Unable to get pending upgrade information for the portal");
+					"Unable to get pending upgrade information for the portal",
+					sqlException);
 			}
 		}
 
@@ -147,7 +148,7 @@ public class ReleaseManagerImpl implements ReleaseManager {
 	}
 
 	@Activate
-	protected void activate(final BundleContext bundleContext) {
+	protected void activate(BundleContext bundleContext) {
 		DB db = DBManagerUtil.getDB();
 
 		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
@@ -314,7 +315,8 @@ public class ReleaseManagerImpl implements ReleaseManager {
 					if (_log.isDebugEnabled()) {
 						_log.debug(
 							"Unable to read service.properties for " +
-								serviceReference);
+								serviceReference,
+							exception);
 					}
 				}
 			}
@@ -352,7 +354,7 @@ public class ReleaseManagerImpl implements ReleaseManager {
 		@Override
 		public void keyEmitted(
 			ServiceTrackerMap<String, List<UpgradeInfo>> serviceTrackerMap,
-			final String key, UpgradeInfo upgradeInfo,
+			String key, UpgradeInfo upgradeInfo,
 			List<UpgradeInfo> upgradeInfos) {
 
 			if (_activated && UpgradeStepRegistratorThreadLocal.isEnabled() &&

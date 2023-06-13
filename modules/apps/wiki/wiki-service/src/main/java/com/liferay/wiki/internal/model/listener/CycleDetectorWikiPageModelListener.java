@@ -37,19 +37,17 @@ public class CycleDetectorWikiPageModelListener
 				"Unable to create wiki page " + model.getTitle() +
 					" because a cycle was detected");
 		}
-
-		super.onBeforeCreate(model);
 	}
 
 	@Override
-	public void onBeforeUpdate(WikiPage model) throws ModelListenerException {
+	public void onBeforeUpdate(WikiPage originalModel, WikiPage model)
+		throws ModelListenerException {
+
 		if (isCycleDetectedInWikiPagesGraph(model)) {
 			throw new ModelListenerException(
 				"Unable to update wiki page " + model.getTitle() +
 					" because a cycle was detected");
 		}
-
-		super.onBeforeUpdate(model);
 	}
 
 	protected boolean isCycleDetectedInWikiPagesGraph(WikiPage wikiPage) {

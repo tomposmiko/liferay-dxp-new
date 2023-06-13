@@ -15,7 +15,6 @@
 package com.liferay.fragment.web.internal.servlet.taglib.clay;
 
 import com.liferay.fragment.model.FragmentComposition;
-import com.liferay.fragment.web.internal.constants.FragmentWebKeys;
 import com.liferay.fragment.web.internal.servlet.taglib.util.BasicFragmentCompositionActionDropdownItemsProvider;
 import com.liferay.frontend.taglib.clay.servlet.taglib.soy.BaseBaseClayCard;
 import com.liferay.frontend.taglib.clay.servlet.taglib.soy.VerticalCard;
@@ -81,12 +80,6 @@ public class BasicFragmentCompositionVerticalCard
 	}
 
 	@Override
-	public String getDefaultEventHandler() {
-		return FragmentWebKeys.
-			FRAGMENT_COMPOSITION_DROPDOWN_DEFAULT_EVENT_HANDLER;
-	}
-
-	@Override
 	public String getIcon() {
 		return "edit-layout";
 	}
@@ -126,14 +119,14 @@ public class BasicFragmentCompositionVerticalCard
 
 	@Override
 	public String getSubtitle() {
-		Date modifiedDate = _fragmentComposition.getModifiedDate();
+		Date statusDate = _fragmentComposition.getStatusDate();
 
-		String modifiedDateDescription = LanguageUtil.getTimeDescription(
+		String statusDateDescription = LanguageUtil.getTimeDescription(
 			_httpServletRequest,
-			System.currentTimeMillis() - modifiedDate.getTime(), true);
+			System.currentTimeMillis() - statusDate.getTime(), true);
 
 		return LanguageUtil.format(
-			_httpServletRequest, "modified-x-ago", modifiedDateDescription);
+			_httpServletRequest, "x-ago", statusDateDescription);
 	}
 
 	@Override

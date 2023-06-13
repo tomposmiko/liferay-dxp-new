@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.FileImpl;
 import com.liferay.portal.uuid.PortalUUIDImpl;
 
 import java.io.File;
@@ -37,7 +36,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -46,16 +44,11 @@ import org.junit.Test;
 public class ZipWriterImplTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		FileUtil fileUtil = new FileUtil();
-
-		fileUtil.setFile(new FileImpl());
-
 		PortalUUIDUtil portalUUIDUtil = new PortalUUIDUtil();
 
 		portalUUIDUtil.setPortalUUID(new PortalUUIDImpl());
@@ -225,9 +218,7 @@ public class ZipWriterImplTest {
 	public void testAddEntryFromStringBuilderThatIsEmpty() throws Exception {
 		ZipWriter zipWriter = new ZipWriterImpl(new File(_tempZipFilePath));
 
-		StringBuilder sb = new StringBuilder();
-
-		zipWriter.addEntry("empty.txt", sb);
+		zipWriter.addEntry("empty.txt", new StringBuilder());
 
 		File file = zipWriter.getFile();
 

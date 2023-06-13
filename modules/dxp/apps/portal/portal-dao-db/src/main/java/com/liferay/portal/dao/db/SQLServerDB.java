@@ -59,32 +59,28 @@ public class SQLServerDB extends BaseDB {
 	}
 
 	@Override
-	public List<Index> getIndexes(Connection con) throws SQLException {
+	public List<Index> getIndexes(Connection connection) throws SQLException {
 		List<Index> indexes = new ArrayList<>();
 
-		DatabaseMetaData databaseMetaData = con.getMetaData();
+		DatabaseMetaData databaseMetaData = connection.getMetaData();
 
 		if (databaseMetaData.getDatabaseMajorVersion() <= _SQL_SERVER_2000) {
 			return indexes;
 		}
 
-		StringBundler sb = new StringBundler(5);
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				StringBundler.concat(
+					"select sys.tables.name as table_name, sys.indexes.name ",
+					"as index_name, is_unique from sys.indexes inner join ",
+					"sys.tables on sys.tables.object_id = ",
+					"sys.indexes.object_id where sys.indexes.name like ",
+					"'LIFERAY_%' or sys.indexes.name like 'IX_%'"));
+			ResultSet resultSet = preparedStatement.executeQuery()) {
 
-		sb.append("select sys.tables.name as table_name, sys.indexes.name as ");
-		sb.append("index_name, is_unique from sys.indexes inner join ");
-		sb.append("sys.tables on sys.tables.object_id = ");
-		sb.append("sys.indexes.object_id where sys.indexes.name like ");
-		sb.append("'LIFERAY_%' or sys.indexes.name like 'IX_%'");
-
-		String sql = sb.toString();
-
-		try (PreparedStatement ps = con.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery()) {
-
-			while (rs.next()) {
-				String indexName = rs.getString("index_name");
-				String tableName = rs.getString("table_name");
-				boolean unique = !rs.getBoolean("is_unique");
+			while (resultSet.next()) {
+				String indexName = resultSet.getString("index_name");
+				String tableName = resultSet.getString("table_name");
+				boolean unique = !resultSet.getBoolean("is_unique");
 
 				indexes.add(new Index(indexName, tableName, unique));
 			}
@@ -100,31 +96,14 @@ public class SQLServerDB extends BaseDB {
 
 	@Override
 	public String getPopulateSQL(String databaseName, String sqlContent) {
-		StringBundler sb = new StringBundler(4);
-
-		sb.append("use ");
-		sb.append(databaseName);
-		sb.append(";\n\n");
-		sb.append(sqlContent);
-
-		return sb.toString();
+		return StringBundler.concat("use ", databaseName, ";\n\n", sqlContent);
 	}
 
 	@Override
 	public String getRecreateSQL(String databaseName) {
-		StringBundler sb = new StringBundler(9);
-
-		sb.append("drop database ");
-		sb.append(databaseName);
-		sb.append(";\n");
-		sb.append("create database ");
-		sb.append(databaseName);
-		sb.append(";\n");
-		sb.append("\n");
-		sb.append("go\n");
-		sb.append("\n");
-
-		return sb.toString();
+		return StringBundler.concat(
+			"drop database ", databaseName, ";\n", "create database ",
+			databaseName, ";\n\n", "go\n\n");
 	}
 
 	@Override

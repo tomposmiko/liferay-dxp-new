@@ -12,14 +12,18 @@
  * details.
  */
 
+import {getEditableLinkValue} from '../utils/getEditableLinkValue';
+import isNullOrUndefined from '../utils/isNullOrUndefined';
 import getAlloyEditorProcessor from './getAlloyEditorProcessor';
 import {getLinkableEditableEditorWrapper} from './getLinkableEditableEditorWrapper';
 
 export default getAlloyEditorProcessor(
 	'text',
 	getLinkableEditableEditorWrapper,
-	(element, value, config = {}) => {
-		if (config.href) {
+	(element, value, editableConfig = {}, languageId) => {
+		const link = getEditableLinkValue(editableConfig, languageId);
+
+		if (link.href) {
 			let anchor =
 				element instanceof HTMLAnchorElement
 					? element
@@ -29,15 +33,15 @@ export default getAlloyEditorProcessor(
 				anchor = document.createElement('a');
 			}
 
-			anchor.href = config.href;
-			anchor.target = config.target || '';
+			anchor.href = link.href;
+			anchor.target = link.target || '';
 			anchor.innerHTML = value;
 
 			if (!element.contains(anchor)) {
 				element.innerHTML = anchor.outerHTML;
 			}
 		}
-		else if (value) {
+		else if (!isNullOrUndefined(value)) {
 			element.innerHTML = value;
 		}
 	}

@@ -22,13 +22,13 @@ import com.liferay.commerce.discount.service.persistence.CommerceDiscountAccount
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountCommerceAccountGroupRelFinder;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountCommerceAccountGroupRelPersistence;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountFinder;
+import com.liferay.commerce.discount.service.persistence.CommerceDiscountOrderTypeRelPersistence;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountPersistence;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountRelFinder;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountRelPersistence;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountRuleFinder;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountRulePersistence;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountUsageEntryPersistence;
-import com.liferay.expando.kernel.service.persistence.ExpandoRowPersistence;
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
@@ -56,8 +56,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -67,7 +65,6 @@ import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
-import com.liferay.portal.kernel.service.persistence.WorkflowInstanceLinkPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -294,7 +291,13 @@ public abstract class CommerceDiscountLocalServiceBaseImpl
 			uuid, companyId, null);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce discount with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce discount's external reference code
+	 * @return the matching commerce discount, or <code>null</code> if a matching commerce discount could not be found
+	 */
 	@Override
 	public CommerceDiscount fetchCommerceDiscountByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -303,6 +306,9 @@ public abstract class CommerceDiscountLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceDiscountByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public CommerceDiscount fetchCommerceDiscountByReferenceCode(
@@ -312,7 +318,14 @@ public abstract class CommerceDiscountLocalServiceBaseImpl
 			companyId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce discount with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce discount's external reference code
+	 * @return the matching commerce discount
+	 * @throws PortalException if a matching commerce discount could not be found
+	 */
 	@Override
 	public CommerceDiscount getCommerceDiscountByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
@@ -484,6 +497,7 @@ public abstract class CommerceDiscountLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -502,6 +516,7 @@ public abstract class CommerceDiscountLocalServiceBaseImpl
 			(CommerceDiscount)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<CommerceDiscount> getBasePersistence() {
 		return commerceDiscountPersistence;
 	}
@@ -783,6 +798,56 @@ public abstract class CommerceDiscountLocalServiceBaseImpl
 
 		this.commerceDiscountCommerceAccountGroupRelFinder =
 			commerceDiscountCommerceAccountGroupRelFinder;
+	}
+
+	/**
+	 * Returns the commerce discount order type rel local service.
+	 *
+	 * @return the commerce discount order type rel local service
+	 */
+	public com.liferay.commerce.discount.service.
+		CommerceDiscountOrderTypeRelLocalService
+			getCommerceDiscountOrderTypeRelLocalService() {
+
+		return commerceDiscountOrderTypeRelLocalService;
+	}
+
+	/**
+	 * Sets the commerce discount order type rel local service.
+	 *
+	 * @param commerceDiscountOrderTypeRelLocalService the commerce discount order type rel local service
+	 */
+	public void setCommerceDiscountOrderTypeRelLocalService(
+		com.liferay.commerce.discount.service.
+			CommerceDiscountOrderTypeRelLocalService
+				commerceDiscountOrderTypeRelLocalService) {
+
+		this.commerceDiscountOrderTypeRelLocalService =
+			commerceDiscountOrderTypeRelLocalService;
+	}
+
+	/**
+	 * Returns the commerce discount order type rel persistence.
+	 *
+	 * @return the commerce discount order type rel persistence
+	 */
+	public CommerceDiscountOrderTypeRelPersistence
+		getCommerceDiscountOrderTypeRelPersistence() {
+
+		return commerceDiscountOrderTypeRelPersistence;
+	}
+
+	/**
+	 * Sets the commerce discount order type rel persistence.
+	 *
+	 * @param commerceDiscountOrderTypeRelPersistence the commerce discount order type rel persistence
+	 */
+	public void setCommerceDiscountOrderTypeRelPersistence(
+		CommerceDiscountOrderTypeRelPersistence
+			commerceDiscountOrderTypeRelPersistence) {
+
+		this.commerceDiscountOrderTypeRelPersistence =
+			commerceDiscountOrderTypeRelPersistence;
 	}
 
 	/**
@@ -1095,95 +1160,6 @@ public abstract class CommerceDiscountLocalServiceBaseImpl
 		this.userPersistence = userPersistence;
 	}
 
-	/**
-	 * Returns the workflow instance link local service.
-	 *
-	 * @return the workflow instance link local service
-	 */
-	public com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
-		getWorkflowInstanceLinkLocalService() {
-
-		return workflowInstanceLinkLocalService;
-	}
-
-	/**
-	 * Sets the workflow instance link local service.
-	 *
-	 * @param workflowInstanceLinkLocalService the workflow instance link local service
-	 */
-	public void setWorkflowInstanceLinkLocalService(
-		com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
-			workflowInstanceLinkLocalService) {
-
-		this.workflowInstanceLinkLocalService =
-			workflowInstanceLinkLocalService;
-	}
-
-	/**
-	 * Returns the workflow instance link persistence.
-	 *
-	 * @return the workflow instance link persistence
-	 */
-	public WorkflowInstanceLinkPersistence
-		getWorkflowInstanceLinkPersistence() {
-
-		return workflowInstanceLinkPersistence;
-	}
-
-	/**
-	 * Sets the workflow instance link persistence.
-	 *
-	 * @param workflowInstanceLinkPersistence the workflow instance link persistence
-	 */
-	public void setWorkflowInstanceLinkPersistence(
-		WorkflowInstanceLinkPersistence workflowInstanceLinkPersistence) {
-
-		this.workflowInstanceLinkPersistence = workflowInstanceLinkPersistence;
-	}
-
-	/**
-	 * Returns the expando row local service.
-	 *
-	 * @return the expando row local service
-	 */
-	public com.liferay.expando.kernel.service.ExpandoRowLocalService
-		getExpandoRowLocalService() {
-
-		return expandoRowLocalService;
-	}
-
-	/**
-	 * Sets the expando row local service.
-	 *
-	 * @param expandoRowLocalService the expando row local service
-	 */
-	public void setExpandoRowLocalService(
-		com.liferay.expando.kernel.service.ExpandoRowLocalService
-			expandoRowLocalService) {
-
-		this.expandoRowLocalService = expandoRowLocalService;
-	}
-
-	/**
-	 * Returns the expando row persistence.
-	 *
-	 * @return the expando row persistence
-	 */
-	public ExpandoRowPersistence getExpandoRowPersistence() {
-		return expandoRowPersistence;
-	}
-
-	/**
-	 * Sets the expando row persistence.
-	 *
-	 * @param expandoRowPersistence the expando row persistence
-	 */
-	public void setExpandoRowPersistence(
-		ExpandoRowPersistence expandoRowPersistence) {
-
-		this.expandoRowPersistence = expandoRowPersistence;
-	}
-
 	public void afterPropertiesSet() {
 		persistedModelLocalServiceRegistry.register(
 			"com.liferay.commerce.discount.model.CommerceDiscount",
@@ -1300,6 +1276,17 @@ public abstract class CommerceDiscountLocalServiceBaseImpl
 		commerceDiscountCommerceAccountGroupRelFinder;
 
 	@BeanReference(
+		type = com.liferay.commerce.discount.service.CommerceDiscountOrderTypeRelLocalService.class
+	)
+	protected com.liferay.commerce.discount.service.
+		CommerceDiscountOrderTypeRelLocalService
+			commerceDiscountOrderTypeRelLocalService;
+
+	@BeanReference(type = CommerceDiscountOrderTypeRelPersistence.class)
+	protected CommerceDiscountOrderTypeRelPersistence
+		commerceDiscountOrderTypeRelPersistence;
+
+	@BeanReference(
 		type = com.liferay.commerce.discount.service.CommerceDiscountRelLocalService.class
 	)
 	protected
@@ -1366,27 +1353,6 @@ public abstract class CommerceDiscountLocalServiceBaseImpl
 
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	@ServiceReference(
-		type = com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService
-		workflowInstanceLinkLocalService;
-
-	@ServiceReference(type = WorkflowInstanceLinkPersistence.class)
-	protected WorkflowInstanceLinkPersistence workflowInstanceLinkPersistence;
-
-	@ServiceReference(
-		type = com.liferay.expando.kernel.service.ExpandoRowLocalService.class
-	)
-	protected com.liferay.expando.kernel.service.ExpandoRowLocalService
-		expandoRowLocalService;
-
-	@ServiceReference(type = ExpandoRowPersistence.class)
-	protected ExpandoRowPersistence expandoRowPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CommerceDiscountLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

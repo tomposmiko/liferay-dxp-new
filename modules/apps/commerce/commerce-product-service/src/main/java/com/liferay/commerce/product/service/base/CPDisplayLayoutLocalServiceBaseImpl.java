@@ -65,8 +65,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -75,7 +73,6 @@ import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
-import com.liferay.portal.kernel.service.persistence.LayoutPersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -446,6 +443,7 @@ public abstract class CPDisplayLayoutLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -464,6 +462,7 @@ public abstract class CPDisplayLayoutLocalServiceBaseImpl
 			(CPDisplayLayout)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<CPDisplayLayout> getBasePersistence() {
 		return cpDisplayLayoutPersistence;
 	}
@@ -1630,47 +1629,6 @@ public abstract class CPDisplayLayoutLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the layout local service.
-	 *
-	 * @return the layout local service
-	 */
-	public com.liferay.portal.kernel.service.LayoutLocalService
-		getLayoutLocalService() {
-
-		return layoutLocalService;
-	}
-
-	/**
-	 * Sets the layout local service.
-	 *
-	 * @param layoutLocalService the layout local service
-	 */
-	public void setLayoutLocalService(
-		com.liferay.portal.kernel.service.LayoutLocalService
-			layoutLocalService) {
-
-		this.layoutLocalService = layoutLocalService;
-	}
-
-	/**
-	 * Returns the layout persistence.
-	 *
-	 * @return the layout persistence
-	 */
-	public LayoutPersistence getLayoutPersistence() {
-		return layoutPersistence;
-	}
-
-	/**
-	 * Sets the layout persistence.
-	 *
-	 * @param layoutPersistence the layout persistence
-	 */
-	public void setLayoutPersistence(LayoutPersistence layoutPersistence) {
-		this.layoutPersistence = layoutPersistence;
-	}
-
-	/**
 	 * Returns the resource local service.
 	 *
 	 * @return the resource local service
@@ -2025,15 +1983,6 @@ public abstract class CPDisplayLayoutLocalServiceBaseImpl
 	protected ClassNamePersistence classNamePersistence;
 
 	@ServiceReference(
-		type = com.liferay.portal.kernel.service.LayoutLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.LayoutLocalService
-		layoutLocalService;
-
-	@ServiceReference(type = LayoutPersistence.class)
-	protected LayoutPersistence layoutPersistence;
-
-	@ServiceReference(
 		type = com.liferay.portal.kernel.service.ResourceLocalService.class
 	)
 	protected com.liferay.portal.kernel.service.ResourceLocalService
@@ -2047,9 +1996,6 @@ public abstract class CPDisplayLayoutLocalServiceBaseImpl
 
 	@ServiceReference(type = UserPersistence.class)
 	protected UserPersistence userPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CPDisplayLayoutLocalServiceBaseImpl.class);
 
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

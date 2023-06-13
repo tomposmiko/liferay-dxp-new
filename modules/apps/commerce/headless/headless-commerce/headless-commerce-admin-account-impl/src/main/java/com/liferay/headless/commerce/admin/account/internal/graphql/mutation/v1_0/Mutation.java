@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
 import com.liferay.portal.vulcan.multipart.MultipartBody;
@@ -212,6 +211,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response deleteAccountBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -220,7 +220,7 @@ public class Mutation {
 			_accountResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			accountResource -> accountResource.deleteAccountBatch(
-				callbackURL, object));
+				id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -290,6 +290,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response deleteAccountAddressBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -299,7 +300,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountAddressResource ->
 				accountAddressResource.deleteAccountAddressBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -330,6 +331,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response updateAccountAddressBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -339,7 +341,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountAddressResource ->
 				accountAddressResource.putAccountAddressBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -373,6 +375,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createAccountIdAccountAddressBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -382,7 +385,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountAddressResource ->
 				accountAddressResource.postAccountIdAccountAddressBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -450,6 +453,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response deleteAccountGroupBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -459,7 +463,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountGroupResource ->
 				accountGroupResource.deleteAccountGroupBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -537,6 +541,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createAccountIdAccountMemberBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -546,7 +551,7 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountMemberResource ->
 				accountMemberResource.postAccountIdAccountMemberBatch(
-					callbackURL, object));
+					id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -625,6 +630,7 @@ public class Mutation {
 
 	@GraphQLField
 	public Response createAccountIdAccountOrganizationBatch(
+			@GraphQLName("id") Long id,
 			@GraphQLName("callbackURL") String callbackURL,
 			@GraphQLName("object") Object object)
 		throws Exception {
@@ -634,7 +640,8 @@ public class Mutation {
 			this::_populateResourceContext,
 			accountOrganizationResource ->
 				accountOrganizationResource.
-					postAccountIdAccountOrganizationBatch(callbackURL, object));
+					postAccountIdAccountOrganizationBatch(
+						id, callbackURL, object));
 	}
 
 	@GraphQLField
@@ -715,9 +722,6 @@ public class Mutation {
 		accountResource.setContextUser(_user);
 		accountResource.setGroupLocalService(_groupLocalService);
 		accountResource.setRoleLocalService(_roleLocalService);
-
-		accountResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -734,9 +738,6 @@ public class Mutation {
 		accountAddressResource.setContextUser(_user);
 		accountAddressResource.setGroupLocalService(_groupLocalService);
 		accountAddressResource.setRoleLocalService(_roleLocalService);
-
-		accountAddressResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -752,9 +753,6 @@ public class Mutation {
 		accountGroupResource.setContextUser(_user);
 		accountGroupResource.setGroupLocalService(_groupLocalService);
 		accountGroupResource.setRoleLocalService(_roleLocalService);
-
-		accountGroupResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -770,9 +768,6 @@ public class Mutation {
 		accountMemberResource.setContextUser(_user);
 		accountMemberResource.setGroupLocalService(_groupLocalService);
 		accountMemberResource.setRoleLocalService(_roleLocalService);
-
-		accountMemberResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(
@@ -789,9 +784,6 @@ public class Mutation {
 		accountOrganizationResource.setContextUser(_user);
 		accountOrganizationResource.setGroupLocalService(_groupLocalService);
 		accountOrganizationResource.setRoleLocalService(_roleLocalService);
-
-		accountOrganizationResource.setVulcanBatchEngineImportTaskResource(
-			_vulcanBatchEngineImportTaskResource);
 	}
 
 	private void _populateResourceContext(UserResource userResource)
@@ -829,7 +821,5 @@ public class Mutation {
 	private BiFunction<Object, String, Sort[]> _sortsBiFunction;
 	private UriInfo _uriInfo;
 	private com.liferay.portal.kernel.model.User _user;
-	private VulcanBatchEngineImportTaskResource
-		_vulcanBatchEngineImportTaskResource;
 
 }

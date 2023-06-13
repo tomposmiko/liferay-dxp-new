@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
@@ -63,9 +64,9 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  */
 @Component(
-	configurationPid = "com.liferay.portal.security.sso.token.configuration.TokenConfiguration",
-	immediate = true, property = "key=logout.events.post",
-	service = LifecycleAction.class
+	configurationPid = "com.liferay.portal.security.sso.token.internal.configuration.TokenConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	property = "key=logout.events.post", service = LifecycleAction.class
 )
 public class TokenLogoutAction extends Action {
 

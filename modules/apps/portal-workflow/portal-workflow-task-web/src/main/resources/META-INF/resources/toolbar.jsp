@@ -18,11 +18,6 @@
 
 <%
 String tabs1 = ParamUtil.getString(renderRequest, "tabs1", "assigned-to-me");
-
-PortletURL portletURL = renderResponse.createRenderURL();
-
-portletURL.setParameter("mvcPath", "/view.jsp");
-portletURL.setParameter("tabs1", tabs1);
 %>
 
 <clay:navigation-bar
@@ -52,7 +47,6 @@ portletURL.setParameter("tabs1", tabs1);
 	clearResultsURL="<%= workflowTaskDisplayContext.getClearResultsURL() %>"
 	filterDropdownItems="<%= workflowTaskDisplayContext.getFilterOptions() %>"
 	itemsTotal="<%= workflowTaskDisplayContext.getTotalItems() %>"
-	namespace="<%= liferayPortletResponse.getNamespace() %>"
 	searchActionURL="<%= workflowTaskDisplayContext.getSearchURL() %>"
 	searchContainerId="workflowTasks"
 	searchFormName="fm1"

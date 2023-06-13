@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Props;
-import com.liferay.portal.search.batch.BatchIndexingHelper;
 import com.liferay.portal.search.index.IndexStatusManager;
 import com.liferay.portal.search.index.UpdateDocumentIndexWriter;
 import com.liferay.portal.search.indexer.BaseModelDocumentFactory;
@@ -46,8 +45,10 @@ import com.liferay.portal.search.indexer.IndexerQueryBuilder;
 import com.liferay.portal.search.indexer.IndexerSearcher;
 import com.liferay.portal.search.indexer.IndexerSummaryBuilder;
 import com.liferay.portal.search.indexer.IndexerWriter;
-import com.liferay.portal.search.internal.expando.ExpandoQueryContributorHelper;
-import com.liferay.portal.search.internal.searcher.IndexSearcherHelper;
+import com.liferay.portal.search.internal.expando.helper.ExpandoQueryContributorHelper;
+import com.liferay.portal.search.internal.indexer.helper.AddSearchKeywordsQueryContributorHelper;
+import com.liferay.portal.search.internal.indexer.helper.PreFilterContributorHelper;
+import com.liferay.portal.search.internal.searcher.helper.IndexSearcherHelper;
 import com.liferay.portal.search.permission.SearchPermissionDocumentContributor;
 import com.liferay.portal.search.permission.SearchPermissionIndexWriter;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
@@ -92,7 +93,7 @@ public class ModelSearchConfiguratorServiceTrackerCustomizer
 		int serviceRanking = GetterUtil.getInteger(
 			serviceReference.getProperty(Constants.SERVICE_RANKING));
 
-		final ModelSearchConfigurator<T> modelSearchConfigurator =
+		ModelSearchConfigurator<T> modelSearchConfigurator =
 			_bundleContext.getService(serviceReference);
 
 		ServiceRegistrationHolder serviceRegistrationHolder =
@@ -103,15 +104,12 @@ public class ModelSearchConfiguratorServiceTrackerCustomizer
 			(serviceRegistrationHolder._serviceRanking > serviceRanking)) {
 
 			if (_log.isWarnEnabled()) {
-				StringBundler sb = new StringBundler(5);
-
-				sb.append(ClassUtil.getClassName(serviceRegistrationHolder));
-				sb.append(" is already registered with a higher ranking of ");
-				sb.append(serviceRegistrationHolder._serviceRanking);
-				sb.append(" for: ");
-				sb.append(modelSearchConfigurator.getClassName());
-
-				_log.warn(sb.toString());
+				_log.warn(
+					StringBundler.concat(
+						ClassUtil.getClassName(serviceRegistrationHolder),
+						" is already registered with a higher ranking of ",
+						serviceRegistrationHolder._serviceRanking, " for: ",
+						modelSearchConfigurator.getClassName()));
 			}
 
 			return modelSearchConfigurator;
@@ -280,7 +278,7 @@ public class ModelSearchConfiguratorServiceTrackerCustomizer
 
 		IndexerWriter<?> indexerWriter = new IndexerWriterImpl<>(
 			modelSearchConfigurator.getModelSearchSettings(),
-			baseModelRetriever, batchIndexingHelper,
+			baseModelRetriever,
 			modelSearchConfigurator.getModelIndexerWriterContributor(),
 			indexerDocumentBuilder, searchPermissionIndexWriter,
 			updateDocumentIndexWriter, indexStatusManager, indexWriterHelper,
@@ -340,9 +338,6 @@ public class ModelSearchConfiguratorServiceTrackerCustomizer
 	protected BaseModelRetriever baseModelRetriever;
 
 	@Reference
-	protected BatchIndexingHelper batchIndexingHelper;
-
-	@Reference
 	protected ExpandoQueryContributorHelper expandoQueryContributorHelper;
 
 	@Reference
@@ -387,19 +382,16 @@ public class ModelSearchConfiguratorServiceTrackerCustomizer
 		ModelSearchConfiguratorServiceTrackerCustomizer.class);
 
 	private BundleContext _bundleContext;
-	private ServiceTrackerList<DocumentContributor<?>, DocumentContributor<?>>
-		_documentContributors;
+	private ServiceTrackerList<DocumentContributor<?>> _documentContributors;
 	private ServiceTrackerMap<String, ModelResourcePermission<?>>
 		_modelResourcePermissionServiceTrackerMap;
 
 	@Reference(target = ModuleServiceLifecycle.PORTLETS_INITIALIZED)
 	private ModuleServiceLifecycle _moduleServiceLifecycle;
 
-	private ServiceTrackerList<QueryConfigContributor, QueryConfigContributor>
-		_queryConfigContributors;
-	private ServiceTrackerList
-		<SearchContextContributor, SearchContextContributor>
-			_searchContextContributors;
+	private ServiceTrackerList<QueryConfigContributor> _queryConfigContributors;
+	private ServiceTrackerList<SearchContextContributor>
+		_searchContextContributors;
 	private final Map<String, ServiceRegistrationHolder>
 		_serviceRegistrationHolders = new Hashtable<>();
 	private ServiceTracker

@@ -215,7 +215,13 @@ public class ERCCompanyEntryLocalServiceUtil {
 		return getService().fetchERCCompanyEntry(ercCompanyEntryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the erc company entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the erc company entry's external reference code
+	 * @return the matching erc company entry, or <code>null</code> if a matching erc company entry could not be found
+	 */
 	public static ERCCompanyEntry fetchERCCompanyEntryByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
 
@@ -223,26 +229,15 @@ public class ERCCompanyEntryLocalServiceUtil {
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchERCCompanyEntryByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static ERCCompanyEntry fetchERCCompanyEntryByReferenceCode(
 		long companyId, String externalReferenceCode) {
 
 		return getService().fetchERCCompanyEntryByReferenceCode(
 			companyId, externalReferenceCode);
-	}
-
-	/**
-	 * Returns the erc company entry with the matching UUID and company.
-	 *
-	 * @param uuid the erc company entry's UUID
-	 * @param companyId the primary key of the company
-	 * @return the matching erc company entry, or <code>null</code> if a matching erc company entry could not be found
-	 */
-	public static ERCCompanyEntry fetchERCCompanyEntryByUuidAndCompanyId(
-		String uuid, long companyId) {
-
-		return getService().fetchERCCompanyEntryByUuidAndCompanyId(
-			uuid, companyId);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
@@ -290,29 +285,20 @@ public class ERCCompanyEntryLocalServiceUtil {
 		return getService().getERCCompanyEntry(ercCompanyEntryId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the erc company entry with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the erc company entry's external reference code
+	 * @return the matching erc company entry
+	 * @throws PortalException if a matching erc company entry could not be found
+	 */
 	public static ERCCompanyEntry getERCCompanyEntryByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
 		throws PortalException {
 
 		return getService().getERCCompanyEntryByExternalReferenceCode(
 			companyId, externalReferenceCode);
-	}
-
-	/**
-	 * Returns the erc company entry with the matching UUID and company.
-	 *
-	 * @param uuid the erc company entry's UUID
-	 * @param companyId the primary key of the company
-	 * @return the matching erc company entry
-	 * @throws PortalException if a matching erc company entry could not be found
-	 */
-	public static ERCCompanyEntry getERCCompanyEntryByUuidAndCompanyId(
-			String uuid, long companyId)
-		throws PortalException {
-
-		return getService().getERCCompanyEntryByUuidAndCompanyId(
-			uuid, companyId);
 	}
 
 	public static

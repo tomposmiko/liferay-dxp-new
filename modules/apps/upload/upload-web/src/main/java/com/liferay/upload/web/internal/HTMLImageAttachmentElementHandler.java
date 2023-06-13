@@ -24,8 +24,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.upload.AttachmentElementHandler;
 import com.liferay.upload.AttachmentElementReplacer;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,27 +54,17 @@ public class HTMLImageAttachmentElementHandler
 
 		StringBuffer sb = new StringBuffer(content.length());
 
-		Map<String, FileEntry> fileEntries = new HashMap<>();
-
 		while (matcher.find()) {
-			String match = matcher.group(0);
+			FileEntry tempAttachmentFileEntry = _getFileEntry(matcher);
 
-			FileEntry attachmentFileEntry = fileEntries.get(match);
-
-			if (attachmentFileEntry == null) {
-				FileEntry tempAttachmentFileEntry = _getFileEntry(matcher);
-
-				attachmentFileEntry = saveTempFileUnsafeFunction.apply(
-					tempAttachmentFileEntry);
-
-				fileEntries.put(match, attachmentFileEntry);
-			}
+			FileEntry attachmentFileEntry = saveTempFileUnsafeFunction.apply(
+				tempAttachmentFileEntry);
 
 			matcher.appendReplacement(
 				sb,
 				Matcher.quoteReplacement(
 					_attachmentElementReplacer.replace(
-						match, attachmentFileEntry)));
+						matcher.group(0), attachmentFileEntry)));
 		}
 
 		matcher.appendTail(sb);
@@ -96,18 +84,11 @@ public class HTMLImageAttachmentElementHandler
 	private static final Pattern _tempAttachmentPattern;
 
 	static {
-		StringBundler sb = new StringBundler(8);
-
-		sb.append("<\\s*?img");
-		sb.append(_ATTRIBUTE_LIST_REGEXP);
-		sb.append(EditorConstants.ATTRIBUTE_DATA_IMAGE_ID);
-		sb.append("\\s*?=\\s*?\"");
-		sb.append("([^\"]*)");
-		sb.append("\"");
-		sb.append(_ATTRIBUTE_LIST_REGEXP);
-		sb.append("/>");
-
-		_tempAttachmentPattern = Pattern.compile(sb.toString());
+		_tempAttachmentPattern = Pattern.compile(
+			StringBundler.concat(
+				"<\\s*?img", _ATTRIBUTE_LIST_REGEXP,
+				EditorConstants.ATTRIBUTE_DATA_IMAGE_ID, "\\s*?=\\s*?\"",
+				"([^\"]*)\"", _ATTRIBUTE_LIST_REGEXP, "/>"));
 	}
 
 	@Reference(

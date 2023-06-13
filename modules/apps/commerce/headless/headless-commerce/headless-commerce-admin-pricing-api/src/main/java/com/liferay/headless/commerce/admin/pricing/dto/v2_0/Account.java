@@ -59,7 +59,7 @@ public class Account implements Serializable {
 	}
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -86,7 +86,7 @@ public class Account implements Serializable {
 	protected Long id;
 
 	@DecimalMin("0")
-	@Schema(example = "20078")
+	@Schema
 	public Long getLogoId() {
 		return logoId;
 	}
@@ -114,7 +114,7 @@ public class Account implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long logoId;
 
-	@Schema(example = "Account Name")
+	@Schema
 	public String getName() {
 		return name;
 	}

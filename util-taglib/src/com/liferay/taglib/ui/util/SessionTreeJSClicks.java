@@ -33,7 +33,9 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Brian Wing Shun Chan
  * @author Eduardo Lundgren
+ * @deprecated As of Cavanaugh (7.4.x), replaced by {@link com.liferay.portal.kernel.util.SessionTreeJSClicks}
  */
+@Deprecated
 public class SessionTreeJSClicks {
 
 	public static void closeLayoutNodes(
@@ -81,6 +83,12 @@ public class SessionTreeJSClicks {
 			}
 			catch (ConcurrentModificationException
 						concurrentModificationException) {
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						concurrentModificationException,
+						concurrentModificationException);
+				}
 			}
 			catch (Exception exception) {
 				_log.error(exception, exception);
@@ -107,6 +115,12 @@ public class SessionTreeJSClicks {
 			}
 			catch (ConcurrentModificationException
 						concurrentModificationException) {
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						concurrentModificationException,
+						concurrentModificationException);
+				}
 			}
 			catch (Exception exception) {
 				_log.error(exception, exception);
@@ -142,6 +156,12 @@ public class SessionTreeJSClicks {
 			}
 			catch (ConcurrentModificationException
 						concurrentModificationException) {
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						concurrentModificationException,
+						concurrentModificationException);
+				}
 			}
 			catch (Exception exception) {
 				_log.error(exception, exception);
@@ -213,6 +233,12 @@ public class SessionTreeJSClicks {
 			}
 			catch (ConcurrentModificationException
 						concurrentModificationException) {
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						concurrentModificationException,
+						concurrentModificationException);
+				}
 			}
 			catch (Exception exception) {
 				_log.error(exception, exception);
@@ -247,6 +273,12 @@ public class SessionTreeJSClicks {
 			}
 			catch (ConcurrentModificationException
 						concurrentModificationException) {
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						concurrentModificationException,
+						concurrentModificationException);
+				}
 			}
 			catch (Exception exception) {
 				_log.error(exception, exception);

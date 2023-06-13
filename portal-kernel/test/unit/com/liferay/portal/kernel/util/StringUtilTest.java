@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.util;
 
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.test.randomizerbumpers.RandomizerBumper;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
@@ -1093,14 +1094,6 @@ public class StringUtilTest {
 		Assert.assertEquals(
 			"Hello World", StringUtil.unquote("\"Hello World\""));
 		Assert.assertEquals("Hello World", StringUtil.unquote("Hello World"));
-	}
-
-	@Test
-	public void testUpperCaseFirstLetter() {
-		Assert.assertEquals("", StringUtil.upperCaseFirstLetter(""));
-		Assert.assertEquals(
-			"Hello World", StringUtil.upperCaseFirstLetter("hello World"));
-		Assert.assertNull(StringUtil.upperCaseFirstLetter(null));
 	}
 
 	@Test

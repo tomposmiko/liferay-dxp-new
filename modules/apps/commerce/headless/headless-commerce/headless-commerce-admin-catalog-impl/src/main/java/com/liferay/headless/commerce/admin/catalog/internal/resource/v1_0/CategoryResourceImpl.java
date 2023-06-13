@@ -62,11 +62,11 @@ public class CategoryResourceImpl
 		CPDefinition cpDefinition =
 			_cpDefinitionService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
-					contextCompany.getCompanyId(), externalReferenceCode);
+					externalReferenceCode, contextCompany.getCompanyId());
 
 		if (cpDefinition == null) {
 			throw new NoSuchCPDefinitionException(
-				"Unable to find Product with externalReferenceCode: " +
+				"Unable to find product with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -105,11 +105,11 @@ public class CategoryResourceImpl
 		CPDefinition cpDefinition =
 			_cpDefinitionService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
-					contextCompany.getCompanyId(), externalReferenceCode);
+					externalReferenceCode, contextCompany.getCompanyId());
 
 		if (cpDefinition == null) {
 			throw new NoSuchCPDefinitionException(
-				"Unable to find Product with externalReferenceCode: " +
+				"Unable to find product with external reference code " +
 					externalReferenceCode);
 		}
 
@@ -145,9 +145,6 @@ public class CategoryResourceImpl
 
 		long[] assetCategoryIds = new long[0];
 
-		ServiceContext serviceContext = _serviceContextHelper.getServiceContext(
-			cpDefinition.getGroupId());
-
 		for (Category category : categories) {
 			AssetCategory assetCategory = _assetCategoryService.fetchCategory(
 				category.getId());
@@ -160,6 +157,9 @@ public class CategoryResourceImpl
 			assetCategoryIds = ArrayUtil.append(
 				assetCategoryIds, assetCategory.getCategoryId());
 		}
+
+		ServiceContext serviceContext = _serviceContextHelper.getServiceContext(
+			cpDefinition.getGroupId());
 
 		serviceContext.setAssetCategoryIds(assetCategoryIds);
 

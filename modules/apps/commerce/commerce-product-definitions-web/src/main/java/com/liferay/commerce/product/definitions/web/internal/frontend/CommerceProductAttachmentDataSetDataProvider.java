@@ -74,7 +74,7 @@ public class CommerceProductAttachmentDataSetDataProvider
 		List<CPAttachmentFileEntry> cpAttachmentFileEntries =
 			_cpAttachmentFileEntryService.getCPAttachmentFileEntries(
 				_portal.getClassNameId(CPDefinition.class), cpDefinitionId,
-				filter.getKeywords(), CPAttachmentFileEntryConstants.TYPE_OTHER,
+				CPAttachmentFileEntryConstants.TYPE_OTHER,
 				WorkflowConstants.STATUS_ANY, pagination.getStartPosition(),
 				pagination.getEndPosition());
 
@@ -87,7 +87,13 @@ public class CommerceProductAttachmentDataSetDataProvider
 			String title = cpAttachmentFileEntry.getTitle(
 				LanguageUtil.getLanguageId(locale));
 
-			FileEntry fileEntry = cpAttachmentFileEntry.getFileEntry();
+			String extension = StringPool.BLANK;
+
+			FileEntry fileEntry = cpAttachmentFileEntry.fetchFileEntry();
+
+			if (fileEntry != null) {
+				extension = HtmlUtil.escape(fileEntry.getExtension());
+			}
 
 			Date modifiedDate = cpAttachmentFileEntry.getModifiedDate();
 
@@ -109,10 +115,9 @@ public class CommerceProductAttachmentDataSetDataProvider
 					new ImageField(
 						title, "rounded", "lg",
 						CommerceMediaResolverUtil.getThumbnailURL(
-							CommerceAccountConstants.ACCOUNT_ID_GUEST,
+							CommerceAccountConstants.ACCOUNT_ID_ADMIN,
 							cpAttachmentFileEntryId)),
-					title, HtmlUtil.escape(fileEntry.getExtension()),
-					cpAttachmentFileEntry.getPriority(),
+					title, extension, cpAttachmentFileEntry.getPriority(),
 					LanguageUtil.format(
 						httpServletRequest, "x-ago", modifiedDateDescription,
 						false),
@@ -137,7 +142,7 @@ public class CommerceProductAttachmentDataSetDataProvider
 
 		return _cpAttachmentFileEntryService.getCPAttachmentFileEntriesCount(
 			_portal.getClassNameId(CPDefinition.class), cpDefinitionId,
-			filter.getKeywords(), CPAttachmentFileEntryConstants.TYPE_OTHER,
+			CPAttachmentFileEntryConstants.TYPE_OTHER,
 			WorkflowConstants.STATUS_ANY);
 	}
 

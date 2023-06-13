@@ -15,15 +15,15 @@
 package com.liferay.site.navigation.admin.web.internal.display.context;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
-import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemBuilder;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -33,18 +33,17 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.site.navigation.admin.constants.SiteNavigationAdminPortletKeys;
+import com.liferay.site.navigation.admin.web.internal.configuration.FFSiteNavigationAdminConfigurationUtil;
 import com.liferay.site.navigation.admin.web.internal.security.permission.resource.SiteNavigationMenuPermission;
 import com.liferay.site.navigation.admin.web.internal.util.SiteNavigationMenuPortletUtil;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
-import com.liferay.site.navigation.model.SiteNavigationMenuItem;
-import com.liferay.site.navigation.service.SiteNavigationMenuItemLocalServiceUtil;
 import com.liferay.site.navigation.service.SiteNavigationMenuLocalService;
 import com.liferay.site.navigation.service.SiteNavigationMenuService;
 import com.liferay.site.navigation.type.DefaultSiteNavigationMenuItemTypeContext;
@@ -54,14 +53,15 @@ import com.liferay.site.navigation.type.SiteNavigationMenuItemTypeRegistry;
 import com.liferay.staging.StagingGroupHelper;
 import com.liferay.staging.StagingGroupHelperUtil;
 
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 import javax.portlet.WindowStateException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -97,31 +97,30 @@ public class SiteNavigationAdminDisplayContext {
 			new DefaultSiteNavigationMenuItemTypeContext(
 				themeDisplay.getScopeGroup());
 
-		return new DropdownItemList() {
-			{
-				for (SiteNavigationMenuItemType siteNavigationMenuItemType :
-						_siteNavigationMenuItemTypeRegistry.
-							getSiteNavigationMenuItemTypes()) {
+		List<SiteNavigationMenuItemType> siteNavigationMenuItemTypes =
+			_siteNavigationMenuItemTypeRegistry.
+				getSiteNavigationMenuItemTypes();
 
-					if (!siteNavigationMenuItemType.isAvailable(
-							siteNavigationMenuItemTypeContext)) {
+		Stream<SiteNavigationMenuItemType> stream =
+			siteNavigationMenuItemTypes.stream();
 
-						continue;
-					}
-
-					add(
-						dropdownItem -> {
-							dropdownItem.setData(
-								Collections.singletonMap(
-									"href",
-									_getAddURL(siteNavigationMenuItemType)));
-							dropdownItem.setLabel(
-								siteNavigationMenuItemType.getLabel(
-									themeDisplay.getLocale()));
-						});
-				}
-			}
-		};
+		return DropdownItemListBuilder.addAll(
+			stream.filter(
+				siteNavigationMenuItemType ->
+					siteNavigationMenuItemType.isAvailable(
+						siteNavigationMenuItemTypeContext)
+			).sorted(
+				Comparator.comparing(
+					siteNavigationMenuItemType ->
+						siteNavigationMenuItemType.getLabel(
+							themeDisplay.getLocale()))
+			).map(
+				siteNavigationMenuItemType -> _getDropdownItem(
+					siteNavigationMenuItemType, themeDisplay)
+			).collect(
+				Collectors.toList()
+			)
+		).build();
 	}
 
 	public String getDisplayStyle() {
@@ -259,82 +258,64 @@ public class SiteNavigationAdminDisplayContext {
 	}
 
 	public Map<String, Object> getSiteNavigationContext() throws Exception {
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
 		return HashMapBuilder.<String, Object>put(
 			"addSiteNavigationMenuItemOptions",
 			getAddSiteNavigationMenuItemDropdownItems()
 		).put(
+			"categoriesMultipleSelectionEnabled",
+			FFSiteNavigationAdminConfigurationUtil.
+				categoriesMultipleSelectionEnabled()
+		).put(
 			"deleteSiteNavigationMenuItemURL",
-			() -> {
-				PortletURL actionURL =
-					_liferayPortletResponse.createActionURL();
-
-				actionURL.setParameter(
-					ActionRequest.ACTION_NAME,
-					"/navigation_menu/delete_site_navigation_menu_item");
-
-				return actionURL.toString();
-			}
+			() -> PortletURLBuilder.createActionURL(
+				_liferayPortletResponse
+			).setActionName(
+				"/site_navigation_admin/delete_site_navigation_menu_item"
+			).buildString()
 		).put(
 			"editSiteNavigationMenuItemParentURL",
-			() -> {
-				PortletURL actionURL =
-					_liferayPortletResponse.createActionURL();
-
-				actionURL.setParameter(
-					ActionRequest.ACTION_NAME,
-					"/navigation_menu/edit_site_navigation_menu_item_parent");
-
-				actionURL.setParameter(
-					"redirect",
-					PortalUtil.getCurrentURL(_liferayPortletRequest));
-
-				return actionURL.toString();
-			}
+			() -> PortletURLBuilder.createActionURL(
+				_liferayPortletResponse
+			).setActionName(
+				"/site_navigation_admin/edit_site_navigation_menu_item_parent"
+			).setRedirect(
+				PortalUtil.getCurrentURL(_liferayPortletRequest)
+			).buildString()
 		).put(
 			"editSiteNavigationMenuItemURL",
-			() -> {
-				PortletURL renderURL =
-					_liferayPortletResponse.createRenderURL();
-
-				renderURL.setParameter(
-					"mvcPath", "/edit_site_navigation_menu_item.jsp");
-
-				renderURL.setWindowState(LiferayWindowState.EXCLUSIVE);
-
-				return renderURL.toString();
-			}
+			() -> PortletURLBuilder.createRenderURL(
+				_liferayPortletResponse
+			).setMVCPath(
+				"/edit_site_navigation_menu_item.jsp"
+			).setWindowState(
+				LiferayWindowState.EXCLUSIVE
+			).buildString()
 		).put(
 			"editSiteNavigationMenuSettingsURL",
-			() -> {
-				PortletURL renderURL =
-					_liferayPortletResponse.createRenderURL();
-
-				renderURL.setParameter(
-					"mvcPath", "/site_navigation_menu_settings.jsp");
-
-				renderURL.setWindowState(LiferayWindowState.EXCLUSIVE);
-
-				return renderURL.toString();
-			}
+			() -> PortletURLBuilder.createRenderURL(
+				_liferayPortletResponse
+			).setMVCPath(
+				"/site_navigation_menu_settings.jsp"
+			).setWindowState(
+				LiferayWindowState.EXCLUSIVE
+			).buildString()
 		).put(
 			"id", _liferayPortletResponse.getNamespace() + "sidebar"
 		).put(
-			"languageDirection", _getLanguageDirection()
-		).put(
-			"languageId",
-			() -> {
-				ThemeDisplay themeDisplay =
-					(ThemeDisplay)_httpServletRequest.getAttribute(
-						WebKeys.THEME_DISPLAY);
-
-				return themeDisplay.getLanguageId();
-			}
+			"languageId", themeDisplay.getLanguageId()
 		).put(
 			"redirect", PortalUtil.getCurrentURL(_liferayPortletRequest)
 		).put(
 			"siteNavigationMenuId", getSiteNavigationMenuId()
 		).put(
-			"siteNavigationMenuItems", _getSiteNavigationMenuItemsJSONArray(0)
+			"siteNavigationMenuItems",
+			SiteNavigationMenuPortletUtil.getSiteNavigationMenuItemsJSONArray(
+				0, getSiteNavigationMenuId(),
+				_siteNavigationMenuItemTypeRegistry, themeDisplay)
 		).put(
 			"siteNavigationMenuName", getSiteNavigationMenuName()
 		).build();
@@ -418,107 +399,100 @@ public class SiteNavigationAdminDisplayContext {
 	private String _getAddURL(
 		SiteNavigationMenuItemType siteNavigationMenuItemType) {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
+		if (siteNavigationMenuItemType.isItemSelector()) {
+			String itemSelectorURL =
+				siteNavigationMenuItemType.getItemSelectorURL(
+					_httpServletRequest);
 
-		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+			if (Validator.isNotNull(itemSelectorURL)) {
+				return itemSelectorURL;
+			}
+		}
 
-		PortletURL addURL = _liferayPortletResponse.createRenderURL();
+		PortletURL addURL = PortletURLBuilder.createRenderURL(
+			_liferayPortletResponse
+		).setMVCPath(
+			"/add_site_navigation_menu_item.jsp"
+		).setRedirect(
+			PortletURLBuilder.createRenderURL(
+				_liferayPortletResponse
+			).setMVCPath(
+				"/add_site_navigation_menu_item_redirect.jsp"
+			).setPortletResource(
+				() -> {
+					ThemeDisplay themeDisplay =
+						(ThemeDisplay)_httpServletRequest.getAttribute(
+							WebKeys.THEME_DISPLAY);
 
-		addURL.setParameter("mvcPath", "/add_site_navigation_menu_item.jsp");
+					PortletDisplay portletDisplay =
+						themeDisplay.getPortletDisplay();
 
-		PortletURL addSiteNavigationMenuItemRedirectURL =
-			_liferayPortletResponse.createRenderURL();
-
-		addSiteNavigationMenuItemRedirectURL.setParameter(
-			"mvcPath", "/add_site_navigation_menu_item_redirect.jsp");
-		addSiteNavigationMenuItemRedirectURL.setParameter(
-			"portletResource", portletDisplay.getId());
-
-		addURL.setParameter(
-			"redirect", addSiteNavigationMenuItemRedirectURL.toString());
-
-		addURL.setParameter(
-			"siteNavigationMenuId", String.valueOf(getSiteNavigationMenuId()));
-		addURL.setParameter("type", siteNavigationMenuItemType.getType());
+					return portletDisplay.getId();
+				}
+			).buildString()
+		).setParameter(
+			"siteNavigationMenuId", getSiteNavigationMenuId()
+		).setParameter(
+			"type", siteNavigationMenuItemType.getType()
+		).build();
 
 		try {
 			addURL.setWindowState(LiferayWindowState.POP_UP);
 		}
 		catch (WindowStateException windowStateException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(windowStateException, windowStateException);
+			}
+
 			return StringPool.BLANK;
 		}
 
 		return addURL.toString();
 	}
 
-	private Map<String, String> _getLanguageDirection() {
-		Map<String, String> languageDirection = new HashMap<>();
+	private DropdownItem _getDropdownItem(
+		SiteNavigationMenuItemType siteNavigationMenuItemType,
+		ThemeDisplay themeDisplay) {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
+		return DropdownItemBuilder.setData(
+			HashMapBuilder.<String, Object>put(
+				"addItemURL",
+				() -> {
+					if (!siteNavigationMenuItemType.isItemSelector()) {
+						return null;
+					}
 
-		for (Locale curLocale :
-				LanguageUtil.getAvailableLocales(
-					themeDisplay.getScopeGroupId())) {
+					RenderRequest renderRequest =
+						(RenderRequest)_httpServletRequest.getAttribute(
+							JavaConstants.JAVAX_PORTLET_REQUEST);
+					RenderResponse renderResponse =
+						(RenderResponse)_httpServletRequest.getAttribute(
+							JavaConstants.JAVAX_PORTLET_RESPONSE);
 
-			languageDirection.put(
-				LocaleUtil.toLanguageId(curLocale),
-				LanguageUtil.get(curLocale, "lang.dir"));
-		}
+					PortletURL addURL = siteNavigationMenuItemType.getAddURL(
+						renderRequest, renderResponse);
 
-		return languageDirection;
+					return addURL.toString();
+				}
+			).put(
+				"addTitle",
+				siteNavigationMenuItemType.getAddTitle(themeDisplay.getLocale())
+			).put(
+				"href", _getAddURL(siteNavigationMenuItemType)
+			).put(
+				"itemSelector", siteNavigationMenuItemType.isItemSelector()
+			).put(
+				"multiSelection", siteNavigationMenuItemType.isMultiSelection()
+			).put(
+				"siteNavigationMenuId", getSiteNavigationMenuId()
+			).build()
+		).setLabel(
+			siteNavigationMenuItemType.getLabel(themeDisplay.getLocale())
+		).build();
 	}
 
-	private JSONArray _getSiteNavigationMenuItemsJSONArray(
-		long parentSiteNavigationMenuItemId) {
-
-		List<SiteNavigationMenuItem> siteNavigationMenuItems =
-			SiteNavigationMenuItemLocalServiceUtil.getSiteNavigationMenuItems(
-				getSiteNavigationMenuId(), parentSiteNavigationMenuItemId);
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		JSONArray siteNavigationMenuItemsJSONArray =
-			JSONFactoryUtil.createJSONArray();
-
-		for (SiteNavigationMenuItem siteNavigationMenuItem :
-				siteNavigationMenuItems) {
-
-			long siteNavigationMenuItemId =
-				siteNavigationMenuItem.getSiteNavigationMenuItemId();
-			SiteNavigationMenuItemType siteNavigationMenuItemType =
-				_siteNavigationMenuItemTypeRegistry.
-					getSiteNavigationMenuItemType(
-						siteNavigationMenuItem.getType());
-
-			siteNavigationMenuItemsJSONArray.put(
-				JSONUtil.put(
-					"children",
-					_getSiteNavigationMenuItemsJSONArray(
-						siteNavigationMenuItemId)
-				).put(
-					"parentSiteNavigationMenuItemId",
-					parentSiteNavigationMenuItemId
-				).put(
-					"siteNavigationMenuItemId", siteNavigationMenuItemId
-				).put(
-					"title",
-					siteNavigationMenuItemType.getTitle(
-						siteNavigationMenuItem, themeDisplay.getLocale())
-				).put(
-					"type",
-					siteNavigationMenuItemType.getSubtitle(
-						siteNavigationMenuItem, themeDisplay.getLocale())
-				));
-		}
-
-		return siteNavigationMenuItemsJSONArray;
-	}
+	private static final Log _log = LogFactoryUtil.getLog(
+		SiteNavigationAdminDisplayContext.class);
 
 	private String _displayStyle;
 	private final HttpServletRequest _httpServletRequest;

@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.math.BigDecimal;
@@ -81,7 +82,8 @@ public class CommercePriceEntryModelImpl
 	public static final String TABLE_NAME = "CommercePriceEntry";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"uuid_", Types.VARCHAR}, {"externalReferenceCode", Types.VARCHAR},
+		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
+		{"externalReferenceCode", Types.VARCHAR},
 		{"commercePriceEntryId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
@@ -102,6 +104,7 @@ public class CommercePriceEntryModelImpl
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("externalReferenceCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("commercePriceEntryId", Types.BIGINT);
@@ -132,7 +135,7 @@ public class CommercePriceEntryModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CommercePriceEntry (uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,commercePriceEntryId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commercePriceListId LONG,CPInstanceUuid VARCHAR(75) null,CProductId LONG,price DECIMAL(30, 16) null,promoPrice DECIMAL(30, 16) null,discountDiscovery BOOLEAN,discountLevel1 DECIMAL(30, 16) null,discountLevel2 DECIMAL(30, 16) null,discountLevel3 DECIMAL(30, 16) null,discountLevel4 DECIMAL(30, 16) null,hasTierPrice BOOLEAN,bulkPricing BOOLEAN,displayDate DATE null,expirationDate DATE null,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
+		"create table CommercePriceEntry (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,commercePriceEntryId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commercePriceListId LONG,CPInstanceUuid VARCHAR(75) null,CProductId LONG,price DECIMAL(30, 16) null,promoPrice DECIMAL(30, 16) null,discountDiscovery BOOLEAN,discountLevel1 DECIMAL(30, 16) null,discountLevel2 DECIMAL(30, 16) null,discountLevel3 DECIMAL(30, 16) null,discountLevel4 DECIMAL(30, 16) null,hasTierPrice BOOLEAN,bulkPricing BOOLEAN,displayDate DATE null,expirationDate DATE null,lastPublishDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
 
 	public static final String TABLE_SQL_DROP = "drop table CommercePriceEntry";
 
@@ -236,6 +239,7 @@ public class CommercePriceEntryModelImpl
 
 		CommercePriceEntry model = new CommercePriceEntryImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setUuid(soapModel.getUuid());
 		model.setExternalReferenceCode(soapModel.getExternalReferenceCode());
 		model.setCommercePriceEntryId(soapModel.getCommercePriceEntryId());
@@ -381,191 +385,234 @@ public class CommercePriceEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CommercePriceEntry>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommercePriceEntry.class.getClassLoader(), CommercePriceEntry.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<CommercePriceEntry> constructor =
+				(Constructor<CommercePriceEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<CommercePriceEntry, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CommercePriceEntry, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommercePriceEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommercePriceEntry, Object>>();
-
-		attributeGetterFunctions.put("uuid", CommercePriceEntry::getUuid);
-		attributeGetterFunctions.put(
-			"externalReferenceCode",
-			CommercePriceEntry::getExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"commercePriceEntryId",
-			CommercePriceEntry::getCommercePriceEntryId);
-		attributeGetterFunctions.put(
-			"companyId", CommercePriceEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", CommercePriceEntry::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommercePriceEntry::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommercePriceEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommercePriceEntry::getModifiedDate);
-		attributeGetterFunctions.put(
-			"commercePriceListId", CommercePriceEntry::getCommercePriceListId);
-		attributeGetterFunctions.put(
-			"CPInstanceUuid", CommercePriceEntry::getCPInstanceUuid);
-		attributeGetterFunctions.put(
-			"CProductId", CommercePriceEntry::getCProductId);
-		attributeGetterFunctions.put("price", CommercePriceEntry::getPrice);
-		attributeGetterFunctions.put(
-			"promoPrice", CommercePriceEntry::getPromoPrice);
-		attributeGetterFunctions.put(
-			"discountDiscovery", CommercePriceEntry::getDiscountDiscovery);
-		attributeGetterFunctions.put(
-			"discountLevel1", CommercePriceEntry::getDiscountLevel1);
-		attributeGetterFunctions.put(
-			"discountLevel2", CommercePriceEntry::getDiscountLevel2);
-		attributeGetterFunctions.put(
-			"discountLevel3", CommercePriceEntry::getDiscountLevel3);
-		attributeGetterFunctions.put(
-			"discountLevel4", CommercePriceEntry::getDiscountLevel4);
-		attributeGetterFunctions.put(
-			"hasTierPrice", CommercePriceEntry::getHasTierPrice);
-		attributeGetterFunctions.put(
-			"bulkPricing", CommercePriceEntry::getBulkPricing);
-		attributeGetterFunctions.put(
-			"displayDate", CommercePriceEntry::getDisplayDate);
-		attributeGetterFunctions.put(
-			"expirationDate", CommercePriceEntry::getExpirationDate);
-		attributeGetterFunctions.put(
-			"lastPublishDate", CommercePriceEntry::getLastPublishDate);
-		attributeGetterFunctions.put("status", CommercePriceEntry::getStatus);
-		attributeGetterFunctions.put(
-			"statusByUserId", CommercePriceEntry::getStatusByUserId);
-		attributeGetterFunctions.put(
-			"statusByUserName", CommercePriceEntry::getStatusByUserName);
-		attributeGetterFunctions.put(
-			"statusDate", CommercePriceEntry::getStatusDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CommercePriceEntry, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommercePriceEntry, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<CommercePriceEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CommercePriceEntry::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CommercePriceEntry, Long>)
+				CommercePriceEntry::setMvccVersion);
+		attributeGetterFunctions.put("uuid", CommercePriceEntry::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CommercePriceEntry, String>)
 				CommercePriceEntry::setUuid);
+		attributeGetterFunctions.put(
+			"externalReferenceCode",
+			CommercePriceEntry::getExternalReferenceCode);
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<CommercePriceEntry, String>)
 				CommercePriceEntry::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"commercePriceEntryId",
+			CommercePriceEntry::getCommercePriceEntryId);
 		attributeSetterBiConsumers.put(
 			"commercePriceEntryId",
 			(BiConsumer<CommercePriceEntry, Long>)
 				CommercePriceEntry::setCommercePriceEntryId);
+		attributeGetterFunctions.put(
+			"companyId", CommercePriceEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommercePriceEntry, Long>)
 				CommercePriceEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", CommercePriceEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommercePriceEntry, Long>)
 				CommercePriceEntry::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommercePriceEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommercePriceEntry, String>)
 				CommercePriceEntry::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommercePriceEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommercePriceEntry, Date>)
 				CommercePriceEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommercePriceEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommercePriceEntry, Date>)
 				CommercePriceEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"commercePriceListId", CommercePriceEntry::getCommercePriceListId);
 		attributeSetterBiConsumers.put(
 			"commercePriceListId",
 			(BiConsumer<CommercePriceEntry, Long>)
 				CommercePriceEntry::setCommercePriceListId);
+		attributeGetterFunctions.put(
+			"CPInstanceUuid", CommercePriceEntry::getCPInstanceUuid);
 		attributeSetterBiConsumers.put(
 			"CPInstanceUuid",
 			(BiConsumer<CommercePriceEntry, String>)
 				CommercePriceEntry::setCPInstanceUuid);
+		attributeGetterFunctions.put(
+			"CProductId", CommercePriceEntry::getCProductId);
 		attributeSetterBiConsumers.put(
 			"CProductId",
 			(BiConsumer<CommercePriceEntry, Long>)
 				CommercePriceEntry::setCProductId);
+		attributeGetterFunctions.put("price", CommercePriceEntry::getPrice);
 		attributeSetterBiConsumers.put(
 			"price",
 			(BiConsumer<CommercePriceEntry, BigDecimal>)
 				CommercePriceEntry::setPrice);
+		attributeGetterFunctions.put(
+			"promoPrice", CommercePriceEntry::getPromoPrice);
 		attributeSetterBiConsumers.put(
 			"promoPrice",
 			(BiConsumer<CommercePriceEntry, BigDecimal>)
 				CommercePriceEntry::setPromoPrice);
+		attributeGetterFunctions.put(
+			"discountDiscovery", CommercePriceEntry::getDiscountDiscovery);
 		attributeSetterBiConsumers.put(
 			"discountDiscovery",
 			(BiConsumer<CommercePriceEntry, Boolean>)
 				CommercePriceEntry::setDiscountDiscovery);
+		attributeGetterFunctions.put(
+			"discountLevel1", CommercePriceEntry::getDiscountLevel1);
 		attributeSetterBiConsumers.put(
 			"discountLevel1",
 			(BiConsumer<CommercePriceEntry, BigDecimal>)
 				CommercePriceEntry::setDiscountLevel1);
+		attributeGetterFunctions.put(
+			"discountLevel2", CommercePriceEntry::getDiscountLevel2);
 		attributeSetterBiConsumers.put(
 			"discountLevel2",
 			(BiConsumer<CommercePriceEntry, BigDecimal>)
 				CommercePriceEntry::setDiscountLevel2);
+		attributeGetterFunctions.put(
+			"discountLevel3", CommercePriceEntry::getDiscountLevel3);
 		attributeSetterBiConsumers.put(
 			"discountLevel3",
 			(BiConsumer<CommercePriceEntry, BigDecimal>)
 				CommercePriceEntry::setDiscountLevel3);
+		attributeGetterFunctions.put(
+			"discountLevel4", CommercePriceEntry::getDiscountLevel4);
 		attributeSetterBiConsumers.put(
 			"discountLevel4",
 			(BiConsumer<CommercePriceEntry, BigDecimal>)
 				CommercePriceEntry::setDiscountLevel4);
+		attributeGetterFunctions.put(
+			"hasTierPrice", CommercePriceEntry::getHasTierPrice);
 		attributeSetterBiConsumers.put(
 			"hasTierPrice",
 			(BiConsumer<CommercePriceEntry, Boolean>)
 				CommercePriceEntry::setHasTierPrice);
+		attributeGetterFunctions.put(
+			"bulkPricing", CommercePriceEntry::getBulkPricing);
 		attributeSetterBiConsumers.put(
 			"bulkPricing",
 			(BiConsumer<CommercePriceEntry, Boolean>)
 				CommercePriceEntry::setBulkPricing);
+		attributeGetterFunctions.put(
+			"displayDate", CommercePriceEntry::getDisplayDate);
 		attributeSetterBiConsumers.put(
 			"displayDate",
 			(BiConsumer<CommercePriceEntry, Date>)
 				CommercePriceEntry::setDisplayDate);
+		attributeGetterFunctions.put(
+			"expirationDate", CommercePriceEntry::getExpirationDate);
 		attributeSetterBiConsumers.put(
 			"expirationDate",
 			(BiConsumer<CommercePriceEntry, Date>)
 				CommercePriceEntry::setExpirationDate);
+		attributeGetterFunctions.put(
+			"lastPublishDate", CommercePriceEntry::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<CommercePriceEntry, Date>)
 				CommercePriceEntry::setLastPublishDate);
+		attributeGetterFunctions.put("status", CommercePriceEntry::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<CommercePriceEntry, Integer>)
 				CommercePriceEntry::setStatus);
+		attributeGetterFunctions.put(
+			"statusByUserId", CommercePriceEntry::getStatusByUserId);
 		attributeSetterBiConsumers.put(
 			"statusByUserId",
 			(BiConsumer<CommercePriceEntry, Long>)
 				CommercePriceEntry::setStatusByUserId);
+		attributeGetterFunctions.put(
+			"statusByUserName", CommercePriceEntry::getStatusByUserName);
 		attributeSetterBiConsumers.put(
 			"statusByUserName",
 			(BiConsumer<CommercePriceEntry, String>)
 				CommercePriceEntry::setStatusByUserName);
+		attributeGetterFunctions.put(
+			"statusDate", CommercePriceEntry::getStatusDate);
 		attributeSetterBiConsumers.put(
 			"statusDate",
 			(BiConsumer<CommercePriceEntry, Date>)
 				CommercePriceEntry::setStatusDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@JSON
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@JSON
@@ -1273,6 +1320,7 @@ public class CommercePriceEntryModelImpl
 		CommercePriceEntryImpl commercePriceEntryImpl =
 			new CommercePriceEntryImpl();
 
+		commercePriceEntryImpl.setMvccVersion(getMvccVersion());
 		commercePriceEntryImpl.setUuid(getUuid());
 		commercePriceEntryImpl.setExternalReferenceCode(
 			getExternalReferenceCode());
@@ -1304,6 +1352,71 @@ public class CommercePriceEntryModelImpl
 		commercePriceEntryImpl.setStatusDate(getStatusDate());
 
 		commercePriceEntryImpl.resetOriginalValues();
+
+		return commercePriceEntryImpl;
+	}
+
+	@Override
+	public CommercePriceEntry cloneWithOriginalValues() {
+		CommercePriceEntryImpl commercePriceEntryImpl =
+			new CommercePriceEntryImpl();
+
+		commercePriceEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		commercePriceEntryImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		commercePriceEntryImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
+		commercePriceEntryImpl.setCommercePriceEntryId(
+			this.<Long>getColumnOriginalValue("commercePriceEntryId"));
+		commercePriceEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commercePriceEntryImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commercePriceEntryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commercePriceEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commercePriceEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commercePriceEntryImpl.setCommercePriceListId(
+			this.<Long>getColumnOriginalValue("commercePriceListId"));
+		commercePriceEntryImpl.setCPInstanceUuid(
+			this.<String>getColumnOriginalValue("CPInstanceUuid"));
+		commercePriceEntryImpl.setCProductId(
+			this.<Long>getColumnOriginalValue("CProductId"));
+		commercePriceEntryImpl.setPrice(
+			this.<BigDecimal>getColumnOriginalValue("price"));
+		commercePriceEntryImpl.setPromoPrice(
+			this.<BigDecimal>getColumnOriginalValue("promoPrice"));
+		commercePriceEntryImpl.setDiscountDiscovery(
+			this.<Boolean>getColumnOriginalValue("discountDiscovery"));
+		commercePriceEntryImpl.setDiscountLevel1(
+			this.<BigDecimal>getColumnOriginalValue("discountLevel1"));
+		commercePriceEntryImpl.setDiscountLevel2(
+			this.<BigDecimal>getColumnOriginalValue("discountLevel2"));
+		commercePriceEntryImpl.setDiscountLevel3(
+			this.<BigDecimal>getColumnOriginalValue("discountLevel3"));
+		commercePriceEntryImpl.setDiscountLevel4(
+			this.<BigDecimal>getColumnOriginalValue("discountLevel4"));
+		commercePriceEntryImpl.setHasTierPrice(
+			this.<Boolean>getColumnOriginalValue("hasTierPrice"));
+		commercePriceEntryImpl.setBulkPricing(
+			this.<Boolean>getColumnOriginalValue("bulkPricing"));
+		commercePriceEntryImpl.setDisplayDate(
+			this.<Date>getColumnOriginalValue("displayDate"));
+		commercePriceEntryImpl.setExpirationDate(
+			this.<Date>getColumnOriginalValue("expirationDate"));
+		commercePriceEntryImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+		commercePriceEntryImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
+		commercePriceEntryImpl.setStatusByUserId(
+			this.<Long>getColumnOriginalValue("statusByUserId"));
+		commercePriceEntryImpl.setStatusByUserName(
+			this.<String>getColumnOriginalValue("statusByUserName"));
+		commercePriceEntryImpl.setStatusDate(
+			this.<Date>getColumnOriginalValue("statusDate"));
 
 		return commercePriceEntryImpl;
 	}
@@ -1382,6 +1495,8 @@ public class CommercePriceEntryModelImpl
 	public CacheModel<CommercePriceEntry> toCacheModel() {
 		CommercePriceEntryCacheModel commercePriceEntryCacheModel =
 			new CommercePriceEntryCacheModel();
+
+		commercePriceEntryCacheModel.mvccVersion = getMvccVersion();
 
 		commercePriceEntryCacheModel.uuid = getUuid();
 
@@ -1604,12 +1719,11 @@ public class CommercePriceEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CommercePriceEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CommercePriceEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private String _uuid;
 	private String _externalReferenceCode;
 	private long _commercePriceEntryId;
@@ -1668,6 +1782,7 @@ public class CommercePriceEntryModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put(
 			"externalReferenceCode", _externalReferenceCode);
@@ -1720,59 +1835,61 @@ public class CommercePriceEntryModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("uuid_", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("externalReferenceCode", 2L);
+		columnBitmasks.put("uuid_", 2L);
 
-		columnBitmasks.put("commercePriceEntryId", 4L);
+		columnBitmasks.put("externalReferenceCode", 4L);
 
-		columnBitmasks.put("companyId", 8L);
+		columnBitmasks.put("commercePriceEntryId", 8L);
 
-		columnBitmasks.put("userId", 16L);
+		columnBitmasks.put("companyId", 16L);
 
-		columnBitmasks.put("userName", 32L);
+		columnBitmasks.put("userId", 32L);
 
-		columnBitmasks.put("createDate", 64L);
+		columnBitmasks.put("userName", 64L);
 
-		columnBitmasks.put("modifiedDate", 128L);
+		columnBitmasks.put("createDate", 128L);
 
-		columnBitmasks.put("commercePriceListId", 256L);
+		columnBitmasks.put("modifiedDate", 256L);
 
-		columnBitmasks.put("CPInstanceUuid", 512L);
+		columnBitmasks.put("commercePriceListId", 512L);
 
-		columnBitmasks.put("CProductId", 1024L);
+		columnBitmasks.put("CPInstanceUuid", 1024L);
 
-		columnBitmasks.put("price", 2048L);
+		columnBitmasks.put("CProductId", 2048L);
 
-		columnBitmasks.put("promoPrice", 4096L);
+		columnBitmasks.put("price", 4096L);
 
-		columnBitmasks.put("discountDiscovery", 8192L);
+		columnBitmasks.put("promoPrice", 8192L);
 
-		columnBitmasks.put("discountLevel1", 16384L);
+		columnBitmasks.put("discountDiscovery", 16384L);
 
-		columnBitmasks.put("discountLevel2", 32768L);
+		columnBitmasks.put("discountLevel1", 32768L);
 
-		columnBitmasks.put("discountLevel3", 65536L);
+		columnBitmasks.put("discountLevel2", 65536L);
 
-		columnBitmasks.put("discountLevel4", 131072L);
+		columnBitmasks.put("discountLevel3", 131072L);
 
-		columnBitmasks.put("hasTierPrice", 262144L);
+		columnBitmasks.put("discountLevel4", 262144L);
 
-		columnBitmasks.put("bulkPricing", 524288L);
+		columnBitmasks.put("hasTierPrice", 524288L);
 
-		columnBitmasks.put("displayDate", 1048576L);
+		columnBitmasks.put("bulkPricing", 1048576L);
 
-		columnBitmasks.put("expirationDate", 2097152L);
+		columnBitmasks.put("displayDate", 2097152L);
 
-		columnBitmasks.put("lastPublishDate", 4194304L);
+		columnBitmasks.put("expirationDate", 4194304L);
 
-		columnBitmasks.put("status", 8388608L);
+		columnBitmasks.put("lastPublishDate", 8388608L);
 
-		columnBitmasks.put("statusByUserId", 16777216L);
+		columnBitmasks.put("status", 16777216L);
 
-		columnBitmasks.put("statusByUserName", 33554432L);
+		columnBitmasks.put("statusByUserId", 33554432L);
 
-		columnBitmasks.put("statusDate", 67108864L);
+		columnBitmasks.put("statusByUserName", 67108864L);
+
+		columnBitmasks.put("statusDate", 134217728L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

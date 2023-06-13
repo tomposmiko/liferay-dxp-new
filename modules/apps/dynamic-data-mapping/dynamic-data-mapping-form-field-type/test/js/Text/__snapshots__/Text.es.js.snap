@@ -9,18 +9,19 @@ exports[`Field Text has a helptext 1`] = `
     tabindex="0"
   >
     <input
-      aria-describedby="textField_fieldHelp"
-      aria-invalid="true"
       class="form-control ddm-field-text"
-      id="textField"
       name="textField"
       type="text"
       value=""
     />
+    <input
+      name="textField_edited"
+      type="hidden"
+      value="false"
+    />
     <span
       aria-hidden="true"
       class="form-text"
-      id="textField_fieldHelp"
     >
       Type something
     </span>
@@ -42,27 +43,24 @@ exports[`Field Text has a label 1`] = `
     data-field-name="textField"
   >
     <label
-      aria-labelledby="textField_fieldDetails"
       class="ddm-label"
+      for="textField"
       tabindex="0"
     >
       label
     </label>
     <input
-      aria-invalid="true"
       class="form-control ddm-field-text"
-      id="textField"
       name="textField"
       type="text"
       value=""
     />
-    <span
-      class="sr-only"
-      id="textField_fieldDetails"
-    >
-      label
-      <br />
-    </span>
+    <input
+      name="textField_edited"
+      type="hidden"
+      value="false"
+    />
+    
   </div>
 </div>
 `;
@@ -76,13 +74,16 @@ exports[`Field Text has a placeholder 1`] = `
     tabindex="0"
   >
     <input
-      aria-invalid="true"
       class="form-control ddm-field-text"
-      id="textField"
       name="textField"
       placeholder="Placeholder"
       type="text"
       value=""
+    />
+    <input
+      name="textField_edited"
+      type="hidden"
+      value="false"
     />
     
   </div>
@@ -98,12 +99,15 @@ exports[`Field Text has a value 1`] = `
     tabindex="0"
   >
     <input
-      aria-invalid="true"
       class="form-control ddm-field-text"
-      id="textField"
       name="textField"
       type="text"
       value="value"
+    />
+    <input
+      name="textField_edited"
+      type="hidden"
+      value="false"
     />
     
   </div>
@@ -119,12 +123,16 @@ exports[`Field Text has an id 1`] = `
     tabindex="0"
   >
     <input
-      aria-invalid="true"
       class="form-control ddm-field-text"
       id="Id"
       name="textField"
       type="text"
       value=""
+    />
+    <input
+      name="textField_edited"
+      type="hidden"
+      value="false"
     />
     
   </div>
@@ -140,12 +148,15 @@ exports[`Field Text is not readOnly 1`] = `
     tabindex="0"
   >
     <input
-      aria-invalid="true"
       class="form-control ddm-field-text"
-      id="textField"
       name="textField"
       type="text"
       value=""
+    />
+    <input
+      name="textField_edited"
+      type="hidden"
+      value="false"
     />
     
   </div>
@@ -161,13 +172,15 @@ exports[`Field Text is not required 1`] = `
     tabindex="0"
   >
     <input
-      aria-invalid="true"
-      aria-required="false"
       class="form-control ddm-field-text"
-      id="textField"
       name="textField"
       type="text"
       value=""
+    />
+    <input
+      name="textField_edited"
+      type="hidden"
+      value="false"
     />
     
   </div>
@@ -183,13 +196,16 @@ exports[`Field Text is readOnly 1`] = `
     tabindex="0"
   >
     <input
-      aria-invalid="true"
       class="form-control ddm-field-text"
       disabled=""
-      id="textField"
       name="textField"
       type="text"
       value=""
+    />
+    <input
+      name="textField_edited"
+      type="hidden"
+      value="false"
     />
     
   </div>
@@ -203,27 +219,24 @@ exports[`Field Text renders Label if showLabel is true 1`] = `
     data-field-name="textField"
   >
     <label
-      aria-labelledby="textField_fieldDetails"
       class="ddm-label"
+      for="textField"
       tabindex="0"
     >
       text
     </label>
     <input
-      aria-invalid="true"
       class="form-control ddm-field-text"
-      id="textField"
       name="textField"
       type="text"
       value=""
     />
-    <span
-      class="sr-only"
-      id="textField_fieldDetails"
-    >
-      text
-      <br />
-    </span>
+    <input
+      name="textField_edited"
+      type="hidden"
+      value="false"
+    />
+    
   </div>
 </div>
 `;

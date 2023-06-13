@@ -21,7 +21,7 @@ RoleItemSelectorViewDisplayContext roleItemSelectorViewDisplayContext = (RoleIte
 %>
 
 <clay:management-toolbar
-	displayContext="<%= roleItemSelectorViewDisplayContext %>"
+	managementToolbarDisplayContext="<%= roleItemSelectorViewDisplayContext %>"
 />
 
 <clay:container-fluid
@@ -39,7 +39,7 @@ RoleItemSelectorViewDisplayContext roleItemSelectorViewDisplayContext = (RoleIte
 		>
 
 			<%
-			String cssClass = "table-cell-content";
+			String cssClass = "table-cell-expand";
 
 			RowChecker rowChecker = searchContainer.getRowChecker();
 
@@ -77,12 +77,14 @@ RoleItemSelectorViewDisplayContext roleItemSelectorViewDisplayContext = (RoleIte
 
 <c:choose>
 	<c:when test="<%= roleItemSelectorViewDisplayContext.getItemSelectorCriterion() instanceof RoleItemSelectorCriterion %>">
-		<aui:script require="metal-dom/src/all/dom as dom">
-			var selectItemHandler = dom.delegate(
+		<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
+			var delegate = delegateModule.default;
+
+			var selectItemHandler = delegate(
 				document.getElementById('<portlet:namespace />roleSelectorWrapper'),
 				'change',
 				'.entry input',
-				function (event) {
+				(event) => {
 					var checked = Liferay.Util.listCheckedExcept(
 						document.getElementById(
 							'<portlet:namespace /><%= roleItemSelectorViewDisplayContext.getSearchContainerId() %>'
@@ -102,7 +104,7 @@ RoleItemSelectorViewDisplayContext roleItemSelectorViewDisplayContext = (RoleIte
 			);
 
 			Liferay.on('destroyPortlet', function removeListener() {
-				selectItemHandler.removeListener();
+				selectItemHandler.dispose();
 
 				Liferay.detach('destroyPortlet', removeListener);
 			});
@@ -114,7 +116,7 @@ RoleItemSelectorViewDisplayContext roleItemSelectorViewDisplayContext = (RoleIte
 				'<portlet:namespace /><%= HtmlUtil.escape(roleItemSelectorViewDisplayContext.getSearchContainerId()) %>'
 			);
 
-			searchContainer.on('rowToggled', function (event) {
+			searchContainer.on('rowToggled', (event) => {
 				var allSelectedElements = event.elements.allSelectedElements;
 				var selectedData = [];
 

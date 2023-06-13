@@ -1,23 +1,23 @@
 definition {
 
 	macro _addOrganization {
-		Variables.assertDefined(parameterList = ${organizationName});
+		Variables.assertDefined(parameterList = "${organizationName}");
 
-		var organizationNameEncoded = URLUtil.encodeUTF8(${organizationName});
+		var organizationNameEncoded = URLUtil.encodeUTF8("${organizationName}");
 
 		if (!(isSet(organizationSite))) {
 			var organizationSite = "false";
 		}
 
 		if (isSet(parentOrganizationId)) {
-			var parentOrganizationId = ${parentOrganizationId};
+			var parentOrganizationId = "${parentOrganizationId}";
 		}
 		else {
-			var parentOrganizationId = 0;
+			var parentOrganizationId = "0";
 		}
 
 		if (isSet(organizationType)) {
-			var organizationType = ${organizationType};
+			var organizationType = "${organizationType}";
 		}
 		else {
 			var organizationType = "organization";
@@ -38,7 +38,7 @@ definition {
 				-d site=${organizationSite}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
 	macro _addOrganizationToSite {
@@ -51,7 +51,22 @@ definition {
 				-u test@liferay.com:test
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	macro _assignPasswordPolicyToOrganization {
+		Variables.assertDefined(parameterList = "${organizationId},${passwordPolicyId}");
+
+		var portalURL = JSONCompany.getPortalURL();
+
+		var curl = '''
+			${portalURL}/api/jsonws/organization/add-password-policy-organizations \
+				-u test@liferay.com:test \
+				-d organizationIds=${organizationId} \
+				-d passwordPolicyId=${passwordPolicyId}
+		''';
+
+		JSONCurlUtil.post("${curl}");
 	}
 
 	macro _assignUserToOrganization {
@@ -66,11 +81,11 @@ definition {
 				-d userIds=${userId}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
 	macro _deleteOrganization {
-		Variables.assertDefined(parameterList = ${organizationId});
+		Variables.assertDefined(parameterList = "${organizationId}");
 
 		var portalURL = JSONCompany.getPortalURL();
 
@@ -80,7 +95,7 @@ definition {
 				-d organizationId=${organizationId}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
 }

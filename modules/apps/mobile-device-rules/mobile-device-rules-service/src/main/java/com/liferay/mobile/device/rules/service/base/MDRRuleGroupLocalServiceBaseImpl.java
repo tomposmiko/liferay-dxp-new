@@ -24,7 +24,6 @@ import com.liferay.mobile.device.rules.service.MDRRuleGroupLocalService;
 import com.liferay.mobile.device.rules.service.MDRRuleGroupLocalServiceUtil;
 import com.liferay.mobile.device.rules.service.persistence.MDRRuleGroupFinder;
 import com.liferay.mobile.device.rules.service.persistence.MDRRuleGroupPersistence;
-import com.liferay.mobile.device.rules.service.persistence.MDRRulePersistence;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -40,8 +39,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -396,6 +393,7 @@ public abstract class MDRRuleGroupLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -414,6 +412,7 @@ public abstract class MDRRuleGroupLocalServiceBaseImpl
 			(MDRRuleGroup)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<MDRRuleGroup> getBasePersistence() {
 		return mdrRuleGroupPersistence;
 	}
@@ -608,23 +607,5 @@ public abstract class MDRRuleGroupLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected MDRRulePersistence mdrRulePersistence;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.GroupLocalService
-		groupLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MDRRuleGroupLocalServiceBaseImpl.class);
 
 }

@@ -20,12 +20,14 @@ import com.liferay.commerce.product.measurement.unit.web.internal.util.CPMeasure
 import com.liferay.commerce.product.model.CPMeasurementUnit;
 import com.liferay.commerce.product.service.CPMeasurementUnitService;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -48,9 +50,11 @@ public class CPMeasurementUnitsDisplayContext {
 
 	public CPMeasurementUnitsDisplayContext(
 		CPMeasurementUnitService cpMeasurementUnitService,
+		PortletResourcePermission portletResourcePermission,
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
 		_cpMeasurementUnitService = cpMeasurementUnitService;
+		_portletResourcePermission = portletResourcePermission;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 	}
@@ -80,6 +84,9 @@ public class CPMeasurementUnitsDisplayContext {
 		String viewDimensionProductMeasurementUnitsURL = getNavigationItemURL(
 			"view-all-dimension-product-measurement-units",
 			CPMeasurementUnitConstants.TYPE_DIMENSION);
+		String viewUnitProductMeasurementUnitsURL = getNavigationItemURL(
+			"view-all-piece-product-measurement-units",
+			CPMeasurementUnitConstants.TYPE_UNIT);
 		String viewWeightProductMeasurementUnitsURL = getNavigationItemURL(
 			"view-all-weight-product-measurement-units",
 			CPMeasurementUnitConstants.TYPE_WEIGHT);
@@ -98,6 +105,11 @@ public class CPMeasurementUnitsDisplayContext {
 				viewDimensionProductMeasurementUnitsURL,
 				LanguageUtil.get(resourceBundle, "dimensions"));
 
+		NavigationItem unitCPMeasurementUnitsNavigationItem = getNavigationItem(
+			toolbarItem.equals("view-all-unit-product-measurement-units"),
+			viewUnitProductMeasurementUnitsURL,
+			LanguageUtil.get(resourceBundle, "unit"));
+
 		NavigationItem weightCPMeasurementUnitsNavigationItem =
 			getNavigationItem(
 				toolbarItem.equals("view-all-weight-product-measurement-units"),
@@ -105,6 +117,7 @@ public class CPMeasurementUnitsDisplayContext {
 				LanguageUtil.get(resourceBundle, "weight"));
 
 		navigationItems.add(dimensionCPMeasurementUnitsNavigationItem);
+		navigationItems.add(unitCPMeasurementUnitsNavigationItem);
 		navigationItems.add(weightCPMeasurementUnitsNavigationItem);
 
 		return navigationItems;
@@ -122,20 +135,27 @@ public class CPMeasurementUnitsDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
-		PortletURL portletURL = _renderResponse.createRenderURL();
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setParameter(
+			"orderByCol", getOrderByCol()
+		).setParameter(
+			"orderByType", getOrderByType()
+		).setParameter(
+			"toolbarItem",
+			() -> {
+				String toolbarItem = ParamUtil.getString(
+					_renderRequest, "toolbarItem");
 
-		portletURL.setParameter("orderByCol", getOrderByCol());
-		portletURL.setParameter("orderByType", getOrderByType());
+				if (Validator.isNotNull(toolbarItem)) {
+					return toolbarItem;
+				}
 
-		String toolbarItem = ParamUtil.getString(_renderRequest, "toolbarItem");
-
-		if (Validator.isNotNull(toolbarItem)) {
-			portletURL.setParameter("toolbarItem", toolbarItem);
-		}
-
-		portletURL.setParameter("type", String.valueOf(getType()));
-
-		return portletURL;
+				return null;
+			}
+		).setParameter(
+			"type", getType()
+		).buildPortletURL();
 	}
 
 	public CPMeasurementUnit getPrimaryCPMeasurementUnit()
@@ -208,31 +228,33 @@ public class CPMeasurementUnitsDisplayContext {
 		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		return PortalPermissionUtil.contains(
-			themeDisplay.getPermissionChecker(),
+		return _portletResourcePermission.contains(
+			themeDisplay.getPermissionChecker(), null,
 			CPActionKeys.MANAGE_COMMERCE_PRODUCT_MEASUREMENT_UNITS);
 	}
 
 	protected NavigationItem getNavigationItem(
 		boolean active, String href, String label) {
 
-		NavigationItem navigationItem = new NavigationItem();
-
-		navigationItem.setActive(active);
-		navigationItem.setHref(href);
-		navigationItem.setLabel(label);
-
-		return navigationItem;
+		return NavigationItemBuilder.setActive(
+			active
+		).setHref(
+			href
+		).setLabel(
+			label
+		).build();
 	}
 
 	protected String getNavigationItemURL(String toolbarItem, int type) {
-		PortletURL portletURL = _renderResponse.createRenderURL();
-
-		portletURL.setParameter("mvcPath", "/view.jsp");
-		portletURL.setParameter("toolbarItem", toolbarItem);
-		portletURL.setParameter("type", String.valueOf(type));
-
-		return portletURL.toString();
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCPath(
+			"/view.jsp"
+		).setParameter(
+			"toolbarItem", toolbarItem
+		).setParameter(
+			"type", type
+		).buildString();
 	}
 
 	protected RowChecker getRowChecker() {
@@ -245,6 +267,7 @@ public class CPMeasurementUnitsDisplayContext {
 
 	private CPMeasurementUnit _cpMeasurementUnit;
 	private final CPMeasurementUnitService _cpMeasurementUnitService;
+	private final PortletResourcePermission _portletResourcePermission;
 	private CPMeasurementUnit _primaryCPMeasurementUnit;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;

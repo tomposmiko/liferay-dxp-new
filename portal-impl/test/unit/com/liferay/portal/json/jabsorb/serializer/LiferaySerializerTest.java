@@ -16,13 +16,13 @@ package com.liferay.portal.json.jabsorb.serializer;
 
 import com.liferay.petra.lang.ClassLoaderPool;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.test.CaptureHandler;
-import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.test.log.LogCapture;
+import com.liferay.portal.test.log.LogEntry;
+import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 import org.jabsorb.serializer.SerializerState;
 
@@ -66,21 +66,16 @@ public class LiferaySerializerTest {
 
 		JSONObject jsonObject = new JSONObject();
 
-		jsonObject.put(
-			"contextName", "TestClassLoader"
-		).put(
-			"javaClass", ServiceContext.class.getName()
-		).put(
-			"serializable", new JSONObject()
-		);
+		jsonObject.put("contextName", "TestClassLoader");
+		jsonObject.put("javaClass", ServiceContext.class.getName());
+		jsonObject.put("serializable", new JSONObject());
 
 		SerializerState serializerState = new SerializerState();
 
 		serializerState.store(jsonObject);
 
-		try (CaptureHandler captureHandler =
-				JDKLoggerTestUtil.configureJDKLogger(
-					LiferaySerializer.class.getName(), Level.WARNING)) {
+		try (LogCapture logCapture = LoggerTestUtil.configureJDKLogger(
+				LiferaySerializer.class.getName(), Level.WARNING)) {
 
 			Object object = liferaySerializer.unmarshall(
 				serializerState, ServiceContext.class, jsonObject);
@@ -89,16 +84,16 @@ public class LiferaySerializerTest {
 
 			Assert.assertEquals(ServiceContext.class, object.getClass());
 
-			List<LogRecord> logRecords = captureHandler.getLogRecords();
+			List<LogEntry> logEntries = logCapture.getLogEntries();
 
-			Assert.assertEquals(logRecords.toString(), 1, logRecords.size());
+			Assert.assertEquals(logEntries.toString(), 1, logEntries.size());
 
-			LogRecord logRecord = logRecords.get(0);
+			LogEntry logEntry = logEntries.get(0);
 
 			Assert.assertEquals(
 				"Unable to load class " + ServiceContext.class.getName() +
 					" in context TestClassLoader",
-				logRecord.getMessage());
+				logEntry.getMessage());
 		}
 
 		ClassLoaderPool.unregister("TestClassLoader");

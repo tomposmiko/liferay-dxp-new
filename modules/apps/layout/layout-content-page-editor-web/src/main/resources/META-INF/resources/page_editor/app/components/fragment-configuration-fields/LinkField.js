@@ -12,61 +12,79 @@
  * details.
  */
 
-import ClayForm, {ClayInput, ClaySelectWithOption} from '@clayui/form';
+import ClayForm, {
+	ClayCheckbox,
+	ClayInput,
+	ClaySelectWithOption,
+} from '@clayui/form';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
+import CurrentLanguageFlag from '../../../common/components/CurrentLanguageFlag';
+import {LayoutSelector} from '../../../common/components/LayoutSelector';
 import MappingSelector from '../../../common/components/MappingSelector';
+import useControlledState from '../../../core/hooks/useControlledState';
 import {ConfigurationFieldPropTypes} from '../../../prop-types/index';
 import {EDITABLE_TYPES} from '../../config/constants/editableTypes';
-import InfoItemService from '../../services/InfoItemService';
-import {useSelector} from '../../store/index';
-import isMapped from '../../utils/isMapped';
+import {useGetFieldValue} from '../../contexts/CollectionItemContext';
+import {useSelector} from '../../contexts/StoreContext';
+import selectLanguageId from '../../selectors/selectLanguageId';
+import isMapped from '../../utils/editable-value/isMapped';
+import isMappedToLayout from '../../utils/editable-value/isMappedToLayout';
+import isMappedToStructure from '../../utils/editable-value/isMappedToStructure';
+import resolveEditableValue from '../../utils/editable-value/resolveEditableValue';
 import {useId} from '../../utils/useId';
 
-const SOURCE_OPTIONS = {
-	fromContentField: {
-		label: `${Liferay.Language.get('from-content-field')}`,
-		value: 'fromContentField',
-	},
+const SOURCE_OPTION_FROM_CONTENT_FIELD = 'fromContentField';
+const SOURCE_OPTION_FROM_LAYOUT = 'fromLayout';
+const SOURCE_OPTION_MANUAL = 'manual';
 
-	manual: {
-		label: `${Liferay.Language.get('manual')}`,
-		value: 'manual',
-	},
-};
-
-export const TARGET_OPTIONS = [
+const SOURCE_OPTIONS = [
 	{
-		label: `${Liferay.Language.get('self')}`,
-		value: '_self',
+		label: Liferay.Language.get('url'),
+		value: SOURCE_OPTION_MANUAL,
 	},
 	{
-		label: `${Liferay.Language.get('blank')}`,
-		value: '_blank',
+		label: Liferay.Language.get('page'),
+		value: SOURCE_OPTION_FROM_LAYOUT,
 	},
 	{
-		label: `${Liferay.Language.get('parent')}`,
-		value: '_parent',
-	},
-	{
-		label: `${Liferay.Language.get('top')}`,
-		value: '_top',
+		label: Liferay.Language.get('mapped-url'),
+		value: SOURCE_OPTION_FROM_CONTENT_FIELD,
 	},
 ];
 
+export const TARGET_OPTIONS = {
+	blank: '_blank',
+	parent: '_parent',
+	self: '_self',
+	top: '_top',
+};
+
 export default function LinkField({field, onValueSelect, value}) {
-	const [nextValue, setNextValue] = useState(value || {});
-	const [nextHref, setNextHref] = useState(nextValue.href);
+	const getFieldValue = useGetFieldValue();
+	const [nextHref, setNextHref] = useControlledState(value.href || '');
+	const [nextValue, setNextValue] = useControlledState(value || {});
+	const [openNewTab, setOpenNewTab] = useControlledState(
+		value.target === '_blank' || ''
+	);
 
 	const [mappedHrefPreview, setMappedHrefPreview] = useState(null);
-	const languageId = useSelector((state) => state.languageId);
+	const languageId = useSelector(selectLanguageId);
 
-	const [source, setSource] = useState(
-		isMapped(value)
-			? SOURCE_OPTIONS.fromContentField.value
-			: SOURCE_OPTIONS.manual.value
-	);
+	const [source, setSource] = useState(SOURCE_OPTION_MANUAL);
+
+	useEffect(() => {
+		if (isMappedToLayout(value)) {
+			setSource(SOURCE_OPTION_FROM_LAYOUT);
+		}
+		else if (isMapped(value)) {
+			setSource(SOURCE_OPTION_FROM_CONTENT_FIELD);
+		}
+		else if (value.href) {
+			setSource(SOURCE_OPTION_MANUAL);
+		}
+	}, [value]);
 
 	const hrefInputId = useId();
 	const hrefPreviewInputId = useId();
@@ -74,25 +92,23 @@ export default function LinkField({field, onValueSelect, value}) {
 	const targetInputId = useId();
 
 	useEffect(() => {
-		if (nextValue.classNameId && nextValue.classPK && nextValue.fieldId) {
+		if (isMapped(nextValue) && !isMappedToStructure(nextValue)) {
 			setMappedHrefPreview('');
 
-			InfoItemService.getInfoItemFieldValue({
-				...nextValue,
-				languageId,
-				onNetworkStatus: () => {},
-			}).then(({fieldValue}) => {
-				setMappedHrefPreview(fieldValue || '');
-			});
+			resolveEditableValue(nextValue, languageId, getFieldValue).then(
+				(href) => {
+					setMappedHrefPreview(href || '');
+				}
+			);
 		}
 		else {
 			setMappedHrefPreview(null);
 		}
-	}, [languageId, nextValue]);
+	}, [languageId, nextValue, getFieldValue]);
 
 	const handleChange = (value) => {
 		const updatedValue = {
-			...nextValue,
+			...(Object.keys(value).length && nextValue),
 			...value,
 		};
 
@@ -104,7 +120,6 @@ export default function LinkField({field, onValueSelect, value}) {
 		onValueSelect(field.name, {});
 		setNextValue({});
 		setSource(event.target.value);
-		setMappedHrefPreview(null);
 	};
 
 	return (
@@ -117,28 +132,52 @@ export default function LinkField({field, onValueSelect, value}) {
 				<ClaySelectWithOption
 					id={sourceInputId}
 					onChange={handleSourceChange}
-					options={Object.values(SOURCE_OPTIONS)}
+					options={SOURCE_OPTIONS}
 					value={source}
 				/>
 			</ClayForm.Group>
 
-			{source === SOURCE_OPTIONS.manual.value && (
-				<ClayForm.Group small>
+			{source === SOURCE_OPTION_MANUAL && (
+				<ClayForm.Group>
 					<label htmlFor={hrefInputId}>
 						{Liferay.Language.get('url')}
 					</label>
 
-					<ClayInput
-						id={hrefInputId}
-						onBlur={() => handleChange({href: nextHref})}
-						onChange={(event) => setNextHref(event.target.value)}
-						type="text"
-						value={nextHref || ''}
-					/>
+					<ClayInput.Group small>
+						<ClayInput.GroupItem>
+							<ClayInput
+								id={hrefInputId}
+								onBlur={() => handleChange({href: nextHref})}
+								onChange={(event) =>
+									setNextHref(event.target.value)
+								}
+								type="text"
+								value={nextHref || ''}
+							/>
+						</ClayInput.GroupItem>
+
+						<ClayInput.GroupItem shrink>
+							<CurrentLanguageFlag />
+						</ClayInput.GroupItem>
+					</ClayInput.Group>
 				</ClayForm.Group>
 			)}
 
-			{source === SOURCE_OPTIONS.fromContentField.value && (
+			{source === SOURCE_OPTION_FROM_LAYOUT && (
+				<LayoutSelector
+					mappedLayout={nextValue?.layout}
+					onLayoutSelect={(layout) => {
+						if (layout && !!Object.keys(layout).length) {
+							handleChange({layout});
+						}
+						else {
+							handleChange({});
+						}
+					}}
+				/>
+			)}
+
+			{source === SOURCE_OPTION_FROM_CONTENT_FIELD && (
 				<>
 					<MappingSelector
 						fieldType={EDITABLE_TYPES.link}
@@ -164,20 +203,20 @@ export default function LinkField({field, onValueSelect, value}) {
 				</>
 			)}
 
-			<ClayForm.Group small>
-				<label htmlFor={targetInputId}>
-					{Liferay.Language.get('target')}
-				</label>
-
-				<ClaySelectWithOption
-					id={targetInputId}
-					onChange={(event) =>
-						handleChange({target: event.target.value})
-					}
-					options={TARGET_OPTIONS}
-					value={nextValue.target}
-				/>
-			</ClayForm.Group>
+			<ClayCheckbox
+				aria-label={Liferay.Language.get('open-in-a-new-tab')}
+				checked={openNewTab}
+				id={targetInputId}
+				label={Liferay.Language.get('open-in-a-new-tab')}
+				onChange={(event) => {
+					setOpenNewTab(event.target.checked);
+					handleChange({
+						target: event.target.checked
+							? TARGET_OPTIONS.blank
+							: TARGET_OPTIONS.self,
+					});
+				}}
+			/>
 		</>
 	);
 }
@@ -190,23 +229,17 @@ LinkField.propTypes = {
 			classNameId: PropTypes.string,
 			classPK: PropTypes.string,
 			fieldId: PropTypes.string,
-			target: PropTypes.oneOf(
-				TARGET_OPTIONS.map((option) => option.value)
-			),
+			target: PropTypes.string,
 		}),
 
 		PropTypes.shape({
 			href: PropTypes.string,
-			target: PropTypes.oneOf(
-				TARGET_OPTIONS.map((option) => option.value)
-			),
+			target: PropTypes.string,
 		}),
 
 		PropTypes.shape({
 			mappedField: PropTypes.string,
-			target: PropTypes.oneOf(
-				TARGET_OPTIONS.map((option) => option.value)
-			),
+			target: PropTypes.string,
 		}),
 	]),
 };

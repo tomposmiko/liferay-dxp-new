@@ -43,6 +43,7 @@ public class CPDefinitionLinkWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("uuid", getUuid());
 		attributes.put("CPDefinitionLinkId", getCPDefinitionLinkId());
 		attributes.put("groupId", getGroupId());
@@ -61,6 +62,12 @@ public class CPDefinitionLinkWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -132,6 +139,11 @@ public class CPDefinitionLinkWrapper
 		if (type != null) {
 			setType(type);
 		}
+	}
+
+	@Override
+	public CPDefinitionLink cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
 	}
 
 	/**
@@ -230,6 +242,16 @@ public class CPDefinitionLinkWrapper
 	@Override
 	public Date getModifiedDate() {
 		return model.getModifiedDate();
+	}
+
+	/**
+	 * Returns the mvcc version of this cp definition link.
+	 *
+	 * @return the mvcc version of this cp definition link
+	 */
+	@Override
+	public long getMvccVersion() {
+		return model.getMvccVersion();
 	}
 
 	/**
@@ -375,6 +397,16 @@ public class CPDefinitionLinkWrapper
 	@Override
 	public void setModifiedDate(Date modifiedDate) {
 		model.setModifiedDate(modifiedDate);
+	}
+
+	/**
+	 * Sets the mvcc version of this cp definition link.
+	 *
+	 * @param mvccVersion the mvcc version of this cp definition link
+	 */
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		model.setMvccVersion(mvccVersion);
 	}
 
 	/**

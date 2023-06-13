@@ -17,7 +17,6 @@ package com.liferay.portlet.expando.service.impl;
 import com.liferay.expando.kernel.exception.ColumnNameException;
 import com.liferay.expando.kernel.exception.ColumnTypeException;
 import com.liferay.expando.kernel.exception.DuplicateColumnNameException;
-import com.liferay.expando.kernel.exception.MissingDefaultLocaleValueException;
 import com.liferay.expando.kernel.model.ExpandoColumn;
 import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.model.ExpandoTable;
@@ -27,11 +26,13 @@ import com.liferay.expando.kernel.model.adapter.StagedExpandoColumn;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.adapter.ModelAdapterUtil;
+import com.liferay.portal.kernel.service.SystemEventLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.expando.model.impl.ExpandoValueImpl;
@@ -408,7 +409,7 @@ public class ExpandoColumnLocalServiceImpl
 		);
 
 		try {
-			systemEventLocalService.addSystemEvent(
+			_systemEventLocalService.addSystemEvent(
 				stagedExpandoColumn.getCompanyId(),
 				stagedModelType.getClassName(),
 				stagedExpandoColumn.getPrimaryKey(), StringPool.BLANK, null,
@@ -433,17 +434,10 @@ public class ExpandoColumnLocalServiceImpl
 			tableId, name);
 
 		if ((column != null) && (column.getColumnId() != columnId)) {
-			StringBundler sb = new StringBundler(7);
-
-			sb.append("{tableId=");
-			sb.append(tableId);
-			sb.append(", columnId=");
-			sb.append(columnId);
-			sb.append(", name=");
-			sb.append(name);
-			sb.append("}");
-
-			throw new DuplicateColumnNameException(sb.toString());
+			throw new DuplicateColumnNameException(
+				StringBundler.concat(
+					"{tableId=", tableId, ", columnId=", columnId, ", name=",
+					name, "}"));
 		}
 
 		if ((type != ExpandoColumnConstants.BOOLEAN) &&
@@ -541,24 +535,14 @@ public class ExpandoColumnLocalServiceImpl
 				(Map<Locale, String[]>)defaultData, LocaleUtil.getDefault());
 		}
 		else if (type == ExpandoColumnConstants.STRING_LOCALIZED) {
-			Map<Locale, String> defaultValuesMap =
-				(Map<Locale, String>)defaultData;
-
-			Locale defaultLocale = LocaleUtil.getDefault();
-
-			if (Validator.isNull(defaultValuesMap.get(defaultLocale))) {
-				for (String defaultValue : defaultValuesMap.values()) {
-					if (Validator.isNotNull(defaultValue)) {
-						throw new MissingDefaultLocaleValueException(
-							defaultLocale);
-					}
-				}
-			}
-
-			value.setStringMap(defaultValuesMap, defaultLocale);
+			value.setStringMap(
+				(Map<Locale, String>)defaultData, LocaleUtil.getDefault());
 		}
 
 		return value;
 	}
+
+	@BeanReference(type = SystemEventLocalService.class)
+	private SystemEventLocalService _systemEventLocalService;
 
 }

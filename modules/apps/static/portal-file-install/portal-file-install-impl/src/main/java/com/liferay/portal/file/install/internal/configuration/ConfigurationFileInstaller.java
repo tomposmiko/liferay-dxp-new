@@ -29,6 +29,7 @@ import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
 
+import java.net.URI;
 import java.net.URL;
 
 import java.util.Dictionary;
@@ -87,7 +88,7 @@ public class ConfigurationFileInstaller implements FileInstaller {
 		String[] pid = _parsePid(file.getName());
 
 		Configuration configuration = _getConfiguration(
-			file.getName(), pid[0], pid[1]);
+			_toConfigKey(file), pid[0], pid[1]);
 
 		Dictionary<String, Object> properties = configuration.getProperties();
 
@@ -105,19 +106,35 @@ public class ConfigurationFileInstaller implements FileInstaller {
 			}
 		}
 
+		String oldFileName = null;
+
 		if (old != null) {
-			old.remove(DirectoryWatcher.FILENAME);
+			oldFileName = (String)old.remove(DirectoryWatcher.FILENAME);
+
 			old.remove(Constants.SERVICE_PID);
 			old.remove(ConfigurationAdmin.SERVICE_FACTORYPID);
+
+			if ((dictionary.get(ConfigurationAdmin.SERVICE_BUNDLELOCATION) ==
+					null) &&
+				Objects.equals(
+					StringPool.QUESTION,
+					old.get(ConfigurationAdmin.SERVICE_BUNDLELOCATION))) {
+
+				old.remove(ConfigurationAdmin.SERVICE_BUNDLELOCATION);
+			}
 		}
 
-		if (!_equals(dictionary, old)) {
-			dictionary.put(DirectoryWatcher.FILENAME, file.getName());
+		String currentFileName = _toConfigKey(file);
+
+		if (!_equals(dictionary, old) ||
+			!Objects.equals(oldFileName, currentFileName)) {
+
+			dictionary.put(DirectoryWatcher.FILENAME, currentFileName);
 
 			String logString = StringPool.BLANK;
 
 			if (pid[1] != null) {
-				logString = StringPool.DASH + pid[1];
+				logString = StringPool.TILDE + pid[1];
 			}
 
 			if (old == null) {
@@ -150,7 +167,7 @@ public class ConfigurationFileInstaller implements FileInstaller {
 		String logString = StringPool.BLANK;
 
 		if (pid[1] != null) {
-			logString = StringPool.DASH + pid[1];
+			logString = StringPool.TILDE + pid[1];
 		}
 
 		if (_log.isInfoEnabled()) {
@@ -161,7 +178,7 @@ public class ConfigurationFileInstaller implements FileInstaller {
 		}
 
 		Configuration configuration = _getConfiguration(
-			file.getName(), pid[0], pid[1]);
+			_toConfigKey(file), pid[0], pid[1]);
 
 		configuration.delete();
 	}
@@ -207,16 +224,11 @@ public class ConfigurationFileInstaller implements FileInstaller {
 	private Configuration _findExistingConfiguration(String fileName)
 		throws Exception {
 
-		StringBundler sb = new StringBundler(5);
-
-		sb.append(StringPool.OPEN_PARENTHESIS);
-		sb.append(DirectoryWatcher.FILENAME);
-		sb.append(StringPool.EQUAL);
-		sb.append(_escapeFilterValue(fileName));
-		sb.append(StringPool.CLOSE_PARENTHESIS);
-
 		Configuration[] configurations = _configurationAdmin.listConfigurations(
-			sb.toString());
+			StringBundler.concat(
+				StringPool.OPEN_PARENTHESIS, DirectoryWatcher.FILENAME,
+				StringPool.EQUAL, _escapeFilterValue(fileName),
+				StringPool.CLOSE_PARENTHESIS));
 
 		if ((configurations != null) && (configurations.length > 0)) {
 			return configurations[0];
@@ -226,7 +238,7 @@ public class ConfigurationFileInstaller implements FileInstaller {
 	}
 
 	private Configuration _getConfiguration(
-			String fileName, String pid, String factoryPid)
+			String fileName, String pid, String name)
 		throws Exception {
 
 		Configuration configuration = _findExistingConfiguration(fileName);
@@ -235,9 +247,9 @@ public class ConfigurationFileInstaller implements FileInstaller {
 			return configuration;
 		}
 
-		if (factoryPid != null) {
-			return _configurationAdmin.createFactoryConfiguration(
-				pid, StringPool.QUESTION);
+		if (name != null) {
+			return _configurationAdmin.getFactoryConfiguration(
+				pid, name, StringPool.QUESTION);
 		}
 
 		return _configurationAdmin.getConfiguration(pid, StringPool.QUESTION);
@@ -246,17 +258,33 @@ public class ConfigurationFileInstaller implements FileInstaller {
 	private String[] _parsePid(String path) {
 		String pid = path.substring(0, path.lastIndexOf(CharPool.PERIOD));
 
-		int index = pid.indexOf(CharPool.DASH);
+		int index = pid.indexOf(CharPool.TILDE);
+
+		if (index <= 0) {
+			index = pid.indexOf(CharPool.UNDERLINE);
+
+			if (index <= 0) {
+				index = pid.indexOf(CharPool.DASH);
+			}
+		}
 
 		if (index > 0) {
-			String factoryPid = pid.substring(index + 1);
+			String name = pid.substring(index + 1);
 
 			pid = pid.substring(0, index);
 
-			return new String[] {pid, factoryPid};
+			return new String[] {pid, name};
 		}
 
 		return new String[] {pid, null};
+	}
+
+	private String _toConfigKey(File file) {
+		file = file.getAbsoluteFile();
+
+		URI uri = file.toURI();
+
+		return uri.toString();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

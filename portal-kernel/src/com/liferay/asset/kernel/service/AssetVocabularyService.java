@@ -81,6 +81,13 @@ public interface AssetVocabularyService extends BaseService {
 			String settings, ServiceContext serviceContext)
 		throws PortalException;
 
+	public AssetVocabulary addVocabulary(
+			String externalReferenceCode, long groupId, String name,
+			String title, Map<Locale, String> titleMap,
+			Map<Locale, String> descriptionMap, String settings,
+			int visibilityType, ServiceContext serviceContext)
+		throws PortalException;
+
 	public List<AssetVocabulary> deleteVocabularies(
 			long[] vocabularyIds, ServiceContext serviceContext)
 		throws PortalException;
@@ -200,12 +207,6 @@ public interface AssetVocabularyService extends BaseService {
 			ServiceContext serviceContext)
 		throws PortalException;
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 #updateVocabulary(long, String, Map, Map, String,
-	 ServiceContext)}
-	 */
-	@Deprecated
 	public AssetVocabulary updateVocabulary(
 			long vocabularyId, String name, String title,
 			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,

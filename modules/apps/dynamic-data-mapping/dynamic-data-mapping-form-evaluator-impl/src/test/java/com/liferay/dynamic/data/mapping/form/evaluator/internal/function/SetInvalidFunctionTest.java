@@ -44,14 +44,13 @@ public class SetInvalidFunctionTest extends PowerMockito {
 
 	@Test
 	public void testApply() {
-		DefaultDDMExpressionObserver defaultDDMExpressionObserver =
-			new DefaultDDMExpressionObserver();
-
-		DefaultDDMExpressionObserver spy = spy(defaultDDMExpressionObserver);
+		DefaultDDMExpressionObserver spyDefaultDDMExpressionObserver = spy(
+			new DefaultDDMExpressionObserver());
 
 		SetInvalidFunction setInvalidFunction = new SetInvalidFunction();
 
-		setInvalidFunction.setDDMExpressionObserver(spy);
+		setInvalidFunction.setDDMExpressionObserver(
+			spyDefaultDDMExpressionObserver);
 
 		Boolean result = setInvalidFunction.apply(
 			"contact", "Custom error message");
@@ -60,7 +59,7 @@ public class SetInvalidFunctionTest extends PowerMockito {
 			ArgumentCaptor.forClass(UpdateFieldPropertyRequest.class);
 
 		Mockito.verify(
-			spy, Mockito.times(1)
+			spyDefaultDDMExpressionObserver, Mockito.times(1)
 		).updateFieldProperty(
 			argumentCaptor.capture()
 		);

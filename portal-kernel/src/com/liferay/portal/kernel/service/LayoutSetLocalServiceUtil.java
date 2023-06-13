@@ -422,19 +422,6 @@ public class LayoutSetLocalServiceUtil {
 		return getService().updateSettings(groupId, privateLayout, settings);
 	}
 
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #updateVirtualHosts(long, boolean, TreeMap)}
-	 */
-	@Deprecated
-	public static LayoutSet updateVirtualHost(
-			long groupId, boolean privateLayout, String virtualHostname)
-		throws PortalException {
-
-		return getService().updateVirtualHost(
-			groupId, privateLayout, virtualHostname);
-	}
-
 	public static LayoutSet updateVirtualHosts(
 			long groupId, boolean privateLayout,
 			java.util.TreeMap<String, String> virtualHostnames)

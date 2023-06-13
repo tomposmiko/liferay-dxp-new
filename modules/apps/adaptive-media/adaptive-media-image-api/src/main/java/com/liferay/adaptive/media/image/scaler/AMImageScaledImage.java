@@ -16,14 +16,11 @@ package com.liferay.adaptive.media.image.scaler;
 
 import java.io.InputStream;
 
-import org.osgi.annotation.versioning.ProviderType;
-
 /**
  * Represents an image scaled by Adaptive Media.
  *
  * @author Sergio González
  */
-@ProviderType
 public interface AMImageScaledImage {
 
 	/**
@@ -39,13 +36,6 @@ public interface AMImageScaledImage {
 	 * @return the <code>InputStream</code> with the image data
 	 */
 	public InputStream getInputStream();
-
-	/**
-	 * Returns this image's mime type
-	 *
-	 * @return this image's mime type
-	 */
-	public String getMimeType();
 
 	/**
 	 * Returns this image's size in bytes.

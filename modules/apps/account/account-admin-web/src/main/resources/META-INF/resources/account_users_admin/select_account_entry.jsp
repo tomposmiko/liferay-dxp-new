@@ -17,9 +17,15 @@
 <%@ include file="/init.jsp" %>
 
 <%
-SearchContainer<AccountEntryDisplay> accountEntryDisplaySearchContainer = AccountEntryDisplaySearchContainerFactory.create(liferayPortletRequest, liferayPortletResponse);
-
 long accountGroupId = ParamUtil.getLong(request, "accountGroupId");
+
+boolean filterManageableAccountEntries = true;
+
+if ((accountGroupId > 0) && AccountGroupPermission.contains(permissionChecker, accountGroupId, AccountActionKeys.ASSIGN_ACCOUNTS)) {
+	filterManageableAccountEntries = false;
+}
+
+SearchContainer<AccountEntryDisplay> accountEntryDisplaySearchContainer = AccountEntryDisplaySearchContainerFactory.create(liferayPortletRequest, liferayPortletResponse, filterManageableAccountEntries);
 
 if (accountGroupId > 0) {
 	accountEntryDisplaySearchContainer.setRowChecker(new AccountGroupAccountEntryRowChecker(liferayPortletResponse, accountGroupId));
@@ -33,7 +39,7 @@ if (selectAccountEntryManagementToolbarDisplayContext.isSingleSelect()) {
 %>
 
 <clay:management-toolbar
-	displayContext="<%= selectAccountEntryManagementToolbarDisplayContext %>"
+	managementToolbarDisplayContext="<%= selectAccountEntryManagementToolbarDisplayContext %>"
 />
 
 <clay:container-fluid
@@ -98,40 +104,3 @@ if (selectAccountEntryManagementToolbarDisplayContext.isSingleSelect()) {
 		/>
 	</liferay-ui:search-container>
 </clay:container-fluid>
-
-<c:choose>
-	<c:when test="<%= selectAccountEntryManagementToolbarDisplayContext.isSingleSelect() %>">
-		<aui:script>
-			Liferay.Util.selectEntityHandler(
-				'#<portlet:namespace />selectAccountEntry',
-				'<%= HtmlUtil.escapeJS(liferayPortletResponse.getNamespace() + "selectAccountEntry") %>'
-			);
-		</aui:script>
-	</c:when>
-	<c:otherwise>
-		<aui:script use="liferay-search-container">
-			var searchContainer = Liferay.SearchContainer.get(
-				'<portlet:namespace />accountEntries'
-			);
-
-			searchContainer.on('rowToggled', function (event) {
-				var selectedItems = event.elements.allSelectedElements;
-
-				var result = {};
-
-				if (!selectedItems.isEmpty()) {
-					result = {
-						data: {
-							value: selectedItems.get('value').join(','),
-						},
-					};
-				}
-
-				Liferay.Util.getOpener().Liferay.fire(
-					'<%= HtmlUtil.escapeJS(liferayPortletResponse.getNamespace() + "selectAccountEntries") %>',
-					result
-				);
-			});
-		</aui:script>
-	</c:otherwise>
-</c:choose>

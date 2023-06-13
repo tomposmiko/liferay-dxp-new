@@ -20,7 +20,6 @@ import com.liferay.fragment.constants.FragmentExportImportConstants;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
-import com.liferay.fragment.util.FragmentEntryRenderUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSON;
@@ -51,7 +50,7 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 
 	@Override
 	public String getContent() {
-		return FragmentEntryRenderUtil.renderFragmentEntry(this);
+		return StringPool.BLANK;
 	}
 
 	@Override
@@ -62,6 +61,15 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 
 	@Override
 	public String getIcon() {
+		if (Validator.isNull(_icon)) {
+			if (getType() == FragmentConstants.TYPE_REACT) {
+				_icon = "react";
+			}
+			else {
+				_icon = "code";
+			}
+		}
+
 		return _icon;
 	}
 
@@ -104,8 +112,9 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 
 	@Override
 	public int getUsageCount() {
-		return FragmentEntryLinkLocalServiceUtil.getFragmentEntryLinksCount(
-			getGroupId(), getFragmentEntryId());
+		return FragmentEntryLinkLocalServiceUtil.
+			getAllFragmentEntryLinksCountByFragmentEntryId(
+				getGroupId(), getFragmentEntryId());
 	}
 
 	@Override
@@ -207,7 +216,7 @@ public class FragmentEntryImpl extends FragmentEntryBaseImpl {
 	private static final Log _log = LogFactoryUtil.getLog(
 		FragmentEntryImpl.class);
 
-	private String _icon = "code";
+	private String _icon;
 	private String _imagePreviewURL;
 
 }

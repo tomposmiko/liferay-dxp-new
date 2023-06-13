@@ -21,7 +21,6 @@ import com.liferay.commerce.order.CommerceOrderHttpHelper;
 import com.liferay.commerce.order.CommerceOrderValidatorRegistry;
 import com.liferay.commerce.percentage.PercentageFormatter;
 import com.liferay.commerce.price.CommerceOrderPriceCalculation;
-import com.liferay.commerce.price.CommerceProductPriceCalculation;
 import com.liferay.commerce.product.constants.CPConstants;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
@@ -82,16 +81,15 @@ public class CommerceCartContentMiniPortlet extends MVCPortlet {
 			CommerceCartContentMiniDisplayContext
 				commerceCartContentDisplayContext =
 					new CommerceCartContentMiniDisplayContext(
-						_portal.getHttpServletRequest(renderRequest),
 						_commerceChannelLocalService, _commerceOrderHttpHelper,
 						_commerceOrderItemService,
 						_commerceOrderPriceCalculation,
-						_commerceOrderValidatorRegistry,
-						_commerceProductPriceCalculation, _cpDefinitionHelper,
+						_commerceOrderValidatorRegistry, _cpDefinitionHelper,
 						_cpInstanceHelper,
 						_commerceOrderModelResourcePermission,
 						_commerceProductPortletResourcePermission,
-						_percentageFormatter);
+						_percentageFormatter,
+						_portal.getHttpServletRequest(renderRequest), _portal);
 
 			renderRequest.setAttribute(
 				WebKeys.PORTLET_DISPLAY_CONTEXT,
@@ -128,11 +126,10 @@ public class CommerceCartContentMiniPortlet extends MVCPortlet {
 	@Reference
 	private CommerceOrderValidatorRegistry _commerceOrderValidatorRegistry;
 
-	@Reference(target = "(resource.name=" + CPConstants.RESOURCE_NAME + ")")
+	@Reference(
+		target = "(resource.name=" + CPConstants.RESOURCE_NAME_PRODUCT + ")"
+	)
 	private PortletResourcePermission _commerceProductPortletResourcePermission;
-
-	@Reference
-	private CommerceProductPriceCalculation _commerceProductPriceCalculation;
 
 	@Reference
 	private CPDefinitionHelper _cpDefinitionHelper;

@@ -19,10 +19,6 @@
 <%
 String tabs3 = ParamUtil.getString(request, "tabs3", "current");
 
-String redirect = ParamUtil.getString(request, "redirect");
-
-String backURL = ParamUtil.getString(request, "backURL", redirect);
-
 long roleId = ParamUtil.getLong(request, "roleId");
 
 Role role = RoleServiceUtil.fetchRole(roleId);
@@ -62,6 +58,7 @@ if (Validator.isNotNull(portletResource)) {
 	<aui:input name="roleId" type="hidden" value="<%= role.getRoleId() %>" />
 	<aui:input name="portletResource" type="hidden" value="<%= portletResource %>" />
 	<aui:input name="modelResources" type="hidden" value='<%= (modelResources == null) ? "" : StringUtil.merge(modelResources) %>' />
+	<aui:input name="accountRoleGroupScope" type="hidden" value="<%= roleDisplayContext.isAccountRoleGroupScope() %>" />
 	<aui:input name="selectedTargets" type="hidden" />
 	<aui:input name="unselectedTargets" type="hidden" />
 
@@ -125,7 +122,7 @@ if (Validator.isNotNull(portletResource)) {
 			</clay:sheet-section>
 		</c:if>
 
-		<c:if test="<%= portletResource.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATE) %>">
+		<c:if test="<%= portletResource.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATE) || portletResource.equals(TemplatePortletKeys.TEMPLATE) %>">
 			<clay:sheet-section>
 				<h4 class="sheet-subtitle"><liferay-ui:message key="related-application-permissions" /></h4>
 
@@ -165,11 +162,11 @@ if (Validator.isNotNull(portletResource)) {
 
 						Portlet curPortlet = PortletLocalServiceUtil.getPortletById(company.getCompanyId(), resource);
 
-						if (portlet.isSystem()) {
+						if (curPortlet.isSystem()) {
 							continue;
 						}
 
-						if (role.getType() == RoleConstants.TYPE_REGULAR) {
+						if (roleDisplayContext.isAllowGroupScope()) {
 							RolePermissions rolePermissions = new RolePermissions(resource, ResourceConstants.SCOPE_GROUP, actionId, role.getRoleId());
 
 							groups = GroupLocalServiceUtil.search(
@@ -226,13 +223,3 @@ if (Validator.isNotNull(portletResource)) {
 		</clay:sheet-footer>
 	</clay:sheet>
 </aui:form>
-
-<%
-PortletURL definePermissionsURL = liferayPortletResponse.createRenderURL();
-
-definePermissionsURL.setParameter("mvcPath", "/edit_role_permissions.jsp");
-definePermissionsURL.setParameter(Constants.CMD, Constants.VIEW);
-definePermissionsURL.setParameter("redirect", backURL);
-definePermissionsURL.setParameter("roleId", String.valueOf(role.getRoleId()));
-definePermissionsURL.setParameter("tabs1", "define-permissions");
-%>

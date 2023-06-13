@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -73,7 +74,7 @@ public class CommerceProductImageDataSetDataProvider
 		List<CPAttachmentFileEntry> cpAttachmentFileEntries =
 			_cpAttachmentFileEntryService.getCPAttachmentFileEntries(
 				_portal.getClassNameId(CPDefinition.class), cpDefinitionId,
-				filter.getKeywords(), CPAttachmentFileEntryConstants.TYPE_IMAGE,
+				CPAttachmentFileEntryConstants.TYPE_IMAGE,
 				WorkflowConstants.STATUS_ANY, pagination.getStartPosition(),
 				pagination.getEndPosition());
 
@@ -86,7 +87,13 @@ public class CommerceProductImageDataSetDataProvider
 			String title = cpAttachmentFileEntry.getTitle(
 				LanguageUtil.getLanguageId(locale));
 
-			FileEntry fileEntry = cpAttachmentFileEntry.getFileEntry();
+			String extension = StringPool.BLANK;
+
+			FileEntry fileEntry = cpAttachmentFileEntry.fetchFileEntry();
+
+			if (fileEntry != null) {
+				extension = HtmlUtil.escape(fileEntry.getExtension());
+			}
 
 			Date modifiedDate = cpAttachmentFileEntry.getModifiedDate();
 
@@ -108,10 +115,9 @@ public class CommerceProductImageDataSetDataProvider
 					new ImageField(
 						title, "rounded", "lg",
 						CommerceMediaResolverUtil.getThumbnailURL(
-							CommerceAccountConstants.ACCOUNT_ID_GUEST,
+							CommerceAccountConstants.ACCOUNT_ID_ADMIN,
 							cpAttachmentFileEntryId)),
-					title, fileEntry.getExtension(),
-					cpAttachmentFileEntry.getPriority(),
+					title, extension, cpAttachmentFileEntry.getPriority(),
 					LanguageUtil.format(
 						httpServletRequest, "x-ago", modifiedDateDescription,
 						false),
@@ -136,7 +142,7 @@ public class CommerceProductImageDataSetDataProvider
 
 		return _cpAttachmentFileEntryService.getCPAttachmentFileEntriesCount(
 			_portal.getClassNameId(CPDefinition.class), cpDefinitionId,
-			filter.getKeywords(), CPAttachmentFileEntryConstants.TYPE_IMAGE,
+			CPAttachmentFileEntryConstants.TYPE_IMAGE,
 			WorkflowConstants.STATUS_ANY);
 	}
 

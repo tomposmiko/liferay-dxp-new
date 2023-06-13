@@ -54,7 +54,7 @@ public class SiteNavigationMenuPortletDataHandler
 
 	public static final String NAMESPACE = "navigation-menus";
 
-	public static final String SCHEMA_VERSION = "1.0.0";
+	public static final String SCHEMA_VERSION = "4.0.0";
 
 	@Override
 	public String getSchemaVersion() {
@@ -119,7 +119,7 @@ public class SiteNavigationMenuPortletDataHandler
 
 	@Override
 	protected String doExportData(
-			final PortletDataContext portletDataContext, String portletId,
+			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
 		throws Exception {
 

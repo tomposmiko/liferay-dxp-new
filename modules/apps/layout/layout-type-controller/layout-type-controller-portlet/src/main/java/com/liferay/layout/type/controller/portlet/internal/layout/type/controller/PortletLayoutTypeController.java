@@ -14,8 +14,6 @@
 
 package com.liferay.layout.type.controller.portlet.internal.layout.type.controller;
 
-import com.liferay.fragment.constants.FragmentActionKeys;
-import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.type.controller.BaseLayoutTypeControllerImpl;
@@ -28,13 +26,13 @@ import com.liferay.portal.kernel.model.LayoutTypeController;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.servlet.DirectRequestDispatcherFactoryUtil;
+import com.liferay.portal.kernel.servlet.PipingServletResponse;
 import com.liferay.portal.kernel.servlet.TransferHeadersHelperUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.servlet.DynamicServletRequestUtil;
-import com.liferay.taglib.servlet.PipingServletResponse;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -87,10 +85,6 @@ public class PortletLayoutTypeController extends BaseLayoutTypeControllerImpl {
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, Layout layout)
 		throws Exception {
-
-		httpServletRequest.setAttribute(
-			FragmentActionKeys.FRAGMENT_RENDERER_CONTROLLER,
-			_fragmentRendererController);
 
 		RequestDispatcher requestDispatcher =
 			TransferHeadersHelperUtil.getTransferHeadersRequestDispatcher(
@@ -216,9 +210,6 @@ public class PortletLayoutTypeController extends BaseLayoutTypeControllerImpl {
 			"p_v_l_s_g_id=${liferay:pvlsgid}";
 
 	private static final String _VIEW_PAGE = "/layout/view/portlet.jsp";
-
-	@Reference
-	private FragmentRendererController _fragmentRendererController;
 
 	@Reference
 	private LayoutPageTemplateEntryLocalService

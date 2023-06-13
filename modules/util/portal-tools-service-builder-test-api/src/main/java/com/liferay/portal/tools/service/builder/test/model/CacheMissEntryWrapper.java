@@ -71,6 +71,11 @@ public class CacheMissEntryWrapper
 		}
 	}
 
+	@Override
+	public CacheMissEntry cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
 	/**
 	 * Returns the cache miss entry ID of this cache miss entry.
 	 *

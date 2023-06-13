@@ -17,6 +17,7 @@ package com.liferay.dynamic.data.mapping.util;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.document.library.kernel.util.DLUtil;
+import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.petra.string.StringPool;
@@ -38,7 +39,7 @@ public class DocumentLibraryDDMFormFieldValueTransformer
 
 	@Override
 	public String getFieldType() {
-		return "ddm-documentlibrary";
+		return DDMFormFieldTypeConstants.DOCUMENT_LIBRARY;
 	}
 
 	@Override
@@ -69,10 +70,10 @@ public class DocumentLibraryDDMFormFieldValueTransformer
 			tempFileEntry.getFileName());
 
 		return DLAppServiceUtil.addFileEntry(
-			tempFileEntry.getGroupId(), 0, fileName,
+			null, tempFileEntry.getGroupId(), 0, fileName,
 			tempFileEntry.getMimeType(), fileName, StringPool.BLANK,
 			StringPool.BLANK, tempFileEntry.getContentStream(),
-			tempFileEntry.getSize(), new ServiceContext());
+			tempFileEntry.getSize(), null, null, new ServiceContext());
 	}
 
 	protected FileEntry fetchTempFileEntry(String value)
@@ -95,15 +96,13 @@ public class DocumentLibraryDDMFormFieldValueTransformer
 	}
 
 	protected String toJSON(FileEntry fileEntry) {
-		JSONObject jsonObject = JSONUtil.put(
+		return JSONUtil.put(
 			"groupId", fileEntry.getGroupId()
 		).put(
 			"title", fileEntry.getTitle()
 		).put(
 			"uuid", fileEntry.getUuid()
-		);
-
-		return jsonObject.toString();
+		).toString();
 	}
 
 }

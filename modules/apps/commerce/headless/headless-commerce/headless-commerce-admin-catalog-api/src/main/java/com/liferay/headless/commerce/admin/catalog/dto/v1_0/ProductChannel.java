@@ -61,7 +61,7 @@ public class ProductChannel implements Serializable {
 	}
 
 	@DecimalMin("0")
-	@Schema(example = "31130")
+	@Schema
 	public Long getChannelId() {
 		return channelId;
 	}
@@ -89,7 +89,7 @@ public class ProductChannel implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long channelId;
 
-	@Schema(example = "USD")
+	@Schema
 	public String getCurrencyCode() {
 		return currencyCode;
 	}
@@ -117,7 +117,7 @@ public class ProductChannel implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String currencyCode;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -146,7 +146,7 @@ public class ProductChannel implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "31130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -173,7 +173,7 @@ public class ProductChannel implements Serializable {
 	@NotNull
 	protected Long id;
 
-	@Schema(example = "Alessio Antonio Rendina")
+	@Schema
 	public String getName() {
 		return name;
 	}

@@ -75,7 +75,7 @@ public class LayoutAssetRendererFactory
 		assetEntry.setCreateDate(layout.getCreateDate());
 		assetEntry.setClassNameId(
 			_portal.getClassNameId(Layout.class.getName()));
-		assetEntry.setClassPK(layout.getPlid());
+		assetEntry.setClassPK(layout.getLayoutId());
 		assetEntry.setTitle(layout.getHTMLTitle(LocaleUtil.getSiteDefault()));
 
 		return assetEntry;

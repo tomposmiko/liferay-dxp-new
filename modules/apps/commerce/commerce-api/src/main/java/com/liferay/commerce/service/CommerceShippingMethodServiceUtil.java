@@ -42,12 +42,11 @@ public class CommerceShippingMethodServiceUtil {
 	 */
 	public static com.liferay.commerce.model.CommerceAddressRestriction
 			addCommerceAddressRestriction(
-				long userId, long groupId, long commerceShippingMethodId,
-				long commerceCountryId)
+				long groupId, long commerceShippingMethodId, long countryId)
 		throws PortalException {
 
 		return getService().addCommerceAddressRestriction(
-			userId, groupId, commerceShippingMethodId, commerceCountryId);
+			groupId, commerceShippingMethodId, countryId);
 	}
 
 	/**
@@ -56,24 +55,24 @@ public class CommerceShippingMethodServiceUtil {
 	@Deprecated
 	public static com.liferay.commerce.model.CommerceAddressRestriction
 			addCommerceAddressRestriction(
-				long commerceShippingMethodId, long commerceCountryId,
+				long commerceShippingMethodId, long countryId,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addCommerceAddressRestriction(
-			commerceShippingMethodId, commerceCountryId, serviceContext);
+			commerceShippingMethodId, countryId, serviceContext);
 	}
 
 	public static CommerceShippingMethod addCommerceShippingMethod(
-			long userId, long groupId, Map<java.util.Locale, String> nameMap,
+			long groupId, Map<java.util.Locale, String> nameMap,
 			Map<java.util.Locale, String> descriptionMap,
 			java.io.File imageFile, String engineKey, double priority,
 			boolean active)
 		throws PortalException {
 
 		return getService().addCommerceShippingMethod(
-			userId, groupId, nameMap, descriptionMap, imageFile, engineKey,
-			priority, active);
+			groupId, nameMap, descriptionMap, imageFile, engineKey, priority,
+			active);
 	}
 
 	public static CommerceShippingMethod createCommerceShippingMethod(
@@ -156,11 +155,11 @@ public class CommerceShippingMethodServiceUtil {
 	}
 
 	public static List<CommerceShippingMethod> getCommerceShippingMethods(
-			long groupId, long commerceCountryId, boolean active)
+			long groupId, long countryId, boolean active)
 		throws PortalException {
 
 		return getService().getCommerceShippingMethods(
-			groupId, commerceCountryId, active);
+			groupId, countryId, active);
 	}
 
 	public static int getCommerceShippingMethodsCount(

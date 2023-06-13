@@ -52,9 +52,8 @@ import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -63,16 +62,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -224,20 +225,11 @@ public abstract class BaseProductResourceTestCase {
 
 		assertContains(product1, (List<Product>)page.getItems());
 		assertContains(product2, (List<Product>)page.getItems());
-		assertValid(page, testGetProductsPage_getExpectedActions());
+		assertValid(page);
 
 		productResource.deleteProduct(product1.getId());
 
 		productResource.deleteProduct(product2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetProductsPage_getExpectedActions()
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -256,31 +248,6 @@ public abstract class BaseProductResourceTestCase {
 		for (EntityField entityField : entityFields) {
 			Page<Product> page = productResource.getProductsPage(
 				null, getFilterString(entityField, "between", product1),
-				Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(product1),
-				(List<Product>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetProductsPageWithFilterDoubleEquals() throws Exception {
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DOUBLE);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		Product product1 = testGetProductsPage_addProduct(randomProduct());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		Product product2 = testGetProductsPage_addProduct(randomProduct());
-
-		for (EntityField entityField : entityFields) {
-			Page<Product> page = productResource.getProductsPage(
-				null, getFilterString(entityField, "eq", product1),
 				Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -357,19 +324,9 @@ public abstract class BaseProductResourceTestCase {
 		testGetProductsPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, product1, product2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					product1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetProductsPageWithSortDouble() throws Exception {
-		testGetProductsPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, product1, product2) -> {
-				BeanTestUtil.setProperty(product1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(product2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -378,8 +335,8 @@ public abstract class BaseProductResourceTestCase {
 		testGetProductsPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, product1, product2) -> {
-				BeanTestUtil.setProperty(product1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(product2, entityField.getName(), 1);
+				BeanUtils.setProperty(product1, entityField.getName(), 0);
+				BeanUtils.setProperty(product2, entityField.getName(), 1);
 			});
 	}
 
@@ -392,27 +349,27 @@ public abstract class BaseProductResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						product1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						product2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						product1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						product2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -420,12 +377,12 @@ public abstract class BaseProductResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						product1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						product2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -502,8 +459,8 @@ public abstract class BaseProductResourceTestCase {
 
 		long totalCount = productsJSONObject.getLong("totalCount");
 
-		Product product1 = testGraphQLGetProductsPage_addProduct();
-		Product product2 = testGraphQLGetProductsPage_addProduct();
+		Product product1 = testGraphQLProduct_addProduct();
+		Product product2 = testGraphQLProduct_addProduct();
 
 		productsJSONObject = JSONUtil.getValueAsJSONObject(
 			invokeGraphQLQuery(graphQLField), "JSONObject/data",
@@ -520,10 +477,6 @@ public abstract class BaseProductResourceTestCase {
 			product2,
 			Arrays.asList(
 				ProductSerDes.toDTOs(productsJSONObject.getString("items"))));
-	}
-
-	protected Product testGraphQLGetProductsPage_addProduct() throws Exception {
-		return testGraphQLProduct_addProduct();
 	}
 
 	@Test
@@ -594,8 +547,7 @@ public abstract class BaseProductResourceTestCase {
 	public void testGraphQLGetProductByExternalReferenceCode()
 		throws Exception {
 
-		Product product =
-			testGraphQLGetProductByExternalReferenceCode_addProduct();
+		Product product = testGraphQLProduct_addProduct();
 
 		Assert.assertTrue(
 			equals(
@@ -645,12 +597,6 @@ public abstract class BaseProductResourceTestCase {
 				"Object/code"));
 	}
 
-	protected Product testGraphQLGetProductByExternalReferenceCode_addProduct()
-		throws Exception {
-
-		return testGraphQLProduct_addProduct();
-	}
-
 	@Test
 	public void testPatchProductByExternalReferenceCode() throws Exception {
 		Assert.assertTrue(false);
@@ -698,7 +644,7 @@ public abstract class BaseProductResourceTestCase {
 
 	@Test
 	public void testGraphQLDeleteProduct() throws Exception {
-		Product product = testGraphQLDeleteProduct_addProduct();
+		Product product = testGraphQLProduct_addProduct();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -711,6 +657,7 @@ public abstract class BaseProductResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteProduct"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -724,10 +671,6 @@ public abstract class BaseProductResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected Product testGraphQLDeleteProduct_addProduct() throws Exception {
-		return testGraphQLProduct_addProduct();
 	}
 
 	@Test
@@ -747,7 +690,7 @@ public abstract class BaseProductResourceTestCase {
 
 	@Test
 	public void testGraphQLGetProduct() throws Exception {
-		Product product = testGraphQLGetProduct_addProduct();
+		Product product = testGraphQLProduct_addProduct();
 
 		Assert.assertTrue(
 			equals(
@@ -784,10 +727,6 @@ public abstract class BaseProductResourceTestCase {
 						getGraphQLFields())),
 				"JSONArray/errors", "Object/0", "JSONObject/extensions",
 				"Object/code"));
-	}
-
-	protected Product testGraphQLGetProduct_addProduct() throws Exception {
-		return testGraphQLProduct_addProduct();
 	}
 
 	@Test
@@ -980,6 +919,14 @@ public abstract class BaseProductResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("diagram", additionalAssertFieldName)) {
+				if (product.getDiagram() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("displayDate", additionalAssertFieldName)) {
 				if (product.getDisplayDate() == null) {
 					valid = false;
@@ -1016,6 +963,14 @@ public abstract class BaseProductResourceTestCase {
 
 			if (Objects.equals("images", additionalAssertFieldName)) {
 				if (product.getImages() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("mappedProducts", additionalAssertFieldName)) {
+				if (product.getMappedProducts() == null) {
 					valid = false;
 				}
 
@@ -1070,6 +1025,14 @@ public abstract class BaseProductResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("pins", additionalAssertFieldName)) {
+				if (product.getPins() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals(
 					"productAccountGroupFilter", additionalAssertFieldName)) {
 
@@ -1102,6 +1065,16 @@ public abstract class BaseProductResourceTestCase {
 
 			if (Objects.equals("productChannels", additionalAssertFieldName)) {
 				if (product.getProductChannels() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"productConfiguration", additionalAssertFieldName)) {
+
+				if (product.getProductConfiguration() == null) {
 					valid = false;
 				}
 
@@ -1261,12 +1234,6 @@ public abstract class BaseProductResourceTestCase {
 	}
 
 	protected void assertValid(Page<Product> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<Product> page, Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<Product> products = page.getItems();
@@ -1281,20 +1248,6 @@ public abstract class BaseProductResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1477,6 +1430,16 @@ public abstract class BaseProductResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("diagram", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						product1.getDiagram(), product2.getDiagram())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("displayDate", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						product1.getDisplayDate(), product2.getDisplayDate())) {
@@ -1533,6 +1496,17 @@ public abstract class BaseProductResourceTestCase {
 			if (Objects.equals("images", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						product1.getImages(), product2.getImages())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("mappedProducts", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						product1.getMappedProducts(),
+						product2.getMappedProducts())) {
 
 					return false;
 				}
@@ -1602,6 +1576,16 @@ public abstract class BaseProductResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("pins", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						product1.getPins(), product2.getPins())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals(
 					"productAccountGroupFilter", additionalAssertFieldName)) {
 
@@ -1645,6 +1629,19 @@ public abstract class BaseProductResourceTestCase {
 				if (!Objects.deepEquals(
 						product1.getProductChannels(),
 						product2.getProductChannels())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"productConfiguration", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						product1.getProductConfiguration(),
+						product2.getProductConfiguration())) {
 
 					return false;
 				}
@@ -1876,16 +1873,14 @@ public abstract class BaseProductResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1902,10 +1897,6 @@ public abstract class BaseProductResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1915,18 +1906,18 @@ public abstract class BaseProductResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -2026,6 +2017,11 @@ public abstract class BaseProductResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("diagram")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("displayDate")) {
 			if (operator.equals("between")) {
 				sb = new StringBundler();
@@ -2111,6 +2107,11 @@ public abstract class BaseProductResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("mappedProducts")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("metaDescription")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -2167,6 +2168,11 @@ public abstract class BaseProductResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("pins")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("productAccountGroupFilter")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -2187,6 +2193,11 @@ public abstract class BaseProductResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("productConfiguration")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("productId")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -2203,9 +2214,8 @@ public abstract class BaseProductResourceTestCase {
 		}
 
 		if (entityFieldName.equals("productStatus")) {
-			sb.append(String.valueOf(product.getProductStatus()));
-
-			return sb.toString();
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("productType")) {
@@ -2372,115 +2382,6 @@ public abstract class BaseProductResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -2555,6 +2456,18 @@ public abstract class BaseProductResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseProductResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

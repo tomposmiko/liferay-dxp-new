@@ -61,7 +61,7 @@ public class PortalConfigurationCORSClientTest extends BaseCORSClientTestCase {
 
 	@Test
 	public void testCORSUsingBasicWithDefaultConfig() throws Exception {
-		assertJsonWSUrl("/user/get-current-user", HttpMethod.OPTIONS, false);
+		assertJsonWSUrl("/user/get-current-user", HttpMethod.OPTIONS, true);
 		assertJsonWSUrl("/user/get-current-user", HttpMethod.GET, false);
 	}
 
@@ -73,9 +73,8 @@ public class PortalConfigurationCORSClientTest extends BaseCORSClientTestCase {
 				true);
 
 		try {
-			assertJsonWSUrl(
-				"/user/get-current-user", HttpMethod.OPTIONS, false);
-			assertJsonWSUrl("/user/get-current-user", HttpMethod.GET, false);
+			assertJsonWSUrl("/user/get-current-user", HttpMethod.OPTIONS, true);
+			assertJsonWSUrl("/user/get-current-user", HttpMethod.GET, true);
 		}
 		finally {
 			ReflectionTestUtil.setFieldValue(
@@ -89,7 +88,17 @@ public class PortalConfigurationCORSClientTest extends BaseCORSClientTestCase {
 		Cookie authenticatedCookie = _getAuthenticatedCookie(
 			"test@liferay.com", "test");
 
-		Invocation.Builder invocationBuilder = _getJsonWebTarget(
+		Invocation.Builder invocationBuilder = _getWebTarget(
+			"web", "guest"
+		).request();
+
+		invocationBuilder = invocationBuilder.cookie(authenticatedCookie);
+
+		Response response = invocationBuilder.get();
+
+		_pAuth = _parsePAuthToken(response);
+
+		invocationBuilder = _getJsonWebTarget(
 			"user", "get-current-user"
 		).request();
 
@@ -98,7 +107,7 @@ public class PortalConfigurationCORSClientTest extends BaseCORSClientTestCase {
 		invocationBuilder = invocationBuilder.header(
 			"Origin", "http://test-cors.com");
 
-		Response response = invocationBuilder.get();
+		response = invocationBuilder.get();
 
 		String corsHeaderString = response.getHeaderString(
 			"Access-Control-Allow-Origin");

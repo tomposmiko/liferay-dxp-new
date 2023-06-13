@@ -58,7 +58,7 @@ public class DDMFormInstanceRecordJSONWriter
 			jsonArray::put
 		);
 
-		String json = jsonArray.toString();
+		String json = jsonArray.toJSONString();
 
 		DDMFormInstanceRecordWriterResponse.Builder builder =
 			DDMFormInstanceRecordWriterResponse.Builder.newBuilder(

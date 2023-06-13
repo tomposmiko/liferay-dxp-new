@@ -84,6 +84,30 @@ public class ContainsSerDes {
 			}
 		}
 
+		if (contains.getValues() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"values\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < contains.getValues().length; i++) {
+				sb.append("\"");
+
+				sb.append(_escape(contains.getValues()[i]));
+
+				sb.append("\"");
+
+				if ((i + 1) < contains.getValues().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		sb.append("}");
 
 		return sb.toString();
@@ -117,6 +141,13 @@ public class ContainsSerDes {
 			map.put("value", String.valueOf(contains.getValue()));
 		}
 
+		if (contains.getValues() == null) {
+			map.put("values", null);
+		}
+		else {
+			map.put("values", String.valueOf(contains.getValues()));
+		}
+
 		return map;
 	}
 
@@ -145,6 +176,11 @@ public class ContainsSerDes {
 			else if (Objects.equals(jsonParserFieldName, "value")) {
 				if (jsonParserFieldValue != null) {
 					contains.setValue((Object)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "values")) {
+				if (jsonParserFieldValue != null) {
+					contains.setValues((Object[])jsonParserFieldValue);
 				}
 			}
 		}

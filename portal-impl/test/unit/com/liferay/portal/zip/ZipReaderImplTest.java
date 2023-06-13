@@ -17,12 +17,10 @@ package com.liferay.portal.zip;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.portal.kernel.test.util.DependenciesTestUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.util.FastDateFormatFactoryImpl;
-import com.liferay.portal.util.FileImpl;
 
 import java.io.InputStream;
 
@@ -33,7 +31,6 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -42,8 +39,7 @@ import org.junit.Test;
 public class ZipReaderImplTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@BeforeClass
@@ -53,10 +49,6 @@ public class ZipReaderImplTest {
 
 		fastDateFormatFactoryUtil.setFastDateFormatFactory(
 			new FastDateFormatFactoryImpl());
-
-		FileUtil fileUtil = new FileUtil();
-
-		fileUtil.setFile(new FileImpl());
 
 		_expectedContent0 = StringUtil.read(
 			DependenciesTestUtil.getDependencyAsInputStream(

@@ -21,9 +21,9 @@ import com.liferay.asset.kernel.service.persistence.AssetCategoryPropertyPersist
 import com.liferay.asset.kernel.service.persistence.AssetCategoryPropertyUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
+import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.dao.orm.Query;
@@ -32,14 +32,12 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelperUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -47,9 +45,6 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portlet.asset.model.impl.AssetCategoryPropertyImpl;
 import com.liferay.portlet.asset.model.impl.AssetCategoryPropertyModelImpl;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceRegistration;
 
 import java.io.Serializable;
 
@@ -67,7 +62,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The persistence implementation for the asset category property service.
@@ -203,7 +197,7 @@ public class AssetCategoryPropertyPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategoryProperty>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategoryProperty assetCategoryProperty : list) {
@@ -580,8 +574,7 @@ public class AssetCategoryPropertyPersistenceImpl
 
 			finderArgs = new Object[] {companyId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -726,7 +719,7 @@ public class AssetCategoryPropertyPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategoryProperty>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategoryProperty assetCategoryProperty : list) {
@@ -1103,8 +1096,7 @@ public class AssetCategoryPropertyPersistenceImpl
 
 			finderArgs = new Object[] {categoryId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1254,7 +1246,7 @@ public class AssetCategoryPropertyPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategoryProperty>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetCategoryProperty assetCategoryProperty : list) {
@@ -1681,8 +1673,7 @@ public class AssetCategoryPropertyPersistenceImpl
 
 			finderArgs = new Object[] {companyId, key};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1826,7 +1817,7 @@ public class AssetCategoryPropertyPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByCA_K, finderArgs, this);
+				_finderPathFetchByCA_K, finderArgs);
 		}
 
 		if (result instanceof AssetCategoryProperty) {
@@ -1948,8 +1939,7 @@ public class AssetCategoryPropertyPersistenceImpl
 
 			finderArgs = new Object[] {categoryId, key};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2091,23 +2081,21 @@ public class AssetCategoryPropertyPersistenceImpl
 	 * Clears the cache for all asset category properties.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache() {
 		EntityCacheUtil.clearCache(AssetCategoryPropertyImpl.class);
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		FinderCacheUtil.clearCache(AssetCategoryPropertyImpl.class);
 	}
 
 	/**
 	 * Clears the cache for the asset category property.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -2130,9 +2118,7 @@ public class AssetCategoryPropertyPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		FinderCacheUtil.clearCache(AssetCategoryPropertyImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			EntityCacheUtil.removeResult(
@@ -2149,10 +2135,9 @@ public class AssetCategoryPropertyPersistenceImpl
 		};
 
 		FinderCacheUtil.putResult(
-			_finderPathCountByCA_K, args, Long.valueOf(1), false);
+			_finderPathCountByCA_K, args, Long.valueOf(1));
 		FinderCacheUtil.putResult(
-			_finderPathFetchByCA_K, args, assetCategoryPropertyModelImpl,
-			false);
+			_finderPathFetchByCA_K, args, assetCategoryPropertyModelImpl);
 	}
 
 	/**
@@ -2418,7 +2403,7 @@ public class AssetCategoryPropertyPersistenceImpl
 	@Override
 	public AssetCategoryProperty fetchByPrimaryKey(Serializable primaryKey) {
 		if (CTPersistenceHelperUtil.isProductionMode(
-				AssetCategoryProperty.class, primaryKey)) {
+				AssetCategoryProperty.class)) {
 
 			return super.fetchByPrimaryKey(primaryKey);
 		}
@@ -2644,7 +2629,7 @@ public class AssetCategoryPropertyPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<AssetCategoryProperty>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -2720,7 +2705,7 @@ public class AssetCategoryPropertyPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)FinderCacheUtil.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -2839,31 +2824,22 @@ public class AssetCategoryPropertyPersistenceImpl
 	 * Initializes the asset category property persistence.
 	 */
 	public void afterPropertiesSet() {
-		Registry registry = RegistryUtil.getRegistry();
-
-		_argumentsResolverServiceRegistration = registry.registerService(
-			ArgumentsResolver.class,
-			new AssetCategoryPropertyModelArgumentsResolver(),
-			HashMapBuilder.<String, Object>put(
-				"model.class.name", AssetCategoryProperty.class.getName()
-			).build());
-
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByCompanyId = _createFinderPath(
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -2871,17 +2847,17 @@ public class AssetCategoryPropertyPersistenceImpl
 			},
 			new String[] {"companyId"}, true);
 
-		_finderPathWithoutPaginationFindByCompanyId = _createFinderPath(
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			true);
 
-		_finderPathCountByCompanyId = _createFinderPath(
+		_finderPathCountByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
 
-		_finderPathWithPaginationFindByCategoryId = _createFinderPath(
+		_finderPathWithPaginationFindByCategoryId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCategoryId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -2889,17 +2865,17 @@ public class AssetCategoryPropertyPersistenceImpl
 			},
 			new String[] {"categoryId"}, true);
 
-		_finderPathWithoutPaginationFindByCategoryId = _createFinderPath(
+		_finderPathWithoutPaginationFindByCategoryId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCategoryId",
 			new String[] {Long.class.getName()}, new String[] {"categoryId"},
 			true);
 
-		_finderPathCountByCategoryId = _createFinderPath(
+		_finderPathCountByCategoryId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCategoryId",
 			new String[] {Long.class.getName()}, new String[] {"categoryId"},
 			false);
 
-		_finderPathWithPaginationFindByC_K = _createFinderPath(
+		_finderPathWithPaginationFindByC_K = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_K",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -2908,22 +2884,22 @@ public class AssetCategoryPropertyPersistenceImpl
 			},
 			new String[] {"companyId", "key_"}, true);
 
-		_finderPathWithoutPaginationFindByC_K = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_K = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_K",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "key_"}, true);
 
-		_finderPathCountByC_K = _createFinderPath(
+		_finderPathCountByC_K = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_K",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "key_"}, false);
 
-		_finderPathFetchByCA_K = _createFinderPath(
+		_finderPathFetchByCA_K = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByCA_K",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"categoryId", "key_"}, true);
 
-		_finderPathCountByCA_K = _createFinderPath(
+		_finderPathCountByCA_K = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCA_K",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"categoryId", "key_"}, false);
@@ -2935,14 +2911,6 @@ public class AssetCategoryPropertyPersistenceImpl
 		_setAssetCategoryPropertyUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(AssetCategoryPropertyImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setAssetCategoryPropertyUtilPersistence(
@@ -2988,131 +2956,9 @@ public class AssetCategoryPropertyPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"key"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			Registry registry = RegistryUtil.getRegistry();
-
-			_serviceRegistrations.add(
-				registry.registerService(
-					FinderPath.class, finderPath,
-					HashMapBuilder.<String, Object>put(
-						"cache.name", cacheName
-					).build()));
-		}
-
-		return finderPath;
-	}
-
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class AssetCategoryPropertyModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			AssetCategoryPropertyModelImpl assetCategoryPropertyModelImpl =
-				(AssetCategoryPropertyModelImpl)baseModel;
-
-			long columnBitmask =
-				assetCategoryPropertyModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					assetCategoryPropertyModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						assetCategoryPropertyModelImpl.getColumnBitmask(
-							columnName);
-				}
-
-				if (finderPath.isBaseModelResult() &&
-					(AssetCategoryPropertyPersistenceImpl.
-						FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION ==
-							finderPath.getCacheName())) {
-
-					finderPathColumnBitmask |= _ORDER_BY_COLUMNS_BITMASK;
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					assetCategoryPropertyModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			AssetCategoryPropertyModelImpl assetCategoryPropertyModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						assetCategoryPropertyModelImpl.getColumnOriginalValue(
-							columnName);
-				}
-				else {
-					arguments[i] =
-						assetCategoryPropertyModelImpl.getColumnValue(
-							columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
-		private static final long _ORDER_BY_COLUMNS_BITMASK;
-
-		static {
-			long orderByColumnsBitmask = 0;
-
-			orderByColumnsBitmask |=
-				AssetCategoryPropertyModelImpl.getColumnBitmask("key_");
-
-			_ORDER_BY_COLUMNS_BITMASK = orderByColumnsBitmask;
-		}
-
+	@Override
+	protected FinderCache getFinderCache() {
+		return FinderCacheUtil.getFinderCache();
 	}
 
 }

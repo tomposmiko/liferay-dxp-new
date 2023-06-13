@@ -20,6 +20,16 @@
 	<td>//div[contains(@class,'tooltip') and contains(@class,'top')][contains(@class,'show') or contains(@class,'in')]</td>
 	<td></td>
 </tr>
+<tr>
+	<td>FLOATING_TOOLTIP_CONTENT</td>
+	<td>//div[contains(@class,'tooltip')]//div[contains(.,'${key_content}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>POPOVER_BODY_CONTENT</td>
+	<td>//div[contains(@class,'popover-body')][normalize-space(text())='${key_content}']</td>
+	<td></td>
+</tr>
 </tbody>
 </table>
 </body>

@@ -14,6 +14,7 @@
 
 package com.liferay.info.item;
 
+import com.liferay.info.item.provider.filter.InfoItemServiceFilter;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Optional;
@@ -95,6 +96,11 @@ public class InfoItemReferenceTest {
 	@Test
 	public void testGetInfoItemReference() {
 		InfoItemIdentifier infoItemIdentifier = new InfoItemIdentifier() {
+
+			@Override
+			public InfoItemServiceFilter getInfoItemServiceFilter() {
+				return null;
+			}
 
 			@Override
 			public Optional<String> getVersionOptional() {

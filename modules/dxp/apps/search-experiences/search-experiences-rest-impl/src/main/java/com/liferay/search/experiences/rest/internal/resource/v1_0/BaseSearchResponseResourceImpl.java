@@ -17,17 +17,24 @@ package com.liferay.search.experiences.rest.internal.resource.v1_0;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.GroupedModel;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
+import com.liferay.portal.odata.filter.FilterParser;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
+import com.liferay.portal.vulcan.batch.engine.VulcanBatchEngineTaskItemDelegate;
+import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
+import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.ActionUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
 import com.liferay.search.experiences.rest.dto.v1_0.Parameter;
@@ -35,10 +42,10 @@ import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 import com.liferay.search.experiences.rest.dto.v1_0.SearchResponse;
 import com.liferay.search.experiences.rest.resource.v1_0.SearchResponseResource;
 
-import java.lang.reflect.Array;
+import java.io.Serializable;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.Generated;
@@ -46,6 +53,8 @@ import javax.annotation.Generated;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -55,12 +64,13 @@ import javax.ws.rs.core.UriInfo;
 @Generated("")
 @javax.ws.rs.Path("/v1.0")
 public abstract class BaseSearchResponseResourceImpl
-	implements SearchResponseResource {
+	implements EntityModelResource, SearchResponseResource,
+			   VulcanBatchEngineTaskItemDelegate<SearchResponse> {
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/search-experiences-rest/v1.0/search' -d $'{"configuration": ___, "createDate": ___, "description": ___, "description_i18n": ___, "elementInstances": ___, "externalReferenceCode": ___, "id": ___, "modifiedDate": ___, "schemaVersion": ___, "title": ___, "title_i18n": ___, "userName": ___, "version": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/search-experiences-rest/v1.0/search' -d $'{"configuration": ___, "createDate": ___, "description": ___, "description_i18n": ___, "elementInstances": ___, "id": ___, "modifiedDate": ___, "title": ___, "title_i18n": ___, "userName": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -97,6 +107,74 @@ public abstract class BaseSearchResponseResourceImpl
 		throws Exception {
 
 		return new SearchResponse();
+	}
+
+	@Override
+	@SuppressWarnings("PMD.UnusedLocalVariable")
+	public void create(
+			java.util.Collection<SearchResponse> searchResponses,
+			Map<String, Serializable> parameters)
+		throws Exception {
+	}
+
+	@Override
+	public void delete(
+			java.util.Collection<SearchResponse> searchResponses,
+			Map<String, Serializable> parameters)
+		throws Exception {
+	}
+
+	@Override
+	public EntityModel getEntityModel(Map<String, List<String>> multivaluedMap)
+		throws Exception {
+
+		return getEntityModel(
+			new MultivaluedHashMap<String, Object>(multivaluedMap));
+	}
+
+	@Override
+	public EntityModel getEntityModel(MultivaluedMap multivaluedMap)
+		throws Exception {
+
+		return null;
+	}
+
+	@Override
+	public Page<SearchResponse> read(
+			Filter filter, Pagination pagination, Sort[] sorts,
+			Map<String, Serializable> parameters, String search)
+		throws Exception {
+
+		return null;
+	}
+
+	@Override
+	public void setLanguageId(String languageId) {
+		this.contextAcceptLanguage = new AcceptLanguage() {
+
+			@Override
+			public List<Locale> getLocales() {
+				return null;
+			}
+
+			@Override
+			public String getPreferredLanguageId() {
+				return languageId;
+			}
+
+			@Override
+			public Locale getPreferredLocale() {
+				return LocaleUtil.fromLanguageId(languageId);
+			}
+
+		};
+	}
+
+	@Override
+	public void update(
+			java.util.Collection<SearchResponse> searchResponses,
+			Map<String, Serializable> parameters)
+		throws Exception {
 	}
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
@@ -163,8 +241,29 @@ public abstract class BaseSearchResponseResourceImpl
 		this.roleLocalService = roleLocalService;
 	}
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider) {
-		this.sortParserProvider = sortParserProvider;
+	@Override
+	public Filter toFilter(
+		String filterString, Map<String, List<String>> multivaluedMap) {
+
+		try {
+			EntityModel entityModel = getEntityModel(multivaluedMap);
+
+			FilterParser filterParser = filterParserProvider.provide(
+				entityModel);
+
+			com.liferay.portal.odata.filter.Filter oDataFilter =
+				new com.liferay.portal.odata.filter.Filter(
+					filterParser.parse(filterString));
+
+			return expressionConvert.convert(
+				oDataFilter.getExpression(),
+				contextAcceptLanguage.getPreferredLocale(), entityModel);
+		}
+		catch (Exception exception) {
+			_log.error("Invalid filter " + filterString, exception);
+		}
+
+		return null;
 	}
 
 	protected Map<String, String> addAction(
@@ -201,79 +300,32 @@ public abstract class BaseSearchResponseResourceImpl
 			actionName, siteId, methodName, null, permissionName, siteId);
 	}
 
-	protected <T, R, E extends Throwable> List<R> transform(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction) {
+	protected <T, R> List<R> transform(
+		java.util.Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction) {
 
 		return TransformUtil.transform(collection, unsafeFunction);
 	}
 
-	protected <T, R, E extends Throwable> R[] transform(
-		T[] array, UnsafeFunction<T, R, E> unsafeFunction, Class<?> clazz) {
+	protected <T, R> R[] transform(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction,
+		Class<?> clazz) {
 
 		return TransformUtil.transform(array, unsafeFunction, clazz);
 	}
 
-	protected <T, R, E extends Throwable> R[] transformToArray(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-		Class<?> clazz) {
+	protected <T, R> R[] transformToArray(
+		java.util.Collection<T> collection,
+		UnsafeFunction<T, R, Exception> unsafeFunction, Class<?> clazz) {
 
 		return TransformUtil.transformToArray(
 			collection, unsafeFunction, clazz);
 	}
 
-	protected <T, R, E extends Throwable> List<R> transformToList(
-		T[] array, UnsafeFunction<T, R, E> unsafeFunction) {
+	protected <T, R> List<R> transformToList(
+		T[] array, UnsafeFunction<T, R, Exception> unsafeFunction) {
 
 		return TransformUtil.transformToList(array, unsafeFunction);
-	}
-
-	protected <T, R, E extends Throwable> long[] transformToLongArray(
-		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction) {
-
-		try {
-			return unsafeTransformToLongArray(collection, unsafeFunction);
-		}
-		catch (Throwable throwable) {
-			throw new RuntimeException(throwable);
-		}
-	}
-
-	protected <T, R, E extends Throwable> List<R> unsafeTransform(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return TransformUtil.unsafeTransform(collection, unsafeFunction);
-	}
-
-	protected <T, R, E extends Throwable> R[] unsafeTransform(
-			T[] array, UnsafeFunction<T, R, E> unsafeFunction, Class<?> clazz)
-		throws E {
-
-		return TransformUtil.unsafeTransform(array, unsafeFunction, clazz);
-	}
-
-	protected <T, R, E extends Throwable> R[] unsafeTransformToArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-			Class<?> clazz)
-		throws E {
-
-		return TransformUtil.unsafeTransformToArray(
-			collection, unsafeFunction, clazz);
-	}
-
-	protected <T, R, E extends Throwable> List<R> unsafeTransformToList(
-			T[] array, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return TransformUtil.unsafeTransformToList(array, unsafeFunction);
-	}
-
-	protected <T, R, E extends Throwable> long[] unsafeTransformToLongArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
-		throws E {
-
-		return (long[])_unsafeTransformToPrimitiveArray(
-			collection, unsafeFunction, long[].class);
 	}
 
 	protected AcceptLanguage contextAcceptLanguage;
@@ -289,24 +341,8 @@ public abstract class BaseSearchResponseResourceImpl
 	protected ResourceActionLocalService resourceActionLocalService;
 	protected ResourcePermissionLocalService resourcePermissionLocalService;
 	protected RoleLocalService roleLocalService;
-	protected SortParserProvider sortParserProvider;
-
-	private <T, R, E extends Throwable> Object _unsafeTransformToPrimitiveArray(
-			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction,
-			Class<?> clazz)
-		throws E {
-
-		List<R> list = unsafeTransform(collection, unsafeFunction);
-
-		Object array = clazz.cast(
-			Array.newInstance(clazz.getComponentType(), list.size()));
-
-		for (int i = 0; i < list.size(); i++) {
-			Array.set(array, i, list.get(i));
-		}
-
-		return array;
-	}
+	protected VulcanBatchEngineImportTaskResource
+		vulcanBatchEngineImportTaskResource;
 
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseSearchResponseResourceImpl.class);

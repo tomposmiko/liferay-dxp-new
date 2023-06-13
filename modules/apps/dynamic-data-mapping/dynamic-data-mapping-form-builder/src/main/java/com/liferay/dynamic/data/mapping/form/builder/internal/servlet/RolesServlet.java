@@ -65,7 +65,8 @@ public class RolesServlet extends BaseDDMFormBuilderServlet {
 		httpServletResponse.setContentType(ContentTypes.APPLICATION_JSON);
 		httpServletResponse.setStatus(HttpServletResponse.SC_OK);
 
-		ServletResponseUtil.write(httpServletResponse, jsonArray.toString());
+		ServletResponseUtil.write(
+			httpServletResponse, jsonArray.toJSONString());
 	}
 
 	protected JSONArray getRolesJSONArray() {

@@ -20,10 +20,8 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.internal.minifier.MinifierThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ServiceProxyFactory;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceTracker;
 
 import org.apache.commons.lang.time.StopWatch;
 
@@ -31,7 +29,9 @@ import org.apache.commons.lang.time.StopWatch;
  * @author Brian Wing Shun Chan
  * @author Raymond Augé
  * @author Roberto Díaz
+ * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
  */
+@Deprecated
 public class MinifierUtil {
 
 	public static String minifyCss(String content) {
@@ -66,14 +66,8 @@ public class MinifierUtil {
 
 			return unsyncStringWriter.toString();
 		}
-		catch (Throwable throwable) {
-			String failingContent = content;
-
-			if (content.length() > 1048576) {
-				failingContent = failingContent.substring(0, 1048575);
-			}
-
-			_log.error("Unable to minify CSS:\n" + failingContent, throwable);
+		catch (Exception exception) {
+			_log.error("Unable to minify CSS:\n" + content, exception);
 
 			unsyncStringWriter.append(content);
 
@@ -100,8 +94,7 @@ public class MinifierUtil {
 	private static String _minifyJavaScript(
 		String resourceName, String content) {
 
-		JavaScriptMinifier javaScriptMinifier =
-			_javaScriptMinifierServiceTracker.getService();
+		JavaScriptMinifier javaScriptMinifier = _javaScriptMinifier;
 
 		if (javaScriptMinifier == null) {
 			return content;
@@ -138,16 +131,9 @@ public class MinifierUtil {
 
 	private static final Log _log = LogFactoryUtil.getLog(MinifierUtil.class);
 
-	private static final ServiceTracker<JavaScriptMinifier, JavaScriptMinifier>
-		_javaScriptMinifierServiceTracker;
-
-	static {
-		Registry registry = RegistryUtil.getRegistry();
-
-		_javaScriptMinifierServiceTracker = registry.trackServices(
-			JavaScriptMinifier.class);
-
-		_javaScriptMinifierServiceTracker.open();
-	}
+	private static volatile JavaScriptMinifier _javaScriptMinifier =
+		ServiceProxyFactory.newServiceTrackedInstance(
+			JavaScriptMinifier.class, MinifierUtil.class, "_javaScriptMinifier",
+			false, true);
 
 }

@@ -23,14 +23,18 @@ import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.storage.constants.FieldConstants;
 import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 import com.liferay.portal.configuration.metatype.definitions.ExtendedAttributeDefinition;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Collections;
 import java.util.List;
@@ -127,6 +131,10 @@ public class ConfigurationModelToDDMFormConverter {
 				return DDMFormFactory.create(formClass);
 			}
 			catch (IllegalArgumentException illegalArgumentException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						illegalArgumentException, illegalArgumentException);
+				}
 			}
 		}
 
@@ -198,6 +206,7 @@ public class ConfigurationModelToDDMFormConverter {
 		setDDMFormFieldLabel(attributeDefinition, ddmFormField);
 		setDDMFormFieldOptions(ddmFormField, ddmFormFieldOptions);
 		setDDMFormFieldPredefinedValue(attributeDefinition, ddmFormField);
+		setDDMFormFieldReadOnly(attributeDefinition, ddmFormField);
 		setDDMFormFieldRequired(attributeDefinition, ddmFormField, required);
 		setDDMFormFieldTip(attributeDefinition, ddmFormField);
 		setDDMFormFieldVisibilityExpression(attributeDefinition, ddmFormField);
@@ -275,6 +284,12 @@ public class ConfigurationModelToDDMFormConverter {
 
 			return DDMFormFieldType.RADIO;
 		}
+		else if (type == AttributeDefinition.INTEGER) {
+			return DDMFormFieldType.NUMERIC;
+		}
+		else if (type == AttributeDefinition.LONG) {
+			return DDMFormFieldType.NUMERIC;
+		}
 		else if (type == AttributeDefinition.PASSWORD) {
 			return DDMFormFieldType.PASSWORD;
 		}
@@ -285,7 +300,7 @@ public class ConfigurationModelToDDMFormConverter {
 		ConfigurationFieldOptionsProvider configurationFieldOptionsProvider =
 			getConfigurationFieldOptionsProvider(attributeDefinition);
 
-		if (SetUtil.isNotEmpty(ddmFormFieldOptions.getOptionsValues()) ||
+		if (!SetUtil.isEmpty(ddmFormFieldOptions.getOptionsValues()) ||
 			(configurationFieldOptionsProvider != null)) {
 
 			return DDMFormFieldType.SELECT;
@@ -348,6 +363,16 @@ public class ConfigurationModelToDDMFormConverter {
 		ddmFormField.setPredefinedValue(predefinedValue);
 	}
 
+	protected void setDDMFormFieldReadOnly(
+		AttributeDefinition attributeDefinition, DDMFormField ddmFormField) {
+
+		if (_configurationModel.hasConfigurationOverrideProperty(
+				attributeDefinition.getID())) {
+
+			ddmFormField.setReadOnly(true);
+		}
+	}
+
 	protected void setDDMFormFieldRepeatable(
 		AttributeDefinition attributeDefinition, DDMFormField ddmFormField) {
 
@@ -374,16 +399,34 @@ public class ConfigurationModelToDDMFormConverter {
 
 		LocalizedValue tip = new LocalizedValue(_locale);
 
+		StringBundler sb = new StringBundler(3);
+
 		Map<String, String> extensionAttributes = _getExtensionAttributes(
 			attributeDefinition);
 
-		List<String> descriptionArguments = StringUtil.split(
-			extensionAttributes.get("description-arguments"));
+		String description = translate(
+			attributeDefinition.getDescription(),
+			StringUtil.split(extensionAttributes.get("description-arguments")));
 
-		tip.addString(
-			_locale,
-			translate(
-				attributeDefinition.getDescription(), descriptionArguments));
+		if (Validator.isNotNull(description)) {
+			sb.append(description);
+		}
+
+		if (_configurationModel.hasConfigurationOverrideProperty(
+				attributeDefinition.getID())) {
+
+			if (sb.length() > 0) {
+				sb.append(StringPool.SPACE);
+			}
+
+			sb.append(
+				LanguageUtil.get(
+					_locale,
+					"this-field-has-been-set-by-a-portal-property-and-cannot-" +
+						"be-changed-here"));
+		}
+
+		tip.addString(_locale, sb.toString());
 
 		ddmFormField.setTip(tip);
 	}
@@ -441,6 +484,9 @@ public class ConfigurationModelToDDMFormConverter {
 			com.liferay.portal.configuration.metatype.annotations.
 				ExtendedAttributeDefinition.XML_NAMESPACE);
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ConfigurationModelToDDMFormConverter.class);
 
 	private final ConfigurationModel _configurationModel;
 	private final Locale _locale;

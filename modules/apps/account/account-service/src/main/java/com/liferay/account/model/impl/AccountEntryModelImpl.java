@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -78,9 +79,12 @@ public class AccountEntryModelImpl
 		{"accountEntryId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
-		{"parentAccountEntryId", Types.BIGINT}, {"name", Types.VARCHAR},
-		{"description", Types.VARCHAR}, {"domains", Types.VARCHAR},
-		{"logoId", Types.BIGINT}, {"taxIdNumber", Types.VARCHAR},
+		{"defaultBillingAddressId", Types.BIGINT},
+		{"defaultShippingAddressId", Types.BIGINT},
+		{"parentAccountEntryId", Types.BIGINT}, {"description", Types.VARCHAR},
+		{"domains", Types.VARCHAR}, {"emailAddress", Types.VARCHAR},
+		{"logoId", Types.BIGINT}, {"name", Types.VARCHAR},
+		{"taxExemptionCode", Types.VARCHAR}, {"taxIdNumber", Types.VARCHAR},
 		{"type_", Types.VARCHAR}, {"status", Types.INTEGER}
 	};
 
@@ -96,18 +100,22 @@ public class AccountEntryModelImpl
 		TABLE_COLUMNS_MAP.put("userName", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
+		TABLE_COLUMNS_MAP.put("defaultBillingAddressId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("defaultShippingAddressId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("parentAccountEntryId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("name", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("description", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("domains", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("emailAddress", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("logoId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("name", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("taxExemptionCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("taxIdNumber", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("type_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("status", Types.INTEGER);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table AccountEntry (mvccVersion LONG default 0 not null,externalReferenceCode VARCHAR(75) null,accountEntryId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,parentAccountEntryId LONG,name VARCHAR(100) null,description STRING null,domains STRING null,logoId LONG,taxIdNumber VARCHAR(75) null,type_ VARCHAR(75) null,status INTEGER)";
+		"create table AccountEntry (mvccVersion LONG default 0 not null,externalReferenceCode VARCHAR(75) null,accountEntryId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,defaultBillingAddressId LONG,defaultShippingAddressId LONG,parentAccountEntryId LONG,description STRING null,domains STRING null,emailAddress VARCHAR(254) null,logoId LONG,name VARCHAR(100) null,taxExemptionCode VARCHAR(75) null,taxIdNumber VARCHAR(75) null,type_ VARCHAR(75) null,status INTEGER)";
 
 	public static final String TABLE_SQL_DROP = "drop table AccountEntry";
 
@@ -141,11 +149,23 @@ public class AccountEntryModelImpl
 	public static final long STATUS_COLUMN_BITMASK = 4L;
 
 	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long TYPE_COLUMN_BITMASK = 8L;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long USERID_COLUMN_BITMASK = 16L;
+
+	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *		#getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long NAME_COLUMN_BITMASK = 8L;
+	public static final long NAME_COLUMN_BITMASK = 32L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -184,11 +204,17 @@ public class AccountEntryModelImpl
 		model.setUserName(soapModel.getUserName());
 		model.setCreateDate(soapModel.getCreateDate());
 		model.setModifiedDate(soapModel.getModifiedDate());
+		model.setDefaultBillingAddressId(
+			soapModel.getDefaultBillingAddressId());
+		model.setDefaultShippingAddressId(
+			soapModel.getDefaultShippingAddressId());
 		model.setParentAccountEntryId(soapModel.getParentAccountEntryId());
-		model.setName(soapModel.getName());
 		model.setDescription(soapModel.getDescription());
 		model.setDomains(soapModel.getDomains());
+		model.setEmailAddress(soapModel.getEmailAddress());
 		model.setLogoId(soapModel.getLogoId());
+		model.setName(soapModel.getName());
+		model.setTaxExemptionCode(soapModel.getTaxExemptionCode());
 		model.setTaxIdNumber(soapModel.getTaxIdNumber());
 		model.setType(soapModel.getType());
 		model.setStatus(soapModel.getStatus());
@@ -304,95 +330,142 @@ public class AccountEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<AccountEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, AccountEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<AccountEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<AccountEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AccountEntry.class.getClassLoader(), AccountEntry.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", AccountEntry::getMvccVersion);
-		attributeGetterFunctions.put(
-			"externalReferenceCode", AccountEntry::getExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"accountEntryId", AccountEntry::getAccountEntryId);
-		attributeGetterFunctions.put("companyId", AccountEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", AccountEntry::getUserId);
-		attributeGetterFunctions.put("userName", AccountEntry::getUserName);
-		attributeGetterFunctions.put("createDate", AccountEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", AccountEntry::getModifiedDate);
-		attributeGetterFunctions.put(
-			"parentAccountEntryId", AccountEntry::getParentAccountEntryId);
-		attributeGetterFunctions.put("name", AccountEntry::getName);
-		attributeGetterFunctions.put(
-			"description", AccountEntry::getDescription);
-		attributeGetterFunctions.put("domains", AccountEntry::getDomains);
-		attributeGetterFunctions.put("logoId", AccountEntry::getLogoId);
-		attributeGetterFunctions.put(
-			"taxIdNumber", AccountEntry::getTaxIdNumber);
-		attributeGetterFunctions.put("type", AccountEntry::getType);
-		attributeGetterFunctions.put("status", AccountEntry::getStatus);
+		try {
+			Constructor<AccountEntry> constructor =
+				(Constructor<AccountEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<AccountEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<AccountEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<AccountEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<AccountEntry, Object>>();
 		Map<String, BiConsumer<AccountEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<AccountEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", AccountEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AccountEntry, Long>)AccountEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"externalReferenceCode", AccountEntry::getExternalReferenceCode);
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<AccountEntry, String>)
 				AccountEntry::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"accountEntryId", AccountEntry::getAccountEntryId);
 		attributeSetterBiConsumers.put(
 			"accountEntryId",
 			(BiConsumer<AccountEntry, Long>)AccountEntry::setAccountEntryId);
+		attributeGetterFunctions.put("companyId", AccountEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AccountEntry, Long>)AccountEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", AccountEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<AccountEntry, Long>)AccountEntry::setUserId);
+		attributeGetterFunctions.put("userName", AccountEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<AccountEntry, String>)AccountEntry::setUserName);
+		attributeGetterFunctions.put("createDate", AccountEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<AccountEntry, Date>)AccountEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", AccountEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<AccountEntry, Date>)AccountEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"defaultBillingAddressId",
+			AccountEntry::getDefaultBillingAddressId);
+		attributeSetterBiConsumers.put(
+			"defaultBillingAddressId",
+			(BiConsumer<AccountEntry, Long>)
+				AccountEntry::setDefaultBillingAddressId);
+		attributeGetterFunctions.put(
+			"defaultShippingAddressId",
+			AccountEntry::getDefaultShippingAddressId);
+		attributeSetterBiConsumers.put(
+			"defaultShippingAddressId",
+			(BiConsumer<AccountEntry, Long>)
+				AccountEntry::setDefaultShippingAddressId);
+		attributeGetterFunctions.put(
+			"parentAccountEntryId", AccountEntry::getParentAccountEntryId);
 		attributeSetterBiConsumers.put(
 			"parentAccountEntryId",
 			(BiConsumer<AccountEntry, Long>)
 				AccountEntry::setParentAccountEntryId);
-		attributeSetterBiConsumers.put(
-			"name", (BiConsumer<AccountEntry, String>)AccountEntry::setName);
+		attributeGetterFunctions.put(
+			"description", AccountEntry::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<AccountEntry, String>)AccountEntry::setDescription);
+		attributeGetterFunctions.put("domains", AccountEntry::getDomains);
 		attributeSetterBiConsumers.put(
 			"domains",
 			(BiConsumer<AccountEntry, String>)AccountEntry::setDomains);
+		attributeGetterFunctions.put(
+			"emailAddress", AccountEntry::getEmailAddress);
+		attributeSetterBiConsumers.put(
+			"emailAddress",
+			(BiConsumer<AccountEntry, String>)AccountEntry::setEmailAddress);
+		attributeGetterFunctions.put("logoId", AccountEntry::getLogoId);
 		attributeSetterBiConsumers.put(
 			"logoId", (BiConsumer<AccountEntry, Long>)AccountEntry::setLogoId);
+		attributeGetterFunctions.put("name", AccountEntry::getName);
+		attributeSetterBiConsumers.put(
+			"name", (BiConsumer<AccountEntry, String>)AccountEntry::setName);
+		attributeGetterFunctions.put(
+			"taxExemptionCode", AccountEntry::getTaxExemptionCode);
+		attributeSetterBiConsumers.put(
+			"taxExemptionCode",
+			(BiConsumer<AccountEntry, String>)
+				AccountEntry::setTaxExemptionCode);
+		attributeGetterFunctions.put(
+			"taxIdNumber", AccountEntry::getTaxIdNumber);
 		attributeSetterBiConsumers.put(
 			"taxIdNumber",
 			(BiConsumer<AccountEntry, String>)AccountEntry::setTaxIdNumber);
+		attributeGetterFunctions.put("type", AccountEntry::getType);
 		attributeSetterBiConsumers.put(
 			"type", (BiConsumer<AccountEntry, String>)AccountEntry::setType);
+		attributeGetterFunctions.put("status", AccountEntry::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<AccountEntry, Integer>)AccountEntry::setStatus);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -512,6 +585,15 @@ public class AccountEntryModelImpl
 	public void setUserUuid(String userUuid) {
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
+	public long getOriginalUserId() {
+		return GetterUtil.getLong(this.<Long>getColumnOriginalValue("userId"));
+	}
+
 	@JSON
 	@Override
 	public String getUserName() {
@@ -570,6 +652,36 @@ public class AccountEntryModelImpl
 
 	@JSON
 	@Override
+	public long getDefaultBillingAddressId() {
+		return _defaultBillingAddressId;
+	}
+
+	@Override
+	public void setDefaultBillingAddressId(long defaultBillingAddressId) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_defaultBillingAddressId = defaultBillingAddressId;
+	}
+
+	@JSON
+	@Override
+	public long getDefaultShippingAddressId() {
+		return _defaultShippingAddressId;
+	}
+
+	@Override
+	public void setDefaultShippingAddressId(long defaultShippingAddressId) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_defaultShippingAddressId = defaultShippingAddressId;
+	}
+
+	@JSON
+	@Override
 	public long getParentAccountEntryId() {
 		return _parentAccountEntryId;
 	}
@@ -581,26 +693,6 @@ public class AccountEntryModelImpl
 		}
 
 		_parentAccountEntryId = parentAccountEntryId;
-	}
-
-	@JSON
-	@Override
-	public String getName() {
-		if (_name == null) {
-			return "";
-		}
-		else {
-			return _name;
-		}
-	}
-
-	@Override
-	public void setName(String name) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_name = name;
 	}
 
 	@JSON
@@ -645,6 +737,26 @@ public class AccountEntryModelImpl
 
 	@JSON
 	@Override
+	public String getEmailAddress() {
+		if (_emailAddress == null) {
+			return "";
+		}
+		else {
+			return _emailAddress;
+		}
+	}
+
+	@Override
+	public void setEmailAddress(String emailAddress) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_emailAddress = emailAddress;
+	}
+
+	@JSON
+	@Override
 	public long getLogoId() {
 		return _logoId;
 	}
@@ -656,6 +768,46 @@ public class AccountEntryModelImpl
 		}
 
 		_logoId = logoId;
+	}
+
+	@JSON
+	@Override
+	public String getName() {
+		if (_name == null) {
+			return "";
+		}
+		else {
+			return _name;
+		}
+	}
+
+	@Override
+	public void setName(String name) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_name = name;
+	}
+
+	@JSON
+	@Override
+	public String getTaxExemptionCode() {
+		if (_taxExemptionCode == null) {
+			return "";
+		}
+		else {
+			return _taxExemptionCode;
+		}
+	}
+
+	@Override
+	public void setTaxExemptionCode(String taxExemptionCode) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_taxExemptionCode = taxExemptionCode;
 	}
 
 	@JSON
@@ -696,6 +848,15 @@ public class AccountEntryModelImpl
 		}
 
 		_type = type;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
+	public String getOriginalType() {
+		return getColumnOriginalValue("type_");
 	}
 
 	@JSON
@@ -787,16 +948,66 @@ public class AccountEntryModelImpl
 		accountEntryImpl.setUserName(getUserName());
 		accountEntryImpl.setCreateDate(getCreateDate());
 		accountEntryImpl.setModifiedDate(getModifiedDate());
+		accountEntryImpl.setDefaultBillingAddressId(
+			getDefaultBillingAddressId());
+		accountEntryImpl.setDefaultShippingAddressId(
+			getDefaultShippingAddressId());
 		accountEntryImpl.setParentAccountEntryId(getParentAccountEntryId());
-		accountEntryImpl.setName(getName());
 		accountEntryImpl.setDescription(getDescription());
 		accountEntryImpl.setDomains(getDomains());
+		accountEntryImpl.setEmailAddress(getEmailAddress());
 		accountEntryImpl.setLogoId(getLogoId());
+		accountEntryImpl.setName(getName());
+		accountEntryImpl.setTaxExemptionCode(getTaxExemptionCode());
 		accountEntryImpl.setTaxIdNumber(getTaxIdNumber());
 		accountEntryImpl.setType(getType());
 		accountEntryImpl.setStatus(getStatus());
 
 		accountEntryImpl.resetOriginalValues();
+
+		return accountEntryImpl;
+	}
+
+	@Override
+	public AccountEntry cloneWithOriginalValues() {
+		AccountEntryImpl accountEntryImpl = new AccountEntryImpl();
+
+		accountEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		accountEntryImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
+		accountEntryImpl.setAccountEntryId(
+			this.<Long>getColumnOriginalValue("accountEntryId"));
+		accountEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		accountEntryImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		accountEntryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		accountEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		accountEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		accountEntryImpl.setDefaultBillingAddressId(
+			this.<Long>getColumnOriginalValue("defaultBillingAddressId"));
+		accountEntryImpl.setDefaultShippingAddressId(
+			this.<Long>getColumnOriginalValue("defaultShippingAddressId"));
+		accountEntryImpl.setParentAccountEntryId(
+			this.<Long>getColumnOriginalValue("parentAccountEntryId"));
+		accountEntryImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		accountEntryImpl.setDomains(
+			this.<String>getColumnOriginalValue("domains"));
+		accountEntryImpl.setEmailAddress(
+			this.<String>getColumnOriginalValue("emailAddress"));
+		accountEntryImpl.setLogoId(this.<Long>getColumnOriginalValue("logoId"));
+		accountEntryImpl.setName(this.<String>getColumnOriginalValue("name"));
+		accountEntryImpl.setTaxExemptionCode(
+			this.<String>getColumnOriginalValue("taxExemptionCode"));
+		accountEntryImpl.setTaxIdNumber(
+			this.<String>getColumnOriginalValue("taxIdNumber"));
+		accountEntryImpl.setType(this.<String>getColumnOriginalValue("type_"));
+		accountEntryImpl.setStatus(
+			this.<Integer>getColumnOriginalValue("status"));
 
 		return accountEntryImpl;
 	}
@@ -919,15 +1130,13 @@ public class AccountEntryModelImpl
 			accountEntryCacheModel.modifiedDate = Long.MIN_VALUE;
 		}
 
+		accountEntryCacheModel.defaultBillingAddressId =
+			getDefaultBillingAddressId();
+
+		accountEntryCacheModel.defaultShippingAddressId =
+			getDefaultShippingAddressId();
+
 		accountEntryCacheModel.parentAccountEntryId = getParentAccountEntryId();
-
-		accountEntryCacheModel.name = getName();
-
-		String name = accountEntryCacheModel.name;
-
-		if ((name != null) && (name.length() == 0)) {
-			accountEntryCacheModel.name = null;
-		}
 
 		accountEntryCacheModel.description = getDescription();
 
@@ -945,7 +1154,31 @@ public class AccountEntryModelImpl
 			accountEntryCacheModel.domains = null;
 		}
 
+		accountEntryCacheModel.emailAddress = getEmailAddress();
+
+		String emailAddress = accountEntryCacheModel.emailAddress;
+
+		if ((emailAddress != null) && (emailAddress.length() == 0)) {
+			accountEntryCacheModel.emailAddress = null;
+		}
+
 		accountEntryCacheModel.logoId = getLogoId();
+
+		accountEntryCacheModel.name = getName();
+
+		String name = accountEntryCacheModel.name;
+
+		if ((name != null) && (name.length() == 0)) {
+			accountEntryCacheModel.name = null;
+		}
+
+		accountEntryCacheModel.taxExemptionCode = getTaxExemptionCode();
+
+		String taxExemptionCode = accountEntryCacheModel.taxExemptionCode;
+
+		if ((taxExemptionCode != null) && (taxExemptionCode.length() == 0)) {
+			accountEntryCacheModel.taxExemptionCode = null;
+		}
 
 		accountEntryCacheModel.taxIdNumber = getTaxIdNumber();
 
@@ -1051,9 +1284,7 @@ public class AccountEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AccountEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AccountEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
@@ -1066,11 +1297,15 @@ public class AccountEntryModelImpl
 	private Date _createDate;
 	private Date _modifiedDate;
 	private boolean _setModifiedDate;
+	private long _defaultBillingAddressId;
+	private long _defaultShippingAddressId;
 	private long _parentAccountEntryId;
-	private String _name;
 	private String _description;
 	private String _domains;
+	private String _emailAddress;
 	private long _logoId;
+	private String _name;
+	private String _taxExemptionCode;
 	private String _taxIdNumber;
 	private String _type;
 	private int _status;
@@ -1114,11 +1349,17 @@ public class AccountEntryModelImpl
 		_columnOriginalValues.put("createDate", _createDate);
 		_columnOriginalValues.put("modifiedDate", _modifiedDate);
 		_columnOriginalValues.put(
+			"defaultBillingAddressId", _defaultBillingAddressId);
+		_columnOriginalValues.put(
+			"defaultShippingAddressId", _defaultShippingAddressId);
+		_columnOriginalValues.put(
 			"parentAccountEntryId", _parentAccountEntryId);
-		_columnOriginalValues.put("name", _name);
 		_columnOriginalValues.put("description", _description);
 		_columnOriginalValues.put("domains", _domains);
+		_columnOriginalValues.put("emailAddress", _emailAddress);
 		_columnOriginalValues.put("logoId", _logoId);
+		_columnOriginalValues.put("name", _name);
+		_columnOriginalValues.put("taxExemptionCode", _taxExemptionCode);
 		_columnOriginalValues.put("taxIdNumber", _taxIdNumber);
 		_columnOriginalValues.put("type_", _type);
 		_columnOriginalValues.put("status", _status);
@@ -1161,21 +1402,29 @@ public class AccountEntryModelImpl
 
 		columnBitmasks.put("modifiedDate", 128L);
 
-		columnBitmasks.put("parentAccountEntryId", 256L);
+		columnBitmasks.put("defaultBillingAddressId", 256L);
 
-		columnBitmasks.put("name", 512L);
+		columnBitmasks.put("defaultShippingAddressId", 512L);
 
-		columnBitmasks.put("description", 1024L);
+		columnBitmasks.put("parentAccountEntryId", 1024L);
 
-		columnBitmasks.put("domains", 2048L);
+		columnBitmasks.put("description", 2048L);
 
-		columnBitmasks.put("logoId", 4096L);
+		columnBitmasks.put("domains", 4096L);
 
-		columnBitmasks.put("taxIdNumber", 8192L);
+		columnBitmasks.put("emailAddress", 8192L);
 
-		columnBitmasks.put("type_", 16384L);
+		columnBitmasks.put("logoId", 16384L);
 
-		columnBitmasks.put("status", 32768L);
+		columnBitmasks.put("name", 32768L);
+
+		columnBitmasks.put("taxExemptionCode", 65536L);
+
+		columnBitmasks.put("taxIdNumber", 131072L);
+
+		columnBitmasks.put("type_", 262144L);
+
+		columnBitmasks.put("status", 524288L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

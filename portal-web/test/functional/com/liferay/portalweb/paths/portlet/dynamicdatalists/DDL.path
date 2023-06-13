@@ -12,7 +12,6 @@
 <tbody>
 
 <!--TOOLBAR-->
-
 <tr>
 	<td>TOOLBAR_ADD</td>
 	<td>//a[@*='Add ${key_ddlDataDefinitionName}']</td>
@@ -73,7 +72,7 @@
 </tr>
 <tr>
 	<td>RECORD_TABLE_PREVIEW</td>
-	<td>//div[contains(@class,'modal-body')]</td>
+	<td>//div[contains(@class,'modal-body')]/p</td>
 	<td></td>
 </tr>
 <tr>

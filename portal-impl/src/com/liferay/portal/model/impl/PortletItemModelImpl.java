@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -251,71 +252,93 @@ public class PortletItemModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<PortletItem, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, PortletItem>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<PortletItem, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<PortletItem, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			PortletItem.class.getClassLoader(), PortletItem.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", PortletItem::getMvccVersion);
-		attributeGetterFunctions.put(
-			"portletItemId", PortletItem::getPortletItemId);
-		attributeGetterFunctions.put("groupId", PortletItem::getGroupId);
-		attributeGetterFunctions.put("companyId", PortletItem::getCompanyId);
-		attributeGetterFunctions.put("userId", PortletItem::getUserId);
-		attributeGetterFunctions.put("userName", PortletItem::getUserName);
-		attributeGetterFunctions.put("createDate", PortletItem::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", PortletItem::getModifiedDate);
-		attributeGetterFunctions.put("name", PortletItem::getName);
-		attributeGetterFunctions.put("portletId", PortletItem::getPortletId);
-		attributeGetterFunctions.put(
-			"classNameId", PortletItem::getClassNameId);
+		try {
+			Constructor<PortletItem> constructor =
+				(Constructor<PortletItem>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<PortletItem, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<PortletItem, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<PortletItem, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<PortletItem, Object>>();
 		Map<String, BiConsumer<PortletItem, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<PortletItem, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", PortletItem::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<PortletItem, Long>)PortletItem::setMvccVersion);
+		attributeGetterFunctions.put(
+			"portletItemId", PortletItem::getPortletItemId);
 		attributeSetterBiConsumers.put(
 			"portletItemId",
 			(BiConsumer<PortletItem, Long>)PortletItem::setPortletItemId);
+		attributeGetterFunctions.put("groupId", PortletItem::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<PortletItem, Long>)PortletItem::setGroupId);
+		attributeGetterFunctions.put("companyId", PortletItem::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<PortletItem, Long>)PortletItem::setCompanyId);
+		attributeGetterFunctions.put("userId", PortletItem::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<PortletItem, Long>)PortletItem::setUserId);
+		attributeGetterFunctions.put("userName", PortletItem::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<PortletItem, String>)PortletItem::setUserName);
+		attributeGetterFunctions.put("createDate", PortletItem::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<PortletItem, Date>)PortletItem::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", PortletItem::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<PortletItem, Date>)PortletItem::setModifiedDate);
+		attributeGetterFunctions.put("name", PortletItem::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<PortletItem, String>)PortletItem::setName);
+		attributeGetterFunctions.put("portletId", PortletItem::getPortletId);
 		attributeSetterBiConsumers.put(
 			"portletId",
 			(BiConsumer<PortletItem, String>)PortletItem::setPortletId);
+		attributeGetterFunctions.put(
+			"classNameId", PortletItem::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<PortletItem, Long>)PortletItem::setClassNameId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -642,6 +665,34 @@ public class PortletItemModelImpl
 	}
 
 	@Override
+	public PortletItem cloneWithOriginalValues() {
+		PortletItemImpl portletItemImpl = new PortletItemImpl();
+
+		portletItemImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		portletItemImpl.setPortletItemId(
+			this.<Long>getColumnOriginalValue("portletItemId"));
+		portletItemImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		portletItemImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		portletItemImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		portletItemImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		portletItemImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		portletItemImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		portletItemImpl.setName(this.<String>getColumnOriginalValue("name"));
+		portletItemImpl.setPortletId(
+			this.<String>getColumnOriginalValue("portletId"));
+		portletItemImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+
+		return portletItemImpl;
+	}
+
+	@Override
 	public int compareTo(PortletItem portletItem) {
 		long primaryKey = portletItem.getPrimaryKey();
 
@@ -855,9 +906,7 @@ public class PortletItemModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, PortletItem>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					PortletItem.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

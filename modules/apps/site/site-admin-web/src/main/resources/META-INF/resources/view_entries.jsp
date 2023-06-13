@@ -16,6 +16,10 @@
 
 <%@ include file="/init.jsp" %>
 
+<%
+SiteAdminDisplayContext siteAdminDisplayContext = (SiteAdminDisplayContext)request.getAttribute(SiteAdminDisplayContext.class.getName());
+%>
+
 <liferay-ui:search-container
 	searchContainer="<%= siteAdminDisplayContext.getGroupSearch() %>"
 >
@@ -28,14 +32,14 @@
 	>
 
 		<%
-		List<Group> childSites = curGroup.getChildren(true);
-
-		String siteImageURL = curGroup.getLogoURL(themeDisplay, false);
+		SiteAdminManagementToolbarDisplayContext siteAdminManagementToolbarDisplayContext = (SiteAdminManagementToolbarDisplayContext)request.getAttribute(SiteAdminManagementToolbarDisplayContext.class.getName());
 
 		row.setData(
 			HashMapBuilder.<String, Object>put(
 				"actions", siteAdminManagementToolbarDisplayContext.getAvailableActions(curGroup)
 			).build());
+
+		List<Group> childSites = curGroup.getChildren(true);
 		%>
 
 		<portlet:renderURL var="viewSubsitesURL">
@@ -45,6 +49,11 @@
 
 		<c:choose>
 			<c:when test='<%= Objects.equals(siteAdminDisplayContext.getDisplayStyle(), "descriptive") %>'>
+
+				<%
+				String siteImageURL = curGroup.getLogoURL(themeDisplay, false);
+				%>
+
 				<c:choose>
 					<c:when test="<%= Validator.isNotNull(siteImageURL) %>">
 						<liferay-ui:search-container-column-image
@@ -84,17 +93,12 @@
 
 				<liferay-ui:search-container-column-text>
 					<clay:dropdown-actions
-						defaultEventHandler="<%= SiteAdminWebKeys.SITE_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
 						dropdownItems="<%= siteAdminDisplayContext.getActionDropdownItems(curGroup) %>"
+						propsTransformer="js/SiteDropdownDefaultPropsTransformer"
 					/>
 				</liferay-ui:search-container-column-text>
 			</c:when>
 			<c:when test='<%= Objects.equals(siteAdminDisplayContext.getDisplayStyle(), "icon") %>'>
-
-				<%
-				row.setCssClass("entry-card lfr-asset-item " + row.getCssClass());
-				%>
-
 				<liferay-ui:search-container-column-text>
 					<clay:vertical-card
 						verticalCard="<%= new SiteVerticalCard(curGroup, liferayPortletRequest, liferayPortletResponse, searchContainer.getRowChecker(), siteAdminDisplayContext) %>"
@@ -222,9 +226,8 @@
 
 				<liferay-ui:search-container-column-text>
 					<clay:dropdown-actions
-						defaultEventHandler="<%= SiteAdminWebKeys.SITE_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
 						dropdownItems="<%= siteAdminDisplayContext.getActionDropdownItems(curGroup) %>"
-						itemsIconAlignment="right"
+						propsTransformer="js/SiteDropdownDefaultPropsTransformer"
 					/>
 				</liferay-ui:search-container-column-text>
 			</c:otherwise>
@@ -236,8 +239,3 @@
 		markupView="lexicon"
 	/>
 </liferay-ui:search-container>
-
-<liferay-frontend:component
-	componentId="<%= SiteAdminWebKeys.SITE_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
-	module="js/SiteDropdownDefaultEventHandler.es"
-/>

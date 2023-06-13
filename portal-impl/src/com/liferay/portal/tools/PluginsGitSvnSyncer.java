@@ -65,7 +65,7 @@ public class PluginsGitSvnSyncer {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			exception.printStackTrace();
 		}
 	}
 
@@ -122,6 +122,9 @@ public class PluginsGitSvnSyncer {
 					unsyncBufferedReader.close();
 				}
 				catch (Exception exception) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(exception, exception);
+					}
 				}
 			}
 		}

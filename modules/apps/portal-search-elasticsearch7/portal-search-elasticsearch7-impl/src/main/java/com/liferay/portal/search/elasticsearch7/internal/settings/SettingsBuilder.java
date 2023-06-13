@@ -14,12 +14,11 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.settings;
 
-import com.liferay.petra.string.CharPool;
-
 import org.apache.commons.lang.StringUtils;
 
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.xcontent.XContentType;
+import org.elasticsearch.common.settings.SettingsException;
+import org.elasticsearch.common.xcontent.XContentType;
 
 /**
  * @author André de Oliveira
@@ -43,12 +42,10 @@ public class SettingsBuilder {
 			return;
 		}
 
-		source = source.trim();
-
-		if (source.charAt(0) == CharPool.OPEN_CURLY_BRACE) {
+		try {
 			_builder.loadFromSource(source, XContentType.JSON);
 		}
-		else {
+		catch (SettingsException settingsException) {
 			_builder.loadFromSource(source, XContentType.YAML);
 		}
 	}

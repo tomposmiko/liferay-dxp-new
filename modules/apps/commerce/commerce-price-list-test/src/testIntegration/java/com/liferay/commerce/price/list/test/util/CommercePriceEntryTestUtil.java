@@ -59,8 +59,8 @@ public class CommercePriceEntryTestUtil {
 
 		CommercePriceList commercePriceList =
 			CommercePriceListTestUtil.addCommercePriceList(
-				commerceCatalog.getGroupId(), currency.getCurrencyCode(), name,
-				RandomTestUtil.randomDouble(), true, null, null, null);
+				null, commerceCatalog.getGroupId(), currency.getCurrencyCode(),
+				name, RandomTestUtil.randomDouble(), true, null, null);
 
 		double price = RandomTestUtil.randomDouble();
 		double promoPrice = RandomTestUtil.randomDouble();
@@ -84,7 +84,7 @@ public class CommercePriceEntryTestUtil {
 				commercePriceList.getGroupId());
 
 		return CommercePriceEntryLocalServiceUtil.addCommercePriceEntry(
-			skuId, commercePriceListId, externalReferenceCode,
+			externalReferenceCode, skuId, commercePriceListId,
 			BigDecimal.valueOf(price), BigDecimal.valueOf(promoPrice),
 			serviceContext);
 	}
@@ -107,7 +107,7 @@ public class CommercePriceEntryTestUtil {
 			commercePriceListId, price, BigDecimal.ZERO, serviceContext);
 	}
 
-	public static CommercePriceEntry upsertCommercePriceEntry(
+	public static CommercePriceEntry addOrUpdateCommercePriceEntry(
 			String externalReferenceCode, long commercePriceEntryId, long skuId,
 			long commercePriceListId, String skuExternalReferenceCode,
 			Double price, Double promoPrice)

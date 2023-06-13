@@ -7,20 +7,20 @@ definition {
 	property testray.main.component.name = "Test Plugins";
 
 	setUp {
-		User.firstLoginPG();
+		User.firstLoginUI();
 	}
 
 	tearDown {
-		Page.tearDownCP();
+		PagesAdmin.tearDownCP();
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewLocalizedChinese {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Test Localized Page");
+		PagesAdmin.addPublicPage(pageName = "Test Localized Page");
 
 		Navigator.gotoPage(pageName = "Test Localized Page");
 
@@ -35,13 +35,13 @@ definition {
 		AssertTextNotPresent(value1 = "FAILED");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewLocalizedEnglish {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Test Localized Page");
+		PagesAdmin.addPublicPage(pageName = "Test Localized Page");
 
 		Navigator.gotoPage(pageName = "Test Localized Page");
 
@@ -58,13 +58,13 @@ definition {
 		AssertTextNotPresent(value1 = "FAILED");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewLocalizedFrench {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Test Localized Page");
+		PagesAdmin.addPublicPage(pageName = "Test Localized Page");
 
 		Navigator.gotoPage(pageName = "Test Localized Page");
 
@@ -79,13 +79,13 @@ definition {
 		AssertTextNotPresent(value1 = "FAILED");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ViewLocalizedSpanish {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Test Localized Page");
+		PagesAdmin.addPublicPage(pageName = "Test Localized Page");
 
 		Navigator.gotoPage(pageName = "Test Localized Page");
 

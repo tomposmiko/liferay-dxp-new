@@ -36,17 +36,17 @@ import org.apache.lucene.search.FuzzyQuery;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.common.xcontent.ToXContent;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.search.MatchQueryParser;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.profile.SearchProfileShardResult;
+import org.elasticsearch.search.profile.ProfileShardResult;
 import org.elasticsearch.search.profile.query.QueryProfileShardResult;
-import org.elasticsearch.xcontent.ToXContent;
-import org.elasticsearch.xcontent.XContentBuilder;
-import org.elasticsearch.xcontent.XContentFactory;
-import org.elasticsearch.xcontent.XContentType;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -78,25 +78,54 @@ public class CommonSearchResponseAssemblerImpl
 			baseSearchRequest.getStatsRequests());
 	}
 
+	protected String getProfileShardResultString(
+			ProfileShardResult profileShardResult)
+		throws IOException {
+
+		XContentBuilder xContentBuilder = XContentFactory.contentBuilder(
+			XContentType.JSON);
+
+		List<QueryProfileShardResult> queryProfileShardResults =
+			profileShardResult.getQueryProfileResults();
+
+		queryProfileShardResults.forEach(
+			queryProfileShardResult -> {
+				try {
+					xContentBuilder.startObject();
+
+					queryProfileShardResult.toXContent(
+						xContentBuilder, ToXContent.EMPTY_PARAMS);
+
+					xContentBuilder.endObject();
+				}
+				catch (IOException ioException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(ioException, ioException);
+					}
+				}
+			});
+
+		return Strings.toString(xContentBuilder);
+	}
+
 	protected void setExecutionProfile(
 		SearchResponse searchResponse, BaseSearchResponse baseSearchResponse) {
 
-		Map<String, SearchProfileShardResult> searchProfileShardResults =
+		Map<String, ProfileShardResult> profileShardResults =
 			searchResponse.getProfileResults();
 
-		if (MapUtil.isEmpty(searchProfileShardResults)) {
+		if (MapUtil.isEmpty(profileShardResults)) {
 			return;
 		}
 
 		Map<String, String> executionProfile = new HashMap<>();
 
-		searchProfileShardResults.forEach(
-			(shardKey, searchProfileShardResult) -> {
+		profileShardResults.forEach(
+			(shardKey, profileShardResult) -> {
 				try {
 					executionProfile.put(
 						shardKey,
-						_getSearchProfileShardResultString(
-							searchProfileShardResult));
+						getProfileShardResultString(profileShardResult));
 				}
 				catch (IOException ioException) {
 					if (_log.isInfoEnabled()) {
@@ -230,36 +259,6 @@ public class CommonSearchResponseAssemblerImpl
 	protected static final String ZERO_TERMS_QUERY_STRING =
 		",\"zero_terms_query\":\"" + MatchQueryParser.DEFAULT_ZERO_TERMS_QUERY +
 			"\"";
-
-	private String _getSearchProfileShardResultString(
-			SearchProfileShardResult searchProfileShardResult)
-		throws IOException {
-
-		XContentBuilder xContentBuilder = XContentFactory.contentBuilder(
-			XContentType.JSON);
-
-		List<QueryProfileShardResult> queryProfileShardResults =
-			searchProfileShardResult.getQueryProfileResults();
-
-		queryProfileShardResults.forEach(
-			queryProfileShardResult -> {
-				try {
-					xContentBuilder.startObject();
-
-					queryProfileShardResult.toXContent(
-						xContentBuilder, ToXContent.EMPTY_PARAMS);
-
-					xContentBuilder.endObject();
-				}
-				catch (IOException ioException) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(ioException, ioException);
-					}
-				}
-			});
-
-		return Strings.toString(xContentBuilder);
-	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CommonSearchResponseAssemblerImpl.class);

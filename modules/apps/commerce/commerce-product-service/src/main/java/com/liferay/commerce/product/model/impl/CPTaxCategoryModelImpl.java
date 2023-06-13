@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -82,7 +83,7 @@ public class CPTaxCategoryModelImpl
 	public static final String TABLE_NAME = "CPTaxCategory";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"externalReferenceCode", Types.VARCHAR},
+		{"mvccVersion", Types.BIGINT}, {"externalReferenceCode", Types.VARCHAR},
 		{"CPTaxCategoryId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
@@ -93,6 +94,7 @@ public class CPTaxCategoryModelImpl
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("externalReferenceCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("CPTaxCategoryId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -105,7 +107,7 @@ public class CPTaxCategoryModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CPTaxCategory (externalReferenceCode VARCHAR(75) null,CPTaxCategoryId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null,description STRING null)";
+		"create table CPTaxCategory (mvccVersion LONG default 0 not null,externalReferenceCode VARCHAR(75) null,CPTaxCategoryId LONG not null primary key,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,name STRING null,description STRING null)";
 
 	public static final String TABLE_SQL_DROP = "drop table CPTaxCategory";
 
@@ -173,6 +175,7 @@ public class CPTaxCategoryModelImpl
 
 		CPTaxCategory model = new CPTaxCategoryImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setExternalReferenceCode(soapModel.getExternalReferenceCode());
 		model.setCPTaxCategoryId(soapModel.getCPTaxCategoryId());
 		model.setCompanyId(soapModel.getCompanyId());
@@ -298,69 +301,111 @@ public class CPTaxCategoryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<CPTaxCategory, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, CPTaxCategory>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<CPTaxCategory, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<CPTaxCategory, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CPTaxCategory.class.getClassLoader(), CPTaxCategory.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"externalReferenceCode", CPTaxCategory::getExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"CPTaxCategoryId", CPTaxCategory::getCPTaxCategoryId);
-		attributeGetterFunctions.put("companyId", CPTaxCategory::getCompanyId);
-		attributeGetterFunctions.put("userId", CPTaxCategory::getUserId);
-		attributeGetterFunctions.put("userName", CPTaxCategory::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CPTaxCategory::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CPTaxCategory::getModifiedDate);
-		attributeGetterFunctions.put("name", CPTaxCategory::getName);
-		attributeGetterFunctions.put(
-			"description", CPTaxCategory::getDescription);
+		try {
+			Constructor<CPTaxCategory> constructor =
+				(Constructor<CPTaxCategory>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<CPTaxCategory, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<CPTaxCategory, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<CPTaxCategory, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<CPTaxCategory, Object>>();
 		Map<String, BiConsumer<CPTaxCategory, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<CPTaxCategory, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CPTaxCategory::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CPTaxCategory, Long>)CPTaxCategory::setMvccVersion);
+		attributeGetterFunctions.put(
+			"externalReferenceCode", CPTaxCategory::getExternalReferenceCode);
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<CPTaxCategory, String>)
 				CPTaxCategory::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"CPTaxCategoryId", CPTaxCategory::getCPTaxCategoryId);
 		attributeSetterBiConsumers.put(
 			"CPTaxCategoryId",
 			(BiConsumer<CPTaxCategory, Long>)CPTaxCategory::setCPTaxCategoryId);
+		attributeGetterFunctions.put("companyId", CPTaxCategory::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CPTaxCategory, Long>)CPTaxCategory::setCompanyId);
+		attributeGetterFunctions.put("userId", CPTaxCategory::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CPTaxCategory, Long>)CPTaxCategory::setUserId);
+		attributeGetterFunctions.put("userName", CPTaxCategory::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CPTaxCategory, String>)CPTaxCategory::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CPTaxCategory::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CPTaxCategory, Date>)CPTaxCategory::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CPTaxCategory::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CPTaxCategory, Date>)CPTaxCategory::setModifiedDate);
+		attributeGetterFunctions.put("name", CPTaxCategory::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<CPTaxCategory, String>)CPTaxCategory::setName);
+		attributeGetterFunctions.put(
+			"description", CPTaxCategory::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<CPTaxCategory, String>)CPTaxCategory::setDescription);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@JSON
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@JSON
@@ -882,6 +927,7 @@ public class CPTaxCategoryModelImpl
 	public Object clone() {
 		CPTaxCategoryImpl cpTaxCategoryImpl = new CPTaxCategoryImpl();
 
+		cpTaxCategoryImpl.setMvccVersion(getMvccVersion());
 		cpTaxCategoryImpl.setExternalReferenceCode(getExternalReferenceCode());
 		cpTaxCategoryImpl.setCPTaxCategoryId(getCPTaxCategoryId());
 		cpTaxCategoryImpl.setCompanyId(getCompanyId());
@@ -893,6 +939,33 @@ public class CPTaxCategoryModelImpl
 		cpTaxCategoryImpl.setDescription(getDescription());
 
 		cpTaxCategoryImpl.resetOriginalValues();
+
+		return cpTaxCategoryImpl;
+	}
+
+	@Override
+	public CPTaxCategory cloneWithOriginalValues() {
+		CPTaxCategoryImpl cpTaxCategoryImpl = new CPTaxCategoryImpl();
+
+		cpTaxCategoryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		cpTaxCategoryImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
+		cpTaxCategoryImpl.setCPTaxCategoryId(
+			this.<Long>getColumnOriginalValue("CPTaxCategoryId"));
+		cpTaxCategoryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		cpTaxCategoryImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		cpTaxCategoryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		cpTaxCategoryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		cpTaxCategoryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		cpTaxCategoryImpl.setName(this.<String>getColumnOriginalValue("name"));
+		cpTaxCategoryImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
 
 		return cpTaxCategoryImpl;
 	}
@@ -971,6 +1044,8 @@ public class CPTaxCategoryModelImpl
 	public CacheModel<CPTaxCategory> toCacheModel() {
 		CPTaxCategoryCacheModel cpTaxCategoryCacheModel =
 			new CPTaxCategoryCacheModel();
+
+		cpTaxCategoryCacheModel.mvccVersion = getMvccVersion();
 
 		cpTaxCategoryCacheModel.externalReferenceCode =
 			getExternalReferenceCode();
@@ -1118,12 +1193,11 @@ public class CPTaxCategoryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CPTaxCategory>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CPTaxCategory.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private String _externalReferenceCode;
 	private long _CPTaxCategoryId;
 	private long _companyId;
@@ -1164,6 +1238,7 @@ public class CPTaxCategoryModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put(
 			"externalReferenceCode", _externalReferenceCode);
 		_columnOriginalValues.put("CPTaxCategoryId", _CPTaxCategoryId);
@@ -1187,23 +1262,25 @@ public class CPTaxCategoryModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("externalReferenceCode", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("CPTaxCategoryId", 2L);
+		columnBitmasks.put("externalReferenceCode", 2L);
 
-		columnBitmasks.put("companyId", 4L);
+		columnBitmasks.put("CPTaxCategoryId", 4L);
 
-		columnBitmasks.put("userId", 8L);
+		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("userName", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("createDate", 32L);
+		columnBitmasks.put("userName", 32L);
 
-		columnBitmasks.put("modifiedDate", 64L);
+		columnBitmasks.put("createDate", 64L);
 
-		columnBitmasks.put("name", 128L);
+		columnBitmasks.put("modifiedDate", 128L);
 
-		columnBitmasks.put("description", 256L);
+		columnBitmasks.put("name", 256L);
+
+		columnBitmasks.put("description", 512L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

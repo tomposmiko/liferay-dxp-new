@@ -34,7 +34,7 @@ public class UADInfoPanelDisplay {
 	}
 
 	public UADEntity<Object> getFirstUADEntity() {
-		if (!_uadEntities.isEmpty()) {
+		if (_uadEntities.size() > 0) {
 			return _uadEntities.get(0);
 		}
 
@@ -42,7 +42,7 @@ public class UADInfoPanelDisplay {
 	}
 
 	public String getSubtitle(Locale locale) {
-		if (_uadEntities.isEmpty()) {
+		if (_uadEntities.size() == 0) {
 			if (_uadDisplay != null) {
 				return UADLanguageUtil.getApplicationName(_uadDisplay, locale);
 			}
@@ -52,13 +52,14 @@ public class UADInfoPanelDisplay {
 		else if (_uadEntities.size() == 1) {
 			return _uadDisplay.getTypeName(locale);
 		}
-
-		return LanguageUtil.format(
-			locale, "x-items-are-selected", getUADEntitiesCount());
+		else {
+			return LanguageUtil.format(
+				locale, "x-items-are-selected", getUADEntitiesCount());
+		}
 	}
 
 	public String getTitle(Locale locale) {
-		if (_uadEntities.isEmpty()) {
+		if (_uadEntities.size() == 0) {
 			if (!_hierarchyView || !_topLevelView) {
 				return _uadDisplay.getTypeName(locale);
 			}
@@ -75,12 +76,13 @@ public class UADInfoPanelDisplay {
 			return SafeDisplayValueUtil.get(
 				displayValues.get(_uadDisplay.getDisplayFieldNames()[0]));
 		}
+		else {
+			if (!_hierarchyView) {
+				return _uadDisplay.getTypeName(locale);
+			}
 
-		if (!_hierarchyView) {
-			return _uadDisplay.getTypeName(locale);
+			return null;
 		}
-
-		return null;
 	}
 
 	public UADDisplay<Object> getUADDisplay() {

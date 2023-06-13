@@ -157,6 +157,11 @@ public class AssetListEntrySegmentsEntryRelWrapper
 		}
 	}
 
+	@Override
+	public AssetListEntrySegmentsEntryRel cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
 	/**
 	 * Returns the asset list entry ID of this asset list entry segments entry rel.
 	 *

@@ -37,17 +37,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MulticastTransport extends Thread implements Transport {
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #MulticastTransport(DatagramHandler, String, int, String)}
-	 */
-	@Deprecated
-	public MulticastTransport(
-		DatagramHandler handler, String multicastAddress, int port) {
-
-		this(handler, multicastAddress, port, null);
-	}
-
 	public MulticastTransport(
 		DatagramHandler handler, String multicastAddress, int port,
 		String bindAddress) {

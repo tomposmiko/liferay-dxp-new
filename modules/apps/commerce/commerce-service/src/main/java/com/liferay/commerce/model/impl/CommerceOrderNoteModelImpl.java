@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -75,7 +76,7 @@ public class CommerceOrderNoteModelImpl
 	public static final String TABLE_NAME = "CommerceOrderNote";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"externalReferenceCode", Types.VARCHAR},
+		{"mvccVersion", Types.BIGINT}, {"externalReferenceCode", Types.VARCHAR},
 		{"commerceOrderNoteId", Types.BIGINT}, {"groupId", Types.BIGINT},
 		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
 		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
@@ -87,6 +88,7 @@ public class CommerceOrderNoteModelImpl
 		new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("externalReferenceCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("commerceOrderNoteId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
@@ -101,7 +103,7 @@ public class CommerceOrderNoteModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CommerceOrderNote (externalReferenceCode VARCHAR(75) null,commerceOrderNoteId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commerceOrderId LONG,content STRING null,restricted BOOLEAN)";
+		"create table CommerceOrderNote (mvccVersion LONG default 0 not null,externalReferenceCode VARCHAR(75) null,commerceOrderNoteId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,commerceOrderId LONG,content STRING null,restricted BOOLEAN)";
 
 	public static final String TABLE_SQL_DROP = "drop table CommerceOrderNote";
 
@@ -181,6 +183,7 @@ public class CommerceOrderNoteModelImpl
 
 		CommerceOrderNote model = new CommerceOrderNoteImpl();
 
+		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setExternalReferenceCode(soapModel.getExternalReferenceCode());
 		model.setCommerceOrderNoteId(soapModel.getCommerceOrderNoteId());
 		model.setGroupId(soapModel.getGroupId());
@@ -310,93 +313,136 @@ public class CommerceOrderNoteModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CommerceOrderNote>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CommerceOrderNote.class.getClassLoader(), CommerceOrderNote.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<CommerceOrderNote> constructor =
+				(Constructor<CommerceOrderNote>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<CommerceOrderNote, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<CommerceOrderNote, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceOrderNote, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceOrderNote, Object>>();
-
-		attributeGetterFunctions.put(
-			"externalReferenceCode",
-			CommerceOrderNote::getExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"commerceOrderNoteId", CommerceOrderNote::getCommerceOrderNoteId);
-		attributeGetterFunctions.put("groupId", CommerceOrderNote::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceOrderNote::getCompanyId);
-		attributeGetterFunctions.put("userId", CommerceOrderNote::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceOrderNote::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceOrderNote::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceOrderNote::getModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceOrderId", CommerceOrderNote::getCommerceOrderId);
-		attributeGetterFunctions.put("content", CommerceOrderNote::getContent);
-		attributeGetterFunctions.put(
-			"restricted", CommerceOrderNote::getRestricted);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<CommerceOrderNote, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CommerceOrderNote, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<CommerceOrderNote, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CommerceOrderNote::getMvccVersion);
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CommerceOrderNote, Long>)
+				CommerceOrderNote::setMvccVersion);
+		attributeGetterFunctions.put(
+			"externalReferenceCode",
+			CommerceOrderNote::getExternalReferenceCode);
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<CommerceOrderNote, String>)
 				CommerceOrderNote::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"commerceOrderNoteId", CommerceOrderNote::getCommerceOrderNoteId);
 		attributeSetterBiConsumers.put(
 			"commerceOrderNoteId",
 			(BiConsumer<CommerceOrderNote, Long>)
 				CommerceOrderNote::setCommerceOrderNoteId);
+		attributeGetterFunctions.put("groupId", CommerceOrderNote::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceOrderNote, Long>)CommerceOrderNote::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceOrderNote::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceOrderNote, Long>)
 				CommerceOrderNote::setCompanyId);
+		attributeGetterFunctions.put("userId", CommerceOrderNote::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceOrderNote, Long>)CommerceOrderNote::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceOrderNote::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceOrderNote, String>)
 				CommerceOrderNote::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceOrderNote::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceOrderNote, Date>)
 				CommerceOrderNote::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceOrderNote::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceOrderNote, Date>)
 				CommerceOrderNote::setModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceOrderId", CommerceOrderNote::getCommerceOrderId);
 		attributeSetterBiConsumers.put(
 			"commerceOrderId",
 			(BiConsumer<CommerceOrderNote, Long>)
 				CommerceOrderNote::setCommerceOrderId);
+		attributeGetterFunctions.put("content", CommerceOrderNote::getContent);
 		attributeSetterBiConsumers.put(
 			"content",
 			(BiConsumer<CommerceOrderNote, String>)
 				CommerceOrderNote::setContent);
+		attributeGetterFunctions.put(
+			"restricted", CommerceOrderNote::getRestricted);
 		attributeSetterBiConsumers.put(
 			"restricted",
 			(BiConsumer<CommerceOrderNote, Boolean>)
 				CommerceOrderNote::setRestricted);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
+	}
+
+	@JSON
+	@Override
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_mvccVersion = mvccVersion;
 	}
 
 	@JSON
@@ -703,6 +749,7 @@ public class CommerceOrderNoteModelImpl
 		CommerceOrderNoteImpl commerceOrderNoteImpl =
 			new CommerceOrderNoteImpl();
 
+		commerceOrderNoteImpl.setMvccVersion(getMvccVersion());
 		commerceOrderNoteImpl.setExternalReferenceCode(
 			getExternalReferenceCode());
 		commerceOrderNoteImpl.setCommerceOrderNoteId(getCommerceOrderNoteId());
@@ -717,6 +764,39 @@ public class CommerceOrderNoteModelImpl
 		commerceOrderNoteImpl.setRestricted(isRestricted());
 
 		commerceOrderNoteImpl.resetOriginalValues();
+
+		return commerceOrderNoteImpl;
+	}
+
+	@Override
+	public CommerceOrderNote cloneWithOriginalValues() {
+		CommerceOrderNoteImpl commerceOrderNoteImpl =
+			new CommerceOrderNoteImpl();
+
+		commerceOrderNoteImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		commerceOrderNoteImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
+		commerceOrderNoteImpl.setCommerceOrderNoteId(
+			this.<Long>getColumnOriginalValue("commerceOrderNoteId"));
+		commerceOrderNoteImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		commerceOrderNoteImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		commerceOrderNoteImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		commerceOrderNoteImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		commerceOrderNoteImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		commerceOrderNoteImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		commerceOrderNoteImpl.setCommerceOrderId(
+			this.<Long>getColumnOriginalValue("commerceOrderId"));
+		commerceOrderNoteImpl.setContent(
+			this.<String>getColumnOriginalValue("content"));
+		commerceOrderNoteImpl.setRestricted(
+			this.<Boolean>getColumnOriginalValue("restricted"));
 
 		return commerceOrderNoteImpl;
 	}
@@ -795,6 +875,8 @@ public class CommerceOrderNoteModelImpl
 	public CacheModel<CommerceOrderNote> toCacheModel() {
 		CommerceOrderNoteCacheModel commerceOrderNoteCacheModel =
 			new CommerceOrderNoteCacheModel();
+
+		commerceOrderNoteCacheModel.mvccVersion = getMvccVersion();
 
 		commerceOrderNoteCacheModel.externalReferenceCode =
 			getExternalReferenceCode();
@@ -942,12 +1024,11 @@ public class CommerceOrderNoteModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CommerceOrderNote>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CommerceOrderNote.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
+	private long _mvccVersion;
 	private String _externalReferenceCode;
 	private long _commerceOrderNoteId;
 	private long _groupId;
@@ -988,6 +1069,7 @@ public class CommerceOrderNoteModelImpl
 	private void _setColumnOriginalValues() {
 		_columnOriginalValues = new HashMap<String, Object>();
 
+		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put(
 			"externalReferenceCode", _externalReferenceCode);
 		_columnOriginalValues.put("commerceOrderNoteId", _commerceOrderNoteId);
@@ -1013,27 +1095,29 @@ public class CommerceOrderNoteModelImpl
 	static {
 		Map<String, Long> columnBitmasks = new HashMap<>();
 
-		columnBitmasks.put("externalReferenceCode", 1L);
+		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("commerceOrderNoteId", 2L);
+		columnBitmasks.put("externalReferenceCode", 2L);
 
-		columnBitmasks.put("groupId", 4L);
+		columnBitmasks.put("commerceOrderNoteId", 4L);
 
-		columnBitmasks.put("companyId", 8L);
+		columnBitmasks.put("groupId", 8L);
 
-		columnBitmasks.put("userId", 16L);
+		columnBitmasks.put("companyId", 16L);
 
-		columnBitmasks.put("userName", 32L);
+		columnBitmasks.put("userId", 32L);
 
-		columnBitmasks.put("createDate", 64L);
+		columnBitmasks.put("userName", 64L);
 
-		columnBitmasks.put("modifiedDate", 128L);
+		columnBitmasks.put("createDate", 128L);
 
-		columnBitmasks.put("commerceOrderId", 256L);
+		columnBitmasks.put("modifiedDate", 256L);
 
-		columnBitmasks.put("content", 512L);
+		columnBitmasks.put("commerceOrderId", 512L);
 
-		columnBitmasks.put("restricted", 1024L);
+		columnBitmasks.put("content", 1024L);
+
+		columnBitmasks.put("restricted", 2048L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

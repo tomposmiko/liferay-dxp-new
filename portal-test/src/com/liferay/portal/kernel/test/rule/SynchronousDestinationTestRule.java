@@ -32,26 +32,23 @@ import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
-import com.liferay.portal.kernel.search.SearchEngine;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.search.SearchEngineHelperUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule.SyncHandler;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
-import com.liferay.registry.Filter;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceTracker;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
 import org.junit.runner.Description;
+
+import org.osgi.framework.Filter;
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * @author Miguel Pastor
@@ -130,6 +127,8 @@ public class SynchronousDestinationTestRule
 		}
 
 		public void enableSync() {
+			Filter audioProcessorFilter = _registerDestinationFilter(
+				DestinationNames.DOCUMENT_LIBRARY_AUDIO_PROCESSOR);
 			Filter auditFilter = _registerDestinationFilter(
 				DestinationNames.AUDIT);
 			Filter asyncFilter = _registerDestinationFilter(
@@ -138,10 +137,18 @@ public class SynchronousDestinationTestRule
 				DestinationNames.BACKGROUND_TASK);
 			Filter backgroundTaskStatusFilter = _registerDestinationFilter(
 				DestinationNames.BACKGROUND_TASK_STATUS);
+			Filter commerceBasePriceListFilter = _registerDestinationFilter(
+				DestinationNames.COMMERCE_BASE_PRICE_LIST);
+			Filter commerceOrderFilter = _registerDestinationFilter(
+				DestinationNames.COMMERCE_ORDER_STATUS);
+			Filter commercePaymentFilter = _registerDestinationFilter(
+				DestinationNames.COMMERCE_PAYMENT_STATUS);
+			Filter commerceShipmentFilter = _registerDestinationFilter(
+				DestinationNames.COMMERCE_SHIPMENT_STATUS);
+			Filter commerceSubscriptionFilter = _registerDestinationFilter(
+				DestinationNames.COMMERCE_SUBSCRIPTION_STATUS);
 			Filter ddmStructureReindexFilter = _registerDestinationFilter(
 				"liferay/ddm_structure_reindex");
-			Filter kaleoGraphWalkerFilter = _registerDestinationFilter(
-				"liferay/kaleo_graph_walker");
 			Filter mailFilter = _registerDestinationFilter(
 				DestinationNames.MAIL);
 			Filter pdfProcessorFilter = _registerDestinationFilter(
@@ -154,38 +161,18 @@ public class SynchronousDestinationTestRule
 				DestinationNames.SUBSCRIPTION_SENDER);
 			Filter tensorflowModelDownloadFilter = _registerDestinationFilter(
 				"liferay/tensorflow_model_download");
+			Filter videoProcessorFilter = _registerDestinationFilter(
+				DestinationNames.DOCUMENT_LIBRARY_VIDEO_PROCESSOR);
 
-			boolean solrEnabled = _isSolrEnabled();
-
-			if (!solrEnabled) {
-				Filter commerceOrderFilter = _registerDestinationFilter(
-					"liferay/order_status");
-				Filter commercePaymentFilter = _registerDestinationFilter(
-					"liferay/payment_status");
-				Filter commerceShipmentFilter = _registerDestinationFilter(
-					"liferay/shipment_status");
-				Filter commerceStockFilter = _registerDestinationFilter(
-					"liferay/stock_quantity");
-				Filter commerceSubscriptionFilter = _registerDestinationFilter(
-					"liferay/subscription_status");
-
-				_waitForDependencies(
-					auditFilter, asyncFilter, backgroundTaskFilter,
-					backgroundTaskStatusFilter, commerceOrderFilter,
-					commercePaymentFilter, commerceShipmentFilter,
-					commerceStockFilter, commerceSubscriptionFilter,
-					ddmStructureReindexFilter, kaleoGraphWalkerFilter,
-					mailFilter, pdfProcessorFilter, rawMetaDataProcessorFilter,
-					segmentsEntryReindexFilter, subscrpitionSenderFilter);
-			}
-			else {
-				_waitForDependencies(
-					auditFilter, asyncFilter, backgroundTaskFilter,
-					backgroundTaskStatusFilter, ddmStructureReindexFilter,
-					kaleoGraphWalkerFilter, mailFilter, pdfProcessorFilter,
-					rawMetaDataProcessorFilter, segmentsEntryReindexFilter,
-					subscrpitionSenderFilter, tensorflowModelDownloadFilter);
-			}
+			_waitForDependencies(
+				audioProcessorFilter, auditFilter, asyncFilter,
+				backgroundTaskFilter, backgroundTaskStatusFilter,
+				commerceBasePriceListFilter, commerceOrderFilter,
+				commercePaymentFilter, commerceShipmentFilter,
+				commerceSubscriptionFilter, ddmStructureReindexFilter,
+				mailFilter, pdfProcessorFilter, rawMetaDataProcessorFilter,
+				segmentsEntryReindexFilter, subscrpitionSenderFilter,
+				tensorflowModelDownloadFilter, videoProcessorFilter);
 
 			_destinations = ReflectionTestUtil.getFieldValue(
 				MessageBusUtil.getMessageBus(), "_destinations");
@@ -199,30 +186,30 @@ public class SynchronousDestinationTestRule
 			replaceDestination(DestinationNames.ASYNC_SERVICE);
 			replaceDestination(DestinationNames.BACKGROUND_TASK);
 			replaceDestination(DestinationNames.BACKGROUND_TASK_STATUS);
+			replaceDestination(DestinationNames.COMMERCE_BASE_PRICE_LIST);
+			replaceDestination(DestinationNames.COMMERCE_ORDER_STATUS);
+			replaceDestination(DestinationNames.COMMERCE_PAYMENT_STATUS);
+			replaceDestination(DestinationNames.COMMERCE_SHIPMENT_STATUS);
+			replaceDestination(DestinationNames.COMMERCE_SUBSCRIPTION_STATUS);
+			replaceDestination(
+				DestinationNames.DOCUMENT_LIBRARY_AUDIO_PROCESSOR);
 			replaceDestination(DestinationNames.DOCUMENT_LIBRARY_PDF_PROCESSOR);
 			replaceDestination(
 				DestinationNames.DOCUMENT_LIBRARY_RAW_METADATA_PROCESSOR);
 			replaceDestination(
 				DestinationNames.DOCUMENT_LIBRARY_SYNC_EVENT_PROCESSOR);
+			replaceDestination(
+				DestinationNames.DOCUMENT_LIBRARY_VIDEO_PROCESSOR);
 			replaceDestination(DestinationNames.MAIL);
 			replaceDestination(DestinationNames.SCHEDULER_ENGINE);
 			replaceDestination(DestinationNames.SUBSCRIPTION_SENDER);
 			replaceDestination("liferay/adaptive_media_processor");
 			replaceDestination("liferay/asset_auto_tagger");
 			replaceDestination("liferay/ddm_structure_reindex");
-			replaceDestination("liferay/kaleo_graph_walker");
 			replaceDestination("liferay/report_request");
 			replaceDestination("liferay/reports_admin");
 			replaceDestination("liferay/segments_entry_reindex");
-
-			if (!solrEnabled) {
-				replaceDestination("liferay/order_status");
-				replaceDestination("liferay/payment_status");
-				replaceDestination("liferay/shipment_status");
-				replaceDestination("liferay/stock_quantity");
-				replaceDestination("liferay/subscription_status");
-				replaceDestination("liferay/tensorflow_model_download");
-			}
+			replaceDestination("liferay/tensorflow_model_download");
 
 			if (_sync != null) {
 				for (String name : _sync.destinationNames()) {
@@ -388,28 +375,18 @@ public class SynchronousDestinationTestRule
 			_sync = sync;
 		}
 
-		private boolean _isSolrEnabled() {
-			SearchEngine searchEngine = SearchEngineHelperUtil.getSearchEngine(
-				SearchEngineHelperUtil.getDefaultSearchEngineId());
-
-			return Objects.equals(searchEngine.getVendor(), "Solr");
-		}
-
 		private Filter _registerDestinationFilter(String destinationName) {
-			Registry registry = RegistryUtil.getRegistry();
-
-			return registry.getFilter(
+			return SystemBundleUtil.createFilter(
 				StringBundler.concat(
 					"(&(destination.name=", destinationName, ")(objectClass=",
 					Destination.class.getName(), "))"));
 		}
 
 		private void _waitForDependencies(Filter... filters) {
-			Registry registry = RegistryUtil.getRegistry();
-
 			for (Filter filter : filters) {
 				ServiceTracker<Object, Object> serviceTracker =
-					registry.trackServices(filter);
+					new ServiceTracker<>(
+						SystemBundleUtil.getBundleContext(), filter, null);
 
 				serviceTracker.open();
 
@@ -500,20 +477,15 @@ public class SynchronousDestinationTestRule
 		extends TestSynchronousDestination {
 
 		@Override
-		public void send(final Message message) {
+		public void send(Message message) {
 			try {
 				TransactionInvokerUtil.invoke(
 					_transactionConfig,
-					new Callable<Void>() {
+					() -> {
+						CleanTransactionSynchronousDestination.super.send(
+							message);
 
-						@Override
-						public Void call() throws Exception {
-							CleanTransactionSynchronousDestination.super.send(
-								message);
-
-							return null;
-						}
-
+						return null;
 					});
 			}
 			catch (Throwable throwable) {

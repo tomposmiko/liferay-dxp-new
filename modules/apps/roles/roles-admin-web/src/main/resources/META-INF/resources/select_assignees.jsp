@@ -50,9 +50,9 @@ PortletURL portletURL = editRoleAssignmentsManagementToolbarDisplayContext.getPo
 <clay:management-toolbar
 	clearResultsURL="<%= editRoleAssignmentsManagementToolbarDisplayContext.getClearResultsURL() %>"
 	creationMenu="<%= editRoleAssignmentsManagementToolbarDisplayContext.getCreationMenu() %>"
-	defaultEventHandler="<%= editRoleAssignmentsManagementToolbarDisplayContext.getDefaultEventHandler() %>"
 	filterDropdownItems="<%= editRoleAssignmentsManagementToolbarDisplayContext.getFilterDropdownItems() %>"
 	itemsTotal="<%= searchContainer.getTotal() %>"
+	propsTransformer="js/SelectAssigneesManagementToolbarPropsTransformer"
 	searchActionURL="<%= editRoleAssignmentsManagementToolbarDisplayContext.getSearchActionURL() %>"
 	searchContainerId="assigneesSearch"
 	searchFormName="searchFm"
@@ -98,10 +98,10 @@ PortletURL portletURL = editRoleAssignmentsManagementToolbarDisplayContext.getPo
 		'<portlet:namespace />assigneesSearch'
 	);
 
-	searchContainer.on('rowToggled', function (event) {
+	searchContainer.on('rowToggled', (event) => {
 		var nodes = event.elements.allSelectedElements.getDOMNodes();
 
-		var <portlet:namespace />assigneeIds = nodes.map(function (node) {
+		var <portlet:namespace />assigneeIds = nodes.map((node) => {
 			return node.value;
 		});
 
@@ -122,8 +122,3 @@ PortletURL portletURL = editRoleAssignmentsManagementToolbarDisplayContext.getPo
 		);
 	});
 </aui:script>
-
-<liferay-frontend:component
-	componentId="<%= editRoleAssignmentsManagementToolbarDisplayContext.getDefaultEventHandler() %>"
-	module="js/EditRoleAssignmentsManagementToolbarDefaultEventHandler.es"
-/>

@@ -38,6 +38,7 @@ import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionModel;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -254,96 +255,118 @@ public class KaleoDefinitionModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, KaleoDefinition>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			KaleoDefinition.class.getClassLoader(), KaleoDefinition.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<KaleoDefinition> constructor =
+				(Constructor<KaleoDefinition>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<KaleoDefinition, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<KaleoDefinition, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<KaleoDefinition, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<KaleoDefinition, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", KaleoDefinition::getMvccVersion);
-		attributeGetterFunctions.put(
-			"kaleoDefinitionId", KaleoDefinition::getKaleoDefinitionId);
-		attributeGetterFunctions.put("groupId", KaleoDefinition::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", KaleoDefinition::getCompanyId);
-		attributeGetterFunctions.put("userId", KaleoDefinition::getUserId);
-		attributeGetterFunctions.put("userName", KaleoDefinition::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", KaleoDefinition::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", KaleoDefinition::getModifiedDate);
-		attributeGetterFunctions.put("name", KaleoDefinition::getName);
-		attributeGetterFunctions.put("title", KaleoDefinition::getTitle);
-		attributeGetterFunctions.put(
-			"description", KaleoDefinition::getDescription);
-		attributeGetterFunctions.put("content", KaleoDefinition::getContent);
-		attributeGetterFunctions.put("scope", KaleoDefinition::getScope);
-		attributeGetterFunctions.put("version", KaleoDefinition::getVersion);
-		attributeGetterFunctions.put("active", KaleoDefinition::getActive);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<KaleoDefinition, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<KaleoDefinition, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<KaleoDefinition, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", KaleoDefinition::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<KaleoDefinition, Long>)KaleoDefinition::setMvccVersion);
+		attributeGetterFunctions.put(
+			"kaleoDefinitionId", KaleoDefinition::getKaleoDefinitionId);
 		attributeSetterBiConsumers.put(
 			"kaleoDefinitionId",
 			(BiConsumer<KaleoDefinition, Long>)
 				KaleoDefinition::setKaleoDefinitionId);
+		attributeGetterFunctions.put("groupId", KaleoDefinition::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<KaleoDefinition, Long>)KaleoDefinition::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", KaleoDefinition::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<KaleoDefinition, Long>)KaleoDefinition::setCompanyId);
+		attributeGetterFunctions.put("userId", KaleoDefinition::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<KaleoDefinition, Long>)KaleoDefinition::setUserId);
+		attributeGetterFunctions.put("userName", KaleoDefinition::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<KaleoDefinition, String>)KaleoDefinition::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", KaleoDefinition::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<KaleoDefinition, Date>)KaleoDefinition::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", KaleoDefinition::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<KaleoDefinition, Date>)
 				KaleoDefinition::setModifiedDate);
+		attributeGetterFunctions.put("name", KaleoDefinition::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<KaleoDefinition, String>)KaleoDefinition::setName);
+		attributeGetterFunctions.put("title", KaleoDefinition::getTitle);
 		attributeSetterBiConsumers.put(
 			"title",
 			(BiConsumer<KaleoDefinition, String>)KaleoDefinition::setTitle);
+		attributeGetterFunctions.put(
+			"description", KaleoDefinition::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<KaleoDefinition, String>)
 				KaleoDefinition::setDescription);
+		attributeGetterFunctions.put("content", KaleoDefinition::getContent);
 		attributeSetterBiConsumers.put(
 			"content",
 			(BiConsumer<KaleoDefinition, String>)KaleoDefinition::setContent);
+		attributeGetterFunctions.put("scope", KaleoDefinition::getScope);
 		attributeSetterBiConsumers.put(
 			"scope",
 			(BiConsumer<KaleoDefinition, String>)KaleoDefinition::setScope);
+		attributeGetterFunctions.put("version", KaleoDefinition::getVersion);
 		attributeSetterBiConsumers.put(
 			"version",
 			(BiConsumer<KaleoDefinition, Integer>)KaleoDefinition::setVersion);
+		attributeGetterFunctions.put("active", KaleoDefinition::getActive);
 		attributeSetterBiConsumers.put(
 			"active",
 			(BiConsumer<KaleoDefinition, Boolean>)KaleoDefinition::setActive);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -896,6 +919,44 @@ public class KaleoDefinitionModelImpl
 	}
 
 	@Override
+	public KaleoDefinition cloneWithOriginalValues() {
+		KaleoDefinitionImpl kaleoDefinitionImpl = new KaleoDefinitionImpl();
+
+		kaleoDefinitionImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		kaleoDefinitionImpl.setKaleoDefinitionId(
+			this.<Long>getColumnOriginalValue("kaleoDefinitionId"));
+		kaleoDefinitionImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		kaleoDefinitionImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		kaleoDefinitionImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		kaleoDefinitionImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		kaleoDefinitionImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		kaleoDefinitionImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		kaleoDefinitionImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		kaleoDefinitionImpl.setTitle(
+			this.<String>getColumnOriginalValue("title"));
+		kaleoDefinitionImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		kaleoDefinitionImpl.setContent(
+			this.<String>getColumnOriginalValue("content"));
+		kaleoDefinitionImpl.setScope(
+			this.<String>getColumnOriginalValue("scope"));
+		kaleoDefinitionImpl.setVersion(
+			this.<Integer>getColumnOriginalValue("version"));
+		kaleoDefinitionImpl.setActive(
+			this.<Boolean>getColumnOriginalValue("active_"));
+
+		return kaleoDefinitionImpl;
+	}
+
+	@Override
 	public int compareTo(KaleoDefinition kaleoDefinition) {
 		int value = 0;
 
@@ -1143,9 +1204,7 @@ public class KaleoDefinitionModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, KaleoDefinition>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					KaleoDefinition.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

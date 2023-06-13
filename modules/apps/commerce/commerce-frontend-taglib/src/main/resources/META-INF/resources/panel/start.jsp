@@ -20,7 +20,7 @@
 String collapseSwitchId = Validator.isNotNull(collapseSwitchName) ? collapseSwitchName : (randomNamespace + "toggle-switch-check");
 %>
 
-<div class="card d-flex flex-column<%= Validator.isNotNull(elementClasses) ? StringPool.SPACE + elementClasses : StringPool.BLANK %>">
+<div class="<%= "card d-flex flex-column" + (Validator.isNotNull(elementClasses) ? StringPool.SPACE + elementClasses : StringPool.BLANK) %>">
 	<c:if test="<%= Validator.isNotNull(actionLabel) || Validator.isNotNull(actionIcon) || Validator.isNotNull(title) %>">
 		<h4 class="align-items-center card-header d-flex justify-content-between py-3">
 			<%= HtmlUtil.escape(title) %>
@@ -30,7 +30,7 @@ String collapseSwitchId = Validator.isNotNull(collapseSwitchName) ? collapseSwit
 					var link = document.getElementById('<%= HtmlUtil.escapeJS(linkId) %>');
 
 					if (link) {
-						link.addEventListener('click', function (e) {
+						link.addEventListener('click', (e) => {
 							e.preventDefault();
 							Liferay.fire(eventsDefinitions.OPEN_MODAL, {
 								id: '<%= HtmlUtil.escapeJS(actionTargetId) %>',
@@ -50,7 +50,7 @@ String collapseSwitchId = Validator.isNotNull(collapseSwitchName) ? collapseSwit
 				</c:when>
 				<c:when test="<%= Validator.isNotNull(actionIcon) %>">
 					<clay:link
-						elementClasses="btn btn-monospaced btn-primary btn-sm text-white"
+						cssClass="btn btn-monospaced btn-primary btn-sm text-white"
 						href='<%= (Validator.isNotNull(actionUrl) && Validator.isNull(actionTargetId)) ? actionUrl : "#" %>'
 						icon="<%= HtmlUtil.escapeAttribute(actionIcon) %>"
 						id="<%= HtmlUtil.escape(linkId) %>"
@@ -66,15 +66,15 @@ String collapseSwitchId = Validator.isNotNull(collapseSwitchName) ? collapseSwit
 								'<%= HtmlUtil.escapeJS(randomNamespace) %>toggle-label'
 							);
 							var toggleCheckbox = document.getElementById(
-								'<%= HtmlUtil.escapeJS(collapseSwitchId) %>'
+								'<%=HtmlUtil.escapeJS(collapseSwitchId) %>'
 							);
 							var collapseClickable = true;
 							var collapsableElement = document.getElementById(
 								'<%= HtmlUtil.escapeJS(randomNamespace) %>collapse'
 							);
 
-							[toggleSwitch, toggleLabel].forEach(function (el) {
-								el.addEventListener('click', function (e) {
+							[toggleSwitch, toggleLabel].forEach((el) => {
+								el.addEventListener('click', (e) => {
 									e.preventDefault();
 
 									if (collapseClickable) {
@@ -87,7 +87,7 @@ String collapseSwitchId = Validator.isNotNull(collapseSwitchName) ? collapseSwit
 
 									collapseClickable = false;
 
-									setTimeout(function () {
+									setTimeout(() => {
 										collapseClickable = true;
 									}, 400);
 								});
@@ -129,4 +129,4 @@ String collapseSwitchId = Validator.isNotNull(collapseSwitchName) ? collapseSwit
 	</c:if>
 
 	<div class="collapse<%= collapsed ? StringPool.BLANK : " show" %>" id="<%= randomNamespace %>collapse">
-		<div class="card-body<%= Validator.isNotNull(bodyClasses) ? StringPool.SPACE + bodyClasses : StringPool.BLANK %>">
+		<div class="<%= "card-body" + (Validator.isNotNull(bodyClasses) ? StringPool.SPACE + bodyClasses : StringPool.BLANK) %>">

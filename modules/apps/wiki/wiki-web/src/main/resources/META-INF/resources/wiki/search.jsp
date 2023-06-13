@@ -34,13 +34,6 @@ String keywords = ParamUtil.getString(request, "keywords");
 boolean createNewPage = WikiNodePermission.contains(permissionChecker, node, ActionKeys.ADD_PAGE);
 
 WikiURLHelper wikiURLHelper = new WikiURLHelper(wikiRequestHelper, renderResponse, wikiGroupServiceConfiguration);
-
-PortletURL portletURL = renderResponse.createRenderURL();
-
-portletURL.setParameter("mvcRenderCommandName", "/wiki/search");
-portletURL.setParameter("redirect", redirect);
-portletURL.setParameter("nodeId", String.valueOf(nodeId));
-portletURL.setParameter("keywords", keywords);
 %>
 
 <aui:form action="<%= wikiURLHelper.getSearchURL() %>" method="get" name="fm">
@@ -63,7 +56,19 @@ portletURL.setParameter("keywords", keywords);
 
 	<liferay-ui:search-container
 		emptyResultsMessage='<%= LanguageUtil.format(request, "no-pages-were-found-that-matched-the-keywords-x", "<strong>" + HtmlUtil.escape(keywords) + "</strong>", false) %>'
-		iteratorURL="<%= portletURL %>"
+		iteratorURL='<%=
+			PortletURLBuilder.createRenderURL(
+				renderResponse
+			).setMVCRenderCommandName(
+				"/wiki/search"
+			).setRedirect(
+				redirect
+			).setKeywords(
+				keywords
+			).setParameter(
+				"nodeId", nodeId
+			).buildPortletURL()
+		%>'
 	>
 
 		<%
@@ -120,12 +125,17 @@ portletURL.setParameter("keywords", keywords);
 			viewPageURL.setParameter("nodeName", node.getName());
 			viewPageURL.setParameter("title", wikiPage.getTitle());
 
-			PortletURL editPageURL = renderResponse.createRenderURL();
-
-			editPageURL.setParameter("mvcRenderCommandName", "/wiki/edit_page");
-			editPageURL.setParameter("redirect", currentURL);
-			editPageURL.setParameter("nodeId", String.valueOf(node.getNodeId()));
-			editPageURL.setParameter("title", title);
+			PortletURL editPageURL = PortletURLBuilder.createRenderURL(
+				renderResponse
+			).setMVCRenderCommandName(
+				"/wiki/edit_page"
+			).setRedirect(
+				currentURL
+			).setParameter(
+				"nodeId", node.getNodeId()
+			).setParameter(
+				"title", title
+			).buildPortletURL();
 
 			WikiEngineRenderer wikiEngineRenderer = (WikiEngineRenderer)request.getAttribute(WikiWebKeys.WIKI_ENGINE_RENDERER);
 
@@ -145,17 +155,7 @@ portletURL.setParameter("keywords", keywords);
 				<portlet:param name="title" value="<%= title %>" />
 			</portlet:renderURL>
 
-			<liferay-ui:app-view-search-entry
-				commentRelatedSearchResults="<%= searchResult.getCommentRelatedSearchResults() %>"
-				containerName="<%= curNode.getName() %>"
-				cssClass='<%= MathUtil.isEven(index) ? "search" : "search alt" %>'
-				description="<%= StringUtil.shorten(HtmlUtil.stripHtml(formattedContent), 200) %>"
-				fileEntryRelatedSearchResults="<%= searchResult.getFileEntryRelatedSearchResults() %>"
-				highlightEnabled="<%= queryConfig.isHighlightEnabled() %>"
-				queryTerms="<%= hits.getQueryTerms() %>"
-				title="<%= wikiPage.getTitle() %>"
-				url="<%= rowURL %>"
-			/>
+			<%@ include file="/wiki/app_view_search_entry.jspf" %>
 		</liferay-ui:search-container-row>
 
 		<liferay-ui:search-paginator

@@ -14,15 +14,10 @@
 
 package com.liferay.analytics.reports.web.internal.portlet.action.test;
 
-import com.liferay.analytics.reports.test.MockObject;
 import com.liferay.analytics.reports.test.util.MockContextUtil;
 import com.liferay.analytics.reports.web.internal.portlet.action.test.util.MockHttpUtil;
 import com.liferay.analytics.reports.web.internal.portlet.action.test.util.MockThemeDisplayUtil;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.info.item.InfoItemReference;
-import com.liferay.layout.display.page.LayoutDisplayPageProvider;
-import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
-import com.liferay.layout.display.page.constants.LayoutDisplayPageWebKeys;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.function.UnsafeSupplier;
 import com.liferay.petra.string.StringBundler;
@@ -36,7 +31,6 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -100,14 +94,17 @@ public class GetTrafficSourcesMVCResourceCommandTest {
 		ReflectionTestUtil.setFieldValue(
 			PrefsPropsUtil.class, "_prefsProps", validPrefsPropsWrapper);
 
-		String dataSourceId = validPrefsPropsWrapper.getString(
-			RandomTestUtil.nextLong(), "liferayAnalyticsDataSourceId");
-
 		ReflectionTestUtil.setFieldValue(
 			_mvcResourceCommand, "_http",
 			MockHttpUtil.geHttp(
 				HashMapBuilder.<String, UnsafeSupplier<String, Exception>>put(
-					"/api/1.0/data-sources/" + dataSourceId,
+					() -> {
+						String dataSourceId = validPrefsPropsWrapper.getString(
+							RandomTestUtil.nextLong(),
+							"liferayAnalyticsDataSourceId");
+
+						return "/api/1.0/data-sources/" + dataSourceId;
+					},
 					() -> StringPool.BLANK
 				).put(
 					"/api/1.0/pages/acquisition-channels",
@@ -133,12 +130,42 @@ public class GetTrafficSourcesMVCResourceCommandTest {
 					() -> JSONUtil.put(
 						"facebook", 385.0
 					).toString()
+				).put(
+					"/api/seo/1.0/traffic-sources",
+					() -> JSONUtil.put(
+						JSONUtil.put(
+							"countryKeywords",
+							JSONUtil.put(
+								JSONUtil.put(
+									"countryCode", "us"
+								).put(
+									"countryName", "United States"
+								).put(
+									"keywords",
+									JSONUtil.put(
+										JSONUtil.put(
+											"keyword", "liferay"
+										).put(
+											"position", 1
+										).put(
+											"searchVolume", 3600
+										).put(
+											"traffic", 2880L
+										))
+								))
+						).put(
+							"name", "organic"
+						).put(
+							"trafficAmount", 3L
+						).put(
+							"trafficShare", 93.93D
+						)
+					).toString()
 				).build()));
 
 		try {
 			MockContextUtil.testWithMockContext(
 				MockContextUtil.MockContext.builder(
-					_classNameLocalService
 				).build(),
 				() -> {
 					MockLiferayResourceRequest mockLiferayResourceRequest =
@@ -178,7 +205,33 @@ public class GetTrafficSourcesMVCResourceCommandTest {
 					Assert.assertEquals(
 						String.format("%.1f", 89.20D),
 						jsonObject2.getString("share"));
+
 					Assert.assertEquals(3192, jsonObject2.get("value"));
+
+					JSONArray countryKeywordsJSONArray =
+						(JSONArray)jsonObject2.get("countryKeywords");
+
+					Assert.assertEquals(
+						JSONUtil.put(
+							JSONUtil.put(
+								"countryCode", "us"
+							).put(
+								"countryName", "United States"
+							).put(
+								"keywords",
+								JSONUtil.put(
+									JSONUtil.put(
+										"keyword", "liferay"
+									).put(
+										"position", 1
+									).put(
+										"searchVolume", 3600
+									).put(
+										"traffic", 2880
+									))
+							)
+						).toString(),
+						countryKeywordsJSONArray.toString());
 
 					JSONObject jsonObject3 = jsonArray.getJSONObject(1);
 
@@ -255,7 +308,6 @@ public class GetTrafficSourcesMVCResourceCommandTest {
 		try {
 			MockContextUtil.testWithMockContext(
 				MockContextUtil.MockContext.builder(
-					_classNameLocalService
 				).build(),
 				() -> {
 					MockLiferayResourceRequest mockLiferayResourceRequest =
@@ -386,8 +438,8 @@ public class GetTrafficSourcesMVCResourceCommandTest {
 							).put(
 								"value", 0
 							)
-						).toString(),
-						jsonArray.toString());
+						).toJSONString(),
+						jsonArray.toJSONString());
 				});
 		}
 		finally {
@@ -404,16 +456,6 @@ public class GetTrafficSourcesMVCResourceCommandTest {
 			new MockLiferayResourceRequest();
 
 		try {
-			LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
-				_layoutDisplayPageProviderTracker.
-					getLayoutDisplayPageProviderByClassName(
-						MockObject.class.getName());
-
-			mockLiferayResourceRequest.setAttribute(
-				LayoutDisplayPageWebKeys.LAYOUT_DISPLAY_PAGE_OBJECT_PROVIDER,
-				layoutDisplayPageProvider.getLayoutDisplayPageObjectProvider(
-					new InfoItemReference(MockObject.class.getName(), 0)));
-
 			mockLiferayResourceRequest.setAttribute(
 				WebKeys.THEME_DISPLAY,
 				MockThemeDisplayUtil.getThemeDisplay(
@@ -421,7 +463,8 @@ public class GetTrafficSourcesMVCResourceCommandTest {
 						TestPropsValues.getCompanyId()),
 					_group, _layout,
 					_layoutSetLocalService.getLayoutSet(
-						_group.getGroupId(), false)));
+						_group.getGroupId(), false),
+					LocaleUtil.US));
 
 			return mockLiferayResourceRequest;
 		}
@@ -429,9 +472,6 @@ public class GetTrafficSourcesMVCResourceCommandTest {
 			throw new AssertionError(portalException);
 		}
 	}
-
-	@Inject
-	private ClassNameLocalService _classNameLocalService;
 
 	@Inject
 	private CompanyLocalService _companyLocalService;
@@ -446,9 +486,6 @@ public class GetTrafficSourcesMVCResourceCommandTest {
 	private Language _language;
 
 	private Layout _layout;
-
-	@Inject
-	private LayoutDisplayPageProviderTracker _layoutDisplayPageProviderTracker;
 
 	@Inject
 	private LayoutSetLocalService _layoutSetLocalService;
@@ -467,10 +504,10 @@ public class GetTrafficSourcesMVCResourceCommandTest {
 
 		@Override
 		public String getString(long companyId, String name) {
-			if (Objects.equals(name, "liferayAnalyticsDataSourceId") ||
+			if (Objects.equals("liferayAnalyticsDataSourceId", name) ||
 				Objects.equals(
 					name, "liferayAnalyticsFaroBackendSecuritySignature") ||
-				Objects.equals(name, "liferayAnalyticsFaroBackendURL")) {
+				Objects.equals("liferayAnalyticsFaroBackendURL", name)) {
 
 				return null;
 			}
@@ -490,10 +527,10 @@ public class GetTrafficSourcesMVCResourceCommandTest {
 
 		@Override
 		public String getString(long companyId, String name) {
-			if (Objects.equals(name, "liferayAnalyticsDataSourceId") ||
+			if (Objects.equals("liferayAnalyticsDataSourceId", name) ||
 				Objects.equals(
 					name, "liferayAnalyticsFaroBackendSecuritySignature") ||
-				Objects.equals(name, "liferayAnalyticsFaroBackendURL")) {
+				Objects.equals("liferayAnalyticsFaroBackendURL", name)) {
 
 				return "test";
 			}

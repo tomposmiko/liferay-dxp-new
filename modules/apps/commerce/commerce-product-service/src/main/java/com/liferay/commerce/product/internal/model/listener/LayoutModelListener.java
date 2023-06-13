@@ -34,10 +34,6 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 	@Override
 	public void onAfterRemove(Layout layout) throws ModelListenerException {
-		if (layout == null) {
-			return;
-		}
-
 		List<CPDisplayLayout> cpDisplayLayouts =
 			_cpDisplayLayoutLocalService.
 				fetchCPDisplayLayoutByGroupIdAndLayoutUuid(

@@ -15,7 +15,6 @@
 package com.liferay.headless.commerce.admin.order.resource.v1_0;
 
 import com.liferay.headless.commerce.admin.order.dto.v1_0.OrderNote;
-import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
@@ -23,9 +22,7 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
-import com.liferay.portal.odata.sort.SortParserProvider;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.batch.engine.resource.VulcanBatchEngineImportTaskResource;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -56,6 +53,10 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface OrderNoteResource {
 
+	public static Builder builder() {
+		return FactoryHolder.factory.create();
+	}
+
 	public Response deleteOrderNoteByExternalReferenceCode(
 			String externalReferenceCode)
 		throws Exception;
@@ -70,7 +71,8 @@ public interface OrderNoteResource {
 
 	public Response deleteOrderNote(Long id) throws Exception;
 
-	public Response deleteOrderNoteBatch(String callbackURL, Object object)
+	public Response deleteOrderNoteBatch(
+			Long id, String callbackURL, Object object)
 		throws Exception;
 
 	public OrderNote getOrderNote(Long id) throws Exception;
@@ -93,7 +95,8 @@ public interface OrderNoteResource {
 	public OrderNote postOrderIdOrderNote(Long id, OrderNote orderNote)
 		throws Exception;
 
-	public Response postOrderIdOrderNoteBatch(String callbackURL, Object object)
+	public Response postOrderIdOrderNoteBatch(
+			Long id, String callbackURL, Object object)
 		throws Exception;
 
 	public default void setContextAcceptLanguage(
@@ -133,12 +136,6 @@ public interface OrderNoteResource {
 
 	public void setRoleLocalService(RoleLocalService roleLocalService);
 
-	public void setSortParserProvider(SortParserProvider sortParserProvider);
-
-	public void setVulcanBatchEngineImportTaskResource(
-		VulcanBatchEngineImportTaskResource
-			vulcanBatchEngineImportTaskResource);
-
 	public default Filter toFilter(String filterString) {
 		return toFilter(
 			filterString, Collections.<String, List<String>>emptyMap());
@@ -150,8 +147,10 @@ public interface OrderNoteResource {
 		return null;
 	}
 
-	public default Sort[] toSorts(String sortsString) {
-		return new Sort[0];
+	public static class FactoryHolder {
+
+		public static volatile Factory factory;
+
 	}
 
 	@ProviderType

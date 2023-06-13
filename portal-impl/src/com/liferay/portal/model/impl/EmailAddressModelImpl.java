@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -328,79 +329,101 @@ public class EmailAddressModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<EmailAddress, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, EmailAddress>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<EmailAddress, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<EmailAddress, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			EmailAddress.class.getClassLoader(), EmailAddress.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", EmailAddress::getMvccVersion);
-		attributeGetterFunctions.put("uuid", EmailAddress::getUuid);
-		attributeGetterFunctions.put(
-			"emailAddressId", EmailAddress::getEmailAddressId);
-		attributeGetterFunctions.put("companyId", EmailAddress::getCompanyId);
-		attributeGetterFunctions.put("userId", EmailAddress::getUserId);
-		attributeGetterFunctions.put("userName", EmailAddress::getUserName);
-		attributeGetterFunctions.put("createDate", EmailAddress::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", EmailAddress::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", EmailAddress::getClassNameId);
-		attributeGetterFunctions.put("classPK", EmailAddress::getClassPK);
-		attributeGetterFunctions.put("address", EmailAddress::getAddress);
-		attributeGetterFunctions.put("typeId", EmailAddress::getTypeId);
-		attributeGetterFunctions.put("primary", EmailAddress::getPrimary);
+		try {
+			Constructor<EmailAddress> constructor =
+				(Constructor<EmailAddress>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<EmailAddress, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<EmailAddress, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<EmailAddress, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<EmailAddress, Object>>();
 		Map<String, BiConsumer<EmailAddress, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<EmailAddress, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", EmailAddress::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<EmailAddress, Long>)EmailAddress::setMvccVersion);
+		attributeGetterFunctions.put("uuid", EmailAddress::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<EmailAddress, String>)EmailAddress::setUuid);
+		attributeGetterFunctions.put(
+			"emailAddressId", EmailAddress::getEmailAddressId);
 		attributeSetterBiConsumers.put(
 			"emailAddressId",
 			(BiConsumer<EmailAddress, Long>)EmailAddress::setEmailAddressId);
+		attributeGetterFunctions.put("companyId", EmailAddress::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<EmailAddress, Long>)EmailAddress::setCompanyId);
+		attributeGetterFunctions.put("userId", EmailAddress::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<EmailAddress, Long>)EmailAddress::setUserId);
+		attributeGetterFunctions.put("userName", EmailAddress::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<EmailAddress, String>)EmailAddress::setUserName);
+		attributeGetterFunctions.put("createDate", EmailAddress::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<EmailAddress, Date>)EmailAddress::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", EmailAddress::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<EmailAddress, Date>)EmailAddress::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", EmailAddress::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<EmailAddress, Long>)EmailAddress::setClassNameId);
+		attributeGetterFunctions.put("classPK", EmailAddress::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<EmailAddress, Long>)EmailAddress::setClassPK);
+		attributeGetterFunctions.put("address", EmailAddress::getAddress);
 		attributeSetterBiConsumers.put(
 			"address",
 			(BiConsumer<EmailAddress, String>)EmailAddress::setAddress);
+		attributeGetterFunctions.put("typeId", EmailAddress::getTypeId);
 		attributeSetterBiConsumers.put(
 			"typeId", (BiConsumer<EmailAddress, Long>)EmailAddress::setTypeId);
+		attributeGetterFunctions.put("primary", EmailAddress::getPrimary);
 		attributeSetterBiConsumers.put(
 			"primary",
 			(BiConsumer<EmailAddress, Boolean>)EmailAddress::setPrimary);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -803,6 +826,37 @@ public class EmailAddressModelImpl
 	}
 
 	@Override
+	public EmailAddress cloneWithOriginalValues() {
+		EmailAddressImpl emailAddressImpl = new EmailAddressImpl();
+
+		emailAddressImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		emailAddressImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		emailAddressImpl.setEmailAddressId(
+			this.<Long>getColumnOriginalValue("emailAddressId"));
+		emailAddressImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		emailAddressImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		emailAddressImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		emailAddressImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		emailAddressImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		emailAddressImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		emailAddressImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		emailAddressImpl.setAddress(
+			this.<String>getColumnOriginalValue("address"));
+		emailAddressImpl.setTypeId(this.<Long>getColumnOriginalValue("typeId"));
+		emailAddressImpl.setPrimary(
+			this.<Boolean>getColumnOriginalValue("primary_"));
+
+		return emailAddressImpl;
+	}
+
+	@Override
 	public int compareTo(EmailAddress emailAddress) {
 		int value = 0;
 
@@ -1019,9 +1073,7 @@ public class EmailAddressModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, EmailAddress>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					EmailAddress.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

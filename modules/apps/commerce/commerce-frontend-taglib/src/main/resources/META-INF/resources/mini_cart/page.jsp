@@ -23,6 +23,8 @@
 		cartActionURLs: {
 			checkoutURL: '<%= HtmlUtil.escapeJS(checkoutURL) %>',
 			orderDetailURL: '<%= HtmlUtil.escapeJS(orderDetailURL) %>',
+			productURLSeparator: '<%= HtmlUtil.escapeJS(productURLSeparator) %>',
+			siteDefaultURL: '<%= HtmlUtil.escapeJS(siteDefaultURL) %>',
 		},
 		displayDiscountLevels: <%= displayDiscountLevels %>,
 		displayTotalItemsQuantity: <%= displayTotalItemsQuantity %>,

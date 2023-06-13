@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -46,6 +44,7 @@ import com.liferay.saml.persistence.service.SamlIdpSsoSessionLocalServiceUtil;
 import com.liferay.saml.persistence.service.persistence.SamlIdpSpConnectionPersistence;
 import com.liferay.saml.persistence.service.persistence.SamlIdpSpSessionPersistence;
 import com.liferay.saml.persistence.service.persistence.SamlIdpSsoSessionPersistence;
+import com.liferay.saml.persistence.service.persistence.SamlPeerBindingPersistence;
 import com.liferay.saml.persistence.service.persistence.SamlSpAuthRequestPersistence;
 import com.liferay.saml.persistence.service.persistence.SamlSpIdpConnectionPersistence;
 import com.liferay.saml.persistence.service.persistence.SamlSpMessagePersistence;
@@ -320,6 +319,7 @@ public abstract class SamlIdpSsoSessionLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -338,6 +338,7 @@ public abstract class SamlIdpSsoSessionLocalServiceBaseImpl
 			(SamlIdpSsoSession)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<SamlIdpSsoSession> getBasePersistence() {
 		return samlIdpSsoSessionPersistence;
 	}
@@ -488,6 +489,9 @@ public abstract class SamlIdpSsoSessionLocalServiceBaseImpl
 	protected SamlIdpSsoSessionPersistence samlIdpSsoSessionPersistence;
 
 	@Reference
+	protected SamlPeerBindingPersistence samlPeerBindingPersistence;
+
+	@Reference
 	protected SamlSpAuthRequestPersistence samlSpAuthRequestPersistence;
 
 	@Reference
@@ -514,8 +518,5 @@ public abstract class SamlIdpSsoSessionLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.portal.kernel.service.UserLocalService
 		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SamlIdpSsoSessionLocalServiceBaseImpl.class);
 
 }

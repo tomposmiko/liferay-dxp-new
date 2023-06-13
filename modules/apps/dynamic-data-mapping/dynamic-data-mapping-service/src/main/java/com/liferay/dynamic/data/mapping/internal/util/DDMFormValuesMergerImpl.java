@@ -20,7 +20,9 @@ import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.DDMFormValuesMerger;
+import com.liferay.dynamic.data.mapping.util.NumericDDMFormFieldUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.text.DecimalFormat;
 
@@ -29,7 +31,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
@@ -42,8 +43,7 @@ public class DDMFormValuesMergerImpl implements DDMFormValuesMerger {
 
 	@Override
 	public DDMFormValues merge(
-		DDMForm ddmForm, DDMFormValues newDDMFormValues,
-		DDMFormValues existingDDMFormValues) {
+		DDMFormValues newDDMFormValues, DDMFormValues existingDDMFormValues) {
 
 		List<DDMFormFieldValue> newDDMFormFieldValues = new ArrayList<>(
 			newDDMFormValues.getDDMFormFieldValues());
@@ -57,19 +57,12 @@ public class DDMFormValuesMergerImpl implements DDMFormValuesMerger {
 
 		List<DDMFormFieldValue> mergedDDMFormFieldValues =
 			mergeDDMFormFieldValues(
-				ddmForm, newDDMFormFieldValues,
+				newDDMFormFieldValues,
 				existingDDMFormValues.getDDMFormFieldValues());
 
 		existingDDMFormValues.setDDMFormFieldValues(mergedDDMFormFieldValues);
 
 		return existingDDMFormValues;
-	}
-
-	@Override
-	public DDMFormValues merge(
-		DDMFormValues newDDMFormValues, DDMFormValues existingDDMFormValues) {
-
-		return merge(null, newDDMFormValues, existingDDMFormValues);
 	}
 
 	protected DDMFormFieldValue getDDMFormFieldValueByName(
@@ -85,7 +78,7 @@ public class DDMFormValuesMergerImpl implements DDMFormValuesMerger {
 	}
 
 	protected List<DDMFormFieldValue> mergeDDMFormFieldValues(
-		DDMForm ddmForm, List<DDMFormFieldValue> newDDMFormFieldValues,
+		List<DDMFormFieldValue> newDDMFormFieldValues,
 		List<DDMFormFieldValue> existingDDMFormFieldValues) {
 
 		List<DDMFormFieldValue> mergedDDMFormFieldValues = new ArrayList<>(
@@ -100,9 +93,7 @@ public class DDMFormValuesMergerImpl implements DDMFormValuesMerger {
 					existingDDMFormFieldValues, newDDMFormFieldValue.getName());
 
 			if (actualDDMFormFieldValue != null) {
-				if (ddmForm == null) {
-					ddmForm = ddmFormValues.getDDMForm();
-				}
+				DDMForm ddmForm = ddmFormValues.getDDMForm();
 
 				Map<String, DDMFormField> ddmFormFieldsMap =
 					ddmForm.getDDMFormFieldsMap(true);
@@ -128,7 +119,6 @@ public class DDMFormValuesMergerImpl implements DDMFormValuesMerger {
 
 				List<DDMFormFieldValue> mergedNestedDDMFormFieldValues =
 					mergeDDMFormFieldValues(
-						null,
 						newDDMFormFieldValue.getNestedDDMFormFieldValues(),
 						actualDDMFormFieldValue.getNestedDDMFormFieldValues());
 
@@ -155,14 +145,15 @@ public class DDMFormValuesMergerImpl implements DDMFormValuesMerger {
 		for (Locale locale : existingValue.getAvailableLocales()) {
 			String value = newValue.getString(locale);
 
-			String dataType = ddmFormField.getDataType();
+			if (StringUtil.equals(ddmFormField.getDataType(), "double") &&
+				!GetterUtil.getBoolean(ddmFormField.getProperty("inputMask"))) {
 
-			if (dataType.equals("double")) {
-				DecimalFormat numberFormat = _getDecimalFormat(locale);
+				DecimalFormat decimalFormat =
+					NumericDDMFormFieldUtil.getDecimalFormat(locale);
 
 				newValue.addString(
 					locale,
-					numberFormat.format(
+					decimalFormat.format(
 						GetterUtil.getDouble(
 							value, newValue.getDefaultLocale())));
 			}
@@ -172,24 +163,5 @@ public class DDMFormValuesMergerImpl implements DDMFormValuesMerger {
 			}
 		}
 	}
-
-	private DecimalFormat _getDecimalFormat(Locale locale) {
-		DecimalFormat formatter = _decimalFormattersMap.get(locale);
-
-		if (formatter == null) {
-			formatter = (DecimalFormat)DecimalFormat.getInstance(locale);
-
-			formatter.setGroupingUsed(false);
-			formatter.setMaximumFractionDigits(Integer.MAX_VALUE);
-			formatter.setParseBigDecimal(true);
-
-			_decimalFormattersMap.put(locale, formatter);
-		}
-
-		return formatter;
-	}
-
-	private static final Map<Locale, DecimalFormat> _decimalFormattersMap =
-		new ConcurrentHashMap<>();
 
 }

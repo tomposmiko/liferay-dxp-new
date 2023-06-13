@@ -22,11 +22,8 @@ import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
-import com.liferay.fragment.service.persistence.FragmentCollectionPersistence;
-import com.liferay.fragment.service.persistence.FragmentEntryFinder;
 import com.liferay.fragment.service.persistence.FragmentEntryLinkFinder;
 import com.liferay.fragment.service.persistence.FragmentEntryLinkPersistence;
-import com.liferay.fragment.service.persistence.FragmentEntryPersistence;
 import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
@@ -45,8 +42,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -438,6 +433,7 @@ public abstract class FragmentEntryLinkLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -456,6 +452,7 @@ public abstract class FragmentEntryLinkLocalServiceBaseImpl
 			(FragmentEntryLink)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<FragmentEntryLink> getBasePersistence() {
 		return fragmentEntryLinkPersistence;
 	}
@@ -669,21 +666,5 @@ public abstract class FragmentEntryLinkLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected FragmentCollectionPersistence fragmentCollectionPersistence;
-
-	@Reference
-	protected FragmentEntryPersistence fragmentEntryPersistence;
-
-	@Reference
-	protected FragmentEntryFinder fragmentEntryFinder;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		FragmentEntryLinkLocalServiceBaseImpl.class);
 
 }

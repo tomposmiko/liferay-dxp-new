@@ -34,7 +34,9 @@ public class BlogsEntrySoap implements Serializable {
 		BlogsEntrySoap soapModel = new BlogsEntrySoap();
 
 		soapModel.setMvccVersion(model.getMvccVersion());
+		soapModel.setCtCollectionId(model.getCtCollectionId());
 		soapModel.setUuid(model.getUuid());
+		soapModel.setExternalReferenceCode(model.getExternalReferenceCode());
 		soapModel.setEntryId(model.getEntryId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
@@ -124,12 +126,28 @@ public class BlogsEntrySoap implements Serializable {
 		_mvccVersion = mvccVersion;
 	}
 
+	public long getCtCollectionId() {
+		return _ctCollectionId;
+	}
+
+	public void setCtCollectionId(long ctCollectionId) {
+		_ctCollectionId = ctCollectionId;
+	}
+
 	public String getUuid() {
 		return _uuid;
 	}
 
 	public void setUuid(String uuid) {
 		_uuid = uuid;
+	}
+
+	public String getExternalReferenceCode() {
+		return _externalReferenceCode;
+	}
+
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		_externalReferenceCode = externalReferenceCode;
 	}
 
 	public long getEntryId() {
@@ -369,7 +387,9 @@ public class BlogsEntrySoap implements Serializable {
 	}
 
 	private long _mvccVersion;
+	private long _ctCollectionId;
 	private String _uuid;
+	private String _externalReferenceCode;
 	private long _entryId;
 	private long _groupId;
 	private long _companyId;

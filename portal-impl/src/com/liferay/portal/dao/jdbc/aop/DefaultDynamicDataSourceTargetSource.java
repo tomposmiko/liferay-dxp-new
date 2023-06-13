@@ -29,9 +29,7 @@ import org.springframework.aop.TargetSource;
 
 /**
  * @author Michael Young
- * @deprecated As of Athanasius (7.3.x), with no direct replacement
  */
-@Deprecated
 public class DefaultDynamicDataSourceTargetSource
 	implements DynamicDataSourceTargetSource, TargetSource {
 

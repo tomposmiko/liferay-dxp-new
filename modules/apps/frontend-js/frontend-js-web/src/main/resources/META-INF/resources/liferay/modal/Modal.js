@@ -15,19 +15,24 @@
 import ClayButton from '@clayui/button';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import ClayModal, {useModal} from '@clayui/modal';
+import {render} from '@liferay/frontend-js-react-web';
 import classNames from 'classnames';
-import {render} from 'frontend-js-react-web';
-import dom from 'metal-dom';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import './Modal.scss';
+import delegate from '../delegate/delegate.es';
 import navigate from '../util/navigate.es';
 
 const Modal = ({
 	bodyHTML,
 	buttons,
+	containerProps = {
+		className: 'cadmin',
+	},
 	customEvents,
+	footerCssClass,
+	headerCssClass,
 	headerHTML,
 	height,
 	id,
@@ -36,6 +41,7 @@ const Modal = ({
 	onClose,
 	onOpen,
 	size,
+	status,
 	title,
 	url,
 	zIndex,
@@ -170,12 +176,14 @@ const Modal = ({
 			{visible && (
 				<ClayModal
 					className="liferay-modal"
+					containerProps={{...containerProps}}
 					id={id}
 					observer={observer}
 					size={url && !size ? 'full-screen' : size}
+					status={status}
 					zIndex={zIndex}
 				>
-					<ClayModal.Header>
+					<ClayModal.Header className={headerCssClass}>
 						{headerHTML ? (
 							<div
 								dangerouslySetInnerHTML={{
@@ -186,6 +194,7 @@ const Modal = ({
 							title
 						)}
 					</ClayModal.Header>
+
 					<div
 						className={classNames('modal-body', {
 							'modal-body-iframe': url,
@@ -216,8 +225,10 @@ const Modal = ({
 							<>{bodyHTML && <Body html={bodyHTML} />}</>
 						)}
 					</div>
+
 					{buttons && (
 						<ClayModal.Footer
+							className={footerCssClass}
 							last={
 								<ClayButton.Group spaced>
 									{buttons.map((button, index) => (
@@ -266,6 +277,9 @@ const openModal = (props) => {
 };
 
 const openPortletModal = ({
+	containerProps,
+	footerCssClass,
+	headerCssClass,
 	iframeBodyCssClass,
 	onClose,
 	portletSelector,
@@ -302,6 +316,9 @@ const openPortletModal = ({
 		}
 
 		openModal({
+			containerProps,
+			footerCssClass,
+			headerCssClass,
 			headerHTML,
 			iframeBodyCssClass,
 			onClose,
@@ -328,10 +345,11 @@ const openPortletWindow = ({bodyCssClass, portlet, uri, ...otherProps}) => {
 const openSelectionModal = ({
 	buttonAddLabel = Liferay.Language.get('add'),
 	buttonCancelLabel = Liferay.Language.get('cancel'),
+	containerProps,
 	customSelectEvent = false,
-	getSelectedItemsOnly = true,
 	height,
 	id,
+	iframeBodyCssClass,
 	multiple = false,
 	onClose,
 	onSelect,
@@ -356,9 +374,7 @@ const openSelectionModal = ({
 			if (searchContainer) {
 				iframeWindowObj.Liferay.componentReady(searchContainer.id).then(
 					(searchContainer) => {
-						const allSelectedElements = getSelectedItemsOnly
-							? searchContainer.select.getAllSelectedElements()
-							: searchContainer.select._getAllElements(false);
+						const allSelectedElements = searchContainer.select.getAllSelectedElements();
 
 						const allSelectedNodes = allSelectedElements.getDOMNodes();
 
@@ -370,11 +386,7 @@ const openSelectionModal = ({
 									item.value = node.value;
 								}
 
-								if (!getSelectedItemsOnly && node.checked) {
-									item.checked = node.checked;
-								}
-
-								const row = node.closest('dd, tr, li');
+								const row = node.closest('tr, li');
 
 								if (row && Object.keys(row.dataset).length) {
 									item = {...item, ...row.dataset};
@@ -410,8 +422,10 @@ const openSelectionModal = ({
 					},
 			  ]
 			: null,
+		containerProps,
 		height,
 		id: id || selectEventName,
+		iframeBodyCssClass,
 		onClose: () => {
 			eventHandlers.forEach((eventHandler) => {
 				eventHandler.detach();
@@ -443,6 +457,11 @@ const openSelectionModal = ({
 
 					if (selectedDataSet.has(itemId)) {
 						itemElement.disabled = true;
+						itemElement.classList.add('disabled');
+					}
+					else {
+						itemElement.disabled = false;
+						itemElement.classList.remove('disabled');
 					}
 				});
 			}
@@ -496,11 +515,10 @@ class Iframe extends React.Component {
 
 		const namespace = iframeURL.searchParams.get('p_p_id');
 
-		let bodyCssClass = CSS_CLASS_IFRAME_BODY;
-
-		if (props.iframeBodyCssClass) {
-			bodyCssClass = `${bodyCssClass} ${props.iframeBodyCssClass}`;
-		}
+		const bodyCssClass =
+			props.iframeBodyCssClass || props.iframeBodyCssClass === ''
+				? `${CSS_CLASS_IFRAME_BODY} ${props.iframeBodyCssClass}`
+				: `cadmin ${CSS_CLASS_IFRAME_BODY}`;
 
 		iframeURL.searchParams.set(`_${namespace}_bodyCssClass`, bodyCssClass);
 
@@ -513,14 +531,14 @@ class Iframe extends React.Component {
 		}
 
 		if (this.delegateHandler) {
-			this.delegateHandler.removeListener();
+			this.delegateHandler.dispose();
 		}
 	}
 
 	onLoadHandler = () => {
 		const iframeWindow = this.iframeRef.current.contentWindow;
 
-		this.delegateHandler = dom.delegate(
+		this.delegateHandler = delegate(
 			iframeWindow.document,
 			'click',
 			'.btn-cancel,.lfr-hide-dialog',
@@ -586,6 +604,7 @@ Modal.propTypes = {
 			type: PropTypes.oneOf(['cancel', 'submit']),
 		})
 	),
+	containerProps: PropTypes.object,
 	customEvents: PropTypes.arrayOf(
 		PropTypes.shape({
 			name: PropTypes.string,

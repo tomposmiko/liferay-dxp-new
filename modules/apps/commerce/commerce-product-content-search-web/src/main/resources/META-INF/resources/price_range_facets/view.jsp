@@ -75,7 +75,7 @@ CPPriceRangeFacetsDisplayContext cpPriceRangeFacetsDisplayContext = (CPPriceRang
 								<aui:input cssClass="start-parameter-name" name="start-parameter-name" type="hidden" value="<%= cpPriceRangeFacetsDisplayContext.getPaginationStartParameterName() %>" />
 
 								<aui:fieldset>
-									<ul class="asset-type list-unstyled">
+									<ul class="list-unstyled">
 
 									<%
 									int i = 0;
@@ -85,25 +85,27 @@ CPPriceRangeFacetsDisplayContext cpPriceRangeFacetsDisplayContext = (CPPriceRang
 									%>
 
 									<li class="facet-value">
-										<label class="facet-checkbox-label" for="<portlet:namespace />term_<%= facet.getFieldName() + i %>">
-											<input
-												class="facet-term"
-												data-term-id="<%= HtmlUtil.escapeAttribute(termCollector.getTerm()) %>"
-												id="<portlet:namespace />term_<%= facet.getFieldName() + i %>"
-												name="<portlet:namespace />term_<%= facet.getFieldName() + i %>"
-												onChange="Liferay.Search.FacetUtil.changeSelection(event);"
-												type="checkbox"
-												<%= cpPriceRangeFacetsDisplayContext.isCPPriceRangeValueSelected(facet.getFieldName(), termCollector.getTerm()) ? "checked" : "" %>
-											/>
+										<div class="custom-checkbox custom-control">
+											<label class="facet-checkbox-label" for="<portlet:namespace />term_<%= facet.getFieldName() + i %>">
+												<input
+													class="custom-control-input facet-term"
+													data-term-id="<%= HtmlUtil.escapeAttribute(termCollector.getTerm()) %>"
+													id="<portlet:namespace />term_<%= facet.getFieldName() + i %>"
+													name="<portlet:namespace />term_<%= facet.getFieldName() + i %>"
+													onChange="Liferay.Search.FacetUtil.changeSelection(event);"
+													type="checkbox"
+													<%= cpPriceRangeFacetsDisplayContext.isCPPriceRangeValueSelected(facet.getFieldName(), termCollector.getTerm()) ? "checked" : "" %>
+												/>
 
-											<span class="term-name">
-												<%= cpPriceRangeFacetsDisplayContext.getPriceRangeLabel(termCollector.getTerm()) %>
-											</span>
+												<span class="custom-control-label term-name <%= cpPriceRangeFacetsDisplayContext.isCPPriceRangeValueSelected(facet.getFieldName(), termCollector.getTerm()) ? "facet-term-selected" : "facet-term-unselected" %>">
+													<span class="custom-control-label-text"><%= cpPriceRangeFacetsDisplayContext.getPriceRangeLabel(termCollector.getTerm()) %></span>
+												</span>
 
-											<small class="term-count">
-												(<%= termCollector.getFrequency() %>)
-											</small>
-										</label>
+												<small class="term-count">
+													(<%= termCollector.getFrequency() %>)
+												</small>
+											</label>
+										</div>
 									</li>
 
 									<%
@@ -130,12 +132,12 @@ CPPriceRangeFacetsDisplayContext cpPriceRangeFacetsDisplayContext = (CPPriceRang
 						<aui:input cssClass="price-range-input" label="<%= StringPool.BLANK %>" name="maximum" prefix="<%= HtmlUtil.escape(cpPriceRangeFacetsDisplayContext.getCurrentCommerceCurrencySymbol()) %>" type="number" value="<%= max %>" wrapperCssClass="col-md-5 price-range-input-wrapper" />
 
 						<div class="col-md-3 ml-2 p-0">
-							<button class="btn btn-secondary price-range-btn" onclick="<portlet:namespace />submitPriceRange();"><liferay-ui:message key="go" /></button>
+							<button class="btn btn-secondary price-range-btn" onclick="<%= liferayPortletResponse.getNamespace() + "submitPriceRange();" %>"><liferay-ui:message key="go" /></button>
 						</div>
 					</div>
 
 					<aui:script>
-						Liferay.provide(window, '<portlet:namespace />submitPriceRange', function () {
+						Liferay.provide(window, '<portlet:namespace />submitPriceRange', () => {
 							var max = document.getElementById('<portlet:namespace />maximum').value;
 
 							if (max == '') {

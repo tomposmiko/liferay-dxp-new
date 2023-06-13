@@ -14,6 +14,8 @@
 
 package com.liferay.portal.search.web.internal.search.bar.portlet.shared.search;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -28,7 +30,7 @@ import com.liferay.portal.search.web.internal.display.context.SearchScopePrefere
 import com.liferay.portal.search.web.internal.search.bar.portlet.SearchBarPortletDestinationUtil;
 import com.liferay.portal.search.web.internal.search.bar.portlet.SearchBarPortletPreferences;
 import com.liferay.portal.search.web.internal.search.bar.portlet.SearchBarPortletPreferencesImpl;
-import com.liferay.portal.search.web.internal.search.bar.portlet.SearchBarPrecedenceHelper;
+import com.liferay.portal.search.web.internal.search.bar.portlet.helper.SearchBarPrecedenceHelper;
 import com.liferay.portal.search.web.internal.util.SearchOptionalUtil;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchContributor;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchSettings;
@@ -93,11 +95,11 @@ public class SearchBarPortletSharedSearchContributor
 		SearchScope searchScope = getSearchScope(
 			searchBarPortletPreferences, portletSharedSearchSettings);
 
-		searchRequestBuilder.withSearchContext(
-			searchContext -> searchContext.setGroupIds(
-				getGroupIds(portletSharedSearchSettings, searchScope)));
-
 		if (searchScope == SearchScope.THIS_SITE) {
+			searchRequestBuilder.withSearchContext(
+				searchContext -> searchContext.setGroupIds(
+					getGroupIds(portletSharedSearchSettings)));
+
 			return;
 		}
 
@@ -126,8 +128,7 @@ public class SearchBarPortletSharedSearchContributor
 	}
 
 	protected long[] getGroupIds(
-		PortletSharedSearchSettings portletSharedSearchSettings,
-		SearchScope searchScope) {
+		PortletSharedSearchSettings portletSharedSearchSettings) {
 
 		ThemeDisplay themeDisplay =
 			portletSharedSearchSettings.getThemeDisplay();
@@ -135,25 +136,23 @@ public class SearchBarPortletSharedSearchContributor
 		try {
 			List<Long> groupIds = new ArrayList<>();
 
-			if (searchScope == SearchScope.THIS_SITE) {
-				groupIds.add(themeDisplay.getScopeGroupId());
+			groupIds.add(themeDisplay.getScopeGroupId());
 
-				List<Group> groups = groupLocalService.getGroups(
-					themeDisplay.getCompanyId(), Layout.class.getName(),
-					themeDisplay.getScopeGroupId());
+			List<Group> groups = groupLocalService.getGroups(
+				themeDisplay.getCompanyId(), Layout.class.getName(),
+				themeDisplay.getScopeGroupId());
 
-				for (Group group : groups) {
-					groupIds.add(group.getGroupId());
-				}
-			}
-			else {
-				groupIds = groupLocalService.getGroupIds(
-					themeDisplay.getCompanyId(), true);
+			for (Group group : groups) {
+				groupIds.add(group.getGroupId());
 			}
 
 			return ArrayUtil.toLongArray(groupIds);
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return new long[] {themeDisplay.getScopeGroupId()};
 		}
 	}
@@ -240,12 +239,8 @@ public class SearchBarPortletSharedSearchContributor
 
 		if (!SearchBarPortletDestinationUtil.isSameDestination(
 				searchBarPortletPreferences,
-				portletSharedSearchSettings.getThemeDisplay())) {
-
-			return false;
-		}
-
-		if (searchBarPrecedenceHelper.
+				portletSharedSearchSettings.getThemeDisplay()) ||
+			searchBarPrecedenceHelper.
 				isSearchBarInBodyWithHeaderSearchBarAlreadyPresent(
 					portletSharedSearchSettings.getThemeDisplay(),
 					portletSharedSearchSettings.getPortletId())) {
@@ -261,5 +256,8 @@ public class SearchBarPortletSharedSearchContributor
 
 	@Reference
 	protected SearchBarPrecedenceHelper searchBarPrecedenceHelper;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		SearchBarPortletSharedSearchContributor.class);
 
 }

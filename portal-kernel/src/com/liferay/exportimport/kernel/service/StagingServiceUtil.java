@@ -51,6 +51,28 @@ public class StagingServiceUtil {
 		return getService().createStagingRequest(groupId, checksum);
 	}
 
+	public static void enableLocalStaging(
+			long groupId, boolean branchingPublic, boolean branchingPrivate,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		getService().enableLocalStaging(
+			groupId, branchingPublic, branchingPrivate, serviceContext);
+	}
+
+	public static void enableRemoteStaging(
+			long groupId, boolean branchingPublic, boolean branchingPrivate,
+			String remoteAddress, int remotePort, String remotePathContext,
+			boolean secureConnection, long remoteGroupId,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		getService().enableRemoteStaging(
+			groupId, branchingPublic, branchingPrivate, remoteAddress,
+			remotePort, remotePathContext, secureConnection, remoteGroupId,
+			serviceContext);
+	}
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *

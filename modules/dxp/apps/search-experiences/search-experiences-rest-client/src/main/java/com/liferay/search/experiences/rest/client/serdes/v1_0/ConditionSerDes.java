@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -251,34 +252,26 @@ public class ConditionSerDes {
 
 			if (Objects.equals(jsonParserFieldName, "allConditions")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Condition[] allConditionsArray =
-						new Condition[jsonParserFieldValues.length];
-
-					for (int i = 0; i < allConditionsArray.length; i++) {
-						allConditionsArray[i] = ConditionSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					condition.setAllConditions(allConditionsArray);
+					condition.setAllConditions(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> ConditionSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Condition[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "anyConditions")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					Condition[] anyConditionsArray =
-						new Condition[jsonParserFieldValues.length];
-
-					for (int i = 0; i < anyConditionsArray.length; i++) {
-						anyConditionsArray[i] = ConditionSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					condition.setAnyConditions(anyConditionsArray);
+					condition.setAnyConditions(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> ConditionSerDes.toDTO((String)object)
+						).toArray(
+							size -> new Condition[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "contains")) {

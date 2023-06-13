@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -77,7 +78,8 @@ public class CalendarNotificationTemplateModelImpl
 	public static final String TABLE_NAME = "CalendarNotificationTemplate";
 
 	public static final Object[][] TABLE_COLUMNS = {
-		{"mvccVersion", Types.BIGINT}, {"uuid_", Types.VARCHAR},
+		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
+		{"uuid_", Types.VARCHAR},
 		{"calendarNotificationTemplateId", Types.BIGINT},
 		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
@@ -93,6 +95,7 @@ public class CalendarNotificationTemplateModelImpl
 
 	static {
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("calendarNotificationTemplateId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
@@ -111,7 +114,7 @@ public class CalendarNotificationTemplateModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table CalendarNotificationTemplate (mvccVersion LONG default 0 not null,uuid_ VARCHAR(75) null,calendarNotificationTemplateId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,calendarId LONG,notificationType VARCHAR(75) null,notificationTypeSettings VARCHAR(200) null,notificationTemplateType VARCHAR(75) null,subject VARCHAR(75) null,body TEXT null,lastPublishDate DATE null)";
+		"create table CalendarNotificationTemplate (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,uuid_ VARCHAR(75) null,calendarNotificationTemplateId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,calendarId LONG,notificationType VARCHAR(75) null,notificationTypeSettings VARCHAR(200) null,notificationTemplateType VARCHAR(75) null,subject VARCHAR(75) null,body TEXT null,lastPublishDate DATE null,primary key (calendarNotificationTemplateId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table CalendarNotificationTemplate";
@@ -205,6 +208,7 @@ public class CalendarNotificationTemplateModelImpl
 			new CalendarNotificationTemplateImpl();
 
 		model.setMvccVersion(soapModel.getMvccVersion());
+		model.setCtCollectionId(soapModel.getCtCollectionId());
 		model.setUuid(soapModel.getUuid());
 		model.setCalendarNotificationTemplateId(
 			soapModel.getCalendarNotificationTemplateId());
@@ -339,134 +343,162 @@ public class CalendarNotificationTemplateModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, CalendarNotificationTemplate>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CalendarNotificationTemplate.class.getClassLoader(),
+			CalendarNotificationTemplate.class, ModelWrapper.class);
+
+		try {
+			Constructor<CalendarNotificationTemplate> constructor =
+				(Constructor<CalendarNotificationTemplate>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map
 		<String, Function<CalendarNotificationTemplate, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<CalendarNotificationTemplate, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CalendarNotificationTemplate, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CalendarNotificationTemplate, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", CalendarNotificationTemplate::getMvccVersion);
-		attributeGetterFunctions.put(
-			"uuid", CalendarNotificationTemplate::getUuid);
-		attributeGetterFunctions.put(
-			"calendarNotificationTemplateId",
-			CalendarNotificationTemplate::getCalendarNotificationTemplateId);
-		attributeGetterFunctions.put(
-			"groupId", CalendarNotificationTemplate::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CalendarNotificationTemplate::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CalendarNotificationTemplate::getUserId);
-		attributeGetterFunctions.put(
-			"userName", CalendarNotificationTemplate::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", CalendarNotificationTemplate::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CalendarNotificationTemplate::getModifiedDate);
-		attributeGetterFunctions.put(
-			"calendarId", CalendarNotificationTemplate::getCalendarId);
-		attributeGetterFunctions.put(
-			"notificationType",
-			CalendarNotificationTemplate::getNotificationType);
-		attributeGetterFunctions.put(
-			"notificationTypeSettings",
-			CalendarNotificationTemplate::getNotificationTypeSettings);
-		attributeGetterFunctions.put(
-			"notificationTemplateType",
-			CalendarNotificationTemplate::getNotificationTemplateType);
-		attributeGetterFunctions.put(
-			"subject", CalendarNotificationTemplate::getSubject);
-		attributeGetterFunctions.put(
-			"body", CalendarNotificationTemplate::getBody);
-		attributeGetterFunctions.put(
-			"lastPublishDate",
-			CalendarNotificationTemplate::getLastPublishDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<CalendarNotificationTemplate, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<CalendarNotificationTemplate, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CalendarNotificationTemplate, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", CalendarNotificationTemplate::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<CalendarNotificationTemplate, Long>)
 				CalendarNotificationTemplate::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CalendarNotificationTemplate::getCtCollectionId);
+		attributeSetterBiConsumers.put(
+			"ctCollectionId",
+			(BiConsumer<CalendarNotificationTemplate, Long>)
+				CalendarNotificationTemplate::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"uuid", CalendarNotificationTemplate::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CalendarNotificationTemplate, String>)
 				CalendarNotificationTemplate::setUuid);
+		attributeGetterFunctions.put(
+			"calendarNotificationTemplateId",
+			CalendarNotificationTemplate::getCalendarNotificationTemplateId);
 		attributeSetterBiConsumers.put(
 			"calendarNotificationTemplateId",
 			(BiConsumer<CalendarNotificationTemplate, Long>)
 				CalendarNotificationTemplate::
 					setCalendarNotificationTemplateId);
+		attributeGetterFunctions.put(
+			"groupId", CalendarNotificationTemplate::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CalendarNotificationTemplate, Long>)
 				CalendarNotificationTemplate::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CalendarNotificationTemplate::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CalendarNotificationTemplate, Long>)
 				CalendarNotificationTemplate::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CalendarNotificationTemplate::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CalendarNotificationTemplate, Long>)
 				CalendarNotificationTemplate::setUserId);
+		attributeGetterFunctions.put(
+			"userName", CalendarNotificationTemplate::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CalendarNotificationTemplate, String>)
 				CalendarNotificationTemplate::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", CalendarNotificationTemplate::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CalendarNotificationTemplate, Date>)
 				CalendarNotificationTemplate::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CalendarNotificationTemplate::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CalendarNotificationTemplate, Date>)
 				CalendarNotificationTemplate::setModifiedDate);
+		attributeGetterFunctions.put(
+			"calendarId", CalendarNotificationTemplate::getCalendarId);
 		attributeSetterBiConsumers.put(
 			"calendarId",
 			(BiConsumer<CalendarNotificationTemplate, Long>)
 				CalendarNotificationTemplate::setCalendarId);
+		attributeGetterFunctions.put(
+			"notificationType",
+			CalendarNotificationTemplate::getNotificationType);
 		attributeSetterBiConsumers.put(
 			"notificationType",
 			(BiConsumer<CalendarNotificationTemplate, String>)
 				CalendarNotificationTemplate::setNotificationType);
+		attributeGetterFunctions.put(
+			"notificationTypeSettings",
+			CalendarNotificationTemplate::getNotificationTypeSettings);
 		attributeSetterBiConsumers.put(
 			"notificationTypeSettings",
 			(BiConsumer<CalendarNotificationTemplate, String>)
 				CalendarNotificationTemplate::setNotificationTypeSettings);
+		attributeGetterFunctions.put(
+			"notificationTemplateType",
+			CalendarNotificationTemplate::getNotificationTemplateType);
 		attributeSetterBiConsumers.put(
 			"notificationTemplateType",
 			(BiConsumer<CalendarNotificationTemplate, String>)
 				CalendarNotificationTemplate::setNotificationTemplateType);
+		attributeGetterFunctions.put(
+			"subject", CalendarNotificationTemplate::getSubject);
 		attributeSetterBiConsumers.put(
 			"subject",
 			(BiConsumer<CalendarNotificationTemplate, String>)
 				CalendarNotificationTemplate::setSubject);
+		attributeGetterFunctions.put(
+			"body", CalendarNotificationTemplate::getBody);
 		attributeSetterBiConsumers.put(
 			"body",
 			(BiConsumer<CalendarNotificationTemplate, String>)
 				CalendarNotificationTemplate::setBody);
+		attributeGetterFunctions.put(
+			"lastPublishDate",
+			CalendarNotificationTemplate::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<CalendarNotificationTemplate, Date>)
 				CalendarNotificationTemplate::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -484,6 +516,21 @@ public class CalendarNotificationTemplateModelImpl
 		}
 
 		_mvccVersion = mvccVersion;
+	}
+
+	@JSON
+	@Override
+	public long getCtCollectionId() {
+		return _ctCollectionId;
+	}
+
+	@Override
+	public void setCtCollectionId(long ctCollectionId) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_ctCollectionId = ctCollectionId;
 	}
 
 	@JSON
@@ -892,6 +939,7 @@ public class CalendarNotificationTemplateModelImpl
 			new CalendarNotificationTemplateImpl();
 
 		calendarNotificationTemplateImpl.setMvccVersion(getMvccVersion());
+		calendarNotificationTemplateImpl.setCtCollectionId(getCtCollectionId());
 		calendarNotificationTemplateImpl.setUuid(getUuid());
 		calendarNotificationTemplateImpl.setCalendarNotificationTemplateId(
 			getCalendarNotificationTemplateId());
@@ -914,6 +962,50 @@ public class CalendarNotificationTemplateModelImpl
 			getLastPublishDate());
 
 		calendarNotificationTemplateImpl.resetOriginalValues();
+
+		return calendarNotificationTemplateImpl;
+	}
+
+	@Override
+	public CalendarNotificationTemplate cloneWithOriginalValues() {
+		CalendarNotificationTemplateImpl calendarNotificationTemplateImpl =
+			new CalendarNotificationTemplateImpl();
+
+		calendarNotificationTemplateImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		calendarNotificationTemplateImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		calendarNotificationTemplateImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		calendarNotificationTemplateImpl.setCalendarNotificationTemplateId(
+			this.<Long>getColumnOriginalValue(
+				"calendarNotificationTemplateId"));
+		calendarNotificationTemplateImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		calendarNotificationTemplateImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		calendarNotificationTemplateImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		calendarNotificationTemplateImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		calendarNotificationTemplateImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		calendarNotificationTemplateImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		calendarNotificationTemplateImpl.setCalendarId(
+			this.<Long>getColumnOriginalValue("calendarId"));
+		calendarNotificationTemplateImpl.setNotificationType(
+			this.<String>getColumnOriginalValue("notificationType"));
+		calendarNotificationTemplateImpl.setNotificationTypeSettings(
+			this.<String>getColumnOriginalValue("notificationTypeSettings"));
+		calendarNotificationTemplateImpl.setNotificationTemplateType(
+			this.<String>getColumnOriginalValue("notificationTemplateType"));
+		calendarNotificationTemplateImpl.setSubject(
+			this.<String>getColumnOriginalValue("subject"));
+		calendarNotificationTemplateImpl.setBody(
+			this.<String>getColumnOriginalValue("body"));
+		calendarNotificationTemplateImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
 
 		return calendarNotificationTemplateImpl;
 	}
@@ -997,6 +1089,9 @@ public class CalendarNotificationTemplateModelImpl
 				new CalendarNotificationTemplateCacheModel();
 
 		calendarNotificationTemplateCacheModel.mvccVersion = getMvccVersion();
+
+		calendarNotificationTemplateCacheModel.ctCollectionId =
+			getCtCollectionId();
 
 		calendarNotificationTemplateCacheModel.uuid = getUuid();
 
@@ -1200,12 +1295,12 @@ public class CalendarNotificationTemplateModelImpl
 		private static final Function
 			<InvocationHandler, CalendarNotificationTemplate>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						CalendarNotificationTemplate.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 
 	private long _mvccVersion;
+	private long _ctCollectionId;
 	private String _uuid;
 	private long _calendarNotificationTemplateId;
 	private long _groupId;
@@ -1253,6 +1348,7 @@ public class CalendarNotificationTemplateModelImpl
 		_columnOriginalValues = new HashMap<String, Object>();
 
 		_columnOriginalValues.put("mvccVersion", _mvccVersion);
+		_columnOriginalValues.put("ctCollectionId", _ctCollectionId);
 		_columnOriginalValues.put("uuid_", _uuid);
 		_columnOriginalValues.put(
 			"calendarNotificationTemplateId", _calendarNotificationTemplateId);
@@ -1296,35 +1392,37 @@ public class CalendarNotificationTemplateModelImpl
 
 		columnBitmasks.put("mvccVersion", 1L);
 
-		columnBitmasks.put("uuid_", 2L);
+		columnBitmasks.put("ctCollectionId", 2L);
 
-		columnBitmasks.put("calendarNotificationTemplateId", 4L);
+		columnBitmasks.put("uuid_", 4L);
 
-		columnBitmasks.put("groupId", 8L);
+		columnBitmasks.put("calendarNotificationTemplateId", 8L);
 
-		columnBitmasks.put("companyId", 16L);
+		columnBitmasks.put("groupId", 16L);
 
-		columnBitmasks.put("userId", 32L);
+		columnBitmasks.put("companyId", 32L);
 
-		columnBitmasks.put("userName", 64L);
+		columnBitmasks.put("userId", 64L);
 
-		columnBitmasks.put("createDate", 128L);
+		columnBitmasks.put("userName", 128L);
 
-		columnBitmasks.put("modifiedDate", 256L);
+		columnBitmasks.put("createDate", 256L);
 
-		columnBitmasks.put("calendarId", 512L);
+		columnBitmasks.put("modifiedDate", 512L);
 
-		columnBitmasks.put("notificationType", 1024L);
+		columnBitmasks.put("calendarId", 1024L);
 
-		columnBitmasks.put("notificationTypeSettings", 2048L);
+		columnBitmasks.put("notificationType", 2048L);
 
-		columnBitmasks.put("notificationTemplateType", 4096L);
+		columnBitmasks.put("notificationTypeSettings", 4096L);
 
-		columnBitmasks.put("subject", 8192L);
+		columnBitmasks.put("notificationTemplateType", 8192L);
 
-		columnBitmasks.put("body", 16384L);
+		columnBitmasks.put("subject", 16384L);
 
-		columnBitmasks.put("lastPublishDate", 32768L);
+		columnBitmasks.put("body", 32768L);
+
+		columnBitmasks.put("lastPublishDate", 65536L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

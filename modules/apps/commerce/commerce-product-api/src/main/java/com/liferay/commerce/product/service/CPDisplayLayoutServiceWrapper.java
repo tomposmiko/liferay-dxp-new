@@ -26,43 +26,24 @@ import com.liferay.portal.kernel.service.ServiceWrapper;
 public class CPDisplayLayoutServiceWrapper
 	implements CPDisplayLayoutService, ServiceWrapper<CPDisplayLayoutService> {
 
+	public CPDisplayLayoutServiceWrapper() {
+		this(null);
+	}
+
 	public CPDisplayLayoutServiceWrapper(
 		CPDisplayLayoutService cpDisplayLayoutService) {
 
 		_cpDisplayLayoutService = cpDisplayLayoutService;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x)
-	 */
-	@Deprecated
 	@Override
 	public com.liferay.commerce.product.model.CPDisplayLayout
 			addCPDisplayLayout(
-				Class<?> clazz, long classPK, String layoutUuid,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+				long groupId, Class<?> clazz, long classPK, String layoutUuid)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDisplayLayoutService.addCPDisplayLayout(
-			clazz, classPK, layoutUuid, serviceContext);
-	}
-
-	@Override
-	public com.liferay.commerce.product.model.CPDisplayLayout
-			addCPDisplayLayout(
-				long userId, long groupId, Class<?> clazz, long classPK,
-				String layoutUuid)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _cpDisplayLayoutService.addCPDisplayLayout(
-			userId, groupId, clazz, classPK, layoutUuid);
-	}
-
-	@Override
-	public void deleteCPDisplayLayout(Class<?> clazz, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_cpDisplayLayoutService.deleteCPDisplayLayout(clazz, classPK);
+			groupId, clazz, classPK, layoutUuid);
 	}
 
 	@Override
@@ -105,11 +86,12 @@ public class CPDisplayLayoutServiceWrapper
 
 	@Override
 	public com.liferay.commerce.product.model.CPDisplayLayout
-			updateCPDisplayLayout(long cpDisplayLayoutId, String layoutUuid)
+			updateCPDisplayLayout(
+				long cpDisplayLayoutId, long classPK, String layoutUuid)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _cpDisplayLayoutService.updateCPDisplayLayout(
-			cpDisplayLayoutId, layoutUuid);
+			cpDisplayLayoutId, classPK, layoutUuid);
 	}
 
 	@Override

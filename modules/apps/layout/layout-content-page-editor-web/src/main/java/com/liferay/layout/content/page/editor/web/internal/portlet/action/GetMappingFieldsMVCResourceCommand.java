@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
-		"mvc.command.name=/content_layout/get_mapping_fields"
+		"mvc.command.name=/layout_content_page_editor/get_mapping_fields"
 	},
 	service = MVCResourceCommand.class
 )
@@ -55,7 +55,9 @@ public class GetMappingFieldsMVCResourceCommand extends BaseMVCResourceCommand {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		String fieldType = ParamUtil.getString(resourceRequest, "fieldType");
+		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		String classTypeId = ParamUtil.getString(
 			resourceRequest, "classTypeId");
 		long classNameId = ParamUtil.getLong(resourceRequest, "classNameId");
@@ -63,18 +65,15 @@ public class GetMappingFieldsMVCResourceCommand extends BaseMVCResourceCommand {
 		try {
 			JSONArray mappingFieldsJSONArray =
 				MappingContentUtil.getMappingFieldsJSONArray(
-					fieldType, classTypeId, _infoItemServiceTracker,
-					_portal.getClassName(classNameId), resourceRequest);
+					classTypeId, themeDisplay.getScopeGroupId(),
+					_infoItemServiceTracker, _portal.getClassName(classNameId),
+					themeDisplay.getLocale());
 
 			JSONPortletResponseUtil.writeJSON(
 				resourceRequest, resourceResponse, mappingFieldsJSONArray);
 		}
 		catch (Exception exception) {
 			_log.error("Unable to get mapping fields", exception);
-
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)resourceRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
 
 			JSONPortletResponseUtil.writeJSON(
 				resourceRequest, resourceResponse,

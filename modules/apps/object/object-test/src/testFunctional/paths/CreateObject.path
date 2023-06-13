@@ -1,0 +1,161 @@
+<html>
+<head>
+<title>CreateObject</title>
+</head>
+
+<body>
+<table border="1" cellpadding="1" cellspacing="1">
+<thead>
+<tr><td rowspan="1" colspan="3">CreateObject</td></tr>
+</thead>
+
+<tbody>
+		<tr>
+		<td>OBJECT_DEFINITION_NAME</td>
+		<td>//input[@id='objectDefinitionName']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>VIEW_OBJECT</td>
+		<td>//a[contains(.,'${key_labelName}')]/../../..//a[@class='btn btn-secondary btn-sm link-monospaced']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>OBJECT_LABEL</td>
+		<td>//input[@id='_com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_label']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>OBJECT_PLURAL_LABEL</td>
+		<td>//input[@id='_com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_pluralLabel']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>PANEL_CATEGORY_KEY</td>
+		<td>//select[contains(@id,'_panelCategoryKey')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>PANEL_CATEGORY_KEY_SELECTED</td>
+		<td>//select[contains(@id,'_panelCategoryKey')]//option[contains(@selected,'') and contains(text(),'${key_panelCategoryKey}')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>SAVE_BUTTON</td>
+		<td>//button[@id='_com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_save']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>VIEW_OBJECT_FIELD_NAME</td>
+		<td>//input[contains(@id,'objectFieldName') and contains(@value,'${key_fieldName}')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>FIELD_ADDED_ON_BLOCK</td>
+		<td>//div[contains(@class,'object-admin-panel__simple-body__content-left')]//div//h5[contains(text(),'${key_fieldLabelName}')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>FIELD_TYPE</td>
+		<td>//select[@id='_com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_type']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>FIELD_NAME</td>
+		<td>//input[@name='_com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_name']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>TITLE_FIELD</td>
+		<td>//select[contains(@id,'_titleObjectFieldId')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>TOGGLE_MANDATORY</td>
+		<td>//input[@id='_com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_required']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>TOGGLE_ACTIVE</td>
+		<td>//input[@id = '_com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_active']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>TOGGLE_COLLAPSIBLE</td>
+		<td>//input[@aria-label = 'Collapsible']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>TOGGLE_INACTIVE</td>
+		<td>//input[@id = '_com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_active']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>VIEW_OBJECT_SCOPE_DISABLED</td>
+		<td>//label[contains(text(),'Scope')]/..//select[@class = 'form-control disabled']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>DISABLED_OBJECT_NAME</td>
+		<td>//input[(@id='_com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_shortName') and (@disabled)]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>DISABLED_FIELD_TYPE</td>
+		<td>//select[(@id='_com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_type') and (@class='form-control disabled')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>DISABLED_FIELD_NAME</td>
+		<td>//input[@class='field disabled form-control lfr-input-text']</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>DISABLED_PUBLISH_OBJECT_BUTTON</td>
+		<td>//button[contains(@disabled,'') and contains(@id,'_com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_publish')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>DISABLED_TAB_TYPE_RELATIONSHIPS</td>
+		<td>//div[@class = 'layout-tab__tab-types disabled']//h4[@class = 'layout-tab__tab-types__title' and contains(text(),'Relationships')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>OBJECT_NAME</td>
+		<td>//div[(@class='table-list-title') and contains(.,'${key_labelName}')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>KEBAB_MENU_BLOCK_FIELD</td>
+		<td>xpath=(//*[contains(@class,'lexicon-icon-ellipsis')])[3]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>KEBAB_MENU_BLOCK_FIELD_OPTION_DELETE</td>
+		<td>xpath=(//button[(@class='dropdown-item') and contains(text(),'Delete')])[3]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>COLLAPSE_EXPAND_OBJECT_PORTLET_ENTRY_FIELD</td>
+		<td>//button[contains(@class,'collapse-icon collapse-icon-middle panel-header panel-header-link')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>ENTRY_RELATIONSHIP_FIELD_OPTION</td>
+		<td>//button[contains(@class,'dropdown-item') and contains(text(),'${key_entry}')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>SELECT_ENTRY_IN_RELATIONSHIP_TAB</td>
+		<td>//div[contains(@class,'entry autofit-col autofit-col-expand') and contains(.,'${key_titleFieldName}')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>VIEW_ENTRY_SELECTED_ON_RELATIONSHIP_FIELD</td>
+		<td>//input[contains(@name,'r_relationship_c_customObjectId') and contains(@value,'${key_entry}')]</td>
+		<td></td>
+	</tr>
+</tbody>
+</table>
+</body>
+</html>

@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -82,21 +83,22 @@ public class DLFileEntryModelImpl
 
 	public static final Object[][] TABLE_COLUMNS = {
 		{"mvccVersion", Types.BIGINT}, {"ctCollectionId", Types.BIGINT},
-		{"uuid_", Types.VARCHAR}, {"fileEntryId", Types.BIGINT},
-		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
-		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
-		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
-		{"classNameId", Types.BIGINT}, {"classPK", Types.BIGINT},
-		{"repositoryId", Types.BIGINT}, {"folderId", Types.BIGINT},
-		{"treePath", Types.VARCHAR}, {"name", Types.VARCHAR},
-		{"fileName", Types.VARCHAR}, {"extension", Types.VARCHAR},
-		{"mimeType", Types.VARCHAR}, {"title", Types.VARCHAR},
-		{"description", Types.VARCHAR}, {"extraSettings", Types.CLOB},
-		{"fileEntryTypeId", Types.BIGINT}, {"version", Types.VARCHAR},
-		{"size_", Types.BIGINT}, {"smallImageId", Types.BIGINT},
-		{"largeImageId", Types.BIGINT}, {"custom1ImageId", Types.BIGINT},
-		{"custom2ImageId", Types.BIGINT},
+		{"uuid_", Types.VARCHAR}, {"externalReferenceCode", Types.VARCHAR},
+		{"fileEntryId", Types.BIGINT}, {"groupId", Types.BIGINT},
+		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
+		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
+		{"modifiedDate", Types.TIMESTAMP}, {"classNameId", Types.BIGINT},
+		{"classPK", Types.BIGINT}, {"repositoryId", Types.BIGINT},
+		{"folderId", Types.BIGINT}, {"treePath", Types.VARCHAR},
+		{"name", Types.VARCHAR}, {"fileName", Types.VARCHAR},
+		{"extension", Types.VARCHAR}, {"mimeType", Types.VARCHAR},
+		{"title", Types.VARCHAR}, {"description", Types.VARCHAR},
+		{"extraSettings", Types.CLOB}, {"fileEntryTypeId", Types.BIGINT},
+		{"version", Types.VARCHAR}, {"size_", Types.BIGINT},
+		{"smallImageId", Types.BIGINT}, {"largeImageId", Types.BIGINT},
+		{"custom1ImageId", Types.BIGINT}, {"custom2ImageId", Types.BIGINT},
 		{"manualCheckInRequired", Types.BOOLEAN},
+		{"expirationDate", Types.TIMESTAMP}, {"reviewDate", Types.TIMESTAMP},
 		{"lastPublishDate", Types.TIMESTAMP}
 	};
 
@@ -107,6 +109,7 @@ public class DLFileEntryModelImpl
 		TABLE_COLUMNS_MAP.put("mvccVersion", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("ctCollectionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("externalReferenceCode", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("fileEntryId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -134,11 +137,13 @@ public class DLFileEntryModelImpl
 		TABLE_COLUMNS_MAP.put("custom1ImageId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("custom2ImageId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("manualCheckInRequired", Types.BOOLEAN);
+		TABLE_COLUMNS_MAP.put("expirationDate", Types.TIMESTAMP);
+		TABLE_COLUMNS_MAP.put("reviewDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("lastPublishDate", Types.TIMESTAMP);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table DLFileEntry (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,uuid_ VARCHAR(75) null,fileEntryId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,repositoryId LONG,folderId LONG,treePath STRING null,name VARCHAR(255) null,fileName VARCHAR(255) null,extension VARCHAR(75) null,mimeType VARCHAR(75) null,title VARCHAR(255) null,description STRING null,extraSettings TEXT null,fileEntryTypeId LONG,version VARCHAR(75) null,size_ LONG,smallImageId LONG,largeImageId LONG,custom1ImageId LONG,custom2ImageId LONG,manualCheckInRequired BOOLEAN,lastPublishDate DATE null,primary key (fileEntryId, ctCollectionId))";
+		"create table DLFileEntry (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,uuid_ VARCHAR(75) null,externalReferenceCode VARCHAR(75) null,fileEntryId LONG not null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,classNameId LONG,classPK LONG,repositoryId LONG,folderId LONG,treePath STRING null,name VARCHAR(255) null,fileName VARCHAR(255) null,extension VARCHAR(75) null,mimeType VARCHAR(75) null,title VARCHAR(255) null,description STRING null,extraSettings TEXT null,fileEntryTypeId LONG,version VARCHAR(75) null,size_ LONG,smallImageId LONG,largeImageId LONG,custom1ImageId LONG,custom2ImageId LONG,manualCheckInRequired BOOLEAN,expirationDate DATE null,reviewDate DATE null,lastPublishDate DATE null,primary key (fileEntryId, ctCollectionId))";
 
 	public static final String TABLE_SQL_DROP = "drop table DLFileEntry";
 
@@ -194,73 +199,79 @@ public class DLFileEntryModelImpl
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long FILEENTRYTYPEID_COLUMN_BITMASK = 8L;
+	public static final long EXTERNALREFERENCECODE_COLUMN_BITMASK = 8L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long FILENAME_COLUMN_BITMASK = 16L;
+	public static final long FILEENTRYTYPEID_COLUMN_BITMASK = 16L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long FOLDERID_COLUMN_BITMASK = 32L;
+	public static final long FILENAME_COLUMN_BITMASK = 32L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long GROUPID_COLUMN_BITMASK = 64L;
+	public static final long FOLDERID_COLUMN_BITMASK = 64L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long LARGEIMAGEID_COLUMN_BITMASK = 128L;
+	public static final long GROUPID_COLUMN_BITMASK = 128L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long MIMETYPE_COLUMN_BITMASK = 256L;
+	public static final long LARGEIMAGEID_COLUMN_BITMASK = 256L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long NAME_COLUMN_BITMASK = 512L;
+	public static final long MIMETYPE_COLUMN_BITMASK = 512L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long REPOSITORYID_COLUMN_BITMASK = 1024L;
+	public static final long NAME_COLUMN_BITMASK = 1024L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long SMALLIMAGEID_COLUMN_BITMASK = 2048L;
+	public static final long REPOSITORYID_COLUMN_BITMASK = 2048L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long TITLE_COLUMN_BITMASK = 4096L;
+	public static final long SMALLIMAGEID_COLUMN_BITMASK = 4096L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long USERID_COLUMN_BITMASK = 8192L;
+	public static final long TITLE_COLUMN_BITMASK = 8192L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long UUID_COLUMN_BITMASK = 16384L;
+	public static final long USERID_COLUMN_BITMASK = 16384L;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long UUID_COLUMN_BITMASK = 32768L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -280,6 +291,7 @@ public class DLFileEntryModelImpl
 		model.setMvccVersion(soapModel.getMvccVersion());
 		model.setCtCollectionId(soapModel.getCtCollectionId());
 		model.setUuid(soapModel.getUuid());
+		model.setExternalReferenceCode(soapModel.getExternalReferenceCode());
 		model.setFileEntryId(soapModel.getFileEntryId());
 		model.setGroupId(soapModel.getGroupId());
 		model.setCompanyId(soapModel.getCompanyId());
@@ -307,6 +319,8 @@ public class DLFileEntryModelImpl
 		model.setCustom1ImageId(soapModel.getCustom1ImageId());
 		model.setCustom2ImageId(soapModel.getCustom2ImageId());
 		model.setManualCheckInRequired(soapModel.isManualCheckInRequired());
+		model.setExpirationDate(soapModel.getExpirationDate());
+		model.setReviewDate(soapModel.getReviewDate());
 		model.setLastPublishDate(soapModel.getLastPublishDate());
 
 		return model;
@@ -424,159 +438,196 @@ public class DLFileEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<DLFileEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, DLFileEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<DLFileEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<DLFileEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DLFileEntry.class.getClassLoader(), DLFileEntry.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", DLFileEntry::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", DLFileEntry::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", DLFileEntry::getUuid);
-		attributeGetterFunctions.put(
-			"fileEntryId", DLFileEntry::getFileEntryId);
-		attributeGetterFunctions.put("groupId", DLFileEntry::getGroupId);
-		attributeGetterFunctions.put("companyId", DLFileEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", DLFileEntry::getUserId);
-		attributeGetterFunctions.put("userName", DLFileEntry::getUserName);
-		attributeGetterFunctions.put("createDate", DLFileEntry::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", DLFileEntry::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", DLFileEntry::getClassNameId);
-		attributeGetterFunctions.put("classPK", DLFileEntry::getClassPK);
-		attributeGetterFunctions.put(
-			"repositoryId", DLFileEntry::getRepositoryId);
-		attributeGetterFunctions.put("folderId", DLFileEntry::getFolderId);
-		attributeGetterFunctions.put("treePath", DLFileEntry::getTreePath);
-		attributeGetterFunctions.put("name", DLFileEntry::getName);
-		attributeGetterFunctions.put("fileName", DLFileEntry::getFileName);
-		attributeGetterFunctions.put("extension", DLFileEntry::getExtension);
-		attributeGetterFunctions.put("mimeType", DLFileEntry::getMimeType);
-		attributeGetterFunctions.put("title", DLFileEntry::getTitle);
-		attributeGetterFunctions.put(
-			"description", DLFileEntry::getDescription);
-		attributeGetterFunctions.put(
-			"extraSettings", DLFileEntry::getExtraSettings);
-		attributeGetterFunctions.put(
-			"fileEntryTypeId", DLFileEntry::getFileEntryTypeId);
-		attributeGetterFunctions.put("version", DLFileEntry::getVersion);
-		attributeGetterFunctions.put("size", DLFileEntry::getSize);
-		attributeGetterFunctions.put(
-			"smallImageId", DLFileEntry::getSmallImageId);
-		attributeGetterFunctions.put(
-			"largeImageId", DLFileEntry::getLargeImageId);
-		attributeGetterFunctions.put(
-			"custom1ImageId", DLFileEntry::getCustom1ImageId);
-		attributeGetterFunctions.put(
-			"custom2ImageId", DLFileEntry::getCustom2ImageId);
-		attributeGetterFunctions.put(
-			"manualCheckInRequired", DLFileEntry::getManualCheckInRequired);
-		attributeGetterFunctions.put(
-			"lastPublishDate", DLFileEntry::getLastPublishDate);
+		try {
+			Constructor<DLFileEntry> constructor =
+				(Constructor<DLFileEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<DLFileEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<DLFileEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<DLFileEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<DLFileEntry, Object>>();
 		Map<String, BiConsumer<DLFileEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<DLFileEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", DLFileEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DLFileEntry, Long>)DLFileEntry::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", DLFileEntry::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<DLFileEntry, Long>)DLFileEntry::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", DLFileEntry::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<DLFileEntry, String>)DLFileEntry::setUuid);
+		attributeGetterFunctions.put(
+			"externalReferenceCode", DLFileEntry::getExternalReferenceCode);
+		attributeSetterBiConsumers.put(
+			"externalReferenceCode",
+			(BiConsumer<DLFileEntry, String>)
+				DLFileEntry::setExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"fileEntryId", DLFileEntry::getFileEntryId);
 		attributeSetterBiConsumers.put(
 			"fileEntryId",
 			(BiConsumer<DLFileEntry, Long>)DLFileEntry::setFileEntryId);
+		attributeGetterFunctions.put("groupId", DLFileEntry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<DLFileEntry, Long>)DLFileEntry::setGroupId);
+		attributeGetterFunctions.put("companyId", DLFileEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DLFileEntry, Long>)DLFileEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", DLFileEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<DLFileEntry, Long>)DLFileEntry::setUserId);
+		attributeGetterFunctions.put("userName", DLFileEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<DLFileEntry, String>)DLFileEntry::setUserName);
+		attributeGetterFunctions.put("createDate", DLFileEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<DLFileEntry, Date>)DLFileEntry::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", DLFileEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<DLFileEntry, Date>)DLFileEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", DLFileEntry::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<DLFileEntry, Long>)DLFileEntry::setClassNameId);
+		attributeGetterFunctions.put("classPK", DLFileEntry::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK", (BiConsumer<DLFileEntry, Long>)DLFileEntry::setClassPK);
+		attributeGetterFunctions.put(
+			"repositoryId", DLFileEntry::getRepositoryId);
 		attributeSetterBiConsumers.put(
 			"repositoryId",
 			(BiConsumer<DLFileEntry, Long>)DLFileEntry::setRepositoryId);
+		attributeGetterFunctions.put("folderId", DLFileEntry::getFolderId);
 		attributeSetterBiConsumers.put(
 			"folderId",
 			(BiConsumer<DLFileEntry, Long>)DLFileEntry::setFolderId);
+		attributeGetterFunctions.put("treePath", DLFileEntry::getTreePath);
 		attributeSetterBiConsumers.put(
 			"treePath",
 			(BiConsumer<DLFileEntry, String>)DLFileEntry::setTreePath);
+		attributeGetterFunctions.put("name", DLFileEntry::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<DLFileEntry, String>)DLFileEntry::setName);
+		attributeGetterFunctions.put("fileName", DLFileEntry::getFileName);
 		attributeSetterBiConsumers.put(
 			"fileName",
 			(BiConsumer<DLFileEntry, String>)DLFileEntry::setFileName);
+		attributeGetterFunctions.put("extension", DLFileEntry::getExtension);
 		attributeSetterBiConsumers.put(
 			"extension",
 			(BiConsumer<DLFileEntry, String>)DLFileEntry::setExtension);
+		attributeGetterFunctions.put("mimeType", DLFileEntry::getMimeType);
 		attributeSetterBiConsumers.put(
 			"mimeType",
 			(BiConsumer<DLFileEntry, String>)DLFileEntry::setMimeType);
+		attributeGetterFunctions.put("title", DLFileEntry::getTitle);
 		attributeSetterBiConsumers.put(
 			"title", (BiConsumer<DLFileEntry, String>)DLFileEntry::setTitle);
+		attributeGetterFunctions.put(
+			"description", DLFileEntry::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<DLFileEntry, String>)DLFileEntry::setDescription);
+		attributeGetterFunctions.put(
+			"extraSettings", DLFileEntry::getExtraSettings);
 		attributeSetterBiConsumers.put(
 			"extraSettings",
 			(BiConsumer<DLFileEntry, String>)DLFileEntry::setExtraSettings);
+		attributeGetterFunctions.put(
+			"fileEntryTypeId", DLFileEntry::getFileEntryTypeId);
 		attributeSetterBiConsumers.put(
 			"fileEntryTypeId",
 			(BiConsumer<DLFileEntry, Long>)DLFileEntry::setFileEntryTypeId);
+		attributeGetterFunctions.put("version", DLFileEntry::getVersion);
 		attributeSetterBiConsumers.put(
 			"version",
 			(BiConsumer<DLFileEntry, String>)DLFileEntry::setVersion);
+		attributeGetterFunctions.put("size", DLFileEntry::getSize);
 		attributeSetterBiConsumers.put(
 			"size", (BiConsumer<DLFileEntry, Long>)DLFileEntry::setSize);
+		attributeGetterFunctions.put(
+			"smallImageId", DLFileEntry::getSmallImageId);
 		attributeSetterBiConsumers.put(
 			"smallImageId",
 			(BiConsumer<DLFileEntry, Long>)DLFileEntry::setSmallImageId);
+		attributeGetterFunctions.put(
+			"largeImageId", DLFileEntry::getLargeImageId);
 		attributeSetterBiConsumers.put(
 			"largeImageId",
 			(BiConsumer<DLFileEntry, Long>)DLFileEntry::setLargeImageId);
+		attributeGetterFunctions.put(
+			"custom1ImageId", DLFileEntry::getCustom1ImageId);
 		attributeSetterBiConsumers.put(
 			"custom1ImageId",
 			(BiConsumer<DLFileEntry, Long>)DLFileEntry::setCustom1ImageId);
+		attributeGetterFunctions.put(
+			"custom2ImageId", DLFileEntry::getCustom2ImageId);
 		attributeSetterBiConsumers.put(
 			"custom2ImageId",
 			(BiConsumer<DLFileEntry, Long>)DLFileEntry::setCustom2ImageId);
+		attributeGetterFunctions.put(
+			"manualCheckInRequired", DLFileEntry::getManualCheckInRequired);
 		attributeSetterBiConsumers.put(
 			"manualCheckInRequired",
 			(BiConsumer<DLFileEntry, Boolean>)
 				DLFileEntry::setManualCheckInRequired);
+		attributeGetterFunctions.put(
+			"expirationDate", DLFileEntry::getExpirationDate);
+		attributeSetterBiConsumers.put(
+			"expirationDate",
+			(BiConsumer<DLFileEntry, Date>)DLFileEntry::setExpirationDate);
+		attributeGetterFunctions.put("reviewDate", DLFileEntry::getReviewDate);
+		attributeSetterBiConsumers.put(
+			"reviewDate",
+			(BiConsumer<DLFileEntry, Date>)DLFileEntry::setReviewDate);
+		attributeGetterFunctions.put(
+			"lastPublishDate", DLFileEntry::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<DLFileEntry, Date>)DLFileEntry::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -638,6 +689,35 @@ public class DLFileEntryModelImpl
 	@Deprecated
 	public String getOriginalUuid() {
 		return getColumnOriginalValue("uuid_");
+	}
+
+	@JSON
+	@Override
+	public String getExternalReferenceCode() {
+		if (_externalReferenceCode == null) {
+			return "";
+		}
+		else {
+			return _externalReferenceCode;
+		}
+	}
+
+	@Override
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_externalReferenceCode = externalReferenceCode;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
+	public String getOriginalExternalReferenceCode() {
+		return getColumnOriginalValue("externalReferenceCode");
 	}
 
 	@JSON
@@ -1279,6 +1359,36 @@ public class DLFileEntryModelImpl
 
 	@JSON
 	@Override
+	public Date getExpirationDate() {
+		return _expirationDate;
+	}
+
+	@Override
+	public void setExpirationDate(Date expirationDate) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_expirationDate = expirationDate;
+	}
+
+	@JSON
+	@Override
+	public Date getReviewDate() {
+		return _reviewDate;
+	}
+
+	@Override
+	public void setReviewDate(Date reviewDate) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_reviewDate = reviewDate;
+	}
+
+	@JSON
+	@Override
 	public Date getLastPublishDate() {
 		return _lastPublishDate;
 	}
@@ -1508,6 +1618,7 @@ public class DLFileEntryModelImpl
 		dlFileEntryImpl.setMvccVersion(getMvccVersion());
 		dlFileEntryImpl.setCtCollectionId(getCtCollectionId());
 		dlFileEntryImpl.setUuid(getUuid());
+		dlFileEntryImpl.setExternalReferenceCode(getExternalReferenceCode());
 		dlFileEntryImpl.setFileEntryId(getFileEntryId());
 		dlFileEntryImpl.setGroupId(getGroupId());
 		dlFileEntryImpl.setCompanyId(getCompanyId());
@@ -1535,9 +1646,82 @@ public class DLFileEntryModelImpl
 		dlFileEntryImpl.setCustom1ImageId(getCustom1ImageId());
 		dlFileEntryImpl.setCustom2ImageId(getCustom2ImageId());
 		dlFileEntryImpl.setManualCheckInRequired(isManualCheckInRequired());
+		dlFileEntryImpl.setExpirationDate(getExpirationDate());
+		dlFileEntryImpl.setReviewDate(getReviewDate());
 		dlFileEntryImpl.setLastPublishDate(getLastPublishDate());
 
 		dlFileEntryImpl.resetOriginalValues();
+
+		return dlFileEntryImpl;
+	}
+
+	@Override
+	public DLFileEntry cloneWithOriginalValues() {
+		DLFileEntryImpl dlFileEntryImpl = new DLFileEntryImpl();
+
+		dlFileEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		dlFileEntryImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		dlFileEntryImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		dlFileEntryImpl.setExternalReferenceCode(
+			this.<String>getColumnOriginalValue("externalReferenceCode"));
+		dlFileEntryImpl.setFileEntryId(
+			this.<Long>getColumnOriginalValue("fileEntryId"));
+		dlFileEntryImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		dlFileEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		dlFileEntryImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		dlFileEntryImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		dlFileEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		dlFileEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		dlFileEntryImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		dlFileEntryImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		dlFileEntryImpl.setRepositoryId(
+			this.<Long>getColumnOriginalValue("repositoryId"));
+		dlFileEntryImpl.setFolderId(
+			this.<Long>getColumnOriginalValue("folderId"));
+		dlFileEntryImpl.setTreePath(
+			this.<String>getColumnOriginalValue("treePath"));
+		dlFileEntryImpl.setName(this.<String>getColumnOriginalValue("name"));
+		dlFileEntryImpl.setFileName(
+			this.<String>getColumnOriginalValue("fileName"));
+		dlFileEntryImpl.setExtension(
+			this.<String>getColumnOriginalValue("extension"));
+		dlFileEntryImpl.setMimeType(
+			this.<String>getColumnOriginalValue("mimeType"));
+		dlFileEntryImpl.setTitle(this.<String>getColumnOriginalValue("title"));
+		dlFileEntryImpl.setDescription(
+			this.<String>getColumnOriginalValue("description"));
+		dlFileEntryImpl.setExtraSettings(
+			this.<String>getColumnOriginalValue("extraSettings"));
+		dlFileEntryImpl.setFileEntryTypeId(
+			this.<Long>getColumnOriginalValue("fileEntryTypeId"));
+		dlFileEntryImpl.setVersion(
+			this.<String>getColumnOriginalValue("version"));
+		dlFileEntryImpl.setSize(this.<Long>getColumnOriginalValue("size_"));
+		dlFileEntryImpl.setSmallImageId(
+			this.<Long>getColumnOriginalValue("smallImageId"));
+		dlFileEntryImpl.setLargeImageId(
+			this.<Long>getColumnOriginalValue("largeImageId"));
+		dlFileEntryImpl.setCustom1ImageId(
+			this.<Long>getColumnOriginalValue("custom1ImageId"));
+		dlFileEntryImpl.setCustom2ImageId(
+			this.<Long>getColumnOriginalValue("custom2ImageId"));
+		dlFileEntryImpl.setManualCheckInRequired(
+			this.<Boolean>getColumnOriginalValue("manualCheckInRequired"));
+		dlFileEntryImpl.setExpirationDate(
+			this.<Date>getColumnOriginalValue("expirationDate"));
+		dlFileEntryImpl.setReviewDate(
+			this.<Date>getColumnOriginalValue("reviewDate"));
+		dlFileEntryImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
 
 		return dlFileEntryImpl;
 	}
@@ -1638,6 +1822,18 @@ public class DLFileEntryModelImpl
 
 		if ((uuid != null) && (uuid.length() == 0)) {
 			dlFileEntryCacheModel.uuid = null;
+		}
+
+		dlFileEntryCacheModel.externalReferenceCode =
+			getExternalReferenceCode();
+
+		String externalReferenceCode =
+			dlFileEntryCacheModel.externalReferenceCode;
+
+		if ((externalReferenceCode != null) &&
+			(externalReferenceCode.length() == 0)) {
+
+			dlFileEntryCacheModel.externalReferenceCode = null;
 		}
 
 		dlFileEntryCacheModel.fileEntryId = getFileEntryId();
@@ -1768,6 +1964,24 @@ public class DLFileEntryModelImpl
 
 		dlFileEntryCacheModel.manualCheckInRequired = isManualCheckInRequired();
 
+		Date expirationDate = getExpirationDate();
+
+		if (expirationDate != null) {
+			dlFileEntryCacheModel.expirationDate = expirationDate.getTime();
+		}
+		else {
+			dlFileEntryCacheModel.expirationDate = Long.MIN_VALUE;
+		}
+
+		Date reviewDate = getReviewDate();
+
+		if (reviewDate != null) {
+			dlFileEntryCacheModel.reviewDate = reviewDate.getTime();
+		}
+		else {
+			dlFileEntryCacheModel.reviewDate = Long.MIN_VALUE;
+		}
+
 		Date lastPublishDate = getLastPublishDate();
 
 		if (lastPublishDate != null) {
@@ -1863,15 +2077,14 @@ public class DLFileEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, DLFileEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					DLFileEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
 	private long _mvccVersion;
 	private long _ctCollectionId;
 	private String _uuid;
+	private String _externalReferenceCode;
 	private long _fileEntryId;
 	private long _groupId;
 	private long _companyId;
@@ -1900,6 +2113,8 @@ public class DLFileEntryModelImpl
 	private long _custom1ImageId;
 	private long _custom2ImageId;
 	private boolean _manualCheckInRequired;
+	private Date _expirationDate;
+	private Date _reviewDate;
 	private Date _lastPublishDate;
 
 	public <T> T getColumnValue(String columnName) {
@@ -1934,6 +2149,8 @@ public class DLFileEntryModelImpl
 		_columnOriginalValues.put("mvccVersion", _mvccVersion);
 		_columnOriginalValues.put("ctCollectionId", _ctCollectionId);
 		_columnOriginalValues.put("uuid_", _uuid);
+		_columnOriginalValues.put(
+			"externalReferenceCode", _externalReferenceCode);
 		_columnOriginalValues.put("fileEntryId", _fileEntryId);
 		_columnOriginalValues.put("groupId", _groupId);
 		_columnOriginalValues.put("companyId", _companyId);
@@ -1962,6 +2179,8 @@ public class DLFileEntryModelImpl
 		_columnOriginalValues.put("custom2ImageId", _custom2ImageId);
 		_columnOriginalValues.put(
 			"manualCheckInRequired", _manualCheckInRequired);
+		_columnOriginalValues.put("expirationDate", _expirationDate);
+		_columnOriginalValues.put("reviewDate", _reviewDate);
 		_columnOriginalValues.put("lastPublishDate", _lastPublishDate);
 	}
 
@@ -1993,61 +2212,67 @@ public class DLFileEntryModelImpl
 
 		columnBitmasks.put("uuid_", 4L);
 
-		columnBitmasks.put("fileEntryId", 8L);
+		columnBitmasks.put("externalReferenceCode", 8L);
 
-		columnBitmasks.put("groupId", 16L);
+		columnBitmasks.put("fileEntryId", 16L);
 
-		columnBitmasks.put("companyId", 32L);
+		columnBitmasks.put("groupId", 32L);
 
-		columnBitmasks.put("userId", 64L);
+		columnBitmasks.put("companyId", 64L);
 
-		columnBitmasks.put("userName", 128L);
+		columnBitmasks.put("userId", 128L);
 
-		columnBitmasks.put("createDate", 256L);
+		columnBitmasks.put("userName", 256L);
 
-		columnBitmasks.put("modifiedDate", 512L);
+		columnBitmasks.put("createDate", 512L);
 
-		columnBitmasks.put("classNameId", 1024L);
+		columnBitmasks.put("modifiedDate", 1024L);
 
-		columnBitmasks.put("classPK", 2048L);
+		columnBitmasks.put("classNameId", 2048L);
 
-		columnBitmasks.put("repositoryId", 4096L);
+		columnBitmasks.put("classPK", 4096L);
 
-		columnBitmasks.put("folderId", 8192L);
+		columnBitmasks.put("repositoryId", 8192L);
 
-		columnBitmasks.put("treePath", 16384L);
+		columnBitmasks.put("folderId", 16384L);
 
-		columnBitmasks.put("name", 32768L);
+		columnBitmasks.put("treePath", 32768L);
 
-		columnBitmasks.put("fileName", 65536L);
+		columnBitmasks.put("name", 65536L);
 
-		columnBitmasks.put("extension", 131072L);
+		columnBitmasks.put("fileName", 131072L);
 
-		columnBitmasks.put("mimeType", 262144L);
+		columnBitmasks.put("extension", 262144L);
 
-		columnBitmasks.put("title", 524288L);
+		columnBitmasks.put("mimeType", 524288L);
 
-		columnBitmasks.put("description", 1048576L);
+		columnBitmasks.put("title", 1048576L);
 
-		columnBitmasks.put("extraSettings", 2097152L);
+		columnBitmasks.put("description", 2097152L);
 
-		columnBitmasks.put("fileEntryTypeId", 4194304L);
+		columnBitmasks.put("extraSettings", 4194304L);
 
-		columnBitmasks.put("version", 8388608L);
+		columnBitmasks.put("fileEntryTypeId", 8388608L);
 
-		columnBitmasks.put("size_", 16777216L);
+		columnBitmasks.put("version", 16777216L);
 
-		columnBitmasks.put("smallImageId", 33554432L);
+		columnBitmasks.put("size_", 33554432L);
 
-		columnBitmasks.put("largeImageId", 67108864L);
+		columnBitmasks.put("smallImageId", 67108864L);
 
-		columnBitmasks.put("custom1ImageId", 134217728L);
+		columnBitmasks.put("largeImageId", 134217728L);
 
-		columnBitmasks.put("custom2ImageId", 268435456L);
+		columnBitmasks.put("custom1ImageId", 268435456L);
 
-		columnBitmasks.put("manualCheckInRequired", 536870912L);
+		columnBitmasks.put("custom2ImageId", 536870912L);
 
-		columnBitmasks.put("lastPublishDate", 1073741824L);
+		columnBitmasks.put("manualCheckInRequired", 1073741824L);
+
+		columnBitmasks.put("expirationDate", 2147483648L);
+
+		columnBitmasks.put("reviewDate", 4294967296L);
+
+		columnBitmasks.put("lastPublishDate", 8589934592L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

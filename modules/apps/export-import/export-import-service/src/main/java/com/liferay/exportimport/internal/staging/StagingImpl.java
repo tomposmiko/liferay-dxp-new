@@ -23,7 +23,6 @@ import com.liferay.document.library.kernel.exception.FileExtensionException;
 import com.liferay.document.library.kernel.exception.FileNameException;
 import com.liferay.document.library.kernel.exception.FileSizeException;
 import com.liferay.document.library.kernel.util.DLValidator;
-import com.liferay.exportimport.configuration.ExportImportServiceConfiguration;
 import com.liferay.exportimport.internal.util.StagingGroupServiceTunnelUtil;
 import com.liferay.exportimport.kernel.background.task.BackgroundTaskExecutorNames;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationParameterMapFactory;
@@ -160,6 +159,7 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.exportimport.service.http.StagingServiceHttp;
 import com.liferay.portlet.exportimport.staging.ProxiedLayoutsThreadLocal;
 import com.liferay.staging.StagingGroupHelper;
+import com.liferay.staging.configuration.StagingConfiguration;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -218,11 +218,7 @@ public class StagingImpl implements Staging {
 
 		Group group = _groupLocalService.fetchGroup(groupId);
 
-		if (group == null) {
-			return;
-		}
-
-		if (!_stagingGroupHelper.isStagingGroup(group)) {
+		if ((group == null) || !_stagingGroupHelper.isStagingGroup(group)) {
 			return;
 		}
 
@@ -720,38 +716,6 @@ public class StagingImpl implements Staging {
 							"cannot-be-found-with-the-following-parameters-x",
 						exportImportContentValidationException.
 							getDlReferenceParameters());
-				}
-			}
-			else if (exportImportContentValidationException.getType() ==
-						ExportImportContentValidationException.
-							JOURNAL_FEED_NOT_FOUND) {
-
-				if (Validator.isNotNull(
-						exportImportContentValidationException.
-							getStagedModelClassName())) {
-
-					errorMessage = LanguageUtil.format(
-						resourceBundle,
-						"unable-to-validate-referenced-article-feed-because-" +
-							"it-cannot-be-found-with-url-x-within-the-" +
-								"content-of-x-with-primary-key-x",
-						new String[] {
-							exportImportContentValidationException.
-								getJournalArticleFeedURL(),
-							exportImportContentValidationException.
-								getStagedModelClassName(),
-							String.valueOf(
-								exportImportContentValidationException.
-									getStagedModelPrimaryKeyObj())
-						});
-				}
-				else {
-					errorMessage = LanguageUtil.format(
-						resourceBundle,
-						"unable-to-validate-referenced-journal-feed-because-" +
-							"it-cannot-be-found-with-url-x",
-						exportImportContentValidationException.
-							getJournalArticleFeedURL());
 				}
 			}
 			else if (exportImportContentValidationException.getType() ==
@@ -1275,14 +1239,12 @@ public class StagingImpl implements Staging {
 			LayoutPrototypeException layoutPrototypeException =
 				(LayoutPrototypeException)exception;
 
-			StringBundler sb = new StringBundler(4);
-
-			sb.append("the-lar-file-could-not-be-imported-because-it-");
-			sb.append("requires-page-templates-or-site-templates-that-could-");
-			sb.append("not-be-found.-please-import-the-following-templates-");
-			sb.append("manually");
-
-			errorMessage = LanguageUtil.get(resourceBundle, sb.toString());
+			errorMessage = LanguageUtil.get(
+				resourceBundle,
+				StringBundler.concat(
+					"the-lar-file-could-not-be-imported-because-it-requires-",
+					"page-templates-or-site-templates-that-could-not-be-",
+					"found.-please-import-the-following-templates-manually"));
 
 			errorMessagesJSONArray = JSONFactoryUtil.createJSONArray();
 
@@ -1290,26 +1252,16 @@ public class StagingImpl implements Staging {
 				layoutPrototypeException.getMissingLayoutPrototypes();
 
 			for (Tuple missingLayoutPrototype : missingLayoutPrototypes) {
-				String layoutPrototypeUuid =
-					(String)missingLayoutPrototype.getObject(1);
-
-				JSONObject errorMessageJSONObject = JSONUtil.put(
-					"info", layoutPrototypeUuid);
-
-				String layoutPrototypeName =
-					(String)missingLayoutPrototype.getObject(2);
-
-				errorMessageJSONObject.put("name", layoutPrototypeName);
-
-				String layoutPrototypeClassName =
-					(String)missingLayoutPrototype.getObject(0);
-
-				errorMessageJSONObject.put(
-					"type",
-					ResourceActionsUtil.getModelResource(
-						locale, layoutPrototypeClassName));
-
-				errorMessagesJSONArray.put(errorMessageJSONObject);
+				errorMessagesJSONArray.put(
+					JSONUtil.put(
+						"info", (String)missingLayoutPrototype.getObject(1)
+					).put(
+						"name", (String)missingLayoutPrototype.getObject(2)
+					).put(
+						"type",
+						ResourceActionsUtil.getModelResource(
+							locale, (String)missingLayoutPrototype.getObject(0))
+					));
 			}
 
 			errorType = ServletResponseConstants.SC_FILE_CUSTOM_EXCEPTION;
@@ -1323,10 +1275,10 @@ public class StagingImpl implements Staging {
 					"site's-available-languages-x",
 				new String[] {
 					StringUtil.merge(
-						localeException.getSourceAvailableLanguageIds(),
+						localeException.getSourceAvailableLocales(),
 						StringPool.COMMA_AND_SPACE),
 					StringUtil.merge(
-						localeException.getTargetAvailableLanguageIds(),
+						localeException.getTargetAvailableLocales(),
 						StringPool.COMMA_AND_SPACE)
 				},
 				false);
@@ -1802,6 +1754,9 @@ public class StagingImpl implements Staging {
 				}
 			}
 			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
 			}
 		}
 
@@ -2034,31 +1989,36 @@ public class StagingImpl implements Staging {
 
 			MissingReference missingReference = entry.getValue();
 
-			Map<String, String> referrers = missingReference.getReferrers();
-
-			JSONObject errorMessageJSONObject =
-				JSONFactoryUtil.createJSONObject();
-
-			if (Validator.isNotNull(missingReference.getClassName())) {
-				errorMessageJSONObject.put(
+			warningMessagesJSONArray.put(
+				JSONUtil.put(
 					"info",
-					LanguageUtil.format(
-						locale,
-						"the-original-x-does-not-exist-in-the-current-" +
-							"environment",
-						ResourceActionsUtil.getModelResource(
-							locale, missingReference.getClassName()),
-						false));
-			}
+					() -> {
+						if (Validator.isNotNull(
+								missingReference.getClassName())) {
 
-			errorMessageJSONObject.put(
-				"size", referrers.size()
-			).put(
-				"type",
-				ResourceActionsUtil.getModelResource(locale, entry.getKey())
-			);
+							return LanguageUtil.format(
+								locale,
+								"the-original-x-does-not-exist-in-the-" +
+									"current-environment",
+								ResourceActionsUtil.getModelResource(
+									locale, missingReference.getClassName()),
+								false);
+						}
 
-			warningMessagesJSONArray.put(errorMessageJSONObject);
+						return null;
+					}
+				).put(
+					"size",
+					() -> {
+						Map<String, String> referrers =
+							missingReference.getReferrers();
+
+						return referrers.size();
+					}
+				).put(
+					"type",
+					ResourceActionsUtil.getModelResource(locale, entry.getKey())
+				));
 		}
 
 		return warningMessagesJSONArray;
@@ -3625,16 +3585,24 @@ public class StagingImpl implements Staging {
 			return 0;
 		}
 
+		long layoutBranchId = getRecentLayoutBranchId(
+			userId, layoutSetBranchId, plid);
+
 		RecentLayoutRevision recentLayoutRevision =
 			_recentLayoutRevisionLocalService.fetchRecentLayoutRevision(
 				userId, layoutSetBranchId, plid);
 
 		if (recentLayoutRevision != null) {
-			return recentLayoutRevision.getLayoutRevisionId();
-		}
+			LayoutRevision layoutRevision =
+				_layoutRevisionLocalService.fetchLayoutRevision(
+					recentLayoutRevision.getLayoutRevisionId());
 
-		long layoutBranchId = getRecentLayoutBranchId(
-			userId, layoutSetBranchId, plid);
+			if ((layoutRevision != null) &&
+				(layoutRevision.getLayoutBranchId() == layoutBranchId)) {
+
+				return layoutRevision.getLayoutRevisionId();
+			}
+		}
 
 		LayoutBranch layoutBranch = _layoutBranchLocalService.fetchLayoutBranch(
 			layoutBranchId);
@@ -3688,11 +3656,6 @@ public class StagingImpl implements Staging {
 			PortletRequest portletRequest, long targetGroupId, boolean remote)
 		throws SchedulerException {
 
-		ScheduleInformation scheduleInformation = new ScheduleInformation();
-
-		int recurrenceType = ParamUtil.getInteger(
-			portletRequest, "recurrenceType");
-
 		Calendar startCalendar = ExportImportDateUtil.getCalendar(
 			portletRequest, "schedulerStartDate", true);
 
@@ -3707,6 +3670,11 @@ public class StagingImpl implements Staging {
 
 			throw schedulerException;
 		}
+
+		ScheduleInformation scheduleInformation = new ScheduleInformation();
+
+		int recurrenceType = ParamUtil.getInteger(
+			portletRequest, "recurrenceType");
 
 		String cronText = SchedulerEngineHelperUtil.getCronText(
 			portletRequest, startCalendar, false, recurrenceType);
@@ -3803,12 +3771,12 @@ public class StagingImpl implements Staging {
 
 	protected boolean isStagingUseVirtualHostForRemoteSite() {
 		try {
-			ExportImportServiceConfiguration configuration =
+			StagingConfiguration stagingConfiguration =
 				_configurationProvider.getCompanyConfiguration(
-					ExportImportServiceConfiguration.class,
+					StagingConfiguration.class,
 					CompanyThreadLocal.getCompanyId());
 
-			return configuration.stagingUseVirtualHostForRemoteSite();
+			return stagingConfiguration.stagingUseVirtualHostForRemoteSite();
 		}
 		catch (Exception exception) {
 			_log.error(exception, exception);
@@ -4172,9 +4140,6 @@ public class StagingImpl implements Staging {
 	private WorkflowInstanceLinkLocalService _workflowInstanceLinkLocalService;
 
 	private class ScheduleInformation {
-
-		public ScheduleInformation() {
-		}
 
 		public String getCronText() {
 			return _cronText;

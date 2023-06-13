@@ -128,8 +128,8 @@ public class SamlSpAuthRequestUtil {
 	 * @param createDate the create date
 	 * @return the matching saml sp auth requests
 	 */
-	public static List<SamlSpAuthRequest> findByCreateDate(Date createDate) {
-		return getPersistence().findByCreateDate(createDate);
+	public static List<SamlSpAuthRequest> findByLtCreateDate(Date createDate) {
+		return getPersistence().findByLtCreateDate(createDate);
 	}
 
 	/**
@@ -144,10 +144,10 @@ public class SamlSpAuthRequestUtil {
 	 * @param end the upper bound of the range of saml sp auth requests (not inclusive)
 	 * @return the range of matching saml sp auth requests
 	 */
-	public static List<SamlSpAuthRequest> findByCreateDate(
+	public static List<SamlSpAuthRequest> findByLtCreateDate(
 		Date createDate, int start, int end) {
 
-		return getPersistence().findByCreateDate(createDate, start, end);
+		return getPersistence().findByLtCreateDate(createDate, start, end);
 	}
 
 	/**
@@ -163,11 +163,11 @@ public class SamlSpAuthRequestUtil {
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching saml sp auth requests
 	 */
-	public static List<SamlSpAuthRequest> findByCreateDate(
+	public static List<SamlSpAuthRequest> findByLtCreateDate(
 		Date createDate, int start, int end,
 		OrderByComparator<SamlSpAuthRequest> orderByComparator) {
 
-		return getPersistence().findByCreateDate(
+		return getPersistence().findByLtCreateDate(
 			createDate, start, end, orderByComparator);
 	}
 
@@ -185,12 +185,12 @@ public class SamlSpAuthRequestUtil {
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching saml sp auth requests
 	 */
-	public static List<SamlSpAuthRequest> findByCreateDate(
+	public static List<SamlSpAuthRequest> findByLtCreateDate(
 		Date createDate, int start, int end,
 		OrderByComparator<SamlSpAuthRequest> orderByComparator,
 		boolean useFinderCache) {
 
-		return getPersistence().findByCreateDate(
+		return getPersistence().findByLtCreateDate(
 			createDate, start, end, orderByComparator, useFinderCache);
 	}
 
@@ -202,13 +202,13 @@ public class SamlSpAuthRequestUtil {
 	 * @return the first matching saml sp auth request
 	 * @throws NoSuchSpAuthRequestException if a matching saml sp auth request could not be found
 	 */
-	public static SamlSpAuthRequest findByCreateDate_First(
+	public static SamlSpAuthRequest findByLtCreateDate_First(
 			Date createDate,
 			OrderByComparator<SamlSpAuthRequest> orderByComparator)
 		throws com.liferay.saml.persistence.exception.
 			NoSuchSpAuthRequestException {
 
-		return getPersistence().findByCreateDate_First(
+		return getPersistence().findByLtCreateDate_First(
 			createDate, orderByComparator);
 	}
 
@@ -219,11 +219,11 @@ public class SamlSpAuthRequestUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching saml sp auth request, or <code>null</code> if a matching saml sp auth request could not be found
 	 */
-	public static SamlSpAuthRequest fetchByCreateDate_First(
+	public static SamlSpAuthRequest fetchByLtCreateDate_First(
 		Date createDate,
 		OrderByComparator<SamlSpAuthRequest> orderByComparator) {
 
-		return getPersistence().fetchByCreateDate_First(
+		return getPersistence().fetchByLtCreateDate_First(
 			createDate, orderByComparator);
 	}
 
@@ -235,13 +235,13 @@ public class SamlSpAuthRequestUtil {
 	 * @return the last matching saml sp auth request
 	 * @throws NoSuchSpAuthRequestException if a matching saml sp auth request could not be found
 	 */
-	public static SamlSpAuthRequest findByCreateDate_Last(
+	public static SamlSpAuthRequest findByLtCreateDate_Last(
 			Date createDate,
 			OrderByComparator<SamlSpAuthRequest> orderByComparator)
 		throws com.liferay.saml.persistence.exception.
 			NoSuchSpAuthRequestException {
 
-		return getPersistence().findByCreateDate_Last(
+		return getPersistence().findByLtCreateDate_Last(
 			createDate, orderByComparator);
 	}
 
@@ -252,11 +252,11 @@ public class SamlSpAuthRequestUtil {
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching saml sp auth request, or <code>null</code> if a matching saml sp auth request could not be found
 	 */
-	public static SamlSpAuthRequest fetchByCreateDate_Last(
+	public static SamlSpAuthRequest fetchByLtCreateDate_Last(
 		Date createDate,
 		OrderByComparator<SamlSpAuthRequest> orderByComparator) {
 
-		return getPersistence().fetchByCreateDate_Last(
+		return getPersistence().fetchByLtCreateDate_Last(
 			createDate, orderByComparator);
 	}
 
@@ -269,13 +269,13 @@ public class SamlSpAuthRequestUtil {
 	 * @return the previous, current, and next saml sp auth request
 	 * @throws NoSuchSpAuthRequestException if a saml sp auth request with the primary key could not be found
 	 */
-	public static SamlSpAuthRequest[] findByCreateDate_PrevAndNext(
+	public static SamlSpAuthRequest[] findByLtCreateDate_PrevAndNext(
 			long samlSpAuthnRequestId, Date createDate,
 			OrderByComparator<SamlSpAuthRequest> orderByComparator)
 		throws com.liferay.saml.persistence.exception.
 			NoSuchSpAuthRequestException {
 
-		return getPersistence().findByCreateDate_PrevAndNext(
+		return getPersistence().findByLtCreateDate_PrevAndNext(
 			samlSpAuthnRequestId, createDate, orderByComparator);
 	}
 
@@ -284,8 +284,8 @@ public class SamlSpAuthRequestUtil {
 	 *
 	 * @param createDate the create date
 	 */
-	public static void removeByCreateDate(Date createDate) {
-		getPersistence().removeByCreateDate(createDate);
+	public static void removeByLtCreateDate(Date createDate) {
+		getPersistence().removeByLtCreateDate(createDate);
 	}
 
 	/**
@@ -294,8 +294,8 @@ public class SamlSpAuthRequestUtil {
 	 * @param createDate the create date
 	 * @return the number of matching saml sp auth requests
 	 */
-	public static int countByCreateDate(Date createDate) {
-		return getPersistence().countByCreateDate(createDate);
+	public static int countByLtCreateDate(Date createDate) {
+		return getPersistence().countByLtCreateDate(createDate);
 	}
 
 	/**

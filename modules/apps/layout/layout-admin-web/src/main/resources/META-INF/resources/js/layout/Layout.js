@@ -17,20 +17,18 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import Breadcrumbs from '../breadcrumbs/Breadcrumbs';
 import MillerColumns from '../miller_columns/MillerColumns';
-import actionHandlers from './actionHandlers';
 
 const Layout = ({
 	getItemChildrenURL,
 	initialBreadcrumbEntries,
 	initialLayoutColumns,
-	languageDirection,
 	languageId,
 	moveItemURL,
 	namespace,
 	searchContainerId,
 }) => {
 	const layoutRef = useRef();
-	const searchContainer = useRef();
+	const searchContainerRef = useRef();
 
 	const [breadcrumbEntries, setBreadcrumbEntries] = useState(
 		initialBreadcrumbEntries
@@ -54,17 +52,17 @@ const Layout = ({
 					},
 				];
 
-				if (searchContainer.current) {
-					searchContainer.current.destroy();
+				if (searchContainerRef.current) {
+					searchContainerRef.current.destroy();
 				}
 
-				searchContainer.current = new Liferay.SearchContainer({
+				searchContainerRef.current = new Liferay.SearchContainer({
 					contentBox: layoutRef.current,
 					id: `${namespace}${searchContainerId}`,
 					plugins,
 				});
 
-				setSearchContainerElement(searchContainer.current);
+				setSearchContainerElement(searchContainerRef.current);
 			}
 		);
 	}, [namespace, searchContainerId]);
@@ -171,14 +169,14 @@ const Layout = ({
 	return (
 		<div ref={layoutRef}>
 			<Breadcrumbs entries={breadcrumbEntries} />
+
 			<MillerColumns
-				actionHandlers={actionHandlers}
 				initialColumns={layoutColumns}
 				namespace={namespace}
 				onColumnsChange={updateBreadcrumbs}
 				onItemMove={saveData}
 				onItemStayHover={getItemChildren}
-				rtl={languageDirection[languageId] === 'rtl'}
+				rtl={Liferay.Language.direction[languageId] === 'rtl'}
 				searchContainer={searchContainerElement}
 			/>
 		</div>
@@ -190,7 +188,6 @@ export default function ({
 	props: {
 		breadcrumbEntries,
 		getItemChildrenURL,
-		languageDirection,
 		languageId,
 		layoutColumns,
 		moveItemURL,
@@ -202,7 +199,6 @@ export default function ({
 			getItemChildrenURL={getItemChildrenURL}
 			initialBreadcrumbEntries={breadcrumbEntries}
 			initialLayoutColumns={layoutColumns}
-			languageDirection={languageDirection}
 			languageId={languageId}
 			moveItemURL={moveItemURL}
 			namespace={namespace}

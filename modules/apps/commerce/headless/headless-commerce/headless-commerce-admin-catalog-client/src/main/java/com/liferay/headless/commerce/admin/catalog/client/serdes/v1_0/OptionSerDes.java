@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -53,6 +54,16 @@ public class OptionSerDes {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
+
+		if (option.getActions() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(option.getActions()));
+		}
 
 		if (option.getCatalogId() != null) {
 			if (sb.length() > 1) {
@@ -214,6 +225,13 @@ public class OptionSerDes {
 
 		Map<String, String> map = new TreeMap<>();
 
+		if (option.getActions() == null) {
+			map.put("actions", null);
+		}
+		else {
+			map.put("actions", String.valueOf(option.getActions()));
+		}
+
 		if (option.getCatalogId() == null) {
 			map.put("catalogId", null);
 		}
@@ -321,7 +339,13 @@ public class OptionSerDes {
 			Option option, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "catalogId")) {
+			if (Objects.equals(jsonParserFieldName, "actions")) {
+				if (jsonParserFieldValue != null) {
+					option.setActions(
+						(Map)OptionSerDes.toMap((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "catalogId")) {
 				if (jsonParserFieldValue != null) {
 					option.setCatalogId(
 						Long.valueOf((String)jsonParserFieldValue));
@@ -370,18 +394,14 @@ public class OptionSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "optionValues")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					OptionValue[] optionValuesArray =
-						new OptionValue[jsonParserFieldValues.length];
-
-					for (int i = 0; i < optionValuesArray.length; i++) {
-						optionValuesArray[i] = OptionValueSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					option.setOptionValues(optionValuesArray);
+					option.setOptionValues(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> OptionValueSerDes.toDTO((String)object)
+						).toArray(
+							size -> new OptionValue[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "priority")) {

@@ -15,9 +15,9 @@
 (function () {
 	const IMAGE_HANDLES = ['tl', 'tr', 'bl', 'br'];
 
-	const positionElement = (el, left, top) => {
-		el.style.left = `${left}px`;
-		el.style.top = `${top}px`;
+	const positionElement = (element, left, top) => {
+		element.style.left = `${left}px`;
+		element.style.top = `${top}px`;
 	};
 
 	const POSITION_ELEMENT_FN = {
@@ -42,8 +42,8 @@
 		},
 	};
 
-	const getBoundingBox = (window, el) => {
-		const rect = el.getBoundingClientRect();
+	const getBoundingBox = (window, element) => {
+		const rect = element.getBoundingClientRect();
 
 		return {
 			height: rect.height,
@@ -73,8 +73,7 @@
 
 		init() {
 			this.container = this.document.createElement('div');
-			this.container.classList.add('ckimgrszwrapper');
-			this.container.id = 'ckimgrsz' + this.editor.id;
+			this.container.id = 'ckimgrsz';
 
 			this.preview = this.document.createElement('span');
 
@@ -91,27 +90,23 @@
 			for (let i = 0; i < keys.length; i++) {
 				this.container.appendChild(this.handles[keys[i]]);
 			}
-
-			this.editor.on('destroy', () => {
-				this.container.remove();
-			});
 		}
 
 		createHandle(name) {
-			const el = this.document.createElement('i');
+			const element = this.document.createElement('i');
 
-			el.classList.add(name);
+			element.classList.add(name);
 
-			return el;
+			return element;
 		}
 
-		isHandle(el) {
+		isHandle(element) {
 			const keys = Object.keys(this.handles);
 
 			let result = false;
 
 			for (let i = 0; i < keys.length; i++) {
-				if (this.handles[keys[i]] === el) {
+				if (this.handles[keys[i]] === element) {
 					result = true;
 				}
 			}
@@ -119,10 +114,10 @@
 			return result;
 		}
 
-		show(el) {
+		show(element) {
 			const uiNode = this.editor.config.uiNode || this.document.body;
 
-			this.el = el;
+			this.el = element;
 
 			this.box = getBoundingBox(this.window, this.el);
 

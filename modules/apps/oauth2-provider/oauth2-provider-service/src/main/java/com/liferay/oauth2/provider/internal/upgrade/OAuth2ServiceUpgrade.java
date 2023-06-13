@@ -15,10 +15,11 @@
 package com.liferay.oauth2.provider.internal.upgrade;
 
 import com.liferay.oauth2.provider.internal.upgrade.v1_2_0.util.OAuth2AuthorizationTable;
-import com.liferay.oauth2.provider.internal.upgrade.v2_0_0.UpgradeOAuth2ApplicationScopeAliases;
+import com.liferay.oauth2.provider.internal.upgrade.v2_0_0.OAuth2ApplicationScopeAliasesUpgradeProcess;
 import com.liferay.oauth2.provider.internal.upgrade.v2_0_0.util.OAuth2ApplicationScopeAliasesTable;
 import com.liferay.oauth2.provider.internal.upgrade.v2_0_0.util.OAuth2ApplicationTable;
 import com.liferay.oauth2.provider.internal.upgrade.v2_0_0.util.OAuth2ScopeGrantTable;
+import com.liferay.oauth2.provider.internal.upgrade.v3_2_0.OAuth2ApplicationFeatureUpgradeProcess;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
@@ -38,7 +39,7 @@ public class OAuth2ServiceUpgrade implements UpgradeStepRegistrator {
 		registry.register(
 			"1.0.0", "1.1.0",
 			new com.liferay.oauth2.provider.internal.upgrade.v1_1_0.
-				UpgradeOAuth2ScopeGrant());
+				OAuth2ScopeGrantUpgradeProcess());
 
 		registry.register(
 			"1.1.0", "1.2.0",
@@ -53,7 +54,7 @@ public class OAuth2ServiceUpgrade implements UpgradeStepRegistrator {
 
 		registry.register(
 			"1.3.0", "2.0.0",
-			new UpgradeOAuth2ApplicationScopeAliases(
+			new OAuth2ApplicationScopeAliasesUpgradeProcess(
 				_companyLocalService, _scopeLocator),
 			UpgradeStepFactory.dropColumns(
 				OAuth2ApplicationScopeAliasesTable.class, "scopeAliases",
@@ -69,6 +70,19 @@ public class OAuth2ServiceUpgrade implements UpgradeStepRegistrator {
 			UpgradeStepFactory.runSql(
 				"update OAuth2Application set clientCredentialUserId = " +
 					"userId, clientCredentialUserName = userName"));
+
+		registry.register(
+			"3.0.0", "3.1.0",
+			UpgradeStepFactory.addColumns(
+				OAuth2ApplicationTable.class, "rememberDevice BOOLEAN"),
+			UpgradeStepFactory.addColumns(
+				OAuth2ApplicationTable.class, "trustedApplication BOOLEAN"),
+			UpgradeStepFactory.addColumns(
+				OAuth2AuthorizationTable.class,
+				"rememberDeviceContent VARCHAR(75) null"));
+
+		registry.register(
+			"3.1.0", "4.0.0", new OAuth2ApplicationFeatureUpgradeProcess());
 	}
 
 	@Reference

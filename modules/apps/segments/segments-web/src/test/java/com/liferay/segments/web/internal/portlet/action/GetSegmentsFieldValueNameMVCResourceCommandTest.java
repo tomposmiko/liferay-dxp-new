@@ -14,7 +14,6 @@
 
 package com.liferay.segments.web.internal.portlet.action;
 
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
@@ -50,7 +49,7 @@ public class GetSegmentsFieldValueNameMVCResourceCommandTest {
 		LiferayUnitTestRule.INSTANCE;
 
 	@Before
-	public void setUp() throws PortalException {
+	public void setUp() {
 		ReflectionTestUtil.setFieldValue(
 			_getSegmentsFieldValueNameMVCResourceCommand,
 			"_segmentsFieldCustomizerRegistry",
@@ -84,7 +83,7 @@ public class GetSegmentsFieldValueNameMVCResourceCommandTest {
 			"fieldValueName", fieldValueName);
 
 		Assert.assertEquals(
-			expectedJSONObject.toString(), jsonObject.toString());
+			expectedJSONObject.toJSONString(), jsonObject.toJSONString());
 	}
 
 	@Test
@@ -106,7 +105,7 @@ public class GetSegmentsFieldValueNameMVCResourceCommandTest {
 					entityName, fieldName, RandomTestUtil.randomString(),
 					LocaleUtil.getDefault());
 
-		Assert.assertEquals("{}", jsonObject.toString());
+		Assert.assertEquals("{}", jsonObject.toJSONString());
 	}
 
 	private SegmentsFieldCustomizer _createSegmentsFieldCustomizer(

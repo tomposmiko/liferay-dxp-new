@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bryan Engler
  */
 @Component(
-	immediate = true,
+	enabled = false, immediate = true,
 	property = "model.class.name=com.liferay.portal.search.elasticsearch.cross.cluster.replication.internal.configuration.CrossClusterReplicationConfiguration",
 	service = ConfigurationModelListener.class
 )
@@ -305,6 +305,10 @@ public class CrossClusterReplicationConfigurationModelListener
 				_getResourceBundle(), key, arguments);
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return null;
 		}
 	}

@@ -14,8 +14,6 @@
 
 package com.liferay.layout.type.controller.content.internal.layout.type.controller;
 
-import com.liferay.fragment.constants.FragmentActionKeys;
-import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
@@ -34,6 +32,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.permission.LayoutPermission;
+import com.liferay.portal.kernel.servlet.PipingServletResponse;
 import com.liferay.portal.kernel.servlet.TransferHeadersHelperUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
@@ -42,7 +41,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.taglib.servlet.PipingServletResponse;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -92,7 +90,7 @@ public class ContentLayoutTypeController extends BaseLayoutTypeControllerImpl {
 
 		Boolean hasUpdatePermissions = null;
 
-		if (layout.getClassNameId() == _portal.getClassNameId(Layout.class)) {
+		if (layout.isDraftLayout()) {
 			Layout curLayout = _layoutLocalService.fetchLayout(
 				layout.getClassPK());
 
@@ -123,10 +121,6 @@ public class ContentLayoutTypeController extends BaseLayoutTypeControllerImpl {
 				layoutMode = Constants.VIEW;
 			}
 		}
-
-		httpServletRequest.setAttribute(
-			FragmentActionKeys.FRAGMENT_RENDERER_CONTROLLER,
-			_fragmentRendererController);
 
 		String page = getViewPage();
 
@@ -316,7 +310,7 @@ public class ContentLayoutTypeController extends BaseLayoutTypeControllerImpl {
 			return layoutPageTemplateEntry;
 		}
 
-		if (layout.getClassNameId() == _portal.getClassNameId(Layout.class)) {
+		if (layout.isDraftLayout()) {
 			Layout publishedLayout = _layoutLocalService.fetchLayout(
 				layout.getClassPK());
 
@@ -362,9 +356,6 @@ public class ContentLayoutTypeController extends BaseLayoutTypeControllerImpl {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ContentLayoutTypeController.class);
-
-	@Reference
-	private FragmentRendererController _fragmentRendererController;
 
 	@Reference
 	private Http _http;

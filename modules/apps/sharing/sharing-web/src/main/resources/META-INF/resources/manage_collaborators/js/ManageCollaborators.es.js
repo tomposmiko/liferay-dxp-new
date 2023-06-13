@@ -19,10 +19,9 @@ import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import ClaySticker from '@clayui/sticker';
+import {useTimeout} from '@liferay/frontend-js-react-web';
 import classNames from 'classnames';
-import {useTimeout} from 'frontend-js-react-web';
 import {fetch, objectToFormData} from 'frontend-js-web';
-import dom from 'metal-dom';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
@@ -119,8 +118,7 @@ const ManageCollaborators = ({
 		if (
 			invalidElements.indexOf(eventTarget.nodeName.toLowerCase()) === -1
 		) {
-			const collaboratorContainer = dom.closest(
-				eventTarget,
+			const collaboratorContainer = eventTarget.closest(
 				'.list-group-item'
 			);
 
@@ -140,7 +138,7 @@ const ManageCollaborators = ({
 
 		setCurrentCollaborators(
 			currentCollaborators.filter(
-				(collaborator) => collaborator.userId != collaboratorId
+				(collaborator) => collaborator.userId !== collaboratorId
 			)
 		);
 
@@ -431,6 +429,7 @@ const ManageCollaborators = ({
 							/>
 						</ClayLayout.ContentCol>
 					</ClayLayout.ContentRow>
+
 					<div
 						className={classNames({
 							hide: userId !== expandedCollaboratorId,
@@ -543,6 +542,7 @@ const ManageCollaborators = ({
 								<h3>
 									{Liferay.Language.get('no-collaborators')}
 								</h3>
+
 								<p>
 									{Liferay.Language.get(
 										'to-add-collaborators-share-the-file-again'
@@ -563,12 +563,14 @@ const ManageCollaborators = ({
 						>
 							{Liferay.Language.get('cancel')}
 						</ClayButton>
+
 						<ClayButton
 							disabled={loadingResponse || expirationDateError}
 							displayType="primary"
 							onClick={handleSaveButtonClick}
 						>
 							{loadingResponse && <ClayLoadingIndicator />}
+
 							{Liferay.Language.get('save')}
 						</ClayButton>
 					</ClayButton.Group>

@@ -14,10 +14,12 @@
 
 package com.liferay.portal.service.impl;
 
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.Plugin;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.PluginSettingLocalService;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
 import com.liferay.portal.service.base.LayoutSetServiceBaseImpl;
@@ -129,7 +131,7 @@ public class LayoutSetServiceImpl extends LayoutSetServiceBaseImpl {
 		GroupPermissionUtil.check(
 			getPermissionChecker(), groupId, ActionKeys.MANAGE_LAYOUTS);
 
-		pluginSettingLocalService.checkPermission(
+		_pluginSettingLocalService.checkPermission(
 			getUserId(), themeId, Plugin.TYPE_THEME);
 
 		return layoutSetLocalService.updateLookAndFeel(
@@ -148,23 +150,6 @@ public class LayoutSetServiceImpl extends LayoutSetServiceBaseImpl {
 			groupId, privateLayout, settings);
 	}
 
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 *             #updateVirtualHosts(long, boolean, TreeMap)}
-	 */
-	@Deprecated
-	@Override
-	public LayoutSet updateVirtualHost(
-			long groupId, boolean privateLayout, String virtualHostname)
-		throws PortalException {
-
-		GroupPermissionUtil.check(
-			getPermissionChecker(), groupId, ActionKeys.UPDATE);
-
-		return layoutSetLocalService.updateVirtualHost(
-			groupId, privateLayout, virtualHostname);
-	}
-
 	@Override
 	public LayoutSet updateVirtualHosts(
 			long groupId, boolean privateLayout,
@@ -177,5 +162,8 @@ public class LayoutSetServiceImpl extends LayoutSetServiceBaseImpl {
 		return layoutSetLocalService.updateVirtualHosts(
 			groupId, privateLayout, virtualHostnames);
 	}
+
+	@BeanReference(type = PluginSettingLocalService.class)
+	private PluginSettingLocalService _pluginSettingLocalService;
 
 }

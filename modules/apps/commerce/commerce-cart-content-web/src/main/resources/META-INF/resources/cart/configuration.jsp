@@ -29,11 +29,11 @@ CommerceCartContentDisplayContext commerceCartContentDisplayContext = (CommerceC
 	<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
 
 	<div class="portlet-configuration-body-content">
-		<div class="container-fluid-1280">
+		<div class="container-fluid container-fluid-max-xl">
 			<aui:fieldset-group markupView="lexicon">
 				<aui:fieldset>
 					<div class="display-template">
-						<liferay-ddm:template-selector
+						<liferay-template:template-selector
 							className="<%= CommerceCartContentPortlet.class.getName() %>"
 							displayStyle="<%= commerceCartContentDisplayContext.getDisplayStyle() %>"
 							displayStyleGroupId="<%= commerceCartContentDisplayContext.getDisplayStyleGroupId() %>"

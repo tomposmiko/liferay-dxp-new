@@ -63,57 +63,18 @@ import java.rmi.RemoteException;
 @Deprecated
 public class CPDisplayLayoutServiceSoap {
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x)
-	 */
-	@Deprecated
 	public static com.liferay.commerce.product.model.CPDisplayLayoutSoap
 			addCPDisplayLayout(
-				Class<?> clazz, long classPK, String layoutUuid,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+				long groupId, Class<?> clazz, long classPK, String layoutUuid)
 		throws RemoteException {
 
 		try {
 			com.liferay.commerce.product.model.CPDisplayLayout returnValue =
 				CPDisplayLayoutServiceUtil.addCPDisplayLayout(
-					clazz, classPK, layoutUuid, serviceContext);
+					groupId, clazz, classPK, layoutUuid);
 
 			return com.liferay.commerce.product.model.CPDisplayLayoutSoap.
 				toSoapModel(returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	public static com.liferay.commerce.product.model.CPDisplayLayoutSoap
-			addCPDisplayLayout(
-				long userId, long groupId, Class<?> clazz, long classPK,
-				String layoutUuid)
-		throws RemoteException {
-
-		try {
-			com.liferay.commerce.product.model.CPDisplayLayout returnValue =
-				CPDisplayLayoutServiceUtil.addCPDisplayLayout(
-					userId, groupId, clazz, classPK, layoutUuid);
-
-			return com.liferay.commerce.product.model.CPDisplayLayoutSoap.
-				toSoapModel(returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	public static void deleteCPDisplayLayout(Class<?> clazz, long classPK)
-		throws RemoteException {
-
-		try {
-			CPDisplayLayoutServiceUtil.deleteCPDisplayLayout(clazz, classPK);
 		}
 		catch (Exception exception) {
 			_log.error(exception, exception);
@@ -155,13 +116,14 @@ public class CPDisplayLayoutServiceSoap {
 	}
 
 	public static com.liferay.commerce.product.model.CPDisplayLayoutSoap
-			updateCPDisplayLayout(long cpDisplayLayoutId, String layoutUuid)
+			updateCPDisplayLayout(
+				long cpDisplayLayoutId, long classPK, String layoutUuid)
 		throws RemoteException {
 
 		try {
 			com.liferay.commerce.product.model.CPDisplayLayout returnValue =
 				CPDisplayLayoutServiceUtil.updateCPDisplayLayout(
-					cpDisplayLayoutId, layoutUuid);
+					cpDisplayLayoutId, classPK, layoutUuid);
 
 			return com.liferay.commerce.product.model.CPDisplayLayoutSoap.
 				toSoapModel(returnValue);

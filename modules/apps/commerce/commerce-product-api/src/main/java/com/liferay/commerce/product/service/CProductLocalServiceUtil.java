@@ -60,12 +60,12 @@ public class CProductLocalServiceUtil {
 	}
 
 	public static CProduct addCProduct(
-			long groupId, long userId, String externalReferenceCode,
+			String externalReferenceCode, long groupId, long userId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().addCProduct(
-			groupId, userId, externalReferenceCode, serviceContext);
+			externalReferenceCode, groupId, userId, serviceContext);
 	}
 
 	/**
@@ -221,7 +221,13 @@ public class CProductLocalServiceUtil {
 		return getService().fetchCProduct(CProductId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the c product with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the c product's external reference code
+	 * @return the matching c product, or <code>null</code> if a matching c product could not be found
+	 */
 	public static CProduct fetchCProductByExternalReferenceCode(
 		long companyId, String externalReferenceCode) {
 
@@ -229,6 +235,9 @@ public class CProductLocalServiceUtil {
 			companyId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCProductByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	public static CProduct fetchCProductByReferenceCode(
 		long companyId, String externalReferenceCode) {
@@ -273,7 +282,14 @@ public class CProductLocalServiceUtil {
 		return getService().getCProductByCPInstanceUuid(cpInstanceUuid);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the c product with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the c product's external reference code
+	 * @return the matching c product
+	 * @throws PortalException if a matching c product could not be found
+	 */
 	public static CProduct getCProductByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
 		throws PortalException {
@@ -404,11 +420,11 @@ public class CProductLocalServiceUtil {
 	}
 
 	public static CProduct updateCProductExternalReferenceCode(
-			long cProductId, String externalReferenceCode)
+			String externalReferenceCode, long cProductId)
 		throws PortalException {
 
 		return getService().updateCProductExternalReferenceCode(
-			cProductId, externalReferenceCode);
+			externalReferenceCode, cProductId);
 	}
 
 	public static CProduct updatePublishedCPDefinitionId(

@@ -256,8 +256,8 @@ public class ExportImportDisplayPagesTest {
 			actualRootLayoutStructureItem.getItemConfigJSONObject();
 
 		Assert.assertEquals(
-			expectedItemConfigJSONObject.toString(),
-			actualItemConfigJSONObject.toString());
+			expectedItemConfigJSONObject.toJSONString(),
+			actualItemConfigJSONObject.toJSONString());
 
 		Assert.assertEquals(
 			expectedRootLayoutStructureItem.getItemType(),
@@ -291,7 +291,7 @@ public class ExportImportDisplayPagesTest {
 		_layoutPageTemplateStructureLocalService;
 
 	@Inject(
-		filter = "mvc.command.name=/layout_page_template/export_display_page"
+		filter = "mvc.command.name=/layout_page_template_admin/export_display_pages"
 	)
 	private MVCResourceCommand _mvcResourceCommand;
 

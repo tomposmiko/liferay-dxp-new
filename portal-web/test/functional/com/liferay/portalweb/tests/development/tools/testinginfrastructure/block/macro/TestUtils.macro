@@ -1,11 +1,11 @@
 definition {
 
 	macro assertEquals {
-		echo(${expected});
+		echo("${expected}");
 
-		echo(${actual});
+		echo("${actual}");
 
-		if (${expected} == ${actual}) {
+		if ("${expected}" == "${actual}") {
 			echo("PASSED");
 		}
 		else {
@@ -14,11 +14,11 @@ definition {
 	}
 
 	macro assertNotEquals {
-		echo(${expected});
+		echo("${expected}");
 
-		echo(${actual});
+		echo("${actual}");
 
-		if (${expected} != ${actual}) {
+		if ("${expected}" != "${actual}") {
 			echo("PASSED");
 		}
 		else {
@@ -31,9 +31,9 @@ definition {
 			var message = "FAIL";
 		}
 
-		echo(${message});
+		echo("${message}");
 
-		fail(${message});
+		fail("${message}");
 	}
 
 	macro getElementTextContent {
@@ -44,32 +44,15 @@ var element = document.evaluate("${element}", document, null, XPathResult.FIRST_
 
 return element.textContent;
 		''';
+		var textContent = selenium.getEval("${javascript}");
 
-		var textContent = selenium.getEval(${javascript});
-
-		return ${textContent};
-	}
-
-	macro getScreenHeight {
-		WaitForSPARefresh();
-
-		var screenHeight = selenium.getEval("return	screen.height.toString();");
-
-		return ${screenHeight};
-	}
-
-	macro getScreenWidth {
-		WaitForSPARefresh();
-
-		var screenWidth = selenium.getEval("return screen.width.toString();");
-
-		return ${screenWidth};
+		return "${textContent}";
 	}
 
 	macro hardRefresh {
 		var mac = OSDetector.isApple();
 
-		if (${mac} == "true") {
+		if ("${mac}" == "true") {
 			RobotType.robotTypeShortcut(locator1 = "Shift + Command + r");
 		}
 		else {
@@ -80,17 +63,32 @@ return element.textContent;
 	}
 
 	macro isGreaterThan {
-		echo(${expected});
+		echo("${expected}");
 
-		echo(${actual});
+		echo("${actual}");
 
-		var result = MathUtil.isGreaterThan(${actual}, ${expected});
+		var result = MathUtil.isGreaterThan("${actual}", "${expected}");
 
-		if (${result} == "true") {
+		if ("${result}" == "true") {
 			echo("PASSED");
 		}
 		else {
 			TestUtils.fail(message = "FAILED: actual '${actual}' is less than or equals to expected '${expected}'");
+		}
+	}
+
+	macro isLessThan {
+		echo("${expected}");
+
+		echo("${actual}");
+
+		var result = MathUtil.isLessThan("${actual}", "${expected}");
+
+		if ("${result}" == "true") {
+			echo("PASSED");
+		}
+		else {
+			TestUtils.fail(message = "FAILED: actual '${actual}' is greater than or equals to expected '${expected}'");
 		}
 	}
 
@@ -99,7 +97,7 @@ return element.textContent;
 			var message = "PASS";
 		}
 
-		echo(${message});
+		echo("${message}");
 	}
 
 	macro typeIntoField {
@@ -109,7 +107,7 @@ return element.textContent;
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(pageName = "Test Page Name");
+		PagesAdmin.addPublicPage(pageName = "Test Page Name");
 	}
 
 }

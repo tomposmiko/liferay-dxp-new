@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -300,64 +301,86 @@ public class AnnouncementsFlagModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, AnnouncementsFlag>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			AnnouncementsFlag.class.getClassLoader(), AnnouncementsFlag.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<AnnouncementsFlag> constructor =
+				(Constructor<AnnouncementsFlag>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<AnnouncementsFlag, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<AnnouncementsFlag, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<AnnouncementsFlag, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<AnnouncementsFlag, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", AnnouncementsFlag::getMvccVersion);
-		attributeGetterFunctions.put("flagId", AnnouncementsFlag::getFlagId);
-		attributeGetterFunctions.put(
-			"companyId", AnnouncementsFlag::getCompanyId);
-		attributeGetterFunctions.put("userId", AnnouncementsFlag::getUserId);
-		attributeGetterFunctions.put(
-			"createDate", AnnouncementsFlag::getCreateDate);
-		attributeGetterFunctions.put("entryId", AnnouncementsFlag::getEntryId);
-		attributeGetterFunctions.put("value", AnnouncementsFlag::getValue);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<AnnouncementsFlag, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<AnnouncementsFlag, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap<String, BiConsumer<AnnouncementsFlag, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", AnnouncementsFlag::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AnnouncementsFlag, Long>)
 				AnnouncementsFlag::setMvccVersion);
+		attributeGetterFunctions.put("flagId", AnnouncementsFlag::getFlagId);
 		attributeSetterBiConsumers.put(
 			"flagId",
 			(BiConsumer<AnnouncementsFlag, Long>)AnnouncementsFlag::setFlagId);
+		attributeGetterFunctions.put(
+			"companyId", AnnouncementsFlag::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AnnouncementsFlag, Long>)
 				AnnouncementsFlag::setCompanyId);
+		attributeGetterFunctions.put("userId", AnnouncementsFlag::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<AnnouncementsFlag, Long>)AnnouncementsFlag::setUserId);
+		attributeGetterFunctions.put(
+			"createDate", AnnouncementsFlag::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<AnnouncementsFlag, Date>)
 				AnnouncementsFlag::setCreateDate);
+		attributeGetterFunctions.put("entryId", AnnouncementsFlag::getEntryId);
 		attributeSetterBiConsumers.put(
 			"entryId",
 			(BiConsumer<AnnouncementsFlag, Long>)AnnouncementsFlag::setEntryId);
+		attributeGetterFunctions.put("value", AnnouncementsFlag::getValue);
 		attributeSetterBiConsumers.put(
 			"value",
 			(BiConsumer<AnnouncementsFlag, Integer>)
 				AnnouncementsFlag::setValue);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -592,6 +615,29 @@ public class AnnouncementsFlagModelImpl
 	}
 
 	@Override
+	public AnnouncementsFlag cloneWithOriginalValues() {
+		AnnouncementsFlagImpl announcementsFlagImpl =
+			new AnnouncementsFlagImpl();
+
+		announcementsFlagImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		announcementsFlagImpl.setFlagId(
+			this.<Long>getColumnOriginalValue("flagId"));
+		announcementsFlagImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		announcementsFlagImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		announcementsFlagImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		announcementsFlagImpl.setEntryId(
+			this.<Long>getColumnOriginalValue("entryId"));
+		announcementsFlagImpl.setValue(
+			this.<Integer>getColumnOriginalValue("value"));
+
+		return announcementsFlagImpl;
+	}
+
+	@Override
 	public int compareTo(AnnouncementsFlag announcementsFlag) {
 		int value = 0;
 
@@ -784,9 +830,7 @@ public class AnnouncementsFlagModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, AnnouncementsFlag>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					AnnouncementsFlag.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

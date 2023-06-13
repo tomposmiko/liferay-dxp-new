@@ -18,10 +18,6 @@ import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTCollectionLocalServiceUtil;
 import com.liferay.change.tracking.service.persistence.CTCollectionPersistence;
-import com.liferay.change.tracking.service.persistence.CTEntryPersistence;
-import com.liferay.change.tracking.service.persistence.CTMessagePersistence;
-import com.liferay.change.tracking.service.persistence.CTPreferencesPersistence;
-import com.liferay.change.tracking.service.persistence.CTProcessPersistence;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -36,8 +32,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -312,6 +306,7 @@ public abstract class CTCollectionLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -330,6 +325,7 @@ public abstract class CTCollectionLocalServiceBaseImpl
 			(CTCollection)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<CTCollection> getBasePersistence() {
 		return ctCollectionPersistence;
 	}
@@ -472,20 +468,5 @@ public abstract class CTCollectionLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected CTEntryPersistence ctEntryPersistence;
-
-	@Reference
-	protected CTMessagePersistence ctMessagePersistence;
-
-	@Reference
-	protected CTPreferencesPersistence ctPreferencesPersistence;
-
-	@Reference
-	protected CTProcessPersistence ctProcessPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		CTCollectionLocalServiceBaseImpl.class);
 
 }

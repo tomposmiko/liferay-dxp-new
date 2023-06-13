@@ -22,12 +22,13 @@ String redirect = ParamUtil.getString(request, "redirect");
 String backURL = ParamUtil.getString(request, "backURL");
 
 if (Validator.isNull(redirect) && Validator.isNull(backURL)) {
-	PortletURL portletURL = renderResponse.createRenderURL();
-
-	portletURL.setParameter("mvcPath", "/view.jsp");
-	portletURL.setParameter("groupId", String.valueOf(groupId));
-
-	backURL = portletURL.toString();
+	backURL = PortletURLBuilder.createRenderURL(
+		renderResponse
+	).setMVCPath(
+		"/view.jsp"
+	).setParameter(
+		"groupId", groupId
+	).buildString();
 }
 
 long ruleGroupId = ParamUtil.getLong(request, "ruleGroupId");
@@ -36,12 +37,17 @@ MDRRuleGroup ruleGroup = MDRRuleGroupLocalServiceUtil.getRuleGroup(ruleGroupId);
 
 String displayStyle = ParamUtil.getString(request, "displayStyle", "list");
 
-PortletURL portletURL = renderResponse.createRenderURL();
-
-portletURL.setParameter("mvcPath", "/view_rules.jsp");
-portletURL.setParameter("redirect", redirect);
-portletURL.setParameter("ruleGroupId", String.valueOf(ruleGroupId));
-portletURL.setParameter("groupId", String.valueOf(groupId));
+PortletURL portletURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCPath(
+	"/view_rules.jsp"
+).setRedirect(
+	redirect
+).setParameter(
+	"groupId", groupId
+).setParameter(
+	"ruleGroupId", ruleGroupId
+).buildPortletURL();
 
 SearchContainer<MDRRule> rulesSearchContainer = new SearchContainer(renderRequest, portletURL, null, "no-classification-rules-are-configured-for-this-device-family");
 
@@ -102,9 +108,11 @@ renderResponse.setTitle(ruleGroup.getName(locale));
 	</liferay-frontend:management-bar-buttons>
 
 	<%
-	PortletURL iteratorURL = PortletURLUtil.clone(portletURL, renderResponse);
-
-	iteratorURL.setParameter("displayStyle", displayStyle);
+	PortletURL iteratorURL = PortletURLBuilder.create(
+		PortletURLUtil.clone(portletURL, renderResponse)
+	).setParameter(
+		"displayStyle", displayStyle
+	).buildPortletURL();
 	%>
 
 	<liferay-frontend:management-bar-filters>
@@ -169,11 +177,6 @@ renderResponse.setTitle(ruleGroup.getName(locale));
 					/>
 				</c:when>
 				<c:when test='<%= displayStyle.equals("icon") %>'>
-
-					<%
-					row.setCssClass("entry-card lfr-asset-item");
-					%>
-
 					<liferay-ui:search-container-column-text>
 						<liferay-frontend:icon-vertical-card
 							actionJsp="/rule_actions.jsp"

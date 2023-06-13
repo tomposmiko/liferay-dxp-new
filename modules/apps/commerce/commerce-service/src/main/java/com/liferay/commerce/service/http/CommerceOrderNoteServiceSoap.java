@@ -84,6 +84,29 @@ public class CommerceOrderNoteServiceSoap {
 		}
 	}
 
+	public static com.liferay.commerce.model.CommerceOrderNoteSoap
+			addOrUpdateCommerceOrderNote(
+				String externalReferenceCode, long commerceOrderNoteId,
+				long commerceOrderId, String content, boolean restricted,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			com.liferay.commerce.model.CommerceOrderNote returnValue =
+				CommerceOrderNoteServiceUtil.addOrUpdateCommerceOrderNote(
+					externalReferenceCode, commerceOrderNoteId, commerceOrderId,
+					content, restricted, serviceContext);
+
+			return com.liferay.commerce.model.CommerceOrderNoteSoap.toSoapModel(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
 	public static void deleteCommerceOrderNote(long commerceOrderNoteId)
 		throws RemoteException {
 
@@ -100,13 +123,13 @@ public class CommerceOrderNoteServiceSoap {
 
 	public static com.liferay.commerce.model.CommerceOrderNoteSoap
 			fetchByExternalReferenceCode(
-				long companyId, String externalReferenceCode)
+				String externalReferenceCode, long companyId)
 		throws RemoteException {
 
 		try {
 			com.liferay.commerce.model.CommerceOrderNote returnValue =
 				CommerceOrderNoteServiceUtil.fetchByExternalReferenceCode(
-					companyId, externalReferenceCode);
+					externalReferenceCode, companyId);
 
 			return com.liferay.commerce.model.CommerceOrderNoteSoap.toSoapModel(
 				returnValue);
@@ -240,29 +263,6 @@ public class CommerceOrderNoteServiceSoap {
 			com.liferay.commerce.model.CommerceOrderNote returnValue =
 				CommerceOrderNoteServiceUtil.updateCommerceOrderNote(
 					commerceOrderNoteId, content, restricted);
-
-			return com.liferay.commerce.model.CommerceOrderNoteSoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	public static com.liferay.commerce.model.CommerceOrderNoteSoap
-			upsertCommerceOrderNote(
-				long commerceOrderNoteId, long commerceOrderId, String content,
-				boolean restricted, String externalReferenceCode,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			com.liferay.commerce.model.CommerceOrderNote returnValue =
-				CommerceOrderNoteServiceUtil.upsertCommerceOrderNote(
-					commerceOrderNoteId, commerceOrderId, content, restricted,
-					externalReferenceCode, serviceContext);
 
 			return com.liferay.commerce.model.CommerceOrderNoteSoap.toSoapModel(
 				returnValue);

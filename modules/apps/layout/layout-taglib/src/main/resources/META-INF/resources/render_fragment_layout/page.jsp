@@ -22,9 +22,9 @@ LayoutStructure layoutStructure = (LayoutStructure)request.getAttribute("liferay
 String mainItemId = (String)request.getAttribute("liferay-layout:render-fragment-layout:mainItemId");
 String mode = (String)request.getAttribute("liferay-layout:render-fragment-layout:mode");
 boolean showPreview = GetterUtil.getBoolean(request.getAttribute("liferay-layout:render-fragment-layout:showPreview"));
-
-RenderFragmentLayoutDisplayContext renderFragmentLayoutDisplayContext = new RenderFragmentLayoutDisplayContext(request, response);
 %>
+
+<liferay-util:dynamic-include key="com.liferay.layout,taglib#/render_fragment_layout/page.jsp#pre" />
 
 <c:if test="<%= layoutStructure != null %>">
 
@@ -45,7 +45,11 @@ RenderFragmentLayoutDisplayContext renderFragmentLayoutDisplayContext = new Rend
 			/>
 		</liferay-util:buffer>
 
-		<%= renderFragmentLayoutDisplayContext.processAMImages(content) %>
+		<%
+		LayoutAdaptiveMediaProcessor layoutAdaptiveMediaProcessor = ServletContextUtil.getLayoutAdaptiveMediaProcessor();
+		%>
+
+		<%= layoutAdaptiveMediaProcessor.processAdaptiveMediaContent(content) %>
 
 	<%
 	}
@@ -55,3 +59,5 @@ RenderFragmentLayoutDisplayContext renderFragmentLayoutDisplayContext = new Rend
 	%>
 
 </c:if>
+
+<liferay-util:dynamic-include key="com.liferay.layout,taglib#/render_fragment_layout/page.jsp#post" />

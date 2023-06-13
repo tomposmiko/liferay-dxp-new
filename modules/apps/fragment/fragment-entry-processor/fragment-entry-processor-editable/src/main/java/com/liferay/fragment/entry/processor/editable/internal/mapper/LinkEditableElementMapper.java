@@ -18,9 +18,11 @@ import com.liferay.fragment.entry.processor.editable.mapper.EditableElementMappe
 import com.liferay.fragment.entry.processor.editable.parser.util.EditableElementParserUtil;
 import com.liferay.fragment.entry.processor.helper.FragmentEntryProcessorHelper;
 import com.liferay.fragment.processor.FragmentEntryProcessorContext;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -47,25 +49,34 @@ public class LinkEditableElementMapper implements EditableElementMapper {
 			FragmentEntryProcessorContext fragmentEntryProcessorContext)
 		throws PortalException {
 
-		String href = configJSONObject.getString("href");
+		JSONObject hrefJSONObject = configJSONObject.getJSONObject("href");
 
 		boolean assetDisplayPage =
 			_fragmentEntryProcessorHelper.isAssetDisplayPage(
 				fragmentEntryProcessorContext.getMode());
 		boolean collectionMapped =
 			_fragmentEntryProcessorHelper.isMappedCollection(configJSONObject);
+		boolean layoutMapped = _fragmentEntryProcessorHelper.isMappedLayout(
+			configJSONObject);
 		boolean mapped = _fragmentEntryProcessorHelper.isMapped(
 			configJSONObject);
 
-		if (Validator.isNull(href) && !assetDisplayPage && !collectionMapped &&
-			!mapped) {
+		if ((hrefJSONObject == null) && !assetDisplayPage &&
+			!collectionMapped && !layoutMapped && !mapped) {
 
 			return;
 		}
 
+		String href = StringPool.BLANK;
+
 		if (collectionMapped) {
 			href = GetterUtil.getString(
 				_fragmentEntryProcessorHelper.getMappedCollectionValue(
+					configJSONObject, fragmentEntryProcessorContext));
+		}
+		else if (layoutMapped) {
+			href = GetterUtil.getString(
+				_fragmentEntryProcessorHelper.getMappedLayoutValue(
 					configJSONObject, fragmentEntryProcessorContext));
 		}
 		else if (mapped) {
@@ -73,6 +84,11 @@ public class LinkEditableElementMapper implements EditableElementMapper {
 				_fragmentEntryProcessorHelper.getMappedInfoItemFieldValue(
 					configJSONObject, new HashMap<>(),
 					fragmentEntryProcessorContext));
+		}
+		else if (hrefJSONObject != null) {
+			href = hrefJSONObject.getString(
+				LocaleUtil.toLanguageId(
+					fragmentEntryProcessorContext.getLocale()));
 		}
 
 		Element linkElement = new Element("a");
@@ -101,8 +117,16 @@ public class LinkEditableElementMapper implements EditableElementMapper {
 			replaceLink = true;
 		}
 
-		if (configJSONObject.has("target")) {
-			linkElement.attr("target", configJSONObject.getString("target"));
+		String target = configJSONObject.getString("target");
+
+		if (Validator.isNotNull(target)) {
+			if (StringUtil.equalsIgnoreCase(target, "_parent") ||
+				StringUtil.equalsIgnoreCase(target, "_top")) {
+
+				target = "_self";
+			}
+
+			linkElement.attr("target", target);
 		}
 
 		String mappedField = configJSONObject.getString("mappedField");

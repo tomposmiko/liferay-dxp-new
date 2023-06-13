@@ -22,6 +22,7 @@ import com.liferay.portal.bundle.blacklist.BundleBlacklistManager;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.lpkg.deployer.test.util.LPKGTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -226,11 +227,12 @@ public class BundleBlacklistTest {
 		Assert.assertNotNull("No WAR bundle found", warBundle);
 		Assert.assertNotNull("No WAR wrapper bundle found", warWrapperBundle);
 
-		Dictionary<String, Object> properties = new HashMapDictionary<>();
-
 		// Blacklist WAR wrapper
 
-		properties.put(_PROP_KEY, warWrapperBundle.getSymbolicName());
+		Dictionary<String, Object> properties =
+			HashMapDictionaryBuilder.<String, Object>put(
+				_PROP_KEY, warWrapperBundle.getSymbolicName()
+			).build();
 
 		_updateConfiguration(properties);
 
@@ -399,7 +401,7 @@ public class BundleBlacklistTest {
 		"com.liferay.portal.bundle.blacklist.internal.BundleBlacklist";
 
 	private static final String _CONFIG_NAME =
-		"com.liferay.portal.bundle.blacklist.internal." +
+		"com.liferay.portal.bundle.blacklist.internal.configuration." +
 			"BundleBlacklistConfiguration";
 
 	private static final String _LPKG_NAME = "Bundle Blacklist Test";

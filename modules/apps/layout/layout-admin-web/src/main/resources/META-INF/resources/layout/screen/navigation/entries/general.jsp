@@ -62,7 +62,7 @@ if (Validator.isNotNull(backURL)) {
 	portletDisplay.setURLBack(backURL);
 }
 
-renderResponse.setTitle(selLayout.getName(locale));
+renderResponse.setTitle(HtmlUtil.escape(selLayout.getName(locale)));
 %>
 
 <c:choose>
@@ -81,9 +81,9 @@ renderResponse.setTitle(selLayout.getName(locale));
 					);
 
 					if (enableLayoutButton) {
-						enableLayoutButton.addEventListener('click', function (event) {
+						enableLayoutButton.addEventListener('click', (event) => {
 							<portlet:actionURL name="/layout_admin/enable_layout" var="enableLayoutURL">
-								<portlet:param name="redirect" value="<%= String.valueOf(layoutsAdminDisplayContext.getScreenNavigationPortletURL()) %>" />
+								<portlet:param name="redirect" value="<%= currentURL %>" />
 								<portlet:param name="incompleteLayoutRevisionId" value="<%= String.valueOf(layoutRevision.getLayoutRevisionId()) %>" />
 							</portlet:actionURL>
 
@@ -96,9 +96,9 @@ renderResponse.setTitle(selLayout.getName(locale));
 					);
 
 					if (deleteLayoutButton) {
-						deleteLayoutButton.addEventListener('click', function (event) {
+						deleteLayoutButton.addEventListener('click', (event) => {
 							<portlet:actionURL name="/layout_admin/delete_layout" var="deleteLayoutURL">
-								<portlet:param name="redirect" value="<%= String.valueOf(layoutsAdminDisplayContext.getScreenNavigationPortletURL()) %>" />
+								<portlet:param name="redirect" value="<%= currentURL %>" />
 								<portlet:param name="selPlid" value="<%= String.valueOf(layoutsAdminDisplayContext.getSelPlid()) %>" />
 								<portlet:param name="layoutSetBranchId" value="0" />
 							</portlet:actionURL>
@@ -116,7 +116,7 @@ renderResponse.setTitle(selLayout.getName(locale));
 		</portlet:actionURL>
 
 		<aui:form action='<%= HttpUtil.addParameter(editLayoutURL, "refererPlid", plid) %>' enctype="multipart/form-data" method="post" name="editLayoutFm" onSubmit="event.preventDefault();">
-			<aui:input name="redirect" type="hidden" value="<%= String.valueOf(layoutsAdminDisplayContext.getScreenNavigationPortletURL()) %>" />
+			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 			<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
 			<aui:input name="portletResource" type="hidden" value="<%= portletResource %>" />
 			<aui:input name="groupId" type="hidden" value="<%= layoutsAdminDisplayContext.getGroupId() %>" />
@@ -148,7 +148,7 @@ renderResponse.setTitle(selLayout.getName(locale));
 				</clay:sheet-header>
 
 				<clay:sheet-section>
-					<liferay-ui:success key="layoutAdded" message="the-page-was-created-succesfully" />
+					<liferay-ui:success key="layoutAdded" message="the-page-was-created-successfully" />
 
 					<liferay-ui:error exception="<%= LayoutTypeException.class %>">
 
@@ -254,7 +254,7 @@ renderResponse.setTitle(selLayout.getName(locale));
 <aui:script>
 	var form = document.getElementById('<portlet:namespace />editLayoutFm');
 
-	form.addEventListener('submit', function (event) {
+	form.addEventListener('submit', (event) => {
 		var applyLayoutPrototype = document.getElementById(
 			'<portlet:namespace />applyLayoutPrototype'
 		);

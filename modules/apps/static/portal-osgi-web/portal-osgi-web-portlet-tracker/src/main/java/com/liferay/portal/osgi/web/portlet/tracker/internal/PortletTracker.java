@@ -225,6 +225,9 @@ public class PortletTracker
 			_bundleContext.ungetService(serviceReference);
 		}
 		catch (IllegalStateException illegalStateException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(illegalStateException, illegalStateException);
+			}
 
 			// We still need to remove the service so we can ignore this and
 			// keep going
@@ -233,14 +236,33 @@ public class PortletTracker
 
 		_portletInstanceFactory.destroy(portletModel);
 
-		List<Company> companies = _companyLocalService.getCompanies();
+		Long companyId = (Long)serviceReference.getProperty(
+			"com.liferay.portlet.company");
 
-		for (Company company : companies) {
+		if (companyId == null) {
+			_companyLocalService.forEachCompanyId(
+				curCompanyId -> {
+					PortletCategory portletCategory =
+						(PortletCategory)WebAppPool.get(
+							curCompanyId, WebKeys.PORTLET_CATEGORY);
+
+					if (portletCategory == null) {
+						_log.error(
+							"Unable to get portlet category for " +
+								curCompanyId);
+					}
+					else {
+						portletCategory.separate(
+							portletModel.getRootPortletId());
+					}
+				});
+		}
+		else {
 			PortletCategory portletCategory = (PortletCategory)WebAppPool.get(
-				company.getCompanyId(), WebKeys.PORTLET_CATEGORY);
+				companyId, WebKeys.PORTLET_CATEGORY);
 
 			if (portletCategory == null) {
-				_log.error("Unable to get portlet category for " + company);
+				_log.error("Unable to get portlet category for " + companyId);
 			}
 			else {
 				portletCategory.separate(portletModel.getRootPortletId());
@@ -284,8 +306,6 @@ public class PortletTracker
 				return null;
 			});
 
-		DependencyManagerSyncUtil.registerSyncFuture(futureTask);
-
 		Thread serviceTrackerOpenerThread = new Thread(
 			futureTask,
 			PortletTracker.class.getName() + "-ServiceTrackerOpener");
@@ -293,6 +313,8 @@ public class PortletTracker
 		serviceTrackerOpenerThread.setDaemon(true);
 
 		serviceTrackerOpenerThread.start();
+
+		DependencyManagerSyncUtil.registerSyncFuture(futureTask);
 
 		if (_log.isInfoEnabled()) {
 			_log.info("Activated");
@@ -351,7 +373,10 @@ public class PortletTracker
 			}
 
 			com.liferay.portal.kernel.model.Portlet portletModel =
-				buildPortletModel(portletApp, portletId, bundle);
+				buildPortletModel(
+					portletApp, portletId, bundle,
+					(Long)serviceReference.getProperty(
+						"com.liferay.portlet.company"));
 
 			portletModel.setPortletName(portletName);
 
@@ -413,14 +438,21 @@ public class PortletTracker
 	}
 
 	protected com.liferay.portal.kernel.model.Portlet buildPortletModel(
-		PortletApp portletApp, String portletId, Bundle bundle) {
+		PortletApp portletApp, String portletId, Bundle bundle,
+		Long companyId) {
 
 		com.liferay.portal.kernel.model.Portlet portletModel =
 			_portletLocalService.createPortlet(0);
 
 		portletModel.setPortletId(portletId);
 
-		portletModel.setCompanyId(CompanyConstants.SYSTEM);
+		if (companyId == null) {
+			portletModel.setCompanyId(CompanyConstants.SYSTEM);
+		}
+		else {
+			portletModel.setCompanyId(companyId);
+		}
+
 		portletModel.setPluginPackage(
 			new BundlePluginPackage(bundle, portletApp));
 		portletModel.setPortletApp(portletApp);
@@ -447,7 +479,9 @@ public class PortletTracker
 				applicationTypes.add(applicationType);
 			}
 			catch (IllegalArgumentException illegalArgumentException) {
-				_log.error("Application type " + applicationTypeValue);
+				_log.error(
+					"Application type " + applicationTypeValue,
+					illegalArgumentException);
 			}
 		}
 
@@ -673,10 +707,6 @@ public class PortletTracker
 		portletModel.setFooterPortletJavaScript(
 			StringPlus.asList(
 				get(serviceReference, "footer-portlet-javascript")));
-		portletModel.setFriendlyURLMapperClass(
-			GetterUtil.getString(
-				get(serviceReference, "friendly-url-mapper-class"),
-				portletModel.getFriendlyURLMapperClass()));
 		portletModel.setFriendlyURLMapping(
 			GetterUtil.getString(
 				get(serviceReference, "friendly-url-mapping"),
@@ -1275,6 +1305,9 @@ public class PortletTracker
 			com.liferay.portal.kernel.model.Portlet portletModel)
 		throws PortalException {
 
+		Long companyId = (Long)serviceReference.getProperty(
+			"com.liferay.portlet.company");
+
 		List<String> categoryNames = StringPlus.asList(
 			get(serviceReference, "display-category"));
 
@@ -1282,11 +1315,19 @@ public class PortletTracker
 			categoryNames.add("category.undefined");
 		}
 
+		if (companyId != null) {
+			_portletLocalService.deployRemotePortlet(
+				new long[] {companyId}, portletModel,
+				ArrayUtil.toStringArray(categoryNames), false, false);
+
+			_portletLocalService.clearCache();
+
+			return;
+		}
+
 		List<Future<Void>> futures = new ArrayList<>();
 
 		List<Company> companies = _companyLocalService.getCompanies(false);
-
-		_portletLocalService.clearCache();
 
 		for (Company company : companies) {
 			futures.add(
@@ -1313,6 +1354,8 @@ public class PortletTracker
 				throw new PortalException(exception);
 			}
 		}
+
+		_portletLocalService.clearCache();
 	}
 
 	protected Object get(
@@ -1420,13 +1463,11 @@ public class PortletTracker
 		Collections.singletonMap(
 			ContentTypes.TEXT_HTML,
 			SetUtil.fromArray(
-				new String[] {
-					String.valueOf(LiferayWindowState.EXCLUSIVE),
-					String.valueOf(LiferayWindowState.POP_UP),
-					String.valueOf(WindowState.MAXIMIZED),
-					String.valueOf(WindowState.MINIMIZED),
-					String.valueOf(WindowState.NORMAL)
-				}));
+				String.valueOf(LiferayWindowState.EXCLUSIVE),
+				String.valueOf(LiferayWindowState.POP_UP),
+				String.valueOf(WindowState.MAXIMIZED),
+				String.valueOf(WindowState.MINIMIZED),
+				String.valueOf(WindowState.NORMAL)));
 
 	private BundleContext _bundleContext;
 
@@ -1552,8 +1593,12 @@ public class PortletTracker
 
 			BundleContext bundleContext = _bundle.getBundleContext();
 
-			bundleContext.ungetService(
-				_servletContextHelperRegistrationServiceReference);
+			try {
+				bundleContext.ungetService(
+					_servletContextHelperRegistrationServiceReference);
+			}
+			catch (IllegalStateException illegalStateException) {
+			}
 		}
 
 		public synchronized void setPortletApp(PortletApp portletApp) {

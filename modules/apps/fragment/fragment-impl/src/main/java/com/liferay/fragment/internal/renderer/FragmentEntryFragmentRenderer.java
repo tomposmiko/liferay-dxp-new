@@ -28,15 +28,16 @@ import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.servlet.PipingServletResponse;
 import com.liferay.portal.kernel.servlet.taglib.util.OutputData;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.taglib.servlet.PipingServletResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -150,21 +151,14 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 
 	private String _renderFragmentEntry(
 		long fragmentEntryId, String css, String html, String js,
-		String configuration, String namespace, String mode,
-		HttpServletRequest httpServletRequest) {
+		String configuration, String namespace, String fragmentElementId,
+		String mode, HttpServletRequest httpServletRequest) {
 
 		StringBundler sb = new StringBundler(18);
 
 		sb.append("<div id=\"");
 
-		StringBundler fragmentIdSB = new StringBundler(4);
-
-		fragmentIdSB.append("fragment-");
-		fragmentIdSB.append(fragmentEntryId);
-		fragmentIdSB.append("-");
-		fragmentIdSB.append(namespace);
-
-		sb.append(fragmentIdSB.toString());
+		sb.append(fragmentElementId);
 
 		sb.append("\" >");
 		sb.append(html);
@@ -216,7 +210,7 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			sb.append("var configuration = ");
 			sb.append(configuration);
 			sb.append("; var fragmentElement = document.querySelector('#");
-			sb.append(fragmentIdSB.toString());
+			sb.append(fragmentElementId);
 			sb.append("'); var fragmentNamespace = '");
 			sb.append(namespace);
 			sb.append("';");
@@ -240,13 +234,16 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 		FragmentEntryLink fragmentEntryLink = _getFragmentEntryLink(
 			fragmentRendererContext);
 
-		StringBundler portalCacheKeySB = new StringBundler(5);
+		StringBundler cacheKeySB = new StringBundler(5);
 
-		portalCacheKeySB.append(fragmentEntryLink.getFragmentEntryLinkId());
-		portalCacheKeySB.append(StringPool.DASH);
-		portalCacheKeySB.append(fragmentRendererContext.getLocale());
-		portalCacheKeySB.append(StringPool.DASH);
-		portalCacheKeySB.append(fragmentEntryLink.getSegmentsExperienceId());
+		cacheKeySB.append(fragmentEntryLink.getFragmentEntryLinkId());
+		cacheKeySB.append(StringPool.DASH);
+		cacheKeySB.append(fragmentRendererContext.getLocale());
+		cacheKeySB.append(StringPool.DASH);
+		cacheKeySB.append(
+			StringUtil.merge(
+				fragmentRendererContext.getSegmentsEntryIds(),
+				StringPool.SEMICOLON));
 
 		String content = StringPool.BLANK;
 
@@ -257,7 +254,7 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			fragmentRendererContext.isUseCachedContent() &&
 			_isCacheable(fragmentEntryLink)) {
 
-			content = portalCache.get(portalCacheKeySB.toString());
+			content = portalCache.get(cacheKeySB.toString());
 
 			if (Validator.isNotNull(content)) {
 				return content;
@@ -283,6 +280,8 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 		defaultFragmentEntryProcessorContext.setFieldValues(
 			fieldValuesOptional.orElse(null));
 
+		defaultFragmentEntryProcessorContext.setFragmentElementId(
+			fragmentRendererContext.getFragmentElementId());
 		defaultFragmentEntryProcessorContext.setPreviewClassNameId(
 			fragmentRendererContext.getPreviewClassNameId());
 		defaultFragmentEntryProcessorContext.setPreviewClassPK(
@@ -331,15 +330,16 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 		content = _renderFragmentEntry(
 			fragmentEntryLink.getFragmentEntryId(), css, html,
 			fragmentEntryLink.getJs(), configurationJSONObject.toString(),
-			fragmentEntryLink.getNamespace(), fragmentRendererContext.getMode(),
-			httpServletRequest);
+			fragmentEntryLink.getNamespace(),
+			fragmentRendererContext.getFragmentElementId(),
+			fragmentRendererContext.getMode(), httpServletRequest);
 
 		if (Objects.equals(
 				fragmentRendererContext.getMode(),
 				FragmentEntryLinkConstants.VIEW) &&
 			_isCacheable(fragmentEntryLink)) {
 
-			portalCache.put(portalCacheKeySB.toString(), content);
+			portalCache.put(cacheKeySB.toString(), content);
 		}
 
 		return content;

@@ -93,7 +93,7 @@ public class SegmentsContextVocabularySegmentsFieldCustomizer
 			return null;
 		}
 
-		final String assetVocabulary = _assetVocabulary;
+		String assetVocabulary = _assetVocabulary;
 
 		Group group = _groupLocalService.fetchCompanyGroup(companyId);
 
@@ -139,7 +139,7 @@ public class SegmentsContextVocabularySegmentsFieldCustomizer
 	private static final Log _log = LogFactoryUtil.getLog(
 		SegmentsContextVocabularySegmentsFieldCustomizer.class);
 
-	private String _assetVocabulary;
+	private volatile String _assetVocabulary;
 
 	@Reference
 	private AssetVocabularyLocalService _assetVocabularyLocalService;

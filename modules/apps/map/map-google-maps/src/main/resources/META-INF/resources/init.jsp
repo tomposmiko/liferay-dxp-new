@@ -39,5 +39,5 @@ page import="com.liferay.taglib.aui.AUIUtil" %>
 <portlet:defineObjects />
 
 <%
-GoogleMapsDisplayContext googleMapsDisplayContext = new GoogleMapsDisplayContext(request);
+GoogleMapsDisplayContext googleMapDisplayContext = new GoogleMapsDisplayContext(request);
 %>

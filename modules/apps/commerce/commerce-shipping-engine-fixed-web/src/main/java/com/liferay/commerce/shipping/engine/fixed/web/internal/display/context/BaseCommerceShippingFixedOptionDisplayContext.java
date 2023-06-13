@@ -20,6 +20,7 @@ import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
 import com.liferay.commerce.service.CommerceShippingMethodService;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -101,38 +102,49 @@ public class BaseCommerceShippingFixedOptionDisplayContext {
 	}
 
 	public PortletURL getPortletURL() throws PortalException {
-		PortletURL portletURL = renderResponse.createRenderURL();
+		return PortletURLBuilder.createRenderURL(
+			renderResponse
+		).setMVCRenderCommandName(
+			"/commerce_shipping_methods/edit_commerce_shipping_method"
+		).setParameter(
+			"commerceShippingMethodId",
+			() -> {
+				CommerceShippingMethod commerceShippingMethod =
+					getCommerceShippingMethod();
 
-		portletURL.setParameter(
-			"mvcRenderCommandName",
-			"/commerce_shipping_methods/edit_commerce_shipping_method");
-		portletURL.setParameter(
+				if (commerceShippingMethod != null) {
+					return commerceShippingMethod.getCommerceShippingMethodId();
+				}
+
+				return null;
+			}
+		).setParameter(
+			"delta",
+			() -> {
+				String delta = ParamUtil.getString(renderRequest, "delta");
+
+				if (Validator.isNotNull(delta)) {
+					return delta;
+				}
+
+				return null;
+			}
+		).setParameter(
+			"engineKey",
+			() -> {
+				String engineKey = ParamUtil.getString(
+					renderRequest, "engineKey");
+
+				if (Validator.isNotNull(engineKey)) {
+					return engineKey;
+				}
+
+				return null;
+			}
+		).setParameter(
 			"screenNavigationCategoryKey",
-			getSelectedScreenNavigationCategoryKey());
-
-		CommerceShippingMethod commerceShippingMethod =
-			getCommerceShippingMethod();
-
-		if (commerceShippingMethod != null) {
-			portletURL.setParameter(
-				"commerceShippingMethodId",
-				String.valueOf(
-					commerceShippingMethod.getCommerceShippingMethodId()));
-		}
-
-		String engineKey = ParamUtil.getString(renderRequest, "engineKey");
-
-		if (Validator.isNotNull(engineKey)) {
-			portletURL.setParameter("engineKey", engineKey);
-		}
-
-		String delta = ParamUtil.getString(renderRequest, "delta");
-
-		if (Validator.isNotNull(delta)) {
-			portletURL.setParameter("delta", delta);
-		}
-
-		return portletURL;
+			getSelectedScreenNavigationCategoryKey()
+		).buildPortletURL();
 	}
 
 	public String getScreenNavigationCategoryKey() {

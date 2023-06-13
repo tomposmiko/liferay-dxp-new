@@ -14,11 +14,10 @@
 
 package com.liferay.journal.web.internal.layout.display.page;
 
-import com.liferay.asset.util.AssetHelper;
+import com.liferay.depot.group.provider.SiteConnectedGroupGroupProvider;
 import com.liferay.info.item.InfoItemReference;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
-import com.liferay.journal.web.internal.asset.model.JournalArticleAssetRendererFactory;
 import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -54,8 +53,7 @@ public class JournalArticleLayoutDisplayPageProvider
 		}
 
 		try {
-			return new JournalArticleLayoutDisplayPageObjectProvider(
-				article, assetHelper, journalArticleAssetRendererFactory);
+			return new JournalArticleLayoutDisplayPageObjectProvider(article);
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(portalException);
@@ -66,17 +64,14 @@ public class JournalArticleLayoutDisplayPageProvider
 	public LayoutDisplayPageObjectProvider<JournalArticle>
 		getLayoutDisplayPageObjectProvider(long groupId, String urlTitle) {
 
-		JournalArticle article =
-			journalArticleLocalService.fetchArticleByUrlTitle(
-				groupId, urlTitle);
-
-		if ((article == null) || article.isInTrash()) {
-			return null;
-		}
-
 		try {
-			return new JournalArticleLayoutDisplayPageObjectProvider(
-				article, assetHelper, journalArticleAssetRendererFactory);
+			JournalArticle article = _getArticle(groupId, urlTitle);
+
+			if ((article == null) || article.isInTrash()) {
+				return null;
+			}
+
+			return new JournalArticleLayoutDisplayPageObjectProvider(article);
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(portalException);
@@ -89,13 +84,28 @@ public class JournalArticleLayoutDisplayPageProvider
 	}
 
 	@Reference
-	protected AssetHelper assetHelper;
-
-	@Reference
-	protected JournalArticleAssetRendererFactory
-		journalArticleAssetRendererFactory;
-
-	@Reference
 	protected JournalArticleLocalService journalArticleLocalService;
+
+	@Reference
+	protected SiteConnectedGroupGroupProvider siteConnectedGroupGroupProvider;
+
+	private JournalArticle _getArticle(long groupId, String urlTitle)
+		throws PortalException {
+
+		for (long connectedGroupId :
+				siteConnectedGroupGroupProvider.
+					getCurrentAndAncestorSiteAndDepotGroupIds(groupId)) {
+
+			JournalArticle article =
+				journalArticleLocalService.fetchArticleByUrlTitle(
+					connectedGroupId, urlTitle);
+
+			if (article != null) {
+				return article;
+			}
+		}
+
+		return null;
+	}
 
 }

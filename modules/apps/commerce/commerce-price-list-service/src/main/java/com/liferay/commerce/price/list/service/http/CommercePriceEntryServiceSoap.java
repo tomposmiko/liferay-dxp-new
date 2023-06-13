@@ -87,32 +87,6 @@ public class CommercePriceEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.commerce.price.list.model.CommercePriceEntrySoap
-			addCommercePriceEntry(
-				long cpInstanceId, long commercePriceListId,
-				String externalReferenceCode, java.math.BigDecimal price,
-				java.math.BigDecimal promoPrice,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			com.liferay.commerce.price.list.model.CommercePriceEntry
-				returnValue =
-					CommercePriceEntryServiceUtil.addCommercePriceEntry(
-						cpInstanceId, commercePriceListId,
-						externalReferenceCode, price, promoPrice,
-						serviceContext);
-
-			return com.liferay.commerce.price.list.model.CommercePriceEntrySoap.
-				toSoapModel(returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
 	/**
 	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
 	 #addCommercePriceEntry(String, long, String, long,
@@ -163,6 +137,31 @@ public class CommercePriceEntryServiceSoap {
 
 	public static com.liferay.commerce.price.list.model.CommercePriceEntrySoap
 			addCommercePriceEntry(
+				String externalReferenceCode, long cpInstanceId,
+				long commercePriceListId, java.math.BigDecimal price,
+				java.math.BigDecimal promoPrice,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			com.liferay.commerce.price.list.model.CommercePriceEntry
+				returnValue =
+					CommercePriceEntryServiceUtil.addCommercePriceEntry(
+						externalReferenceCode, cpInstanceId,
+						commercePriceListId, price, promoPrice, serviceContext);
+
+			return com.liferay.commerce.price.list.model.CommercePriceEntrySoap.
+				toSoapModel(returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.commerce.price.list.model.CommercePriceEntrySoap
+			addCommercePriceEntry(
 				String externalReferenceCode, long cProductId,
 				String cpInstanceUuid, long commercePriceListId,
 				java.math.BigDecimal price, boolean discountDiscovery,
@@ -190,6 +189,75 @@ public class CommercePriceEntryServiceSoap {
 						expirationDateMonth, expirationDateDay,
 						expirationDateYear, expirationDateHour,
 						expirationDateMinute, neverExpire, serviceContext);
+
+			return com.liferay.commerce.price.list.model.CommercePriceEntrySoap.
+				toSoapModel(returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.commerce.price.list.model.CommercePriceEntrySoap
+			addOrUpdateCommercePriceEntry(
+				String externalReferenceCode, long commercePriceEntryId,
+				long cProductId, String cpInstanceUuid,
+				long commercePriceListId, java.math.BigDecimal price,
+				java.math.BigDecimal promoPrice,
+				String skuExternalReferenceCode,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			com.liferay.commerce.price.list.model.CommercePriceEntry
+				returnValue =
+					CommercePriceEntryServiceUtil.addOrUpdateCommercePriceEntry(
+						externalReferenceCode, commercePriceEntryId, cProductId,
+						cpInstanceUuid, commercePriceListId, price, promoPrice,
+						skuExternalReferenceCode, serviceContext);
+
+			return com.liferay.commerce.price.list.model.CommercePriceEntrySoap.
+				toSoapModel(returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.commerce.price.list.model.CommercePriceEntrySoap
+			addOrUpdateCommercePriceEntry(
+				String externalReferenceCode, long commercePriceEntryId,
+				long cProductId, String cpInstanceUuid,
+				long commercePriceListId, java.math.BigDecimal price,
+				boolean discountDiscovery, java.math.BigDecimal discountLevel1,
+				java.math.BigDecimal discountLevel2,
+				java.math.BigDecimal discountLevel3,
+				java.math.BigDecimal discountLevel4, int displayDateMonth,
+				int displayDateDay, int displayDateYear, int displayDateHour,
+				int displayDateMinute, int expirationDateMonth,
+				int expirationDateDay, int expirationDateYear,
+				int expirationDateHour, int expirationDateMinute,
+				boolean neverExpire, String skuExternalReferenceCode,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			com.liferay.commerce.price.list.model.CommercePriceEntry
+				returnValue =
+					CommercePriceEntryServiceUtil.addOrUpdateCommercePriceEntry(
+						externalReferenceCode, commercePriceEntryId, cProductId,
+						cpInstanceUuid, commercePriceListId, price,
+						discountDiscovery, discountLevel1, discountLevel2,
+						discountLevel3, discountLevel4, displayDateMonth,
+						displayDateDay, displayDateYear, displayDateHour,
+						displayDateMinute, expirationDateMonth,
+						expirationDateDay, expirationDateYear,
+						expirationDateHour, expirationDateMinute, neverExpire,
+						skuExternalReferenceCode, serviceContext);
 
 			return com.liferay.commerce.price.list.model.CommercePriceEntrySoap.
 				toSoapModel(returnValue);
@@ -713,7 +781,7 @@ public class CommercePriceEntryServiceSoap {
 
 	/**
 	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
-	 #upsertCommercePriceEntry(String, long, long, String, long,
+	 #addOrUpdateCommercePriceEntry(String, long, long, String, long,
 	 BigDecimal, BigDecimal, String, ServiceContext)}
 	 */
 	@Deprecated
@@ -747,7 +815,7 @@ public class CommercePriceEntryServiceSoap {
 
 	/**
 	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
-	 #upsertCommercePriceEntry(String, long, long, String, long,
+	 #addOrUpdateCommercePriceEntry(String, long, long, String, long,
 	 BigDecimal, boolean, BigDecimal, BigDecimal, BigDecimal,
 	 BigDecimal, int, int, int, int, int, int, int, int, int,
 	 int, boolean, String, ServiceContext)}
@@ -776,75 +844,6 @@ public class CommercePriceEntryServiceSoap {
 					CommercePriceEntryServiceUtil.upsertCommercePriceEntry(
 						commercePriceEntryId, cProductId, cpInstanceUuid,
 						commercePriceListId, externalReferenceCode, price,
-						discountDiscovery, discountLevel1, discountLevel2,
-						discountLevel3, discountLevel4, displayDateMonth,
-						displayDateDay, displayDateYear, displayDateHour,
-						displayDateMinute, expirationDateMonth,
-						expirationDateDay, expirationDateYear,
-						expirationDateHour, expirationDateMinute, neverExpire,
-						skuExternalReferenceCode, serviceContext);
-
-			return com.liferay.commerce.price.list.model.CommercePriceEntrySoap.
-				toSoapModel(returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	public static com.liferay.commerce.price.list.model.CommercePriceEntrySoap
-			upsertCommercePriceEntry(
-				String externalReferenceCode, long commercePriceEntryId,
-				long cProductId, String cpInstanceUuid,
-				long commercePriceListId, java.math.BigDecimal price,
-				java.math.BigDecimal promoPrice,
-				String skuExternalReferenceCode,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			com.liferay.commerce.price.list.model.CommercePriceEntry
-				returnValue =
-					CommercePriceEntryServiceUtil.upsertCommercePriceEntry(
-						externalReferenceCode, commercePriceEntryId, cProductId,
-						cpInstanceUuid, commercePriceListId, price, promoPrice,
-						skuExternalReferenceCode, serviceContext);
-
-			return com.liferay.commerce.price.list.model.CommercePriceEntrySoap.
-				toSoapModel(returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	public static com.liferay.commerce.price.list.model.CommercePriceEntrySoap
-			upsertCommercePriceEntry(
-				String externalReferenceCode, long commercePriceEntryId,
-				long cProductId, String cpInstanceUuid,
-				long commercePriceListId, java.math.BigDecimal price,
-				boolean discountDiscovery, java.math.BigDecimal discountLevel1,
-				java.math.BigDecimal discountLevel2,
-				java.math.BigDecimal discountLevel3,
-				java.math.BigDecimal discountLevel4, int displayDateMonth,
-				int displayDateDay, int displayDateYear, int displayDateHour,
-				int displayDateMinute, int expirationDateMonth,
-				int expirationDateDay, int expirationDateYear,
-				int expirationDateHour, int expirationDateMinute,
-				boolean neverExpire, String skuExternalReferenceCode,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			com.liferay.commerce.price.list.model.CommercePriceEntry
-				returnValue =
-					CommercePriceEntryServiceUtil.upsertCommercePriceEntry(
-						externalReferenceCode, commercePriceEntryId, cProductId,
-						cpInstanceUuid, commercePriceListId, price,
 						discountDiscovery, discountLevel1, discountLevel2,
 						discountLevel3, discountLevel4, displayDateMonth,
 						displayDateDay, displayDateYear, displayDateHour,

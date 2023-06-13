@@ -72,8 +72,6 @@ public class RowStyledLayoutStructureItem extends StyledLayoutStructureItem {
 		jsonObject.put(
 			"gutters", _gutters
 		).put(
-			"indexed", _indexed
-		).put(
 			"modulesPerRow", getModulesPerRow()
 		).put(
 			"numberOfColumns", _numberOfColumns
@@ -174,20 +172,12 @@ public class RowStyledLayoutStructureItem extends StyledLayoutStructureItem {
 		return _gutters;
 	}
 
-	public boolean isIndexed() {
-		return _indexed;
-	}
-
 	public boolean isReverseOrder() {
 		return _reverseOrder;
 	}
 
 	public void setGutters(boolean gutters) {
 		_gutters = gutters;
-	}
-
-	public void setIndexed(boolean indexed) {
-		_indexed = indexed;
 	}
 
 	public void setModulesPerRow(int modulesPerRow) {
@@ -209,30 +199,40 @@ public class RowStyledLayoutStructureItem extends StyledLayoutStructureItem {
 	public void setViewportConfiguration(
 		String viewportSizeId, JSONObject configurationJSONObject) {
 
-		JSONObject currentConfigurationJSONObject =
-			_viewportConfigurations.getOrDefault(
-				viewportSizeId, JSONFactoryUtil.createJSONObject());
-
-		if (configurationJSONObject.has("modulesPerRow")) {
-			currentConfigurationJSONObject.put(
-				"modulesPerRow",
-				configurationJSONObject.getInt("modulesPerRow"));
-		}
-
-		if (configurationJSONObject.has("reverseOrder")) {
-			currentConfigurationJSONObject.put(
-				"reverseOrder",
-				configurationJSONObject.getBoolean("reverseOrder"));
-		}
-
-		if (configurationJSONObject.has("verticalAlignment")) {
-			currentConfigurationJSONObject.put(
-				"verticalAlignment",
-				configurationJSONObject.getString("verticalAlignment"));
-		}
-
 		_viewportConfigurations.put(
-			viewportSizeId, currentConfigurationJSONObject);
+			viewportSizeId,
+			_viewportConfigurations.getOrDefault(
+				viewportSizeId, JSONFactoryUtil.createJSONObject()
+			).put(
+				"modulesPerRow",
+				() -> {
+					if (configurationJSONObject.has("modulesPerRow")) {
+						return configurationJSONObject.getInt("modulesPerRow");
+					}
+
+					return null;
+				}
+			).put(
+				"reverseOrder",
+				() -> {
+					if (configurationJSONObject.has("reverseOrder")) {
+						return configurationJSONObject.getBoolean(
+							"reverseOrder");
+					}
+
+					return null;
+				}
+			).put(
+				"verticalAlignment",
+				() -> {
+					if (configurationJSONObject.has("verticalAlignment")) {
+						return configurationJSONObject.getString(
+							"verticalAlignment");
+					}
+
+					return null;
+				}
+			));
 	}
 
 	/**
@@ -256,10 +256,6 @@ public class RowStyledLayoutStructureItem extends StyledLayoutStructureItem {
 
 		if (itemConfigJSONObject.has("modulesPerRow")) {
 			setModulesPerRow(itemConfigJSONObject.getInt("modulesPerRow"));
-		}
-
-		if (itemConfigJSONObject.has("indexed")) {
-			setIndexed(itemConfigJSONObject.getBoolean("indexed"));
 		}
 
 		if (itemConfigJSONObject.has("numberOfColumns")) {
@@ -290,7 +286,6 @@ public class RowStyledLayoutStructureItem extends StyledLayoutStructureItem {
 	}
 
 	private boolean _gutters = true;
-	private boolean _indexed = true;
 	private Integer _modulesPerRow;
 	private int _numberOfColumns;
 	private boolean _reverseOrder;

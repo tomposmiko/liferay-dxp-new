@@ -57,7 +57,8 @@ public class FileEntrySearchFixture {
 		else {
 			fileEntry = addFileEntryWithWorkflow(
 				fileEntryBlueprint.getUserId(), fileEntryBlueprint.getGroupId(),
-				fileEntryBlueprint.getTitle(), serviceContext);
+				fileEntryBlueprint.getFileName(), fileEntryBlueprint.getTitle(),
+				serviceContext);
 		}
 
 		_fileEntries.add(fileEntry);
@@ -102,10 +103,11 @@ public class FileEntrySearchFixture {
 
 		try {
 			return dlAppLocalService.addFileEntry(
-				serviceContext.getUserId(), serviceContext.getScopeGroupId(),
+				null, serviceContext.getUserId(),
+				serviceContext.getScopeGroupId(),
 				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, fileName,
 				MimeTypesUtil.getContentType(fileName), title, StringPool.BLANK,
-				StringPool.BLANK, file, serviceContext);
+				StringPool.BLANK, file, null, null, serviceContext);
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(portalException);
@@ -113,13 +115,12 @@ public class FileEntrySearchFixture {
 	}
 
 	protected FileEntry addFileEntryWithWorkflow(
-		long userId, long groupId, String title,
+		long userId, long groupId, String fileName, String title,
 		ServiceContext serviceContext) {
 
 		try {
 			return DLAppTestUtil.addFileEntryWithWorkflow(
-				userId, groupId, 0, StringPool.BLANK, title, true,
-				serviceContext);
+				userId, groupId, 0, fileName, title, true, serviceContext);
 		}
 		catch (RuntimeException runtimeException) {
 			throw runtimeException;

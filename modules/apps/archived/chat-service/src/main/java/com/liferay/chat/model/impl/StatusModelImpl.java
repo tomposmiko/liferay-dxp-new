@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -225,52 +226,73 @@ public class StatusModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Status, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Status>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Status, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Status, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Status.class.getClassLoader(), Status.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("statusId", Status::getStatusId);
-		attributeGetterFunctions.put("userId", Status::getUserId);
-		attributeGetterFunctions.put("modifiedDate", Status::getModifiedDate);
-		attributeGetterFunctions.put("online", Status::getOnline);
-		attributeGetterFunctions.put("awake", Status::getAwake);
-		attributeGetterFunctions.put(
-			"activePanelIds", Status::getActivePanelIds);
-		attributeGetterFunctions.put("message", Status::getMessage);
-		attributeGetterFunctions.put("playSound", Status::getPlaySound);
+		try {
+			Constructor<Status> constructor =
+				(Constructor<Status>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Status, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Status, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Status, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Status, Object>>();
 		Map<String, BiConsumer<Status, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Status, ?>>();
 
+		attributeGetterFunctions.put("statusId", Status::getStatusId);
 		attributeSetterBiConsumers.put(
 			"statusId", (BiConsumer<Status, Long>)Status::setStatusId);
+		attributeGetterFunctions.put("userId", Status::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<Status, Long>)Status::setUserId);
+		attributeGetterFunctions.put("modifiedDate", Status::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate", (BiConsumer<Status, Long>)Status::setModifiedDate);
+		attributeGetterFunctions.put("online", Status::getOnline);
 		attributeSetterBiConsumers.put(
 			"online", (BiConsumer<Status, Boolean>)Status::setOnline);
+		attributeGetterFunctions.put("awake", Status::getAwake);
 		attributeSetterBiConsumers.put(
 			"awake", (BiConsumer<Status, Boolean>)Status::setAwake);
+		attributeGetterFunctions.put(
+			"activePanelIds", Status::getActivePanelIds);
 		attributeSetterBiConsumers.put(
 			"activePanelIds",
 			(BiConsumer<Status, String>)Status::setActivePanelIds);
+		attributeGetterFunctions.put("message", Status::getMessage);
 		attributeSetterBiConsumers.put(
 			"message", (BiConsumer<Status, String>)Status::setMessage);
+		attributeGetterFunctions.put("playSound", Status::getPlaySound);
 		attributeSetterBiConsumers.put(
 			"playSound", (BiConsumer<Status, Boolean>)Status::setPlaySound);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -528,6 +550,25 @@ public class StatusModelImpl
 	}
 
 	@Override
+	public Status cloneWithOriginalValues() {
+		StatusImpl statusImpl = new StatusImpl();
+
+		statusImpl.setStatusId(this.<Long>getColumnOriginalValue("statusId"));
+		statusImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		statusImpl.setModifiedDate(
+			this.<Long>getColumnOriginalValue("modifiedDate"));
+		statusImpl.setOnline(this.<Boolean>getColumnOriginalValue("online_"));
+		statusImpl.setAwake(this.<Boolean>getColumnOriginalValue("awake"));
+		statusImpl.setActivePanelIds(
+			this.<String>getColumnOriginalValue("activePanelIds"));
+		statusImpl.setMessage(this.<String>getColumnOriginalValue("message"));
+		statusImpl.setPlaySound(
+			this.<Boolean>getColumnOriginalValue("playSound"));
+
+		return statusImpl;
+	}
+
+	@Override
 	public int compareTo(Status status) {
 		long primaryKey = status.getPrimaryKey();
 
@@ -710,9 +751,7 @@ public class StatusModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Status>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Status.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

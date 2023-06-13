@@ -27,13 +27,15 @@ if (Validator.isNull(redirect)) {
 
 String bindRedirectURL = currentURL;
 
-PortletURL viewFactoryInstancesURL = renderResponse.createRenderURL();
-
-viewFactoryInstancesURL.setParameter("mvcRenderCommandName", "/configuration_admin/view_factory_instances");
-
 ConfigurationModel configurationModel = (ConfigurationModel)request.getAttribute(ConfigurationAdminWebKeys.CONFIGURATION_MODEL);
 
-viewFactoryInstancesURL.setParameter("factoryPid", configurationModel.getFactoryPid());
+PortletURL viewFactoryInstancesURL = PortletURLBuilder.createRenderURL(
+	renderResponse
+).setMVCRenderCommandName(
+	"/configuration_admin/view_factory_instances"
+).setParameter(
+	"factoryPid", configurationModel.getFactoryPid()
+).buildPortletURL();
 
 if (configurationModel.isFactory()) {
 	bindRedirectURL = viewFactoryInstancesURL.toString();
@@ -64,7 +66,7 @@ if (configurationModel.isFactory()) {
 }
 
 portletDisplay.setShowBackIcon(true);
-portletDisplay.setURLBack(portletURL.toString());
+portletDisplay.setURLBack(redirect);
 
 renderResponse.setTitle(categoryDisplayName);
 %>
@@ -209,7 +211,7 @@ renderResponse.setTitle(categoryDisplayName);
 
 					<c:if test="<%= !configurationModel.hasScopeConfiguration(configurationScopeDisplayContext.getScope()) %>">
 						<aui:alert closeable="<%= false %>" id="errorAlert" type="info">
-							<liferay-ui:message key="this-configuration-is-not-saved-yet" />
+							<liferay-ui:message key="this-configuration-is-not-saved-yet.-the-values-shown-are-the-default" />
 						</aui:alert>
 					</c:if>
 
@@ -228,7 +230,7 @@ renderResponse.setTitle(categoryDisplayName);
 					<%
 					ConfigurationFormRenderer configurationFormRenderer = (ConfigurationFormRenderer)request.getAttribute(ConfigurationAdminWebKeys.CONFIGURATION_FORM_RENDERER);
 
-					configurationFormRenderer.render(request, PipingServletResponse.createPipingServletResponse(pageContext));
+					configurationFormRenderer.render(request, PipingServletResponseFactory.createPipingServletResponse(pageContext));
 					%>
 
 					<liferay-util:dynamic-include key='<%= "com.liferay.configuration.admin.web#/edit_configuration.jsp#" + configurationModel.getFactoryPid() + "#post" %>' />
@@ -244,6 +246,15 @@ renderResponse.setTitle(categoryDisplayName);
 						</c:choose>
 
 						<aui:button href="<%= redirect %>" name="cancel" type="cancel" />
+
+						<c:if test="<%= Validator.isNotNull(configurationModel.getLiferayLearnMessageKey()) && Validator.isNotNull(configurationModel.getLiferayLearnMessageResource()) %>">
+							<div class="btn float-right">
+								<liferay-learn:message
+									key="<%= configurationModel.getLiferayLearnMessageKey() %>"
+									resource="<%= configurationModel.getLiferayLearnMessageResource() %>"
+								/>
+							</div>
+						</c:if>
 					</aui:button-row>
 				</aui:form>
 			</clay:sheet>

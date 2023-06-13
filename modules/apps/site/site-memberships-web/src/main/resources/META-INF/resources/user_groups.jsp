@@ -30,14 +30,15 @@ Role role = userGroupsDisplayContext.getRole();
 />
 
 <clay:management-toolbar
-	displayContext="<%= userGroupsManagementToolbarDisplayContext %>"
+	managementToolbarDisplayContext="<%= userGroupsManagementToolbarDisplayContext %>"
+	propsTransformer="js/UserGroupsManagementToolbarPropsTransformer"
 />
 
 <portlet:actionURL name="deleteGroupUserGroups" var="deleteGroupUserGroupsURL">
 	<portlet:param name="redirect" value="<%= currentURL %>" />
 </portlet:actionURL>
 
-<aui:form action="<%= deleteGroupUserGroupsURL %>" cssClass="container-fluid-1280 portlet-site-memberships-user-groups" name="fm">
+<aui:form action="<%= deleteGroupUserGroupsURL %>" cssClass="container-fluid container-fluid-max-xl portlet-site-memberships-user-groups" name="fm">
 	<aui:input name="tabs1" type="hidden" value="user-groups" />
 	<aui:input name="navigation" type="hidden" value="<%= userGroupsDisplayContext.getNavigation() %>" />
 	<aui:input name="roleId" type="hidden" value="<%= (role != null) ? role.getRoleId() : 0 %>" />
@@ -94,8 +95,3 @@ Role role = userGroupsDisplayContext.getRole();
 	<aui:input name="tabs1" type="hidden" value="user-groups" />
 	<aui:input name="userGroupId" type="hidden" />
 </aui:form>
-
-<liferay-frontend:component
-	componentId="<%= userGroupsManagementToolbarDisplayContext.getDefaultEventHandler() %>"
-	module="js/UserGroupsManagementToolbarDefaultEventHandler.es"
-/>

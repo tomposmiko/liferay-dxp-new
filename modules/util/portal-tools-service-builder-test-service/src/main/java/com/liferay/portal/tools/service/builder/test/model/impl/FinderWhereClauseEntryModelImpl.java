@@ -30,6 +30,7 @@ import com.liferay.portal.tools.service.builder.test.model.FinderWhereClauseEntr
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -220,48 +221,70 @@ public class FinderWhereClauseEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, FinderWhereClauseEntry>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			FinderWhereClauseEntry.class.getClassLoader(),
+			FinderWhereClauseEntry.class, ModelWrapper.class);
+
+		try {
+			Constructor<FinderWhereClauseEntry> constructor =
+				(Constructor<FinderWhereClauseEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<FinderWhereClauseEntry, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<FinderWhereClauseEntry, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<FinderWhereClauseEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<FinderWhereClauseEntry, Object>>();
-
-		attributeGetterFunctions.put(
-			"finderWhereClauseEntryId",
-			FinderWhereClauseEntry::getFinderWhereClauseEntryId);
-		attributeGetterFunctions.put("name", FinderWhereClauseEntry::getName);
-		attributeGetterFunctions.put(
-			"nickname", FinderWhereClauseEntry::getNickname);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<FinderWhereClauseEntry, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<FinderWhereClauseEntry, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<FinderWhereClauseEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"finderWhereClauseEntryId",
+			FinderWhereClauseEntry::getFinderWhereClauseEntryId);
 		attributeSetterBiConsumers.put(
 			"finderWhereClauseEntryId",
 			(BiConsumer<FinderWhereClauseEntry, Long>)
 				FinderWhereClauseEntry::setFinderWhereClauseEntryId);
+		attributeGetterFunctions.put("name", FinderWhereClauseEntry::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<FinderWhereClauseEntry, String>)
 				FinderWhereClauseEntry::setName);
+		attributeGetterFunctions.put(
+			"nickname", FinderWhereClauseEntry::getNickname);
 		attributeSetterBiConsumers.put(
 			"nickname",
 			(BiConsumer<FinderWhereClauseEntry, String>)
 				FinderWhereClauseEntry::setNickname);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -390,6 +413,21 @@ public class FinderWhereClauseEntryModelImpl
 		finderWhereClauseEntryImpl.setNickname(getNickname());
 
 		finderWhereClauseEntryImpl.resetOriginalValues();
+
+		return finderWhereClauseEntryImpl;
+	}
+
+	@Override
+	public FinderWhereClauseEntry cloneWithOriginalValues() {
+		FinderWhereClauseEntryImpl finderWhereClauseEntryImpl =
+			new FinderWhereClauseEntryImpl();
+
+		finderWhereClauseEntryImpl.setFinderWhereClauseEntryId(
+			this.<Long>getColumnOriginalValue("finderWhereClauseEntryId"));
+		finderWhereClauseEntryImpl.setName(
+			this.<String>getColumnOriginalValue("name"));
+		finderWhereClauseEntryImpl.setNickname(
+			this.<String>getColumnOriginalValue("nickname"));
 
 		return finderWhereClauseEntryImpl;
 	}
@@ -574,9 +612,7 @@ public class FinderWhereClauseEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, FinderWhereClauseEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					FinderWhereClauseEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

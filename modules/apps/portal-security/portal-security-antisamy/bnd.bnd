@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Portal Security AntiSamy
 Bundle-SymbolicName: com.liferay.portal.security.antisamy
-Bundle-Version: 5.0.42
+Bundle-Version: 6.0.17
 Import-Package:\
 	!org.apache.avalon.framework.*,\
 	!org.apache.commons.logging.*,\
@@ -8,10 +8,12 @@ Import-Package:\
 	!org.apache.log4j.*,\
 	!org.apache.xml.resolver.*,\
 	\
-	!org.conscrypt.*,\
-	\
 	!sun.io,\
 	\
 	org.w3c.dom,\
 	\
 	*
+Require-Capability:\
+	osgi.extender;\
+		filter := "(&(osgi.extender=osgi.configurator)(version>=1.0)(!(version>=2.0)))"
+-includeresource: OSGI-INF/configurator=configurator

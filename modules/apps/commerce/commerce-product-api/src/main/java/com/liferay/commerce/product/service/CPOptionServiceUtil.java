@@ -53,16 +53,30 @@ public class CPOptionServiceUtil {
 			skuContributor, key, serviceContext);
 	}
 
+	public static CPOption addOrUpdateCPOption(
+			String externalReferenceCode, Map<java.util.Locale, String> nameMap,
+			Map<java.util.Locale, String> descriptionMap,
+			String ddmFormFieldTypeName, boolean facetable, boolean required,
+			boolean skuContributor, String key,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addOrUpdateCPOption(
+			externalReferenceCode, nameMap, descriptionMap,
+			ddmFormFieldTypeName, facetable, required, skuContributor, key,
+			serviceContext);
+	}
+
 	public static void deleteCPOption(long cpOptionId) throws PortalException {
 		getService().deleteCPOption(cpOptionId);
 	}
 
 	public static CPOption fetchByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
+			String externalReferenceCode, long companyId)
 		throws PortalException {
 
 		return getService().fetchByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	public static CPOption fetchCPOption(long cpOptionId)
@@ -122,17 +136,12 @@ public class CPOptionServiceUtil {
 			facetable, required, skuContributor, key, serviceContext);
 	}
 
-	public static CPOption upsertCPOption(
-			Map<java.util.Locale, String> nameMap,
-			Map<java.util.Locale, String> descriptionMap,
-			String ddmFormFieldTypeName, boolean facetable, boolean required,
-			boolean skuContributor, String key, String externalReferenceCode,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+	public static CPOption updateCPOptionExternalReferenceCode(
+			String externalReferenceCode, long cpOptionId)
 		throws PortalException {
 
-		return getService().upsertCPOption(
-			nameMap, descriptionMap, ddmFormFieldTypeName, facetable, required,
-			skuContributor, key, externalReferenceCode, serviceContext);
+		return getService().updateCPOptionExternalReferenceCode(
+			externalReferenceCode, cpOptionId);
 	}
 
 	public static CPOptionService getService() {

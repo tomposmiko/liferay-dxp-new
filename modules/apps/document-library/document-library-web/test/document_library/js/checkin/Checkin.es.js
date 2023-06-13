@@ -45,17 +45,11 @@ function _renderCheckinComponent({checkedOut = true} = {}) {
 }
 
 describe('Checkin', () => {
-	beforeEach(() => {
-		const components = {};
-
-		Liferay.component = (id, component) => {
-			components[id] = component;
-		};
-		Liferay.componentReady = (id) => Promise.resolve(components[id]);
-
-		Liferay.destroyComponent = jest.fn();
-	});
-
+	const components = {};
+	Liferay.component = (id, component) => {
+		components[id] = component;
+	};
+	Liferay.componentReady = (id) => Promise.resolve(components[id]);
 	afterEach(cleanup);
 
 	describe('when the file is checked out', () => {
@@ -83,7 +77,7 @@ describe('Checkin', () => {
 					const form = await waitForElement(() =>
 						result.getByRole('form')
 					);
-					expect(form);
+					expect(form).toBeTruthy();
 				});
 
 				describe('and the form is submitted', () => {
@@ -162,7 +156,7 @@ describe('Checkin', () => {
 					const form = await waitForElement(() =>
 						result.getByRole('form')
 					);
-					expect(form);
+					expect(form).toBeTruthy();
 				});
 
 				describe('and the form is submitted', () => {

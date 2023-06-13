@@ -18,14 +18,12 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration;
 import com.liferay.portal.search.elasticsearch7.internal.configuration.ElasticsearchConfigurationWrapper;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.PropsImpl;
 
 import java.util.Collections;
 
@@ -37,7 +35,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -48,14 +45,11 @@ import org.mockito.Mockito;
 public class CompanyIdIndexNameBuilderTest {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
 	@Before
 	public void setUp() throws Exception {
-		PropsUtil.setProps(new PropsImpl());
-
 		ElasticsearchConnectionFixture elasticsearchConnectionFixture =
 			ElasticsearchConnectionFixture.builder(
 			).clusterName(
@@ -106,7 +100,7 @@ public class CompanyIdIndexNameBuilderTest {
 
 	@Test(expected = ElasticsearchStatusException.class)
 	public void testIndexNamePrefixInvalidIndexName() throws Exception {
-		createIndices(StringPool.SLASH, 0);
+		createIndices(StringPool.STAR, 0);
 	}
 
 	@Test

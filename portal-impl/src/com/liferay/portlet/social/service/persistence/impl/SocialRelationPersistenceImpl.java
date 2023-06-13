@@ -16,9 +16,9 @@ package com.liferay.portlet.social.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
-import com.liferay.portal.kernel.dao.orm.ArgumentsResolver;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
+import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
 import com.liferay.portal.kernel.dao.orm.Query;
@@ -27,12 +27,10 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelperUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -42,9 +40,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portlet.social.model.impl.SocialRelationImpl;
 import com.liferay.portlet.social.model.impl.SocialRelationModelImpl;
-import com.liferay.registry.Registry;
-import com.liferay.registry.RegistryUtil;
-import com.liferay.registry.ServiceRegistration;
 import com.liferay.social.kernel.exception.NoSuchRelationException;
 import com.liferay.social.kernel.model.SocialRelation;
 import com.liferay.social.kernel.model.SocialRelationTable;
@@ -66,7 +61,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The persistence implementation for the social relation service.
@@ -197,7 +191,7 @@ public class SocialRelationPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialRelation>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialRelation socialRelation : list) {
@@ -589,8 +583,7 @@ public class SocialRelationPersistenceImpl
 
 			finderArgs = new Object[] {uuid};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -755,7 +748,7 @@ public class SocialRelationPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialRelation>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialRelation socialRelation : list) {
@@ -1180,8 +1173,7 @@ public class SocialRelationPersistenceImpl
 
 			finderArgs = new Object[] {uuid, companyId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1346,7 +1338,7 @@ public class SocialRelationPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialRelation>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialRelation socialRelation : list) {
@@ -1714,8 +1706,7 @@ public class SocialRelationPersistenceImpl
 
 			finderArgs = new Object[] {companyId};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -1857,7 +1848,7 @@ public class SocialRelationPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialRelation>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialRelation socialRelation : list) {
@@ -2225,8 +2216,7 @@ public class SocialRelationPersistenceImpl
 
 			finderArgs = new Object[] {userId1};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2368,7 +2358,7 @@ public class SocialRelationPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialRelation>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialRelation socialRelation : list) {
@@ -2736,8 +2726,7 @@ public class SocialRelationPersistenceImpl
 
 			finderArgs = new Object[] {userId2};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -2876,7 +2865,7 @@ public class SocialRelationPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialRelation>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialRelation socialRelation : list) {
@@ -3242,8 +3231,7 @@ public class SocialRelationPersistenceImpl
 
 			finderArgs = new Object[] {type};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3391,7 +3379,7 @@ public class SocialRelationPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialRelation>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialRelation socialRelation : list) {
@@ -3790,8 +3778,7 @@ public class SocialRelationPersistenceImpl
 
 			finderArgs = new Object[] {companyId, type};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -3947,7 +3934,7 @@ public class SocialRelationPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialRelation>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialRelation socialRelation : list) {
@@ -4346,8 +4333,7 @@ public class SocialRelationPersistenceImpl
 
 			finderArgs = new Object[] {userId1, userId2};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -4502,7 +4488,7 @@ public class SocialRelationPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialRelation>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialRelation socialRelation : list) {
@@ -4900,8 +4886,7 @@ public class SocialRelationPersistenceImpl
 
 			finderArgs = new Object[] {userId1, type};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5056,7 +5041,7 @@ public class SocialRelationPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialRelation>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SocialRelation socialRelation : list) {
@@ -5454,8 +5439,7 @@ public class SocialRelationPersistenceImpl
 
 			finderArgs = new Object[] {userId2, type};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5588,7 +5572,7 @@ public class SocialRelationPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
-				_finderPathFetchByU1_U2_T, finderArgs, this);
+				_finderPathFetchByU1_U2_T, finderArgs);
 		}
 
 		if (result instanceof SocialRelation) {
@@ -5702,8 +5686,7 @@ public class SocialRelationPersistenceImpl
 
 			finderArgs = new Object[] {userId1, userId2, type};
 
-			count = (Long)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
 		}
 
 		if (count == null) {
@@ -5834,23 +5817,21 @@ public class SocialRelationPersistenceImpl
 	 * Clears the cache for all social relations.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
 	public void clearCache() {
 		EntityCacheUtil.clearCache(SocialRelationImpl.class);
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		FinderCacheUtil.clearCache(SocialRelationImpl.class);
 	}
 
 	/**
 	 * Clears the cache for the social relation.
 	 *
 	 * <p>
-	 * The <code>EntityCache</code> and <code>com.liferay.portal.kernel.dao.orm.FinderCache</code> are both cleared by this method.
+	 * The <code>EntityCache</code> and <code>FinderCache</code> are both cleared by this method.
 	 * </p>
 	 */
 	@Override
@@ -5868,9 +5849,7 @@ public class SocialRelationPersistenceImpl
 
 	@Override
 	public void clearCache(Set<Serializable> primaryKeys) {
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		FinderCacheUtil.clearCache(SocialRelationImpl.class);
 
 		for (Serializable primaryKey : primaryKeys) {
 			EntityCacheUtil.removeResult(SocialRelationImpl.class, primaryKey);
@@ -5887,9 +5866,9 @@ public class SocialRelationPersistenceImpl
 		};
 
 		FinderCacheUtil.putResult(
-			_finderPathCountByU1_U2_T, args, Long.valueOf(1), false);
+			_finderPathCountByU1_U2_T, args, Long.valueOf(1));
 		FinderCacheUtil.putResult(
-			_finderPathFetchByU1_U2_T, args, socialRelationModelImpl, false);
+			_finderPathFetchByU1_U2_T, args, socialRelationModelImpl);
 	}
 
 	/**
@@ -6128,9 +6107,7 @@ public class SocialRelationPersistenceImpl
 	 */
 	@Override
 	public SocialRelation fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(
-				SocialRelation.class, primaryKey)) {
-
+		if (CTPersistenceHelperUtil.isProductionMode(SocialRelation.class)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
@@ -6349,7 +6326,7 @@ public class SocialRelationPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<SocialRelation>)FinderCacheUtil.getResult(
-				finderPath, finderArgs, this);
+				finderPath, finderArgs);
 		}
 
 		if (list == null) {
@@ -6425,7 +6402,7 @@ public class SocialRelationPersistenceImpl
 
 		if (productionMode) {
 			count = (Long)FinderCacheUtil.getResult(
-				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+				_finderPathCountAll, FINDER_ARGS_EMPTY);
 		}
 
 		if (count == null) {
@@ -6538,30 +6515,22 @@ public class SocialRelationPersistenceImpl
 	 * Initializes the social relation persistence.
 	 */
 	public void afterPropertiesSet() {
-		Registry registry = RegistryUtil.getRegistry();
-
-		_argumentsResolverServiceRegistration = registry.registerService(
-			ArgumentsResolver.class, new SocialRelationModelArgumentsResolver(),
-			HashMapBuilder.<String, Object>put(
-				"model.class.name", SocialRelation.class.getName()
-			).build());
-
 		_valueObjectFinderCacheListThreshold = GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.VALUE_OBJECT_FINDER_CACHE_LIST_THRESHOLD));
 
-		_finderPathWithPaginationFindAll = _createFinderPath(
+		_finderPathWithPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathWithoutPaginationFindAll = _createFinderPath(
+		_finderPathWithoutPaginationFindAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0],
 			new String[0], true);
 
-		_finderPathCountAll = _createFinderPath(
+		_finderPathCountAll = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
-		_finderPathWithPaginationFindByUuid = _createFinderPath(
+		_finderPathWithPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
@@ -6569,17 +6538,17 @@ public class SocialRelationPersistenceImpl
 			},
 			new String[] {"uuid_"}, true);
 
-		_finderPathWithoutPaginationFindByUuid = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			true);
 
-		_finderPathCountByUuid = _createFinderPath(
+		_finderPathCountByUuid = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			false);
 
-		_finderPathWithPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -6588,17 +6557,17 @@ public class SocialRelationPersistenceImpl
 			},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathWithoutPaginationFindByUuid_C = _createFinderPath(
+		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, true);
 
-		_finderPathCountByUuid_C = _createFinderPath(
+		_finderPathCountByUuid_C = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
 
-		_finderPathWithPaginationFindByCompanyId = _createFinderPath(
+		_finderPathWithPaginationFindByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -6606,17 +6575,17 @@ public class SocialRelationPersistenceImpl
 			},
 			new String[] {"companyId"}, true);
 
-		_finderPathWithoutPaginationFindByCompanyId = _createFinderPath(
+		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			true);
 
-		_finderPathCountByCompanyId = _createFinderPath(
+		_finderPathCountByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
 
-		_finderPathWithPaginationFindByUserId1 = _createFinderPath(
+		_finderPathWithPaginationFindByUserId1 = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId1",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -6624,17 +6593,17 @@ public class SocialRelationPersistenceImpl
 			},
 			new String[] {"userId1"}, true);
 
-		_finderPathWithoutPaginationFindByUserId1 = _createFinderPath(
+		_finderPathWithoutPaginationFindByUserId1 = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId1",
 			new String[] {Long.class.getName()}, new String[] {"userId1"},
 			true);
 
-		_finderPathCountByUserId1 = _createFinderPath(
+		_finderPathCountByUserId1 = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId1",
 			new String[] {Long.class.getName()}, new String[] {"userId1"},
 			false);
 
-		_finderPathWithPaginationFindByUserId2 = _createFinderPath(
+		_finderPathWithPaginationFindByUserId2 = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUserId2",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -6642,17 +6611,17 @@ public class SocialRelationPersistenceImpl
 			},
 			new String[] {"userId2"}, true);
 
-		_finderPathWithoutPaginationFindByUserId2 = _createFinderPath(
+		_finderPathWithoutPaginationFindByUserId2 = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUserId2",
 			new String[] {Long.class.getName()}, new String[] {"userId2"},
 			true);
 
-		_finderPathCountByUserId2 = _createFinderPath(
+		_finderPathCountByUserId2 = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUserId2",
 			new String[] {Long.class.getName()}, new String[] {"userId2"},
 			false);
 
-		_finderPathWithPaginationFindByType = _createFinderPath(
+		_finderPathWithPaginationFindByType = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByType",
 			new String[] {
 				Integer.class.getName(), Integer.class.getName(),
@@ -6660,17 +6629,17 @@ public class SocialRelationPersistenceImpl
 			},
 			new String[] {"type_"}, true);
 
-		_finderPathWithoutPaginationFindByType = _createFinderPath(
+		_finderPathWithoutPaginationFindByType = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByType",
 			new String[] {Integer.class.getName()}, new String[] {"type_"},
 			true);
 
-		_finderPathCountByType = _createFinderPath(
+		_finderPathCountByType = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByType",
 			new String[] {Integer.class.getName()}, new String[] {"type_"},
 			false);
 
-		_finderPathWithPaginationFindByC_T = _createFinderPath(
+		_finderPathWithPaginationFindByC_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_T",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -6679,17 +6648,17 @@ public class SocialRelationPersistenceImpl
 			},
 			new String[] {"companyId", "type_"}, true);
 
-		_finderPathWithoutPaginationFindByC_T = _createFinderPath(
+		_finderPathWithoutPaginationFindByC_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_T",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"companyId", "type_"}, true);
 
-		_finderPathCountByC_T = _createFinderPath(
+		_finderPathCountByC_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_T",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"companyId", "type_"}, false);
 
-		_finderPathWithPaginationFindByU1_U2 = _createFinderPath(
+		_finderPathWithPaginationFindByU1_U2 = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU1_U2",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -6698,17 +6667,17 @@ public class SocialRelationPersistenceImpl
 			},
 			new String[] {"userId1", "userId2"}, true);
 
-		_finderPathWithoutPaginationFindByU1_U2 = _createFinderPath(
+		_finderPathWithoutPaginationFindByU1_U2 = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU1_U2",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"userId1", "userId2"}, true);
 
-		_finderPathCountByU1_U2 = _createFinderPath(
+		_finderPathCountByU1_U2 = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU1_U2",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"userId1", "userId2"}, false);
 
-		_finderPathWithPaginationFindByU1_T = _createFinderPath(
+		_finderPathWithPaginationFindByU1_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU1_T",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -6717,17 +6686,17 @@ public class SocialRelationPersistenceImpl
 			},
 			new String[] {"userId1", "type_"}, true);
 
-		_finderPathWithoutPaginationFindByU1_T = _createFinderPath(
+		_finderPathWithoutPaginationFindByU1_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU1_T",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"userId1", "type_"}, true);
 
-		_finderPathCountByU1_T = _createFinderPath(
+		_finderPathCountByU1_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU1_T",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"userId1", "type_"}, false);
 
-		_finderPathWithPaginationFindByU2_T = _createFinderPath(
+		_finderPathWithPaginationFindByU2_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByU2_T",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -6736,17 +6705,17 @@ public class SocialRelationPersistenceImpl
 			},
 			new String[] {"userId2", "type_"}, true);
 
-		_finderPathWithoutPaginationFindByU2_T = _createFinderPath(
+		_finderPathWithoutPaginationFindByU2_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByU2_T",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"userId2", "type_"}, true);
 
-		_finderPathCountByU2_T = _createFinderPath(
+		_finderPathCountByU2_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU2_T",
 			new String[] {Long.class.getName(), Integer.class.getName()},
 			new String[] {"userId2", "type_"}, false);
 
-		_finderPathFetchByU1_U2_T = _createFinderPath(
+		_finderPathFetchByU1_U2_T = new FinderPath(
 			FINDER_CLASS_NAME_ENTITY, "fetchByU1_U2_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -6754,7 +6723,7 @@ public class SocialRelationPersistenceImpl
 			},
 			new String[] {"userId1", "userId2", "type_"}, true);
 
-		_finderPathCountByU1_U2_T = _createFinderPath(
+		_finderPathCountByU1_U2_T = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByU1_U2_T",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -6769,14 +6738,6 @@ public class SocialRelationPersistenceImpl
 		_setSocialRelationUtilPersistence(null);
 
 		EntityCacheUtil.removeCache(SocialRelationImpl.class.getName());
-
-		_argumentsResolverServiceRegistration.unregister();
-
-		for (ServiceRegistration<FinderPath> serviceRegistration :
-				_serviceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	private void _setSocialRelationUtilPersistence(
@@ -6821,109 +6782,9 @@ public class SocialRelationPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"uuid", "type"});
 
-	private FinderPath _createFinderPath(
-		String cacheName, String methodName, String[] params,
-		String[] columnNames, boolean baseModelResult) {
-
-		FinderPath finderPath = new FinderPath(
-			cacheName, methodName, params, columnNames, baseModelResult);
-
-		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
-			Registry registry = RegistryUtil.getRegistry();
-
-			_serviceRegistrations.add(
-				registry.registerService(
-					FinderPath.class, finderPath,
-					HashMapBuilder.<String, Object>put(
-						"cache.name", cacheName
-					).build()));
-		}
-
-		return finderPath;
-	}
-
-	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
-		new HashSet<>();
-	private ServiceRegistration<ArgumentsResolver>
-		_argumentsResolverServiceRegistration;
-
-	private static class SocialRelationModelArgumentsResolver
-		implements ArgumentsResolver {
-
-		@Override
-		public Object[] getArguments(
-			FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
-			boolean original) {
-
-			String[] columnNames = finderPath.getColumnNames();
-
-			if ((columnNames == null) || (columnNames.length == 0)) {
-				if (baseModel.isNew()) {
-					return new Object[0];
-				}
-
-				return null;
-			}
-
-			SocialRelationModelImpl socialRelationModelImpl =
-				(SocialRelationModelImpl)baseModel;
-
-			long columnBitmask = socialRelationModelImpl.getColumnBitmask();
-
-			if (!checkColumn || (columnBitmask == 0)) {
-				return _getValue(
-					socialRelationModelImpl, columnNames, original);
-			}
-
-			Long finderPathColumnBitmask = _finderPathColumnBitmasksCache.get(
-				finderPath);
-
-			if (finderPathColumnBitmask == null) {
-				finderPathColumnBitmask = 0L;
-
-				for (String columnName : columnNames) {
-					finderPathColumnBitmask |=
-						socialRelationModelImpl.getColumnBitmask(columnName);
-				}
-
-				_finderPathColumnBitmasksCache.put(
-					finderPath, finderPathColumnBitmask);
-			}
-
-			if ((columnBitmask & finderPathColumnBitmask) != 0) {
-				return _getValue(
-					socialRelationModelImpl, columnNames, original);
-			}
-
-			return null;
-		}
-
-		private static Object[] _getValue(
-			SocialRelationModelImpl socialRelationModelImpl,
-			String[] columnNames, boolean original) {
-
-			Object[] arguments = new Object[columnNames.length];
-
-			for (int i = 0; i < arguments.length; i++) {
-				String columnName = columnNames[i];
-
-				if (original) {
-					arguments[i] =
-						socialRelationModelImpl.getColumnOriginalValue(
-							columnName);
-				}
-				else {
-					arguments[i] = socialRelationModelImpl.getColumnValue(
-						columnName);
-				}
-			}
-
-			return arguments;
-		}
-
-		private static final Map<FinderPath, Long>
-			_finderPathColumnBitmasksCache = new ConcurrentHashMap<>();
-
+	@Override
+	protected FinderCache getFinderCache() {
+		return FinderCacheUtil.getFinderCache();
 	}
 
 }

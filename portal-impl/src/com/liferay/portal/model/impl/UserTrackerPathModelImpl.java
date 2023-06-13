@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -220,57 +221,79 @@ public class UserTrackerPathModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, UserTrackerPath>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			UserTrackerPath.class.getClassLoader(), UserTrackerPath.class,
+			ModelWrapper.class);
+
+		try {
+			Constructor<UserTrackerPath> constructor =
+				(Constructor<UserTrackerPath>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<UserTrackerPath, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<UserTrackerPath, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<UserTrackerPath, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<UserTrackerPath, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", UserTrackerPath::getMvccVersion);
-		attributeGetterFunctions.put(
-			"userTrackerPathId", UserTrackerPath::getUserTrackerPathId);
-		attributeGetterFunctions.put(
-			"companyId", UserTrackerPath::getCompanyId);
-		attributeGetterFunctions.put(
-			"userTrackerId", UserTrackerPath::getUserTrackerId);
-		attributeGetterFunctions.put("path", UserTrackerPath::getPath);
-		attributeGetterFunctions.put("pathDate", UserTrackerPath::getPathDate);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<UserTrackerPath, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<UserTrackerPath, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<UserTrackerPath, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", UserTrackerPath::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<UserTrackerPath, Long>)UserTrackerPath::setMvccVersion);
+		attributeGetterFunctions.put(
+			"userTrackerPathId", UserTrackerPath::getUserTrackerPathId);
 		attributeSetterBiConsumers.put(
 			"userTrackerPathId",
 			(BiConsumer<UserTrackerPath, Long>)
 				UserTrackerPath::setUserTrackerPathId);
+		attributeGetterFunctions.put(
+			"companyId", UserTrackerPath::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<UserTrackerPath, Long>)UserTrackerPath::setCompanyId);
+		attributeGetterFunctions.put(
+			"userTrackerId", UserTrackerPath::getUserTrackerId);
 		attributeSetterBiConsumers.put(
 			"userTrackerId",
 			(BiConsumer<UserTrackerPath, Long>)
 				UserTrackerPath::setUserTrackerId);
+		attributeGetterFunctions.put("path", UserTrackerPath::getPath);
 		attributeSetterBiConsumers.put(
 			"path",
 			(BiConsumer<UserTrackerPath, String>)UserTrackerPath::setPath);
+		attributeGetterFunctions.put("pathDate", UserTrackerPath::getPathDate);
 		attributeSetterBiConsumers.put(
 			"pathDate",
 			(BiConsumer<UserTrackerPath, Date>)UserTrackerPath::setPathDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -438,6 +461,26 @@ public class UserTrackerPathModelImpl
 		userTrackerPathImpl.setPathDate(getPathDate());
 
 		userTrackerPathImpl.resetOriginalValues();
+
+		return userTrackerPathImpl;
+	}
+
+	@Override
+	public UserTrackerPath cloneWithOriginalValues() {
+		UserTrackerPathImpl userTrackerPathImpl = new UserTrackerPathImpl();
+
+		userTrackerPathImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		userTrackerPathImpl.setUserTrackerPathId(
+			this.<Long>getColumnOriginalValue("userTrackerPathId"));
+		userTrackerPathImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		userTrackerPathImpl.setUserTrackerId(
+			this.<Long>getColumnOriginalValue("userTrackerId"));
+		userTrackerPathImpl.setPath(
+			this.<String>getColumnOriginalValue("path_"));
+		userTrackerPathImpl.setPathDate(
+			this.<Date>getColumnOriginalValue("pathDate"));
 
 		return userTrackerPathImpl;
 	}
@@ -625,9 +668,7 @@ public class UserTrackerPathModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, UserTrackerPath>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					UserTrackerPath.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

@@ -28,12 +28,9 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-
-import java.util.List;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -137,22 +134,20 @@ public class OAuthManager {
 
 	@Activate
 	protected void activate() {
-		List<Company> companys = _companyLocalService.getCompanies();
-
-		for (Company company : companys) {
-			try {
-				setupExpando(company.getCompanyId());
-			}
-			catch (Exception exception) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						StringBundler.concat(
-							"Unable to setup Marketplace for company ",
-							company.getCompanyId(), ": ",
-							exception.getMessage()));
+		_companyLocalService.forEachCompanyId(
+			companyId -> {
+				try {
+					setupExpando(companyId);
 				}
-			}
-		}
+				catch (Exception exception) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							StringBundler.concat(
+								"Unable to setup Marketplace for company ",
+								companyId, ": ", exception.getMessage()));
+					}
+				}
+			});
 	}
 
 	@Reference(unbind = "-")

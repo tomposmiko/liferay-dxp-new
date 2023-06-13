@@ -18,6 +18,7 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.fragment.processor.FragmentEntryProcessorContext;
 import com.liferay.info.item.InfoItemFieldValues;
+import com.liferay.info.type.WebImage;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 
@@ -37,13 +38,16 @@ public interface FragmentEntryProcessorHelper {
 
 	public String getEditableValue(JSONObject jsonObject, Locale locale);
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #getEditableValue(JSONObject, Locale)}
-	 */
-	@Deprecated
-	public String getEditableValue(
-		JSONObject jsonObject, Locale locale, long[] segmentsExperienceIds);
+	public long getFileEntryId(
+			long classNameId, long classPK, String fieldId, Locale locale)
+		throws PortalException;
+
+	public long getFileEntryId(
+		Object displayObject, String fieldId, Locale locale);
+
+	public long getFileEntryId(String className, long classPK);
+
+	public long getFileEntryId(WebImage webImage);
 
 	public Object getMappedCollectionValue(
 			JSONObject jsonObject,

@@ -14,6 +14,7 @@
 
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
+import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.content.page.editor.listener.ContentPageEditorListenerTracker;
 import com.liferay.layout.content.page.editor.web.internal.util.layout.structure.LayoutStructureUtil;
@@ -53,7 +54,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
-		"mvc.command.name=/content_layout/publish_layout_page_template_entry"
+		"mvc.command.name=/layout_content_page_editor/publish_layout_page_template_entry"
 	},
 	service = {AopService.class, MVCActionCommand.class}
 )
@@ -121,8 +122,8 @@ public class PublishLayoutPageTemplateEntryMVCActionCommand
 		throws Exception {
 
 		LayoutStructureUtil.deleteMarkedForDeletionItems(
-			_contentPageEditorListenerTracker, draftLayout.getGroupId(),
-			draftLayout.getPlid());
+			draftLayout.getCompanyId(), _contentPageEditorListenerTracker,
+			draftLayout.getGroupId(), draftLayout.getPlid(), _portletRegistry);
 
 		draftLayout = _layoutLocalService.fetchLayout(draftLayout.getPlid());
 
@@ -165,5 +166,8 @@ public class PublishLayoutPageTemplateEntryMVCActionCommand
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private PortletRegistry _portletRegistry;
 
 }

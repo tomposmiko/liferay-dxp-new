@@ -23,7 +23,6 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
 
 import java.io.IOException;
 
@@ -42,6 +41,7 @@ import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * @author Tom Wang
@@ -56,9 +56,9 @@ public class SplitPackagesTest {
 			_getAllowedSplitPackageNames();
 		Map<Bundle, Set<ExportPackage>> exportPackagesMap = new HashMap<>();
 
-		Bundle systemBundle = (Bundle)ModuleFrameworkUtilAdapter.getFramework();
+		Bundle currentBundle = FrameworkUtil.getBundle(SplitPackagesTest.class);
 
-		BundleContext bundleContext = systemBundle.getBundleContext();
+		BundleContext bundleContext = currentBundle.getBundleContext();
 
 		for (Bundle bundle : bundleContext.getBundles()) {
 			Set<ExportPackage> exportPackages = _getExportPackages(bundle);
@@ -187,15 +187,8 @@ public class SplitPackagesTest {
 
 		@Override
 		public String toString() {
-			StringBundler sb = new StringBundler(5);
-
-			sb.append("{name=");
-			sb.append(_name);
-			sb.append(", version=");
-			sb.append(_version);
-			sb.append("}");
-
-			return sb.toString();
+			return StringBundler.concat(
+				"{name=", _name, ", version=", _version, "}");
 		}
 
 		private ExportPackage(String name, String version) {

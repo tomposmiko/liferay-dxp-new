@@ -20,13 +20,10 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.LayoutTemplateLocalService;
 import com.liferay.portal.kernel.service.LayoutTemplateLocalServiceUtil;
-import com.liferay.portal.kernel.service.persistence.PluginSettingPersistence;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 
@@ -98,49 +95,6 @@ public abstract class LayoutTemplateLocalServiceBaseImpl
 		this.counterLocalService = counterLocalService;
 	}
 
-	/**
-	 * Returns the plugin setting local service.
-	 *
-	 * @return the plugin setting local service
-	 */
-	public com.liferay.portal.kernel.service.PluginSettingLocalService
-		getPluginSettingLocalService() {
-
-		return pluginSettingLocalService;
-	}
-
-	/**
-	 * Sets the plugin setting local service.
-	 *
-	 * @param pluginSettingLocalService the plugin setting local service
-	 */
-	public void setPluginSettingLocalService(
-		com.liferay.portal.kernel.service.PluginSettingLocalService
-			pluginSettingLocalService) {
-
-		this.pluginSettingLocalService = pluginSettingLocalService;
-	}
-
-	/**
-	 * Returns the plugin setting persistence.
-	 *
-	 * @return the plugin setting persistence
-	 */
-	public PluginSettingPersistence getPluginSettingPersistence() {
-		return pluginSettingPersistence;
-	}
-
-	/**
-	 * Sets the plugin setting persistence.
-	 *
-	 * @param pluginSettingPersistence the plugin setting persistence
-	 */
-	public void setPluginSettingPersistence(
-		PluginSettingPersistence pluginSettingPersistence) {
-
-		this.pluginSettingPersistence = pluginSettingPersistence;
-	}
-
 	public void afterPropertiesSet() {
 		_setLocalServiceUtilService(layoutTemplateLocalService);
 	}
@@ -207,17 +161,5 @@ public abstract class LayoutTemplateLocalServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.PluginSettingLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.PluginSettingLocalService
-		pluginSettingLocalService;
-
-	@BeanReference(type = PluginSettingPersistence.class)
-	protected PluginSettingPersistence pluginSettingPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		LayoutTemplateLocalServiceBaseImpl.class);
 
 }

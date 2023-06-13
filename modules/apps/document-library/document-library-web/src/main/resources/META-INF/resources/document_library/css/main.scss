@@ -1,5 +1,7 @@
 @import 'atlas-variables';
 
+@import 'image_editor_modal';
+
 @mixin file-icon($colorIndex, $color) {
 	[data-file-icon-color='#{$colorIndex}'] .lexicon-icon {
 		color: $color;
@@ -27,7 +29,7 @@ $productMenuWidth: 320px;
 
 	.bulk-status-container {
 		height: 32px;
-		margin-top: -1.25rem;
+		margin-bottom: -32px;
 
 		.bulk-status {
 			background: #2e5aac;
@@ -178,7 +180,7 @@ $productMenuWidth: 320px;
 		margin-bottom: 1rem;
 	}
 
-	.file-entry-type-fields .CodeMirror {
+	.file-entry-type-fields .ddm-form-builder-app .CodeMirror {
 		height: 100%;
 	}
 
@@ -267,6 +269,16 @@ $productMenuWidth: 320px;
 
 	.metadata-panel-container {
 		margin-top: 1em;
+
+		.sheet {
+			border: 0;
+			padding: 0;
+
+			.container-fluid {
+				padding-left: 0;
+				padding-right: 0;
+			}
+		}
 	}
 
 	.modal .edit-categories {
@@ -349,6 +361,9 @@ $productMenuWidth: 320px;
 	}
 
 	.lfr-header-row {
+		border: 1px solid transparent;
+		min-height: 31px;
+
 		.lfr-asset-summary {
 			margin-left: 5px;
 
@@ -373,11 +388,15 @@ $productMenuWidth: 320px;
 				font-weight: bold;
 			}
 		}
+
+		.lfr-search-combobox {
+			float: right;
+			margin: -2px 0 0 2px;
+		}
 	}
 
 	.lfr-header-row-content {
-		padding-left: 0;
-		padding-top: 0;
+		padding: 0 4px 0 0;
 
 		.edit-toolbar {
 			margin: 0;
@@ -385,6 +404,16 @@ $productMenuWidth: 320px;
 
 		.nav-item-icon {
 			width: 15px;
+		}
+	}
+
+	.lfr-header-row,
+	.lfr-header-row-content {
+		&:after {
+			clear: both;
+			content: '';
+			display: block;
+			height: 0;
 		}
 	}
 
@@ -554,6 +583,18 @@ $productMenuWidth: 320px;
 	}
 
 	.sidebar-body {
+		.collaborators {
+			.component-title {
+				font-weight: 600;
+				margin: 0;
+			}
+
+			.component-subtitle {
+				font-size: 14px;
+				font-weight: 600;
+			}
+		}
+
 		.thumbnail {
 			margin-bottom: 1.5rem;
 		}
@@ -582,8 +623,7 @@ $productMenuWidth: 320px;
 			text-shadow: 1px 1px #fff;
 		}
 
-		.user-date,
-		.taglib-asset-tags-summary {
+		.user-date {
 			font-weight: bold;
 		}
 
@@ -704,6 +744,15 @@ $productMenuWidth: 320px;
 		padding-bottom: 15px;
 	}
 
+	.expiration-date,
+	.review-date {
+		margin-bottom: 1rem;
+
+		.form-group-autofit {
+			margin-bottom: 0.5rem;
+		}
+	}
+
 	.lfr-asset-column-details .lfr-panel {
 		margin-bottom: 0.5em;
 		padding-bottom: 0;
@@ -743,12 +792,4 @@ $productMenuWidth: 320px;
 
 .autocomplete-dropdown-menu {
 	z-index: 2000;
-}
-
-.modal-dialog {
-	position: relative;
-}
-
-.modal-open .modal {
-	overflow-y: auto;
 }

@@ -24,9 +24,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition.Scope;
 import com.liferay.portal.configuration.metatype.definitions.ExtendedAttributeDefinition;
 import com.liferay.portal.configuration.metatype.definitions.ExtendedObjectClassDefinition;
-import com.liferay.portal.configuration.persistence.ReloadablePersistenceManager;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -39,11 +36,8 @@ import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.portal.util.PropsValues;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.Serializable;
-
-import java.net.URI;
 
 import java.util.Dictionary;
 import java.util.List;
@@ -257,35 +251,6 @@ public class ExportConfigurationMVCResourceCommand
 	}
 
 	protected String getFileName(String factoryPid, String pid) {
-		try {
-			Dictionary<String, ?> dictionary =
-				_reloadablePersistenceManager.load(pid);
-
-			if (dictionary != null) {
-				String fileNameURI = String.valueOf(
-					dictionary.get("felix.fileinstall.filename"));
-
-				if (Validator.isNotNull(fileNameURI)) {
-					File file = new File(URI.create(fileNameURI));
-
-					return file.getName();
-				}
-			}
-		}
-		catch (Exception exception) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Unable to load existing felix.fileinstall.filename " +
-						"value: " + exception,
-					exception);
-			}
-			else if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Unable to load existing felix.fileinstall.filename" +
-						"value: " + exception);
-			}
-		}
-
 		String fileName = pid;
 
 		if (Validator.isNotNull(factoryPid) && !factoryPid.equals(pid)) {
@@ -298,7 +263,7 @@ public class ExportConfigurationMVCResourceCommand
 					factoryInstanceId, "scoped.");
 			}
 
-			fileName = factoryPid + StringPool.DASH + factoryInstanceId;
+			fileName = factoryPid + StringPool.TILDE + factoryInstanceId;
 		}
 
 		return fileName + ".config";
@@ -367,13 +332,7 @@ public class ExportConfigurationMVCResourceCommand
 		return properties;
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		ExportConfigurationMVCResourceCommand.class);
-
 	@Reference(target = "(filter.visibility=*)")
 	private ConfigurationModelRetriever _configurationModelRetriever;
-
-	@Reference
-	private ReloadablePersistenceManager _reloadablePersistenceManager;
 
 }

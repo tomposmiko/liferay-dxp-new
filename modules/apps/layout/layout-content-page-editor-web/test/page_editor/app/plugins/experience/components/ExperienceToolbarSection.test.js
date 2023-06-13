@@ -23,8 +23,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 import configModule from '../../../../../../src/main/resources/META-INF/resources/page_editor/app/config';
+import {StoreAPIContextProvider} from '../../../../../../src/main/resources/META-INF/resources/page_editor/app/contexts/StoreContext';
 import serviceFetch from '../../../../../../src/main/resources/META-INF/resources/page_editor/app/services/serviceFetch';
-import {StoreAPIContextProvider} from '../../../../../../src/main/resources/META-INF/resources/page_editor/app/store/index';
 import {
 	CREATE_SEGMENTS_EXPERIENCE,
 	DELETE_SEGMENTS_EXPERIENCE,
@@ -36,6 +36,7 @@ import ExperienceToolbarSection from '../../../../../../src/main/resources/META-
 import '@testing-library/jest-dom/extend-expect';
 
 const MOCK_DELETE_URL = 'delete-experience-test-url';
+const MOCK_DUPLICATE_URL = 'duplicate-experience-test-url';
 const MOCK_CREATE_URL = 'create-experience-test-url';
 const MOCK_UPDATE_PRIORITY_URL = 'update-experience-priority-test-url';
 const MOCK_UPDATE_URL = 'update-experience-test-url';
@@ -74,8 +75,7 @@ function renderExperienceToolbarSection(
 
 const mockState = {
 	availableSegmentsExperiences: {
-		0: {
-			active: true,
+		'0': {
 			hasLockedSegmentsExperiment: false,
 			name: 'Default Experience',
 			priority: -1,
@@ -85,8 +85,8 @@ const mockState = {
 			segmentsExperimentURL: 'https//:default-experience.com',
 		},
 		'test-experience-id-01': {
-			active: true,
 			hasLockedSegmentsExperiment: false,
+			languageIds: ['en_US', 'es_ES'],
 			name: 'Experience #1',
 			priority: 3,
 			segmentsEntryId: 'test-segment-id-00',
@@ -95,8 +95,8 @@ const mockState = {
 			segmentsExperimentURL: 'https//:experience-1.com',
 		},
 		'test-experience-id-02': {
-			active: true,
 			hasLockedSegmentsExperiment: false,
+			languageIds: ['en_US', 'es_ES', 'ar_SA'],
 			name: 'Experience #2',
 			priority: 1,
 			segmentsEntryId: 'test-segment-id-01',
@@ -115,6 +115,29 @@ const mockState = {
 
 const mockConfig = {
 	addSegmentsExperienceURL: MOCK_CREATE_URL,
+	availableLanguages: {
+		ar_SA: {
+			default: false,
+			displayName: 'Arabic (Saudi Arabia)',
+			languageIcon: 'ar-sa',
+			languageId: 'ar_SA',
+			w3cLanguageId: 'ar-SA',
+		},
+		en_US: {
+			default: false,
+			displayName: 'English (United States)',
+			languageIcon: 'en-us',
+			languageId: 'en_US',
+			w3cLanguageId: 'en-US',
+		},
+		es_ES: {
+			default: true,
+			displayName: 'Spanish (Spain)',
+			languageIcon: 'es-es',
+			languageId: 'es_ES',
+			w3cLanguageId: 'es-ES',
+		},
+	},
 	availableSegmentsEntries: {
 		'test-segment-id-00': {
 			name: 'A segment 0',
@@ -128,6 +151,7 @@ const mockConfig = {
 	classPK: 'test-classPK',
 	defaultSegmentsExperienceId: '0',
 	deleteSegmentsExperienceURL: MOCK_DELETE_URL,
+	duplicateSegmentsExperienceURL: MOCK_DUPLICATE_URL,
 	updateSegmentsExperiencePriorityURL: MOCK_UPDATE_PRIORITY_URL,
 	updateSegmentsExperienceURL: MOCK_UPDATE_URL,
 };
@@ -181,7 +205,6 @@ describe('ExperienceToolbarSection', () => {
 			availableSegmentsExperiences: {
 				...mockState.availableSegmentsExperiences,
 				'test-experience-id-03': {
-					active: true,
 					hasLockedSegmentsExperiment: true,
 					name: 'Experience #3',
 					priority: 5,
@@ -536,7 +559,6 @@ describe('ExperienceToolbarSection', () => {
 			expect.stringContaining(MOCK_UPDATE_URL),
 			expect.objectContaining({
 				body: expect.objectContaining({
-					active: true,
 					name: 'New Experience #1',
 					segmentsEntryId: 'test-segment-id-00',
 					segmentsExperienceId: 'test-experience-id-01',
@@ -694,6 +716,74 @@ describe('ExperienceToolbarSection', () => {
 		expect(mockDispatch).toHaveBeenCalledWith(
 			expect.objectContaining({
 				type: DELETE_SEGMENTS_EXPERIENCE,
+			})
+		);
+	});
+
+	it('calls the backend to duplicate an experience', async () => {
+		serviceFetch
+			.mockImplementationOnce((url, {body}) =>
+				Promise.resolve({
+					segmentsExperience: {
+						active: true,
+						name: body.name,
+						priority: '1000',
+						segmentsEntryId: body.segmentsEntryId,
+						segmentsExperienceId: 'a-new-test-experience-id',
+					},
+				})
+			)
+			.mockImplementationOnce(() => {
+				return Promise.resolve([]);
+			});
+
+		const mockDispatch = jest.fn((a) => {
+			if (typeof a === 'function') {
+				return a(mockDispatch);
+			}
+		});
+
+		const {
+			getAllByRole,
+			getByLabelText,
+			getByRole,
+		} = renderExperienceToolbarSection(mockState, mockConfig, mockDispatch);
+
+		const dropDownButton = getByLabelText('experience');
+
+		userEvent.click(dropDownButton);
+
+		await waitForElement(() => getByRole('list'));
+
+		const experienceItems = getAllByRole('listitem');
+
+		expect(experienceItems.length).toBe(3);
+
+		expect(
+			within(experienceItems[0]).getByText('Experience #1')
+		).toBeInTheDocument();
+
+		const duplicateExperienceButton = within(experienceItems[0]).getByTitle(
+			'duplicate-experience'
+		);
+
+		userEvent.click(duplicateExperienceButton);
+
+		await wait(() => expect(serviceFetch).toHaveBeenCalledTimes(2));
+
+		expect(serviceFetch).toHaveBeenCalledWith(
+			expect.stringContaining(MOCK_DUPLICATE_URL),
+			expect.objectContaining({
+				body: expect.objectContaining({
+					segmentsExperienceId: 'test-experience-id-01',
+				}),
+			}),
+			expect.any(Function)
+		);
+
+		expect(mockDispatch).toHaveBeenCalledWith(
+			expect.objectContaining({
+				type: CREATE_SEGMENTS_EXPERIENCE,
 			})
 		);
 	});

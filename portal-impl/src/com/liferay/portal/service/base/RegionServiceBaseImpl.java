@@ -20,14 +20,12 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Region;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.RegionService;
 import com.liferay.portal.kernel.service.RegionServiceUtil;
-import com.liferay.portal.kernel.service.persistence.CountryPersistence;
+import com.liferay.portal.kernel.service.persistence.RegionLocalizationPersistence;
 import com.liferay.portal.kernel.service.persistence.RegionPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 
@@ -54,6 +52,29 @@ public abstract class RegionServiceBaseImpl
 	 *
 	 * Never modify or reference this class directly. Use <code>RegionService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>RegionServiceUtil</code>.
 	 */
+
+	/**
+	 * Returns the region local service.
+	 *
+	 * @return the region local service
+	 */
+	public com.liferay.portal.kernel.service.RegionLocalService
+		getRegionLocalService() {
+
+		return regionLocalService;
+	}
+
+	/**
+	 * Sets the region local service.
+	 *
+	 * @param regionLocalService the region local service
+	 */
+	public void setRegionLocalService(
+		com.liferay.portal.kernel.service.RegionLocalService
+			regionLocalService) {
+
+		this.regionLocalService = regionLocalService;
+	}
 
 	/**
 	 * Returns the region remote service.
@@ -115,43 +136,23 @@ public abstract class RegionServiceBaseImpl
 	}
 
 	/**
-	 * Returns the country remote service.
+	 * Returns the region localization persistence.
 	 *
-	 * @return the country remote service
+	 * @return the region localization persistence
 	 */
-	public com.liferay.portal.kernel.service.CountryService
-		getCountryService() {
-
-		return countryService;
+	public RegionLocalizationPersistence getRegionLocalizationPersistence() {
+		return regionLocalizationPersistence;
 	}
 
 	/**
-	 * Sets the country remote service.
+	 * Sets the region localization persistence.
 	 *
-	 * @param countryService the country remote service
+	 * @param regionLocalizationPersistence the region localization persistence
 	 */
-	public void setCountryService(
-		com.liferay.portal.kernel.service.CountryService countryService) {
+	public void setRegionLocalizationPersistence(
+		RegionLocalizationPersistence regionLocalizationPersistence) {
 
-		this.countryService = countryService;
-	}
-
-	/**
-	 * Returns the country persistence.
-	 *
-	 * @return the country persistence
-	 */
-	public CountryPersistence getCountryPersistence() {
-		return countryPersistence;
-	}
-
-	/**
-	 * Sets the country persistence.
-	 *
-	 * @param countryPersistence the country persistence
-	 */
-	public void setCountryPersistence(CountryPersistence countryPersistence) {
-		this.countryPersistence = countryPersistence;
+		this.regionLocalizationPersistence = regionLocalizationPersistence;
 	}
 
 	public void afterPropertiesSet() {
@@ -217,6 +218,12 @@ public abstract class RegionServiceBaseImpl
 		}
 	}
 
+	@BeanReference(
+		type = com.liferay.portal.kernel.service.RegionLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.RegionLocalService
+		regionLocalService;
+
 	@BeanReference(type = RegionService.class)
 	protected RegionService regionService;
 
@@ -229,15 +236,7 @@ public abstract class RegionServiceBaseImpl
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
 
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.CountryService.class
-	)
-	protected com.liferay.portal.kernel.service.CountryService countryService;
-
-	@BeanReference(type = CountryPersistence.class)
-	protected CountryPersistence countryPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		RegionServiceBaseImpl.class);
+	@BeanReference(type = RegionLocalizationPersistence.class)
+	protected RegionLocalizationPersistence regionLocalizationPersistence;
 
 }

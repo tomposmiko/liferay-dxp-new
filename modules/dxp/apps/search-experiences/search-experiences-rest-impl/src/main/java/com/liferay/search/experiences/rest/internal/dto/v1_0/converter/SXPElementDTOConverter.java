@@ -14,12 +14,9 @@
 
 package com.liferay.search.experiences.rest.internal.dto.v1_0.converter;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
-import com.liferay.search.experiences.rest.dto.v1_0.ElementDefinition;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPElement;
 import com.liferay.search.experiences.rest.dto.v1_0.util.ElementDefinitionUtil;
 import com.liferay.search.experiences.service.SXPElementLocalService;
@@ -31,6 +28,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bryan Engler
  */
 @Component(
+	enabled = false,
 	property = "dto.class.name=com.liferay.search.experiences.model.SXPElement",
 	service = {DTOConverter.class, SXPElementDTOConverter.class}
 )
@@ -67,38 +65,19 @@ public class SXPElementDTOConverter
 					dtoConverterContext.getLocale());
 				description_i18n = LocalizedMapUtil.getI18nMap(
 					true, sxpElement.getDescriptionMap());
-				elementDefinition = _toElementDefinition(
+				elementDefinition = ElementDefinitionUtil.toElementDefinition(
 					sxpElement.getElementDefinitionJSON());
-				externalReferenceCode = sxpElement.getExternalReferenceCode();
 				id = sxpElement.getSXPElementId();
 				modifiedDate = sxpElement.getModifiedDate();
 				readOnly = sxpElement.getReadOnly();
-				schemaVersion = sxpElement.getSchemaVersion();
 				title = sxpElement.getTitle(dtoConverterContext.getLocale());
 				title_i18n = LocalizedMapUtil.getI18nMap(
 					true, sxpElement.getTitleMap());
 				type = sxpElement.getType();
 				userName = sxpElement.getUserName();
-				version = sxpElement.getVersion();
 			}
 		};
 	}
-
-	private ElementDefinition _toElementDefinition(String json) {
-		try {
-			return ElementDefinitionUtil.toElementDefinition(json);
-		}
-		catch (Exception exception) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(exception, exception);
-			}
-
-			return null;
-		}
-	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SXPElementDTOConverter.class);
 
 	@Reference
 	private SXPElementLocalService _sxpElementLocalService;

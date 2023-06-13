@@ -76,7 +76,7 @@ CPMeasurementUnitsDisplayContext cpMeasurementUnitsDisplayContext = (CPMeasureme
 		</liferay-frontend:management-bar-action-buttons>
 	</liferay-frontend:management-bar>
 
-	<div class="container-fluid-1280">
+	<div class="container-fluid container-fluid-max-xl">
 		<portlet:actionURL name="/cp_measurement_unit/edit_cp_measurement_unit" var="editCPMeasurementUnitActionURL" />
 
 		<aui:form action="<%= editCPMeasurementUnitActionURL %>" method="post" name="fm">
@@ -93,19 +93,21 @@ CPMeasurementUnitsDisplayContext cpMeasurementUnitsDisplayContext = (CPMeasureme
 					keyProperty="CPMeasurementUnitId"
 					modelVar="cpMeasurementUnit"
 				>
-
-					<%
-					PortletURL rowURL = renderResponse.createRenderURL();
-
-					rowURL.setParameter("mvcRenderCommandName", "/cp_measurement_unit/edit_cp_measurement_unit");
-					rowURL.setParameter("redirect", currentURL);
-					rowURL.setParameter("cpMeasurementUnitId", String.valueOf(cpMeasurementUnit.getCPMeasurementUnitId()));
-					rowURL.setParameter("type", String.valueOf(cpMeasurementUnitsDisplayContext.getType()));
-					%>
-
 					<liferay-ui:search-container-column-text
-						cssClass="important table-cell-content"
-						href="<%= rowURL %>"
+						cssClass="important table-cell-expand"
+						href='<%=
+							PortletURLBuilder.createRenderURL(
+								renderResponse
+							).setMVCRenderCommandName(
+								"/cp_measurement_unit/edit_cp_measurement_unit"
+							).setRedirect(
+								currentURL
+							).setParameter(
+								"cpMeasurementUnitId", cpMeasurementUnit.getCPMeasurementUnitId()
+							).setParameter(
+								"type", cpMeasurementUnitsDisplayContext.getType()
+							).buildPortletURL()
+						%>'
 						name="name"
 						value="<%= HtmlUtil.escape(cpMeasurementUnit.getName(locale)) %>"
 					/>
@@ -116,7 +118,7 @@ CPMeasurementUnitsDisplayContext cpMeasurementUnitsDisplayContext = (CPMeasureme
 					/>
 
 					<liferay-ui:search-container-column-text
-						cssClass="table-cell-content"
+						cssClass="table-cell-expand"
 						name="ratio-to-primary"
 						property="rate"
 					/>

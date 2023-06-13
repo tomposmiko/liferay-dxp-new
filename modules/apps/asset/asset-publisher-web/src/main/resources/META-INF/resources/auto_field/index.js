@@ -97,7 +97,7 @@ function AssetCategories({
 }
 
 function AssetTags({groupIds, index, namespace, rule, tagSelectorURL}) {
-	const [inputValue, setInputValue] = useState('');
+	const [inputValue, setInputValue] = useState();
 	const [selectedItems, setSelectedItems] = useState(rule.selectedItems);
 
 	return (
@@ -313,10 +313,11 @@ function AutoField({
 			<ul className="timeline">
 				<li className="timeline-item">
 					<div className="panel panel-default">
-						<div className="flex-container mb-0 panel-body py-2">
+						<div className="d-flex flex-wrap mb-0 panel-body py-2">
 							<div className="h4 panel-title">
 								{Liferay.Language.get('rules')}
 							</div>
+
 							<div className="timeline-increment">
 								<span className="timeline-icon"></span>
 							</div>

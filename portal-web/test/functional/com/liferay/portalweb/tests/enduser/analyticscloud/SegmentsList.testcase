@@ -34,7 +34,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 
@@ -44,12 +44,16 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8462 | Test Summary: Inform the User when there are no disabled Segments"
-	@priority = 3
+	@priority = "3"
 	test AssertUserIsInformedWhenThereAreNoDisabledSegments {
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Go to Segments and filter by "Disable Segments"") {
@@ -64,44 +68,39 @@ definition {
 	}
 
 	@description = "Search for specific segment"
-	@priority = 5
+	@priority = "5"
 	test CanSearchForSegment {
-		property portal.upstream = "quarantine";
-
-		// AC Refactor ticket: LRAC-9707
-
 		var usernameList = "ac,userea";
 		var emailList = "ac@liferay.com,userea@liferay.com";
 
-		for (var name : list ${usernameList}) {
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
+		for (var name : list "${usernameList}") {
 			JSONUser.addUser(
 				userEmailAddress = "${name}@liferay.com",
-				userFirstName = ${name},
-				userLastName = ${name},
-				userScreenName = ${name});
-
-			JSONUser.setFirstPassword(
-				agreeToTermsAndAnswerReminderQuery = "true",
-				requireReset = "false",
-				userEmailAddress = "${name}@liferay.com");
+				userFirstName = "${name}",
+				userLastName = "${name}",
+				userScreenName = "${name}");
 		}
 
 		ACDXPSettings.syncNewContactData();
 
 		ACUtils.navigateToSitePageWithUser(
-			emailList = ${emailList},
+			emailList = "${emailList}",
 			pageName = "AC Page",
 			siteName = "Site Name");
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+		ACProperties.switchProperty(propertyName = "${propertyName}");
 
 		ACNavigation.goToSegments();
 
 		ACSegments.createStaticSegment();
 
-		ACUtils.setItemName(itemName = "Static Segment Test");
+		ACSegments.nameSegment(segmentName = "Static Segment Test");
 
 		ACSegments.addStaticMember(tableMember = "ac ac");
 
@@ -111,7 +110,7 @@ definition {
 
 		ACSegments.createStaticSegment();
 
-		ACUtils.setItemName(itemName = "Static Segment Test 2");
+		ACSegments.nameSegment(segmentName = "Static Segment Test 2");
 
 		ACSegments.addStaticMember(tableMember = "userea userea");
 
@@ -129,18 +128,17 @@ definition {
 	}
 
 	@description = "Search for specific segment"
-	@priority = 5
+	@priority = "5"
 	test CanShowSegmentList {
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
 			userFirstName = "userfn",
 			userLastName = "userln",
 			userScreenName = "usersn");
-
-		JSONUser.setFirstPassword(
-			agreeToTermsAndAnswerReminderQuery = "true",
-			requireReset = "false",
-			userEmailAddress = "userea@liferay.com");
 
 		ACDXPSettings.syncNewContactData();
 
@@ -156,13 +154,13 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+		ACProperties.switchProperty(propertyName = "${propertyName}");
 
 		ACNavigation.goToSegments();
 
 		ACSegments.createStaticSegment();
 
-		ACUtils.setItemName(itemName = "Static Segment Test");
+		ACSegments.nameSegment(segmentName = "Static Segment Test");
 
 		ACSegments.addStaticMember(tableMember = "userfn userln");
 
@@ -172,7 +170,7 @@ definition {
 
 		ACSegments.createDynamicSegment();
 
-		ACUtils.setItemName(itemName = "Dynamic Segment Test");
+		ACSegments.nameSegment(segmentName = "Dynamic Segment Test");
 
 		ACSegments.goToSidebarAttributes(criterion = "Individual Attributes");
 
@@ -190,19 +188,23 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8578 | Test Summary: Order the Segment List By Membership"
-	@priority = 4
+	@priority = "4"
 	test OrderSegmentListByMembership {
 		property portal.upstream = "quarantine";
 
 		var usernameList = "user1,user2,user3";
 		var emailList = "user1@liferay.com,user2@liferay.com,user3@liferay.com";
 
-		for (var name : list ${usernameList}) {
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
+		for (var name : list "${usernameList}") {
 			JSONUser.addUser(
 				userEmailAddress = "${name}@liferay.com",
-				userFirstName = ${name},
-				userLastName = ${name},
-				userScreenName = ${name});
+				userFirstName = "${name}",
+				userLastName = "${name}",
+				userScreenName = "${name}");
 
 			JSONUser.setFirstPassword(
 				agreeToTermsAndAnswerReminderQuery = "true",
@@ -216,7 +218,7 @@ definition {
 
 		task ("View the page as different users") {
 			ACUtils.navigateToSitePageWithUser(
-				emailList = ${emailList},
+				emailList = "${emailList}",
 				pageName = "AC Page",
 				siteName = "Site Name");
 
@@ -226,7 +228,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add 3 new Static Segments") {
@@ -235,17 +237,17 @@ definition {
 
 				ACSegments.createStaticSegment();
 
-				ACUtils.setItemName(itemName = ${segmentName});
+				ACSegments.nameSegment(segmentName = "${segmentName}");
 
-				if (${segmentName} == "Static Segment Test1") {
+				if ("${segmentName}" == "Static Segment Test1") {
 					ACSegments.addStaticMultiMember(tableMember = "user1 user1,user2 user2,user3 user3");
 				}
 
-				if (${segmentName} == "Static Segment Test2") {
+				if ("${segmentName}" == "Static Segment Test2") {
 					ACSegments.addStaticMultiMember(tableMember = "user1 user1,user2 user2");
 				}
 
-				if (${segmentName} == "Static Segment Test3") {
+				if ("${segmentName}" == "Static Segment Test3") {
 					ACSegments.addStaticMultiMember(tableMember = "user1 user1");
 				}
 
@@ -261,15 +263,15 @@ definition {
 
 		task ("Assert 3 segments in order filter by membership display") {
 			ACUtils.viewNameListInOrder(
-				index = 1,
+				index = "1",
 				name = "Static Segment Test1");
 
 			ACUtils.viewNameListInOrder(
-				index = 2,
+				index = "2",
 				name = "Static Segment Test2");
 
 			ACUtils.viewNameListInOrder(
-				index = 3,
+				index = "3",
 				name = "Static Segment Test3");
 		}
 
@@ -279,22 +281,28 @@ definition {
 
 		task ("Assert 3 segments in order filter by membership display") {
 			ACUtils.viewNameListInOrder(
-				index = 1,
+				index = "1",
 				name = "Static Segment Test3");
 
 			ACUtils.viewNameListInOrder(
-				index = 2,
+				index = "2",
 				name = "Static Segment Test2");
 
 			ACUtils.viewNameListInOrder(
-				index = 3,
+				index = "3",
 				name = "Static Segment Test1");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8460 | Test Summary: Order the Segment List By Name"
-	@priority = 4
+	@priority = "4"
 	test OrderSegmentListByName {
+		property portal.upstream = "quarantine";
+
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
+
 		task ("Add a new user in DXP") {
 			JSONUser.addUser(
 				userEmailAddress = "userea@liferay.com",
@@ -317,7 +325,7 @@ definition {
 
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "userea@liferay.com",
-				userLoginFullName = ${fullName});
+				userLoginFullName = "${fullName}");
 
 			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
@@ -329,7 +337,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add 3 new Static Segments") {
@@ -338,7 +346,7 @@ definition {
 
 				ACSegments.createStaticSegment();
 
-				ACUtils.setItemName(itemName = ${segmentName});
+				ACSegments.nameSegment(segmentName = "${segmentName}");
 
 				ACSegments.addStaticMember(tableMember = "userfn userln");
 
@@ -354,15 +362,15 @@ definition {
 
 		task ("Assert 3 segments filter by name display") {
 			ACUtils.viewNameListInOrder(
-				index = 1,
+				index = "1",
 				name = "Static Segment Test1");
 
 			ACUtils.viewNameListInOrder(
-				index = 2,
+				index = "2",
 				name = "Static Segment Test2");
 
 			ACUtils.viewNameListInOrder(
-				index = 3,
+				index = "3",
 				name = "Static Segment Test3");
 		}
 
@@ -374,25 +382,25 @@ definition {
 
 		task ("Assert 3 segments in order filter by membership display") {
 			ACUtils.viewNameListInOrder(
-				index = 1,
+				index = "1",
 				name = "Static Segment Test3");
 
 			ACUtils.viewNameListInOrder(
-				index = 2,
+				index = "2",
 				name = "Static Segment Test2");
 
 			ACUtils.viewNameListInOrder(
-				index = 3,
+				index = "3",
 				name = "Static Segment Test1");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8461 | Test Summary: Paginate Segment list"
-	@priority = 3
+	@priority = "3"
 	test PaginateSegmentList {
-		property portal.upstream = "quarantine";
-
-		// AC Refactor ticket: LRAC-9707
+		task ("Get site assigned property name") {
+			var propertyName = ACDXPSettings.getAssignedPropertyName(siteName = "Site Name");
+		}
 
 		task ("Add a new user in DXP") {
 			JSONUser.addUser(
@@ -416,7 +424,7 @@ definition {
 
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "userea@liferay.com",
-				userLoginFullName = ${fullName});
+				userLoginFullName = "${fullName}");
 
 			ACUtils.navigateToSitePage(
 				pageName = "AC Page",
@@ -428,7 +436,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
+			ACProperties.switchProperty(propertyName = "${propertyName}");
 		}
 
 		task ("Add 6 new Static Segments") {
@@ -437,7 +445,7 @@ definition {
 
 				ACSegments.createStaticSegment();
 
-				ACUtils.setItemName(itemName = ${segmentName});
+				ACSegments.nameSegment(segmentName = "${segmentName}");
 
 				ACSegments.addStaticMember(tableMember = "userfn userln");
 
@@ -449,7 +457,7 @@ definition {
 			ACNavigation.goToSegments();
 
 			for (var segmentName : list "Static Segment Test1,Static Segment Test2,Static Segment Test3,Static Segment Test4,Static Segment Test5,Static Segment Test6") {
-				ACSegments.assertSegmentPresent(segmentName = ${segmentName});
+				ACSegments.assertSegmentPresent(segmentName = "${segmentName}");
 			}
 		}
 
@@ -460,21 +468,21 @@ definition {
 
 			ACUtils.viewResultsMessage(results = "Showing 1 to 6 of 6 entries.");
 
-			ACUtils.viewResultsPages(pageNumber = 1);
+			ACUtils.viewResultsPages(pageNumber = "1");
 		}
 
 		task ("Change the pagination to "5"") {
-			ACUtils.changePagination(itemsPerPage = 5);
+			ACUtils.changePagination(itemsPerPage = "5");
 
 			for (var segmentName : list "Static Segment Test1,Static Segment Test2,Static Segment Test3,Static Segment Test4,Static Segment Test5") {
-				ACSegments.assertSegmentPresent(segmentName = ${segmentName});
+				ACSegments.assertSegmentPresent(segmentName = "${segmentName}");
 			}
 
 			ACUtils.viewResultsMessage(results = "Showing 1 to 5 of 6 entries.");
 
-			ACUtils.viewResultsPages(pageNumber = 1);
+			ACUtils.viewResultsPages(pageNumber = "1");
 
-			ACUtils.viewResultsPages(pageNumber = 2);
+			ACUtils.viewResultsPages(pageNumber = "2");
 		}
 
 		task ("Page number display 1 2 and check previous next button") {

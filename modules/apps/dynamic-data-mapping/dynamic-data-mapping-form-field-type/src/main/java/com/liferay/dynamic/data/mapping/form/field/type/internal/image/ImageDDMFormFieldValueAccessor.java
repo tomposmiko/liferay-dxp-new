@@ -14,34 +14,34 @@
 
 package com.liferay.dynamic.data.mapping.form.field.type.internal.image;
 
-import com.liferay.dynamic.data.mapping.configuration.DDMWebConfiguration;
+import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueAccessor;
+import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.trash.TrashHelper;
 
 import java.util.Locale;
-import java.util.Map;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Leonardo Barros
  */
 @Component(
-	configurationPid = "com.liferay.dynamic.data.mapping.configuration.DDMWebConfiguration",
-	immediate = true, property = "ddm.form.field.type.name=image",
+	immediate = true,
+	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.IMAGE,
 	service = {
 		DDMFormFieldValueAccessor.class, ImageDDMFormFieldValueAccessor.class
 	}
@@ -60,7 +60,18 @@ public class ImageDDMFormFieldValueAccessor
 		}
 
 		try {
-			return jsonFactory.createJSONObject(value.getString(locale));
+			JSONObject valueJSONObject = jsonFactory.createJSONObject(
+				value.getString(locale));
+
+			FileEntry fileEntry = _getFileEntry(valueJSONObject);
+
+			if ((fileEntry != null) && fileEntry.isInTrash()) {
+				valueJSONObject.put(
+					"title",
+					_trashHelper.getOriginalTitle(fileEntry.getTitle()));
+			}
+
+			return valueJSONObject;
 		}
 		catch (JSONException jsonException) {
 			if (_log.isDebugEnabled()) {
@@ -84,11 +95,9 @@ public class ImageDDMFormFieldValueAccessor
 
 		DDMFormField ddmFormField = ddmFormFieldValue.getDDMFormField();
 
-		if (((!_ddmWebConfiguration.
-				enableSettingTheImageDescriptionAsOptional() ||
-			  GetterUtil.getBoolean(
-				  ddmFormField.getProperty("requiredDescription"))) &&
-			 Validator.isNull(jsonObject.getString("description"))) ||
+		if ((Validator.isNull(jsonObject.getString("description")) &&
+			 GetterUtil.getBoolean(
+				 ddmFormField.getProperty("requiredDescription"))) ||
 			Validator.isNull(jsonObject.getString("url"))) {
 
 			return true;
@@ -97,19 +106,35 @@ public class ImageDDMFormFieldValueAccessor
 		return false;
 	}
 
-	@Activate
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-		_ddmWebConfiguration = ConfigurableUtil.createConfigurable(
-			DDMWebConfiguration.class, properties);
-	}
-
 	@Reference
 	protected JSONFactory jsonFactory;
+
+	private FileEntry _getFileEntry(JSONObject valueJSONObject) {
+		if ((valueJSONObject == null) || (valueJSONObject.length() <= 0)) {
+			return null;
+		}
+
+		try {
+			return _dlAppService.getFileEntryByUuidAndGroupId(
+				valueJSONObject.getString("uuid"),
+				valueJSONObject.getLong("groupId"));
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to retrieve file entry ", portalException);
+			}
+
+			return null;
+		}
+	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ImageDDMFormFieldValueAccessor.class);
 
-	private volatile DDMWebConfiguration _ddmWebConfiguration;
+	@Reference
+	private DLAppService _dlAppService;
+
+	@Reference
+	private TrashHelper _trashHelper;
 
 }

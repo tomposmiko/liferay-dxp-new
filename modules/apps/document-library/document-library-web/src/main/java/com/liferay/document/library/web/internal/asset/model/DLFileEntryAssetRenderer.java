@@ -25,6 +25,7 @@ import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.document.library.web.internal.security.permission.resource.DLFileEntryPermission;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -55,7 +56,6 @@ import com.liferay.trash.TrashHelper;
 
 import java.util.Locale;
 
-import javax.portlet.ActionRequest;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
@@ -237,14 +237,13 @@ public class DLFileEntryAssetRenderer
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse) {
 
-		PortletURL portletURL = _getPortletURL(liferayPortletRequest);
-
-		portletURL.setParameter(
-			"mvcRenderCommandName", "/document_library/edit_file_entry");
-		portletURL.setParameter(
-			"fileEntryId", String.valueOf(_fileEntry.getFileEntryId()));
-
-		return portletURL;
+		return PortletURLBuilder.create(
+			_getPortletURL(liferayPortletRequest)
+		).setMVCRenderCommandName(
+			"/document_library/edit_file_entry"
+		).setParameter(
+			"fileEntryId", _fileEntry.getFileEntryId()
+		).buildPortletURL();
 	}
 
 	@Override
@@ -252,17 +251,17 @@ public class DLFileEntryAssetRenderer
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse) {
 
-		PortletURL portletURL = _getPortletURL(liferayPortletRequest);
-
-		portletURL.setParameter(
-			ActionRequest.ACTION_NAME, "/document_library/get_file");
-		portletURL.setParameter(
-			"groupId", String.valueOf(_fileEntry.getRepositoryId()));
-		portletURL.setParameter(
-			"folderId", String.valueOf(_fileEntry.getFolderId()));
-		portletURL.setParameter("title", String.valueOf(_fileEntry.getTitle()));
-
-		return portletURL;
+		return PortletURLBuilder.create(
+			_getPortletURL(liferayPortletRequest)
+		).setActionName(
+			"/document_library/get_file"
+		).setParameter(
+			"folderId", _fileEntry.getFolderId()
+		).setParameter(
+			"groupId", _fileEntry.getRepositoryId()
+		).setParameter(
+			"title", _fileEntry.getTitle()
+		).buildPortletURL();
 	}
 
 	@Override
@@ -285,16 +284,15 @@ public class DLFileEntryAssetRenderer
 		AssetRendererFactory<FileEntry> assetRendererFactory =
 			getAssetRendererFactory();
 
-		PortletURL portletURL = assetRendererFactory.getURLView(
-			liferayPortletResponse, windowState);
-
-		portletURL.setParameter(
-			"mvcRenderCommandName", "/document_library/view_file_entry");
-		portletURL.setParameter(
-			"fileEntryId", String.valueOf(_fileEntry.getFileEntryId()));
-		portletURL.setWindowState(windowState);
-
-		return portletURL.toString();
+		return PortletURLBuilder.create(
+			assetRendererFactory.getURLView(liferayPortletResponse, windowState)
+		).setMVCRenderCommandName(
+			"/document_library/view_file_entry"
+		).setParameter(
+			"fileEntryId", _fileEntry.getFileEntryId()
+		).setWindowState(
+			windowState
+		).buildString();
 	}
 
 	@Override
@@ -304,19 +302,11 @@ public class DLFileEntryAssetRenderer
 			String noSuchEntryRedirect)
 		throws PortalException {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)liferayPortletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return getURLViewInContext(themeDisplay, noSuchEntryRedirect);
-	}
-
-	@Override
-	public String getURLViewInContext(
-			ThemeDisplay themeDisplay, String noSuchEntryRedirect)
-		throws PortalException {
-
 		if (_assetDisplayPageFriendlyURLProvider != null) {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)liferayPortletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
 			String friendlyURL =
 				_assetDisplayPageFriendlyURLProvider.getFriendlyURL(
 					FileEntry.class.getName(), getClassPK(), themeDisplay);
@@ -326,6 +316,10 @@ public class DLFileEntryAssetRenderer
 			}
 		}
 
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)liferayPortletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
 		if (!_hasViewInContextGroupLayout(
 				themeDisplay, _fileEntry.getGroupId())) {
 
@@ -333,7 +327,7 @@ public class DLFileEntryAssetRenderer
 		}
 
 		return getURLViewInContext(
-			themeDisplay, noSuchEntryRedirect,
+			liferayPortletRequest, noSuchEntryRedirect,
 			"/document_library/find_file_entry", "fileEntryId",
 			_fileEntry.getFileEntryId());
 	}

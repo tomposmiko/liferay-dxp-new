@@ -1,7 +1,0 @@
-Bundle-Name: Liferay Portal Upgrade API
-Bundle-SymbolicName: com.liferay.portal.upgrade.api
-Bundle-Version: 4.1.2
-Export-Package:\
-	com.liferay.portal.upgrade.registry,\
-	com.liferay.portal.upgrade.release,\
-	com.liferay.portal.upgrade.step.util

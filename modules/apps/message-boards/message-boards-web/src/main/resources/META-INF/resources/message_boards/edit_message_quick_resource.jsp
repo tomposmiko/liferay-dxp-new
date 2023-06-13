@@ -129,10 +129,10 @@ String redirect = ParamUtil.getString(request, "redirect");
 <div class="divider"></div>
 
 <div class="panel-body">
-	<div class="card-body message-content" id="<portlet:namespace />addQuickReply<%= parentMessageId %>">
+	<div class="card-body message-content" id="<%= liferayPortletResponse.getNamespace() + "addQuickReply" + parentMessageId %>">
 		<portlet:actionURL name="/message_boards/edit_message" var="editMessageURL" />
 
-		<aui:form action="<%= editMessageURL %>" method="post" name='<%= "addQuickReplyFm" + parentMessageId %>' onSubmit="event.preventDefault(); ">
+		<aui:form action="<%= editMessageURL %>" method="post" name='<%= "addQuickReplyFm" + parentMessageId %>' onSubmit='<%= "event.preventDefault(); " %>'>
 			<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.ADD %>" />
 			<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 			<aui:input name="messageId" type="hidden" value="<%= 0 %>" />
@@ -188,7 +188,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 				/>
 			</liferay-expando:custom-attributes-available>
 
-			<aui:button-row>
+			<div class="sheet-footer">
 
 				<%
 				String publishButtonLabel = "publish";
@@ -205,7 +205,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 				%>
 
 				<aui:button onClick="<%= taglibCancelReply %>" type="cancel" />
-			</aui:button-row>
+			</div>
 		</aui:form>
 
 		<portlet:renderURL var="advancedReplyURL">
@@ -223,18 +223,25 @@ String redirect = ParamUtil.getString(request, "redirect");
 	</div>
 </div>
 
-<aui:script require='<%= npmResolvedPackageName + "/message_boards/js/MBPortlet.es as MBPortlet" %>'>
-	new MBPortlet.default({
-		constants: {
-			ACTION_PUBLISH: '<%= WorkflowConstants.ACTION_PUBLISH %>',
-			CMD: '<%= Constants.CMD %>',
-		},
-		currentAction: '<%= Constants.ADD %>',
-		namespace: '<portlet:namespace />',
-		replyToMessageId: '<%= parentMessageId %>',
-		rootNode: '#<portlet:namespace />addQuickReply<%= parentMessageId %>',
-	});
-</aui:script>
+<liferay-frontend:component
+	context='<%=
+		HashMapBuilder.<String, Object>put(
+			"constants",
+			HashMapBuilder.<String, Object>put(
+				"ACTION_PUBLISH", WorkflowConstants.ACTION_PUBLISH
+			).put(
+				"CMD", Constants.CMD
+			).build()
+		).put(
+			"currentAction", Constants.ADD
+		).put(
+			"replyToMessageId", parentMessageId
+		).put(
+			"rootNodeId", liferayPortletResponse.getNamespace() + "addQuickReply" + parentMessageId
+		).build()
+	%>'
+	module="message_boards/js/MBPortlet.es"
+/>
 
 <aui:script>
 	window[

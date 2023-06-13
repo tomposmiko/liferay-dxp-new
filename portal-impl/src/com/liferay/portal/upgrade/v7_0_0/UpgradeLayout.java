@@ -29,8 +29,7 @@ public class UpgradeLayout extends UpgradeProcess {
 				StringBundler.concat(
 					"delete from Layout where layoutPrototypeUuid != '' and ",
 					"layoutPrototypeUuid not in (select uuid_ from ",
-					"LayoutPrototype) and layoutPrototypeLinkEnabled = ",
-					"[$TRUE$]"));
+					"LayoutPrototype) and layoutPrototypeLinkEnabled = TRUE"));
 		}
 	}
 
@@ -66,7 +65,7 @@ public class UpgradeLayout extends UpgradeProcess {
 					"update Layout set layoutPrototypeUuid = null where ",
 					"layoutPrototypeUuid != '' and layoutPrototypeUuid not in ",
 					"(select uuid_ from LayoutPrototype) and ",
-					"layoutPrototypeLinkEnabled = [$FALSE$]"));
+					"layoutPrototypeLinkEnabled = FALSE"));
 		}
 	}
 

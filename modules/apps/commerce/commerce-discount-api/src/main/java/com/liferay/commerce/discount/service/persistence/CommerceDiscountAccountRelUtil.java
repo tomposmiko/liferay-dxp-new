@@ -854,12 +854,12 @@ public class CommerceDiscountAccountRelUtil {
 	 * @return the matching commerce discount account rel
 	 * @throws NoSuchDiscountAccountRelException if a matching commerce discount account rel could not be found
 	 */
-	public static CommerceDiscountAccountRel findByC_C(
+	public static CommerceDiscountAccountRel findByCAI_CDI(
 			long commerceAccountId, long commerceDiscountId)
 		throws com.liferay.commerce.discount.exception.
 			NoSuchDiscountAccountRelException {
 
-		return getPersistence().findByC_C(
+		return getPersistence().findByCAI_CDI(
 			commerceAccountId, commerceDiscountId);
 	}
 
@@ -870,10 +870,10 @@ public class CommerceDiscountAccountRelUtil {
 	 * @param commerceDiscountId the commerce discount ID
 	 * @return the matching commerce discount account rel, or <code>null</code> if a matching commerce discount account rel could not be found
 	 */
-	public static CommerceDiscountAccountRel fetchByC_C(
+	public static CommerceDiscountAccountRel fetchByCAI_CDI(
 		long commerceAccountId, long commerceDiscountId) {
 
-		return getPersistence().fetchByC_C(
+		return getPersistence().fetchByCAI_CDI(
 			commerceAccountId, commerceDiscountId);
 	}
 
@@ -885,11 +885,11 @@ public class CommerceDiscountAccountRelUtil {
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the matching commerce discount account rel, or <code>null</code> if a matching commerce discount account rel could not be found
 	 */
-	public static CommerceDiscountAccountRel fetchByC_C(
+	public static CommerceDiscountAccountRel fetchByCAI_CDI(
 		long commerceAccountId, long commerceDiscountId,
 		boolean useFinderCache) {
 
-		return getPersistence().fetchByC_C(
+		return getPersistence().fetchByCAI_CDI(
 			commerceAccountId, commerceDiscountId, useFinderCache);
 	}
 
@@ -900,12 +900,12 @@ public class CommerceDiscountAccountRelUtil {
 	 * @param commerceDiscountId the commerce discount ID
 	 * @return the commerce discount account rel that was removed
 	 */
-	public static CommerceDiscountAccountRel removeByC_C(
+	public static CommerceDiscountAccountRel removeByCAI_CDI(
 			long commerceAccountId, long commerceDiscountId)
 		throws com.liferay.commerce.discount.exception.
 			NoSuchDiscountAccountRelException {
 
-		return getPersistence().removeByC_C(
+		return getPersistence().removeByCAI_CDI(
 			commerceAccountId, commerceDiscountId);
 	}
 
@@ -916,10 +916,10 @@ public class CommerceDiscountAccountRelUtil {
 	 * @param commerceDiscountId the commerce discount ID
 	 * @return the number of matching commerce discount account rels
 	 */
-	public static int countByC_C(
+	public static int countByCAI_CDI(
 		long commerceAccountId, long commerceDiscountId) {
 
-		return getPersistence().countByC_C(
+		return getPersistence().countByCAI_CDI(
 			commerceAccountId, commerceDiscountId);
 	}
 

@@ -35,6 +35,7 @@ public class CPAttachmentFileEntrySoap implements Serializable {
 
 		CPAttachmentFileEntrySoap soapModel = new CPAttachmentFileEntrySoap();
 
+		soapModel.setMvccVersion(model.getMvccVersion());
 		soapModel.setUuid(model.getUuid());
 		soapModel.setExternalReferenceCode(model.getExternalReferenceCode());
 		soapModel.setCPAttachmentFileEntryId(
@@ -48,6 +49,8 @@ public class CPAttachmentFileEntrySoap implements Serializable {
 		soapModel.setClassNameId(model.getClassNameId());
 		soapModel.setClassPK(model.getClassPK());
 		soapModel.setFileEntryId(model.getFileEntryId());
+		soapModel.setCDNEnabled(model.isCDNEnabled());
+		soapModel.setCDNURL(model.getCDNURL());
 		soapModel.setDisplayDate(model.getDisplayDate());
 		soapModel.setExpirationDate(model.getExpirationDate());
 		soapModel.setTitle(model.getTitle());
@@ -119,6 +122,14 @@ public class CPAttachmentFileEntrySoap implements Serializable {
 
 	public void setPrimaryKey(long pk) {
 		setCPAttachmentFileEntryId(pk);
+	}
+
+	public long getMvccVersion() {
+		return _mvccVersion;
+	}
+
+	public void setMvccVersion(long mvccVersion) {
+		_mvccVersion = mvccVersion;
 	}
 
 	public String getUuid() {
@@ -217,6 +228,26 @@ public class CPAttachmentFileEntrySoap implements Serializable {
 		_fileEntryId = fileEntryId;
 	}
 
+	public boolean getCDNEnabled() {
+		return _cdnEnabled;
+	}
+
+	public boolean isCDNEnabled() {
+		return _cdnEnabled;
+	}
+
+	public void setCDNEnabled(boolean cdnEnabled) {
+		_cdnEnabled = cdnEnabled;
+	}
+
+	public String getCDNURL() {
+		return _cdnURL;
+	}
+
+	public void setCDNURL(String cdnURL) {
+		_cdnURL = cdnURL;
+	}
+
 	public Date getDisplayDate() {
 		return _displayDate;
 	}
@@ -305,6 +336,7 @@ public class CPAttachmentFileEntrySoap implements Serializable {
 		_statusDate = statusDate;
 	}
 
+	private long _mvccVersion;
 	private String _uuid;
 	private String _externalReferenceCode;
 	private long _CPAttachmentFileEntryId;
@@ -317,6 +349,8 @@ public class CPAttachmentFileEntrySoap implements Serializable {
 	private long _classNameId;
 	private long _classPK;
 	private long _fileEntryId;
+	private boolean _cdnEnabled;
+	private String _cdnURL;
 	private Date _displayDate;
 	private Date _expirationDate;
 	private String _title;

@@ -61,9 +61,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 	<ul>
 
 		<%
-		List<Tuple> missingLayoutPrototypes = lpe.getMissingLayoutPrototypes();
-
-		for (Tuple missingLayoutPrototype : missingLayoutPrototypes) {
+		for (Tuple missingLayoutPrototype : lpe.getMissingLayoutPrototypes()) {
 			String layoutPrototypeClassName = (String)missingLayoutPrototype.getObject(0);
 			String layoutPrototypeUuid = (String)missingLayoutPrototype.getObject(1);
 			String layoutPrototypeName = (String)missingLayoutPrototype.getObject(2);
@@ -87,7 +85,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 	%>
 
 	<c:if test="<%= le.getType() == LocaleException.TYPE_EXPORT_IMPORT %>">
-		<liferay-ui:message arguments="<%= new String[] {StringUtil.merge(le.getSourceAvailableLanguageIds(), StringPool.COMMA_AND_SPACE), StringUtil.merge(le.getTargetAvailableLanguageIds(), StringPool.COMMA_AND_SPACE)} %>" key="the-available-languages-in-the-lar-file-x-do-not-match-the-site's-available-languages-x" translateArguments="<%= false %>" />
+		<liferay-ui:message arguments="<%= new String[] {StringUtil.merge(le.getSourceAvailableLocales(), StringPool.COMMA_AND_SPACE), StringUtil.merge(le.getTargetAvailableLocales(), StringPool.COMMA_AND_SPACE)} %>" key="the-available-languages-in-the-lar-file-x-do-not-match-the-site's-available-languages-x" translateArguments="<%= false %>" />
 	</c:if>
 </liferay-ui:error>
 
@@ -100,7 +98,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 	<liferay-ui:message arguments="<%= sdske.getStructureKey() %>" key="dynamic-data-mapping-structure-with-structure-key-x-already-exists" translateArguments="<%= false %>" />
 </liferay-ui:error>
 
-<portlet:actionURL name="importLayouts" var="importPagesURL">
+<portlet:actionURL name="/export_import/import_layouts" var="importPagesURL">
 	<portlet:param name="mvcRenderCommandName" value="viewImport" />
 	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.IMPORT %>" />
 	<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
@@ -108,7 +106,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 
 <aui:form action="<%= importPagesURL %>" cssClass="lfr-export-dialog" method="post" name="fm1">
 	<portlet:renderURL var="portletURL">
-		<portlet:param name="mvcRenderCommandName" value="importLayoutsView" />
+		<portlet:param name="mvcRenderCommandName" value="/export_import/view_import_layouts" />
 		<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 	</portlet:renderURL>
 
@@ -161,9 +159,16 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 			<aui:fieldset collapsible="<%= true %>" cssClass="options-group" label="pages">
 				<c:choose>
 					<c:when test="<%= !group.isDepot() && !group.isCompany() && !group.isLayoutPrototype() && !group.isLayoutSetPrototype() %>">
-						<aui:input id="publicPages" label="public-pages" name="privateLayout" type="radio" value="<%= false %>" />
+						<c:choose>
+							<c:when test="<%= group.isPrivateLayoutsEnabled() %>">
+								<aui:input id="publicPages" label="public-pages" name="privateLayout" type="radio" value="<%= false %>" />
 
-						<aui:input id="privatePages" label="private-pages" name="privateLayout" type="radio" value="<%= true %>" />
+								<aui:input id="privatePages" label="private-pages" name="privateLayout" type="radio" value="<%= true %>" />
+							</c:when>
+							<c:otherwise>
+								<aui:input name="privateLayout" type="hidden" value="<%= false %>" />
+							</c:otherwise>
+						</c:choose>
 
 						<aui:input label="logo" name="<%= PortletDataHandlerKeys.LOGO %>" type="checkbox" value="<%= true %>" />
 
@@ -422,7 +427,7 @@ ManifestSummary manifestSummary = ExportImportHelperUtil.getManifestSummary(user
 
 	<aui:button-row>
 		<portlet:renderURL var="backURL">
-			<portlet:param name="mvcRenderCommandName" value="importLayouts" />
+			<portlet:param name="mvcRenderCommandName" value="/export_import/import_layouts" />
 			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.VALIDATE %>" />
 			<portlet:param name="groupId" value="<%= String.valueOf(groupId) %>" />
 		</portlet:renderURL>

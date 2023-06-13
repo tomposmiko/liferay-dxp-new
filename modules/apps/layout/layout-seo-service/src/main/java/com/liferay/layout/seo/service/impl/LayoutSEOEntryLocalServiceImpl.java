@@ -28,6 +28,7 @@ import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -38,6 +39,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -112,6 +114,13 @@ public class LayoutSEOEntryLocalServiceImpl
 	}
 
 	@Override
+	public List<LayoutSEOEntry> getLayoutSEOEntriesByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		return layoutSEOEntryPersistence.findByUuid_C(uuid, companyId);
+	}
+
+	@Override
 	public LayoutSEOEntry updateCustomMetaTags(
 			long userId, long groupId, boolean privateLayout, long layoutId,
 			ServiceContext serviceContext)
@@ -131,7 +140,7 @@ public class LayoutSEOEntryLocalServiceImpl
 		layoutSEOEntry.setModifiedDate(DateUtil.newDate());
 
 		DDMStructure ddmStructure = _getDDMStructure(
-			groupLocalService.getGroup(groupId));
+			_groupLocalService.getGroup(groupId));
 
 		long ddmStorageId = _updateDDMStorage(
 			layoutSEOEntry.getCompanyId(), layoutSEOEntry.getDDMStorageId(), 0,
@@ -230,16 +239,16 @@ public class LayoutSEOEntryLocalServiceImpl
 		layoutSEOEntry.setUuid(serviceContext.getUuid());
 		layoutSEOEntry.setGroupId(groupId);
 
-		Group group = groupLocalService.getGroup(groupId);
+		Group group = _groupLocalService.getGroup(groupId);
 
 		layoutSEOEntry.setCompanyId(group.getCompanyId());
 
 		layoutSEOEntry.setUserId(userId);
 
-		Date now = DateUtil.newDate();
+		Date date = DateUtil.newDate();
 
-		layoutSEOEntry.setCreateDate(now);
-		layoutSEOEntry.setModifiedDate(now);
+		layoutSEOEntry.setCreateDate(date);
+		layoutSEOEntry.setModifiedDate(date);
 
 		layoutSEOEntry.setPrivateLayout(privateLayout);
 		layoutSEOEntry.setLayoutId(layoutId);
@@ -247,7 +256,7 @@ public class LayoutSEOEntryLocalServiceImpl
 		layoutSEOEntry.setCanonicalURLMap(canonicalURLMap);
 
 		DDMStructure ddmStructure = _getDDMStructure(
-			groupLocalService.getGroup(groupId));
+			_groupLocalService.getGroup(groupId));
 
 		long ddmStorageId = _updateDDMStorage(
 			layoutSEOEntry.getCompanyId(), layoutSEOEntry.getDDMStorageId(),
@@ -333,7 +342,7 @@ public class LayoutSEOEntryLocalServiceImpl
 	}
 
 	private DDMStructure _getDDMStructure(Group group) throws PortalException {
-		Group companyGroup = groupLocalService.getCompanyGroup(
+		Group companyGroup = _groupLocalService.getCompanyGroup(
 			group.getCompanyId());
 
 		return _ddmStructureLocalService.getStructure(
@@ -377,6 +386,9 @@ public class LayoutSEOEntryLocalServiceImpl
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
+
+	@Reference
+	private GroupLocalService _groupLocalService;
 
 	@Reference
 	private StorageEngine _storageEngine;

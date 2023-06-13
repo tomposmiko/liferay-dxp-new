@@ -19,7 +19,6 @@ import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFacto
 import com.liferay.petra.executor.PortalExecutorManager;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.change.tracking.sql.CTSQLModeThreadLocal;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -99,6 +98,9 @@ public class SearchEngineInitializer implements Runnable {
 			}
 		}
 		catch (InterruptedException interruptedException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(interruptedException, interruptedException);
+			}
 		}
 
 		ExecutorService executorService =
@@ -135,25 +137,14 @@ public class SearchEngineInitializer implements Runnable {
 
 						@Override
 						public Void call() throws Exception {
-							CTSQLModeThreadLocal.CTSQLMode ctSQLMode =
-								CTSQLModeThreadLocal.getCTSQLMode();
-
 							try (SafeCloseable safeCloseable =
 									BackgroundTaskThreadLocal.
 										setBackgroundTaskIdWithSafeCloseable(
 											backgroundTaskId)) {
 
-								CTSQLModeThreadLocal.
-									setCTSQLModeWithSafeCloseable(
-										CTSQLModeThreadLocal.CTSQLMode.CT_ALL);
-
 								reindex(indexer);
 
 								return null;
-							}
-							finally {
-								CTSQLModeThreadLocal.
-									setCTSQLModeWithSafeCloseable(ctSQLMode);
 							}
 						}
 
@@ -217,7 +208,7 @@ public class SearchEngineInitializer implements Runnable {
 	private final BundleContext _bundleContext;
 	private final long _companyId;
 	private boolean _finished;
-	private ServiceTrackerList<Indexer<?>, Indexer<?>> _indexers;
+	private ServiceTrackerList<Indexer<?>> _indexers;
 	private final PortalExecutorManager _portalExecutorManager;
 	private final Set<String> _usedSearchEngineIds = new HashSet<>();
 

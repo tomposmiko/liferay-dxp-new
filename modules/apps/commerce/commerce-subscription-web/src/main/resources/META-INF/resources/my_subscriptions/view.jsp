@@ -27,7 +27,7 @@ CommerceSubscriptionContentDisplayContext commerceSubscriptionContentDisplayCont
 		</div>
 	</c:when>
 	<c:otherwise>
-		<div class="container-fluid-1280" id="<portlet:namespace />subscriptionEntriesContainer">
+		<div class="container-fluid container-fluid-max-xl" id="<portlet:namespace />subscriptionEntriesContainer">
 			<div class="commerce-product-subscription-entries-container" id="<portlet:namespace />entriesContainer">
 				<liferay-ui:search-container
 					id="commerceSubscriptionEntries"
@@ -36,7 +36,6 @@ CommerceSubscriptionContentDisplayContext commerceSubscriptionContentDisplayCont
 				>
 					<liferay-ui:search-container-row
 						className="com.liferay.commerce.model.CommerceSubscriptionEntry"
-						cssClass="entry-display-style"
 						keyProperty="commerceSubscriptionEntryId"
 						modelVar="commerceSubscriptionEntry"
 					>
@@ -46,11 +45,9 @@ CommerceSubscriptionContentDisplayContext commerceSubscriptionContentDisplayCont
 
 						String thumbnailSrc = commerceSubscriptionContentDisplayContext.getCommerceSubscriptionEntryThumbnailSrc(commerceSubscriptionEntry);
 
-						List<KeyValuePair> keyValuePairs = commerceSubscriptionContentDisplayContext.getKeyValuePairs(commerceSubscriptionEntry);
-
 						StringJoiner stringJoiner = new StringJoiner(StringPool.COMMA);
 
-						for (KeyValuePair keyValuePair : keyValuePairs) {
+						for (KeyValuePair keyValuePair : commerceSubscriptionContentDisplayContext.getKeyValuePairs(commerceSubscriptionEntry)) {
 							stringJoiner.add(keyValuePair.getValue());
 						}
 						%>
@@ -117,7 +114,7 @@ CommerceSubscriptionContentDisplayContext commerceSubscriptionContentDisplayCont
 											%>
 
 											<clay:link
-												buttonStyle="secondary"
+												displayType="secondary"
 												href='<%= String.valueOf(dropdownItem.get("href")) %>'
 												label='<%= String.valueOf(dropdownItem.get("label")) %>'
 											/>

@@ -30,6 +30,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Path;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +65,26 @@ public class GitUtil {
 		return commitMessages;
 	}
 
+	public static List<String> getCurrentBranchDeletedFileNames(
+			String baseDirName, String gitWorkingBranchName)
+		throws Exception {
+
+		String gitWorkingBranchLatestCommitId = _getLatestCommitId(
+			gitWorkingBranchName, "origin/" + gitWorkingBranchName,
+			"upstream/" + gitWorkingBranchName);
+
+		List<String> deleteFileNames = new ArrayList<>();
+
+		deleteFileNames.addAll(
+			getDeletedFileNames(baseDirName, gitWorkingBranchLatestCommitId));
+
+		return deleteFileNames;
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public static String getCurrentBranchFileContent(
 			String gitWorkingBranchName, String fileName)
 		throws Exception {
@@ -100,6 +121,32 @@ public class GitUtil {
 		return fileNames;
 	}
 
+	public static String getFileContent(String fileName) throws Exception {
+		StringBundler sb = new StringBundler();
+
+		try (UnsyncBufferedReader unsyncBufferedReader = getGitCommandReader(
+				"git show HEAD:" + fileName)) {
+
+			String line = null;
+
+			while ((line = unsyncBufferedReader.readLine()) != null) {
+				sb.append(line);
+
+				sb.append("\n");
+			}
+		}
+
+		if (sb.length() > 0) {
+			sb.setIndex(sb.index() - 1);
+		}
+
+		return sb.toString();
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public static String getLatestAuthorFileContent(String fileName)
 		throws Exception {
 
@@ -127,6 +174,14 @@ public class GitUtil {
 		return fileNames;
 	}
 
+	public static String getLatestCommitId() throws Exception {
+		return _getLatestCommitId("HEAD");
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+	 */
+	@Deprecated
 	public static String getLocalChangesFileContent(String fileName)
 		throws Exception {
 
@@ -150,6 +205,48 @@ public class GitUtil {
 		}
 
 		return fileNames;
+	}
+
+	public static List<String> getModifiedFileNames(
+			String baseDirName, int commitCount)
+		throws Exception {
+
+		return getModifiedFileNames(baseDirName, commitCount, false);
+	}
+
+	public static List<String> getModifiedFileNames(
+			String baseDirName, int commitCount,
+			boolean includeDeletedFileNames)
+		throws Exception {
+
+		if (commitCount <= 0) {
+			return Collections.emptyList();
+		}
+
+		UnsyncBufferedReader unsyncBufferedReader = getGitCommandReader(
+			"git log --pretty=format:%h");
+
+		String line = null;
+
+		int count = 0;
+
+		while ((line = unsyncBufferedReader.readLine()) != null) {
+			count++;
+
+			if (count != commitCount) {
+				continue;
+			}
+
+			List<String> fileNames = getFileNames(baseDirName, line);
+
+			if (includeDeletedFileNames) {
+				fileNames.addAll(getDeletedFileNames(baseDirName, line));
+			}
+
+			return fileNames;
+		}
+
+		return null;
 	}
 
 	public static List<String> getModifiedLastDayFileNames(String baseDirName)
@@ -255,7 +352,7 @@ public class GitUtil {
 		UnsyncBufferedReader unsyncBufferedReader = getGitCommandReader(
 			StringBundler.concat(
 				"git diff --diff-filter=RD --name-status ", commitId, " ",
-				_getLatestCommitId()));
+				getLatestCommitId()));
 
 		String line = null;
 
@@ -305,31 +402,15 @@ public class GitUtil {
 		return dirNames;
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *             #getFileContent(String)}
+	 */
+	@Deprecated
 	protected static String getFileContent(String commitId, String fileName)
 		throws Exception {
 
-		StringBundler sb = new StringBundler();
-
-		String gitCommand = StringBundler.concat(
-			"git show ", commitId, ":", fileName);
-
-		try (UnsyncBufferedReader unsyncBufferedReader = getGitCommandReader(
-				gitCommand)) {
-
-			String line = null;
-
-			while ((line = unsyncBufferedReader.readLine()) != null) {
-				sb.append(line);
-
-				sb.append("\n");
-			}
-		}
-
-		if (sb.length() > 0) {
-			sb.setIndex(sb.index() - 1);
-		}
-
-		return sb.toString();
+		return getFileContent(fileName);
 	}
 
 	protected static String getFileName(String fileName, int gitLevel) {
@@ -351,7 +432,7 @@ public class GitUtil {
 		UnsyncBufferedReader unsyncBufferedReader = getGitCommandReader(
 			StringBundler.concat(
 				"git diff --diff-filter=AMR --name-only ", commitId, " ",
-				_getLatestCommitId()));
+				getLatestCommitId()));
 
 		String line = null;
 
@@ -455,11 +536,9 @@ public class GitUtil {
 		int gitLevel = getGitLevel(baseDirName);
 
 		while ((line = unsyncBufferedReader.readLine()) != null) {
-			if (StringUtil.count(line, CharPool.SLASH) < gitLevel) {
-				continue;
-			}
+			if ((StringUtil.count(line, CharPool.SLASH) < gitLevel) ||
+				Validator.isNull(command) || !line.startsWith(command + " '")) {
 
-			if (Validator.isNull(command) || !line.startsWith(command + " '")) {
 				continue;
 			}
 
@@ -488,10 +567,6 @@ public class GitUtil {
 				return null;
 			}
 		}
-	}
-
-	private static String _getLatestCommitId() throws Exception {
-		return _getLatestCommitId("HEAD");
 	}
 
 	private static String _getLatestCommitId(String... branchNames)

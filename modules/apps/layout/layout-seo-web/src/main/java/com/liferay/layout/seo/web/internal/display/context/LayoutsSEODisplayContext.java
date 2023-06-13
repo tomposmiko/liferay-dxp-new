@@ -64,9 +64,10 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.URLCodec;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portlet.display.template.PortletDisplayTemplate;
 import com.liferay.portlet.layoutsadmin.display.context.GroupDisplayContextHelper;
 
 import java.util.HashMap;
@@ -155,9 +156,8 @@ public class LayoutsSEODisplayContext {
 	}
 
 	public String getDefaultCanonicalURL() throws PortalException {
-		return URLCodec.decodeURL(
-			_layoutSEOCanonicalURLProvider.getDefaultCanonicalURL(
-				_selLayout, _themeDisplay));
+		return _layoutSEOCanonicalURLProvider.getDefaultCanonicalURL(
+			_selLayout, _themeDisplay);
 	}
 
 	public Map<Locale, String> getDefaultCanonicalURLMap()
@@ -338,7 +338,7 @@ public class LayoutsSEODisplayContext {
 		).put(
 			"openGraphDescription",
 			_selLayout.getTypeSettingsProperty(
-				"mapped-openGraphDescription", "description")
+				"mapped-openGraphDescription", "${description}")
 		).put(
 			"openGraphImage",
 			_selLayout.getTypeSettingsProperty("mapped-openGraphImage", null)
@@ -347,7 +347,8 @@ public class LayoutsSEODisplayContext {
 			_selLayout.getTypeSettingsProperty("mapped-openGraphImageAlt", null)
 		).put(
 			"openGraphTitle",
-			_selLayout.getTypeSettingsProperty("mapped-openGraphTitle", "title")
+			_selLayout.getTypeSettingsProperty(
+				"mapped-openGraphTitle", "${title}")
 		).build();
 	}
 
@@ -424,9 +425,10 @@ public class LayoutsSEODisplayContext {
 		).put(
 			"description",
 			_selLayout.getTypeSettingsProperty(
-				"mapped-description", "description")
+				"mapped-description", "${description}")
 		).put(
-			"title", _selLayout.getTypeSettingsProperty("mapped-title", "title")
+			"title",
+			_selLayout.getTypeSettingsProperty("mapped-title", "${title}")
 		).build();
 	}
 
@@ -475,6 +477,10 @@ public class LayoutsSEODisplayContext {
 			"fields",
 			infoForm.getAllInfoFields(
 			).stream(
+			).filter(
+				infoField -> !StringUtil.startsWith(
+					infoField.getName(),
+					PortletDisplayTemplate.DISPLAY_STYLE_PREFIX)
 			).map(
 				infoField -> JSONUtil.put(
 					"key", infoField.getName()

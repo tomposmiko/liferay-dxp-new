@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -266,37 +267,59 @@ public class ClassNameModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<ClassName, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, ClassName>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<ClassName, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<ClassName, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ClassName.class.getClassLoader(), ClassName.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", ClassName::getMvccVersion);
-		attributeGetterFunctions.put("classNameId", ClassName::getClassNameId);
-		attributeGetterFunctions.put("value", ClassName::getValue);
+		try {
+			Constructor<ClassName> constructor =
+				(Constructor<ClassName>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<ClassName, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<ClassName, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<ClassName, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<ClassName, Object>>();
 		Map<String, BiConsumer<ClassName, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<ClassName, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", ClassName::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<ClassName, Long>)ClassName::setMvccVersion);
+		attributeGetterFunctions.put("classNameId", ClassName::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<ClassName, Long>)ClassName::setClassNameId);
+		attributeGetterFunctions.put("value", ClassName::getValue);
 		attributeSetterBiConsumers.put(
 			"value", (BiConsumer<ClassName, String>)ClassName::setValue);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -441,6 +464,19 @@ public class ClassNameModelImpl
 		classNameImpl.setValue(getValue());
 
 		classNameImpl.resetOriginalValues();
+
+		return classNameImpl;
+	}
+
+	@Override
+	public ClassName cloneWithOriginalValues() {
+		ClassNameImpl classNameImpl = new ClassNameImpl();
+
+		classNameImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		classNameImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		classNameImpl.setValue(this.<String>getColumnOriginalValue("value"));
 
 		return classNameImpl;
 	}
@@ -614,9 +650,7 @@ public class ClassNameModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, ClassName>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					ClassName.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

@@ -19,6 +19,7 @@ import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServices
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
 import com.liferay.dynamic.data.mapping.form.web.internal.configuration.activator.DDMFormWebConfigurationActivator;
+import com.liferay.dynamic.data.mapping.form.web.internal.configuration.activator.FFSubmissionsSettingsConfigurationActivator;
 import com.liferay.dynamic.data.mapping.form.web.internal.constants.DDMFormWebKeys;
 import com.liferay.dynamic.data.mapping.form.web.internal.display.context.DDMFormDisplayContext;
 import com.liferay.dynamic.data.mapping.form.web.internal.instance.lifecycle.AddDefaultSharedFormLayoutPortalInstanceLifecycleListener;
@@ -31,6 +32,8 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalServi
 import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterTracker;
 import com.liferay.dynamic.data.mapping.util.DDMFormValuesMerger;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValuesValidationException;
+import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.log.Log;
@@ -45,6 +48,8 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -56,6 +61,8 @@ import javax.portlet.PortletException;
 import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -149,13 +156,30 @@ public class DDMFormPortlet extends MVCPortlet {
 		try {
 			setRenderRequestAttributes(renderRequest, renderResponse);
 
-			DDMFormDisplayContext ddmFormPortletDisplayContext =
+			DDMFormDisplayContext ddmFormDisplayContext =
 				(DDMFormDisplayContext)renderRequest.getAttribute(
 					WebKeys.PORTLET_DISPLAY_CONTEXT);
 
-			if (ddmFormPortletDisplayContext.isFormShared()) {
+			if (ddmFormDisplayContext.isFormShared()) {
 				saveRefererGroupIdInRequest(
-					renderRequest, ddmFormPortletDisplayContext);
+					renderRequest, ddmFormDisplayContext);
+			}
+
+			if ((ddmFormDisplayContext.isLimitToOneSubmissionPerUserEnabled() &&
+				 !ddmFormDisplayContext.isLoggedUser()) ||
+				(ddmFormDisplayContext.isRequireAuthentication() &&
+				 ddmFormDisplayContext.isSharedURL())) {
+
+				HttpServletResponse httpServletResponse =
+					_portal.getHttpServletResponse(renderResponse);
+
+				httpServletResponse.sendRedirect(
+					StringBundler.concat(
+						_portal.getPathMain(), "/portal/login?redirect=",
+						URLCodec.encodeURL(
+							_portal.getCurrentURL(renderRequest))));
+
+				return;
 			}
 		}
 		catch (Exception exception) {
@@ -203,10 +227,10 @@ public class DDMFormPortlet extends MVCPortlet {
 
 	protected void saveRefererGroupIdInRequest(
 		RenderRequest renderRequest,
-		DDMFormDisplayContext ddmFormPortletDisplayContext) {
+		DDMFormDisplayContext ddmFormDisplayContext) {
 
 		DDMFormInstance ddmFormInstance =
-			ddmFormPortletDisplayContext.getFormInstance();
+			ddmFormDisplayContext.getFormInstance();
 
 		if (ddmFormInstance != null) {
 			renderRequest.setAttribute(
@@ -232,9 +256,12 @@ public class DDMFormPortlet extends MVCPortlet {
 			_ddmFormInstanceVersionLocalService, _ddmFormRenderer,
 			_ddmFormValuesFactory, _ddmFormValuesMerger,
 			_ddmFormWebConfigurationActivator.getDDMFormWebConfiguration(),
-			_ddmStorageAdapterTracker, _groupLocalService, _jsonFactory,
-			_portal, renderRequest, renderResponse, _roleLocalService,
-			_userLocalService, _workflowDefinitionLinkLocalService);
+			_ddmStorageAdapterTracker,
+			_ffSubmissionsSettingsConfigurationActivator, _groupLocalService,
+			_jsonFactory, _objectFieldLocalService,
+			_objectRelationshipLocalService, _portal, renderRequest,
+			renderResponse, _roleLocalService, _userLocalService,
+			_workflowDefinitionLinkLocalService);
 
 		renderRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT, ddmFormDisplayContext);
@@ -288,10 +315,20 @@ public class DDMFormPortlet extends MVCPortlet {
 	private DDMStorageAdapterTracker _ddmStorageAdapterTracker;
 
 	@Reference
+	private FFSubmissionsSettingsConfigurationActivator
+		_ffSubmissionsSettingsConfigurationActivator;
+
+	@Reference
 	private GroupLocalService _groupLocalService;
 
 	@Reference
 	private JSONFactory _jsonFactory;
+
+	@Reference
+	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 	@Reference
 	private Portal _portal;

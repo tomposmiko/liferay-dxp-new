@@ -12,49 +12,47 @@ definition {
 
 	macro addDocumentWithOnlyOwnerPermissions {
 		DMDocument.addPG(
-			dmDocumentDescription = ${dmDocumentDescription},
-			dmDocumentFile = ${dmDocumentFile},
-			dmDocumentTitle = ${dmDocumentTitle},
+			dmDocumentDescription = "${dmDocumentDescription}",
+			dmDocumentFile = "${dmDocumentFile}",
+			dmDocumentTitle = "${dmDocumentTitle}",
 			viewableBy = "Owner");
 
-		DMNavigator.gotoDocumentPermissionsCP(dmDocumentTitle = ${dmDocumentTitle});
+		PermissionsInline.gotoDocumentsAndMediaDocumentPG(dmDocumentTitle = "${dmDocumentTitle}");
 
 		Role.removePermissionPG(
 			permissionDefinitionKey = "INLINE_PERMISSIONS_ADD_DISCUSSION_CHECKBOX",
 			roleTitle = "Guest");
 
-		IFrame.closeFrame();
-
-		Pause(locator1 = 5000);
+		Pause(locator1 = "3000");
 	}
 
 	macro changePermission {
 		if (isSet(depotName)) {
-			DMDocument.viewCP(dmDocumentTitle = ${dmDocumentTitle});
+			DMDocument.viewCP(dmDocumentTitle = "${dmDocumentTitle}");
 		}
 		else {
 			DMDocument.viewPG(
-				dmDocumentDescription = ${dmDocumentDescription},
-				dmDocumentTitle = ${dmDocumentTitle});
+				dmDocumentDescription = "${dmDocumentDescription}",
+				dmDocumentTitle = "${dmDocumentTitle}");
 		}
 
 		DMDocumentSharing._manageCollaborators();
 
 		SelectFrame(locator1 = "IFrame#MODAL_IFRAME");
 
-		var key_userName = ${userName};
+		var key_userName = "${userName}";
 
 		AssertTextEquals(
 			locator1 = "Sharing#MANAGE_COLLABORATORS_NAME",
-			value1 = ${userName});
+			value1 = "${userName}");
 
 		Select(
 			locator1 = "Sharing#MANAGE_COLLABORATORS_ACCESS_DROPDOWN",
-			value1 = ${selectPermission});
+			value1 = "${selectPermission}");
 
 		AssertSelectedLabel(
 			locator1 = "Sharing#MANAGE_COLLABORATORS_ACCESS_DROPDOWN",
-			value1 = ${selectPermission});
+			value1 = "${selectPermission}");
 
 		Button.clickSave();
 
@@ -63,13 +61,40 @@ definition {
 		Alert.viewSuccessMessageText(successMessage = "Permissions Changed");
 	}
 
+	macro editViaSharedwithMe {
+		Asset.openTosharedContent(
+			navTab = "Shared with Me",
+			siteURLKey = "guest");
+
+		if (isSet(dmDocumentTitle)) {
+			DMDocument.editCP(
+				dmDocumentTitle = "${dmDocumentTitle}",
+				dmDocumentTitleEdit = "${entryTitleEdit}");
+		}
+		else {
+			LexiconEntry.gotoEntryMenuItem(
+				menuItem = "Edit",
+				rowEntry = "${entryTitle}");
+
+			BlogsEntry.editTitle(
+				entryTitle = "${entryTitle}",
+				entryTitleEdit = "${entryTitleEdit}");
+
+			Button.clickPublish();
+		}
+
+		LexiconEntry.viewEntryName(rowEntry = "${entryTitleEdit}");
+	}
+
 	macro removeCollaborator {
-		DMDocumentSharing._manageCollaborators();
+		if (!(isSet(sharedByMe))) {
+			DMDocumentSharing._manageCollaborators();
+		}
 
 		SelectFrame(locator1 = "IFrame#MODAL_IFRAME");
 
-		for (var collaborator : list ${collaboratorList}) {
-			var key_userName = ${collaborator};
+		for (var collaborator : list "${collaboratorList}") {
+			var key_userName = "${collaborator}";
 
 			Click(locator1 = "Sharing#MANAGE_COLLABORATORS_REMOVE_BUTTON");
 		}
@@ -88,12 +113,12 @@ definition {
 	macro viewCollaborators {
 		DMDocument.expandInfo();
 
-		for (var collaborator : list ${collaboratorList}) {
-			var key_collaborator = ${collaborator};
+		for (var collaborator : list "${collaboratorList}") {
+			var key_collaborator = "${collaborator}";
 
 			AssertElementPresent(
 				locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_COLLABORATOR_TOOLTIP",
-				value1 = ${collaborator});
+				value1 = "${collaborator}");
 		}
 	}
 
@@ -102,26 +127,88 @@ definition {
 			locator1 = "Portlet#HEADER",
 			value1 = "Shared Content");
 
-		if (${contentSharingPermission} == "View") {
-			AssertElementNotPresent(locator1 = "Comments#COMMENT_FIELD");
+		if ("${contentSharingPermission}" == "View") {
+			AssertElementNotPresent(locator1 = "CKEditor#BODY_FIELD_IFRAME");
+
+			Click(locator1 = "Notifications#NOTIFICATIONS_PORTLET_VERTICAL_ELLIPSIS");
+
+			MenuItem.viewNotPresent(menuItem = "Edit");
 		}
-		else {
-			AssertElementPresent(locator1 = "Comments#COMMENT_FIELD");
+		else if ("${contentSharingPermission}" == "Comment") {
+			SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME");
+
+			AssertElementPresent(locator1 = "CKEditor#BODY");
+
+			SelectFrame(value1 = "relative=top");
+
+			Click(locator1 = "Notifications#NOTIFICATIONS_PORTLET_VERTICAL_ELLIPSIS");
+
+			MenuItem.viewNotPresent(menuItem = "Edit");
+		}
+		else if ("${contentSharingPermission}" == "Update") {
+			SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME");
+
+			AssertElementPresent(locator1 = "CKEditor#BODY");
+
+			SelectFrame(value1 = "relative=top");
+
+			Click(locator1 = "Notifications#NOTIFICATIONS_PORTLET_VERTICAL_ELLIPSIS");
+
+			MenuItem.viewPresent(menuItem = "Edit");
 		}
 
-		var key_dmDocumentTitle = ${dmDocumentTitle};
+		var key_dmDocumentTitle = "${dmDocumentTitle}";
 
 		AssertTextEquals(
 			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE",
-			value1 = ${dmDocumentTitle});
+			value1 = "${dmDocumentTitle}");
+	}
+
+	macro viewNoDuplicateDocument {
+		UserBar.gotoDropdownItem(dropdownItem = "Shared Content");
+
+		AssertTextEquals(
+			key_contentTitle = "${dmDocumentTitle}",
+			locator1 = "Sharing#SHARED_CONTENT_CONTENT_TITLE",
+			value1 = "${dmDocumentTitle}");
+
+		AssertElementNotPresent(
+			key_contentTitle = "${dmDocumentTitle}",
+			locator1 = "Sharing#SHARED_CONTENT_CONTENT_TITLE_2");
 	}
 
 	macro viewSharedFlag {
 		if (isSet(detailsView)) {
-			AssertVisible(locator1 = "DocumentsAndMedia#ICON_DOCUMENT_SHARED");
+			if ("${displayStyle}" == "table") {
+				AssertVisible(
+					key_dmDocumentTitle = "${dmDocumentTitle}",
+					locator1 = "DocumentsAndMedia#TABLE_DOCUMENT_SHARED");
+			}
+			else {
+				AssertVisible(
+					key_dmDocumentTitle = "${dmDocumentTitle}",
+					locator1 = "DocumentsAndMedia#ICON_DOCUMENT_SHARED");
+			}
 		}
 		else {
-			AssertElementNotPresent(locator1 = "DocumentsAndMedia#ICON_DOCUMENT_SHARED");
+			AssertElementNotPresent(
+				key_dmDocumentTitle = "${dmDocumentTitle}",
+				locator1 = "DocumentsAndMedia#ICON_DOCUMENT_SHARED");
+		}
+	}
+
+	macro viewSharingOption {
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+
+		Click(
+			key_dmDocumentTitle = "${dmDocumentTitle}",
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_VERTICAL_ELLIPSIS");
+
+		if ("${sharing}" == "true") {
+			MenuItem.viewPresent(menuItem = "Share");
+		}
+		else {
+			MenuItem.viewNotPresent(menuItem = "Share");
 		}
 	}
 

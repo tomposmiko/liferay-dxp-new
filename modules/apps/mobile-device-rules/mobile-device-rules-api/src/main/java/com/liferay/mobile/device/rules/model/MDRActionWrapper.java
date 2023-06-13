@@ -169,6 +169,11 @@ public class MDRActionWrapper
 		}
 	}
 
+	@Override
+	public MDRAction cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
 	/**
 	 * Returns the action ID of this mdr action.
 	 *

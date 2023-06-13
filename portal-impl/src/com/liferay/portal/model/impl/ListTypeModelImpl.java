@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -263,39 +264,61 @@ public class ListTypeModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<ListType, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, ListType>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<ListType, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<ListType, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			ListType.class.getClassLoader(), ListType.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", ListType::getMvccVersion);
-		attributeGetterFunctions.put("listTypeId", ListType::getListTypeId);
-		attributeGetterFunctions.put("name", ListType::getName);
-		attributeGetterFunctions.put("type", ListType::getType);
+		try {
+			Constructor<ListType> constructor =
+				(Constructor<ListType>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<ListType, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<ListType, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<ListType, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<ListType, Object>>();
 		Map<String, BiConsumer<ListType, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<ListType, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", ListType::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<ListType, Long>)ListType::setMvccVersion);
+		attributeGetterFunctions.put("listTypeId", ListType::getListTypeId);
 		attributeSetterBiConsumers.put(
 			"listTypeId", (BiConsumer<ListType, Long>)ListType::setListTypeId);
+		attributeGetterFunctions.put("name", ListType::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<ListType, String>)ListType::setName);
+		attributeGetterFunctions.put("type", ListType::getType);
 		attributeSetterBiConsumers.put(
 			"type", (BiConsumer<ListType, String>)ListType::setType);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -450,6 +473,20 @@ public class ListTypeModelImpl
 		listTypeImpl.setType(getType());
 
 		listTypeImpl.resetOriginalValues();
+
+		return listTypeImpl;
+	}
+
+	@Override
+	public ListType cloneWithOriginalValues() {
+		ListTypeImpl listTypeImpl = new ListTypeImpl();
+
+		listTypeImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		listTypeImpl.setListTypeId(
+			this.<Long>getColumnOriginalValue("listTypeId"));
+		listTypeImpl.setName(this.<String>getColumnOriginalValue("name"));
+		listTypeImpl.setType(this.<String>getColumnOriginalValue("type_"));
 
 		return listTypeImpl;
 	}
@@ -629,9 +666,7 @@ public class ListTypeModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, ListType>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					ListType.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

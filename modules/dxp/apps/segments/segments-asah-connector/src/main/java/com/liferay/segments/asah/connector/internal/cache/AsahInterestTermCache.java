@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -31,7 +32,8 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.segments.asah.connector.internal.configuration.SegmentsAsahConfiguration",
-	immediate = true, service = AsahInterestTermCache.class
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	service = AsahInterestTermCache.class
 )
 public class AsahInterestTermCache {
 
@@ -69,7 +71,7 @@ public class AsahInterestTermCache {
 
 	private static final String _CACHE_PREFIX = "segments-";
 
-	private int _interestTermsTimeToLiveInSeconds =
+	private volatile int _interestTermsTimeToLiveInSeconds =
 		PortalCache.DEFAULT_TIME_TO_LIVE;
 	private PortalCache<String, String[]> _portalCache;
 

@@ -52,38 +52,29 @@ public interface DDMIndexer {
 		Document document, DDMStructure ddmStructure,
 		DDMFormValues ddmFormValues);
 
-	public default Sort createDDMStructureFieldSort(
-			DDMStructure ddmStructure, String fieldName, Locale locale,
+	public Sort createDDMStructureFieldSort(
+			DDMStructure ddmStructure, String fieldReference, Locale locale,
 			SortOrder sortOrder)
-		throws PortalException {
+		throws PortalException;
 
-		throw new UnsupportedOperationException();
-	}
-
-	public default Sort createDDMStructureFieldSort(
+	public Sort createDDMStructureFieldSort(
 			String ddmStructureFieldName, Locale locale, SortOrder sortOrder)
-		throws PortalException {
+		throws PortalException;
 
-		throw new UnsupportedOperationException();
-	}
-
-	public default QueryFilter createFieldValueQueryFilter(
-			DDMStructure ddmStructure, String fieldName, Locale locale,
+	public QueryFilter createFieldValueQueryFilter(
+			DDMStructure ddmStructure, String fieldReference, Locale locale,
 			Serializable value)
-		throws Exception {
-
-		throw new UnsupportedOperationException();
-	}
+		throws Exception;
 
 	public QueryFilter createFieldValueQueryFilter(
 			String ddmStructureFieldName, Serializable ddmStructureFieldValue,
 			Locale locale)
 		throws Exception;
 
-	public String encodeName(long ddmStructureId, String fieldName);
+	public String encodeName(long ddmStructureId, String fieldReference);
 
 	public String encodeName(
-		long ddmStructureId, String fieldName, Locale locale);
+		long ddmStructureId, String fieldReference, Locale locale);
 
 	public String extractIndexableAttributes(
 		DDMStructure ddmStructure, DDMFormValues ddmFormValues, Locale locale);

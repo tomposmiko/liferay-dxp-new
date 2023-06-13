@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -223,70 +224,92 @@ public class DDMDataProviderInstanceLinkModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, DDMDataProviderInstanceLink>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			DDMDataProviderInstanceLink.class.getClassLoader(),
+			DDMDataProviderInstanceLink.class, ModelWrapper.class);
+
+		try {
+			Constructor<DDMDataProviderInstanceLink> constructor =
+				(Constructor<DDMDataProviderInstanceLink>)
+					proxyClass.getConstructor(InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map
 		<String, Function<DDMDataProviderInstanceLink, Object>>
 			_attributeGetterFunctions;
+	private static final Map
+		<String, BiConsumer<DDMDataProviderInstanceLink, Object>>
+			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<DDMDataProviderInstanceLink, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<DDMDataProviderInstanceLink, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", DDMDataProviderInstanceLink::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", DDMDataProviderInstanceLink::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"dataProviderInstanceLinkId",
-			DDMDataProviderInstanceLink::getDataProviderInstanceLinkId);
-		attributeGetterFunctions.put(
-			"companyId", DDMDataProviderInstanceLink::getCompanyId);
-		attributeGetterFunctions.put(
-			"dataProviderInstanceId",
-			DDMDataProviderInstanceLink::getDataProviderInstanceId);
-		attributeGetterFunctions.put(
-			"structureId", DDMDataProviderInstanceLink::getStructureId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map
-		<String, BiConsumer<DDMDataProviderInstanceLink, Object>>
-			_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<DDMDataProviderInstanceLink, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<DDMDataProviderInstanceLink, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", DDMDataProviderInstanceLink::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<DDMDataProviderInstanceLink, Long>)
 				DDMDataProviderInstanceLink::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", DDMDataProviderInstanceLink::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<DDMDataProviderInstanceLink, Long>)
 				DDMDataProviderInstanceLink::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"dataProviderInstanceLinkId",
+			DDMDataProviderInstanceLink::getDataProviderInstanceLinkId);
 		attributeSetterBiConsumers.put(
 			"dataProviderInstanceLinkId",
 			(BiConsumer<DDMDataProviderInstanceLink, Long>)
 				DDMDataProviderInstanceLink::setDataProviderInstanceLinkId);
+		attributeGetterFunctions.put(
+			"companyId", DDMDataProviderInstanceLink::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<DDMDataProviderInstanceLink, Long>)
 				DDMDataProviderInstanceLink::setCompanyId);
+		attributeGetterFunctions.put(
+			"dataProviderInstanceId",
+			DDMDataProviderInstanceLink::getDataProviderInstanceId);
 		attributeSetterBiConsumers.put(
 			"dataProviderInstanceId",
 			(BiConsumer<DDMDataProviderInstanceLink, Long>)
 				DDMDataProviderInstanceLink::setDataProviderInstanceId);
+		attributeGetterFunctions.put(
+			"structureId", DDMDataProviderInstanceLink::getStructureId);
 		attributeSetterBiConsumers.put(
 			"structureId",
 			(BiConsumer<DDMDataProviderInstanceLink, Long>)
 				DDMDataProviderInstanceLink::setStructureId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -463,6 +486,27 @@ public class DDMDataProviderInstanceLinkModelImpl
 		ddmDataProviderInstanceLinkImpl.setStructureId(getStructureId());
 
 		ddmDataProviderInstanceLinkImpl.resetOriginalValues();
+
+		return ddmDataProviderInstanceLinkImpl;
+	}
+
+	@Override
+	public DDMDataProviderInstanceLink cloneWithOriginalValues() {
+		DDMDataProviderInstanceLinkImpl ddmDataProviderInstanceLinkImpl =
+			new DDMDataProviderInstanceLinkImpl();
+
+		ddmDataProviderInstanceLinkImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		ddmDataProviderInstanceLinkImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		ddmDataProviderInstanceLinkImpl.setDataProviderInstanceLinkId(
+			this.<Long>getColumnOriginalValue("dataProviderInstanceLinkId"));
+		ddmDataProviderInstanceLinkImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		ddmDataProviderInstanceLinkImpl.setDataProviderInstanceId(
+			this.<Long>getColumnOriginalValue("dataProviderInstanceId"));
+		ddmDataProviderInstanceLinkImpl.setStructureId(
+			this.<Long>getColumnOriginalValue("structureId"));
 
 		return ddmDataProviderInstanceLinkImpl;
 	}
@@ -649,8 +693,7 @@ public class DDMDataProviderInstanceLinkModelImpl
 		private static final Function
 			<InvocationHandler, DDMDataProviderInstanceLink>
 				_escapedModelProxyProviderFunction =
-					ProxyUtil.getProxyProviderFunction(
-						DDMDataProviderInstanceLink.class, ModelWrapper.class);
+					_getProxyProviderFunction();
 
 	}
 

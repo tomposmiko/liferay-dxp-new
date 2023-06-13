@@ -55,9 +55,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CAMPAIGN_TABLE-->
-
 <tr>
 	<td>CAMPAIGN_TABLE_PRIORITY</td>
 	<td>//*[@data-qa-id='row'][contains(.,'${key_rowEntry}')]/td[7]</td>
@@ -73,9 +71,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CAMPAIGN_TRACKING_ACTIONS-->
-
 <tr>
 	<td>CAMPAIGN_TRACKING_ACTIONS</td>
 	<td>//div[@class='property-builder-field-label']/h5[normalize-space(text())='${key_campaignTrackingAction}']</td>
@@ -96,9 +92,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CAMPAIGN_TRACKING_ACTIONS_PAGE-->
-
 <tr>
 	<td>CAMPAIGN_TRACKING_ACTIONS_PAGE_ALIAS_FIELD</td>
 	<td>//div[contains(@class,'pagetrackingaction')]//input[contains(@id,'alias')]</td>
@@ -119,9 +113,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CAMPAIGN_TRACKING_ACTIONS_CUSTOM_FORM-->
-
 <tr>
 	<td>CAMPAIGN_TRACKING_ACTIONS_CUSTOM_FORM_NAME_FIELD</td>
 	<td>//div[contains(@class,'formtrackingaction')]//input[contains(@id,'alias')]</td>
@@ -142,9 +134,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CAMPAIGN_TRACKING_ACTIONS_DDL_FORM-->
-
 <tr>
 	<td>CAMPAIGN_TRACKING_ACTIONS_DDL_FORM_NAME_FIELD</td>
 	<td>//div[contains(@class,'ddmformtrackingaction')]//input[contains(@id,'alias')]</td>
@@ -170,9 +160,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CAMPAIGN_TRACKING_ACTIONS_YOUTUBE_VIDEOS-->
-
 <tr>
 	<td>CAMPAIGN_TRACKING_ACTIONS_YOUTUBE_VIDEOS_ALIAS_FIELD</td>
 	<td>//div[contains(@class,'youtubetrackingaction')]//input[contains(@id,'alias')]</td>
@@ -193,9 +181,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CAMPAIGN_TRACKING_ACTIONS_CONTENT-->
-
 <tr>
 	<td>CAMPAIGN_TRACKING_ACTIONS_CONTENT_NAME_FIELD</td>
 	<td>//div[contains(@class,'contenttrackingaction')]//input[contains(@id,'alias')]</td>
@@ -216,9 +202,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--CAMPAIGN_TRACKING_ACTIONS_LINK-->
-
 <tr>
 	<td>CAMPAIGN_TRACKING_ACTIONS_LINK_ALIAS_FIELD</td>
 	<td>//div[contains(@class,'linktrackingaction')]//input[contains(@id,'alias')]</td>

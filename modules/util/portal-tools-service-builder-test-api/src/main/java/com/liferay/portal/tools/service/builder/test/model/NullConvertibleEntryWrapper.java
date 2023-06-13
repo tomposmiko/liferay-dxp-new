@@ -65,6 +65,11 @@ public class NullConvertibleEntryWrapper
 		}
 	}
 
+	@Override
+	public NullConvertibleEntry cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
 	/**
 	 * Returns the name of this null convertible entry.
 	 *

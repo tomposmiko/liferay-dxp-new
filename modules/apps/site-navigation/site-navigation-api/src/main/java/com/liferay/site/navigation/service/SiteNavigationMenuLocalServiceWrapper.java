@@ -30,6 +30,10 @@ public class SiteNavigationMenuLocalServiceWrapper
 	implements ServiceWrapper<SiteNavigationMenuLocalService>,
 			   SiteNavigationMenuLocalService {
 
+	public SiteNavigationMenuLocalServiceWrapper() {
+		this(null);
+	}
+
 	public SiteNavigationMenuLocalServiceWrapper(
 		SiteNavigationMenuLocalService siteNavigationMenuLocalService) {
 
@@ -163,9 +167,7 @@ public class SiteNavigationMenuLocalServiceWrapper
 	}
 
 	@Override
-	public void deleteSiteNavigationMenus(long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
+	public void deleteSiteNavigationMenus(long groupId) {
 		_siteNavigationMenuLocalService.deleteSiteNavigationMenus(groupId);
 	}
 
@@ -290,6 +292,14 @@ public class SiteNavigationMenuLocalServiceWrapper
 	public SiteNavigationMenu fetchSiteNavigationMenu(long groupId, int type) {
 		return _siteNavigationMenuLocalService.fetchSiteNavigationMenu(
 			groupId, type);
+	}
+
+	@Override
+	public SiteNavigationMenu fetchSiteNavigationMenuByName(
+		long groupId, String name) {
+
+		return _siteNavigationMenuLocalService.fetchSiteNavigationMenuByName(
+			groupId, name);
 	}
 
 	/**

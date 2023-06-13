@@ -39,7 +39,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.RoleConstants;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -53,9 +53,8 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -64,16 +63,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -236,10 +237,7 @@ public abstract class BaseDataDefinitionResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantDataDefinition),
 				(List<DataDefinition>)page.getItems());
-			assertValid(
-				page,
-				testGetDataDefinitionByContentTypeContentTypePage_getExpectedActions(
-					irrelevantContentType));
+			assertValid(page);
 		}
 
 		DataDefinition dataDefinition1 =
@@ -260,24 +258,11 @@ public abstract class BaseDataDefinitionResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(dataDefinition1, dataDefinition2),
 			(List<DataDefinition>)page.getItems());
-		assertValid(
-			page,
-			testGetDataDefinitionByContentTypeContentTypePage_getExpectedActions(
-				contentType));
+		assertValid(page);
 
 		dataDefinitionResource.deleteDataDefinition(dataDefinition1.getId());
 
 		dataDefinitionResource.deleteDataDefinition(dataDefinition2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetDataDefinitionByContentTypeContentTypePage_getExpectedActions(
-				String contentType)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -340,23 +325,9 @@ public abstract class BaseDataDefinitionResourceTestCase {
 		testGetDataDefinitionByContentTypeContentTypePageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, dataDefinition1, dataDefinition2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					dataDefinition1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetDataDefinitionByContentTypeContentTypePageWithSortDouble()
-		throws Exception {
-
-		testGetDataDefinitionByContentTypeContentTypePageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, dataDefinition1, dataDefinition2) -> {
-				BeanTestUtil.setProperty(
-					dataDefinition1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					dataDefinition2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -367,9 +338,9 @@ public abstract class BaseDataDefinitionResourceTestCase {
 		testGetDataDefinitionByContentTypeContentTypePageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, dataDefinition1, dataDefinition2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					dataDefinition1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					dataDefinition2, entityField.getName(), 1);
 			});
 	}
@@ -385,27 +356,27 @@ public abstract class BaseDataDefinitionResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataDefinition1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataDefinition2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataDefinition1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataDefinition2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -413,12 +384,12 @@ public abstract class BaseDataDefinitionResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataDefinition1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataDefinition2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -564,7 +535,7 @@ public abstract class BaseDataDefinitionResourceTestCase {
 	@Test
 	public void testGraphQLDeleteDataDefinition() throws Exception {
 		DataDefinition dataDefinition =
-			testGraphQLDeleteDataDefinition_addDataDefinition();
+			testGraphQLDataDefinition_addDataDefinition();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -577,6 +548,7 @@ public abstract class BaseDataDefinitionResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteDataDefinition"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -590,12 +562,6 @@ public abstract class BaseDataDefinitionResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected DataDefinition testGraphQLDeleteDataDefinition_addDataDefinition()
-		throws Exception {
-
-		return testGraphQLDataDefinition_addDataDefinition();
 	}
 
 	@Test
@@ -621,7 +587,7 @@ public abstract class BaseDataDefinitionResourceTestCase {
 	@Test
 	public void testGraphQLGetDataDefinition() throws Exception {
 		DataDefinition dataDefinition =
-			testGraphQLGetDataDefinition_addDataDefinition();
+			testGraphQLDataDefinition_addDataDefinition();
 
 		Assert.assertTrue(
 			equals(
@@ -664,10 +630,36 @@ public abstract class BaseDataDefinitionResourceTestCase {
 				"Object/code"));
 	}
 
-	protected DataDefinition testGraphQLGetDataDefinition_addDataDefinition()
+	@Test
+	public void testPatchDataDefinition() throws Exception {
+		DataDefinition postDataDefinition =
+			testPatchDataDefinition_addDataDefinition();
+
+		DataDefinition randomPatchDataDefinition = randomPatchDataDefinition();
+
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		DataDefinition patchDataDefinition =
+			dataDefinitionResource.patchDataDefinition(
+				postDataDefinition.getId(), randomPatchDataDefinition);
+
+		DataDefinition expectedPatchDataDefinition = postDataDefinition.clone();
+
+		_beanUtilsBean.copyProperties(
+			expectedPatchDataDefinition, randomPatchDataDefinition);
+
+		DataDefinition getDataDefinition =
+			dataDefinitionResource.getDataDefinition(
+				patchDataDefinition.getId());
+
+		assertEquals(expectedPatchDataDefinition, getDataDefinition);
+		assertValid(getDataDefinition);
+	}
+
+	protected DataDefinition testPatchDataDefinition_addDataDefinition()
 		throws Exception {
 
-		return testGraphQLDataDefinition_addDataDefinition();
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
 
 	@Test
@@ -801,10 +793,7 @@ public abstract class BaseDataDefinitionResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantDataDefinition),
 				(List<DataDefinition>)page.getItems());
-			assertValid(
-				page,
-				testGetSiteDataDefinitionByContentTypeContentTypePage_getExpectedActions(
-					irrelevantSiteId, irrelevantContentType));
+			assertValid(page);
 		}
 
 		DataDefinition dataDefinition1 =
@@ -825,24 +814,11 @@ public abstract class BaseDataDefinitionResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(dataDefinition1, dataDefinition2),
 			(List<DataDefinition>)page.getItems());
-		assertValid(
-			page,
-			testGetSiteDataDefinitionByContentTypeContentTypePage_getExpectedActions(
-				siteId, contentType));
+		assertValid(page);
 
 		dataDefinitionResource.deleteDataDefinition(dataDefinition1.getId());
 
 		dataDefinitionResource.deleteDataDefinition(dataDefinition2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetSiteDataDefinitionByContentTypeContentTypePage_getExpectedActions(
-				Long siteId, String contentType)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -907,23 +883,9 @@ public abstract class BaseDataDefinitionResourceTestCase {
 		testGetSiteDataDefinitionByContentTypeContentTypePageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, dataDefinition1, dataDefinition2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					dataDefinition1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetSiteDataDefinitionByContentTypeContentTypePageWithSortDouble()
-		throws Exception {
-
-		testGetSiteDataDefinitionByContentTypeContentTypePageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, dataDefinition1, dataDefinition2) -> {
-				BeanTestUtil.setProperty(
-					dataDefinition1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					dataDefinition2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -934,9 +896,9 @@ public abstract class BaseDataDefinitionResourceTestCase {
 		testGetSiteDataDefinitionByContentTypeContentTypePageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, dataDefinition1, dataDefinition2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					dataDefinition1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					dataDefinition2, entityField.getName(), 1);
 			});
 	}
@@ -952,27 +914,27 @@ public abstract class BaseDataDefinitionResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataDefinition1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataDefinition2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataDefinition1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataDefinition2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -980,12 +942,12 @@ public abstract class BaseDataDefinitionResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataDefinition1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						dataDefinition2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1121,21 +1083,12 @@ public abstract class BaseDataDefinitionResourceTestCase {
 		DataDefinition getDataDefinition =
 			dataDefinitionResource.
 				getSiteDataDefinitionByContentTypeByDataDefinitionKey(
-					testGetSiteDataDefinitionByContentTypeByDataDefinitionKey_getSiteId(
-						postDataDefinition),
+					postDataDefinition.getSiteId(),
 					postDataDefinition.getContentType(),
 					postDataDefinition.getDataDefinitionKey());
 
 		assertEquals(postDataDefinition, getDataDefinition);
 		assertValid(getDataDefinition);
-	}
-
-	protected Long
-			testGetSiteDataDefinitionByContentTypeByDataDefinitionKey_getSiteId(
-				DataDefinition dataDefinition)
-		throws Exception {
-
-		return dataDefinition.getSiteId();
 	}
 
 	protected DataDefinition
@@ -1151,7 +1104,7 @@ public abstract class BaseDataDefinitionResourceTestCase {
 		throws Exception {
 
 		DataDefinition dataDefinition =
-			testGraphQLGetSiteDataDefinitionByContentTypeByDataDefinitionKey_addDataDefinition();
+			testGraphQLDataDefinition_addDataDefinition();
 
 		Assert.assertTrue(
 			equals(
@@ -1165,16 +1118,13 @@ public abstract class BaseDataDefinitionResourceTestCase {
 									{
 										put(
 											"siteKey",
-											"\"" +
-												testGraphQLGetSiteDataDefinitionByContentTypeByDataDefinitionKey_getSiteId(
-													dataDefinition) + "\"");
-
+											"\"" + dataDefinition.getSiteId() +
+												"\"");
 										put(
 											"contentType",
 											"\"" +
 												dataDefinition.
 													getContentType() + "\"");
-
 										put(
 											"dataDefinitionKey",
 											"\"" +
@@ -1186,14 +1136,6 @@ public abstract class BaseDataDefinitionResourceTestCase {
 								getGraphQLFields())),
 						"JSONObject/data",
 						"Object/dataDefinitionByContentTypeByDataDefinitionKey"))));
-	}
-
-	protected Long
-			testGraphQLGetSiteDataDefinitionByContentTypeByDataDefinitionKey_getSiteId(
-				DataDefinition dataDefinition)
-		throws Exception {
-
-		return dataDefinition.getSiteId();
 	}
 
 	@Test
@@ -1225,13 +1167,6 @@ public abstract class BaseDataDefinitionResourceTestCase {
 						getGraphQLFields())),
 				"JSONArray/errors", "Object/0", "JSONObject/extensions",
 				"Object/code"));
-	}
-
-	protected DataDefinition
-			testGraphQLGetSiteDataDefinitionByContentTypeByDataDefinitionKey_addDataDefinition()
-		throws Exception {
-
-		return testGraphQLDataDefinition_addDataDefinition();
 	}
 
 	protected DataDefinition testGraphQLDataDefinition_addDataDefinition()
@@ -1442,13 +1377,6 @@ public abstract class BaseDataDefinitionResourceTestCase {
 	}
 
 	protected void assertValid(Page<DataDefinition> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<DataDefinition> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<DataDefinition> dataDefinitions = page.getItems();
@@ -1463,20 +1391,6 @@ public abstract class BaseDataDefinitionResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1755,16 +1669,14 @@ public abstract class BaseDataDefinitionResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1781,10 +1693,6 @@ public abstract class BaseDataDefinitionResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1794,18 +1702,18 @@ public abstract class BaseDataDefinitionResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -2043,115 +1951,6 @@ public abstract class BaseDataDefinitionResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -2226,6 +2025,18 @@ public abstract class BaseDataDefinitionResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseDataDefinitionResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

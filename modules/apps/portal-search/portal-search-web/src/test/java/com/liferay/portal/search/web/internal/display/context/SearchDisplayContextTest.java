@@ -17,6 +17,7 @@ package com.liferay.portal.search.web.internal.display.context;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Company;
@@ -26,7 +27,6 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.upgrade.MockPortletPreferences;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -90,13 +90,6 @@ public class SearchDisplayContextTest {
 		assertSearchSkippedAndNullResults(
 			null,
 			new ConfigurationRenderRequest(renderRequest, portletPreferences));
-	}
-
-	@Test
-	public void testNoScopeParameter() throws Exception {
-		portletPreferences.setValue("searchScope", "let-the-user-choose");
-
-		assertSearchKeywords(StringPool.DOUBLE_SPACE, StringPool.BLANK);
 	}
 
 	@Test
@@ -234,6 +227,10 @@ public class SearchDisplayContextTest {
 
 		PropsTestUtil.setProps(Collections.emptyMap());
 
+		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
+
+		jsonFactoryUtil.setJSONFactory(createJSONFactory());
+
 		return new SearchDisplayContext(
 			renderRequest, portletPreferences,
 			createPortal(themeDisplay, renderRequest), Mockito.mock(Html.class),
@@ -347,8 +344,8 @@ public class SearchDisplayContextTest {
 	@Mock
 	protected HttpServletRequest httpServletRequest;
 
-	protected PortletPreferences portletPreferences =
-		new MockPortletPreferences();
+	@Mock
+	protected PortletPreferences portletPreferences;
 
 	@Mock
 	protected PortletURLFactory portletURLFactory;

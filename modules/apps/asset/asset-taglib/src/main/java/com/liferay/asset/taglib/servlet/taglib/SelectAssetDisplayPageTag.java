@@ -45,13 +45,8 @@ public class SelectAssetDisplayPageTag extends IncludeTag {
 		return _groupId;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 * @return
-	 */
-	@Deprecated
-	public boolean isNew() {
-		return _new;
+	public long getParentClassPK() {
+		return _parentClassPK;
 	}
 
 	public boolean isShowPortletLayouts() {
@@ -82,20 +77,15 @@ public class SelectAssetDisplayPageTag extends IncludeTag {
 		_groupId = groupId;
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 * @param newValue
-	 */
-	@Deprecated
-	public void setNew(boolean newValue) {
-		_new = newValue;
-	}
-
 	@Override
 	public void setPageContext(PageContext pageContext) {
 		super.setPageContext(pageContext);
 
-		servletContext = ServletContextUtil.getServletContext();
+		setServletContext(ServletContextUtil.getServletContext());
+	}
+
+	public void setParentClassPK(long parentClassPK) {
+		_parentClassPK = parentClassPK;
 	}
 
 	public void setShowPortletLayouts(boolean showPortletLayouts) {
@@ -115,7 +105,7 @@ public class SelectAssetDisplayPageTag extends IncludeTag {
 		_classTypeId = 0;
 		_eventName = null;
 		_groupId = 0;
-		_new = false;
+		_parentClassPK = 0;
 		_showPortletLayouts = false;
 		_showViewInContextLink = true;
 	}
@@ -142,8 +132,8 @@ public class SelectAssetDisplayPageTag extends IncludeTag {
 			"liferay-asset:select-asset-display-page:groupId",
 			String.valueOf(_groupId));
 		httpServletRequest.setAttribute(
-			"liferay-asset:select-asset-display-page:new",
-			String.valueOf(_new));
+			"liferay-asset:select-asset-display-page:parentClassPK",
+			String.valueOf(_parentClassPK));
 		httpServletRequest.setAttribute(
 			"liferay-asset:select-asset-display-page:showPortletLayouts",
 			String.valueOf(_showPortletLayouts));
@@ -159,7 +149,7 @@ public class SelectAssetDisplayPageTag extends IncludeTag {
 	private long _classTypeId;
 	private String _eventName;
 	private long _groupId;
-	private boolean _new;
+	private long _parentClassPK;
 	private boolean _showPortletLayouts;
 	private boolean _showViewInContextLink = true;
 

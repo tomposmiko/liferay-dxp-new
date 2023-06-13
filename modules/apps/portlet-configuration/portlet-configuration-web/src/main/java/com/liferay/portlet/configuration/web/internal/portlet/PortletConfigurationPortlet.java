@@ -15,8 +15,6 @@
 package com.liferay.portlet.configuration.web.internal.portlet;
 
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -33,7 +31,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletConfig;
 import com.liferay.portal.kernel.portlet.LiferayPortletConfigWrapper;
 import com.liferay.portal.kernel.portlet.PortletConfigFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletConfigurationLayoutUtil;
-import com.liferay.portal.kernel.portlet.PortletConfigurationListener;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletLayoutListener;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
@@ -103,8 +100,6 @@ import javax.portlet.ResourceResponse;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -584,13 +579,6 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 
 			portletPreferences.store();
 		}
-	}
-
-	@Activate
-	protected void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, PortletConfigurationListener.class,
-			"javax.portlet.name");
 	}
 
 	protected void checkEditPermissionsJSP(PortletRequest request)
@@ -1077,14 +1065,6 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 		}
 
 		portletPreferences.store();
-
-		PortletConfigurationListener portletConfigurationListener =
-			_serviceTrackerMap.getService(portlet.getPortletName());
-
-		if (portletConfigurationListener != null) {
-			portletConfigurationListener.onUpdateScope(
-				portlet.getPortletId(), portletPreferences);
-		}
 	}
 
 	private void _handleException(
@@ -1120,9 +1100,6 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 
 	@Reference
 	private RoleTypeContributorProvider _roleTypeContributorProvider;
-
-	private ServiceTrackerMap<String, PortletConfigurationListener>
-		_serviceTrackerMap;
 
 	private class PortletConfigurationPortletPortletConfig
 		extends LiferayPortletConfigWrapper {

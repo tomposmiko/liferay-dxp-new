@@ -1,39 +1,63 @@
 definition {
 
 	macro _convertNameToKey {
-		Variables.assertDefined(parameterList = ${name});
+		Variables.assertDefined(parameterList = "${name}");
 
-		var key = StringUtil.replace(${name}, " ", "-");
+		var key = StringUtil.replace("${name}", " ", "-");
+		var key = StringUtil.lowerCase("${key}");
 
-		var key = StringUtil.lowerCase(${key});
+		return "${key}";
+	}
 
-		return ${key};
+	macro goToTranslation {
+		PagesAdmin.openPageEllipsisMenu(pageName = "${pageName}");
+
+		MenuItem.click(menuItem = "Translate");
 	}
 
 	macro openEditContentPage {
 		if (!(isSet(siteURLKey))) {
-			var siteURLKey = ContentPagesNavigator._convertNameToKey(name = ${siteName});
+			var siteURLKey = ContentPagesNavigator._convertNameToKey(name = "${siteName}");
 		}
 
 		if (!(isSet(pageFriendlyUrl))) {
-			var pageFriendlyUrl = ContentPagesNavigator._convertNameToKey(name = ${pageName});
+			var pageFriendlyUrl = ContentPagesNavigator._convertNameToKey(name = "${pageName}");
 		}
 
-		Navigator.openWithAppendToBaseURL(urlAppend = "web/${siteURLKey}/${pageFriendlyUrl}?p_l_mode=edit");
+		if ("${privateLayout}" == "true") {
+			var type = "group";
+		}
+		else {
+			var type = "web";
+		}
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "${type}/${siteURLKey}/${pageFriendlyUrl}?p_l_mode=edit");
 
 		PageEditor.assertFragmentSidebarLoaded();
 	}
 
 	macro openViewContentPage {
 		if (!(isSet(siteURLKey))) {
-			var siteURLKey = ContentPagesNavigator._convertNameToKey(name = ${siteName});
+			var siteURLKey = ContentPagesNavigator._convertNameToKey(name = "${siteName}");
 		}
 
 		if (!(isSet(pageFriendlyUrl))) {
-			var pageFriendlyUrl = ContentPagesNavigator._convertNameToKey(name = ${pageName});
+			var pageFriendlyUrl = ContentPagesNavigator._convertNameToKey(name = "${pageName}");
 		}
 
-		Navigator.openWithAppendToBaseURL(urlAppend = "web/${siteURLKey}/${pageFriendlyUrl}");
+		if ("${privateLayout}" == "true") {
+			var type = "group";
+		}
+		else {
+			var type = "web";
+		}
+
+		if (isSet(locale)) {
+			Navigator.openWithAppendToBaseURL(urlAppend = "${locale}/${type}/${siteURLKey}/${pageFriendlyUrl}");
+		}
+		else {
+			Navigator.openWithAppendToBaseURL(urlAppend = "${type}/${siteURLKey}/${pageFriendlyUrl}");
+		}
 	}
 
 }

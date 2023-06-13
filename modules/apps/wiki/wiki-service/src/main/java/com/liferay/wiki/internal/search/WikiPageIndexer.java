@@ -134,6 +134,10 @@ public class WikiPageIndexer
 			page = _wikiPageLocalService.getPage(classPK);
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return;
 		}
 
@@ -254,7 +258,8 @@ public class WikiPageIndexer
 		catch (WikiFormatException wikiFormatException) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
-					"Unable to get wiki engine for " + wikiPage.getFormat());
+					"Unable to get wiki engine for " + wikiPage.getFormat(),
+					wikiFormatException);
 			}
 		}
 
@@ -280,9 +285,6 @@ public class WikiPageIndexer
 				LocalizationUtil.getLocalizedName(Field.TITLE, languageId),
 				title);
 		}
-
-		document.addNumber(
-			"versionCount", GetterUtil.getDouble(wikiPage.getVersion()));
 
 		return document;
 	}
@@ -361,7 +363,7 @@ public class WikiPageIndexer
 		}
 	}
 
-	protected void reindexNodes(final long companyId) throws PortalException {
+	protected void reindexNodes(long companyId) throws PortalException {
 		ActionableDynamicQuery actionableDynamicQuery =
 			_wikiNodeLocalService.getActionableDynamicQuery();
 
@@ -373,10 +375,10 @@ public class WikiPageIndexer
 		actionableDynamicQuery.performActions();
 	}
 
-	protected void reindexPages(long companyId, long groupId, final long nodeId)
+	protected void reindexPages(long companyId, long groupId, long nodeId)
 		throws PortalException {
 
-		final IndexableActionableDynamicQuery indexableActionableDynamicQuery =
+		IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			_wikiPageLocalService.getIndexableActionableDynamicQuery();
 
 		indexableActionableDynamicQuery.setAddCriteriaMethod(

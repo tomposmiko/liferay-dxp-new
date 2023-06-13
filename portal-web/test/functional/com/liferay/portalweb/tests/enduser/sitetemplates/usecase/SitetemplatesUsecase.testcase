@@ -17,7 +17,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -41,7 +41,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-87055."
-	@priority = 3
+	@priority = "3"
 	test AddPageTemplatesWithDuplicateNameViaSiteTemplate {
 		SiteTemplates.addCP(
 			siteTemplateActive = "Yes",
@@ -95,7 +95,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-51432 and LPS-95113."
-	@priority = 4
+	@priority = "4"
 	test AdminCanNotAddASubpageOfAChildPageLinkedToSiteTemplatePage {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SitetemplatesUsecase#AdminCanNotAddASubpageOfAChildPageLinkedToSiteTemplatePage";
@@ -134,7 +134,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.togglePrivacy(privacy = "Public Pages");
+		PagesAdmin.togglePrivacy(privacy = "Public Pages");
 
 		Page.viewNoDeletePagesAssociatedWithSiteTemplate(
 			page = "Site Child Page Name",
@@ -158,20 +158,20 @@ definition {
 
 		Page.viewNoPG(pageName = "Site Child Page Name");
 
-		Page.viewNoPage(
+		PagesAdmin.viewPageItemNotPresent(
 			pageName = "Site Page Name",
 			privacy = "Public Pages");
 
-		Page.viewNoPage(
+		PagesAdmin.viewPageItemNotPresent(
 			pageName = "Site Child Page Name",
 			privacy = "Public Pages");
 
 		AssertConsoleTextNotPresent(value1 = "java.lang.NullPointerException");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test EditSiteTemplateGuestPermissions {
-		SiteTemplates.addCP(siteTemplateName = ${siteTemplateName});
+		SiteTemplates.addCP(siteTemplateName = "${siteTemplateName}");
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
@@ -186,7 +186,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Permissions",
 			pageName = "Home");
 
@@ -207,7 +207,7 @@ definition {
 			roleTitle = "Guest");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ImportOldSchemaVerion {
 		property test.name.skip.portal.instance = "SitetemplatesUsecase#ImportOldSchemaVerion";
 
@@ -217,15 +217,16 @@ definition {
 			portlet = "Site Templates");
 
 		LAR.importPortlet(
-			failureExpected = "true",
+			compressedFile = "true",
+			importSchemaVersionMismatching = "true",
 			larFileName = "class-site-template-7.0.lar",
 			uploadFrom = "dependencies");
 	}
 
 	@description = "This is a use case for LPS-81629"
-	@priority = 4
+	@priority = "4"
 	test PortletPreferencesPersistWithSiteTemplateWhenSamePortletAddedOnSecondPage {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		SiteTemplates.addCP(siteTemplateName = "Site Template Name");
 
@@ -235,12 +236,12 @@ definition {
 
 		SiteTemplatesNavigator.gotoSiteTemplatesPage(
 			pageName = "Page1 Name",
-			siteName = ${siteName},
+			siteName = "${siteName}",
 			siteTemplateName = "Site Template Name");
 
 		Portlet.addPG(
 			defaultURL = "false",
-			portletName = "Hello World");
+			portletName = "IFrame");
 
 		SiteTemplates.addSitePageViaSiteTemplateCP(
 			pageName = "Page2 Name",
@@ -259,7 +260,7 @@ definition {
 			pageName = "Page1 Name",
 			siteName = "Site Name");
 
-		PermissionsInline.gotoConfigurationPG(portletName = "Hello World");
+		PermissionsInline.gotoConfigurationPG(portletName = "IFrame");
 
 		Role.removePermissionPG(
 			permissionDefinitionKey = "CONTENT_PERMISSIONS_VIEW_CHECKBOX",
@@ -273,7 +274,7 @@ definition {
 			portlet = "Site Templates");
 
 		SiteTemplates.gotoViewPages(
-			siteName = ${siteName},
+			siteName = "${siteName}",
 			siteTemplateName = "Site Template Name");
 
 		AssertClick(
@@ -282,13 +283,13 @@ definition {
 
 		Portlet.addPG(
 			defaultURL = "false",
-			portletName = "Hello World");
+			portletName = "IFrame");
 
 		Navigator.gotoSitePage(
 			pageName = "Page1 Name",
 			siteName = "Site Name");
 
-		PermissionsInline.gotoConfigurationPG(portletName = "Hello World");
+		PermissionsInline.gotoConfigurationPG(portletName = "IFrame");
 
 		Role.viewPermissionPG(
 			permissionDefinitionKey = "CONTENT_PERMISSIONS_VIEW_CHECKBOX",
@@ -296,7 +297,7 @@ definition {
 			roleTitle = "Guest");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test SiteAdminCannotDeletePagesThatWereCreatedBySiteTemplates {
 		SiteTemplates.addCP(siteTemplateName = "Site Template Name");
 
@@ -326,11 +327,12 @@ definition {
 			pageName = "Public Pages");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test SitesDynamicTemplateInheritance {
+		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property portal.acceptance = "true";
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		SiteTemplates.addCP(siteTemplateName = "Site Template Name");
 
@@ -340,10 +342,10 @@ definition {
 			portlet = "Site Templates");
 
 		SiteTemplates.gotoViewPages(
-			siteName = ${siteName},
+			siteName = "${siteName}",
 			siteTemplateName = "Site Template Name");
 
-		ContentPages.clickPencil();
+		ContentPages.gotoPageEditor();
 
 		PageEditor.addWidget(portletName = "Message Boards");
 
@@ -355,32 +357,18 @@ definition {
 			userLastName = "userln",
 			userScreenName = "usersn");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Users and Organizations");
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
 
-		User.editPasswordCP(
-			userEmailAddress = "userea@liferay.com",
-			userScreenName = "usersn");
+		JSONUser.addUserToSite(
+			groupName = "Guest",
+			userEmailAddress = "userea@liferay.com");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Users and Organizations");
-
-		User.editUserSiteCP(
-			siteName = ${siteName},
-			userScreenName = "usersn");
-
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Users and Organizations");
-
-		User.assignRegularRoleCP(
+		JSONRole.assignRoleToUser(
 			roleTitle = "Administrator",
-			userScreenName = "usersn");
+			userEmailAddress = "userea@liferay.com");
 
 		User.firstLoginPG(
 			password = "test",
@@ -396,21 +384,16 @@ definition {
 			siteTemplateName = "Site Template Name",
 			userGroupName = "UG UserGroup Name");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "User Groups");
-
 		User.firstLoginPG(
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 	}
 
-	@priority = 3
+	@priority = "3"
 	test SitesTemplateResourceInheritance {
 		property portal.release = "false";
 
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		SiteTemplates.addCP(siteTemplateName = "Site Template Name");
 
@@ -420,7 +403,7 @@ definition {
 
 		SiteTemplatesNavigator.gotoSiteTemplatesPage(
 			pageName = "Test Page Name",
-			siteName = ${siteName},
+			siteName = "${siteName}",
 			siteTemplateName = "Site Template Name");
 
 		Portlet.addPG(portletName = "Documents and Media");
@@ -429,7 +412,7 @@ definition {
 
 		SiteTemplatesNavigator.gotoSiteTemplatesPage(
 			pageName = "Test Page Name",
-			siteName = ${siteName},
+			siteName = "${siteName}",
 			siteTemplateName = "Site Template Name");
 
 		DMDocument.addPG(
@@ -480,13 +463,14 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-86487."
-	@priority = 4
+	@priority = "4"
 	test SiteTemplatePageLinkInWebContentRedirectCorrectly {
-		property portal.acceptance = "quarantine";
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SitetemplatesUsecase#SiteTemplatePageLinkInWebContentRedirectCorrectly";
 
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		SiteTemplates.addCP(siteTemplateName = "Template Site");
 
@@ -502,12 +486,12 @@ definition {
 
 		SiteTemplatesNavigator.gotoSiteTemplatesPage(
 			pageName = "Page2 Name",
-			siteName = ${siteName},
+			siteName = "${siteName}",
 			siteTemplateName = "Template Site");
 
 		var page2URL = Navigator.getCurrentURL();
 
-		var entryExternalURL = StringUtil.replace(${page2URL}, "http://", "");
+		var entryExternalURL = StringUtil.replace("${page2URL}", "http://", "");
 
 		ProductMenu.gotoPortlet(
 			category = "Content & Data",
@@ -518,8 +502,8 @@ definition {
 		PortletEntry.inputTitle(title = "Web Content Title");
 
 		CKEditor.addEntryExternalURL(
-			displayText = ${page2URL},
-			entryExternalURL = ${entryExternalURL},
+			displayText = "${page2URL}",
+			entryExternalURL = "${entryExternalURL}",
 			fieldLabel = "content");
 
 		PortletEntry.publish();
@@ -554,13 +538,13 @@ definition {
 
 		Click(locator1 = "WCD#WEB_CONTENT_LINK");
 
-		Pause(locator1 = 1000);
+		Pause(locator1 = "1000");
 
 		AssertLocation(value1 = "${portalURL}/web/site-name/page2-name");
 	}
 
 	@description = "This is a use case for LPS-74081."
-	@priority = 4
+	@priority = "4"
 	test ViewImportedSitePageWithNumericFriendlyURL {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -575,15 +559,15 @@ definition {
 
 		JSONLayout.addPublicLayout(
 			groupName = "Export",
-			layoutName = 1);
+			layoutName = "1");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
-			pageName = 1);
+			pageName = "1");
 
 		AssertTextEquals(
 			locator1 = "TextInput#FRIENDLY_URL",
@@ -591,15 +575,15 @@ definition {
 
 		JSONLayout.addPublicLayout(
 			groupName = "Export",
-			layoutName = 2);
+			layoutName = "2");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
-			pageName = 2);
+			pageName = "2");
 
 		AssertTextEquals(
 			locator1 = "TextInput#FRIENDLY_URL",
@@ -613,7 +597,7 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.gotoPageMenuItem(
+		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
 			pageName = "Hello");
 
@@ -641,23 +625,20 @@ definition {
 			siteType = "Template");
 
 		LAR.importSiteCP(
-			larFileName = ${larFileName},
+			larFileName = "${larFileName}",
 			siteName = "New Site");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			portlet = "Pages");
 
-		Page.viewPagesOrder(
-			depth = 2,
-			pageName1 = "Home",
-			pageName2 = 1,
-			pageName3 = 2,
-			pageName4 = "Hello");
+		PagesAdmin.viewPagesOrder(
+			depth = "2",
+			pageNameList = "Home,1,2,Hello");
 	}
 
 	@description = "This is a use case for LPS-107677."
-	@priority = 3
+	@priority = "3"
 	test ViewImportedSitePageWithoutInfoMessage {
 		SiteTemplates.addCP(
 			siteTemplateActive = "Yes",
@@ -683,7 +664,8 @@ definition {
 
 		LAR.exportSiteCP(siteScopeName = "Site A");
 
-		var key_larFileName = ${larFileName};
+		var key_larFileName = "${larFileName}";
+
 		var larFileName = LAR.getLarFileName();
 
 		LAR.downloadLar();
@@ -703,7 +685,7 @@ definition {
 		JSONGroup.addGroup(groupName = "Site B");
 
 		LAR.importSiteCP(
-			larFileName = ${larFileName},
+			larFileName = "${larFileName}",
 			siteName = "Site B");
 
 		Navigator.gotoSitePage(
@@ -713,9 +695,9 @@ definition {
 		SiteTemplates.viewNoInfoMessage();
 	}
 
-	@priority = 3
+	@priority = "3"
 	test ViewInlineGuestPermissionsInSiteTemplatesViaWCD {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		SiteTemplates.addCP(siteTemplateName = "Site Template Name");
 
@@ -725,7 +707,7 @@ definition {
 
 		SiteTemplatesNavigator.gotoSiteTemplatesPage(
 			pageName = "Test Page Name",
-			siteName = ${siteName},
+			siteName = "${siteName}",
 			siteTemplateName = "Site Template Name");
 
 		Portlet.addPG(
@@ -734,7 +716,7 @@ definition {
 
 		SiteTemplatesNavigator.gotoSiteTemplatesPage(
 			pageName = "Test Page Name",
-			siteName = ${siteName},
+			siteName = "${siteName}",
 			siteTemplateName = "Site Template Name");
 
 		PermissionsInline.gotoConfigurationPG(
@@ -748,9 +730,9 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-92663."
-	@priority = 4
+	@priority = "4"
 	test ViewNavigationMenuCopyFromSitesTemplate {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		SiteTemplates.addCP(
 			siteTemplateActive = "Yes",
@@ -766,7 +748,7 @@ definition {
 			pageName = "Page2 Name",
 			siteTemplateName = "Site Template Name");
 
-		NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = ${siteTemplateID});
+		NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "${siteTemplateID}");
 
 		NavigationMenusAdmin.addMenu(menuName = "Test Navigation Menu Name");
 
@@ -843,9 +825,9 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-113145."
-	@priority = 3
+	@priority = "3"
 	test ViewPortletConfigurationOfGlobalTemplatesPageCopyFromSitesTemplate {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		SiteTemplates.addCP(
 			siteTemplateActive = "Yes",

@@ -16,10 +16,12 @@ package com.liferay.fragment.contributor;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.fragment.model.FragmentComposition;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoaderUtil;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -32,6 +34,16 @@ public interface FragmentCollectionContributor {
 
 	public String getFragmentCollectionKey();
 
+	public default List<FragmentComposition> getFragmentCompositions() {
+		return Collections.emptyList();
+	}
+
+	public default List<FragmentComposition> getFragmentCompositions(
+		Locale locale) {
+
+		return Collections.emptyList();
+	}
+
 	public List<FragmentEntry> getFragmentEntries();
 
 	public List<FragmentEntry> getFragmentEntries(int type);
@@ -40,14 +52,6 @@ public interface FragmentCollectionContributor {
 		int type, Locale locale) {
 
 		return getFragmentEntries(type);
-	}
-
-	public List<FragmentEntry> getFragmentEntries(int[] types);
-
-	public default List<FragmentEntry> getFragmentEntries(
-		int[] types, Locale locale) {
-
-		return getFragmentEntries(types);
 	}
 
 	public default List<FragmentEntry> getFragmentEntries(Locale locale) {

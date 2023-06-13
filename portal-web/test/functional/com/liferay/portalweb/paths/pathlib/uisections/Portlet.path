@@ -27,7 +27,7 @@
 </tr>
 <tr>
 	<td>CONFIGURATION_CHECKBOX</td>
-	<td>//label[contains(.,'${key_fieldName}')]/input[contains(@id,'PortletConfiguration')]</td>
+	<td>//label[text()[normalize-space()='${key_fieldName}']]/input[contains(@id,'PortletConfiguration')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -76,6 +76,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>HEADER_INSIDE_PAGE_COLUMN</td>
+	<td>//div[@id='main-content']//div[contains(@id,'column-${key_pageColumnNumber}')]//header[contains(@class,'portlet-topper')]//span[.='${key_portletName}']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ICON_PLUS_SIGN</td>
 	<td>//header[div/span[.='${key_portletName}']]//*[@data-qa-id='addButton']//a/span</td>
 	<td></td>
@@ -86,8 +91,18 @@
 	<td></td>
 </tr>
 <tr>
+	<td>MESSAGE_INFO</td>
+	<td>//div[contains(@class,'portlet-msg-info')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>MODAL_TITLE</td>
 	<td>//div[contains(@class,'modal-content')]//*[@class='modal-title']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NESTED_APPLICATION_COLUMN</td>
+	<td>//div[contains(@id,'NestedPortletsPortlet')]//div[contains(@class,'portlet-dropzone') and contains(@id,'column-${key_nestedColumnNumber}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -111,6 +126,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PORTLET_TITLE_INSIDE_NESTED_APPLICATION_COLUMN</td>
+	<td>//section[contains(@id,'NestedPortlets')]//div[contains(@id,'column-${key_nestedColumnNumber}')]//h2[contains(@class,'portlet-title') and contains(.,'${key_portletName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PORTLET_TITLE_INSIDE_PAGE_COLUMN</td>
+	<td>//div[@id='main-content']//div[contains(@id,'column-${key_pageColumnNumber}')]//h2[contains(@class,'portlet-title') and (.='${key_portletName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SEARCH_FIELD</td>
 	<td>//div[*[normalize-space()='${key_portletName}']]//input[contains(@name,'keywords')]</td>
 	<td></td>
@@ -127,12 +152,17 @@
 </tr>
 <tr>
 	<td>SPECIFIC_BORDERLESS_ELLIPSIS_ICON</td>
-	<td>//header[@class='portlet-topper' and contains(.,'${key_portletName}')]//div[contains(@class,'portlet-options')]/a</td>
+	<td>//header[contains(@class,'portlet-topper') and contains(.,'${key_portletName}')]//div[contains(@class,'portlet-options')]/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SPECIFIC_ELLIPSIS_ICON</td>
 	<td>//div[@id='main-content']//header[contains(.,'${key_portletName}')]//menu/div[contains(@class,'portlet-options')]/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SPECIFIC_FRAGMENTS_AND_WIDGETS</td>
+	<td>//div[contains(@id,'fragment')]//section[contains(@id,'${key_portletName}')]</td>
 	<td></td>
 </tr>
 <tr>

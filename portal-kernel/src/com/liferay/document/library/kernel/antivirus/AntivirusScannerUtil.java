@@ -14,6 +14,8 @@
 
 package com.liferay.document.library.kernel.antivirus;
 
+import com.liferay.portal.kernel.util.ServiceProxyFactory;
+
 import java.io.File;
 
 /**
@@ -22,44 +24,25 @@ import java.io.File;
  */
 public class AntivirusScannerUtil {
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public static AntivirusScanner getAntivirusScanner() {
-		return _antivirusScanner;
-	}
-
 	public static boolean isActive() {
-		AntivirusScanner antivirusScanner = getAntivirusScanner();
-
-		if (antivirusScanner == null) {
-			return false;
-		}
-
-		return antivirusScanner.isActive();
+		return _antivirusScanner.isActive();
 	}
 
 	public static void scan(byte[] bytes) throws AntivirusScannerException {
 		if (isActive()) {
-			getAntivirusScanner().scan(bytes);
+			_antivirusScanner.scan(bytes);
 		}
 	}
 
 	public static void scan(File file) throws AntivirusScannerException {
 		if (isActive()) {
-			getAntivirusScanner().scan(file);
+			_antivirusScanner.scan(file);
 		}
 	}
 
-	/**
-	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
-	 */
-	@Deprecated
-	public void setAntivirusScanner(AntivirusScanner antivirusScanner) {
-		_antivirusScanner = antivirusScanner;
-	}
-
-	private static AntivirusScanner _antivirusScanner;
+	private static volatile AntivirusScanner _antivirusScanner =
+		ServiceProxyFactory.newServiceTrackedInstance(
+			AntivirusScanner.class, AntivirusScannerUtil.class,
+			"_antivirusScanner", false);
 
 }

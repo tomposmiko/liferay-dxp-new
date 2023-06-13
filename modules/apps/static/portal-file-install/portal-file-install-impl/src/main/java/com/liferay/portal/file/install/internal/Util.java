@@ -14,9 +14,6 @@
 
 package com.liferay.portal.file.install.internal;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -71,7 +68,7 @@ public class Util {
 			dataOutputStream.writeLong(checksum);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
+			exception.printStackTrace();
 		}
 	}
 
@@ -80,7 +77,5 @@ public class Util {
 	}
 
 	private static final String _CHECKSUM_SUFFIX = ".checksum";
-
-	private static final Log _log = LogFactoryUtil.getLog(Util.class);
 
 }

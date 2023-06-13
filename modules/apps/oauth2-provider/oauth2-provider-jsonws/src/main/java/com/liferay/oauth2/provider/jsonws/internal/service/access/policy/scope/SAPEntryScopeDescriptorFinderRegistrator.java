@@ -22,8 +22,11 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.service.access.policy.model.SAPEntry;
 import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalService;
@@ -80,12 +83,14 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 						_buildScopeDescriptorProperties(companyId));
 				});
 
-			Dictionary<String, Object> properties = new HashMapDictionary<>();
-
-			properties.put("companyId", String.valueOf(companyId));
-			properties.put(
-				"osgi.jaxrs.name", OAuth2JSONWSConstants.APPLICATION_NAME);
-			properties.put("sap.scope.finder", Boolean.TRUE);
+			Dictionary<String, Object> properties =
+				HashMapDictionaryBuilder.<String, Object>put(
+					"companyId", String.valueOf(companyId)
+				).put(
+					"osgi.jaxrs.name", OAuth2JSONWSConstants.APPLICATION_NAME
+				).put(
+					"sap.scope.finder", Boolean.TRUE
+				).build();
 
 			_scopeFinderServiceRegistrations.compute(
 				companyId,
@@ -127,9 +132,9 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 		_sapEntryOAuth2Prefix =
 			oAuth2JSONWSConfiguration.sapEntryOAuth2Prefix();
 
-		for (long companyId : _scopeFinderServiceRegistrations.keySet()) {
-			register(companyId);
-		}
+		_companyLocalService.forEachCompanyId(
+			companyId -> register(companyId),
+			ArrayUtil.toLongArray(_scopeFinderServiceRegistrations.keySet()));
 	}
 
 	@Reference(
@@ -156,6 +161,9 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 					_buildScopeDescriptorProperties(entry.getKey()));
 			}
 			catch (IllegalStateException illegalStateException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(illegalStateException, illegalStateException);
+				}
 
 				// Concurrent unregistration from register(long)
 
@@ -220,6 +228,9 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 					_buildScopeDescriptorProperties(entry.getKey()));
 			}
 			catch (IllegalStateException illegalStateException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(illegalStateException, illegalStateException);
+				}
 
 				// Concurrent unregistration from register(long)
 
@@ -230,14 +241,11 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 	private HashMapDictionary<String, Object> _buildScopeDescriptorProperties(
 		long companyId) {
 
-		HashMapDictionary<String, Object> properties =
-			new HashMapDictionary<>();
-
-		properties.put("companyId", String.valueOf(companyId));
-		properties.put(
-			"osgi.jaxrs.name", _jaxRsApplicationNames.toArray(new String[0]));
-
-		return properties;
+		return HashMapDictionaryBuilder.<String, Object>put(
+			"companyId", String.valueOf(companyId)
+		).put(
+			"osgi.jaxrs.name", _jaxRsApplicationNames.toArray(new String[0])
+		).build();
 	}
 
 	private String _parseScope(SAPEntry sapEntry) {
@@ -254,6 +262,9 @@ public class SAPEntryScopeDescriptorFinderRegistrator {
 		SAPEntryScopeDescriptorFinderRegistrator.class);
 
 	private BundleContext _bundleContext;
+
+	@Reference
+	private CompanyLocalService _companyLocalService;
 
 	@Reference(target = "(default=true)")
 	private ScopeDescriptor _defaultScopeDescriptor;

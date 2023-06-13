@@ -16,6 +16,7 @@ package com.liferay.marketplace.app.manager.web.internal.util;
 
 import com.liferay.marketplace.app.manager.web.internal.constants.BundleConstants;
 import com.liferay.marketplace.model.App;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -30,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
 
-import javax.portlet.PortletURL;
 import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,14 +47,14 @@ public class MarketplaceAppManagerUtil {
 		AppDisplay appDisplay, Bundle bundle,
 		HttpServletRequest httpServletRequest, RenderResponse renderResponse) {
 
-		PortletURL portletURL = renderResponse.createRenderURL();
-
-		portletURL.setParameter("mvcPath", "/view.jsp");
-
 		PortalUtil.addPortletBreadcrumbEntry(
 			httpServletRequest,
 			LanguageUtil.get(httpServletRequest, "app-manager"),
-			portletURL.toString());
+			PortletURLBuilder.createRenderURL(
+				renderResponse
+			).setMVCPath(
+				"/view.jsp"
+			).buildString());
 
 		PortalUtil.addPortletBreadcrumbEntry(
 			httpServletRequest, appDisplay.getDisplayTitle(),
@@ -74,14 +74,14 @@ public class MarketplaceAppManagerUtil {
 		AppDisplay appDisplay, HttpServletRequest httpServletRequest,
 		RenderResponse renderResponse) {
 
-		PortletURL portletURL = renderResponse.createRenderURL();
-
-		portletURL.setParameter("mvcPath", "/view.jsp");
-
 		PortalUtil.addPortletBreadcrumbEntry(
 			httpServletRequest,
 			LanguageUtil.get(httpServletRequest, "app-manager"),
-			portletURL.toString());
+			PortletURLBuilder.createRenderURL(
+				renderResponse
+			).setMVCPath(
+				"/view.jsp"
+			).buildString());
 
 		PortalUtil.addPortletBreadcrumbEntry(
 			httpServletRequest, appDisplay.getDisplayTitle(), null);

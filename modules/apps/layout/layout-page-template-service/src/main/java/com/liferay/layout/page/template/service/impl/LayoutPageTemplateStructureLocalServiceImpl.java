@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -80,7 +81,7 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 
 		// Layout page template structure
 
-		User user = userLocalService.getUser(userId);
+		User user = _userLocalService.getUser(userId);
 
 		long layoutPageTemplateStructureId = counterLocalService.increment();
 
@@ -110,7 +111,7 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 				groupId, plid);
 
 		if (count > 0) {
-			_fragmentEntryLinkLocalService.updateClassedModel(plid);
+			_updateLayoutStatus(userId, plid);
 		}
 
 		// Layout page template structure rel
@@ -349,7 +350,7 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 					segmentsExperienceId, data);
 		}
 
-		_updateLayoutStatus(plid);
+		_updateLayoutStatus(PrincipalThreadLocal.getUserId(), plid);
 
 		return layoutPageTemplateStructure;
 	}
@@ -389,12 +390,12 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 		return LayoutPageTemplateEntryTypeConstants.TYPE_BASIC;
 	}
 
-	private void _updateLayoutStatus(long plid) throws PortalException {
-		Layout layout = _layoutLocalService.getLayout(plid);
+	private void _updateLayoutStatus(long userId, long plid)
+		throws PortalException {
 
-		layout.setStatus(WorkflowConstants.STATUS_DRAFT);
-
-		_layoutLocalService.updateLayout(layout);
+		_layoutLocalService.updateStatus(
+			userId, plid, WorkflowConstants.STATUS_DRAFT,
+			ServiceContextThreadLocal.getServiceContext());
 	}
 
 	@Reference
@@ -413,5 +414,8 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

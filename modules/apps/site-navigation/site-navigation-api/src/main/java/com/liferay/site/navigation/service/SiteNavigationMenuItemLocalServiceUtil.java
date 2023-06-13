@@ -137,6 +137,14 @@ public class SiteNavigationMenuItemLocalServiceUtil {
 			siteNavigationMenuItemId);
 	}
 
+	public static SiteNavigationMenuItem deleteSiteNavigationMenuItem(
+			long siteNavigationMenuItemId, boolean deleteChildren)
+		throws PortalException {
+
+		return getService().deleteSiteNavigationMenuItem(
+			siteNavigationMenuItemId, deleteChildren);
+	}
+
 	/**
 	 * Deletes the site navigation menu item from the database. Also notifies the appropriate model listeners.
 	 *
@@ -298,6 +306,13 @@ public class SiteNavigationMenuItemLocalServiceUtil {
 	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
+	}
+
+	public static List<Long> getParentSiteNavigationMenuItemIds(
+		long siteNavigationMenuId, String typeSettingsKeyword) {
+
+		return getService().getParentSiteNavigationMenuItemIds(
+			siteNavigationMenuId, typeSettingsKeyword);
 	}
 
 	/**

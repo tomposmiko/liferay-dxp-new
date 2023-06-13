@@ -110,10 +110,10 @@ public class CartCommentResourceImpl
 		throws Exception {
 
 		CommerceOrderNote commerceOrderNote =
-			_commerceOrderNoteService.upsertCommerceOrderNote(
-				GetterUtil.get(cartComment.getId(), 0L),
+			_commerceOrderNoteService.addOrUpdateCommerceOrderNote(
+				null, GetterUtil.get(cartComment.getId(), 0L),
 				commerceOrder.getCommerceOrderId(), cartComment.getContent(),
-				GetterUtil.get(cartComment.getRestricted(), false), null,
+				GetterUtil.get(cartComment.getRestricted(), false),
 				_serviceContextHelper.getServiceContext(
 					commerceOrder.getGroupId()));
 

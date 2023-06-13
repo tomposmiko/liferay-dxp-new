@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -250,77 +251,99 @@ public class MBThreadFlagModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<MBThreadFlag, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, MBThreadFlag>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<MBThreadFlag, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<MBThreadFlag, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			MBThreadFlag.class.getClassLoader(), MBThreadFlag.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", MBThreadFlag::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", MBThreadFlag::getCtCollectionId);
-		attributeGetterFunctions.put("uuid", MBThreadFlag::getUuid);
-		attributeGetterFunctions.put(
-			"threadFlagId", MBThreadFlag::getThreadFlagId);
-		attributeGetterFunctions.put("groupId", MBThreadFlag::getGroupId);
-		attributeGetterFunctions.put("companyId", MBThreadFlag::getCompanyId);
-		attributeGetterFunctions.put("userId", MBThreadFlag::getUserId);
-		attributeGetterFunctions.put("userName", MBThreadFlag::getUserName);
-		attributeGetterFunctions.put("createDate", MBThreadFlag::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", MBThreadFlag::getModifiedDate);
-		attributeGetterFunctions.put("threadId", MBThreadFlag::getThreadId);
-		attributeGetterFunctions.put(
-			"lastPublishDate", MBThreadFlag::getLastPublishDate);
+		try {
+			Constructor<MBThreadFlag> constructor =
+				(Constructor<MBThreadFlag>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<MBThreadFlag, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<MBThreadFlag, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<MBThreadFlag, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<MBThreadFlag, Object>>();
 		Map<String, BiConsumer<MBThreadFlag, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<MBThreadFlag, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", MBThreadFlag::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<MBThreadFlag, Long>)MBThreadFlag::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", MBThreadFlag::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<MBThreadFlag, Long>)MBThreadFlag::setCtCollectionId);
+		attributeGetterFunctions.put("uuid", MBThreadFlag::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<MBThreadFlag, String>)MBThreadFlag::setUuid);
+		attributeGetterFunctions.put(
+			"threadFlagId", MBThreadFlag::getThreadFlagId);
 		attributeSetterBiConsumers.put(
 			"threadFlagId",
 			(BiConsumer<MBThreadFlag, Long>)MBThreadFlag::setThreadFlagId);
+		attributeGetterFunctions.put("groupId", MBThreadFlag::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<MBThreadFlag, Long>)MBThreadFlag::setGroupId);
+		attributeGetterFunctions.put("companyId", MBThreadFlag::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<MBThreadFlag, Long>)MBThreadFlag::setCompanyId);
+		attributeGetterFunctions.put("userId", MBThreadFlag::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<MBThreadFlag, Long>)MBThreadFlag::setUserId);
+		attributeGetterFunctions.put("userName", MBThreadFlag::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<MBThreadFlag, String>)MBThreadFlag::setUserName);
+		attributeGetterFunctions.put("createDate", MBThreadFlag::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<MBThreadFlag, Date>)MBThreadFlag::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", MBThreadFlag::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<MBThreadFlag, Date>)MBThreadFlag::setModifiedDate);
+		attributeGetterFunctions.put("threadId", MBThreadFlag::getThreadId);
 		attributeSetterBiConsumers.put(
 			"threadId",
 			(BiConsumer<MBThreadFlag, Long>)MBThreadFlag::setThreadId);
+		attributeGetterFunctions.put(
+			"lastPublishDate", MBThreadFlag::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<MBThreadFlag, Date>)MBThreadFlag::setLastPublishDate);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -653,6 +676,36 @@ public class MBThreadFlagModelImpl
 	}
 
 	@Override
+	public MBThreadFlag cloneWithOriginalValues() {
+		MBThreadFlagImpl mbThreadFlagImpl = new MBThreadFlagImpl();
+
+		mbThreadFlagImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		mbThreadFlagImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		mbThreadFlagImpl.setUuid(this.<String>getColumnOriginalValue("uuid_"));
+		mbThreadFlagImpl.setThreadFlagId(
+			this.<Long>getColumnOriginalValue("threadFlagId"));
+		mbThreadFlagImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		mbThreadFlagImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		mbThreadFlagImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		mbThreadFlagImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		mbThreadFlagImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		mbThreadFlagImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		mbThreadFlagImpl.setThreadId(
+			this.<Long>getColumnOriginalValue("threadId"));
+		mbThreadFlagImpl.setLastPublishDate(
+			this.<Date>getColumnOriginalValue("lastPublishDate"));
+
+		return mbThreadFlagImpl;
+	}
+
+	@Override
 	public int compareTo(MBThreadFlag mbThreadFlag) {
 		long primaryKey = mbThreadFlag.getPrimaryKey();
 
@@ -869,9 +922,7 @@ public class MBThreadFlagModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, MBThreadFlag>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					MBThreadFlag.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

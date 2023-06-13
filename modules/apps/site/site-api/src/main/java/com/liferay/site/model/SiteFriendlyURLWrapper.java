@@ -134,6 +134,11 @@ public class SiteFriendlyURLWrapper
 		}
 	}
 
+	@Override
+	public SiteFriendlyURL cloneWithOriginalValues() {
+		return wrap(model.cloneWithOriginalValues());
+	}
+
 	/**
 	 * Returns the company ID of this site friendly url.
 	 *

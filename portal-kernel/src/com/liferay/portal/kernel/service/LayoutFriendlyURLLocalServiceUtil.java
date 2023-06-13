@@ -327,6 +327,16 @@ public class LayoutFriendlyURLLocalServiceUtil {
 	}
 
 	public static LayoutFriendlyURL getLayoutFriendlyURL(
+			long groupId, boolean privateLayout, String friendlyURL,
+			String languageId)
+		throws com.liferay.portal.kernel.exception.
+			NoSuchLayoutFriendlyURLException {
+
+		return getService().getLayoutFriendlyURL(
+			groupId, privateLayout, friendlyURL, languageId);
+	}
+
+	public static LayoutFriendlyURL getLayoutFriendlyURL(
 			long plid, String languageId)
 		throws PortalException {
 

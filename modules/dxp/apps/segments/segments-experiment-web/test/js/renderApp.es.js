@@ -114,7 +114,7 @@ export default function renderApp({
 					publishExperience,
 					runExperiment,
 				},
-				assetsPath: '',
+				imagesPath: '',
 				page: {
 					classNameId,
 					classPK,

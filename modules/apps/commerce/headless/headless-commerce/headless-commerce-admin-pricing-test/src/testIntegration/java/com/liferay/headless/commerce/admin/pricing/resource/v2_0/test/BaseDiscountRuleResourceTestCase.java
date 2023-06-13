@@ -51,9 +51,8 @@ import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.text.DateFormat;
 
@@ -62,16 +61,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
 import org.junit.After;
@@ -229,8 +230,7 @@ public abstract class BaseDiscountRuleResourceTestCase {
 
 	@Test
 	public void testGraphQLDeleteDiscountRule() throws Exception {
-		DiscountRule discountRule =
-			testGraphQLDeleteDiscountRule_addDiscountRule();
+		DiscountRule discountRule = testGraphQLDiscountRule_addDiscountRule();
 
 		Assert.assertTrue(
 			JSONUtil.getValueAsBoolean(
@@ -243,6 +243,7 @@ public abstract class BaseDiscountRuleResourceTestCase {
 							}
 						})),
 				"JSONObject/data", "Object/deleteDiscountRule"));
+
 		JSONArray errorsJSONArray = JSONUtil.getValueAsJSONArray(
 			invokeGraphQLQuery(
 				new GraphQLField(
@@ -256,12 +257,6 @@ public abstract class BaseDiscountRuleResourceTestCase {
 			"JSONArray/errors");
 
 		Assert.assertTrue(errorsJSONArray.length() > 0);
-	}
-
-	protected DiscountRule testGraphQLDeleteDiscountRule_addDiscountRule()
-		throws Exception {
-
-		return testGraphQLDiscountRule_addDiscountRule();
 	}
 
 	@Test
@@ -284,8 +279,7 @@ public abstract class BaseDiscountRuleResourceTestCase {
 
 	@Test
 	public void testGraphQLGetDiscountRule() throws Exception {
-		DiscountRule discountRule =
-			testGraphQLGetDiscountRule_addDiscountRule();
+		DiscountRule discountRule = testGraphQLDiscountRule_addDiscountRule();
 
 		Assert.assertTrue(
 			equals(
@@ -324,12 +318,6 @@ public abstract class BaseDiscountRuleResourceTestCase {
 				"Object/code"));
 	}
 
-	protected DiscountRule testGraphQLGetDiscountRule_addDiscountRule()
-		throws Exception {
-
-		return testGraphQLDiscountRule_addDiscountRule();
-	}
-
 	@Test
 	public void testPatchDiscountRule() throws Exception {
 		DiscountRule postDiscountRule = testPatchDiscountRule_addDiscountRule();
@@ -342,8 +330,8 @@ public abstract class BaseDiscountRuleResourceTestCase {
 
 		DiscountRule expectedPatchDiscountRule = postDiscountRule.clone();
 
-		BeanTestUtil.copyProperties(
-			randomPatchDiscountRule, expectedPatchDiscountRule);
+		_beanUtilsBean.copyProperties(
+			expectedPatchDiscountRule, randomPatchDiscountRule);
 
 		DiscountRule getDiscountRule = discountRuleResource.getDiscountRule(
 			patchDiscountRule.getId());
@@ -391,10 +379,7 @@ public abstract class BaseDiscountRuleResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantDiscountRule),
 				(List<DiscountRule>)page.getItems());
-			assertValid(
-				page,
-				testGetDiscountByExternalReferenceCodeDiscountRulesPage_getExpectedActions(
-					irrelevantExternalReferenceCode));
+			assertValid(page);
 		}
 
 		DiscountRule discountRule1 =
@@ -415,24 +400,11 @@ public abstract class BaseDiscountRuleResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(discountRule1, discountRule2),
 			(List<DiscountRule>)page.getItems());
-		assertValid(
-			page,
-			testGetDiscountByExternalReferenceCodeDiscountRulesPage_getExpectedActions(
-				externalReferenceCode));
+		assertValid(page);
 
 		discountRuleResource.deleteDiscountRule(discountRule1.getId());
 
 		discountRuleResource.deleteDiscountRule(discountRule2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetDiscountByExternalReferenceCodeDiscountRulesPage_getExpectedActions(
-				String externalReferenceCode)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -560,10 +532,7 @@ public abstract class BaseDiscountRuleResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantDiscountRule),
 				(List<DiscountRule>)page.getItems());
-			assertValid(
-				page,
-				testGetDiscountIdDiscountRulesPage_getExpectedActions(
-					irrelevantId));
+			assertValid(page);
 		}
 
 		DiscountRule discountRule1 =
@@ -582,21 +551,11 @@ public abstract class BaseDiscountRuleResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(discountRule1, discountRule2),
 			(List<DiscountRule>)page.getItems());
-		assertValid(
-			page, testGetDiscountIdDiscountRulesPage_getExpectedActions(id));
+		assertValid(page);
 
 		discountRuleResource.deleteDiscountRule(discountRule1.getId());
 
 		discountRuleResource.deleteDiscountRule(discountRule2.getId());
-	}
-
-	protected Map<String, Map<String, String>>
-			testGetDiscountIdDiscountRulesPage_getExpectedActions(Long id)
-		throws Exception {
-
-		Map<String, Map<String, String>> expectedActions = new HashMap<>();
-
-		return expectedActions;
 	}
 
 	@Test
@@ -622,40 +581,6 @@ public abstract class BaseDiscountRuleResourceTestCase {
 				discountRuleResource.getDiscountIdDiscountRulesPage(
 					id, null,
 					getFilterString(entityField, "between", discountRule1),
-					Pagination.of(1, 2), null);
-
-			assertEquals(
-				Collections.singletonList(discountRule1),
-				(List<DiscountRule>)page.getItems());
-		}
-	}
-
-	@Test
-	public void testGetDiscountIdDiscountRulesPageWithFilterDoubleEquals()
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(
-			EntityField.Type.DOUBLE);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		Long id = testGetDiscountIdDiscountRulesPage_getId();
-
-		DiscountRule discountRule1 =
-			testGetDiscountIdDiscountRulesPage_addDiscountRule(
-				id, randomDiscountRule());
-
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		DiscountRule discountRule2 =
-			testGetDiscountIdDiscountRulesPage_addDiscountRule(
-				id, randomDiscountRule());
-
-		for (EntityField entityField : entityFields) {
-			Page<DiscountRule> page =
-				discountRuleResource.getDiscountIdDiscountRulesPage(
-					id, null, getFilterString(entityField, "eq", discountRule1),
 					Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -754,23 +679,9 @@ public abstract class BaseDiscountRuleResourceTestCase {
 		testGetDiscountIdDiscountRulesPageWithSort(
 			EntityField.Type.DATE_TIME,
 			(entityField, discountRule1, discountRule2) -> {
-				BeanTestUtil.setProperty(
+				BeanUtils.setProperty(
 					discountRule1, entityField.getName(),
 					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetDiscountIdDiscountRulesPageWithSortDouble()
-		throws Exception {
-
-		testGetDiscountIdDiscountRulesPageWithSort(
-			EntityField.Type.DOUBLE,
-			(entityField, discountRule1, discountRule2) -> {
-				BeanTestUtil.setProperty(
-					discountRule1, entityField.getName(), 0.1);
-				BeanTestUtil.setProperty(
-					discountRule2, entityField.getName(), 0.5);
 			});
 	}
 
@@ -781,10 +692,8 @@ public abstract class BaseDiscountRuleResourceTestCase {
 		testGetDiscountIdDiscountRulesPageWithSort(
 			EntityField.Type.INTEGER,
 			(entityField, discountRule1, discountRule2) -> {
-				BeanTestUtil.setProperty(
-					discountRule1, entityField.getName(), 0);
-				BeanTestUtil.setProperty(
-					discountRule2, entityField.getName(), 1);
+				BeanUtils.setProperty(discountRule1, entityField.getName(), 0);
+				BeanUtils.setProperty(discountRule2, entityField.getName(), 1);
 			});
 	}
 
@@ -799,27 +708,27 @@ public abstract class BaseDiscountRuleResourceTestCase {
 
 				String entityFieldName = entityField.getName();
 
-				Method method = clazz.getMethod(
+				java.lang.reflect.Method method = clazz.getMethod(
 					"get" + StringUtil.upperCaseFirstLetter(entityFieldName));
 
 				Class<?> returnType = method.getReturnType();
 
 				if (returnType.isAssignableFrom(Map.class)) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						discountRule1, entityFieldName,
 						Collections.singletonMap("Aaa", "Aaa"));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						discountRule2, entityFieldName,
 						Collections.singletonMap("Bbb", "Bbb"));
 				}
 				else if (entityFieldName.contains("email")) {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						discountRule1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()) +
 									"@liferay.com");
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						discountRule2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -827,12 +736,12 @@ public abstract class BaseDiscountRuleResourceTestCase {
 									"@liferay.com");
 				}
 				else {
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						discountRule1, entityFieldName,
 						"aaa" +
 							StringUtil.toLowerCase(
 								RandomTestUtil.randomString()));
-					BeanTestUtil.setProperty(
+					BeanUtils.setProperty(
 						discountRule2, entityFieldName,
 						"bbb" +
 							StringUtil.toLowerCase(
@@ -1065,13 +974,6 @@ public abstract class BaseDiscountRuleResourceTestCase {
 	}
 
 	protected void assertValid(Page<DiscountRule> page) {
-		assertValid(page, Collections.emptyMap());
-	}
-
-	protected void assertValid(
-		Page<DiscountRule> page,
-		Map<String, Map<String, String>> expectedActions) {
-
 		boolean valid = false;
 
 		java.util.Collection<DiscountRule> discountRules = page.getItems();
@@ -1086,20 +988,6 @@ public abstract class BaseDiscountRuleResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
-
-		Map<String, Map<String, String>> actions = page.getActions();
-
-		for (String key : expectedActions.keySet()) {
-			Map action = actions.get(key);
-
-			Assert.assertNotNull(key + " does not contain an action", action);
-
-			Map expectedAction = expectedActions.get(key);
-
-			Assert.assertEquals(
-				expectedAction.get("method"), action.get("method"));
-			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
-		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1270,16 +1158,14 @@ public abstract class BaseDiscountRuleResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		return TransformUtil.transform(
-			ReflectionUtil.getDeclaredFields(clazz),
-			field -> {
-				if (field.isSynthetic()) {
-					return null;
-				}
+		Stream<java.lang.reflect.Field> stream = Stream.of(
+			ReflectionUtil.getDeclaredFields(clazz));
 
-				return field;
-			},
-			java.lang.reflect.Field.class);
+		return stream.filter(
+			field -> !field.isSynthetic()
+		).toArray(
+			java.lang.reflect.Field[]::new
+		);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -1296,10 +1182,6 @@ public abstract class BaseDiscountRuleResourceTestCase {
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
 
-		if (entityModel == null) {
-			return Collections.emptyList();
-		}
-
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();
 
@@ -1309,18 +1191,18 @@ public abstract class BaseDiscountRuleResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		return TransformUtil.transform(
-			getEntityFields(),
-			entityField -> {
-				if (!Objects.equals(entityField.getType(), type) ||
-					ArrayUtil.contains(
-						getIgnoredEntityFieldNames(), entityField.getName())) {
+		java.util.Collection<EntityField> entityFields = getEntityFields();
 
-					return null;
-				}
+		Stream<EntityField> stream = entityFields.stream();
 
-				return entityField;
-			});
+		return stream.filter(
+			entityField ->
+				Objects.equals(entityField.getType(), type) &&
+				!ArrayUtil.contains(
+					getIgnoredEntityFieldNames(), entityField.getName())
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	protected String getFilterString(
@@ -1444,115 +1326,6 @@ public abstract class BaseDiscountRuleResourceTestCase {
 	protected Company testCompany;
 	protected Group testGroup;
 
-	protected static class BeanTestUtil {
-
-		public static void copyProperties(Object source, Object target)
-			throws Exception {
-
-			Class<?> sourceClass = _getSuperClass(source.getClass());
-
-			Class<?> targetClass = target.getClass();
-
-			for (java.lang.reflect.Field field :
-					sourceClass.getDeclaredFields()) {
-
-				if (field.isSynthetic()) {
-					continue;
-				}
-
-				Method getMethod = _getMethod(
-					sourceClass, field.getName(), "get");
-
-				Method setMethod = _getMethod(
-					targetClass, field.getName(), "set",
-					getMethod.getReturnType());
-
-				setMethod.invoke(target, getMethod.invoke(source));
-			}
-		}
-
-		public static boolean hasProperty(Object bean, String name) {
-			Method setMethod = _getMethod(
-				bean.getClass(), "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod != null) {
-				return true;
-			}
-
-			return false;
-		}
-
-		public static void setProperty(Object bean, String name, Object value)
-			throws Exception {
-
-			Class<?> clazz = bean.getClass();
-
-			Method setMethod = _getMethod(
-				clazz, "set" + StringUtil.upperCaseFirstLetter(name));
-
-			if (setMethod == null) {
-				throw new NoSuchMethodException();
-			}
-
-			Class<?>[] parameterTypes = setMethod.getParameterTypes();
-
-			setMethod.invoke(bean, _translateValue(parameterTypes[0], value));
-		}
-
-		private static Method _getMethod(Class<?> clazz, String name) {
-			for (Method method : clazz.getMethods()) {
-				if (name.equals(method.getName()) &&
-					(method.getParameterCount() == 1) &&
-					_parameterTypes.contains(method.getParameterTypes()[0])) {
-
-					return method;
-				}
-			}
-
-			return null;
-		}
-
-		private static Method _getMethod(
-				Class<?> clazz, String fieldName, String prefix,
-				Class<?>... parameterTypes)
-			throws Exception {
-
-			return clazz.getMethod(
-				prefix + StringUtil.upperCaseFirstLetter(fieldName),
-				parameterTypes);
-		}
-
-		private static Class<?> _getSuperClass(Class<?> clazz) {
-			Class<?> superClass = clazz.getSuperclass();
-
-			if ((superClass == null) || (superClass == Object.class)) {
-				return clazz;
-			}
-
-			return superClass;
-		}
-
-		private static Object _translateValue(
-			Class<?> parameterType, Object value) {
-
-			if ((value instanceof Integer) &&
-				parameterType.equals(Long.class)) {
-
-				Integer intValue = (Integer)value;
-
-				return intValue.longValue();
-			}
-
-			return value;
-		}
-
-		private static final Set<Class<?>> _parameterTypes = new HashSet<>(
-			Arrays.asList(
-				Boolean.class, Date.class, Double.class, Integer.class,
-				Long.class, Map.class, String.class));
-
-	}
-
 	protected class GraphQLField {
 
 		public GraphQLField(String key, GraphQLField... graphQLFields) {
@@ -1627,6 +1400,18 @@ public abstract class BaseDiscountRuleResourceTestCase {
 	private static final com.liferay.portal.kernel.log.Log _log =
 		LogFactoryUtil.getLog(BaseDiscountRuleResourceTestCase.class);
 
+	private static BeanUtilsBean _beanUtilsBean = new BeanUtilsBean() {
+
+		@Override
+		public void copyProperty(Object bean, String name, Object value)
+			throws IllegalAccessException, InvocationTargetException {
+
+			if (value != null) {
+				super.copyProperty(bean, name, value);
+			}
+		}
+
+	};
 	private static DateFormat _dateFormat;
 
 	@Inject

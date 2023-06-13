@@ -43,7 +43,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	enabled = false,
-	property = "model.class.name=com.liferay.commerce.product.model.CPAttachmentFileEntry",
+	property = "dto.class.name=com.liferay.commerce.product.model.CPAttachmentFileEntry",
 	service = {AttachmentDTOConverter.class, DTOConverter.class}
 )
 public class AttachmentDTOConverter
@@ -68,11 +68,13 @@ public class AttachmentDTOConverter
 		String portalURL = company.getPortalURL(0);
 
 		String downloadURL = _commerceMediaResolver.getDownloadURL(
-			CommerceAccountConstants.ACCOUNT_ID_GUEST,
+			CommerceAccountConstants.ACCOUNT_ID_ADMIN,
 			cpAttachmentFileEntry.getCPAttachmentFileEntryId());
 
 		return new Attachment() {
 			{
+				cdnEnabled = cpAttachmentFileEntry.isCDNEnabled();
+				cdnURL = cpAttachmentFileEntry.getCDNURL();
 				customFields = CustomFieldsUtil.toCustomFields(
 					dtoConverterContext.isAcceptAllLanguages(),
 					CPAttachmentFileEntry.class.getName(),

@@ -24,27 +24,28 @@ String[] tempFileNames = LayoutServiceUtil.getTempFileNames(groupId, ExportImpor
 
 portletDisplay.setShowBackIcon(true);
 
-PortletURL importProcessesURL = PortalUtil.getControlPanelPortletURL(request, ExportImportPortletKeys.IMPORT, PortletRequest.RENDER_PHASE);
-
-importProcessesURL.setParameter("mvcPath", "/import/view.jsp");
-
-portletDisplay.setURLBack(importProcessesURL.toString());
+portletDisplay.setURLBack(
+	PortletURLBuilder.create(
+		PortalUtil.getControlPanelPortletURL(request, ExportImportPortletKeys.IMPORT, PortletRequest.RENDER_PHASE)
+	).setMVCPath(
+		"/import/view_import_layouts.jsp"
+	).buildString());
 
 renderResponse.setTitle(LanguageUtil.get(request, "new-import-process"));
 %>
 
 <clay:container-fluid
-	cssClass="container-view"
+	cssClass="container-form-lg"
 	id='<%= liferayPortletResponse.getNamespace() + "exportImportOptions" %>'
 >
 
 	<%
-	int incompleteBackgroundTasksCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupId, BackgroundTaskExecutorNames.LAYOUT_IMPORT_BACKGROUND_TASK_EXECUTOR, false);
+	int incompleteBackgroundTaskCount = BackgroundTaskManagerUtil.getBackgroundTasksCount(groupId, BackgroundTaskExecutorNames.LAYOUT_IMPORT_BACKGROUND_TASK_EXECUTOR, false);
 	%>
 
-	<div class="<%= (incompleteBackgroundTasksCount == 0) ? "hide" : "in-progress" %>" id="<portlet:namespace />incompleteProcessMessage">
+	<div class="<%= (incompleteBackgroundTaskCount == 0) ? "hide" : "in-progress" %>" id="<portlet:namespace />incompleteProcessMessage">
 		<liferay-util:include page="/incomplete_processes_message.jsp" servletContext="<%= application %>">
-			<liferay-util:param name="incompleteBackgroundTasksCount" value="<%= String.valueOf(incompleteBackgroundTasksCount) %>" />
+			<liferay-util:param name="incompleteBackgroundTaskCount" value="<%= String.valueOf(incompleteBackgroundTaskCount) %>" />
 		</liferay-util:include>
 	</div>
 

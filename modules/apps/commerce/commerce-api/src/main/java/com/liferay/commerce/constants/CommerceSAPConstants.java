@@ -15,10 +15,8 @@
 package com.liferay.commerce.constants;
 
 import com.liferay.commerce.account.service.CommerceAccountService;
-import com.liferay.commerce.service.CommerceCountryService;
 import com.liferay.commerce.service.CommerceOrderItemService;
 import com.liferay.commerce.service.CommerceOrderService;
-import com.liferay.commerce.service.CommerceRegionService;
 import com.liferay.petra.string.StringBundler;
 
 /**
@@ -47,24 +45,17 @@ public class CommerceSAPConstants {
 			SAP_ENTRY_NAME,
 			StringBundler.concat(
 				CommerceAccountService.class.getName(), "#getCommerceAccount\n",
-				CommerceCountryService.class.getName(),
-				"#getBillingCommerceCountriesByChannelId\n",
-				CommerceCountryService.class.getName(),
-				"#getCommerceCountries\n",
-				CommerceCountryService.class.getName(),
-				"#getShippingCommerceCountriesByChannelId\n",
+				CommerceOrderItemService.class.getName(),
+				"#addOrUpdateCommerceOrderItem\n",
 				CommerceOrderItemService.class.getName(),
 				"#getCommerceOrderItem\n",
 				CommerceOrderItemService.class.getName(),
 				"#getCommerceOrderItems\n",
 				CommerceOrderItemService.class.getName(),
 				"#getCommerceOrderItemsQuantity\n",
-				CommerceOrderItemService.class.getName(),
-				"#upsertCommerceOrderItem\n",
 				CommerceOrderService.class.getName(), "#addCommerceOrder\n",
 				CommerceOrderService.class.getName(), "#fetchCommerceOrder\n",
 				CommerceOrderService.class.getName(), "#getCommerceOrder\n",
-				CommerceRegionService.class.getName(), "#getCommerceRegions\n",
 				CLASS_NAME_COMMERCE_CART_RESOURCE, "*\n",
 				CLASS_NAME_COMMERCE_HEADLESS_CART_ITEM_RESOURCE,
 				"#deleteCartItem\n",

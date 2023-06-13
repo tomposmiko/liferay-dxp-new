@@ -45,7 +45,7 @@ AUI.add(
 
 				rowSelector: {
 					validator: Lang.isString,
-					value: 'dd,li,tr',
+					value: 'li,tr',
 				},
 
 				tooltipClass: {
@@ -177,7 +177,7 @@ AUI.add(
 									(event) => {
 										targetNodes.toggleClass(
 											target.infoCssClass,
-											event.type == 'drag:start'
+											event.type === 'drag:start'
 										);
 									}
 								);

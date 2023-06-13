@@ -68,13 +68,6 @@ public class LanguageExtension {
 
 			serviceRegistration.unregister();
 		}
-
-		for (ServiceRegistration
-				<com.liferay.portal.kernel.util.ResourceBundleLoader>
-					serviceRegistration : _compatServiceRegistrations) {
-
-			serviceRegistration.unregister();
-		}
 	}
 
 	public void start() throws InvalidSyntaxException {
@@ -118,6 +111,12 @@ public class LanguageExtension {
 					bundleWiring.getClassLoader(), (String)baseName,
 					GetterUtil.getBoolean(excludePortalResources));
 			}
+			else {
+				attributes.put("resource.bundle.base.name", "content.Language");
+
+				resourceBundleLoader =
+					ResourceBundleLoaderUtil.getPortalResourceBundleLoader();
+			}
 
 			if (Validator.isNotNull(serviceRanking)) {
 				attributes.put(
@@ -138,13 +137,6 @@ public class LanguageExtension {
 				_serviceRegistrations.add(
 					_bundleContext.registerService(
 						ResourceBundleLoader.class, resourceBundleLoader,
-						attributes));
-
-				_compatServiceRegistrations.add(
-					_bundleContext.registerService(
-						com.liferay.portal.kernel.util.ResourceBundleLoader.
-							class,
-						new CompatResourceBundleLoader(resourceBundleLoader),
 						attributes));
 			}
 			else if (_log.isWarnEnabled()) {
@@ -183,10 +175,6 @@ public class LanguageExtension {
 	private final Bundle _bundle;
 	private final List<BundleCapability> _bundleCapabilities;
 	private final BundleContext _bundleContext;
-	private final Collection
-		<ServiceRegistration
-			<com.liferay.portal.kernel.util.ResourceBundleLoader>>
-				_compatServiceRegistrations = new ArrayList<>();
 	private final Collection<ServiceRegistration<ResourceBundleLoader>>
 		_serviceRegistrations = new ArrayList<>();
 	private final List<ServiceTrackerResourceBundleLoader>

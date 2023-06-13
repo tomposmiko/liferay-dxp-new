@@ -47,27 +47,19 @@ else if (collapsible) {
 						<%= header %>
 					</legend>
 
-					<div class="panel-heading" id="<%= id %>Header" role="presentation">
-						<div id="<%= id %>Title">
-							<a aria-controls="<%= id %>Content" aria-expanded="<%= !collapsed %>" class="collapse-icon <%= collapsed ? "collapsed" : StringPool.BLANK %> sheet-subtitle" data-toggle="liferay-collapse" href="#<%= id %>Content" role="button">
-								<span aria-hidden="true">
-									<%= header %>
-								</span>
+					<a aria-controls="<%= id %>Content" aria-expanded="<%= !collapsed %>" class="collapse-icon <%= collapsed ? "collapsed" : StringPool.BLANK %> sheet-subtitle" data-toggle="liferay-collapse" href="#<%= id %>Content" role="button">
+						<span aria-hidden="true">
+							<%= header %>
+						</span>
 
-								<aui:icon cssClass="collapse-icon-closed" image="angle-right" markupView="lexicon" />
+						<aui:icon cssClass="collapse-icon-closed" image="angle-right" markupView="lexicon" />
 
-								<aui:icon cssClass="collapse-icon-open" image="angle-down" markupView="lexicon" />
-							</a>
-						</div>
-					</div>
+						<aui:icon cssClass="collapse-icon-open" image="angle-down" markupView="lexicon" />
+					</a>
 				</c:when>
 				<c:otherwise>
 					<legend class="fieldset-legend">
-						<div class="panel-heading" id="<%= id %>Header" role="presentation">
-							<div id="<%= id %>Title">
-								<h3 class="legend sheet-subtitle"><%= header %></h3>
-							</div>
-						</div>
+						<h3 class="legend sheet-subtitle"><%= header %></h3>
 					</legend>
 				</c:otherwise>
 			</c:choose>
@@ -79,5 +71,5 @@ else if (collapsible) {
 		</c:otherwise>
 	</c:choose>
 
-	<div aria-labelledby="<%= id %>Header" class="<%= !collapsed ? "show" : StringPool.BLANK %> <%= collapsible ? "panel-collapse collapse" : StringPool.BLANK %> <%= column ? "row" : StringPool.BLANK %>" id="<%= id %>Content" role="presentation">
+	<div class="<%= !collapsed ? "show" : StringPool.BLANK %> <%= collapsible ? "panel-collapse collapse" : StringPool.BLANK %> <%= column ? "row" : StringPool.BLANK %>" id="<%= id %>Content" role="presentation">
 		<div class="<%= collapsible ? "panel-body" : StringPool.BLANK %>">

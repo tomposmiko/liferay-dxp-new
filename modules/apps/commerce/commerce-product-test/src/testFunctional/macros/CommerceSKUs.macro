@@ -3,35 +3,40 @@ definition {
 	macro addPriceToSKU {
 		Type(
 			locator1 = "CommerceEntry#PRICE_FIELD",
-			value1 = ${price});
+			value1 = "${price}");
 	}
 
 	macro addSKU {
-		for (var optionValues : list ${optionValuesList}) {
-			var optionValue = StringUtil.extractFirst(${optionValues}, ":");
-			var price = StringUtil.extractLast(${optionValues}, ":");
-			var optionValueUppercase = StringUtil.upperCase(${optionValue});
+		for (var optionValues : list "${optionValuesList}") {
+			var optionValue = StringUtil.extractFirst("${optionValues}", ":");
+			var price = StringUtil.extractLast("${optionValues}", ":");
+			var optionValueUppercase = StringUtil.upperCase("${optionValue}");
 
 			Refresh();
 
 			Click(locator1 = "Button#PLUS");
 
-			AssertClick(
-				key_menuItem = "Add SKU",
-				locator1 = "MenuItem#DROPDOWN_MENU_ITEM",
-				value1 = ${key_menuItem});
+			if (IsElementPresent(key_menuItem = "Add SKU", locator1 = "MenuItem#DROPDOWN_MENU_ITEM")) {
+				AssertClick(
+					key_menuItem = "Add SKU",
+					locator1 = "MenuItem#DROPDOWN_MENU_ITEM",
+					value1 = "${key_menuItem}");
+			}
 
 			SelectFrame.selectFrameNoLoading(locator1 = "CommerceEntry#IFRAME_SIDE_PANEL");
 
 			CommerceEntry.addSKUsEntry(
-				optionValue = ${optionValue},
+				noOption = "${noOption}",
+				optionValue = "${optionValue}",
 				productSKU = "${optionValueUppercase}SKU");
+
+			WaitForElementNotPresent(locator1 = "TextInput#REQUIRED_ALERT");
 
 			Check.checkToggleSwitch(
 				key_toggleSwitchLabel = "Purchasable",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
 
-			CommerceSKUs.addPriceToSKU(price = ${price});
+			CommerceSKUs.addPriceToSKU(price = "${price}");
 
 			Button.clickPublish();
 

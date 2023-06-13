@@ -100,7 +100,7 @@ public class PriceModifier implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Map<String, Map<String, String>> actions;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getActive() {
 		return active;
 	}
@@ -128,7 +128,7 @@ public class PriceModifier implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean active;
 
-	@Schema(example = "2017-07-21")
+	@Schema
 	public Date getDisplayDate() {
 		return displayDate;
 	}
@@ -156,7 +156,7 @@ public class PriceModifier implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date displayDate;
 
-	@Schema(example = "2017-08-21")
+	@Schema
 	public Date getExpirationDate() {
 		return expirationDate;
 	}
@@ -184,7 +184,7 @@ public class PriceModifier implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date expirationDate;
 
-	@Schema(example = "AB-34098-789-N")
+	@Schema
 	public String getExternalReferenceCode() {
 		return externalReferenceCode;
 	}
@@ -213,7 +213,7 @@ public class PriceModifier implements Serializable {
 	protected String externalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "30130")
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -239,8 +239,7 @@ public class PriceModifier implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	@DecimalMin("0")
-	@Schema(example = "25")
+	@Schema
 	@Valid
 	public BigDecimal getModifierAmount() {
 		return modifierAmount;
@@ -270,7 +269,7 @@ public class PriceModifier implements Serializable {
 	@NotNull
 	protected BigDecimal modifierAmount;
 
-	@Schema(example = "percentage")
+	@Schema
 	public String getModifierType() {
 		return modifierType;
 	}
@@ -299,7 +298,7 @@ public class PriceModifier implements Serializable {
 	@NotEmpty
 	protected String modifierType;
 
-	@Schema(example = "true")
+	@Schema
 	public Boolean getNeverExpire() {
 		return neverExpire;
 	}
@@ -327,7 +326,7 @@ public class PriceModifier implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean neverExpire;
 
-	@Schema(example = "PLAB-34098-789-N")
+	@Schema
 	public String getPriceListExternalReferenceCode() {
 		return priceListExternalReferenceCode;
 	}
@@ -360,7 +359,7 @@ public class PriceModifier implements Serializable {
 	protected String priceListExternalReferenceCode;
 
 	@DecimalMin("0")
-	@Schema(example = "20078")
+	@Schema
 	public Long getPriceListId() {
 		return priceListId;
 	}
@@ -486,7 +485,7 @@ public class PriceModifier implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected PriceModifierProduct[] priceModifierProducts;
 
-	@Schema(example = "1.2")
+	@Schema
 	public Double getPriority() {
 		return priority;
 	}
@@ -514,7 +513,7 @@ public class PriceModifier implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Double priority;
 
-	@Schema(example = "product")
+	@Schema
 	public String getTarget() {
 		return target;
 	}
@@ -543,7 +542,7 @@ public class PriceModifier implements Serializable {
 	@NotEmpty
 	protected String target;
 
-	@Schema(example = "20% Off")
+	@Schema
 	public String getTitle() {
 		return title;
 	}

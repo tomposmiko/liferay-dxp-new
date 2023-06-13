@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.service.LayoutLocalService;
-import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalService;
 import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalServiceWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceWrapper;
@@ -40,26 +39,17 @@ import org.osgi.service.component.annotations.Reference;
 public class DefaultLayoutLayoutSetPrototypeLocalServiceWrapper
 	extends LayoutSetPrototypeLocalServiceWrapper {
 
-	public DefaultLayoutLayoutSetPrototypeLocalServiceWrapper() {
-		super(null);
-	}
-
-	public DefaultLayoutLayoutSetPrototypeLocalServiceWrapper(
-		LayoutSetPrototypeLocalService layoutSetPrototypeLocalService) {
-
-		super(layoutSetPrototypeLocalService);
-	}
-
 	@Override
 	public LayoutSetPrototype addLayoutSetPrototype(
 			long userId, long companyId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, boolean active,
-			boolean layoutsUpdateable, ServiceContext serviceContext)
+			boolean layoutsUpdateable, boolean readyForPropagation,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		LayoutSetPrototype layoutSetPrototype = super.addLayoutSetPrototype(
 			userId, companyId, nameMap, descriptionMap, active,
-			layoutsUpdateable, serviceContext);
+			layoutsUpdateable, readyForPropagation, serviceContext);
 
 		if (GetterUtil.getBoolean(
 				serviceContext.getAttribute("addDefaultLayout"), true)) {
@@ -90,6 +80,18 @@ public class DefaultLayoutLayoutSetPrototypeLocalServiceWrapper
 		}
 
 		return layoutSetPrototype;
+	}
+
+	@Override
+	public LayoutSetPrototype addLayoutSetPrototype(
+			long userId, long companyId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, boolean active,
+			boolean layoutsUpdateable, ServiceContext serviceContext)
+		throws PortalException {
+
+		return addLayoutSetPrototype(
+			userId, companyId, nameMap, descriptionMap, active,
+			layoutsUpdateable, true, serviceContext);
 	}
 
 	@Reference

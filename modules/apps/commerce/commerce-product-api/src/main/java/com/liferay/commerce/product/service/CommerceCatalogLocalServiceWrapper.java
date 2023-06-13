@@ -27,6 +27,10 @@ public class CommerceCatalogLocalServiceWrapper
 	implements CommerceCatalogLocalService,
 			   ServiceWrapper<CommerceCatalogLocalService> {
 
+	public CommerceCatalogLocalServiceWrapper() {
+		this(null);
+	}
+
 	public CommerceCatalogLocalServiceWrapper(
 		CommerceCatalogLocalService commerceCatalogLocalService) {
 
@@ -55,28 +59,28 @@ public class CommerceCatalogLocalServiceWrapper
 	@Override
 	public com.liferay.commerce.product.model.CommerceCatalog
 			addCommerceCatalog(
-				String name, String commerceCurrencyCode,
-				String catalogDefaultLanguageId, boolean system,
-				String externalReferenceCode,
+				String externalReferenceCode, String name,
+				String commerceCurrencyCode, String catalogDefaultLanguageId,
+				boolean system,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceCatalogLocalService.addCommerceCatalog(
-			name, commerceCurrencyCode, catalogDefaultLanguageId, system,
-			externalReferenceCode, serviceContext);
+			externalReferenceCode, name, commerceCurrencyCode,
+			catalogDefaultLanguageId, system, serviceContext);
 	}
 
 	@Override
 	public com.liferay.commerce.product.model.CommerceCatalog
 			addCommerceCatalog(
-				String name, String commerceCurrencyCode,
-				String catalogDefaultLanguageId, String externalReferenceCode,
+				String externalReferenceCode, String name,
+				String commerceCurrencyCode, String catalogDefaultLanguageId,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceCatalogLocalService.addCommerceCatalog(
-			name, commerceCurrencyCode, catalogDefaultLanguageId,
-			externalReferenceCode, serviceContext);
+			externalReferenceCode, name, commerceCurrencyCode,
+			catalogDefaultLanguageId, serviceContext);
 	}
 
 	@Override
@@ -280,10 +284,10 @@ public class CommerceCatalogLocalServiceWrapper
 	@Override
 	public com.liferay.commerce.product.model.CommerceCatalog
 		fetchByExternalReferenceCode(
-			long companyId, String externalReferenceCode) {
+			String externalReferenceCode, long companyId) {
 
 		return _commerceCatalogLocalService.fetchByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			externalReferenceCode, companyId);
 	}
 
 	@Override
@@ -294,7 +298,13 @@ public class CommerceCatalogLocalServiceWrapper
 			commerceCatalogId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce catalog with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce catalog's external reference code
+	 * @return the matching commerce catalog, or <code>null</code> if a matching commerce catalog could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CommerceCatalog
 		fetchCommerceCatalogByExternalReferenceCode(
@@ -313,6 +323,9 @@ public class CommerceCatalogLocalServiceWrapper
 			groupId);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchCommerceCatalogByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public com.liferay.commerce.product.model.CommerceCatalog
@@ -357,7 +370,14 @@ public class CommerceCatalogLocalServiceWrapper
 			commerceCatalogId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the commerce catalog with the matching external reference code and company.
+	 *
+	 * @param companyId the primary key of the company
+	 * @param externalReferenceCode the commerce catalog's external reference code
+	 * @return the matching commerce catalog
+	 * @throws PortalException if a matching commerce catalog could not be found
+	 */
 	@Override
 	public com.liferay.commerce.product.model.CommerceCatalog
 			getCommerceCatalogByExternalReferenceCode(
@@ -445,20 +465,20 @@ public class CommerceCatalogLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.commerce.product.model.CommerceCatalog>
-			searchCommerceCatalogs(long companyId)
+			search(long companyId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _commerceCatalogLocalService.searchCommerceCatalogs(companyId);
+		return _commerceCatalogLocalService.search(companyId);
 	}
 
 	@Override
 	public java.util.List<com.liferay.commerce.product.model.CommerceCatalog>
-			searchCommerceCatalogs(
+			search(
 				long companyId, String keywords, int start, int end,
 				com.liferay.portal.kernel.search.Sort sort)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return _commerceCatalogLocalService.searchCommerceCatalogs(
+		return _commerceCatalogLocalService.search(
 			companyId, keywords, start, end, sort);
 	}
 
@@ -505,12 +525,12 @@ public class CommerceCatalogLocalServiceWrapper
 	@Override
 	public com.liferay.commerce.product.model.CommerceCatalog
 			updateCommerceCatalogExternalReferenceCode(
-				long commerceCatalogId, String externalReferenceCode)
+				String externalReferenceCode, long commerceCatalogId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceCatalogLocalService.
 			updateCommerceCatalogExternalReferenceCode(
-				commerceCatalogId, externalReferenceCode);
+				externalReferenceCode, commerceCatalogId);
 	}
 
 	@Override

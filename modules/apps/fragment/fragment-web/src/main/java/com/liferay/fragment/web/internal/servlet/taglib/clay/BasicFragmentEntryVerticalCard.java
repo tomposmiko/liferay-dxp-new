@@ -17,12 +17,12 @@ package com.liferay.fragment.web.internal.servlet.taglib.clay;
 import com.liferay.fragment.constants.FragmentActionKeys;
 import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.model.FragmentEntry;
-import com.liferay.fragment.web.internal.constants.FragmentWebKeys;
 import com.liferay.fragment.web.internal.security.permission.resource.FragmentPermission;
 import com.liferay.fragment.web.internal.servlet.taglib.util.BasicFragmentEntryActionDropdownItemsProvider;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -33,7 +33,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import java.util.Date;
 import java.util.List;
 
-import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -42,7 +41,8 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Eudaldo Alonso
  */
-public class BasicFragmentEntryVerticalCard extends FragmentEntryVerticalCard {
+public class BasicFragmentEntryVerticalCard
+	extends BaseFragmentEntryVerticalCard {
 
 	public BasicFragmentEntryVerticalCard(
 		FragmentEntry fragmentEntry, RenderRequest renderRequest,
@@ -77,11 +77,6 @@ public class BasicFragmentEntryVerticalCard extends FragmentEntryVerticalCard {
 	}
 
 	@Override
-	public String getDefaultEventHandler() {
-		return FragmentWebKeys.FRAGMENT_ENTRY_DROPDOWN_DEFAULT_EVENT_HANDLER;
-	}
-
-	@Override
 	public String getHref() {
 		if (!FragmentPermission.contains(
 				themeDisplay.getPermissionChecker(),
@@ -92,20 +87,17 @@ public class BasicFragmentEntryVerticalCard extends FragmentEntryVerticalCard {
 			return null;
 		}
 
-		PortletURL editFragmentEntryURL = _renderResponse.createRenderURL();
-
-		editFragmentEntryURL.setParameter(
-			"mvcRenderCommandName", "/fragment/edit_fragment_entry");
-		editFragmentEntryURL.setParameter(
-			"redirect", themeDisplay.getURLCurrent());
-		editFragmentEntryURL.setParameter(
-			"fragmentCollectionId",
-			String.valueOf(fragmentEntry.getFragmentCollectionId()));
-		editFragmentEntryURL.setParameter(
-			"fragmentEntryId",
-			String.valueOf(fragmentEntry.getFragmentEntryId()));
-
-		return editFragmentEntryURL.toString();
+		return PortletURLBuilder.createRenderURL(
+			_renderResponse
+		).setMVCRenderCommandName(
+			"/fragment/edit_fragment_entry"
+		).setRedirect(
+			themeDisplay.getURLCurrent()
+		).setParameter(
+			"fragmentCollectionId", fragmentEntry.getFragmentCollectionId()
+		).setParameter(
+			"fragmentEntryId", fragmentEntry.getFragmentEntryId()
+		).buildString();
 	}
 
 	@Override
@@ -128,14 +120,14 @@ public class BasicFragmentEntryVerticalCard extends FragmentEntryVerticalCard {
 
 	@Override
 	public String getSubtitle() {
-		Date modifiedDate = fragmentEntry.getModifiedDate();
+		Date statusDate = fragmentEntry.getStatusDate();
 
-		String modifiedDateDescription = LanguageUtil.getTimeDescription(
+		String statusDateDescription = LanguageUtil.getTimeDescription(
 			_httpServletRequest,
-			System.currentTimeMillis() - modifiedDate.getTime(), true);
+			System.currentTimeMillis() - statusDate.getTime(), true);
 
 		return LanguageUtil.format(
-			_httpServletRequest, "modified-x-ago", modifiedDateDescription);
+			_httpServletRequest, "x-ago", statusDateDescription);
 	}
 
 	@Override

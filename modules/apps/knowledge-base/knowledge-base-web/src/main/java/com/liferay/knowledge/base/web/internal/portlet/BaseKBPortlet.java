@@ -44,12 +44,13 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
-import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -208,6 +209,10 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 			jsonObject.put("deleted", Boolean.TRUE);
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			String errorMessage = themeDisplay.translate(
 				"an-unexpected-error-occurred-while-deleting-the-file");
 
@@ -301,8 +306,7 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 
 		PortletResponseUtil.sendFile(
 			resourceRequest, resourceResponse, null,
-			rss.getBytes(StringPool.UTF8), ContentTypes.TEXT_XML_UTF8, null,
-			HttpHeaders.CACHE_CONTROL_NO_CACHE_VALUE);
+			rss.getBytes(StringPool.UTF8), ContentTypes.TEXT_XML_UTF8);
 	}
 
 	@Override
@@ -337,6 +341,9 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 								resourceResponse));
 					}
 					catch (ServletException servletException) {
+						if (_log.isDebugEnabled()) {
+							_log.debug(servletException, servletException);
+						}
 					}
 				}
 
@@ -427,9 +434,10 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 			String urlTitle = ParamUtil.getString(actionRequest, "urlTitle");
 
 			kbArticle = kbArticleService.addKBArticle(
-				portal.getPortletId(actionRequest), parentResourceClassNameId,
-				parentResourcePrimKey, title, urlTitle, content, description,
-				sourceURL, sections, selectedFileNames, serviceContext);
+				null, portal.getPortletId(actionRequest),
+				parentResourceClassNameId, parentResourcePrimKey, title,
+				urlTitle, content, description, sourceURL, sections,
+				selectedFileNames, serviceContext);
 		}
 		else if (cmd.equals(Constants.REVERT)) {
 			int version = ParamUtil.getInteger(
@@ -727,5 +735,7 @@ public abstract class BaseKBPortlet extends MVCPortlet {
 	protected KBTemplateService kbTemplateService;
 	protected Portal portal;
 	protected UploadResponseHandler uploadResponseHandler;
+
+	private static final Log _log = LogFactoryUtil.getLog(BaseKBPortlet.class);
 
 }

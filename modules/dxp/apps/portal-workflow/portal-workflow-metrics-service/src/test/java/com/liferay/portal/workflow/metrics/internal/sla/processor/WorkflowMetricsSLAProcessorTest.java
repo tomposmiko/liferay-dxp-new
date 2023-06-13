@@ -15,12 +15,10 @@
 package com.liferay.portal.workflow.metrics.internal.sla.processor;
 
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.DocumentBuilder;
 import com.liferay.portal.search.internal.document.DocumentBuilderImpl;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-import com.liferay.portal.util.PropsImpl;
 import com.liferay.portal.workflow.metrics.internal.sla.calendar.DefaultWorkflowMetricsSLACalendar;
 import com.liferay.portal.workflow.metrics.internal.sla.calendar.WorkflowMetricsSLACalendarTrackerImpl;
 import com.liferay.portal.workflow.metrics.model.WorkflowMetricsSLADefinitionVersion;
@@ -36,9 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 import org.powermock.api.mockito.PowerMockito;
@@ -49,14 +45,8 @@ import org.powermock.api.mockito.PowerMockito;
 public class WorkflowMetricsSLAProcessorTest extends PowerMockito {
 
 	@ClassRule
-	@Rule
-	public static final LiferayUnitTestRule liferayUnitTestRule =
+	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
-
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-		PropsUtil.setProps(new PropsImpl());
-	}
 
 	@Test
 	public void testIsBreached() {
@@ -556,11 +546,11 @@ public class WorkflowMetricsSLAProcessorTest extends PowerMockito {
 			new WorkflowMetricsSLAInstanceResult() {
 				{
 					setElapsedTime(10000);
-					setLastCheckLocalDateTime(nowLocalDateTime);
-					setOnTime(true);
+					setModifiedLocalDateTime(nowLocalDateTime);
 					setRemainingTime(0);
 					setWorkflowMetricsSLAStatus(
 						WorkflowMetricsSLAStatus.STOPPED);
+					setOnTime(true);
 				}
 			},
 			nowLocalDateTime, true, 0, 1, workflowMetricsSLADefinitionVersion,

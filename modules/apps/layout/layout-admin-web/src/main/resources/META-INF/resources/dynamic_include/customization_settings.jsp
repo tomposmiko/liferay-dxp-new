@@ -23,7 +23,7 @@ boolean hasUpdateLayoutPermission = GetterUtil.getBoolean(request.getAttribute(C
 %>
 
 <div id="<%= portletNamespace %>customizationBar">
-	<div class="control-menu-level-2">
+	<div class="control-menu-level-2 py-2">
 		<clay:container-fluid>
 			<div class="control-menu-level-2-heading d-block d-md-none">
 				<liferay-ui:message key="customization-options" />
@@ -34,7 +34,7 @@ boolean hasUpdateLayoutPermission = GetterUtil.getBoolean(request.getAttribute(C
 			</div>
 
 			<ul class="control-menu-level-2-nav control-menu-nav flex-column flex-md-row">
-				<li class="control-menu-nav-item mb-0">
+				<li class="control-menu-nav-item flex-shrink-1 mb-0">
 					<span class="text-info">
 						<liferay-ui:icon
 							data='<%=
@@ -67,7 +67,7 @@ boolean hasUpdateLayoutPermission = GetterUtil.getBoolean(request.getAttribute(C
 				</li>
 
 				<c:if test="<%= hasUpdateLayoutPermission %>">
-					<li class="control-menu-nav-item mb-0">
+					<li class="control-menu-nav-item flex-shrink-0 mb-0 ml-2">
 						<aui:input id='<%= portletNamespace + "manageCustomization" %>' inlineField="<%= true %>" label="<%= StringPool.BLANK %>" labelOff='<%= LanguageUtil.get(resourceBundle, "hide-customizable-zones") %>' labelOn='<%= LanguageUtil.get(resourceBundle, "view-customizable-zones") %>' name="manageCustomization" type="toggle-switch" useNamespace="<%= false %>" wrappedField="<%= true %>" />
 
 						<div class="hide layout-customizable-controls-container" id="<%= portletNamespace %>layoutCustomizableControls">
@@ -79,15 +79,9 @@ boolean hasUpdateLayoutPermission = GetterUtil.getBoolean(request.getAttribute(C
 						</div>
 					</li>
 
-					<aui:script use="liferay-layout-customization-settings">
-						var layoutCustomizationSettings = new Liferay.LayoutCustomizationSettings({
-							namespace: '<%= portletNamespace %>',
-						});
-
-						Liferay.once('screenLoad', function () {
-							layoutCustomizationSettings.destroy();
-						});
-					</aui:script>
+					<liferay-frontend:component
+						module="js/LayoutCustomizationSettings"
+					/>
 				</c:if>
 
 				<%
@@ -102,20 +96,24 @@ boolean hasUpdateLayoutPermission = GetterUtil.getBoolean(request.getAttribute(C
 
 				toggleCustomizedViewMessage = LanguageUtil.get(resourceBundle, toggleCustomizedViewMessage);
 
-				PortletURL resetCustomizationViewURL = PortletURLFactoryUtil.create(request, LayoutAdminPortletKeys.GROUP_PAGES, PortletRequest.ACTION_PHASE);
+				String resetCustomizationViewURL = PortletURLBuilder.create(
+					PortletURLFactoryUtil.create(request, LayoutAdminPortletKeys.GROUP_PAGES, PortletRequest.ACTION_PHASE)
+				).setActionName(
+					"/layout_admin/reset_customization_view"
+				).buildString();
 
-				resetCustomizationViewURL.setParameter(ActionRequest.ACTION_NAME, "/layout_admin/reset_customization_view");
+				String resetCustomizationsViewURLString = "javascript:if (confirm('" + UnicodeLanguageUtil.get(resourceBundle, "are-you-sure-you-want-to-reset-your-customizations-to-default") + "')){submitForm(document.hrefFm, '" + HtmlUtil.escapeJS(resetCustomizationViewURL) + "');}";
 
-				String resetCustomizationsViewURLString = "javascript:if (confirm('" + UnicodeLanguageUtil.get(resourceBundle, "are-you-sure-you-want-to-reset-your-customizations-to-default") + "')){submitForm(document.hrefFm, '" + HtmlUtil.escapeJS(resetCustomizationViewURL.toString()) + "');}";
-
-				PortletURL toggleCustomizationViewPortletURL = PortletURLFactoryUtil.create(request, LayoutAdminPortletKeys.GROUP_PAGES, PortletRequest.ACTION_PHASE);
-
-				toggleCustomizationViewPortletURL.setParameter(ActionRequest.ACTION_NAME, "/layout_admin/toggle_customized_view");
-
-				String toggleCustomizationViewURL = HttpUtil.addParameter(toggleCustomizationViewPortletURL.toString(), "customized_view", !layoutTypePortlet.isCustomizedView());
+				String toggleCustomizationViewURL = HttpUtil.addParameter(
+					PortletURLBuilder.create(
+						PortletURLFactoryUtil.create(request, LayoutAdminPortletKeys.GROUP_PAGES, PortletRequest.ACTION_PHASE)
+					).setActionName(
+						"/layout_admin/toggle_customized_view"
+					).buildString(),
+					"customized_view", !layoutTypePortlet.isCustomizedView());
 				%>
 
-				<li class="control-menu-nav-item d-md-block d-none">
+				<li class="control-menu-nav-item d-md-block d-none flex-shrink-0 ml-2">
 					<liferay-ui:icon-menu
 						direction="left-side"
 						icon="<%= StringPool.BLANK %>"
@@ -136,7 +134,7 @@ boolean hasUpdateLayoutPermission = GetterUtil.getBoolean(request.getAttribute(C
 						</c:if>
 					</liferay-ui:icon-menu>
 				</li>
-				<li class="control-menu-nav-item d-block d-md-none mb-0 mt-3">
+				<li class="control-menu-nav-item d-block d-md-none flex-shrink-0 mb-0 ml-2 mt-3">
 					<div class="btn-group dropdown flex-nowrap">
 						<aui:a cssClass="btn btn-primary text-white" href="<%= toggleCustomizationViewURL %>" label="<%= toggleCustomizedViewMessage %>" />
 
@@ -156,27 +154,27 @@ boolean hasUpdateLayoutPermission = GetterUtil.getBoolean(request.getAttribute(C
 					</div>
 				</li>
 
-				<aui:script require="metal-dom/src/dom as dom">
-					var closeCustomizationOptions = document.getElementById(
+				<aui:script>
+					const closeCustomizationOptions = document.getElementById(
 						'<%= portletNamespace %>closeCustomizationOptions'
 					);
-					var controlMenu = document.querySelector(
+					const controlMenu = document.querySelector(
 						'#<%= portletNamespace %>customizationBar .control-menu-level-2'
 					);
 
 					if (closeCustomizationOptions && controlMenu) {
-						closeCustomizationOptions.addEventListener('click', function (event) {
-							dom.toggleClasses(controlMenu, 'open');
+						closeCustomizationOptions.addEventListener('click', (event) => {
+							controlMenu.classList.toggle('open');
 						});
 					}
 
-					var customizationButton = document.getElementById(
+					const customizationButton = document.getElementById(
 						'<%= portletNamespace %>customizationButton'
 					);
 
 					if (customizationButton && controlMenu) {
-						customizationButton.addEventListener('click', function (event) {
-							dom.toggleClasses(controlMenu, 'open');
+						customizationButton.addEventListener('click', (event) => {
+							controlMenu.classList.toggle('open');
 						});
 					}
 				</aui:script>

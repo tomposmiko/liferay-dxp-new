@@ -107,17 +107,10 @@ public class AntiSamySanitizerImpl implements Sanitizer {
 				StringBundler.concat("Sanitizing ", className, "#", classPK));
 		}
 
-		if (Validator.isNull(content)) {
-			return content;
-		}
+		if (Validator.isNull(content) || Validator.isNull(contentType) ||
+			!contentType.equals(ContentTypes.TEXT_HTML) ||
+			isWhitelisted(className, classPK)) {
 
-		if (Validator.isNull(contentType) ||
-			!contentType.equals(ContentTypes.TEXT_HTML)) {
-
-			return content;
-		}
-
-		if (isWhitelisted(className, classPK)) {
 			return content;
 		}
 
@@ -129,24 +122,18 @@ public class AntiSamySanitizerImpl implements Sanitizer {
 			AntiSamySanitizerImpl.class.getClassLoader());
 
 		try {
-			CleanResults cleanResults = null;
-
 			AntiSamy antiSamy = new AntiSamy();
 
 			if (isConfigured(className, classPK)) {
 				Policy policy = _policies.get(className);
 
-				cleanResults = antiSamy.scan(content, policy, AntiSamy.SAX);
-			}
-			else {
-				cleanResults = antiSamy.scan(content, _policy);
+				CleanResults cleanResults = antiSamy.scan(
+					content, policy, AntiSamy.SAX);
+
+				return cleanResults.getCleanHTML();
 			}
 
-			if (_log.isWarnEnabled()) {
-				for (String errorMessage : cleanResults.getErrorMessages()) {
-					_log.warn(errorMessage);
-				}
-			}
+			CleanResults cleanResults = antiSamy.scan(content, _policy);
 
 			return cleanResults.getCleanHTML();
 		}

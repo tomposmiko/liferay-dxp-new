@@ -61,6 +61,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Michael C. Han
+ * @author Brian Wing Shun Chan
  */
 @Component(
 	immediate = true,
@@ -431,6 +432,7 @@ public class DefaultMessageBus implements ManagedServiceFactory, MessageBus {
 			BaseDestination baseDestination = (BaseDestination)destination;
 
 			baseDestination.setName(destinationName);
+
 			baseDestination.afterPropertiesSet();
 		}
 
@@ -546,7 +548,7 @@ public class DefaultMessageBus implements ManagedServiceFactory, MessageBus {
 			List<MessageListener> messageListeners =
 				_queuedMessageListeners.remove(destination.getName());
 
-			if (ListUtil.isNotEmpty(messageListeners)) {
+			if (!ListUtil.isEmpty(messageListeners)) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						StringBundler.concat(
@@ -616,7 +618,6 @@ public class DefaultMessageBus implements ManagedServiceFactory, MessageBus {
 			_messageListenerServiceTracker;
 	private final Map<String, List<MessageListener>> _queuedMessageListeners =
 		new HashMap<>();
-	private ServiceTrackerList<MessageBusInterceptor, MessageBusInterceptor>
-		_serviceTrackerList;
+	private ServiceTrackerList<MessageBusInterceptor> _serviceTrackerList;
 
 }

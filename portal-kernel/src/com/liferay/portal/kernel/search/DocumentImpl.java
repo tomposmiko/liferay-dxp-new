@@ -48,7 +48,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * @author Brian Wing Shun Chan
@@ -401,21 +400,9 @@ public class DocumentImpl implements Document {
 			return;
 		}
 
-		Stream<String> valuesStream = Arrays.stream(values);
+		createField(name, values);
 
-		String[] filteredValues = valuesStream.filter(
-			value -> Validator.isNotNull(value)
-		).toArray(
-			String[]::new
-		);
-
-		if (ArrayUtil.isEmpty(filteredValues)) {
-			return;
-		}
-
-		createField(name, filteredValues);
-
-		_createSortableTextField(name, true, filteredValues);
+		_createSortableTextField(name, true, values);
 	}
 
 	@Override
@@ -791,14 +778,10 @@ public class DocumentImpl implements Document {
 			return get(name, defaultName);
 		}
 
-		String localizedName = Field.getLocalizedName(locale, name);
-
-		Field field = getField(localizedName);
+		Field field = getField(Field.getLocalizedName(locale, name));
 
 		if (field == null) {
-			localizedName = Field.getLocalizedName(locale, defaultName);
-
-			field = getField(localizedName);
+			field = getField(Field.getLocalizedName(locale, defaultName));
 		}
 
 		if (field == null) {

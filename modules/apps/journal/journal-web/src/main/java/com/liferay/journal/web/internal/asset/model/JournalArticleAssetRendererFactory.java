@@ -31,8 +31,11 @@ import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalArticleResourceLocalService;
 import com.liferay.journal.util.JournalContent;
 import com.liferay.journal.util.JournalConverter;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
@@ -64,9 +67,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = "javax.portlet.name=" + JournalPortletKeys.JOURNAL,
-	service = {
-		AssetRendererFactory.class, JournalArticleAssetRendererFactory.class
-	}
+	service = AssetRendererFactory.class
 )
 public class JournalArticleAssetRendererFactory
 	extends BaseAssetRendererFactory<JournalArticle> {
@@ -184,6 +185,10 @@ public class JournalArticleAssetRendererFactory
 			return ddmStructure.getName(locale);
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
 			return super.getTypeName(locale, subtypeId);
 		}
 	}
@@ -193,11 +198,13 @@ public class JournalArticleAssetRendererFactory
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse, long classTypeId) {
 
-		PortletURL portletURL = _portal.getControlPanelPortletURL(
-			liferayPortletRequest, getGroup(liferayPortletRequest),
-			JournalPortletKeys.JOURNAL, 0, 0, PortletRequest.RENDER_PHASE);
-
-		portletURL.setParameter("mvcPath", "/edit_article.jsp");
+		PortletURL portletURL = PortletURLBuilder.create(
+			_portal.getControlPanelPortletURL(
+				liferayPortletRequest, getGroup(liferayPortletRequest),
+				JournalPortletKeys.JOURNAL, 0, 0, PortletRequest.RENDER_PHASE)
+		).setMVCPath(
+			"/edit_article.jsp"
+		).buildPortletURL();
 
 		if (classTypeId > 0) {
 			DDMStructure ddmStructure =
@@ -225,6 +232,9 @@ public class JournalArticleAssetRendererFactory
 			liferayPortletURL.setWindowState(windowState);
 		}
 		catch (WindowStateException windowStateException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(windowStateException, windowStateException);
+			}
 		}
 
 		return liferayPortletURL;
@@ -235,11 +245,8 @@ public class JournalArticleAssetRendererFactory
 			PermissionChecker permissionChecker, long groupId, long classTypeId)
 		throws Exception {
 
-		if (classTypeId == 0) {
-			return false;
-		}
-
-		if (!_ddmStructureModelResourcePermission.contains(
+		if ((classTypeId == 0) ||
+			!_ddmStructureModelResourcePermission.contains(
 				permissionChecker, classTypeId, ActionKeys.VIEW)) {
 
 			return false;
@@ -281,6 +288,9 @@ public class JournalArticleAssetRendererFactory
 
 		return journalArticleAssetRenderer;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		JournalArticleAssetRendererFactory.class);
 
 	@Reference
 	private AssetDisplayPageFriendlyURLProvider

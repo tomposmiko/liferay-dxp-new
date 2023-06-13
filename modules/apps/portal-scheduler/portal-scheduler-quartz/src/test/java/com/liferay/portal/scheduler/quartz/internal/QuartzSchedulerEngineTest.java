@@ -29,8 +29,8 @@ import com.liferay.portal.kernel.scheduler.TriggerState;
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
 import com.liferay.portal.kernel.security.SecureRandomUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
-import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.Props;
@@ -87,7 +87,6 @@ import org.quartz.spi.JobFactory;
 /**
  * @author Tina Tian
  */
-@NewEnv(type = NewEnv.Type.CLASSLOADER)
 public class QuartzSchedulerEngineTest {
 
 	@ClassRule
@@ -209,6 +208,64 @@ public class QuartzSchedulerEngineTest {
 	}
 
 	@Test
+	public void testDescriptionMaxLength() {
+		int descriptionMaxLength =
+			_quartzSchedulerEngine.getDescriptionMaxLength() +
+				RandomTestUtil.randomInt();
+
+		_quartzSchedulerEngine.setProps(
+			PropsTestUtil.setProps(
+				PropsKeys.SCHEDULER_DESCRIPTION_MAX_LENGTH,
+				String.valueOf(descriptionMaxLength)));
+
+		Assert.assertEquals(
+			descriptionMaxLength,
+			_quartzSchedulerEngine.getDescriptionMaxLength());
+	}
+
+	@Test
+	public void testDisableScheduler() {
+		_quartzSchedulerEngine.deactivate();
+
+		_quartzSchedulerEngine.setProps(
+			PropsTestUtil.setProps(PropsKeys.SCHEDULER_ENABLED, "true"));
+
+		_quartzSchedulerEngine.activate();
+
+		Boolean schedulerEngineEnabled = ReflectionTestUtil.getFieldValue(
+			_quartzSchedulerEngine, "_schedulerEngineEnabled");
+
+		Assert.assertTrue(schedulerEngineEnabled);
+
+		_quartzSchedulerEngine.deactivate();
+
+		_quartzSchedulerEngine.setProps(
+			PropsTestUtil.setProps(PropsKeys.SCHEDULER_ENABLED, "false"));
+
+		_quartzSchedulerEngine.activate();
+
+		schedulerEngineEnabled = ReflectionTestUtil.getFieldValue(
+			_quartzSchedulerEngine, "_schedulerEngineEnabled");
+
+		Assert.assertFalse(schedulerEngineEnabled);
+	}
+
+	@Test
+	public void testGroupNameMaxLength() {
+		int groupNameMaxLength =
+			_quartzSchedulerEngine.getGroupNameMaxLength() +
+				RandomTestUtil.randomInt();
+
+		_quartzSchedulerEngine.setProps(
+			PropsTestUtil.setProps(
+				PropsKeys.SCHEDULER_GROUP_NAME_MAX_LENGTH,
+				String.valueOf(groupNameMaxLength)));
+
+		Assert.assertEquals(
+			groupNameMaxLength, _quartzSchedulerEngine.getGroupNameMaxLength());
+	}
+
+	@Test
 	public void testInitJobState() throws Exception {
 		List<SchedulerResponse> schedulerResponses =
 			_quartzSchedulerEngine.getScheduledJobs(
@@ -240,6 +297,21 @@ public class QuartzSchedulerEngineTest {
 		Assert.assertEquals(
 			schedulerResponses.toString(), _DEFAULT_JOB_NUMBER,
 			schedulerResponses.size());
+	}
+
+	@Test
+	public void testJobNameMaxLength() {
+		int jobNameMaxLength =
+			_quartzSchedulerEngine.getJobNameMaxLength() +
+				RandomTestUtil.randomInt();
+
+		_quartzSchedulerEngine.setProps(
+			PropsTestUtil.setProps(
+				PropsKeys.SCHEDULER_JOB_NAME_MAX_LENGTH,
+				String.valueOf(jobNameMaxLength)));
+
+		Assert.assertEquals(
+			jobNameMaxLength, _quartzSchedulerEngine.getJobNameMaxLength());
 	}
 
 	@Test

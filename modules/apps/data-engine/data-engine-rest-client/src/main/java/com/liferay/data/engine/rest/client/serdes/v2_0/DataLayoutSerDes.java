@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -59,7 +60,7 @@ public class DataLayoutSerDes {
 		sb.append("{");
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (dataLayout.getContentType() != null) {
 			if (sb.length() > 1) {
@@ -83,6 +84,16 @@ public class DataLayoutSerDes {
 			sb.append("\"dataDefinitionId\": ");
 
 			sb.append(dataLayout.getDataDefinitionId());
+		}
+
+		if (dataLayout.getDataLayoutFields() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dataLayoutFields\": ");
+
+			sb.append(_toJSON(dataLayout.getDataLayoutFields()));
 		}
 
 		if (dataLayout.getDataLayoutKey() != null) {
@@ -252,7 +263,7 @@ public class DataLayoutSerDes {
 		Map<String, String> map = new TreeMap<>();
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ssXX");
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		if (dataLayout.getContentType() == null) {
 			map.put("contentType", null);
@@ -268,6 +279,15 @@ public class DataLayoutSerDes {
 			map.put(
 				"dataDefinitionId",
 				String.valueOf(dataLayout.getDataDefinitionId()));
+		}
+
+		if (dataLayout.getDataLayoutFields() == null) {
+			map.put("dataLayoutFields", null);
+		}
+		else {
+			map.put(
+				"dataLayoutFields",
+				String.valueOf(dataLayout.getDataLayoutFields()));
 		}
 
 		if (dataLayout.getDataLayoutKey() == null) {
@@ -388,6 +408,13 @@ public class DataLayoutSerDes {
 						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "dataLayoutFields")) {
+				if (jsonParserFieldValue != null) {
+					dataLayout.setDataLayoutFields(
+						(Map)DataLayoutSerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "dataLayoutKey")) {
 				if (jsonParserFieldValue != null) {
 					dataLayout.setDataLayoutKey((String)jsonParserFieldValue);
@@ -395,34 +422,26 @@ public class DataLayoutSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "dataLayoutPages")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					DataLayoutPage[] dataLayoutPagesArray =
-						new DataLayoutPage[jsonParserFieldValues.length];
-
-					for (int i = 0; i < dataLayoutPagesArray.length; i++) {
-						dataLayoutPagesArray[i] = DataLayoutPageSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					dataLayout.setDataLayoutPages(dataLayoutPagesArray);
+					dataLayout.setDataLayoutPages(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> DataLayoutPageSerDes.toDTO((String)object)
+						).toArray(
+							size -> new DataLayoutPage[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dataRules")) {
 				if (jsonParserFieldValue != null) {
-					Object[] jsonParserFieldValues =
-						(Object[])jsonParserFieldValue;
-
-					DataRule[] dataRulesArray =
-						new DataRule[jsonParserFieldValues.length];
-
-					for (int i = 0; i < dataRulesArray.length; i++) {
-						dataRulesArray[i] = DataRuleSerDes.toDTO(
-							(String)jsonParserFieldValues[i]);
-					}
-
-					dataLayout.setDataRules(dataRulesArray);
+					dataLayout.setDataRules(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> DataRuleSerDes.toDTO((String)object)
+						).toArray(
+							size -> new DataRule[size]
+						));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {

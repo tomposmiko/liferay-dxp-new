@@ -18,11 +18,11 @@ definition {
 			category = "Site Builder",
 			portlet = "Pages");
 
-		SitePages.addPublicPage(
+		PagesAdmin.addPublicPage(
 			pageName = "Calendar Page",
 			sitePageType = "Widget Page");
 
-		SitePages.configurePage(
+		PagesAdmin.configurePage(
 			columnName = "1 Column",
 			pageName = "Calendar Page",
 			privacy = "Public Pages",
@@ -38,7 +38,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -52,29 +52,68 @@ definition {
 
 			CalendarConfiguration.tearDown();
 
-			Page.tearDownCP();
+			PagesAdmin.tearDownCP();
 		}
 	}
 
-	@priority = 3
+	@description = "LRQA-71362 - Verify that the user can configure the Default Duration of an Event"
+	@ignore = "Test Stub"
+	@priority = "3"
+	test CanConfigureEventsDefaultDuration {
+
+		// TODO LRQA-71621 CanConfigureEventsDefaultDuration pending implementation
+
+	}
+
+	@description = "LRQA-71362 - Verify that the user can modify the default View from the Calendar"
+	@priority = "3"
+	test CanModifyViews {
+		Navigator.gotoPage(pageName = "Calendar Page");
+
+		Calendar.viewDefaultViewCalendar(defaultView = "Week");
+
+		CalendarNavigator.gotoConfiguration();
+
+		CalendarConfiguration.viewDefaultViewConfiguration(defaultView = "Week");
+
+		CalendarConfiguration.selectDefaultView(defaultView = "Month");
+
+		CalendarConfiguration.save();
+
+		Alert.viewSuccessMessage();
+
+		Navigator.gotoPage(pageName = "Calendar Page");
+
+		Calendar.viewDefaultViewCalendar(defaultView = "Month");
+
+		Navigator.gotoPage(pageName = "Calendar Page");
+
+		CalendarNavigator.gotoConfiguration();
+
+		CalendarConfiguration.viewDefaultViewConfiguration(defaultView = "Month");
+	}
+
+	@priority = "3"
 	test ConfigureDefaultView {
 		for (var defaultView : list "Day,Week,Month,Agenda") {
 			Navigator.gotoPage(pageName = "Calendar Page");
 
 			CalendarNavigator.gotoConfiguration();
 
-			CalendarConfiguration.selectDefaultView(defaultView = ${defaultView});
+			CalendarConfiguration.selectDefaultView(defaultView = "${defaultView}");
 
 			CalendarConfiguration.save();
 
 			Navigator.gotoPage(pageName = "Calendar Page");
 
-			CalendarScheduler.viewSelectedView(view = ${defaultView});
+			CalendarScheduler.viewSelectedView(view = "${defaultView}");
 		}
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ConfigureDisplayTimeZone {
+		property portal.acceptance = "true";
+
 		CalendarNavigator.gotoConfiguration();
 
 		CalendarConfiguration.editTimeZoneUTC();
@@ -140,10 +179,8 @@ definition {
 			startDateTime = "AM");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test ConfigureEventsDisplaySettingsAndViewEvents {
-		property portal.upstream = "quarantine";
-
 		for (var eventNumber : list "1,2,3,4,5") {
 			CalendarNavigator.gotoAddEvent();
 
@@ -158,14 +195,14 @@ definition {
 		CalendarNavigator.gotoView(viewType = "Agenda");
 
 		for (var eventNumber : list "1,2,3,4,5") {
-			CalendarEvent.viewViaAgendaView(eventNumber = ${eventNumber});
+			CalendarEvent.viewViaAgendaView(eventNumber = "${eventNumber}");
 		}
 
 		Navigator.gotoPage(pageName = "Calendar Page");
 
 		CalendarNavigator.gotoConfiguration();
 
-		CalendarConfiguration.editNumberOfEventsDisplayed(maxNumberOfEvents = 4);
+		CalendarConfiguration.editNumberOfEventsDisplayed(maxNumberOfEvents = "4");
 
 		CalendarConfiguration.save();
 
@@ -174,16 +211,14 @@ definition {
 		CalendarNavigator.gotoView(viewType = "Agenda");
 
 		for (var eventNumber : list "1,2,3,4") {
-			CalendarEvent.viewViaAgendaView(eventNumber = ${eventNumber});
+			CalendarEvent.viewViaAgendaView(eventNumber = "${eventNumber}");
 		}
 
-		CalendarEvent.viewNotPresentViaAgendaView(eventNumber = 5);
+		CalendarEvent.viewNotPresentViaAgendaView(eventNumber = "5");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test View24hourTimeFormat {
-		property portal.upstream = "quarantine";
-
 		CalendarScheduler.viewFirstHour(firstHour = "12am");
 
 		CalendarScheduler.viewLastHour(lastHour = "11pm");
@@ -269,8 +304,9 @@ definition {
 			startDateTime = "09:00 PM");
 	}
 
-	@priority = 5
+	@priority = "5"
 	test ViewCalendarTimeZoneDefaults {
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "CalendarConfiguration#ViewCalendarTimeZoneDefaults";
 
 		UserBar.gotoDropdownItem(dropdownItem = "Account Settings");
@@ -298,9 +334,9 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-51783."
-	@priority = 4
+	@priority = "4"
 	test ViewEventDetailsAllDayWithModifiedUserTimeZone {
-		var siteName = TestCase.getSiteName(siteName = ${siteName});
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		UserBar.gotoDropdownItem(dropdownItem = "Account Settings");
 
@@ -319,7 +355,7 @@ definition {
 		Navigator.gotoPage(pageName = "Calendar Page");
 
 		CalendarEvent.viewDetails(
-			calendarName = ${siteName},
+			calendarName = "${siteName}",
 			eventTitle = "Calendar Event All Day Title",
 			eventType = "All Day");
 
@@ -329,8 +365,10 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-51127."
-	@priority = 5
+	@priority = "5"
 	test ViewWeekStartMonday {
+		property portal.acceptance = "true";
+
 		CalendarNavigator.gotoConfiguration();
 
 		CalendarConfiguration.selectWeekStartsOn(weekStartDay = "Monday");
@@ -357,7 +395,7 @@ definition {
 	}
 
 	@description = "This is a use case for 51127."
-	@priority = 3
+	@priority = "3"
 	test ViewWeekStartSaturday {
 		CalendarNavigator.gotoConfiguration();
 

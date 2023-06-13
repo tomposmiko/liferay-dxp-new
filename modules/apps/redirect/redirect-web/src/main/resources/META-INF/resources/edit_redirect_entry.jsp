@@ -25,7 +25,7 @@ RedirectEntry redirectEntry = (RedirectEntry)request.getAttribute(RedirectEntry.
 String destinationURL = (redirectEntry != null) ? redirectEntry.getDestinationURL() : ParamUtil.getString(request, "destinationURL");
 String sourceURL = (redirectEntry != null) ? redirectEntry.getSourceURL() : ParamUtil.getString(request, "sourceURL");
 
-RedirectEntriesDisplayContext redirectEntriesDisplayContext = (RedirectEntriesDisplayContext)request.getAttribute(RedirectEntriesDisplayContext.class.getName());
+RedirectDisplayContext redirectDisplayContext = new RedirectDisplayContext(request, liferayPortletRequest, liferayPortletResponse);
 
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
@@ -107,7 +107,7 @@ else {
 				</div>
 
 				<div class="input-group-item">
-					<aui:input autoFocus="<%= Validator.isNull(sourceURL) || Validator.isNotNull(destinationURL) %>" label="" name="sourceURL" required="<%= true %>" type="text" value="<%= URLCodec.decodeURL(sourceURL) %>" />
+					<aui:input autoFocus="<%= Validator.isNull(sourceURL) || Validator.isNotNull(destinationURL) %>" label="" name="sourceURL" required="<%= true %>" type="text" value="<%= sourceURL %>" />
 				</div>
 			</div>
 		</aui:field-wrapper>
@@ -143,7 +143,7 @@ else {
 			</aui:option>
 		</aui:select>
 
-		<aui:input helpMessage="the-redirect-will-be-active-until-the-chosen-date.-leave-it-empty-to-avoid-expiration" name="expirationDate" type="date" value="<%= redirectEntriesDisplayContext.getExpirationDateInputValue(redirectEntry) %>" />
+		<aui:input helpMessage="the-redirect-will-be-active-until-the-chosen-date.-leave-it-empty-to-avoid-expiration" name="expirationDate" type="date" value="<%= redirectDisplayContext.getExpirationDateInputValue(redirectEntry) %>" />
 
 		<c:if test="<%= redirectEntry != null %>">
 			<clay:alert

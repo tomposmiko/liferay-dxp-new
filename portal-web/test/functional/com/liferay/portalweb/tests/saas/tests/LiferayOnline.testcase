@@ -1,0 +1,242 @@
+@component-name = "portal-lol"
+definition {
+
+	property database.types = "mysql";
+	property liferay.online.properties = "true";
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.main.component.name = "LOL";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginUI(
+			password = "test",
+			userEmailAddress = "test@liferay.com");
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			PagesAdmin.tearDownCP();
+
+			WebContent.tearDownCP();
+		}
+	}
+
+	@description = "This is a test for LPS-135077. I can create a Virtual Instance with Default Initializer"
+	@priority = "4"
+	test AddVirtualInstanceWithDefaultInitializer {
+		task ("Add virtual instance able.com with a blank Initializer") {
+			PortalInstances.openVirtualInstancesAdmin();
+
+			LiferayOnline.addVirtualInstanceWithInitializer(
+				mailDomain = "www.baker.com",
+				virtualHost = "www.baker.com",
+				webId = "www.baker.com");
+		}
+
+		task ("Go to the new Virtual Instance") {
+			Navigator.openSpecificURL(url = "http://www.baker.com:8080");
+		}
+
+		task ("Assert the default Welcome Page is present") {
+			ContentPages.viewFragmentText(
+				fragmentName = "heading",
+				id = "element-text",
+				text = "Welcome to Liferay");
+		}
+	}
+
+	@description = "This is a test for LPS-135077. I can create a New Virtual Instance with the initializer"
+	@priority = "5"
+	test AddVirtualInstanceWithInitializer {
+		task ("Add virtual instance raylife.com with the Raylife Initializer") {
+			PortalInstances.openVirtualInstancesAdmin();
+
+			LiferayOnline.addVirtualInstanceWithInitializer(
+				initializerName = "Raylife",
+				mailDomain = "raylife.com",
+				virtualHost = "raylife",
+				webId = "raylife");
+		}
+
+		task ("Go to the new Virtual Instance") {
+			Navigator.openSpecificURL(url = "http://raylife:8080");
+		}
+
+		task ("Assert the Raylife logo is present") {
+			AssertElementPresent(locator1 = "Raylife#RAYLIFE_LOGO");
+		}
+	}
+
+	@description = "This is a test for LPS-135077. Raylife initializer is not deployed and is not shown on inicializer list"
+	@priority = "4"
+	test CannotSelectInitializerWithoutDeploy {
+		task ("Go to Gogo Shell Admin and Stop Raylife Module") {
+			GogoShell.openGogoShellAdmin();
+
+			var moduleID = GogoShell.getModuleID(moduleName = "com.liferay.site.initializer.raylife");
+
+			GogoShell.stopModule(moduleID = "${moduleID}");
+
+			GogoShell.viewModuleStatus(
+				moduleName = "com.liferay.site.initializer.raylife",
+				moduleStatus = "Resolved");
+		}
+
+		task ("Go to Add a New Virtual Instance and Assert the Raylife Module is Not Present") {
+			PortalInstances.openVirtualInstancesAdmin();
+
+			LexiconEntry.gotoAdd();
+
+			Type(
+				locator1 = "TextInput#WEB_ID",
+				value1 = "Test");
+
+			Click(locator1 = "OpenIDConnectLogin#OPENID_CONNECT_DROPDOWN_MENU");
+
+			AssertElementNotPresent(
+				key_providerNname = "Raylife",
+				locator1 = "OpenIDConnectLogin#OPENID_CONNECT_DROPDOWN_OPTION");
+		}
+
+		task ("Go to Gogo Shell Admin and Start Raylife Module") {
+			GogoShell.openGogoShellAdmin();
+
+			GogoShell.startModule(moduleID = "${moduleID}");
+
+			GogoShell.viewModuleStatus(
+				moduleName = "com.liferay.site.initializer.raylife",
+				moduleStatus = "Active");
+		}
+	}
+
+	@priority = "5"
+	test Smoke {
+		property liferay.online.smoke = "true";
+
+		AssertConsoleTextPresent(value1 = "Stopping blacklisted bundle");
+
+		HeadlessPortalInstanceAPI.addPortalInstance(
+			domain = "liferay.com",
+			portalInstanceId = "www.able.com",
+			virtualHost = "www.able.com");
+
+		User.firstLoginUI(
+			password = "test",
+			specificURL = "http://www.able.com:8080",
+			userEmailAddress = "test@liferay.com");
+
+		Smoke.viewWelcomeContentPage();
+
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			portlet = "Pages");
+
+		PagesAdmin.addPublicPage(pageName = "Test Page1");
+
+		PagesAdmin.addPublicPage(pageName = "Test Page2");
+
+		PagesAdmin.addPublicPage(pageName = "Test Page3");
+
+		var pageName = "Test Page1";
+		var portletBody = "Please configure this portlet to make it visible to all users.";
+		var portletName = "IFrame";
+
+		task ("Add a '${portletName}' portlet to the page named '${pageName}'") {
+			Navigator.gotoSpecificURLPage(
+				pageName = "${pageName}",
+				url = "http://www.able.com:8080");
+
+			Portlet.addPG(
+				i = "${i}",
+				portletName = "${portletName}");
+
+			Portlet.viewTitle(portletName = "${portletName}");
+
+			Portlet.viewBody(
+				portletBody = "${portletBody}",
+				portletName = "${portletName}");
+
+			Navigator.gotoSpecificURLPage(
+				pageName = "${pageName}",
+				url = "http://www.able.com:8080");
+
+			Portlet.viewTitle(portletName = "${portletName}");
+
+			Portlet.viewBody(
+				portletBody = "${portletBody}",
+				portletName = "${portletName}");
+		}
+
+		var collectionName = "Basic Components";
+		var contentPageName = "Test Content Page";
+		var fragmentId = "Heading";
+		var fragmentName = "Heading";
+
+		task ("Add a '${fragmentName}' fragment to the content page named '${contentPageName}'") {
+			task ("Create a Content Page") {
+				Navigator.openSpecificURL(url = "http://www.able.com:8080");
+
+				ProductMenu.gotoPortlet(
+					category = "Site Builder",
+					portlet = "Pages");
+
+				ContentPages.addPage(pageName = "${contentPageName}");
+			}
+
+			task ("Add a basic '${fragmentName}' component") {
+				PageEditor.addFragment(
+					collectionName = "${collectionName}",
+					fragmentName = "${fragmentName}");
+			}
+
+			task ("Publish Content Page") {
+				PageEditor.clickPublish();
+			}
+
+			task ("Navigate to the content page") {
+				Navigator.gotoSpecificURLPage(
+					pageName = "${contentPageName}",
+					url = "http://www.able.com:8080");
+			}
+
+			task ("Assert the '${fragmentName}' fragment is present") {
+				AssertElementPresent(locator1 = "//h1[contains(.,'Heading Example')]");
+			}
+		}
+
+		var portlet = "Web Content";
+
+		task ("Navigate to Product Menu > Sites > Content > ${portlet}") {
+			Navigator.openSpecificURL(url = "http://www.able.com:8080");
+
+			ProductMenu.gotoPortlet(
+				category = "Content & Data",
+				portlet = "${portlet}");
+
+			SiteAdmin.viewPortletTitle(portletTitle = "${portlet}");
+		}
+
+		var webContentContent = "Web Content Content";
+		var webContentTitle = "Web Content Title";
+
+		task ("Add a web content article with '${webContentTitle}' as the title and '${webContentContent}' as the content") {
+			WebContentNavigator.gotoAddCP();
+
+			WebContent.addCP(
+				webContentContent = "${webContentContent}",
+				webContentTitle = "${webContentTitle}");
+
+			PortletEntry.publish();
+
+			WebContent.viewTitle(webContentTitle = "${webContentTitle}");
+		}
+	}
+
+}

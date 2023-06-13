@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -279,107 +280,129 @@ public class UserNotificationEventModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, UserNotificationEvent>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			UserNotificationEvent.class.getClassLoader(),
+			UserNotificationEvent.class, ModelWrapper.class);
+
+		try {
+			Constructor<UserNotificationEvent> constructor =
+				(Constructor<UserNotificationEvent>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<UserNotificationEvent, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<UserNotificationEvent, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<UserNotificationEvent, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<UserNotificationEvent, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", UserNotificationEvent::getMvccVersion);
-		attributeGetterFunctions.put("uuid", UserNotificationEvent::getUuid);
-		attributeGetterFunctions.put(
-			"userNotificationEventId",
-			UserNotificationEvent::getUserNotificationEventId);
-		attributeGetterFunctions.put(
-			"companyId", UserNotificationEvent::getCompanyId);
-		attributeGetterFunctions.put(
-			"userId", UserNotificationEvent::getUserId);
-		attributeGetterFunctions.put("type", UserNotificationEvent::getType);
-		attributeGetterFunctions.put(
-			"timestamp", UserNotificationEvent::getTimestamp);
-		attributeGetterFunctions.put(
-			"deliveryType", UserNotificationEvent::getDeliveryType);
-		attributeGetterFunctions.put(
-			"deliverBy", UserNotificationEvent::getDeliverBy);
-		attributeGetterFunctions.put(
-			"delivered", UserNotificationEvent::getDelivered);
-		attributeGetterFunctions.put(
-			"payload", UserNotificationEvent::getPayload);
-		attributeGetterFunctions.put(
-			"actionRequired", UserNotificationEvent::getActionRequired);
-		attributeGetterFunctions.put(
-			"archived", UserNotificationEvent::getArchived);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<UserNotificationEvent, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<UserNotificationEvent, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<UserNotificationEvent, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", UserNotificationEvent::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<UserNotificationEvent, Long>)
 				UserNotificationEvent::setMvccVersion);
+		attributeGetterFunctions.put("uuid", UserNotificationEvent::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<UserNotificationEvent, String>)
 				UserNotificationEvent::setUuid);
+		attributeGetterFunctions.put(
+			"userNotificationEventId",
+			UserNotificationEvent::getUserNotificationEventId);
 		attributeSetterBiConsumers.put(
 			"userNotificationEventId",
 			(BiConsumer<UserNotificationEvent, Long>)
 				UserNotificationEvent::setUserNotificationEventId);
+		attributeGetterFunctions.put(
+			"companyId", UserNotificationEvent::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<UserNotificationEvent, Long>)
 				UserNotificationEvent::setCompanyId);
+		attributeGetterFunctions.put(
+			"userId", UserNotificationEvent::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<UserNotificationEvent, Long>)
 				UserNotificationEvent::setUserId);
+		attributeGetterFunctions.put("type", UserNotificationEvent::getType);
 		attributeSetterBiConsumers.put(
 			"type",
 			(BiConsumer<UserNotificationEvent, String>)
 				UserNotificationEvent::setType);
+		attributeGetterFunctions.put(
+			"timestamp", UserNotificationEvent::getTimestamp);
 		attributeSetterBiConsumers.put(
 			"timestamp",
 			(BiConsumer<UserNotificationEvent, Long>)
 				UserNotificationEvent::setTimestamp);
+		attributeGetterFunctions.put(
+			"deliveryType", UserNotificationEvent::getDeliveryType);
 		attributeSetterBiConsumers.put(
 			"deliveryType",
 			(BiConsumer<UserNotificationEvent, Integer>)
 				UserNotificationEvent::setDeliveryType);
+		attributeGetterFunctions.put(
+			"deliverBy", UserNotificationEvent::getDeliverBy);
 		attributeSetterBiConsumers.put(
 			"deliverBy",
 			(BiConsumer<UserNotificationEvent, Long>)
 				UserNotificationEvent::setDeliverBy);
+		attributeGetterFunctions.put(
+			"delivered", UserNotificationEvent::getDelivered);
 		attributeSetterBiConsumers.put(
 			"delivered",
 			(BiConsumer<UserNotificationEvent, Boolean>)
 				UserNotificationEvent::setDelivered);
+		attributeGetterFunctions.put(
+			"payload", UserNotificationEvent::getPayload);
 		attributeSetterBiConsumers.put(
 			"payload",
 			(BiConsumer<UserNotificationEvent, String>)
 				UserNotificationEvent::setPayload);
+		attributeGetterFunctions.put(
+			"actionRequired", UserNotificationEvent::getActionRequired);
 		attributeSetterBiConsumers.put(
 			"actionRequired",
 			(BiConsumer<UserNotificationEvent, Boolean>)
 				UserNotificationEvent::setActionRequired);
+		attributeGetterFunctions.put(
+			"archived", UserNotificationEvent::getArchived);
 		attributeSetterBiConsumers.put(
 			"archived",
 			(BiConsumer<UserNotificationEvent, Boolean>)
 				UserNotificationEvent::setArchived);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -768,6 +791,41 @@ public class UserNotificationEventModelImpl
 	}
 
 	@Override
+	public UserNotificationEvent cloneWithOriginalValues() {
+		UserNotificationEventImpl userNotificationEventImpl =
+			new UserNotificationEventImpl();
+
+		userNotificationEventImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		userNotificationEventImpl.setUuid(
+			this.<String>getColumnOriginalValue("uuid_"));
+		userNotificationEventImpl.setUserNotificationEventId(
+			this.<Long>getColumnOriginalValue("userNotificationEventId"));
+		userNotificationEventImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		userNotificationEventImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		userNotificationEventImpl.setType(
+			this.<String>getColumnOriginalValue("type_"));
+		userNotificationEventImpl.setTimestamp(
+			this.<Long>getColumnOriginalValue("timestamp"));
+		userNotificationEventImpl.setDeliveryType(
+			this.<Integer>getColumnOriginalValue("deliveryType"));
+		userNotificationEventImpl.setDeliverBy(
+			this.<Long>getColumnOriginalValue("deliverBy"));
+		userNotificationEventImpl.setDelivered(
+			this.<Boolean>getColumnOriginalValue("delivered"));
+		userNotificationEventImpl.setPayload(
+			this.<String>getColumnOriginalValue("payload"));
+		userNotificationEventImpl.setActionRequired(
+			this.<Boolean>getColumnOriginalValue("actionRequired"));
+		userNotificationEventImpl.setArchived(
+			this.<Boolean>getColumnOriginalValue("archived"));
+
+		return userNotificationEventImpl;
+	}
+
+	@Override
 	public int compareTo(UserNotificationEvent userNotificationEvent) {
 		int value = 0;
 
@@ -981,9 +1039,7 @@ public class UserNotificationEventModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, UserNotificationEvent>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					UserNotificationEvent.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

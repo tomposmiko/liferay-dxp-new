@@ -17,8 +17,6 @@ package com.liferay.portlet.asset.service.base;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil;
-import com.liferay.asset.kernel.service.persistence.AssetCategoryFinder;
-import com.liferay.asset.kernel.service.persistence.AssetCategoryPersistence;
 import com.liferay.asset.kernel.service.persistence.AssetVocabularyFinder;
 import com.liferay.asset.kernel.service.persistence.AssetVocabularyPersistence;
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
@@ -42,8 +40,6 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -51,10 +47,6 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
-import com.liferay.portal.kernel.service.persistence.GroupFinder;
-import com.liferay.portal.kernel.service.persistence.GroupPersistence;
-import com.liferay.portal.kernel.service.persistence.UserFinder;
-import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -274,32 +266,48 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 		return assetVocabularyPersistence.fetchByUUID_G(uuid, groupId);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the asset vocabulary with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the asset vocabulary's external reference code
+	 * @return the matching asset vocabulary, or <code>null</code> if a matching asset vocabulary could not be found
+	 */
 	@Override
 	public AssetVocabulary fetchAssetVocabularyByExternalReferenceCode(
-		long companyId, String externalReferenceCode) {
+		long groupId, String externalReferenceCode) {
 
-		return assetVocabularyPersistence.fetchByC_ERC(
-			companyId, externalReferenceCode);
+		return assetVocabularyPersistence.fetchByG_ERC(
+			groupId, externalReferenceCode);
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #fetchAssetVocabularyByExternalReferenceCode(long, String)}
+	 */
 	@Deprecated
 	@Override
 	public AssetVocabulary fetchAssetVocabularyByReferenceCode(
-		long companyId, String externalReferenceCode) {
+		long groupId, String externalReferenceCode) {
 
 		return fetchAssetVocabularyByExternalReferenceCode(
-			companyId, externalReferenceCode);
+			groupId, externalReferenceCode);
 	}
 
-	@Deprecated
+	/**
+	 * Returns the asset vocabulary with the matching external reference code and group.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param externalReferenceCode the asset vocabulary's external reference code
+	 * @return the matching asset vocabulary
+	 * @throws PortalException if a matching asset vocabulary could not be found
+	 */
 	@Override
 	public AssetVocabulary getAssetVocabularyByExternalReferenceCode(
-			long companyId, String externalReferenceCode)
+			long groupId, String externalReferenceCode)
 		throws PortalException {
 
-		return assetVocabularyPersistence.findByC_ERC(
-			companyId, externalReferenceCode);
+		return assetVocabularyPersistence.findByG_ERC(
+			groupId, externalReferenceCode);
 	}
 
 	/**
@@ -430,6 +438,7 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -448,6 +457,7 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 			(AssetVocabulary)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<AssetVocabulary> getBasePersistence() {
 		return assetVocabularyPersistence;
 	}
@@ -638,208 +648,6 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 		this.counterLocalService = counterLocalService;
 	}
 
-	/**
-	 * Returns the group local service.
-	 *
-	 * @return the group local service
-	 */
-	public com.liferay.portal.kernel.service.GroupLocalService
-		getGroupLocalService() {
-
-		return groupLocalService;
-	}
-
-	/**
-	 * Sets the group local service.
-	 *
-	 * @param groupLocalService the group local service
-	 */
-	public void setGroupLocalService(
-		com.liferay.portal.kernel.service.GroupLocalService groupLocalService) {
-
-		this.groupLocalService = groupLocalService;
-	}
-
-	/**
-	 * Returns the group persistence.
-	 *
-	 * @return the group persistence
-	 */
-	public GroupPersistence getGroupPersistence() {
-		return groupPersistence;
-	}
-
-	/**
-	 * Sets the group persistence.
-	 *
-	 * @param groupPersistence the group persistence
-	 */
-	public void setGroupPersistence(GroupPersistence groupPersistence) {
-		this.groupPersistence = groupPersistence;
-	}
-
-	/**
-	 * Returns the group finder.
-	 *
-	 * @return the group finder
-	 */
-	public GroupFinder getGroupFinder() {
-		return groupFinder;
-	}
-
-	/**
-	 * Sets the group finder.
-	 *
-	 * @param groupFinder the group finder
-	 */
-	public void setGroupFinder(GroupFinder groupFinder) {
-		this.groupFinder = groupFinder;
-	}
-
-	/**
-	 * Returns the resource local service.
-	 *
-	 * @return the resource local service
-	 */
-	public com.liferay.portal.kernel.service.ResourceLocalService
-		getResourceLocalService() {
-
-		return resourceLocalService;
-	}
-
-	/**
-	 * Sets the resource local service.
-	 *
-	 * @param resourceLocalService the resource local service
-	 */
-	public void setResourceLocalService(
-		com.liferay.portal.kernel.service.ResourceLocalService
-			resourceLocalService) {
-
-		this.resourceLocalService = resourceLocalService;
-	}
-
-	/**
-	 * Returns the user local service.
-	 *
-	 * @return the user local service
-	 */
-	public com.liferay.portal.kernel.service.UserLocalService
-		getUserLocalService() {
-
-		return userLocalService;
-	}
-
-	/**
-	 * Sets the user local service.
-	 *
-	 * @param userLocalService the user local service
-	 */
-	public void setUserLocalService(
-		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
-
-		this.userLocalService = userLocalService;
-	}
-
-	/**
-	 * Returns the user persistence.
-	 *
-	 * @return the user persistence
-	 */
-	public UserPersistence getUserPersistence() {
-		return userPersistence;
-	}
-
-	/**
-	 * Sets the user persistence.
-	 *
-	 * @param userPersistence the user persistence
-	 */
-	public void setUserPersistence(UserPersistence userPersistence) {
-		this.userPersistence = userPersistence;
-	}
-
-	/**
-	 * Returns the user finder.
-	 *
-	 * @return the user finder
-	 */
-	public UserFinder getUserFinder() {
-		return userFinder;
-	}
-
-	/**
-	 * Sets the user finder.
-	 *
-	 * @param userFinder the user finder
-	 */
-	public void setUserFinder(UserFinder userFinder) {
-		this.userFinder = userFinder;
-	}
-
-	/**
-	 * Returns the asset category local service.
-	 *
-	 * @return the asset category local service
-	 */
-	public com.liferay.asset.kernel.service.AssetCategoryLocalService
-		getAssetCategoryLocalService() {
-
-		return assetCategoryLocalService;
-	}
-
-	/**
-	 * Sets the asset category local service.
-	 *
-	 * @param assetCategoryLocalService the asset category local service
-	 */
-	public void setAssetCategoryLocalService(
-		com.liferay.asset.kernel.service.AssetCategoryLocalService
-			assetCategoryLocalService) {
-
-		this.assetCategoryLocalService = assetCategoryLocalService;
-	}
-
-	/**
-	 * Returns the asset category persistence.
-	 *
-	 * @return the asset category persistence
-	 */
-	public AssetCategoryPersistence getAssetCategoryPersistence() {
-		return assetCategoryPersistence;
-	}
-
-	/**
-	 * Sets the asset category persistence.
-	 *
-	 * @param assetCategoryPersistence the asset category persistence
-	 */
-	public void setAssetCategoryPersistence(
-		AssetCategoryPersistence assetCategoryPersistence) {
-
-		this.assetCategoryPersistence = assetCategoryPersistence;
-	}
-
-	/**
-	 * Returns the asset category finder.
-	 *
-	 * @return the asset category finder
-	 */
-	public AssetCategoryFinder getAssetCategoryFinder() {
-		return assetCategoryFinder;
-	}
-
-	/**
-	 * Sets the asset category finder.
-	 *
-	 * @param assetCategoryFinder the asset category finder
-	 */
-	public void setAssetCategoryFinder(
-		AssetCategoryFinder assetCategoryFinder) {
-
-		this.assetCategoryFinder = assetCategoryFinder;
-	}
-
 	public void afterPropertiesSet() {
 		persistedModelLocalServiceRegistry.register(
 			"com.liferay.asset.kernel.model.AssetVocabulary",
@@ -943,51 +751,6 @@ public abstract class AssetVocabularyLocalServiceBaseImpl
 	)
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.GroupLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.GroupLocalService
-		groupLocalService;
-
-	@BeanReference(type = GroupPersistence.class)
-	protected GroupPersistence groupPersistence;
-
-	@BeanReference(type = GroupFinder.class)
-	protected GroupFinder groupFinder;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.ResourceLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.ResourceLocalService
-		resourceLocalService;
-
-	@BeanReference(
-		type = com.liferay.portal.kernel.service.UserLocalService.class
-	)
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@BeanReference(type = UserPersistence.class)
-	protected UserPersistence userPersistence;
-
-	@BeanReference(type = UserFinder.class)
-	protected UserFinder userFinder;
-
-	@BeanReference(
-		type = com.liferay.asset.kernel.service.AssetCategoryLocalService.class
-	)
-	protected com.liferay.asset.kernel.service.AssetCategoryLocalService
-		assetCategoryLocalService;
-
-	@BeanReference(type = AssetCategoryPersistence.class)
-	protected AssetCategoryPersistence assetCategoryPersistence;
-
-	@BeanReference(type = AssetCategoryFinder.class)
-	protected AssetCategoryFinder assetCategoryFinder;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AssetVocabularyLocalServiceBaseImpl.class);
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

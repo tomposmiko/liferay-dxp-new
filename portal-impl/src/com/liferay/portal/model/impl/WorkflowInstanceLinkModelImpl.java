@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -255,102 +256,124 @@ public class WorkflowInstanceLinkModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
+	private static Function<InvocationHandler, WorkflowInstanceLink>
+		_getProxyProviderFunction() {
+
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			WorkflowInstanceLink.class.getClassLoader(),
+			WorkflowInstanceLink.class, ModelWrapper.class);
+
+		try {
+			Constructor<WorkflowInstanceLink> constructor =
+				(Constructor<WorkflowInstanceLink>)proxyClass.getConstructor(
+					InvocationHandler.class);
+
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
+	}
+
 	private static final Map<String, Function<WorkflowInstanceLink, Object>>
 		_attributeGetterFunctions;
+	private static final Map<String, BiConsumer<WorkflowInstanceLink, Object>>
+		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<WorkflowInstanceLink, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<WorkflowInstanceLink, Object>>();
-
-		attributeGetterFunctions.put(
-			"mvccVersion", WorkflowInstanceLink::getMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", WorkflowInstanceLink::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"workflowInstanceLinkId",
-			WorkflowInstanceLink::getWorkflowInstanceLinkId);
-		attributeGetterFunctions.put(
-			"groupId", WorkflowInstanceLink::getGroupId);
-		attributeGetterFunctions.put(
-			"companyId", WorkflowInstanceLink::getCompanyId);
-		attributeGetterFunctions.put("userId", WorkflowInstanceLink::getUserId);
-		attributeGetterFunctions.put(
-			"userName", WorkflowInstanceLink::getUserName);
-		attributeGetterFunctions.put(
-			"createDate", WorkflowInstanceLink::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", WorkflowInstanceLink::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", WorkflowInstanceLink::getClassNameId);
-		attributeGetterFunctions.put(
-			"classPK", WorkflowInstanceLink::getClassPK);
-		attributeGetterFunctions.put(
-			"workflowInstanceId", WorkflowInstanceLink::getWorkflowInstanceId);
-
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
-	}
-
-	private static final Map<String, BiConsumer<WorkflowInstanceLink, Object>>
-		_attributeSetterBiConsumers;
-
-	static {
 		Map<String, BiConsumer<WorkflowInstanceLink, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<WorkflowInstanceLink, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", WorkflowInstanceLink::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<WorkflowInstanceLink, Long>)
 				WorkflowInstanceLink::setMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", WorkflowInstanceLink::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<WorkflowInstanceLink, Long>)
 				WorkflowInstanceLink::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"workflowInstanceLinkId",
+			WorkflowInstanceLink::getWorkflowInstanceLinkId);
 		attributeSetterBiConsumers.put(
 			"workflowInstanceLinkId",
 			(BiConsumer<WorkflowInstanceLink, Long>)
 				WorkflowInstanceLink::setWorkflowInstanceLinkId);
+		attributeGetterFunctions.put(
+			"groupId", WorkflowInstanceLink::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<WorkflowInstanceLink, Long>)
 				WorkflowInstanceLink::setGroupId);
+		attributeGetterFunctions.put(
+			"companyId", WorkflowInstanceLink::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<WorkflowInstanceLink, Long>)
 				WorkflowInstanceLink::setCompanyId);
+		attributeGetterFunctions.put("userId", WorkflowInstanceLink::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<WorkflowInstanceLink, Long>)
 				WorkflowInstanceLink::setUserId);
+		attributeGetterFunctions.put(
+			"userName", WorkflowInstanceLink::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<WorkflowInstanceLink, String>)
 				WorkflowInstanceLink::setUserName);
+		attributeGetterFunctions.put(
+			"createDate", WorkflowInstanceLink::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<WorkflowInstanceLink, Date>)
 				WorkflowInstanceLink::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", WorkflowInstanceLink::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<WorkflowInstanceLink, Date>)
 				WorkflowInstanceLink::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", WorkflowInstanceLink::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<WorkflowInstanceLink, Long>)
 				WorkflowInstanceLink::setClassNameId);
+		attributeGetterFunctions.put(
+			"classPK", WorkflowInstanceLink::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<WorkflowInstanceLink, Long>)
 				WorkflowInstanceLink::setClassPK);
+		attributeGetterFunctions.put(
+			"workflowInstanceId", WorkflowInstanceLink::getWorkflowInstanceId);
 		attributeSetterBiConsumers.put(
 			"workflowInstanceId",
 			(BiConsumer<WorkflowInstanceLink, Long>)
 				WorkflowInstanceLink::setWorkflowInstanceId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -686,6 +709,39 @@ public class WorkflowInstanceLinkModelImpl
 	}
 
 	@Override
+	public WorkflowInstanceLink cloneWithOriginalValues() {
+		WorkflowInstanceLinkImpl workflowInstanceLinkImpl =
+			new WorkflowInstanceLinkImpl();
+
+		workflowInstanceLinkImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		workflowInstanceLinkImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		workflowInstanceLinkImpl.setWorkflowInstanceLinkId(
+			this.<Long>getColumnOriginalValue("workflowInstanceLinkId"));
+		workflowInstanceLinkImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		workflowInstanceLinkImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		workflowInstanceLinkImpl.setUserId(
+			this.<Long>getColumnOriginalValue("userId"));
+		workflowInstanceLinkImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		workflowInstanceLinkImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		workflowInstanceLinkImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		workflowInstanceLinkImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		workflowInstanceLinkImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		workflowInstanceLinkImpl.setWorkflowInstanceId(
+			this.<Long>getColumnOriginalValue("workflowInstanceId"));
+
+		return workflowInstanceLinkImpl;
+	}
+
+	@Override
 	public int compareTo(WorkflowInstanceLink workflowInstanceLink) {
 		int value = 0;
 
@@ -896,9 +952,7 @@ public class WorkflowInstanceLinkModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, WorkflowInstanceLink>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					WorkflowInstanceLink.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

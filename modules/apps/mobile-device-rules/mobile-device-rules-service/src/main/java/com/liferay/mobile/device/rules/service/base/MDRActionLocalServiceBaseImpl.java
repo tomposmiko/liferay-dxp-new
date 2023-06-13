@@ -23,7 +23,6 @@ import com.liferay.mobile.device.rules.model.MDRAction;
 import com.liferay.mobile.device.rules.service.MDRActionLocalService;
 import com.liferay.mobile.device.rules.service.MDRActionLocalServiceUtil;
 import com.liferay.mobile.device.rules.service.persistence.MDRActionPersistence;
-import com.liferay.mobile.device.rules.service.persistence.MDRRuleGroupInstancePersistence;
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -41,8 +40,6 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -415,6 +412,7 @@ public abstract class MDRActionLocalServiceBaseImpl
 	/**
 	 * @throws PortalException
 	 */
+	@Override
 	public PersistedModel createPersistedModel(Serializable primaryKeyObj)
 		throws PortalException {
 
@@ -431,6 +429,7 @@ public abstract class MDRActionLocalServiceBaseImpl
 		return mdrActionLocalService.deleteMDRAction((MDRAction)persistedModel);
 	}
 
+	@Override
 	public BasePersistence<MDRAction> getBasePersistence() {
 		return mdrActionPersistence;
 	}
@@ -621,15 +620,5 @@ public abstract class MDRActionLocalServiceBaseImpl
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService
 		counterLocalService;
-
-	@Reference
-	protected com.liferay.portal.kernel.service.UserLocalService
-		userLocalService;
-
-	@Reference
-	protected MDRRuleGroupInstancePersistence mdrRuleGroupInstancePersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		MDRActionLocalServiceBaseImpl.class);
 
 }

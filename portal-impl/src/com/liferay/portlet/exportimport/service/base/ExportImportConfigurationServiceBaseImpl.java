@@ -25,15 +25,12 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
 import com.liferay.portal.kernel.service.persistence.UserFinder;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.trash.kernel.service.persistence.TrashEntryPersistence;
 
 import java.lang.reflect.Field;
 
@@ -435,75 +432,6 @@ public abstract class ExportImportConfigurationServiceBaseImpl
 		this.userFinder = userFinder;
 	}
 
-	/**
-	 * Returns the trash entry local service.
-	 *
-	 * @return the trash entry local service
-	 */
-	@SuppressWarnings("deprecation")
-	public com.liferay.trash.kernel.service.TrashEntryLocalService
-		getTrashEntryLocalService() {
-
-		return trashEntryLocalService;
-	}
-
-	/**
-	 * Sets the trash entry local service.
-	 *
-	 * @param trashEntryLocalService the trash entry local service
-	 */
-	@SuppressWarnings("deprecation")
-	public void setTrashEntryLocalService(
-		com.liferay.trash.kernel.service.TrashEntryLocalService
-			trashEntryLocalService) {
-
-		this.trashEntryLocalService = trashEntryLocalService;
-	}
-
-	/**
-	 * Returns the trash entry remote service.
-	 *
-	 * @return the trash entry remote service
-	 */
-	@SuppressWarnings("deprecation")
-	public com.liferay.trash.kernel.service.TrashEntryService
-		getTrashEntryService() {
-
-		return trashEntryService;
-	}
-
-	/**
-	 * Sets the trash entry remote service.
-	 *
-	 * @param trashEntryService the trash entry remote service
-	 */
-	@SuppressWarnings("deprecation")
-	public void setTrashEntryService(
-		com.liferay.trash.kernel.service.TrashEntryService trashEntryService) {
-
-		this.trashEntryService = trashEntryService;
-	}
-
-	/**
-	 * Returns the trash entry persistence.
-	 *
-	 * @return the trash entry persistence
-	 */
-	public TrashEntryPersistence getTrashEntryPersistence() {
-		return trashEntryPersistence;
-	}
-
-	/**
-	 * Sets the trash entry persistence.
-	 *
-	 * @param trashEntryPersistence the trash entry persistence
-	 */
-	public void setTrashEntryPersistence(
-		TrashEntryPersistence trashEntryPersistence) {
-
-		this.trashEntryPersistence = trashEntryPersistence;
-	}
-
 	public void afterPropertiesSet() {
 		_setServiceUtilService(exportImportConfigurationService);
 	}
@@ -654,25 +582,5 @@ public abstract class ExportImportConfigurationServiceBaseImpl
 
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
-
-	@BeanReference(
-		type = com.liferay.trash.kernel.service.TrashEntryLocalService.class
-	)
-	@SuppressWarnings("deprecation")
-	protected com.liferay.trash.kernel.service.TrashEntryLocalService
-		trashEntryLocalService;
-
-	@BeanReference(
-		type = com.liferay.trash.kernel.service.TrashEntryService.class
-	)
-	@SuppressWarnings("deprecation")
-	protected com.liferay.trash.kernel.service.TrashEntryService
-		trashEntryService;
-
-	@BeanReference(type = TrashEntryPersistence.class)
-	protected TrashEntryPersistence trashEntryPersistence;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ExportImportConfigurationServiceBaseImpl.class);
 
 }

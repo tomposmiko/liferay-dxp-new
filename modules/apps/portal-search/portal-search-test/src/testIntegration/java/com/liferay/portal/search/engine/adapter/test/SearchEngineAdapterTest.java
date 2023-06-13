@@ -106,9 +106,7 @@ public class SearchEngineAdapterTest {
 
 		_deleteDocument(uid);
 
-		document = _getDocument(uid);
-
-		Assert.assertNull(document);
+		Assert.assertNull(_getDocument(uid));
 	}
 
 	@Test
@@ -175,14 +173,7 @@ public class SearchEngineAdapterTest {
 
 			String message = runtimeException.getMessage();
 
-			if (isSearchEngine("Solr")) {
-				Assert.assertTrue(
-					message,
-					message.contains(
-						"<p>Problem accessing /solr/" + index + "/update") ||
-					message.contains("Error 404 Not Found"));
-			}
-			else if (isSearchEngine("Elasticsearch7")) {
+			if (isSearchEngine("Elasticsearch7")) {
 				Assert.assertTrue(
 					message,
 					message.contains("reason=no such index [" + index + "]"));
@@ -209,9 +200,7 @@ public class SearchEngineAdapterTest {
 
 		String name = clazz.getName();
 
-		if (name.startsWith("org.elasticsearch") ||
-			name.startsWith("org.apache.solr")) {
-
+		if (name.startsWith("org.elasticsearch")) {
 			throw _getTestFrameworkSafeToLoadException(
 				name, throwable.getMessage(), throwable.getStackTrace());
 		}
@@ -220,10 +209,6 @@ public class SearchEngineAdapterTest {
 	}
 
 	protected String getIndexName() throws Exception {
-		if (isSearchEngine("Solr")) {
-			return "liferay";
-		}
-
 		return "liferay-" + TestPropsValues.getCompanyId();
 	}
 

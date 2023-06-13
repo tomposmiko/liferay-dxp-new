@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -233,67 +234,88 @@ public class CTEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<CTEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, CTEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<CTEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<CTEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CTEntry.class.getClassLoader(), CTEntry.class, ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", CTEntry::getMvccVersion);
-		attributeGetterFunctions.put("ctEntryId", CTEntry::getCtEntryId);
-		attributeGetterFunctions.put("companyId", CTEntry::getCompanyId);
-		attributeGetterFunctions.put("userId", CTEntry::getUserId);
-		attributeGetterFunctions.put("createDate", CTEntry::getCreateDate);
-		attributeGetterFunctions.put("modifiedDate", CTEntry::getModifiedDate);
-		attributeGetterFunctions.put(
-			"ctCollectionId", CTEntry::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"modelClassNameId", CTEntry::getModelClassNameId);
-		attributeGetterFunctions.put("modelClassPK", CTEntry::getModelClassPK);
-		attributeGetterFunctions.put(
-			"modelMvccVersion", CTEntry::getModelMvccVersion);
-		attributeGetterFunctions.put("changeType", CTEntry::getChangeType);
+		try {
+			Constructor<CTEntry> constructor =
+				(Constructor<CTEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<CTEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<CTEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<CTEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<CTEntry, Object>>();
 		Map<String, BiConsumer<CTEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<CTEntry, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", CTEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion", (BiConsumer<CTEntry, Long>)CTEntry::setMvccVersion);
+		attributeGetterFunctions.put("ctEntryId", CTEntry::getCtEntryId);
 		attributeSetterBiConsumers.put(
 			"ctEntryId", (BiConsumer<CTEntry, Long>)CTEntry::setCtEntryId);
+		attributeGetterFunctions.put("companyId", CTEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<CTEntry, Long>)CTEntry::setCompanyId);
+		attributeGetterFunctions.put("userId", CTEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<CTEntry, Long>)CTEntry::setUserId);
+		attributeGetterFunctions.put("createDate", CTEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<CTEntry, Date>)CTEntry::setCreateDate);
+		attributeGetterFunctions.put("modifiedDate", CTEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CTEntry, Date>)CTEntry::setModifiedDate);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CTEntry::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<CTEntry, Long>)CTEntry::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"modelClassNameId", CTEntry::getModelClassNameId);
 		attributeSetterBiConsumers.put(
 			"modelClassNameId",
 			(BiConsumer<CTEntry, Long>)CTEntry::setModelClassNameId);
+		attributeGetterFunctions.put("modelClassPK", CTEntry::getModelClassPK);
 		attributeSetterBiConsumers.put(
 			"modelClassPK",
 			(BiConsumer<CTEntry, Long>)CTEntry::setModelClassPK);
+		attributeGetterFunctions.put(
+			"modelMvccVersion", CTEntry::getModelMvccVersion);
 		attributeSetterBiConsumers.put(
 			"modelMvccVersion",
 			(BiConsumer<CTEntry, Long>)CTEntry::setModelMvccVersion);
+		attributeGetterFunctions.put("changeType", CTEntry::getChangeType);
 		attributeSetterBiConsumers.put(
 			"changeType", (BiConsumer<CTEntry, Integer>)CTEntry::setChangeType);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -578,6 +600,35 @@ public class CTEntryModelImpl
 	}
 
 	@Override
+	public CTEntry cloneWithOriginalValues() {
+		CTEntryImpl ctEntryImpl = new CTEntryImpl();
+
+		ctEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		ctEntryImpl.setCtEntryId(
+			this.<Long>getColumnOriginalValue("ctEntryId"));
+		ctEntryImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		ctEntryImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		ctEntryImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		ctEntryImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		ctEntryImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		ctEntryImpl.setModelClassNameId(
+			this.<Long>getColumnOriginalValue("modelClassNameId"));
+		ctEntryImpl.setModelClassPK(
+			this.<Long>getColumnOriginalValue("modelClassPK"));
+		ctEntryImpl.setModelMvccVersion(
+			this.<Long>getColumnOriginalValue("modelMvccVersion"));
+		ctEntryImpl.setChangeType(
+			this.<Integer>getColumnOriginalValue("changeType"));
+
+		return ctEntryImpl;
+	}
+
+	@Override
 	public int compareTo(CTEntry ctEntry) {
 		long primaryKey = ctEntry.getPrimaryKey();
 
@@ -772,9 +823,7 @@ public class CTEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CTEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CTEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

@@ -15,6 +15,7 @@
 package com.liferay.dynamic.data.mapping.form.field.type.internal.checkbox.multiple;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueAccessor;
+import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
@@ -28,6 +29,7 @@ import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
@@ -42,7 +44,8 @@ import org.osgi.service.component.annotations.Reference;
  * @author Dylan Rebelak
  */
 @Component(
-	immediate = true, property = "ddm.form.field.type.name=checkbox_multiple",
+	immediate = true,
+	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.CHECKBOX_MULTIPLE,
 	service = {
 		CheckboxMultipleDDMFormFieldValueAccessor.class,
 		DDMFormFieldValueAccessor.class
@@ -79,13 +82,11 @@ public class CheckboxMultipleDDMFormFieldValueAccessor
 				optionsValuesJSONArray.getString(i));
 
 			if (matcher.matches()) {
-				StringBundler sb = new StringBundler(3);
-
-				sb.append(StringPool.OPEN_BRACKET);
-				sb.append(getOptionsLabels(ddmFormFieldValue, locale));
-				sb.append(StringPool.CLOSE_BRACKET);
-
-				return createJSONArray(sb.toString());
+				return createJSONArray(
+					StringBundler.concat(
+						StringPool.OPEN_BRACKET,
+						getOptionsLabels(ddmFormFieldValue, locale),
+						StringPool.CLOSE_BRACKET));
 			}
 		}
 
@@ -177,7 +178,7 @@ public class CheckboxMultipleDDMFormFieldValueAccessor
 				optionValue);
 
 			if (optionLabel != null) {
-				sb.append(optionLabel.getString(locale));
+				sb.append(HtmlUtil.escape(optionLabel.getString(locale)));
 			}
 			else {
 				sb.append(optionValue);

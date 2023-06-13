@@ -35,9 +35,7 @@
 	<td></td>
 	<td></td>
 </tr>
-
 <!--LOCALIZATION-->
-
 <tr>
 	<td>LOCALIZATION_TEST_1</td>
 	<td>//table[@class='table table-bordered table-hover table-striped']/tbody/tr[1]/td[5]</td>

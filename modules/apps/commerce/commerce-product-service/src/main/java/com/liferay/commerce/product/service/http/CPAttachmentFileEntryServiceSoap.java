@@ -69,14 +69,14 @@ public class CPAttachmentFileEntryServiceSoap {
 
 	public static com.liferay.commerce.product.model.CPAttachmentFileEntrySoap
 			addCPAttachmentFileEntry(
-				long userId, long groupId, long classNameId, long classPK,
-				long fileEntryId, int displayDateMonth, int displayDateDay,
-				int displayDateYear, int displayDateHour, int displayDateMinute,
-				int expirationDateMonth, int expirationDateDay,
-				int expirationDateYear, int expirationDateHour,
-				int expirationDateMinute, boolean neverExpire,
-				String[] titleMapLanguageIds, String[] titleMapValues,
-				String json, double priority, int type,
+				long groupId, long classNameId, long classPK, long fileEntryId,
+				boolean cdnEnabled, String cdnURL, int displayDateMonth,
+				int displayDateDay, int displayDateYear, int displayDateHour,
+				int displayDateMinute, int expirationDateMonth,
+				int expirationDateDay, int expirationDateYear,
+				int expirationDateHour, int expirationDateMinute,
+				boolean neverExpire, String[] titleMapLanguageIds,
+				String[] titleMapValues, String json, double priority, int type,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 
@@ -87,12 +87,55 @@ public class CPAttachmentFileEntryServiceSoap {
 			com.liferay.commerce.product.model.CPAttachmentFileEntry
 				returnValue =
 					CPAttachmentFileEntryServiceUtil.addCPAttachmentFileEntry(
-						userId, groupId, classNameId, classPK, fileEntryId,
-						displayDateMonth, displayDateDay, displayDateYear,
-						displayDateHour, displayDateMinute, expirationDateMonth,
-						expirationDateDay, expirationDateYear,
-						expirationDateHour, expirationDateMinute, neverExpire,
-						titleMap, json, priority, type, serviceContext);
+						groupId, classNameId, classPK, fileEntryId, cdnEnabled,
+						cdnURL, displayDateMonth, displayDateDay,
+						displayDateYear, displayDateHour, displayDateMinute,
+						expirationDateMonth, expirationDateDay,
+						expirationDateYear, expirationDateHour,
+						expirationDateMinute, neverExpire, titleMap, json,
+						priority, type, serviceContext);
+
+			return com.liferay.commerce.product.model.CPAttachmentFileEntrySoap.
+				toSoapModel(returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.commerce.product.model.CPAttachmentFileEntrySoap
+			addOrUpdateCPAttachmentFileEntry(
+				String externalReferenceCode, long groupId, long classNameId,
+				long classPK, long cpAttachmentFileEntryId, long fileEntryId,
+				boolean cdnEnabled, String cdnURL, int displayDateMonth,
+				int displayDateDay, int displayDateYear, int displayDateHour,
+				int displayDateMinute, int expirationDateMonth,
+				int expirationDateDay, int expirationDateYear,
+				int expirationDateHour, int expirationDateMinute,
+				boolean neverExpire, String[] titleMapLanguageIds,
+				String[] titleMapValues, String json, double priority, int type,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
+				titleMapLanguageIds, titleMapValues);
+
+			com.liferay.commerce.product.model.CPAttachmentFileEntry
+				returnValue =
+					CPAttachmentFileEntryServiceUtil.
+						addOrUpdateCPAttachmentFileEntry(
+							externalReferenceCode, groupId, classNameId,
+							classPK, cpAttachmentFileEntryId, fileEntryId,
+							cdnEnabled, cdnURL, displayDateMonth,
+							displayDateDay, displayDateYear, displayDateHour,
+							displayDateMinute, expirationDateMonth,
+							expirationDateDay, expirationDateYear,
+							expirationDateHour, expirationDateMinute,
+							neverExpire, titleMap, json, priority, type,
+							serviceContext);
 
 			return com.liferay.commerce.product.model.CPAttachmentFileEntrySoap.
 				toSoapModel(returnValue);
@@ -120,7 +163,7 @@ public class CPAttachmentFileEntryServiceSoap {
 
 	public static com.liferay.commerce.product.model.CPAttachmentFileEntrySoap
 			fetchByExternalReferenceCode(
-				long companyId, String externalReferenceCode)
+				String externalReferenceCode, long companyId)
 		throws RemoteException {
 
 		try {
@@ -128,7 +171,7 @@ public class CPAttachmentFileEntryServiceSoap {
 				returnValue =
 					CPAttachmentFileEntryServiceUtil.
 						fetchByExternalReferenceCode(
-							companyId, externalReferenceCode);
+							externalReferenceCode, companyId);
 
 			return com.liferay.commerce.product.model.CPAttachmentFileEntrySoap.
 				toSoapModel(returnValue);
@@ -212,31 +255,6 @@ public class CPAttachmentFileEntryServiceSoap {
 		}
 	}
 
-	public static com.liferay.commerce.product.model.CPAttachmentFileEntrySoap[]
-			getCPAttachmentFileEntries(
-				long classNameId, long classPK, String keywords, int type,
-				int status, int start, int end)
-		throws RemoteException {
-
-		try {
-			java.util.List
-				<com.liferay.commerce.product.model.CPAttachmentFileEntry>
-					returnValue =
-						CPAttachmentFileEntryServiceUtil.
-							getCPAttachmentFileEntries(
-								classNameId, classPK, keywords, type, status,
-								start, end);
-
-			return com.liferay.commerce.product.model.CPAttachmentFileEntrySoap.
-				toSoapModels(returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
 	public static int getCPAttachmentFileEntriesCount(
 			long classNameId, long classPK, int type, int status)
 		throws RemoteException {
@@ -246,26 +264,6 @@ public class CPAttachmentFileEntryServiceSoap {
 				CPAttachmentFileEntryServiceUtil.
 					getCPAttachmentFileEntriesCount(
 						classNameId, classPK, type, status);
-
-			return returnValue;
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	public static int getCPAttachmentFileEntriesCount(
-			long classNameId, long classPK, String keywords, int type,
-			int status)
-		throws RemoteException {
-
-		try {
-			int returnValue =
-				CPAttachmentFileEntryServiceUtil.
-					getCPAttachmentFileEntriesCount(
-						classNameId, classPK, keywords, type, status);
 
 			return returnValue;
 		}
@@ -299,13 +297,13 @@ public class CPAttachmentFileEntryServiceSoap {
 	public static com.liferay.commerce.product.model.CPAttachmentFileEntrySoap
 			updateCPAttachmentFileEntry(
 				long cpAttachmentFileEntryId, long fileEntryId,
-				int displayDateMonth, int displayDateDay, int displayDateYear,
-				int displayDateHour, int displayDateMinute,
-				int expirationDateMonth, int expirationDateDay,
-				int expirationDateYear, int expirationDateHour,
-				int expirationDateMinute, boolean neverExpire,
-				String[] titleMapLanguageIds, String[] titleMapValues,
-				String json, double priority, int type,
+				boolean cdnEnabled, String cdnURL, int displayDateMonth,
+				int displayDateDay, int displayDateYear, int displayDateHour,
+				int displayDateMinute, int expirationDateMonth,
+				int expirationDateDay, int expirationDateYear,
+				int expirationDateHour, int expirationDateMinute,
+				boolean neverExpire, String[] titleMapLanguageIds,
+				String[] titleMapValues, String json, double priority, int type,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 
@@ -317,125 +315,13 @@ public class CPAttachmentFileEntryServiceSoap {
 				returnValue =
 					CPAttachmentFileEntryServiceUtil.
 						updateCPAttachmentFileEntry(
-							cpAttachmentFileEntryId, fileEntryId,
-							displayDateMonth, displayDateDay, displayDateYear,
-							displayDateHour, displayDateMinute,
+							cpAttachmentFileEntryId, fileEntryId, cdnEnabled,
+							cdnURL, displayDateMonth, displayDateDay,
+							displayDateYear, displayDateHour, displayDateMinute,
 							expirationDateMonth, expirationDateDay,
 							expirationDateYear, expirationDateHour,
 							expirationDateMinute, neverExpire, titleMap, json,
 							priority, type, serviceContext);
-
-			return com.liferay.commerce.product.model.CPAttachmentFileEntrySoap.
-				toSoapModel(returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	/**
-	 * @param classNameId
-	 * @param classPK
-	 * @param fileEntryId
-	 * @param displayDateMonth
-	 * @param displayDateDay
-	 * @param displayDateYear
-	 * @param displayDateHour
-	 * @param displayDateMinute
-	 * @param expirationDateMonth
-	 * @param expirationDateDay
-	 * @param expirationDateYear
-	 * @param expirationDateHour
-	 * @param expirationDateMinute
-	 * @param neverExpire
-	 * @param titleMap
-	 * @param json
-	 * @param priority
-	 * @param type
-	 * @param externalReferenceCode
-	 * @param serviceContext
-	 * @throws PortalException
-	 * @deprecated As of Athanasius (7.3.x), use {@link
-	 #upsertCPAttachmentFileEntry(long, long, long, long, int,
-	 int, int, int, int, int, int, int, int, int, boolean, Map,
-	 String, double, int, String, ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.commerce.product.model.CPAttachmentFileEntrySoap
-			upsertCPAttachmentFileEntry(
-				long groupId, long classNameId, long classPK, long fileEntryId,
-				int displayDateMonth, int displayDateDay, int displayDateYear,
-				int displayDateHour, int displayDateMinute,
-				int expirationDateMonth, int expirationDateDay,
-				int expirationDateYear, int expirationDateHour,
-				int expirationDateMinute, boolean neverExpire,
-				String[] titleMapLanguageIds, String[] titleMapValues,
-				String json, double priority, int type,
-				String externalReferenceCode,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
-				titleMapLanguageIds, titleMapValues);
-
-			com.liferay.commerce.product.model.CPAttachmentFileEntry
-				returnValue =
-					CPAttachmentFileEntryServiceUtil.
-						upsertCPAttachmentFileEntry(
-							groupId, classNameId, classPK, fileEntryId,
-							displayDateMonth, displayDateDay, displayDateYear,
-							displayDateHour, displayDateMinute,
-							expirationDateMonth, expirationDateDay,
-							expirationDateYear, expirationDateHour,
-							expirationDateMinute, neverExpire, titleMap, json,
-							priority, type, externalReferenceCode,
-							serviceContext);
-
-			return com.liferay.commerce.product.model.CPAttachmentFileEntrySoap.
-				toSoapModel(returnValue);
-		}
-		catch (Exception exception) {
-			_log.error(exception, exception);
-
-			throw new RemoteException(exception.getMessage());
-		}
-	}
-
-	public static com.liferay.commerce.product.model.CPAttachmentFileEntrySoap
-			upsertCPAttachmentFileEntry(
-				long groupId, long classNameId, long classPK,
-				long cpAttachmentFileEntryId, long fileEntryId,
-				int displayDateMonth, int displayDateDay, int displayDateYear,
-				int displayDateHour, int displayDateMinute,
-				int expirationDateMonth, int expirationDateDay,
-				int expirationDateYear, int expirationDateHour,
-				int expirationDateMinute, boolean neverExpire,
-				String[] titleMapLanguageIds, String[] titleMapValues,
-				String json, double priority, int type,
-				String externalReferenceCode,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
-				titleMapLanguageIds, titleMapValues);
-
-			com.liferay.commerce.product.model.CPAttachmentFileEntry
-				returnValue =
-					CPAttachmentFileEntryServiceUtil.
-						upsertCPAttachmentFileEntry(
-							groupId, classNameId, classPK,
-							cpAttachmentFileEntryId, fileEntryId,
-							displayDateMonth, displayDateDay, displayDateYear,
-							displayDateHour, displayDateMinute,
-							expirationDateMonth, expirationDateDay,
-							expirationDateYear, expirationDateHour,
-							expirationDateMinute, neverExpire, titleMap, json,
-							priority, type, externalReferenceCode,
-							serviceContext);
 
 			return com.liferay.commerce.product.model.CPAttachmentFileEntrySoap.
 				toSoapModel(returnValue);

@@ -32,15 +32,19 @@ import org.mozilla.javascript.EvaluatorException;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 
 /**
  * @author Carlos Sierra Andrés
+ * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
  */
 @Component(
 	configurationPid = "com.frontend.js.minifier.configuration.YahooJavaScriptMinifierConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	service = JavaScriptMinifier.class
 )
+@Deprecated
 public class YahooJavaScriptMinifier implements JavaScriptMinifier {
 
 	@Override
@@ -62,7 +66,7 @@ public class YahooJavaScriptMinifier implements JavaScriptMinifier {
 				_yahooJavaScriptMinifierConfiguration.jsDisableOptimizations());
 		}
 		catch (Exception exception) {
-			_log.error("Unable to minify JavaScript:\n" + content);
+			_log.error("Unable to minify JavaScript:\n" + content, exception);
 
 			unsyncStringWriter.append(content);
 		}
@@ -81,7 +85,7 @@ public class YahooJavaScriptMinifier implements JavaScriptMinifier {
 	private static final Log _log = LogFactoryUtil.getLog(
 		YahooJavaScriptMinifier.class);
 
-	private YahooJavaScriptMinifierConfiguration
+	private volatile YahooJavaScriptMinifierConfiguration
 		_yahooJavaScriptMinifierConfiguration;
 
 	private static class JavaScriptErrorReporter implements ErrorReporter {

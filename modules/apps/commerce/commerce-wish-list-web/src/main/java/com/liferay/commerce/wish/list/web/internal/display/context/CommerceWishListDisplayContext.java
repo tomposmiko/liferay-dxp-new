@@ -14,12 +14,16 @@
 
 package com.liferay.commerce.wish.list.web.internal.display.context;
 
+import com.liferay.commerce.context.CommerceContext;
+import com.liferay.commerce.currency.model.CommerceCurrency;
 import com.liferay.commerce.currency.model.CommerceMoney;
+import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.price.CommerceProductPriceCalculation;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.util.CPDefinitionHelper;
 import com.liferay.commerce.product.util.CPInstanceHelper;
+import com.liferay.commerce.util.CommerceUtil;
 import com.liferay.commerce.wish.list.constants.CommerceWishListActionKeys;
 import com.liferay.commerce.wish.list.constants.CommerceWishListPortletKeys;
 import com.liferay.commerce.wish.list.model.CommerceWishList;
@@ -28,8 +32,9 @@ import com.liferay.commerce.wish.list.service.CommerceWishListItemService;
 import com.liferay.commerce.wish.list.service.CommerceWishListService;
 import com.liferay.commerce.wish.list.util.CommerceWishListHttpHelper;
 import com.liferay.commerce.wish.list.util.comparator.CommerceWishListNameComparator;
-import com.liferay.commerce.wish.list.web.internal.display.context.util.CommerceWishListRequestHelper;
+import com.liferay.commerce.wish.list.web.internal.display.context.helper.CommerceWishListRequestHelper;
 import com.liferay.commerce.wish.list.web.internal.util.CommerceWishListPortletUtil;
+import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -82,6 +87,41 @@ public class CommerceWishListDisplayContext {
 			httpServletRequest);
 		_portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
 			httpServletRequest);
+	}
+
+	public long getCommerceAccountId() throws PortalException {
+		return CommerceUtil.getCommerceAccountId(
+			_commerceWishListRequestHelper.getCommerceContext());
+	}
+
+	public long getCommerceChannelId() throws PortalException {
+		CommerceContext commerceContext =
+			_commerceWishListRequestHelper.getCommerceContext();
+
+		return commerceContext.getCommerceChannelId();
+	}
+
+	public String getCommerceCurrencyCode() throws PortalException {
+		CommerceContext commerceContext =
+			_commerceWishListRequestHelper.getCommerceContext();
+
+		CommerceCurrency commerceCurrency =
+			commerceContext.getCommerceCurrency();
+
+		return commerceCurrency.getCode();
+	}
+
+	public long getCommerceOrderId() throws PortalException {
+		CommerceContext commerceContext =
+			_commerceWishListRequestHelper.getCommerceContext();
+
+		CommerceOrder commerceOrder = commerceContext.getCommerceOrder();
+
+		if (commerceOrder != null) {
+			return commerceOrder.getCommerceOrderId();
+		}
+
+		return 0;
 	}
 
 	public CommerceWishList getCommerceWishList() throws PortalException {
@@ -249,15 +289,11 @@ public class CommerceWishListDisplayContext {
 	}
 
 	public String getRowURL(long commerceWishListId) {
-		LiferayPortletResponse liferayPortletResponse =
-			_commerceWishListRequestHelper.getLiferayPortletResponse();
-
-		PortletURL rowURL = liferayPortletResponse.createRenderURL();
-
-		rowURL.setParameter(
-			"commerceWishListId", String.valueOf(commerceWishListId));
-
-		return rowURL.toString();
+		return PortletURLBuilder.createRenderURL(
+			_commerceWishListRequestHelper.getLiferayPortletResponse()
+		).setParameter(
+			"commerceWishListId", commerceWishListId
+		).buildString();
 	}
 
 	public SearchContainer<CommerceWishList> getSearchContainer()

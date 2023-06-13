@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -259,73 +260,95 @@ public class SubscriptionModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<Subscription, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, Subscription>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<Subscription, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<Subscription, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			Subscription.class.getClassLoader(), Subscription.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", Subscription::getMvccVersion);
-		attributeGetterFunctions.put(
-			"subscriptionId", Subscription::getSubscriptionId);
-		attributeGetterFunctions.put("groupId", Subscription::getGroupId);
-		attributeGetterFunctions.put("companyId", Subscription::getCompanyId);
-		attributeGetterFunctions.put("userId", Subscription::getUserId);
-		attributeGetterFunctions.put("userName", Subscription::getUserName);
-		attributeGetterFunctions.put("createDate", Subscription::getCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", Subscription::getModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", Subscription::getClassNameId);
-		attributeGetterFunctions.put("classPK", Subscription::getClassPK);
-		attributeGetterFunctions.put("frequency", Subscription::getFrequency);
+		try {
+			Constructor<Subscription> constructor =
+				(Constructor<Subscription>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<Subscription, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<Subscription, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<Subscription, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<Subscription, Object>>();
 		Map<String, BiConsumer<Subscription, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<Subscription, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", Subscription::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<Subscription, Long>)Subscription::setMvccVersion);
+		attributeGetterFunctions.put(
+			"subscriptionId", Subscription::getSubscriptionId);
 		attributeSetterBiConsumers.put(
 			"subscriptionId",
 			(BiConsumer<Subscription, Long>)Subscription::setSubscriptionId);
+		attributeGetterFunctions.put("groupId", Subscription::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<Subscription, Long>)Subscription::setGroupId);
+		attributeGetterFunctions.put("companyId", Subscription::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<Subscription, Long>)Subscription::setCompanyId);
+		attributeGetterFunctions.put("userId", Subscription::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<Subscription, Long>)Subscription::setUserId);
+		attributeGetterFunctions.put("userName", Subscription::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<Subscription, String>)Subscription::setUserName);
+		attributeGetterFunctions.put("createDate", Subscription::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<Subscription, Date>)Subscription::setCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", Subscription::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<Subscription, Date>)Subscription::setModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", Subscription::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<Subscription, Long>)Subscription::setClassNameId);
+		attributeGetterFunctions.put("classPK", Subscription::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<Subscription, Long>)Subscription::setClassPK);
+		attributeGetterFunctions.put("frequency", Subscription::getFrequency);
 		attributeSetterBiConsumers.put(
 			"frequency",
 			(BiConsumer<Subscription, String>)Subscription::setFrequency);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -657,6 +680,35 @@ public class SubscriptionModelImpl
 	}
 
 	@Override
+	public Subscription cloneWithOriginalValues() {
+		SubscriptionImpl subscriptionImpl = new SubscriptionImpl();
+
+		subscriptionImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		subscriptionImpl.setSubscriptionId(
+			this.<Long>getColumnOriginalValue("subscriptionId"));
+		subscriptionImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+		subscriptionImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		subscriptionImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
+		subscriptionImpl.setUserName(
+			this.<String>getColumnOriginalValue("userName"));
+		subscriptionImpl.setCreateDate(
+			this.<Date>getColumnOriginalValue("createDate"));
+		subscriptionImpl.setModifiedDate(
+			this.<Date>getColumnOriginalValue("modifiedDate"));
+		subscriptionImpl.setClassNameId(
+			this.<Long>getColumnOriginalValue("classNameId"));
+		subscriptionImpl.setClassPK(
+			this.<Long>getColumnOriginalValue("classPK"));
+		subscriptionImpl.setFrequency(
+			this.<String>getColumnOriginalValue("frequency"));
+
+		return subscriptionImpl;
+	}
+
+	@Override
 	public int compareTo(Subscription subscription) {
 		long primaryKey = subscription.getPrimaryKey();
 
@@ -864,9 +916,7 @@ public class SubscriptionModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, Subscription>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					Subscription.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

@@ -12,11 +12,9 @@
  * details.
  */
 
-import {addMappedInfoItems} from '../actions/index';
 import updateFragmentEntryLinkConfiguration from '../actions/updateFragmentEntryLinkConfiguration';
 import updatePageContents from '../actions/updatePageContents';
 import {FREEMARKER_FRAGMENT_ENTRY_PROCESSOR} from '../config/constants/freemarkerFragmentEntryProcessor';
-import {config} from '../config/index';
 import FragmentService from '../services/FragmentService';
 import InfoItemService from '../services/InfoItemService';
 
@@ -31,10 +29,11 @@ export default function updateFragmentConfiguration({
 		[FREEMARKER_FRAGMENT_ENTRY_PROCESSOR]: configurationValues,
 	};
 
-	return (dispatch) => {
+	return (dispatch, getState) => {
 		return FragmentService.updateConfigurationValues({
-			configurationValues: nextEditableValues,
+			editableValues: nextEditableValues,
 			fragmentEntryLinkId,
+			languageId: getState().languageId,
 			onNetworkStatus: dispatch,
 		})
 			.then(({fragmentEntryLink, layoutData}) => {
@@ -53,18 +52,7 @@ export default function updateFragmentConfiguration({
 					dispatch(
 						updatePageContents({
 							pageContents,
-							segmentsExperienceId:
-								config.defaultSegmentsExperienceId,
 						})
-					);
-
-					dispatch(
-						addMappedInfoItems(
-							pageContents.filter(
-								(element) =>
-									element.classNameId && element.classPK
-							)
-						)
 					);
 				});
 			});

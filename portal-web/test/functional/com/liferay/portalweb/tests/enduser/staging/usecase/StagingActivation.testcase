@@ -11,14 +11,12 @@ definition {
 		User.firstLoginPG();
 
 		JSONGroup.addGroup(groupName = "Site Name");
-
-		SitePages.openPagesAdmin(siteURLKey = "Site Name");
 	}
 
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (${testPortalInstance} == "true") {
+		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -26,18 +24,16 @@ definition {
 		}
 	}
 
-	@priority = 4
+	@priority = "4"
 	test CheckPublicationSummaryLocal {
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
 			layoutName = "Staging Test Page");
 
-		Staging.openStagingAdmin(siteURLKey = "site-name");
-
-		Staging.activateStagingCP(siteName = "Site Name");
+		JSONStaging.enableLocalStaging(groupName = "Site Name");
 
 		JSONLayout.addWidgetToPublicLayout(
-			groupName = "Site Name-staging",
+			groupName = "Site Name (Staging)",
 			layoutName = "Staging Test Page",
 			site = "false",
 			widgetName = "Documents and Media");
@@ -60,18 +56,18 @@ definition {
 			publicationTitle = "summCheck");
 	}
 
-	@priority = 4
+	@priority = "4"
 	test CheckPublicationSummaryRemote {
 		property app.server.bundles.size = "1";
 		property custom.properties = "tunneling.servlet.shared.secret=1234567890123456${line.separator}auth.verifier.TunnelAuthVerifier.hosts.allowed=";
 		property databases.size = "1";
+		property minimum.slave.ram = "24";
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "StagingActivation#CheckPublicationSummaryRemote";
 
-		Staging.remoteStagingSetUp(
-			remotePort = 9080,
-			remoteStaging = "true",
-			siteName = "Site Name");
+		Staging.remoteStagingSetUpViaJson(
+			groupName = "Site Name",
+			remotePort = "9080");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
@@ -92,7 +88,8 @@ definition {
 		Staging.viewPublicationSummary(publicationTitle = "summCheck");
 	}
 
-	@priority = 4
+	@priority = "4"
+	@uitest
 	test DeleteRecycleBinOnStagingActivation {
 		property portal.acceptance = "true";
 

@@ -48,7 +48,6 @@ const carouselProps = {
 	},
 	handleClickNext: jest.fn(),
 	handleClickPrevious: jest.fn(),
-	isImage: true,
 };
 
 const renderCarouselComponent = (props) => render(<Carousel {...props} />);
@@ -120,6 +119,6 @@ describe('Infopanel', () => {
 	it('renders item data on the info panel', () => {
 		const {getByText} = renderCarouselComponent(carouselProps);
 
-		expect(getByText(itemTitle));
+		expect(getByText(itemTitle)).toBeTruthy();
 	});
 });

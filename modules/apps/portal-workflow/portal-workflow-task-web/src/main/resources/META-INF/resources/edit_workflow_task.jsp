@@ -128,7 +128,7 @@ renderResponse.setTitle(workflowTaskDisplayContext.getHeaderTitle(workflowTask))
 				>
 					<aui:field-wrapper label="create-date">
 						<aui:fieldset>
-							<%= workflowTaskDisplayContext.getCreateDate(workflowTask) %>
+							<%= workflowTaskDisplayContext.getCreateDateString(workflowTask) %>
 						</aui:fieldset>
 					</aui:field-wrapper>
 
@@ -198,11 +198,10 @@ renderResponse.setTitle(workflowTaskDisplayContext.getHeaderTitle(workflowTask))
 									/>
 
 									<c:if test="<%= workflowTaskDisplayContext.hasViewDiffsPortletURL(workflowTask) %>">
-										<liferay-ui:icon
+										<liferay-frontend:management-bar-button
+											href="<%= workflowTaskDisplayContext.getTaglibViewDiffsURL(workflowTask) %>"
 											icon="paste"
-											markupView="lexicon"
-											message="diffs"
-											url="<%= workflowTaskDisplayContext.getTaglibViewDiffsURL(workflowTask) %>"
+											label="diffs"
 										/>
 									</c:if>
 
@@ -272,11 +271,6 @@ renderResponse.setTitle(workflowTaskDisplayContext.getHeaderTitle(workflowTask))
 					</liferay-ui:panel>
 
 					<c:if test="<%= (assetEntry != null) && workflowHandler.isCommentable() %>">
-
-						<%
-						long discussionClassPK = workflowHandler.getDiscussionClassPK(workflowTask.getOptionalAttributes());
-						%>
-
 						<liferay-ui:panel
 							extended="<%= true %>"
 							markupView="lexicon"
@@ -285,8 +279,8 @@ renderResponse.setTitle(workflowTaskDisplayContext.getHeaderTitle(workflowTask))
 							<liferay-comment:discussion
 								assetEntryVisible="<%= false %>"
 								className="<%= assetRenderer.getClassName() %>"
-								classPK="<%= discussionClassPK %>"
-								formName='<%= "fm" + discussionClassPK %>'
+								classPK="<%= classPK %>"
+								formName='<%= "fm" + classPK %>'
 								ratingsEnabled="<%= false %>"
 								redirect="<%= currentURL %>"
 								userId="<%= user.getUserId() %>"

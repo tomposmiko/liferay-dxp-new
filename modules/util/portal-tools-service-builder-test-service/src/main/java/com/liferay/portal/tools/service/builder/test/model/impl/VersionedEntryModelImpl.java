@@ -31,6 +31,7 @@ import com.liferay.portal.tools.service.builder.test.model.VersionedEntryVersion
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -233,45 +234,67 @@ public class VersionedEntryModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<VersionedEntry, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, VersionedEntry>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<VersionedEntry, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<VersionedEntry, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			VersionedEntry.class.getClassLoader(), VersionedEntry.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put(
-			"mvccVersion", VersionedEntry::getMvccVersion);
-		attributeGetterFunctions.put("headId", VersionedEntry::getHeadId);
-		attributeGetterFunctions.put(
-			"versionedEntryId", VersionedEntry::getVersionedEntryId);
-		attributeGetterFunctions.put("groupId", VersionedEntry::getGroupId);
+		try {
+			Constructor<VersionedEntry> constructor =
+				(Constructor<VersionedEntry>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<VersionedEntry, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<VersionedEntry, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<VersionedEntry, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<VersionedEntry, Object>>();
 		Map<String, BiConsumer<VersionedEntry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<VersionedEntry, ?>>();
 
+		attributeGetterFunctions.put(
+			"mvccVersion", VersionedEntry::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<VersionedEntry, Long>)VersionedEntry::setMvccVersion);
+		attributeGetterFunctions.put("headId", VersionedEntry::getHeadId);
 		attributeSetterBiConsumers.put(
 			"headId",
 			(BiConsumer<VersionedEntry, Long>)VersionedEntry::setHeadId);
+		attributeGetterFunctions.put(
+			"versionedEntryId", VersionedEntry::getVersionedEntryId);
 		attributeSetterBiConsumers.put(
 			"versionedEntryId",
 			(BiConsumer<VersionedEntry, Long>)
 				VersionedEntry::setVersionedEntryId);
+		attributeGetterFunctions.put("groupId", VersionedEntry::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<VersionedEntry, Long>)VersionedEntry::setGroupId);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -458,6 +481,22 @@ public class VersionedEntryModelImpl
 	}
 
 	@Override
+	public VersionedEntry cloneWithOriginalValues() {
+		VersionedEntryImpl versionedEntryImpl = new VersionedEntryImpl();
+
+		versionedEntryImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		versionedEntryImpl.setHeadId(
+			this.<Long>getColumnOriginalValue("headId"));
+		versionedEntryImpl.setVersionedEntryId(
+			this.<Long>getColumnOriginalValue("versionedEntryId"));
+		versionedEntryImpl.setGroupId(
+			this.<Long>getColumnOriginalValue("groupId"));
+
+		return versionedEntryImpl;
+	}
+
+	@Override
 	public int compareTo(VersionedEntry versionedEntry) {
 		long primaryKey = versionedEntry.getPrimaryKey();
 
@@ -625,9 +664,7 @@ public class VersionedEntryModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, VersionedEntry>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					VersionedEntry.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 

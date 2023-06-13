@@ -100,14 +100,8 @@ AUI.add(
 
 					instance.set('timestamp');
 
-					if (event.src == SRC) {
-						Liferay.Util.fetch(URL_BASE + 'extend_session').then(
-							(response) => {
-								if (response.status === 500) {
-									instance.expire();
-								}
-							}
-						);
+					if (event.src === SRC) {
+						Liferay.Util.fetch(URL_BASE + 'extend_session');
 					}
 				},
 
@@ -211,10 +205,10 @@ AUI.add(
 					var newVal = event.newVal;
 					var prevVal = event.prevVal;
 
-					if (prevVal == 'expired' && prevVal != newVal) {
+					if (prevVal === 'expired' && prevVal !== newVal) {
 						event.preventDefault();
 					}
-					else if (prevVal == 'active' && prevVal == newVal) {
+					else if (prevVal === 'active' && prevVal === newVal) {
 						instance._afterSessionStateChange(event);
 					}
 				},
@@ -275,7 +269,7 @@ AUI.add(
 							if (instance._initTimestamp !== timestamp) {
 								instance.set('timestamp', timestamp);
 
-								if (sessionState != 'active') {
+								if (sessionState !== 'active') {
 									instance.set(
 										'sessionState',
 										'active',
@@ -299,7 +293,7 @@ AUI.add(
 						var hasWarned = elapsed >= warningTime;
 
 						if (hasExpiredTimeoutOffset || hasWarned) {
-							if (timestamp == 'expired') {
+							if (timestamp === 'expired') {
 								expirationMoment = true;
 								extend = false;
 								hasExpired = true;
@@ -308,7 +302,7 @@ AUI.add(
 
 							if (
 								hasExpiredTimeoutOffset &&
-								sessionState != 'expired'
+								sessionState !== 'expired'
 							) {
 								if (extend && !hasExpired) {
 									expirationMoment = false;
@@ -329,7 +323,7 @@ AUI.add(
 								hasWarned &&
 								!hasExpiredTimeoutOffset &&
 								!extend &&
-								sessionState != 'warned'
+								sessionState !== 'warned'
 							) {
 								instance.warn();
 
@@ -381,7 +375,7 @@ AUI.add(
 					var instance = this;
 
 					instance._cookieKey =
-						'LFR_SESSION_STATE_' + themeDisplay.getRealUserId();
+						'LFR_SESSION_STATE_' + themeDisplay.getUserId();
 
 					instance._cookieOptions = {
 						path: '/',
@@ -643,7 +637,7 @@ AUI.add(
 				_onHostSessionStateChange(event) {
 					var instance = this;
 
-					if (event.newVal == 'warned') {
+					if (event.newVal === 'warned') {
 						instance._beforeHostWarned(event);
 					}
 				},
@@ -716,7 +710,7 @@ AUI.add(
 
 					var host = instance.get('host');
 
-					if (Liferay.Util.getTop() == CONFIG.win) {
+					if (Liferay.Util.getTop() === CONFIG.win) {
 						instance._host = host;
 
 						instance._toggleText = {

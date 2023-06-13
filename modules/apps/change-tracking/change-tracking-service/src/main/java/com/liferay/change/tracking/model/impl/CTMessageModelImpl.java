@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 
 import java.sql.Blob;
@@ -210,47 +211,69 @@ public class CTMessageModelImpl
 		return _attributeSetterBiConsumers;
 	}
 
-	private static final Map<String, Function<CTMessage, Object>>
-		_attributeGetterFunctions;
+	private static Function<InvocationHandler, CTMessage>
+		_getProxyProviderFunction() {
 
-	static {
-		Map<String, Function<CTMessage, Object>> attributeGetterFunctions =
-			new LinkedHashMap<String, Function<CTMessage, Object>>();
+		Class<?> proxyClass = ProxyUtil.getProxyClass(
+			CTMessage.class.getClassLoader(), CTMessage.class,
+			ModelWrapper.class);
 
-		attributeGetterFunctions.put("mvccVersion", CTMessage::getMvccVersion);
-		attributeGetterFunctions.put("ctMessageId", CTMessage::getCtMessageId);
-		attributeGetterFunctions.put("companyId", CTMessage::getCompanyId);
-		attributeGetterFunctions.put(
-			"ctCollectionId", CTMessage::getCtCollectionId);
-		attributeGetterFunctions.put(
-			"messageContent", CTMessage::getMessageContent);
+		try {
+			Constructor<CTMessage> constructor =
+				(Constructor<CTMessage>)proxyClass.getConstructor(
+					InvocationHandler.class);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
+			return invocationHandler -> {
+				try {
+					return constructor.newInstance(invocationHandler);
+				}
+				catch (ReflectiveOperationException
+							reflectiveOperationException) {
+
+					throw new InternalError(reflectiveOperationException);
+				}
+			};
+		}
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new InternalError(noSuchMethodException);
+		}
 	}
 
+	private static final Map<String, Function<CTMessage, Object>>
+		_attributeGetterFunctions;
 	private static final Map<String, BiConsumer<CTMessage, Object>>
 		_attributeSetterBiConsumers;
 
 	static {
+		Map<String, Function<CTMessage, Object>> attributeGetterFunctions =
+			new LinkedHashMap<String, Function<CTMessage, Object>>();
 		Map<String, BiConsumer<CTMessage, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<CTMessage, ?>>();
 
+		attributeGetterFunctions.put("mvccVersion", CTMessage::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<CTMessage, Long>)CTMessage::setMvccVersion);
+		attributeGetterFunctions.put("ctMessageId", CTMessage::getCtMessageId);
 		attributeSetterBiConsumers.put(
 			"ctMessageId",
 			(BiConsumer<CTMessage, Long>)CTMessage::setCtMessageId);
+		attributeGetterFunctions.put("companyId", CTMessage::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<CTMessage, Long>)CTMessage::setCompanyId);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CTMessage::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<CTMessage, Long>)CTMessage::setCtCollectionId);
+		attributeGetterFunctions.put(
+			"messageContent", CTMessage::getMessageContent);
 		attributeSetterBiConsumers.put(
 			"messageContent",
 			(BiConsumer<CTMessage, String>)CTMessage::setMessageContent);
 
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}
@@ -403,6 +426,24 @@ public class CTMessageModelImpl
 		ctMessageImpl.setMessageContent(getMessageContent());
 
 		ctMessageImpl.resetOriginalValues();
+
+		return ctMessageImpl;
+	}
+
+	@Override
+	public CTMessage cloneWithOriginalValues() {
+		CTMessageImpl ctMessageImpl = new CTMessageImpl();
+
+		ctMessageImpl.setMvccVersion(
+			this.<Long>getColumnOriginalValue("mvccVersion"));
+		ctMessageImpl.setCtMessageId(
+			this.<Long>getColumnOriginalValue("ctMessageId"));
+		ctMessageImpl.setCompanyId(
+			this.<Long>getColumnOriginalValue("companyId"));
+		ctMessageImpl.setCtCollectionId(
+			this.<Long>getColumnOriginalValue("ctCollectionId"));
+		ctMessageImpl.setMessageContent(
+			this.<String>getColumnOriginalValue("messageContent"));
 
 		return ctMessageImpl;
 	}
@@ -580,9 +621,7 @@ public class CTMessageModelImpl
 	private static class EscapedModelProxyProviderFunctionHolder {
 
 		private static final Function<InvocationHandler, CTMessage>
-			_escapedModelProxyProviderFunction =
-				ProxyUtil.getProxyProviderFunction(
-					CTMessage.class, ModelWrapper.class);
+			_escapedModelProxyProviderFunction = _getProxyProviderFunction();
 
 	}
 
